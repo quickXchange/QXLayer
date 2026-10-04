@@ -23,11 +23,11 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
   const root = preview ? '/catalog-preview' : '/';
   const actions = preview
     ? <Link href="/admin" className="s-btn s-btn-ghost" data-testid="link-back-console">Back to console</Link>
-    : <><Link href="/sign-in" className="s-btn s-btn-ghost" data-testid="link-sign-in">Sign in</Link><Link href="/sign-up" className="s-btn s-btn-ghost" data-testid="link-sign-up">Request access</Link></>;
+    : <><Link href="/sign-in" className="s-btn s-btn-ghost" data-testid="link-sign-in">Sign in</Link><Link href="/sign-up" className="s-btn s-btn-ghost" data-testid="link-sign-up">Get Started</Link></>;
   const footer = (
     <footer className="s-footer relative z-[2] mt-10 border-t" style={{ borderColor: 'var(--s-line)', background: 'var(--s-bg2)' }}>
       <div className="s-wrap flex flex-col gap-1 py-6 text-xs s-muted sm:flex-row sm:justify-between">
-        <span>Private Label</span>
+        <span>Private Label · <a href="/private-label-website/nexa-sandbox" data-testid="link-live-demo" className="underline">Live Demo (sandbox)</a></span>
         <span className="s-mono uppercase tracking-widest">Sandbox environment - account requests are not purchases - no live finance</span>
       </div>
     </footer>

@@ -24,6 +24,10 @@ For Products & Services, the user wants large premium product showcases, not man
 
 **Why:** The user explicitly rejected the repetitive product grid and requested spacious product-specific dashboard/interface previews while limiting changes to catalog presentation.
 
+The user distinguishes QXLayer Main Platform from White Label Client Sites. Main platform preview/navigation must open the public landing page directly, including for signed-in visitors. The tenant Site Finder is a sandbox/development utility only, never the platform homepage.
+
+**Why:** The user reported the platform preview opening “Find a branded site” instead of the main product landing page and asked for clearly separated destinations without any redesign.
+
 **Why:** The user explicitly rejected the replacement beige/green catalog frontend, clarified that the catalog must be additive inside the previously approved design, and supplied a recording as the exact master reference.
 
 **How to apply:** Identify the actual approved Exchange-widget page and compare it with the pre-catalog source before making frontend-only changes. Edit current frontend files using that source; do not restore a checkpoint or roll back the project when retaining the catalog backend. Do not confuse the console welcome page with the premium customer website.

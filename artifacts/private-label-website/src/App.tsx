@@ -15,6 +15,13 @@ import {
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 15_000, gcTime: 60_000, refetchInterval: 30_000, refetchOnWindowFocus: true, refetchOnReconnect: true } } });
 
+function MainPlatformEntry() {
+  // Cross-artifact navigation: the main platform is registered at /,
+  // while this router handles only /private-label-website/.
+  useEffect(() => { window.location.replace('/'); }, []);
+  return <a href="/">Open QXLayer Main Platform</a>;
+}
+
 function RouteScroll() {
   const [location] = useLocation();
   useEffect(() => {
@@ -46,7 +53,8 @@ function Router() {
     // survives a page crash.
     <RoutedErrorBoundary>
       <Switch>
-        <Route path="/" component={Entry} />
+        <Route path="/" component={MainPlatformEntry} />
+        <Route path="/sandbox/site-finder" component={Entry} />
         <Route path="/:slug" component={SiteHome} />
         <Route path="/:slug/privacy">{() => <LegalPage kind="privacy" />}</Route>
         <Route path="/:slug/terms">{() => <LegalPage kind="terms" />}</Route>

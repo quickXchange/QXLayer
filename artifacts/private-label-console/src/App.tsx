@@ -94,12 +94,7 @@ function ClerkQueryClientCacheInvalidator() {
 }
 
 function HomeRedirect() {
-  return (
-    <>
-      <Show when="signed-in"><Redirect to="/admin" /></Show>
-      <Show when="signed-out"><Home /></Show>
-    </>
-  );
+  return <Home />;
 }
 
 function PrincipalGate({ children }: { children: ReactNode }) {

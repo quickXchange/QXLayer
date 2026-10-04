@@ -1,6 +1,8 @@
 # Main platform product catalog
 
-This is the platform's public marketing surface, not a tenant website or an executing financial product. The public root remains signed-out; signed-in operators can preview the same page at `/catalog-preview`. Super Admins edit it at `/landing-products` through the **Landing catalog** console navigation.
+This is the platform's public marketing surface, not a tenant website or an executing financial product. The main platform preview and public root `/` open the landing page for both signed-out and signed-in visitors. Operators use `/admin` for administration and `/catalog-preview` for the protected preview. Super Admins edit it at `/landing-products` through the **Landing catalog** console navigation.
+
+The preview destinations are labeled **QXLayer Main Platform** and **White Label Client Sites**. Tenant sites retain `/private-label-website/{slug}`. The client-site root `/private-label-website/` forwards to the main landing page; its Site Finder is only a sandbox/development utility at `/private-label-website/sandbox/site-finder`. The landing page's sandbox Live Demo link opens the existing `/private-label-website/nexa-sandbox` tenant, without enabling live execution.
 
 ## Presentation
 

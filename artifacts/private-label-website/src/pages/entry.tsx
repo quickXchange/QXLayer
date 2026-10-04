@@ -15,6 +15,7 @@ export default function Entry() {
         <div className="space-y-3">
           <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Private label sandbox</p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Find a branded site</h1>
+          <p className="text-sm text-muted-foreground">Sandbox / development utility. <a href="/" className="underline">Open QXLayer Main Platform</a></p>
           <p className="text-sm leading-relaxed text-muted-foreground">Enter the site identifier you were given. Each site has its own branding and services.</p>
         </div>
         <div>
