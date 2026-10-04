@@ -1,0 +1,3 @@
+- [RLS policy materialization](rls-policy-materialization.md) — verify live predicates; schema pushes may create policy metadata without expressions.
+- [Validation namespaces](validation-compatibility.md) — mixed Zod namespaces can erase inferred types and prevent validation-error matching.
+- [Vite dependency cache](vite-dependency-cache.md) — React version errors can come from stale prebundles even when package resolution matches.

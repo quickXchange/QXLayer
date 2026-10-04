@@ -1,0 +1,209 @@
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  useListModuleCatalog, useListSandboxAssetNetworks, useUpdateTenantBrand, useUpdateTenantDomain,
+  useUpdateTenantModules, useUpdateTenantAssetsNetworks, useUpdateTenantConfiguration,
+  type Tenant, type ModuleKey, type BrandInput,
+} from '@workspace/api-client-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { useInvalidateTenant } from '@/lib/invalidate';
+import { ErrorState } from './bits';
+
+interface SP { tenant: Tenant; readOnly?: boolean; onSaved?: () => void; saveLabel?: string; }
+const HEX = /^#[0-9A-Fa-f]{6}$/;
+
+export function Section({ n, title, note, children, footer }: { n: string; title: string; note: string; children: ReactNode; footer: ReactNode }) {
+  return (
+    <section className="rounded-md border bg-card">
+      <header className="flex items-baseline gap-3 border-b px-5 py-4">
+        <span className="font-mono text-xs text-copper">{n}</span>
+        <div><h2 className="font-display text-2xl leading-none">{title}</h2><p className="mt-1 text-sm text-muted-foreground">{note}</p></div>
+      </header>
+      <div className="space-y-4 p-5">{children}</div>
+      <footer className="flex items-center justify-end gap-3 border-t bg-muted/40 px-5 py-3">{footer}</footer>
+    </section>
+  );
+}
+
+function useSave(tenantId: string, onSaved?: () => void) {
+  const { toast } = useToast();
+  const inv = useInvalidateTenant();
+  return {
+    ok: (what: string) => { inv(tenantId); toast({ title: `${what} saved` }); onSaved?.(); },
+    fail: (e: unknown) => toast({ title: 'Save failed', description: (e as Error)?.message ?? 'Request rejected', variant: 'destructive' }),
+  };
+}
+
+function SaveBtn({ pending, disabled, readOnly, label, id }: { pending: boolean; disabled?: boolean; readOnly?: boolean; label?: string; id: string }) {
+  if (readOnly) return <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only for your role</span>;
+  return <Button data-testid={`button-save-${id}`} disabled={pending || disabled} type="submit">{pending ? 'Saving' : label ?? 'Save'}</Button>;
+}
+
+export function BrandSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
+  const save = useSave(tenant.id, onSaved);
+  const m = useUpdateTenantBrand();
+  const init = useMemo(() => ({
+    brandName: tenant.brandName, logoUrl: tenant.logoUrl ?? '', primaryColor: tenant.primaryColor, accentColor: tenant.accentColor,
+    themeMode: tenant.themeMode, defaultLanguage: tenant.defaultLanguage, langs: tenant.supportedLanguages.join(', '),
+  }), [tenant]);
+  const [f, setF] = useState(init);
+  useEffect(() => setF(init), [init]);
+  const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
+  const langs = f.langs.split(',').map((x) => x.trim()).filter(Boolean);
+  const err = f.brandName.trim().length < 2 ? 'Brand name needs 2+ characters'
+    : !HEX.test(f.primaryColor) || !HEX.test(f.accentColor) ? 'Colors must be #RRGGBB'
+    : f.defaultLanguage.trim().length < 2 ? 'Default language needs 2+ characters'
+    : langs.length === 0 || langs.some((l) => l.length < 2 || l.length > 12) ? 'Supported languages: comma separated, 2-12 chars each' : '';
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const data: BrandInput = { brandName: f.brandName.trim(), logoUrl: f.logoUrl.trim() || null, primaryColor: f.primaryColor, accentColor: f.accentColor, themeMode: f.themeMode as BrandInput['themeMode'], defaultLanguage: f.defaultLanguage.trim(), supportedLanguages: langs };
+    m.mutate({ tenantId: tenant.id, data }, { onSuccess: () => save.ok('Brand'), onError: save.fail });
+  };
+  const color = (k: 'primaryColor' | 'accentColor', l: string) => (
+    <div className="space-y-1.5"><Label>{l}</Label>
+      <div className="flex gap-2">
+        <input type="color" aria-label={l} disabled={readOnly} value={HEX.test(f[k]) ? f[k] : '#000000'} onChange={(e) => set(k, e.target.value)} className="h-9 w-11 rounded border bg-transparent p-0.5" />
+        <Input data-testid={`input-${k}`} disabled={readOnly} className="font-mono" value={f[k]} onChange={(e) => set(k, e.target.value)} />
+      </div></div>
+  );
+  return (
+    <form onSubmit={submit}>
+      <Section n="01" title="Brand" note="Identity applied to every module this client enables."
+        footer={<>{err && !readOnly && <span className="mr-auto text-sm text-destructive">{err}</span>}<SaveBtn id="brand" pending={m.isPending} disabled={!!err} readOnly={readOnly} label={saveLabel} /></>}>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5"><Label>Brand name</Label><Input data-testid="input-brandName" disabled={readOnly} value={f.brandName} onChange={(e) => set('brandName', e.target.value)} /></div>
+          <div className="space-y-1.5"><Label>Logo URL</Label><Input data-testid="input-logoUrl" disabled={readOnly} placeholder="https://" value={f.logoUrl} onChange={(e) => set('logoUrl', e.target.value)} /></div>
+          {color('primaryColor', 'Primary color')}{color('accentColor', 'Accent color')}
+          <div className="space-y-1.5"><Label>Theme mode</Label>
+            <Select disabled={readOnly} value={f.themeMode} onValueChange={(v) => set('themeMode', v)}>
+              <SelectTrigger data-testid="select-themeMode"><SelectValue /></SelectTrigger>
+              <SelectContent>{['light', 'dark', 'system'].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent>
+            </Select></div>
+          <div className="space-y-1.5"><Label>Default language</Label><Input data-testid="input-defaultLanguage" disabled={readOnly} value={f.defaultLanguage} onChange={(e) => set('defaultLanguage', e.target.value)} /></div>
+          <div className="space-y-1.5 md:col-span-2"><Label>Supported languages</Label><Input data-testid="input-supportedLanguages" disabled={readOnly} placeholder="en, de, es" value={f.langs} onChange={(e) => set('langs', e.target.value)} /></div>
+        </div>
+        <div className="flex items-center gap-3 rounded-md border p-3" data-testid="preview-brand">
+          <div className="grid h-10 w-10 place-items-center rounded-md font-display text-lg text-white" style={{ background: HEX.test(f.primaryColor) ? f.primaryColor : '#999' }}>{(f.brandName || '?')[0]}</div>
+          <span className="font-medium">{f.brandName || 'Brand preview'}</span>
+          <span className="ml-auto h-3 w-16 rounded-full" style={{ background: HEX.test(f.accentColor) ? f.accentColor : '#999' }} />
+        </div>
+      </Section>
+    </form>
+  );
+}
+
+export function DomainSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
+  const save = useSave(tenant.id, onSaved);
+  const m = useUpdateTenantDomain();
+  const [d, setD] = useState(tenant.domain ?? '');
+  useEffect(() => setD(tenant.domain ?? ''), [tenant.domain]);
+  const v = d.trim().toLowerCase();
+  const bad = v !== '' && !/^(?!-)[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(v);
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { domain: v || null } }, { onSuccess: () => save.ok('Domain'), onError: save.fail }); }}>
+      <Section n="02" title="Domain" note="Saved as unverified configuration. DNS is not checked and nothing is served."
+        footer={<>{bad && <span className="mr-auto text-sm text-destructive">Enter a hostname like app.example.com</span>}<SaveBtn id="domain" pending={m.isPending} disabled={bad} readOnly={readOnly} label={saveLabel ?? (v ? 'Save domain' : 'Save without domain')} /></>}>
+        <div className="space-y-1.5"><Label>Custom domain (optional)</Label>
+          <Input data-testid="input-domain" disabled={readOnly} className="font-mono" placeholder="app.example.com" value={d} onChange={(e) => setD(e.target.value)} /></div>
+        <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Status: unverified · leave empty to clear</p>
+      </Section>
+    </form>
+  );
+}
+
+export function ModulesSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
+  const save = useSave(tenant.id, onSaved);
+  const cat = useListModuleCatalog();
+  const m = useUpdateTenantModules();
+  const [sel, setSel] = useState<ModuleKey[]>(tenant.enabledModules);
+  const key = tenant.enabledModules.join(',');
+  useEffect(() => setSel(tenant.enabledModules), [key]); // eslint-disable-line react-hooks/exhaustive-deps
+  const toggle = (k: ModuleKey) => setSel((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { moduleKeys: sel } }, { onSuccess: () => save.ok('Modules'), onError: save.fail }); }}>
+      <Section n="03" title="Modules" note="Entitlements only. Enabling a module grants access to the sandbox surface, nothing more."
+        footer={<SaveBtn id="modules" pending={m.isPending} readOnly={readOnly} label={saveLabel} />}>
+        {cat.isLoading ? <Skeleton className="h-40" /> : cat.isError ? <ErrorState what="module catalog" onRetry={() => cat.refetch()} /> : (
+          <div className="grid gap-2 md:grid-cols-2">
+            {cat.data?.map((mod) => (
+              <label key={mod.key} className={`flex gap-3 rounded-md border p-3 ${readOnly ? '' : 'cursor-pointer hover:bg-muted/50'} ${sel.includes(mod.key) ? 'border-primary bg-primary/5' : ''}`}>
+                <Checkbox data-testid={`checkbox-module-${mod.key}`} disabled={readOnly} checked={sel.includes(mod.key)} onCheckedChange={() => toggle(mod.key)} className="mt-0.5" />
+                <span><span className="block text-sm font-medium">{mod.name}</span><span className="block text-xs text-muted-foreground">{mod.description}</span></span>
+              </label>
+            ))}
+          </div>
+        )}
+        {readOnly && <p className="text-sm text-muted-foreground">Only a super admin can change modules.</p>}
+      </Section>
+    </form>
+  );
+}
+
+export function AssetsSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
+  const save = useSave(tenant.id, onSaved);
+  const cat = useListSandboxAssetNetworks();
+  const m = useUpdateTenantAssetsNetworks();
+  const [sel, setSel] = useState<string[]>(tenant.assetNetworkIds);
+  const key = tenant.assetNetworkIds.join(',');
+  useEffect(() => setSel(tenant.assetNetworkIds), [key]); // eslint-disable-line react-hooks/exhaustive-deps
+  const toggle = (id: string) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const groups = useMemo(() => {
+    const g = new Map<string, NonNullable<typeof cat.data>['assets']>();
+    cat.data?.assets.forEach((a) => g.set(a.assetId, [...(g.get(a.assetId) ?? []), a]));
+    return [...g.entries()];
+  }, [cat.data]);
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { assetNetworkIds: sel } }, { onSuccess: () => save.ok('Assets and networks'), onError: save.fail }); }}>
+      <Section n="04" title="Assets and networks" note="Sandbox and testnet pairs only, stored as assetId:networkId."
+        footer={<><span className="mr-auto font-mono text-xs text-muted-foreground">{sel.length} selected</span><SaveBtn id="assets" pending={m.isPending} readOnly={readOnly} label={saveLabel} /></>}>
+        {cat.isLoading ? <Skeleton className="h-40" /> : cat.isError ? <ErrorState what="asset catalog" onRetry={() => cat.refetch()} /> : (
+          <div className="divide-y rounded-md border">
+            {groups.map(([id, rows]) => (
+              <div key={id} className="flex flex-wrap items-center gap-x-6 gap-y-2 p-3">
+                <div className="w-40"><span className="font-mono text-sm font-medium">{rows[0].symbol}</span><span className="ml-2 text-xs text-muted-foreground">{rows[0].name}</span></div>
+                {rows.map((r) => { const v = `${r.assetId}:${r.networkId}`; return (
+                  <label key={v} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <Checkbox data-testid={`checkbox-asset-${v}`} disabled={readOnly} checked={sel.includes(v)} onCheckedChange={() => toggle(v)} />
+                    {r.networkName}{r.testnet && <span className="font-mono text-[10px] uppercase text-copper">testnet</span>}
+                  </label>); })}
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
+    </form>
+  );
+}
+
+export function ConfigSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
+  const save = useSave(tenant.id, onSaved);
+  const m = useUpdateTenantConfiguration();
+  const init = { x: tenant.exchangeEnabled, p: tenant.paymentsEnabled, g: tenant.allowGuestCheckout };
+  const [f, setF] = useState(init);
+  useEffect(() => setF({ x: tenant.exchangeEnabled, p: tenant.paymentsEnabled, g: tenant.allowGuestCheckout }), [tenant.exchangeEnabled, tenant.paymentsEnabled, tenant.allowGuestCheckout]);
+  const rows: [keyof typeof f, string, string][] = [
+    ['x', 'Exchange flag', 'Marks the exchange surface as switched on in configuration.'],
+    ['p', 'Payments flag', 'Marks the payments surface as switched on in configuration.'],
+    ['g', 'Allow guest checkout', 'Permit sessions without a registered end-user.'],
+  ];
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { environment: 'sandbox', exchangeEnabled: f.x, paymentsEnabled: f.p, allowGuestCheckout: f.g } }, { onSuccess: () => save.ok('Configuration'), onError: save.fail }); }}>
+      <Section n="05" title="Configuration" note="Environment is fixed to sandbox."
+        footer={<SaveBtn id="config" pending={m.isPending} readOnly={readOnly} label={saveLabel} />}>
+        <div className="flex items-center justify-between rounded-md border bg-muted/40 p-3"><span className="text-sm">Environment</span><span className="font-mono text-xs uppercase tracking-wider text-copper">sandbox</span></div>
+        {rows.map(([k, t, d]) => (
+          <div key={k} className="flex items-center justify-between gap-4">
+            <div><p className="text-sm font-medium">{t}</p><p className="text-xs text-muted-foreground">{d}</p></div>
+            <Switch data-testid={`switch-${k}`} disabled={readOnly} checked={f[k]} onCheckedChange={(v) => setF((s) => ({ ...s, [k]: v }))} />
+          </div>
+        ))}
+      </Section>
+    </form>
+  );
+}

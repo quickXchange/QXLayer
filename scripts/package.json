@@ -5,9 +5,14 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "db:role:dev": "tsx ./src/database-permissions.ts --role-only",
+    "db:permissions:dev": "tsx ./src/database-permissions.ts",
+    "db:seed:dev": "tsx ./src/seed-catalog.ts",
+    "access:assign:dev": "tsx ./src/assign-access.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@workspace/db": "workspace:*",
     "@types/node": "catalog:",
     "tsx": "catalog:"
   }
