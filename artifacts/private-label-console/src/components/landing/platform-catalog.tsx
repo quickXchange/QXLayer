@@ -5,7 +5,7 @@ import type { LandingProduct } from '@workspace/api-client-react';
 import { Section, SectionHead } from '@site/components/sections/common';
 import { Reveal } from '@site/components/reveal';
 import { ProductIcon } from './icons';
-import { ArchitectureArt } from './architecture-art';
+import { ProductShowcaseList } from './product-showcase';
 import { billingLabel, priceText, readinessNote, setupText, statusLabel } from '@/lib/landing';
 
 const ECO = [
@@ -34,25 +34,6 @@ function Status({ p }: { p: LandingProduct }) {
       <span className="s-badge" data-testid={`status-product-${p.key}`}>{statusLabel(p.status)}</span>
       <span className="s-badge s-muted">{p.readiness === 'sandbox_only' ? 'Sandbox only' : 'Planned'}</span>
     </div>
-  );
-}
-
-function Featured({ p, onOpen, className = '', big }: { p: LandingProduct; onOpen: (p: LandingProduct) => void; className?: string; big?: boolean }) {
-  return (
-    <Reveal className={className}>
-      <article className="s-card flex h-full flex-col justify-between gap-6 p-6 md:p-8" data-testid={`card-featured-${p.key}`}>
-        <div className="flex items-start justify-between gap-4"><ProductIcon icon={p.icon} className={big ? 'h-20 w-20' : 'h-14 w-14'} /><Status p={p} /></div>
-        {big && <ArchitectureArt />}
-        <div>
-          <h3 className={`${big ? 'text-4xl md:text-5xl' : 'text-2xl'} font-semibold leading-none tracking-tight`}>{p.name}</h3>
-          <p className="s-muted mt-3 max-w-md text-sm leading-relaxed">{p.description}</p>
-        </div>
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <Price p={p} big={big} />
-          <button type="button" className="s-btn s-btn-primary" onClick={() => onOpen(p)} data-testid={`button-cta-featured-${p.key}`}>{p.ctaLabel}<ArrowUpRight size={16} /></button>
-        </div>
-      </article>
-    </Reveal>
   );
 }
 
@@ -105,43 +86,32 @@ function ProductModal({ p, onClose }: { p: LandingProduct; onClose: () => void }
 export function PlatformCatalog({ items, loading, error, onRetry, open, setOpen }: {
   items: LandingProduct[]; loading: boolean; error: boolean; onRetry: () => void; open: LandingProduct | null; setOpen: (p: LandingProduct | null) => void;
 }) {
-  const by = (key: string) => items.find((p) => p.key === key);
-  const mobile = items.filter((p) => p.key === 'ios_app' || p.key === 'android_app');
-  const [ex, pay, eng] = ['crypto_exchange', 'crypto_payments', 'crypto_engine'].map(by);
   const skel = (n: number, h: string) => <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: n }, (_, i) => <div key={i} className={`s-skel ${h}`} />)}</div>;
   return (
     <>
       <Section id="featured">
-        <SectionHead eyebrow="Core products" title="The foundations, stated plainly" body="Status, price and readiness are shown exactly as published by the platform team." />
-        <div className="mt-10">
-          {loading ? skel(4, 'h-64') : error ? (
+        <SectionHead eyebrow="Core products" title="The foundations, stated plainly" body="Status, price and readiness are shown exactly as published by the platform team. Every product below is a preview of a planned or sandbox service." />
+        <div className="mt-8">
+          {loading ? skel(4, 'h-16') : error ? (
             <div className="s-card p-8" role="alert" data-testid="error-catalog"><p className="text-xl font-semibold">The product catalog could not be loaded</p><p className="s-muted mt-1 text-sm">No product information is shown until it can be read from the platform.</p><button type="button" className="s-btn s-btn-primary mt-5" onClick={onRetry} data-testid="button-retry-catalog"><RefreshCw size={16} />Retry</button></div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
-              {ex && <Featured p={ex} onOpen={setOpen} big className="md:col-span-2 lg:col-span-4 lg:row-span-2" />}
-              {pay && <Featured p={pay} onOpen={setOpen} className="lg:col-span-2" />}
-              {eng && <Featured p={eng} onOpen={setOpen} className="lg:col-span-2" />}
-              {mobile.length > 0 && (
-                <Reveal className="md:col-span-2 lg:col-span-6">
-                  <div className="s-card p-6 md:p-8" data-testid="card-featured-mobile">
-                    <h3 className="text-2xl font-semibold tracking-tight">Mobile Apps</h3>
-                    <div className="mt-5 grid gap-6 md:grid-cols-2">
-                      {mobile.map((p) => (
-                        <div key={p.key} className="flex flex-col gap-4 border-t pt-5" style={{ borderColor: 'var(--s-line)' }}>
-                          <div className="flex items-center gap-4"><ProductIcon icon={p.icon} className="h-14 w-14" /><div><p className="text-lg font-semibold">{p.name}</p><Status p={p} /></div></div>
-                          <p className="s-muted text-sm">{p.description}</p>
-                          <div className="flex flex-wrap items-end justify-between gap-3"><Price p={p} /><button type="button" className="s-btn s-btn-primary" onClick={() => setOpen(p)} data-testid={`button-cta-featured-${p.key}`}>{p.ctaLabel}<ArrowUpRight size={16} /></button></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Reveal>
-              )}
-            </div>
+          ) : items.length > 0 && (
+            <nav aria-label="Product index" className="flex flex-wrap gap-2" data-testid="nav-product-index">
+              {items.map((p) => <a key={p.key} href={`#product-${p.key}`} className="s-badge" data-testid={`link-index-${p.key}`}>{p.name}</a>)}
+            </nav>
           )}
         </div>
       </Section>
 
+      <Section id="products">
+        <SectionHead eyebrow="Full catalog" title="Every product, in context" body="Pricing is a starting point and is shown as published. Where no price is published, pricing is on request." />
+        <div className="mt-10">
+          {loading ? skel(8, 'h-60') : error ? null : items.length === 0 ? (
+            <div className="s-card p-10 text-center" data-testid="empty-catalog"><p className="text-xl font-semibold">No products are published right now</p><p className="s-muted mt-1 text-sm">Check back soon.</p></div>
+          ) : (
+            <ProductShowcaseList items={items} onOpen={setOpen} />
+          )}
+        </div>
+      </Section>
       <Section id="ecosystem" tint>
         <SectionHead eyebrow="One platform" title="Build your crypto ecosystem" body="A conceptual map of the product areas under a single platform. Availability and readiness of each product is stated in the catalog." />
         <div className="relative mt-12">
@@ -157,30 +127,6 @@ export function PlatformCatalog({ items, loading, error, onRetry, open, setOpen 
               </Fragment>
             ))}
           </div>
-        </div>
-      </Section>
-
-      <Section id="products">
-        <SectionHead eyebrow="Full catalog" title="Every product, stated plainly" body="Pricing is a starting point and is shown as published. Where no price is published, pricing is on request." />
-        <div className="mt-10">
-          {loading ? skel(8, 'h-60') : error ? null : items.length === 0 ? (
-            <div className="s-card p-10 text-center" data-testid="empty-catalog"><p className="text-xl font-semibold">No products are published right now</p><p className="s-muted mt-1 text-sm">Check back soon.</p></div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-testid="grid-catalog">
-              {items.map((p, i) => (
-                <Reveal key={p.key} delay={(i % 4) * 60}>
-                  <article className="s-card flex h-full flex-col gap-4 p-5" data-testid={`card-product-${p.key}`}>
-                    <ProductIcon icon={p.icon} className="h-11 w-11" />
-                    <Status p={p} />
-                    <h3 className="text-lg font-semibold leading-tight" data-testid={`text-name-${p.key}`}>{p.name}</h3>
-                    <p className="s-muted line-clamp-4 flex-1 text-sm leading-relaxed">{p.description}</p>
-                    <Price p={p} />
-                    <button type="button" className="s-btn s-btn-ghost justify-between" onClick={() => setOpen(p)} data-testid={`button-cta-${p.key}`}>{p.ctaLabel}<ArrowRight size={16} /></button>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
-          )}
         </div>
       </Section>
       {open && <ProductModal p={open} onClose={() => setOpen(null)} />}

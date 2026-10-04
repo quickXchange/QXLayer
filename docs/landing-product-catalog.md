@@ -6,6 +6,12 @@ This is the platform's public marketing surface, not a tenant website or an exec
 
 The platform landing page reuses the pre-catalog customer website's actual hero, shell, Exchange widget, atmosphere, styles and theme implementation. It does not use the replacement beige/green catalog layout. Products, prices and the ecosystem map are additional below-hero sections in the approved visual language.
 
+The user's original website recording is the master visual reference. The matching saved hero composition keeps title, subtitle and actions together before the widget on stacked layouts, with the original two-column desktop composition. Floating decorative crypto coins extend the original lighting and network atmosphere.
+
+Catalog artwork is selected by immutable product key, independent of editable icons. Thirteen major products each have a large alternating showcase with layered dashboard/interface compositions; only secondary products use smaller cards. Mobile presents product copy, pricing and CTA before the visual. Each product appears once, in database display order, including consecutive secondary groups. Public product-index links point to each showcase or secondary card.
+
+Preview scenes combine static HTML/CSS interfaces, card/phone materials and schematic infrastructure. They are visibly labeled illustrative and planned/unimplemented or sandbox-not-live, and contain no real balances, quotes, yields or executing services. Product-specific lighting stays within the original purple/teal palette. Pointer parallax, touch glow and floating layers respect reduced motion.
+
 Platform branding is presentation-only and is not a tenant or an entitlement configuration. The platform Exchange form has no configured assets, quote source or enabled transaction execution; its original controls and rate rows remain visible with unavailable rates and a disabled submission button. Existing tenant pages retain their own branding, configured assets, capabilities and original empty-state behavior. No platform catalog is added to tenant pages.
 
 This restoration edited current frontend source directly. It did not restore a checkpoint, roll back the project, change backend code or modify catalog records or migrations.

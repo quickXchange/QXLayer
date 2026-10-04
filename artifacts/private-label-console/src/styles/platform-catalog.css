@@ -10,3 +10,19 @@
 .pc-modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:1rem;background:color-mix(in srgb,var(--s-bg) 72%,transparent);backdrop-filter:blur(8px)}
 .pc-modal > [role="dialog"]{max-height:calc(100dvh - 2rem);overflow-y:auto}
 @media(prefers-reduced-motion:reduce){.pc-flow,.lp-flow{animation:none}}
+.pa{width:100%;perspective:640px;aspect-ratio:8/5;max-height:20rem}
+.pa-svg{width:100%;height:100%;overflow:visible;transform:rotateX(9deg) rotateY(-12deg);transform-style:preserve-3d;animation:pa-tilt 9s ease-in-out infinite alternate}
+.pa-fl,.pa-fl2{animation:pa-fl 5.5s ease-in-out infinite alternate;transform-box:fill-box}
+.pa-fl2{animation-duration:7s;animation-direction:alternate-reverse}
+.pa-spin{animation:pa-spin 24s linear infinite}
+.pa-pulse{animation:pa-pulse 3.4s ease-in-out infinite}
+.pa-card{animation:pa-card 8s ease-in-out infinite alternate;transform-box:view-box}
+.pa-sheen{animation:pa-sheen 6s ease-in-out infinite;transform-box:fill-box}
+@keyframes pa-tilt{from{transform:rotateX(9deg) rotateY(-12deg)}to{transform:rotateX(5deg) rotateY(10deg)}}
+@keyframes pa-fl{from{transform:translate3d(0,3px,0)}to{transform:translate3d(0,-6px,0)}}
+@keyframes pa-spin{to{transform:rotate(360deg)}}
+@keyframes pa-pulse{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes pa-card{from{transform:rotate(-3deg) translate3d(0,2px,0)}to{transform:rotate(2deg) translate3d(0,-5px,0)}}
+@keyframes pa-sheen{0%,100%{opacity:.2}50%{opacity:1}}
+.pa-banner{margin:-.25rem -.25rem 0;border-radius:.75rem;background:radial-gradient(closest-side,color-mix(in srgb,var(--s-primary) 14%,transparent),transparent)}
+@media(prefers-reduced-motion:reduce){.pa-svg,.pa-fl,.pa-fl2,.pa-spin,.pa-pulse,.pa-card,.pa-sheen{animation:none}}

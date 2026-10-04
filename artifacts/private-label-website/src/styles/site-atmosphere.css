@@ -28,16 +28,15 @@
 .s-facts li{display:inline-flex;align-items:center;gap:.5rem;color:var(--s-muted)}
 .s-facts li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--s-accent);box-shadow:0 0 10px var(--s-glow)}
 .s-hero .s-display{max-width:13ch}@media(max-width:767px){.s-hero .s-display{max-width:none}}
-.s-hero .s-wrap.s-hero-composition{display:grid;gap:1.25rem}
-.s-hero-details .s-hero-sub{margin-top:0!important}
-@media(max-width:1023px){
-  .s-hero .s-display{max-width:none}
-  .s-hero .s-wrap.s-hero-composition{padding-inline:.75rem}
-  .s-hero-intro,.s-hero-details{padding-inline:.4rem}
-}
-@media(min-width:1024px){
-  .s-hero .s-wrap.s-hero-composition{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);column-gap:3rem;row-gap:1.25rem}
-  .s-hero-intro{grid-column:1;grid-row:1;align-self:end}
-  .s-hero-details{grid-column:1;grid-row:2;align-self:start}
-  .s-hero-composition>.s-stage{grid-column:2;grid-row:1 / span 2;align-self:center}
-}
+.s-hero .s-wrap.s-hero-composition{display:grid;gap:2rem;position:relative;z-index:1}
+@media(min-width:768px){.s-hero .s-wrap.s-hero-composition{gap:3rem}}
+@media(min-width:1024px){.s-hero .s-wrap.s-hero-composition{grid-template-columns:1fr 1.02fr;align-items:center;gap:4rem}}
+.s-hero-coins{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.s-hc{position:absolute;display:block;animation:s-hc-drift var(--d,22s) ease-in-out infinite alternate;animation-delay:var(--l,0s);will-change:transform}
+.s-hc svg{display:block;width:100%;height:100%;filter:drop-shadow(0 8px 14px color-mix(in srgb,var(--s-glow) 35%,transparent))}
+.s-hc-far svg{filter:blur(1.2px)}
+@keyframes s-hc-drift{from{transform:translate3d(0,0,0) rotate(-6deg)}to{transform:translate3d(var(--x,14px),var(--y,-26px),0) rotate(8deg)}}
+@media(max-width:767px){.s-hc{opacity:.7}.s-hc-hide{display:none}}
+@media(max-width:1023px){.s-hc{opacity:.22!important}.s-hc-far{opacity:.12!important}.s-hc:first-child{left:auto!important;right:1%;top:2%!important}}
+@media(prefers-reduced-motion:reduce){.s-hc{animation:none}}
+.s-hero-actions{display:flex;flex-wrap:wrap;gap:.75rem}
