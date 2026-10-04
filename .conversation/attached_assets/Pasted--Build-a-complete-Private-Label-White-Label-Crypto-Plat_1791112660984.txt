@@ -1,0 +1,491 @@
+
+Build a complete Private Label / White Label Crypto Platform that allows us to create and manage branded crypto products for multiple clients from one central system.
+
+The platform should be modular, scalable, secure, and designed so new services can be added later without rebuilding the core system.
+
+1. Main Concept
+
+Create a central Super Admin Platform where we can create a new client/brand and choose which crypto products are enabled for that client.
+
+Each client must have their own:
+
+- Brand name
+- Logo
+- Domain / custom domain
+- Colors and theme
+- Dark / Light mode
+- Languages
+- Supported cryptocurrencies
+- Supported blockchain networks
+- Payment methods
+- Fees and pricing
+- Deposit addresses
+- API integrations
+- Telegram configuration
+- Customers
+- Orders
+- Analytics
+- Email configuration
+- Legal pages
+- Support information
+
+All clients must be isolated from each other.
+
+Use a proper multi-tenant architecture.
+
+---
+
+2. Products / Services
+
+The platform should support multiple modules.
+
+Crypto Exchange Website
+
+Allow us to create a complete branded exchanger website for each client.
+
+Modules:
+
+- Swap
+- Instant Convert
+- Buy Crypto
+- Sell Crypto
+- Crypto → Fiat
+- Fiat → Crypto
+- Order tracking
+- Exchange rates
+- Transaction history
+- Payment methods
+- Bank payouts
+- Crypto deposit addresses
+- QR payments
+- Customer accounts
+- Guest checkout
+- Support
+- FAQ
+- Blog
+- Legal pages
+
+The exchanger design must be completely customizable from Admin.
+
+---
+
+3. Crypto Payment Gateway
+
+Create a private-label crypto payment gateway.
+
+Businesses should be able to accept crypto payments through:
+
+- Hosted checkout
+- Payment links
+- QR codes
+- API
+- Webhooks
+- Telegram
+- Website integration
+
+Support multiple blockchain networks and tokens.
+
+Payment flow:
+
+Merchant creates invoice → customer chooses crypto/network → unique payment information is generated → blockchain payment is monitored → confirmations are tracked → invoice status updates automatically → webhook is sent to merchant.
+
+Statuses should include:
+
+Pending
+Waiting for Payment
+Payment Detected
+Confirming
+Paid
+Expired
+Underpaid
+Overpaid
+Failed
+Refunded
+
+Merchant dashboard should show:
+
+- Payments
+- Transactions
+- Invoices
+- Customers
+- Balances
+- Settlements
+- Refunds
+- API keys
+- Webhooks
+- Payment links
+- Analytics
+
+---
+
+4. Telegram Bot
+
+Each Private Label client should be able to connect their own Telegram Bot.
+
+The bot can provide:
+
+- Swap
+- Convert
+- Buy/Sell
+- Create payment
+- Track order
+- Check transaction
+- Check rates
+- Customer support
+- Account information
+- Payment notifications
+
+Bot branding and available services must depend on the client configuration.
+
+---
+
+5. Telegram Mini App
+
+Create a complete Telegram Mini App version of the platform.
+
+It should support:
+
+- Swap
+- Convert
+- Buy/Sell
+- Crypto payments
+- Payment links
+- Order tracking
+- Customer dashboard
+- Transaction history
+- Support
+
+The Mini App must automatically use the same:
+
+- Brand
+- currencies
+- networks
+- pricing
+- payment methods
+- orders
+- API configuration
+
+as the client's main website.
+
+Do not maintain separate duplicated configurations.
+
+---
+
+6. Website Builder
+
+Create a website builder specifically for crypto exchangers and crypto payment companies.
+
+Admin should be able to customize:
+
+- Logo
+- Favicon
+- Colors
+- Fonts
+- Buttons
+- Backgrounds
+- Header
+- Footer
+- Navigation
+- Hero section
+- Exchange widget
+- Payment widget
+- Pages
+- Sections
+- Social media
+- Support links
+- SEO
+- Legal pages
+
+Allow SVG, PNG, WEBP and JPG logos.
+
+Support desktop, tablet and mobile.
+
+---
+
+7. Super Admin
+
+Create one master Super Admin.
+
+Super Admin should manage:
+
+- Private Label clients
+- Plans
+- subscriptions
+- modules
+- domains
+- API providers
+- blockchain providers
+- clients' usage
+- transaction volume
+- revenue
+- commissions
+- limits
+- system health
+
+For each client show:
+
+Brand
+Domain
+Plan
+Enabled modules
+Users
+Orders
+Payments
+Volume
+Revenue
+API status
+Blockchain status
+Account status
+
+Super Admin must be able to enable/disable individual modules for each client.
+
+Example:
+
+Client A:
+Exchange + Telegram Bot
+
+Client B:
+Crypto Payments + API
+
+Client C:
+Exchange + Payments + Mini App + Telegram Bot
+
+---
+
+8. Client Admin Panel
+
+Every client gets their own Admin Panel.
+
+Sections:
+
+Overview
+Orders
+Payments
+Transactions
+Customers
+Currencies
+Crypto Assets
+Crypto Networks
+Payment Methods
+Pricing & Routes
+Wallets
+Payment Gateway
+Payment Links
+Merchants
+API Keys
+Webhooks
+Telegram Bot
+Telegram Mini App
+Website Builder
+Domains
+Languages
+Email
+Notifications
+Analytics
+Security
+Team
+Settings
+
+Only information belonging to that client should be accessible.
+
+---
+
+9. Blockchain Engine
+
+Build the architecture so blockchain providers are replaceable.
+
+Each network can have:
+
+Primary Provider
+Secondary Provider
+Manual Fallback
+
+Example:
+
+Ethereum → Alchemy
+BSC → Alchemy
+TRON → TRON provider
+Bitcoin → Bitcoin node/provider
+Solana → Solana RPC
+
+Never hardcode one provider into the business logic.
+
+If the primary provider fails, the system should safely switch to the configured fallback where supported.
+
+Track:
+
+- latest block
+- deposits
+- confirmations
+- transaction hash
+- amount
+- token contract
+- address
+- memo/tag where required
+- provider health
+- synchronization status
+
+---
+
+10. Wallet Architecture
+
+Support:
+
+- Static wallet addresses
+- Address pools
+- Unique address per order
+- Provider-generated addresses
+- Manual addresses
+- Provider fallback
+- Hot wallets
+- Future cold-wallet support
+
+Wallet configuration must be separated by:
+
+Client → Asset → Network → Provider.
+
+---
+
+11. Developer API
+
+Create a documented API so clients and merchants can integrate the platform into external websites/apps.
+
+Examples:
+
+POST /payments
+GET /payments/:id
+POST /exchange/orders
+GET /exchange/orders/:id
+GET /rates
+GET /currencies
+GET /networks
+POST /payment-links
+POST /refunds
+
+Include:
+
+- API keys
+- secret keys
+- permissions/scopes
+- rate limits
+- webhook signatures
+- request logs
+- API usage analytics
+- sandbox/test mode
+
+---
+
+12. Security
+
+Security is critical.
+
+Implement:
+
+- Tenant isolation
+- Owner/Admin roles
+- Staff permissions
+- 2FA
+- secure sessions
+- API key hashing
+- webhook signature verification
+- rate limiting
+- audit logs
+- login history
+- suspicious activity monitoring
+- encrypted sensitive configuration
+- CSRF/XSS protections
+- secure file uploads
+- sanitized SVG uploads
+
+Never expose private keys, API secrets or provider credentials to the frontend.
+
+---
+
+13. Private Label Provisioning
+
+The goal is to make launching a new crypto business fast.
+
+Create a workflow:
+
+Create Client
+→ Choose Products
+→ Add Brand
+→ Configure Domain
+→ Select Crypto Assets
+→ Select Networks
+→ Configure Providers
+→ Configure Wallets
+→ Configure Pricing
+→ Connect Telegram
+→ Configure Payment Gateway
+→ Preview
+→ Launch
+
+Eventually we should be able to create a complete branded crypto platform for a new customer without modifying source code.
+
+---
+
+14. Future Modules
+
+Design the architecture so we can later add:
+
+- Crypto Cards
+- Merchant POS
+- Mobile iOS App
+- Android App
+- WhatsApp Bot
+- DEX integration
+- Staking
+- Earn
+- Affiliate system
+- OTC desk
+- Crypto API
+- RPC / Node services
+- Merchant plugins
+- WooCommerce integration
+- Shopify integration
+- Accounting integrations
+
+Do not tightly couple these future modules to the exchange core.
+
+---
+
+15. Important Architecture Rule
+
+Do NOT build everything as one giant application with duplicated logic.
+
+Use shared services for:
+
+Authentication
+Pricing
+Orders
+Payments
+Blockchain monitoring
+Wallets
+Notifications
+Brand configuration
+API integrations
+
+Website, Telegram Bot, Telegram Mini App and future mobile apps should consume the same backend services.
+
+The final architecture should be:
+
+PRIVATE LABEL CORE
+
+→ Exchange Engine
+→ Crypto Payment Engine
+→ Blockchain Engine
+→ Wallet Engine
+→ Pricing Engine
+→ Merchant API
+→ Website
+→ Telegram Bot
+→ Telegram Mini App
+→ Future Mobile Apps
+
+Before implementing major changes, first inspect the existing project and reuse working infrastructure where possible.
+
+Do not break existing Exchange/Swap/Convert functionality.
+
+First produce the proposed architecture, database changes, tenant-isolation strategy, module structure, and implementation phases.
+

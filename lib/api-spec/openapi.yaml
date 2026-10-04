@@ -3,13 +3,19 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Sandbox administration and multi-tenant provisioning API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: platform
+    description: Platform operator foundation
+  - name: tenants
+    description: Tenant administration and provisioning
+  - name: catalog
+    description: Sandbox product, asset, and network catalogs
 paths:
   /healthz:
     get:
@@ -24,7 +30,312 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /me:
+    get:
+      operationId: getCurrentPrincipal
+      tags: [platform]
+      summary: Get the signed-in platform identity and role
+      responses:
+        "200":
+          description: Current principal
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentPrincipal"
+        "401":
+          description: Sign-in required
+  /overview:
+    get:
+      operationId: getPlatformOverview
+      tags: [platform]
+      summary: Get a safe administrative overview
+      responses:
+        "200":
+          description: Overview metrics and recent activity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformOverview"
+        "401":
+          description: Sign-in required
+  /activity:
+    get:
+      operationId: listPlatformActivity
+      tags: [platform]
+      summary: List recent administrative activity
+      responses:
+        "200":
+          description: Recent activity, scoped to the current administrator
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityEvent"
+        "401":
+          description: Sign-in required
+  /modules:
+    get:
+      operationId: listModuleCatalog
+      tags: [catalog]
+      summary: List available product modules
+      responses:
+        "200":
+          description: Product module catalog
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModuleDefinition"
+  /asset-networks:
+    get:
+      operationId: listSandboxAssetNetworks
+      tags: [catalog]
+      summary: List supported sandbox assets and networks
+      responses:
+        "200":
+          description: Sandbox catalog
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssetNetworkCatalog"
+  /tenants:
+    get:
+      operationId: listTenants
+      tags: [tenants]
+      summary: List tenants visible to the current administrator
+      responses:
+        "200":
+          description: Tenant list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TenantSummary"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Administrator access required
+    post:
+      operationId: createTenant
+      tags: [tenants]
+      summary: Create a draft tenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantInput"
+      responses:
+        "201":
+          description: Draft tenant created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "400":
+          description: Invalid tenant input
+        "401":
+          description: Sign-in required
+        "403":
+          description: Super administrator access required
+        "409":
+          description: Tenant slug is already in use
+  /tenants/{tenantId}:
+    get:
+      operationId: getTenant
+      tags: [tenants]
+      summary: Get one tenant and its provisioning state
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      responses:
+        "200":
+          description: Tenant details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Tenant access denied
+        "404":
+          description: Tenant not found
+  /tenants/{tenantId}/brand:
+    put:
+      operationId: updateTenantBrand
+      tags: [tenants]
+      summary: Set the tenant brand
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BrandInput"
+      responses:
+        "200":
+          description: Brand saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "400":
+          description: Invalid brand settings
+        "401":
+          description: Sign-in required
+        "403":
+          description: Tenant access denied
+        "404":
+          description: Tenant not found
+  /tenants/{tenantId}/domain:
+    put:
+      operationId: updateTenantDomain
+      tags: [tenants]
+      summary: Set or clear a tenant domain
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DomainInput"
+      responses:
+        "200":
+          description: Domain settings saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "400":
+          description: Invalid domain
+        "401":
+          description: Sign-in required
+        "403":
+          description: Tenant access denied
+        "404":
+          description: Tenant not found
+        "409":
+          description: Domain is already assigned
+  /tenants/{tenantId}/modules:
+    put:
+      operationId: updateTenantModules
+      tags: [tenants]
+      summary: Set enabled product modules for a tenant
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantModulesInput"
+      responses:
+        "200":
+          description: Module entitlements saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "400":
+          description: Invalid module selection
+        "401":
+          description: Sign-in required
+        "403":
+          description: Tenant access denied
+        "404":
+          description: Tenant not found
+  /tenants/{tenantId}/assets-networks:
+    put:
+      operationId: updateTenantAssetsNetworks
+      tags: [tenants]
+      summary: Set supported sandbox assets and networks for a tenant
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssetsNetworksInput"
+      responses:
+        "200":
+          description: Supported assets and networks saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "400":
+          description: Invalid catalog selection
+        "401":
+          description: Sign-in required
+        "403":
+          description: Tenant access denied
+        "404":
+          description: Tenant not found
+  /tenants/{tenantId}/configuration:
+    put:
+      operationId: updateTenantConfiguration
+      tags: [tenants]
+      summary: Set sandbox-only tenant configuration
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantConfigurationInput"
+      responses:
+        "200":
+          description: Configuration saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "400":
+          description: Invalid configuration
+        "401":
+          description: Sign-in required
+        "403":
+          description: Tenant access denied
+        "404":
+          description: Tenant not found
+  /tenants/{tenantId}/launch:
+    post:
+      operationId: activateTenant
+      tags: [tenants]
+      summary: Activate a fully provisioned tenant in sandbox mode
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+      responses:
+        "200":
+          description: Tenant activated in sandbox mode
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tenant"
+        "400":
+          description: Required provisioning steps are incomplete
+        "401":
+          description: Sign-in required
+        "403":
+          description: Tenant access denied
+        "404":
+          description: Tenant not found
 components:
+  parameters:
+    TenantId:
+      name: tenantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +344,158 @@ components:
           type: string
       required:
         - status
+    Role:
+      type: string
+      enum: [super_admin, client_admin, staff, unassigned]
+    TenantStatus:
+      type: string
+      enum: [draft, active, suspended]
+    ProvisioningStep:
+      type: string
+      enum: [brand, domain, modules, assets_networks, configuration, ready]
+    ModuleKey:
+      type: string
+      enum: [crypto_exchange, crypto_payments, telegram_bot, telegram_mini_app, website, merchant_api]
+    CurrentPrincipal:
+      type: object
+      properties:
+        userId: { type: string }
+        email: { type: ["string", "null"] }
+        role: { $ref: "#/components/schemas/Role" }
+        tenantId: { type: ["string", "null"], format: uuid }
+        sandboxOnly: { type: boolean }
+      required: [userId, email, role, tenantId, sandboxOnly]
+    PlatformOverview:
+      type: object
+      properties:
+        totalTenants: { type: integer }
+        activeTenants: { type: integer }
+        draftTenants: { type: integer }
+        enabledModules: { type: integer }
+        sandboxOnly: { type: boolean }
+        recentActivity:
+          type: array
+          items: { $ref: "#/components/schemas/ActivityEvent" }
+      required: [totalTenants, activeTenants, draftTenants, enabledModules, sandboxOnly, recentActivity]
+    ActivityEvent:
+      type: object
+      properties:
+        id: { type: string }
+        eventType: { type: string }
+        description: { type: string }
+        tenantId: { type: ["string", "null"], format: uuid }
+        createdAt: { type: string, format: date-time }
+      required: [id, eventType, description, tenantId, createdAt]
+    ModuleDefinition:
+      type: object
+      properties:
+        key: { $ref: "#/components/schemas/ModuleKey" }
+        name: { type: string }
+        description: { type: string }
+        category: { type: string }
+        sandboxAvailable: { type: boolean }
+      required: [key, name, description, category, sandboxAvailable]
+    AssetNetwork:
+      type: object
+      properties:
+        assetId: { type: string }
+        symbol: { type: string }
+        name: { type: string }
+        networkId: { type: string }
+        networkName: { type: string }
+        testnet: { type: boolean }
+      required: [assetId, symbol, name, networkId, networkName, testnet]
+    AssetNetworkCatalog:
+      type: object
+      properties:
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/AssetNetwork" }
+        sandboxOnly: { type: boolean }
+      required: [assets, sandboxOnly]
+    TenantInput:
+      type: object
+      properties:
+        name: { type: string, minLength: 2, maxLength: 120 }
+        slug: { type: string, minLength: 2, maxLength: 48, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+      required: [name, slug]
+    BrandInput:
+      type: object
+      properties:
+        brandName: { type: string, minLength: 2, maxLength: 120 }
+        logoUrl: { type: ["string", "null"], maxLength: 2048 }
+        primaryColor: { type: string, pattern: "^#[0-9A-Fa-f]{6}$" }
+        accentColor: { type: string, pattern: "^#[0-9A-Fa-f]{6}$" }
+        themeMode: { type: string, enum: [light, dark, system] }
+        defaultLanguage: { type: string, minLength: 2, maxLength: 12 }
+        supportedLanguages:
+          type: array
+          items: { type: string, minLength: 2, maxLength: 12 }
+      required: [brandName, logoUrl, primaryColor, accentColor, themeMode, defaultLanguage, supportedLanguages]
+    DomainInput:
+      type: object
+      properties:
+        domain: { type: ["string", "null"], maxLength: 253 }
+      required: [domain]
+    TenantModulesInput:
+      type: object
+      properties:
+        moduleKeys:
+          type: array
+          uniqueItems: true
+          items: { $ref: "#/components/schemas/ModuleKey" }
+      required: [moduleKeys]
+    AssetsNetworksInput:
+      type: object
+      properties:
+        assetNetworkIds:
+          type: array
+          uniqueItems: true
+          items: { type: string }
+      required: [assetNetworkIds]
+    TenantConfigurationInput:
+      type: object
+      properties:
+        environment: { type: string, enum: [sandbox] }
+        exchangeEnabled: { type: boolean }
+        paymentsEnabled: { type: boolean }
+        allowGuestCheckout: { type: boolean }
+      required: [environment, exchangeEnabled, paymentsEnabled, allowGuestCheckout]
+    TenantSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        slug: { type: string }
+        brandName: { type: string }
+        domain: { type: ["string", "null"] }
+        status: { $ref: "#/components/schemas/TenantStatus" }
+        enabledModules:
+          type: array
+          items: { $ref: "#/components/schemas/ModuleKey" }
+        provisioningStep: { $ref: "#/components/schemas/ProvisioningStep" }
+        environment: { type: string, enum: [sandbox] }
+        createdAt: { type: string, format: date-time }
+      required: [id, name, slug, brandName, domain, status, enabledModules, provisioningStep, environment, createdAt]
+    Tenant:
+      allOf:
+        - $ref: "#/components/schemas/TenantSummary"
+        - type: object
+          properties:
+            logoUrl: { type: ["string", "null"] }
+            primaryColor: { type: string }
+            accentColor: { type: string }
+            themeMode: { type: string, enum: [light, dark, system] }
+            defaultLanguage: { type: string }
+            supportedLanguages:
+              type: array
+              items: { type: string }
+            assetNetworkIds:
+              type: array
+              items: { type: string }
+            exchangeEnabled: { type: boolean }
+            paymentsEnabled: { type: boolean }
+            allowGuestCheckout: { type: boolean }
+            configurationComplete: { type: boolean }
+          required: [logoUrl, primaryColor, accentColor, themeMode, defaultLanguage, supportedLanguages, assetNetworkIds, exchangeEnabled, paymentsEnabled, allowGuestCheckout, configurationComplete]
 

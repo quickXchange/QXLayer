@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Private Label Platform"
+description = "An independent sandbox admin platform for provisioning isolated crypto product tenants, managing brands and domains, and assigning product modules."
+version = "1.0.0"
+id = "artifacts/private-label-console"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24073
+
+[services.development]
+run = "pnpm --filter @workspace/private-label-console run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/private-label-console", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/private-label-console/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24073"
+BASE_PATH = "/"
