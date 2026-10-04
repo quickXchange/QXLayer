@@ -28,3 +28,16 @@
 .s-facts li{display:inline-flex;align-items:center;gap:.5rem;color:var(--s-muted)}
 .s-facts li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--s-accent);box-shadow:0 0 10px var(--s-glow)}
 .s-hero .s-display{max-width:13ch}@media(max-width:767px){.s-hero .s-display{max-width:none}}
+.s-hero .s-wrap.s-hero-composition{display:grid;gap:1.25rem}
+.s-hero-details .s-hero-sub{margin-top:0!important}
+@media(max-width:1023px){
+  .s-hero .s-display{max-width:none}
+  .s-hero .s-wrap.s-hero-composition{padding-inline:.75rem}
+  .s-hero-intro,.s-hero-details{padding-inline:.4rem}
+}
+@media(min-width:1024px){
+  .s-hero .s-wrap.s-hero-composition{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);column-gap:3rem;row-gap:1.25rem}
+  .s-hero-intro{grid-column:1;grid-row:1;align-self:end}
+  .s-hero-details{grid-column:1;grid-row:2;align-self:start}
+  .s-hero-composition>.s-stage{grid-column:2;grid-row:1 / span 2;align-self:center}
+}

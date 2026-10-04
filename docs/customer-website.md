@@ -44,8 +44,13 @@ Customer styles are divided into base, atmosphere, widget, sections and showcase
 stylesheets, with a final instrument layer for deeper widget surfaces, traveling
 edge illumination, desktop pointer highlights and recessed input panels. Large
 atmospheric orbs stay static; mobile disables the widget sheen and pointer light.
-The tighter mobile hero places Nexa's widget around 378px from the top at 390px
-width, compared with around 433px before this refinement. Additional checks at
+The hero now places the widget directly after the headline on mobile; descriptive
+copy and secondary actions follow it. Desktop gives the widget a wider column.
+At 390px width, Nexa's widget starts around 212px from the top, is 366px wide, and
+its preview button fits within the first 844px viewport. Mobile rate details use
+a compact two-column layout without hiding labels or notices. Branded SVG light
+ribbons and small animated comets give the background a more visible atmosphere,
+with lighter mobile effects and reduced-motion support. Additional checks at
 320px and 768px found no horizontal overflow, and real pointer clicks confirmed
 that the picker and non-executing preview action still work.
 Capability logic, routing, theme preference behavior, backend,
@@ -110,13 +115,13 @@ Final production build (not published):
 
 | Asset | Minified | Gzip |
 |---|---:|---:|
-| Initial JavaScript | 381.05 kB | 122.65 kB |
+| Initial JavaScript | 382.11 kB | 123.01 kB |
 | Lazy below-fold JavaScript | 17.19 kB | 6.23 kB |
-| CSS | 141.77 kB | 23.63 kB |
+| CSS | 145.88 kB | 24.41 kB |
 | HTML | 1.21 kB | 0.47 kB |
 
-Initial JavaScript + CSS: **146.28 kB gzip**; all JavaScript + CSS: **152.51 kB gzip**.
-Build took 3.56 seconds in the development container. These exclude font responses,
+Initial JavaScript + CSS: **147.42 kB gzip**; all JavaScript + CSS: **153.65 kB gzip**.
+Build took 3.71 seconds in the development container. These exclude font responses,
 transport headers and logos. Only the configured tenant font is loaded; SVG marks
 and coin glyphs do not require large media or additional coin-image requests.
 

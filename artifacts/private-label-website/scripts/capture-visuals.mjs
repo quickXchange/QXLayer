@@ -86,13 +86,20 @@ for (const [slug, theme, width, height, name] of cases) {
     payments:!!document.getElementById('payments'),developers:!!document.getElementById('developers'),
     headerMenu:getComputedStyle(document.querySelector('[data-testid="button-menu"]')).display,
     headerCta:getComputedStyle(document.querySelector('[data-testid="link-header-cta"]')).display,
-    widgetTop:document.getElementById('exchange').getBoundingClientRect().top
+    widgetTop:document.getElementById('exchange').getBoundingClientRect().top,
+    widgetWidth:document.querySelector('[data-testid="widget-exchange"]').getBoundingClientRect().width,
+    previewBottom:document.querySelector('[data-testid="button-exchange-cta"]').getBoundingClientRect().bottom
   })`);
   assert.ok(measurements.scrollWidth <= measurements.width, `${name} horizontal overflow`);
   assert.equal(measurements.payments, slug === 'nexa-sandbox');
   assert.equal(measurements.developers, slug === 'nexa-sandbox');
   if (width < 640) assert.equal(measurements.headerCta, 'none');
   else assert.equal(measurements.headerMenu, 'none');
+  if (width < 640) {
+    assert.ok(measurements.widgetTop < 250, `${name} widget is too far below the first viewport`);
+    assert.ok(measurements.widgetWidth >= width - 30, `${name} widget is not dominant enough`);
+    if (slug === 'nexa-sandbox') assert.ok(measurements.previewBottom <= height, 'Nexa preview action falls below the first viewport');
+  }
   const screenshot = await call('Page.captureScreenshot', { format: 'jpeg', quality: 90, captureBeyondViewport: false });
   await writeFile(`${directory}/${name}.jpg`, Buffer.from(screenshot.data, 'base64'));
   results.push({ name, theme, ...measurements });

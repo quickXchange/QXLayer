@@ -9,7 +9,9 @@
       "developers": true,
       "headerMenu": "none",
       "headerCta": "flex",
-      "widgetTop": 157
+      "widgetTop": 157,
+      "widgetWidth": 616.40625,
+      "previewBottom": 882.09375
     },
     {
       "name": "nexa-mobile-dark",
@@ -20,7 +22,9 @@
       "developers": true,
       "headerMenu": "grid",
       "headerCta": "none",
-      "widgetTop": 378.046875
+      "widgetTop": 211.671875,
+      "widgetWidth": 366,
+      "previewBottom": 840.546875
     },
     {
       "name": "nexa-light",
@@ -31,7 +35,9 @@
       "developers": true,
       "headerMenu": "none",
       "headerCta": "flex",
-      "widgetTop": 157
+      "widgetTop": 157,
+      "widgetWidth": 616.40625,
+      "previewBottom": 882.09375
     },
     {
       "name": "aster-desktop",
@@ -42,7 +48,9 @@
       "developers": false,
       "headerMenu": "none",
       "headerCta": "flex",
-      "widgetTop": 157
+      "widgetTop": 157,
+      "widgetWidth": 616.40625,
+      "previewBottom": 774.96875
     },
     {
       "name": "aster-mobile",
@@ -53,7 +61,9 @@
       "developers": false,
       "headerMenu": "grid",
       "headerCta": "none",
-      "widgetTop": 356.25
+      "widgetTop": 212.671875,
+      "widgetWidth": 366,
+      "previewBottom": 795.140625
     }
   ],
   "additionalWidths": [
@@ -67,8 +77,8 @@
     }
   ],
   "mobileSelector": {
-    "left": 23.5,
-    "right": 366.5,
+    "left": 15.660003662109375,
+    "right": 374.3399963378906,
     "width": 390
   },
   "reducedMotion": {

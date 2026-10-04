@@ -16,10 +16,10 @@ function Side({ label, asset, onPick, value, onValue, readOnly, fiat, error, id,
         <div className="mt-1.5 flex items-center gap-3">
           <input id={`amt-${id}`} className="s-amount" inputMode="decimal" autoComplete="off" placeholder="0.00" value={value} readOnly={readOnly} aria-invalid={!!error} aria-describedby={error ? `err-${id}` : undefined} onChange={(e) => { const v = e.target.value.replace(',', '.'); if (AMOUNT.test(v)) onValue?.(v); }} data-testid={`input-amount-${id}`} />
           {fiat ? (
-            <span className="s-pick" style={{ cursor: 'default' }} data-testid={`pill-fiat-${id}`}><span className="s-coin" style={{ width: 44, height: 44, background: 'var(--s-secondary)', color: 'var(--s-bg)' }}>Fi</span>Fiat</span>
+            <span className="s-pick" style={{ cursor: 'default' }} data-testid={`pill-fiat-${id}`}><span className="s-coin" style={{ width: 52, height: 52, background: 'var(--s-secondary)', color: 'var(--s-bg)' }}>Fi</span>Fiat</span>
           ) : (
             <button type="button" className="s-pick" onClick={onPick} disabled={!assetsAvailable} aria-haspopup="dialog" aria-label={`${label}: choose asset${asset ? `, ${asset.symbol} on ${asset.networkName}` : ''}`} data-testid={`button-asset-${id}`}>
-              {asset ? <Coin asset={asset} size={44} /> : <span className="s-coin" style={{ width: 44, height: 44, background: 'var(--s-secondary)' }}>?</span>}
+              {asset ? <Coin asset={asset} size={52} /> : <span className="s-coin" style={{ width: 52, height: 52, background: 'var(--s-secondary)' }}>?</span>}
               <span className="truncate">{asset ? asset.symbol : 'Select'}</span><ChevronDown size={15} aria-hidden="true" />
             </button>
           )}
@@ -108,7 +108,8 @@ export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps })
       {noAssets ? (
         <div className="py-10 text-center" data-testid="state-widget-no-assets"><h3 className="text-lg font-semibold">No assets configured</h3><p className="s-muted mx-auto mt-2 max-w-xs text-sm">This tenant has not enabled any assets or networks yet, so there is nothing to exchange.</p></div>
       ) : insufficient ? (
-        <div className="mt-5 rounded-[var(--s-r2)] border p-5" style={{ borderColor: 'var(--s-line)' }} data-testid="state-widget-insufficient">
+        <div className="s-insuff mt-5" data-testid="state-widget-insufficient">
+          <div className="s-pairviz" aria-hidden="true">{assets[0] && <Coin asset={assets[0]} size={64} />}<span className="s-pairviz-line" /><span className="s-ghostcoin">2</span></div>
           <div className="flex items-start gap-3"><Info size={18} className="mt-0.5 shrink-0" style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" />
             <div><h3 className="font-semibold">A {LABEL[tab].toLowerCase()} needs two different assets</h3>
               <p className="s-muted mt-1.5 text-sm leading-relaxed">{site.brandName} currently has one configured asset, so no valid pair exists. A pair is not simulated with a duplicate. Currently configured:</p>
@@ -116,7 +117,7 @@ export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps })
             </div></div>
         </div>
       ) : (
-        <div className="mt-5">
+        <div className="mt-4 sm:mt-5">
           <Side id="top" label={tab === 'buy' ? 'You pay' : tab === 'convert' ? 'You convert' : 'You send'} asset={tab === 'buy' ? null : from} fiat={tab === 'buy'} onPick={() => setPicker('from')} value={amount} onValue={(v) => { setAmount(v); reset(); }} error={amountError} assetsAvailable={assets.length > 0} />
           {twoSided ? <button type="button" className="s-swapbtn" onClick={flip} aria-label="Switch direction" disabled={!from || !to} data-testid="button-switch-direction"><ArrowDownUp size={17} /></button> : <div className="h-3" />}
           <Side id="bottom" label="You receive" asset={tab === 'sell' ? null : to} fiat={tab === 'sell'} onPick={() => setPicker(cryptoSide === 'to' ? 'to' : 'from')} value="" readOnly assetsAvailable={assets.length > 0} />
