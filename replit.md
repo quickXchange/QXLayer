@@ -1,4 +1,4 @@
-# Private Label Crypto Platform — Sandbox Foundation
+# QXLayer Crypto Platform — Sandbox Foundation
 
 An independent multi-tenant administration and provisioning foundation, not a live exchange or payment gateway.
 

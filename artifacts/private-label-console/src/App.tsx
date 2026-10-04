@@ -26,6 +26,8 @@ import PlanDetail from '@/pages/plan-detail';
 import Addons from '@/pages/addons';
 import LandingProducts from '@/pages/landing-products';
 import CatalogPreview from '@/pages/catalog-preview';
+import { QXLAYER_LOGO_URL } from '@/lib/brand';
+import { BrandLogo } from '@/components/brand-logo';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
@@ -42,7 +44,7 @@ if (!clerkPubKey) throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env fi
 const clerkAppearance = {
   theme: shadcn,
   cssLayerName: 'clerk',
-  options: { logoPlacement: 'inside' as const, logoLinkUrl: basePath || '/', logoImageUrl: `${window.location.origin}${basePath}/logo.svg` },
+  options: { logoPlacement: 'inside' as const, logoLinkUrl: basePath || '/', logoImageUrl: new URL(QXLAYER_LOGO_URL, window.location.origin).href },
   variables: {
     colorPrimary: '#12423f', colorForeground: '#12201f', colorMutedForeground: '#5a6664', colorDanger: '#b3382a',
     colorBackground: '#fbf8f2', colorInput: '#ffffff', colorInputForeground: '#12201f', colorNeutral: '#8a7f6c',
@@ -50,6 +52,7 @@ const clerkAppearance = {
   },
   elements: {
     rootBox: 'w-full flex justify-center',
+    logoImage: '!h-20 !w-20 !object-contain',
     cardBox: 'bg-[#fbf8f2] border border-[#ddd5c4] rounded-xl w-[440px] max-w-full overflow-hidden',
     card: '!shadow-none !border-0 !bg-transparent !rounded-none',
     footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
@@ -69,8 +72,8 @@ const clerkAppearance = {
 };
 
 const localization = {
-  signIn: { start: { title: 'Sign in to Private Label', subtitle: 'Operator console, sandbox environment' } },
-  signUp: { start: { title: 'Request an account', subtitle: 'Access is assigned by a platform operator after sign-up' } },
+  signIn: { start: { title: 'Sign in to QXLayer', subtitle: 'Operator console, sandbox environment' } },
+  signUp: { start: { title: 'Request a QXLayer account', subtitle: 'Access is assigned by a platform operator after sign-up' } },
 };
 
 function AuthFrame({ children }: { children: ReactNode }) {
@@ -100,11 +103,11 @@ function HomeRedirect() {
 function PrincipalGate({ children }: { children: ReactNode }) {
   const q = useGetCurrentPrincipal();
   const { signOut } = useClerk();
-  if (q.isLoading) return <div className="space-y-3 p-10"><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div>;
+  if (q.isLoading) return <div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div>;
   if (q.isError || !q.data) {
     return (
       <div className="grid min-h-[100dvh] place-items-center px-5 text-center">
-        <div className="space-y-3"><p className="font-display text-3xl">Could not verify your access</p>
+        <div className="space-y-3"><BrandLogo size={48} className="mx-auto" /><p className="font-display text-3xl">Could not verify your access</p>
           <div className="flex justify-center gap-2"><Button data-testid="button-retry" onClick={() => q.refetch()}>Retry</Button>
             <Button variant="ghost" onClick={() => signOut({ redirectUrl: '/' })}>Sign out</Button></div></div>
       </div>

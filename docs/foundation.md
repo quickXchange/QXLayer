@@ -1,4 +1,4 @@
-# Private Label Crypto Platform — Foundation Report
+# QXLayer Crypto Platform — Foundation Report
 
 ## Scope and status
 

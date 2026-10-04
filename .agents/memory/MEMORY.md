@@ -4,3 +4,4 @@
 - [Vite dependency cache](vite-dependency-cache.md) — React version errors can come from stale prebundles even when package resolution matches.
 - [Website CSS cascade](website-css-cascade.md) — layered visibility utilities can lose to custom display rules; verify mobile and desktop computed display.
 - [Core and catalog scope](customer-visual-approval.md) — premium catalog advertising is not service implementation; reusable core, no live crypto, publishing or QuickXchange changes.
+- [Official QXLayer brand](qxlayer-brand.md) — use the uploaded master intact on platform-owned surfaces; never override customer/tenant branding.

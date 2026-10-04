@@ -6,6 +6,7 @@ import { useHealthCheck } from '@workspace/api-client-react';
 import { usePrincipal } from '@/lib/principal';
 import { roleLabel } from '@/lib/format';
 import { Button } from '@/components/ui/button';
+import { BrandLogo } from '@/components/brand-logo';
 
 const nav = [
   { href: '/admin', label: 'Overview', icon: LayoutGrid },
@@ -21,8 +22,8 @@ const nav = [
 export function Logo({ light }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="" className="h-8 w-8" />
-      <span className={`font-display text-xl leading-none ${light ? 'text-sidebar-accent-foreground' : ''}`}>Private Label</span>
+      <BrandLogo />
+      <span className={`font-display text-xl leading-none ${light ? 'text-sidebar-accent-foreground' : ''}`}>QXLayer</span>
     </div>
   );
 }
