@@ -53,6 +53,11 @@ An independent multi-tenant administration and provisioning foundation, not a li
 
 Super-admin and client-admin foundations; database-driven plans, generic feature/limit definitions, tenant subscriptions/add-ons/overrides, quota-checked sandbox resources, audited administration and one dynamically branded website. Exchange, payment, wallet, blockchain and Telegram execution is deferred. See `docs/plans-entitlements-website.md`.
 
+The customer website uses an original shared visual system, not QuickXchange's
+layout, widget or identity. Tenant differences must remain configuration-driven,
+never frontend forks. See `docs/customer-website.md` for branding controls,
+responsive behavior, sandbox boundaries and measured verification results.
+
 ## User preferences
 
 - Do NOT connect to, modify, migrate, or depend on the existing QuickXchange project at this stage. This platform is independent; QuickXchange must remain untouched.

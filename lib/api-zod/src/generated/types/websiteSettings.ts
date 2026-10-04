@@ -6,11 +6,20 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { SiteLink } from './siteLink';
+import type { WebsiteFaq } from './websiteFaq';
+import type { WebsiteSettingsBorderRadius } from './websiteSettingsBorderRadius';
 import type { WebsiteSettingsFontKey } from './websiteSettingsFontKey';
+import type { WebsiteSettingsSurfaceStyle } from './websiteSettingsSurfaceStyle';
 
 export interface WebsiteSettings {
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
   secondaryColor: string;
+  /** @pattern ^#[0-9A-Fa-f]{6}$ */
+  glowColor?: string;
+  surfaceStyle?: WebsiteSettingsSurfaceStyle;
+  borderRadius?: WebsiteSettingsBorderRadius;
+  /** @maxItems 16 */
+  faq?: WebsiteFaq[];
   /**
      * @maxLength 2048
      * @nullable

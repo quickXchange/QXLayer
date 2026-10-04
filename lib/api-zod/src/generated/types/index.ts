@@ -61,5 +61,8 @@ export * from './tenantSummary';
 export * from './tenantSummaryEnvironment';
 export * from './tenantThemeMode';
 export * from './usageItem';
+export * from './websiteFaq';
 export * from './websiteSettings';
+export * from './websiteSettingsBorderRadius';
 export * from './websiteSettingsFontKey';
+export * from './websiteSettingsSurfaceStyle';

@@ -766,6 +766,10 @@ components:
       type: object
       properties:
         secondaryColor: {type: string, pattern: "^#[0-9A-Fa-f]{6}$"}
+        glowColor: {type: string, pattern: "^#[0-9A-Fa-f]{6}$"}
+        surfaceStyle: {type: string, enum: [solid, glass]}
+        borderRadius: {type: string, enum: [sharp, soft, rounded]}
+        faq: {type: array, maxItems: 16, items: {$ref: "#/components/schemas/WebsiteFaq"}}
         faviconUrl: {type: ["string", "null"], maxLength: 2048}
         fontKey: {type: string, enum: [system, inter, manrope, dm-sans, space-grotesk]}
         heroTitle: {type: string, minLength: 2, maxLength: 180}
@@ -778,6 +782,12 @@ components:
         privacyContent: {type: string, maxLength: 20000}
         termsContent: {type: string, maxLength: 20000}
       required: [secondaryColor, faviconUrl, fontKey, heroTitle, heroSubtitle, supportEmail, supportUrl, supportDetails, socialLinks, footerText, privacyContent, termsContent]
+    WebsiteFaq:
+      type: object
+      properties:
+        question: {type: string, minLength: 2, maxLength: 180}
+        answer: {type: string, minLength: 2, maxLength: 2000}
+      required: [question, answer]
     SiteLink:
       type: object
       properties: {label: {type: string, minLength: 1, maxLength: 80}, url: {type: string, maxLength: 2048}}

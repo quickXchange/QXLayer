@@ -128,6 +128,15 @@ export const CreateTenantBody = zod.object({
 })
 
 export const createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const createTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const createTenantResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const createTenantResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const createTenantResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const createTenantResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const createTenantResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const createTenantResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const createTenantResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -180,6 +189,13 @@ export const CreateTenantResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(createTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(createTenantResponseTwoWebsiteSettingsFaqItemQuestionMin).max(createTenantResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(createTenantResponseTwoWebsiteSettingsFaqItemAnswerMin).max(createTenantResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(createTenantResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(createTenantResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(createTenantResponseTwoWebsiteSettingsHeroTitleMin).max(createTenantResponseTwoWebsiteSettingsHeroTitleMax),
@@ -206,6 +222,15 @@ export const GetTenantParams = zod.object({
 })
 
 export const getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getTenantResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const getTenantResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const getTenantResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const getTenantResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const getTenantResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const getTenantResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const getTenantResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -258,6 +283,13 @@ export const GetTenantResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(getTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(getTenantResponseTwoWebsiteSettingsFaqItemQuestionMin).max(getTenantResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(getTenantResponseTwoWebsiteSettingsFaqItemAnswerMin).max(getTenantResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(getTenantResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(getTenantResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(getTenantResponseTwoWebsiteSettingsHeroTitleMin).max(getTenantResponseTwoWebsiteSettingsHeroTitleMax),
@@ -309,6 +341,15 @@ export const UpdateTenantBrandBody = zod.object({
 })
 
 export const updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantBrandResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantBrandResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const updateTenantBrandResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const updateTenantBrandResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const updateTenantBrandResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const updateTenantBrandResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -361,6 +402,13 @@ export const UpdateTenantBrandResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(updateTenantBrandResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(updateTenantBrandResponseTwoWebsiteSettingsFaqItemQuestionMin).max(updateTenantBrandResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(updateTenantBrandResponseTwoWebsiteSettingsFaqItemAnswerMin).max(updateTenantBrandResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(updateTenantBrandResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(updateTenantBrandResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantBrandResponseTwoWebsiteSettingsHeroTitleMax),
@@ -395,6 +443,15 @@ export const UpdateTenantDomainBody = zod.object({
 })
 
 export const updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantDomainResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantDomainResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const updateTenantDomainResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const updateTenantDomainResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const updateTenantDomainResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const updateTenantDomainResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -447,6 +504,13 @@ export const UpdateTenantDomainResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(updateTenantDomainResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(updateTenantDomainResponseTwoWebsiteSettingsFaqItemQuestionMin).max(updateTenantDomainResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(updateTenantDomainResponseTwoWebsiteSettingsFaqItemAnswerMin).max(updateTenantDomainResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(updateTenantDomainResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(updateTenantDomainResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantDomainResponseTwoWebsiteSettingsHeroTitleMax),
@@ -477,6 +541,15 @@ export const UpdateTenantModulesBody = zod.object({
 })
 
 export const updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantModulesResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantModulesResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const updateTenantModulesResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const updateTenantModulesResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const updateTenantModulesResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const updateTenantModulesResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -529,6 +602,13 @@ export const UpdateTenantModulesResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(updateTenantModulesResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(updateTenantModulesResponseTwoWebsiteSettingsFaqItemQuestionMin).max(updateTenantModulesResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(updateTenantModulesResponseTwoWebsiteSettingsFaqItemAnswerMin).max(updateTenantModulesResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(updateTenantModulesResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(updateTenantModulesResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantModulesResponseTwoWebsiteSettingsHeroTitleMax),
@@ -559,6 +639,15 @@ export const UpdateTenantAssetsNetworksBody = zod.object({
 })
 
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -611,6 +700,13 @@ export const UpdateTenantAssetsNetworksResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(updateTenantAssetsNetworksResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemQuestionMin).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemAnswerMin).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroTitleMax),
@@ -644,6 +740,15 @@ export const UpdateTenantConfigurationBody = zod.object({
 })
 
 export const updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantConfigurationResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const updateTenantConfigurationResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const updateTenantConfigurationResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -696,6 +801,13 @@ export const UpdateTenantConfigurationResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(updateTenantConfigurationResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemQuestionMin).max(updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemAnswerMin).max(updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(updateTenantConfigurationResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(updateTenantConfigurationResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantConfigurationResponseTwoWebsiteSettingsHeroTitleMax),
@@ -722,6 +834,15 @@ export const ActivateTenantParams = zod.object({
 })
 
 export const activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const activateTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const activateTenantResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const activateTenantResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const activateTenantResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const activateTenantResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const activateTenantResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const activateTenantResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const activateTenantResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -774,6 +895,13 @@ export const ActivateTenantResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(activateTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(activateTenantResponseTwoWebsiteSettingsFaqItemQuestionMin).max(activateTenantResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(activateTenantResponseTwoWebsiteSettingsFaqItemAnswerMin).max(activateTenantResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(activateTenantResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(activateTenantResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(activateTenantResponseTwoWebsiteSettingsHeroTitleMin).max(activateTenantResponseTwoWebsiteSettingsHeroTitleMax),
@@ -2056,6 +2184,15 @@ export const UpdateTenantWebsiteSettingsParams = zod.object({
 })
 
 export const updateTenantWebsiteSettingsBodySecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsBodyGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsBodyFaqItemQuestionMin = 2;
+export const updateTenantWebsiteSettingsBodyFaqItemQuestionMax = 180;
+
+export const updateTenantWebsiteSettingsBodyFaqItemAnswerMin = 2;
+export const updateTenantWebsiteSettingsBodyFaqItemAnswerMax = 2000;
+
+export const updateTenantWebsiteSettingsBodyFaqMax = 16;
+
 export const updateTenantWebsiteSettingsBodyFaviconUrlMax = 2048;
 
 export const updateTenantWebsiteSettingsBodyHeroTitleMin = 2;
@@ -2085,6 +2222,13 @@ export const updateTenantWebsiteSettingsBodyTermsContentMax = 20000;
 
 export const UpdateTenantWebsiteSettingsBody = zod.object({
   "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsBodySecondaryColorRegExp),
+  "glowColor": zod.string().regex(updateTenantWebsiteSettingsBodyGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(updateTenantWebsiteSettingsBodyFaqItemQuestionMin).max(updateTenantWebsiteSettingsBodyFaqItemQuestionMax),
+  "answer": zod.string().min(updateTenantWebsiteSettingsBodyFaqItemAnswerMin).max(updateTenantWebsiteSettingsBodyFaqItemAnswerMax)
+})).max(updateTenantWebsiteSettingsBodyFaqMax).optional(),
   "faviconUrl": zod.string().max(updateTenantWebsiteSettingsBodyFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(updateTenantWebsiteSettingsBodyHeroTitleMin).max(updateTenantWebsiteSettingsBodyHeroTitleMax),
@@ -2102,6 +2246,15 @@ export const UpdateTenantWebsiteSettingsBody = zod.object({
 })
 
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemAnswerMin = 2;
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqMax = 16;
+
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
 
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroTitleMin = 2;
@@ -2154,6 +2307,13 @@ export const UpdateTenantWebsiteSettingsResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemQuestionMin).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemAnswerMin).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemAnswerMax)
+})).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroTitleMax),
@@ -2233,6 +2393,15 @@ export const GetPublicSiteParams = zod.object({
 })
 
 export const getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getPublicSiteResponseWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getPublicSiteResponseWebsiteSettingsFaqItemQuestionMin = 2;
+export const getPublicSiteResponseWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const getPublicSiteResponseWebsiteSettingsFaqItemAnswerMin = 2;
+export const getPublicSiteResponseWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const getPublicSiteResponseWebsiteSettingsFaqMax = 16;
+
 export const getPublicSiteResponseWebsiteSettingsFaviconUrlMax = 2048;
 
 export const getPublicSiteResponseWebsiteSettingsHeroTitleMin = 2;
@@ -2271,6 +2440,13 @@ export const GetPublicSiteResponse = zod.object({
   "sandboxOnly": zod.boolean(),
   "websiteSettings": zod.object({
   "secondaryColor": zod.string().regex(getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(getPublicSiteResponseWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(getPublicSiteResponseWebsiteSettingsFaqItemQuestionMin).max(getPublicSiteResponseWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(getPublicSiteResponseWebsiteSettingsFaqItemAnswerMin).max(getPublicSiteResponseWebsiteSettingsFaqItemAnswerMax)
+})).max(getPublicSiteResponseWebsiteSettingsFaqMax).optional(),
   "faviconUrl": zod.string().max(getPublicSiteResponseWebsiteSettingsFaviconUrlMax).nullable(),
   "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
   "heroTitle": zod.string().min(getPublicSiteResponseWebsiteSettingsHeroTitleMin).max(getPublicSiteResponseWebsiteSettingsHeroTitleMax),

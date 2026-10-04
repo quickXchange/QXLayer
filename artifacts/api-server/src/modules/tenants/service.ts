@@ -168,6 +168,8 @@ export function saveWebsiteSettings(principal: Principal, tenantId: string, inpu
   validateSettings(input);
   return saveStep(principal, tenantId, "brand", async (client) => {
     requireFeature(await resolveEntitlements(client, tenantId), "website");
-    await client.query("UPDATE tenant_branding SET website_settings=$2::jsonb WHERE tenant_id=$1", [tenantId, JSON.stringify(input)]);
+    // Optional newer branding fields survive saves from the unchanged admin form.
+    // Explicit empty arrays still clear configuration; omitted keys stay intact.
+    await client.query("UPDATE tenant_branding SET website_settings=COALESCE(website_settings,'{}'::jsonb) || $2::jsonb WHERE tenant_id=$1", [tenantId, JSON.stringify(input)]);
   });
 }

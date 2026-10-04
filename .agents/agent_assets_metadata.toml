@@ -1,0 +1,58 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "UBUMaVY_zLsMaNvFnr_Ji"
+uri = "file://screenshots/customer-website/aster-desktop.jpg"
+type = "image"
+title = "Aster — desktop"
+description = "Light teal/Manrope identity, original A logo, and honest one-asset sandbox state. 1440×1000."
+logical_id = "3e1680d0-d108-4017-9dea-78e5602d7c25"
+content_hash = "sha256:5f6d2cc63d349352f0b20912cc8657ae1a6f9ca9094204eb9cc8c50e30ed804e"
+size = 102776
+mtime_ms = 1791119344999
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/3e1680d0-d108-4017-9dea-78e5602d7c25/a0f03897-3e8b-42a1-9f68-4cc4bc47aecf"
+storage_version_token = "1791119520734385"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "v7aKX5-EdLv8gDBahGG52"
+uri = "file://screenshots/customer-website/nexa-desktop.jpg"
+type = "image"
+title = "Nexa — desktop"
+description = "Dark violet/cyan identity, original N logo, and Convert sandbox widget. Same shared frontend. 1440×1000."
+logical_id = "1904a05b-7f4f-46ba-b031-3f009421b5fc"
+content_hash = "sha256:d83bcd2161b49592189ac5a500cdac9f2e06da9f9ab5fb381a980c22656680dd"
+size = 99341
+mtime_ms = 1791119347443
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/1904a05b-7f4f-46ba-b031-3f009421b5fc/223e77d8-e2d0-4d69-8cc1-4df6e2100443"
+storage_version_token = "1791119521297970"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "-v2lGTdj8imvIlAo1GKPJ"
+uri = "file://screenshots/customer-website/aster-mobile.jpg"
+type = "image"
+title = "Aster — mobile"
+description = "Compact branded header, lighter effects and stacked sandbox layout. 390×844."
+logical_id = "7827d0f9-a9d9-441f-81af-5d2bce0dc4bf"
+content_hash = "sha256:5f39c4923a2b24e9680547e5749b3783d57fecef2f851ec0763fa4e8fbf98f78"
+size = 43655
+mtime_ms = 1791119349175
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7827d0f9-a9d9-441f-81af-5d2bce0dc4bf/41e7fa0b-d878-4441-a7b9-812a3f9cb6b2"
+storage_version_token = "1791119521782788"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "kh8o_IBHC4Pj-rR9Dld_n"
+uri = "file://screenshots/customer-website/nexa-mobile.jpg"
+type = "image"
+title = "Nexa — mobile"
+description = "Responsive dark identity and mobile Convert layout. 390×844."
+logical_id = "fc758be9-7974-447d-b39b-365c6b4fb38b"
+content_hash = "sha256:4a938b729e3391529a15d26e6e1ceace658c07c574560d8a15fc1d4faa1909c5"
+size = 40153
+mtime_ms = 1791119350947
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fc758be9-7974-447d-b39b-365c6b4fb38b/e052e4e9-d7c8-4e32-aa54-a1ef6acd564f"
+storage_version_token = "1791119522257012"
+content_type = "image/jpeg"

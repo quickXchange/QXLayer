@@ -214,6 +214,36 @@ export const TenantThemeMode = {
   system: 'system',
 } as const;
 
+export type WebsiteSettingsSurfaceStyle = typeof WebsiteSettingsSurfaceStyle[keyof typeof WebsiteSettingsSurfaceStyle];
+
+
+export const WebsiteSettingsSurfaceStyle = {
+  solid: 'solid',
+  glass: 'glass',
+} as const;
+
+export type WebsiteSettingsBorderRadius = typeof WebsiteSettingsBorderRadius[keyof typeof WebsiteSettingsBorderRadius];
+
+
+export const WebsiteSettingsBorderRadius = {
+  sharp: 'sharp',
+  soft: 'soft',
+  rounded: 'rounded',
+} as const;
+
+export interface WebsiteFaq {
+  /**
+     * @minLength 2
+     * @maxLength 180
+     */
+  question: string;
+  /**
+     * @minLength 2
+     * @maxLength 2000
+     */
+  answer: string;
+}
+
 export type WebsiteSettingsFontKey = typeof WebsiteSettingsFontKey[keyof typeof WebsiteSettingsFontKey];
 
 
@@ -238,6 +268,12 @@ export interface SiteLink {
 export interface WebsiteSettings {
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
   secondaryColor: string;
+  /** @pattern ^#[0-9A-Fa-f]{6}$ */
+  glowColor?: string;
+  surfaceStyle?: WebsiteSettingsSurfaceStyle;
+  borderRadius?: WebsiteSettingsBorderRadius;
+  /** @maxItems 16 */
+  faq?: WebsiteFaq[];
   /**
      * @maxLength 2048
      * @nullable
