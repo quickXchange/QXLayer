@@ -1,14 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { L, Win } from './showcase-frame';
 import { Coin, Cube, Rack } from './showcase-art';
-import { Logo, QXMark } from './showcase-brand';
+import { QXMark } from './showcase-brand';
 import { Bar, Chart, Chips, Cols, Kpis, Kv, St, Tr } from './showcase-ui';
 
 const Mod = ({ n, t, a, b, p }: { n: string; t: string; a: [string, string]; b: [string, string]; p: number }) => (
   <Win title={`${n} ${t}`}><Kv k={a[0]} v={a[1]} /><Kv k={b[0]} v={b[1]} /><Bar p={p} /></Win>
 );
 const Asic = ({ i }: { i: number }) => (
-  <div className="sx-asic"><span className="fan" /><span className="fan" /><div><Logo s={1.2} theme="dark" /><small>Unit {i + 1} / 110 TH/s</small></div><i style={{ animationDelay: `${i * -.7}s` }} /></div>
+  <div className="sx-asic"><span className="fan" /><span className="fan" /><div><small>Unit {i + 1} / 110 TH/s</small></div><i style={{ animationDelay: `${i * -.7}s` }} /></div>
 );
 
 export const infraScenes: Record<string, () => ReactNode> = {
@@ -35,7 +35,7 @@ export const infraScenes: Record<string, () => ReactNode> = {
     <L x={18} y={20} w={14} d={14} z={2} fl={2}><Rack label="Full nodes" rows={6} /></L>
     <L x={9} y={74} w={9} d={8} z={2} fl={1}><Cube s={5} /></L>
     <L x={24} y={76} w={8} d={8} z={2} fl={2}><Cube s={4} /></L>
-    <L x={36} y={12} w={61} d={12} z={3} m><Win title="RPC monitoring dashboard">
+    <L x={36} y={12} w={61} d={12} z={3} m><Win title="RPC monitoring dashboard" branded>
       <Kpis items={[['Requests / s', '4,806', '+5.3%'], ['p50 latency', '38 ms'], ['Uptime 30d', '99.96%'], ['Synced chains', '6 / 6']]} />
       <div className="sx-two"><Chart a={[40, 46, 44, 55, 52, 63, 58, 70, 66, 72]} h={7} /><Cols v={[60, 74, 52, 82, 66, 90]} labels={['ETH', 'SOL', 'BNB', 'BTC', 'ARB', 'OP']} h={7} /></div>
       <Tr head cols="1fr 5em 4.5em 5em" c={['Endpoint', 'Region', 'Latency', 'Status']} />
@@ -47,9 +47,9 @@ export const infraScenes: Record<string, () => ReactNode> = {
   </>,
 
   cloud_mining: () => <>
-    <L x={4} y={9} w={30} d={10} z={1} fl={1}><div className="sx-cloudbox"><div className="sc-cloud"><i /><i /><i /><b><QXMark s={3.4} /></b></div><Logo s={1.6} sub="Cloud" /></div></L>
+    <L x={4} y={9} w={30} d={10} z={1} fl={1}><div className="sx-cloudbox"><div className="sc-cloud"><i /><i /><i /></div><small>Cloud</small></div></L>
     <L x={3} y={42} w={36} d={14} z={3} fl={2} m><div className="sx-shelf">{[0, 1, 2, 3].map((i) => <Asic key={i} i={i} />)}</div></L>
-    <L x={42} y={9} w={55} d={8} z={4} m><Win title="Mining contracts dashboard">
+    <L x={42} y={9} w={55} d={8} z={4} m><Win title="Mining contracts dashboard" branded>
       <Kpis items={[['Hashrate', '440 TH/s', '+2.1%'], ['Daily output', '0.00182 BTC'], ['Uptime', '99.2%'], ['Power', '1.43 kW']]} />
       <div className="sx-two"><Chart a={[36, 42, 40, 52, 48, 58, 56, 64]} h={7} /><Cols v={[52, 60, 48, 70, 64, 76, 58]} labels={['M', 'T', 'W', 'T', 'F', 'S', 'S']} h={7} /></div>
       <Tr head cols="1fr 6em 5em" c={['Contract', 'Term', 'Status']} />
@@ -57,7 +57,7 @@ export const infraScenes: Record<string, () => ReactNode> = {
       <Tr cols="1fr 6em 5em" c={['Contract CM-103 (demo)', '6 months', <St t="Starting" k="wait" />]} />
     </Win></L>
     <L x={42} y={72} w={26} d={10} z={2}><Win title="Pool connection"><Chips items={['Pool Alpha', 'Pool Beta']} on={0} /><Kv k="Workers online" v="22 / 22" /></Win></L>
-    <L x={71} y={72} w={26} d={8} z={2} fl={1}><div className="sx-glassnote wide"><QXMark s={2.2} /><span><b>Demo metrics</b><small>Not live mining output</small></span></div></L>
+    <L x={71} y={72} w={26} d={8} z={2} fl={1}><div className="sx-glassnote wide"><span><b>Demo metrics</b><small>Not live mining output</small></span></div></L>
   </>,
 
   kolo: () => <>
@@ -69,6 +69,6 @@ export const infraScenes: Record<string, () => ReactNode> = {
     <L x={2} y={52} w={27} d={12} z={2} fl={1}><Win title="Kolo rewards"><Kv k="Points" v="3,480" /><Bar p={68} /><small className="sx-note">Level 4 of 6 (demo)</small></Win></L>
     <L x={71} y={9} w={27} d={8} z={2} fl={1} m><Win title="Ecosystem console"><Kpis items={[['Active modules', '6'], ['Syncs / h', '1,204']]} /><Chart a={[30, 40, 36, 52, 48, 62, 58, 72]} h={5} /></Win></L>
     <L x={71} y={52} w={27} d={12} z={2} fl={2}><Win title="Services"><Chips items={['Wallet', 'Pay', 'Earn', 'Swap']} on={1} /><Kv k="Health" v={<St t="Nominal" />} /></Win></L>
-    <L x={31} y={80} w={38} d={6} z={2}><div className="sx-glassnote wide"><QXMark s={2.2} /><span><b>Kolo ecosystem map</b><small>Illustrative modules, sandbox only</small></span></div></L>
+    <L x={31} y={80} w={38} d={6} z={2}><div className="sx-glassnote wide"><span><b>Kolo ecosystem map</b><small>Illustrative modules, sandbox only</small></span></div></L>
   </>,
 };

@@ -28,7 +28,7 @@ export function ShowcaseFrame({ label, accent, brandLabel, children }: { label: 
     <figure className="sc-fig">
       <div ref={ref} className="sc-stage" style={{ '--sc-light': accent ?? 'var(--s-primary)' } as CSSProperties} aria-hidden="true" onPointerMove={move} onPointerLeave={leave}>
         <div className="sc-glow" />
-        <div className="sc-tag sc-tag-l"><Logo s={1.7} sub={brandLabel} /></div>
+        {brandLabel && <div className="sc-tag sc-tag-l">{brandLabel}</div>}
         <div className="sc-tag sc-tag-r">Demo / Sandbox</div>
         {children}
       </div>
@@ -46,6 +46,9 @@ export function L({ x, y, w, d = 10, z = 1, fl, m, children }: { x: number; y: n
   );
 }
 
-export const Win = ({ title, children, tone, brandSize = 1.65 }: { title: string; children: ReactNode; tone?: 'flat'; brandSize?: number }) => (
-  <div className={`sc-win ${tone ?? ''}`}><div className="sc-bar"><Logo s={brandSize} /><b>{title}</b><u>Demo</u></div><div className="sc-body">{children}</div></div>
+/** Branding is opt-in: only the scene's primary interface carries the identity.
+ * mobileBrand is used when that primary dashboard is hidden on narrow screens.
+ */
+export const Win = ({ title, children, tone, branded = false, mobileBrand = false, brandSize = 1.65 }: { title: string; children: ReactNode; tone?: 'flat'; branded?: boolean; mobileBrand?: boolean; brandSize?: number }) => (
+  <div className={`sc-win ${tone ?? ''}`}><div className="sc-bar">{(branded || mobileBrand) && <span className={mobileBrand ? 'sx-mobile-brand' : undefined}><Logo s={brandSize} /></span>}<b>{title}</b><u>Demo</u></div><div className="sc-body">{children}</div></div>
 );

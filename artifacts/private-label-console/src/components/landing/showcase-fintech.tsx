@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { L, Win } from './showcase-frame';
 import { Coin } from './showcase-art';
-import { Logo, QXMark } from './showcase-brand';
+import { Logo } from './showcase-brand';
 import { Bar, Btn, Chart, Chips, Cn, Cols, Donut, Fld, Kpis, Kv, Nav, Pair, Qr, St, Tg, Tr } from './showcase-ui';
 
 const CardVisuals = () => (
@@ -13,7 +13,7 @@ const CardVisuals = () => (
       <div className="sx-cardbot"><span><small>Cardholder</small>Mira Valdesar</span><span><small>Valid</small>09/29</span><span className="sx-mc"><i /><i /></span></div>
     </div>
     <div className="sx-glass">
-      <div className="sx-cardtop"><Logo s={1.7} theme="dark" /><small>Virtual</small></div>
+      <div className="sx-cardtop"><small>Virtual</small></div>
       <div className="sx-pan s">4821 7702 3318 0462</div>
       <div className="sx-cardbot"><span><small>Cardholder</small>Mira Valdesar</span><span><small>CVV</small>***</span></div>
     </div>
@@ -22,7 +22,7 @@ const CardVisuals = () => (
 
 export const fintechScenes: Record<string, () => ReactNode> = {
   crypto_exchange: () => <>
-    <L x={2} y={9} w={64} d={6}><Win title="Exchange admin dashboard" brandSize={1.9}>
+    <L x={2} y={9} w={64} d={6}><Win title="Exchange admin dashboard" branded brandSize={1.9}>
       <div className="sx-split"><Nav items={['Overview', 'Orders', 'Assets', 'Networks', 'Payment methods', 'Analytics']} />
         <div className="sx-grid">
           <Kpis items={[['Orders today', '1,284', '+6.1%'], ['Volume', '$2.41M', '+11.4%'], ['Fee income', '$7,318.20', '+4.9%'], ['Avg settle', '3m 42s', '-0:18']]} />
@@ -35,7 +35,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
           </div>
         </div>
       </div></Win></L>
-    <L x={60} y={12} w={37} d={18} z={5} fl={1} m><Win title="Swap / Convert" brandSize={1.8}>
+    <L x={60} y={12} w={37} d={18} z={5} fl={1} m><Win title="Swap / Convert" mobileBrand brandSize={1.8}>
       <Fld l="You send" v="0.0842" sub="$5,716.40" r={<Cn c="BTC" />} />
       <div className="sx-swap">&#8645;</div>
       <Fld l="You receive" v="1.7186" sub="$5,702.88" r={<Cn c="ETH" />} />
@@ -47,7 +47,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
   </>,
 
   crypto_payments: () => <>
-    <L x={2} y={9} w={60} d={6}><Win title="Pay merchant dashboard">
+    <L x={2} y={9} w={60} d={6}><Win title="Pay merchant dashboard" branded>
       <div className="sx-split"><Nav items={['Payments', 'Links', 'Payouts', 'Customers', 'Settings']} />
         <div className="sx-grid">
           <Kpis items={[['Volume 24h', '$182,406.50', '+8.2%'], ['Payments', '1,942', '+3.4%'], ['Success rate', '97.3%', '+0.6%'], ['Avg order', '$93.92']]} />
@@ -57,7 +57,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
           <Tr cols="6.5em 1fr 6.5em 5em" c={['PAY-7729', <><Cn c="BTC" />Lumen Studio</>, '$74.15', <St t="Waiting" k="wait" />]} />
         </div>
       </div></Win></L>
-    <L x={58} y={11} w={39} d={18} z={5} fl={1} m><Win title="Crypto checkout">
+    <L x={58} y={11} w={39} d={18} z={5} fl={1} m><Win title="Crypto checkout" mobileBrand>
       <div className="sx-merch"><span><b>Northwind Outfitters</b><small>Order 4417 / demo</small></span><strong>$128.40</strong></div>
       <div className="sx-pay"><Cn c="BTC" /><Cn c="ETH" /><span className="sx-cc2 on"><Coin c="USDT" size={1.5} />USDT</span></div>
       <div className="sx-payrow"><Qr /><div className="sx-grid">
@@ -99,7 +99,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
         <Kv k="APY (demo)" v={<b className="up">{apy}</b>} /><Bar p={p} /><small className="sx-note">Unlocks in {20 + i * 9} days</small>
       </Win></L>
     ))}
-    <L x={2} y={42} w={58} d={6} z={2} m><Win title="Rewards overview">
+    <L x={2} y={42} w={58} d={6} z={2} m><Win title="Rewards overview" branded>
       <Kpis items={[['Total staked', '$11,486.30'], ['Rewards earned', '$412.86', '+2.9%'], ['Avg APY', '5.4%']]} />
       <Chart a={[18, 24, 30, 38, 42, 53, 60, 71, 77, 90]} h={8} />
     </Win></L>
@@ -107,7 +107,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
   </>,
 
   earn: () => <>
-    <L x={2} y={10} w={29} d={8} z={2} m><Win title="Earn portfolio">
+    <L x={2} y={10} w={29} d={8} z={2} m><Win title="Earn portfolio" branded>
       <div className="sx-center"><Donut parts={[[38, 'var(--s-primary)'], [27, 'var(--s-accent)'], [20, '#f4b73e'], [15, '#26a17b']]} v="$24,918" s="deposited" /></div>
       <Kv k="Accrued" v={<b className="up">+$412.86</b>} /><Kv k="Blended APY" v="4.6%" /><Chips items={['USDC', 'USDT', 'BTC', 'ETH']} />
     </Win></L>
@@ -117,11 +117,11 @@ export const fintechScenes: Record<string, () => ReactNode> = {
     </Win></L>
     <L x={73} y={9} w={25} d={18} z={4} fl={1}><Win title="Deposit"><Fld l="Amount" v="2,500" r={<Cn c="USDC" />} /><Kv k="APY" v="5.1%" /><Kv k="Est. monthly" v="$10.63" /><Btn t="Deposit USDC" /></Win></L>
     <L x={33} y={66} w={64} d={8} z={2}><Win title="Yield accrual, 90 days"><Chart a={[14, 20, 26, 28, 36, 40, 46, 52, 60, 66, 75, 84]} b={[10, 13, 16, 19, 23, 27, 31, 36, 40, 45, 50, 55]} h={6} /></Win></L>
-    <L x={2} y={72} w={29} d={10} z={3} fl={2}><div className="sx-glassnote"><QXMark s={2.2} /><span><b>Earn on QXLayer</b><small>Demo yields, sandbox only</small></span></div></L>
+    <L x={2} y={72} w={29} d={10} z={3} fl={2}><div className="sx-glassnote"><span><b>Earn portfolio</b><small>Demo yields, sandbox only</small></span></div></L>
   </>,
 
   dex: () => <>
-    <L x={34} y={10} w={32} d={20} z={5} fl={1} m><Win title="Swap">
+    <L x={34} y={10} w={32} d={20} z={5} fl={1} m><Win title="Swap" branded>
       <Fld l="From" v="1.000" sub="$3,327.40" r={<Cn c="ETH" />} />
       <div className="sx-swap">&#8645;</div>
       <Fld l="To (estimated)" v="19.098" sub="$3,321.10" r={<Cn c="SOL" />} />
@@ -141,7 +141,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
       <Tr cols="1fr 6em" c={[<><Cn c="SOL" />to<Cn c="ETH" /></>, '$742.60']} />
       <Chart a={[40, 36, 48, 44, 58, 52, 66, 61, 72]} h={5} />
     </Win></L>
-    <L x={6} y={72} w={50} d={6} z={2}><div className="sx-glassnote wide"><QXMark s={2.2} /><span><b>Liquidity depth, last 7 days</b><small>Demo pool data for illustration</small></span><Cols v={[40, 52, 46, 70, 58, 82, 66]} h={3} /></div></L>
+    <L x={6} y={72} w={50} d={6} z={2}><div className="sx-glassnote wide"><span><b>Liquidity depth, last 7 days</b><small>Demo pool data for illustration</small></span><Cols v={[40, 52, 46, 70, 58, 82, 66]} h={3} /></div></L>
     <L x={60} y={72} w={37} d={10} z={2} fl={1}><Win title="Add liquidity"><Fld l="Deposit" v="2.00 ETH" r={<Pair a="ETH" b="USDC" />} /><Btn t="Add to ETH/USDC" /></Win></L>
   </>,
 
@@ -159,7 +159,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
       </div></Win></L>
     <L x={52} y={11} w={45} d={16} z={4} fl={1} m><div className="sx-site">
       <div className="sx-sitebar"><Logo s={1.5} sub="Insights" /><span>Markets</span><span>Guides</span><span>Updates</span></div>
-      <div className="sx-hero"><QXMark s={5} /></div>
+      <div className="sx-hero" />
       <div className="sx-art"><small>Guides / 6 min read</small><h4>What settlement times really tell you about a payment rail</h4><span>By Ilse Brandt / 14 March 2026 (demo)</span>
         <p>Merchants rarely ask how an invoice is routed. They ask when the money lands. Median settlement fell from eleven minutes to under four once confirmations were tuned per network.</p>
         <p>Three decisions moved the number, and one that did not.</p></div>

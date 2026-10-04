@@ -1,6 +1,5 @@
 import { useId, type CSSProperties, type ReactNode } from 'react';
 import { Coin, type CoinId } from './showcase-art';
-import { QXMark } from './showcase-brand';
 
 /** Data-dense presentational atoms. All values are fictional demo data. */
 export const Kpis = ({ items }: { items: [string, string, string?][] }) => (
@@ -68,7 +67,6 @@ export const Qr = () => {
   return (
     <div className="sx-qr">
       <svg viewBox="-1 -1 23 23" fill="#1b1340">{cells}{f(0, 0)}{f(14, 0)}{f(0, 14)}</svg>
-      <span><QXMark s={1.8} theme="light" /></span>
     </div>
   );
 };

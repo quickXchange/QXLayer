@@ -19,7 +19,7 @@ const IosWallet = () => <>
   <div style={{ flex: 1 }} /><Tab items={['Home', 'Markets', 'Swap', 'Card', 'Me']} on={0} />
 </>;
 const IosMarkets = () => <>
-  <Sb /><div className="ph-top"><Logo s={1.7} theme="dark" /><small>Markets</small></div>
+  <Sb /><div className="ph-top"><small>Markets</small></div>
   <Chips items={['Favorites', 'Gainers', 'Volume']} />
   <Asset c="BTC" a="Bitcoin" v="$67,880" d="+1.8%" /><Asset c="ETH" a="Ethereum" v="$3,327" d="+3.2%" /><Asset c="SOL" a="Solana" v="$174.24" d="-0.7%" /><Asset c="USDT" a="Tether" v="$1.00" d="+0.0%" />
   <Chart a={[40, 52, 46, 60, 54, 70, 66]} h={4} />
@@ -39,21 +39,21 @@ const DroidHome = () => <>
 </>;
 const DroidSwap = () => <>
   <div className="and-sb"><b>9:41</b><span>5G</span></div>
-  <div className="and-bar"><Logo s={1.7} theme="dark" /><small>Swap</small></div>
+  <div className="and-bar"><small>Swap</small></div>
   <div className="and-card flat"><small>You pay</small><strong>250.00</strong><span><Cn c="USDT" /></span></div>
   <div className="and-card flat"><small>You get (est.)</small><strong>0.0753</strong><span><Cn c="ETH" /></span></div>
   <Kv k="Rate" v="1 ETH = 3,327 USDT" /><Kv k="Network fee" v="$1.12" />
   <div style={{ flex: 1 }} /><div className="and-fab">Confirm swap</div>
 </>;
 const TgChat = ({ mini }: { mini?: boolean }) => <>
-  <div className="tg-top"><Sb /><div className="tg-h"><span>&lsaquo;</span><QXMark s={2.2} /><div><b>QXLayer Bot</b><small>bot</small></div></div></div>
+  <div className="tg-top"><Sb /><div className="tg-h"><span>&lsaquo;</span>{!mini && <QXMark s={2.2} />}<div><b>{mini ? 'Wallet Bot' : 'QXLayer Bot'}</b><small>bot</small></div></div></div>
   <div className="tg-body">
-    <div className="tg-b in">Welcome to QXLayer. Pick a service to continue.<time>10:02</time></div>
+    <div className="tg-b in">Welcome. Pick a service to continue.<time>10:02</time></div>
     <div className="tg-kb"><span>Exchange</span><span>Payment link</span><span>Wallet</span><span>Support</span></div>
     <div className="tg-b out">Exchange<time>10:03 read</time></div>
     <div className="tg-b in">Quote (demo)<br />0.0842 BTC to 1.7186 ETH<br />Network: Bitcoin to Ethereum<br />Rate locked for 02:00<time>10:03</time></div>
     <div className="tg-kb two"><span>Confirm</span><span>Cancel</span></div>
-    {mini ? <div className="tg-kb"><span className="web">Open QXLayer Wallet</span></div> : <div className="tg-b in">Order QX-48213 created. Awaiting deposit (sandbox).<time>10:04</time></div>}
+    {mini ? <div className="tg-kb"><span className="web">Open Wallet</span></div> : <div className="tg-b in">Order QX-48213 created. Awaiting deposit (sandbox).<time>10:04</time></div>}
   </div>
   <div className="tg-in"><span>Message</span><i /></div>
 </>;
@@ -89,27 +89,27 @@ export const phoneScenes: Record<string, () => ReactNode> = {
     <L x={7} y={14} w={20} d={10} z={1} fl={2}><Phone><IosMarkets /></Phone></L>
     <L x={30} y={9} w={23} d={22} z={3} fl={1} m="n"><Phone><IosWallet /></Phone></L>
     <L x={58} y={14} w={38} d={14} z={2} fl={2}><Win title="Confirm swap" ><Kv k="You pay" v="0.0842 BTC" /><Kv k="You receive" v="1.7186 ETH" /><Kv k="Fee" v="$13.72" /><Kv k="Face ID" v="Required" /><Btn t="Confirm with Face ID" /></Win></L>
-    <L x={58} y={64} w={38} d={10} z={2} fl={1}><div className="sx-glassnote wide"><QXMark s={2.4} /><span><b>QXLayer for iPhone</b><small>Wallet, markets and swaps. Demo screens.</small></span></div></L>
+    <L x={58} y={64} w={38} d={10} z={2} fl={1}><div className="sx-glassnote wide"><span><b>iPhone app</b><small>Wallet, markets and swaps. Demo screens.</small></span></div></L>
   </>,
   android_app: () => <>
     <L x={36} y={9} w={23} d={22} z={3} fl={1} m="n"><Phone droid><DroidHome /></Phone></L>
     <L x={9} y={15} w={21} d={10} z={1} fl={2}><Phone droid><DroidSwap /></Phone></L>
-    <L x={64} y={12} w={33} d={14} z={2} fl={2}><Win title="Notifications"><div className="and-note"><QXMark s={1.8} /><span><b>Payment received</b><small>+0.0120 BTC credited / demo</small></span></div><div className="and-note"><QXMark s={1.8} /><span><b>Price alert</b><small>ETH crossed $3,300</small></span></div><div className="and-note"><QXMark s={1.8} /><span><b>Earn payout</b><small>+0.42 SOL</small></span></div></Win></L>
-    <L x={64} y={66} w={33} d={10} z={2} fl={1}><div className="sx-glassnote wide"><QXMark s={2.4} /><span><b>QXLayer for Android</b><small>Material layout. Demo screens.</small></span></div></L>
+    <L x={64} y={12} w={33} d={14} z={2} fl={2}><Win title="Notifications"><div className="and-note"><Coin c="BTC" size={1.8} /><span><b>Payment received</b><small>+0.0120 BTC credited / demo</small></span></div><div className="and-note"><Coin c="ETH" size={1.8} /><span><b>Price alert</b><small>ETH crossed $3,300</small></span></div><div className="and-note"><Coin c="SOL" size={1.8} /><span><b>Earn payout</b><small>+0.42 SOL</small></span></div></Win></L>
+    <L x={64} y={66} w={33} d={10} z={2} fl={1}><div className="sx-glassnote wide"><span><b>Android app</b><small>Material layout. Demo screens.</small></span></div></L>
   </>,
   telegram_bot: () => <>
     <L x={2} y={10} w={52} d={6} z={1}><div className="tgd">
       <div className="tgd-side"><div className="tgd-s">Search</div>
-        {([['QXLayer Bot', 'Order QX-48213 created', '10:04'], ['Saved Messages', 'Rates sheet', '09:40'], ['Ops channel', 'Daily summary ready', 'Mon']] as const).map(([n, m, t], i) => <div key={n} className={`tgd-c ${i === 0 ? 'on' : ''}`}>{i === 0 ? <QXMark s={2.4} /> : <span className="ph-av">{n[0]}</span>}<span><b>{n}</b><small>{m}</small></span><time>{t}</time></div>)}
+        {([['QXLayer Bot', 'Order QX-48213 created', '10:04'], ['Saved Messages', 'Rates sheet', '09:40'], ['Ops channel', 'Daily summary ready', 'Mon']] as const).map(([n, m, t], i) => <div key={n} className={`tgd-c ${i === 0 ? 'on' : ''}`}><span className="ph-av">{i === 0 ? 'B' : n[0]}</span><span><b>{n}</b><small>{m}</small></span><time>{t}</time></div>)}
       </div>
-      <div className="tgd-main"><div className="tgd-h"><QXMark s={2} /><b>QXLayer Bot</b><small>bot</small></div>
+      <div className="tgd-main"><div className="tgd-h"><b>QXLayer Bot</b><small>bot</small></div>
         <div className="tg-b in">/start<time>10:01</time></div>
-        <div className="tg-b in">Welcome to QXLayer. Exchange, pay links and wallet in one chat.<time>10:02</time></div>
+        <div className="tg-b in">Welcome. Exchange, pay links and wallet in one chat.<time>10:02</time></div>
         <div className="tg-kb"><span>Exchange</span><span>Payment link</span><span>Wallet</span></div>
       </div></div></L>
     <L x={58} y={8} w={23} d={22} z={3} fl={1} m="n"><Phone skin="tg"><TgChat /></Phone></L>
     <L x={80} y={50} w={18} d={12} z={4} fl={2}><Win title="Bot commands"><Kv k="/start" v="Menu" /><Kv k="/swap" v="Quote" /><Kv k="/pay" v="Link" /></Win></L>
-    <L x={6} y={66} w={46} d={8} z={2}><div className="sx-glassnote wide"><QXMark s={2.4} /><span><b>QXLayer Bot flow</b><small>Start, select, confirm. Sandbox conversation.</small></span><Chips items={['Start', 'Select', 'Confirm']} on={1} /></div></L>
+    <L x={6} y={66} w={46} d={8} z={2}><div className="sx-glassnote wide"><span><b>Bot flow</b><small>Start, select, confirm. Sandbox conversation.</small></span><Chips items={['Start', 'Select', 'Confirm']} on={1} /></div></L>
   </>,
   telegram_mini_app: () => <>
     <L x={8} y={13} w={21} d={10} z={1} fl={2}><Phone skin="tg"><TgChat mini /></Phone></L>
@@ -118,7 +118,7 @@ export const phoneScenes: Record<string, () => ReactNode> = {
       <div className="sx-two"><div className="sx-kpi"><small>Rewards</small><strong>148 pts</strong></div><div className="sx-kpi"><small>Streak</small><strong>6 days</strong></div></div>
       <Tr cols="1fr 5em" c={[<><Cn c="USDT" />to<Cn c="ETH" /></>, '$120.00']} /><Bar p={62} />
     </Win></L>
-    <L x={62} y={62} w={35} d={10} z={2} fl={1}><div className="sx-glassnote wide"><QXMark s={2.4} /><span><b>QXLayer Mini App</b><small>Opens inside the chat. Demo screens.</small></span></div></L>
+    <L x={62} y={62} w={35} d={10} z={2} fl={1}><div className="sx-glassnote wide"><span><b>Mini App</b><small>Opens inside the chat. Demo screens.</small></span></div></L>
   </>,
   whatsapp_bot: () => <>
     <L x={6} y={8} w={23} d={22} z={3} fl={1} m="n"><Phone droid skin="wa"><WaChat /></Phone></L>
