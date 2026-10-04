@@ -9,7 +9,8 @@ const GLYPH: Record<string, { bg: string; node: React.ReactNode }> = {
   eth: { bg: '#5b6ee1', node: <g fill="#fff"><path d="M12 4l5 8.2-5 2.9-5-2.9z" opacity=".95" /><path d="M12 16l5-2.9-5 6.9-5-6.9z" opacity=".75" /></g> },
   usdt: { bg: '#1fa37a', node: <g stroke="#fff" strokeWidth="1.8" strokeLinecap="round" fill="none"><path d="M7 7.5h10M12 7.5V18" /><ellipse cx="12" cy="12" rx="5.6" ry="1.9" strokeWidth="1.3" /></g> },
 };
-export function Coin({ asset, size = 36 }: { asset: Pick<AssetNetwork, 'symbol' | 'assetId'>; size?: number }) {
+export function Coin({ asset, size = 36 }: { asset: Pick<AssetNetwork, 'symbol' | 'assetId' | 'logoUrl'>; size?: number }) {
+  if (asset.logoUrl) return <img className="s-coin" src={asset.logoUrl} alt={asset.symbol} width={size} height={size} style={{ width: size, height: size, objectFit: 'contain' }} />;
   const g = GLYPH[asset.symbol.toLowerCase()] ?? GLYPH[asset.assetId.toLowerCase()];
   if (g) return <span className="s-coin" aria-hidden="true" style={{ width: size, height: size, background: g.bg }}><svg viewBox="0 0 24 24" width={size * 0.62} height={size * 0.62}>{g.node}</svg></span>;
   let h = 0; for (const c of asset.assetId) h = (h * 31 + c.charCodeAt(0)) % 360;
@@ -19,7 +20,7 @@ export function NetBadge({ a }: { a: AssetNetwork }) {
   return <span className="s-badge" data-testid={`badge-network-${a.networkId}`}>{a.networkName}{a.testnet ? ' testnet' : ''}</span>;
 }
 
-export function AssetPicker({ assets, selected, blockedAssetId, title, onSelect, onClose }: { assets: AssetNetwork[]; selected: string | null; blockedAssetId?: string | null; title: string; onSelect: (a: AssetNetwork) => void; onClose: () => void }) {
+export function AssetPicker({ assets, selected, blockedAssetId, blockedKey, title, onSelect, onClose }: { assets: AssetNetwork[]; selected: string | null; blockedAssetId?: string | null; blockedKey?: string | null; title: string; onSelect: (a: AssetNetwork) => void; onClose: () => void }) {
   const [q, setQ] = useState('');
   const input = useRef<HTMLInputElement>(null);
   const sheet = useRef<HTMLDivElement>(null);
@@ -59,7 +60,7 @@ export function AssetPicker({ assets, selected, blockedAssetId, title, onSelect,
         <div className="overflow-y-auto px-2 pb-4" role="listbox" aria-label="Assets">
           {list.length === 0 && <p className="s-muted px-4 py-10 text-center text-sm" data-testid="state-picker-empty">No configured asset matches &ldquo;{q}&rdquo;.</p>}
           {list.map((a) => {
-            const blocked = !!blockedAssetId && a.assetId === blockedAssetId;
+            const blocked = (!!blockedAssetId && a.assetId === blockedAssetId) || (!!blockedKey && assetKey(a) === blockedKey);
             const sel = assetKey(a) === selected;
             return (
               <button key={assetKey(a)} type="button" role="option" aria-selected={sel} disabled={blocked} onClick={() => onSelect(a)} className="s-opt" data-testid={`option-asset-${a.assetId}-${a.networkId}`}>

@@ -9,6 +9,7 @@
 export interface ActivityEvent {
   id: string;
   eventType: string;
+  actorId?: string;
   description: string;
   /** @nullable */
   tenantId: string | null;

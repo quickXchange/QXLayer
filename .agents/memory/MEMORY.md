@@ -5,3 +5,5 @@
 - [Website CSS cascade](website-css-cascade.md) — layered visibility utilities can lose to custom display rules; verify mobile and desktop computed display.
 - [Core and catalog scope](customer-visual-approval.md) — premium catalog advertising is not service implementation; reusable core, no live crypto, publishing or QuickXchange changes.
 - [Official QXLayer brand](qxlayer-brand.md) — use the uploaded master intact on platform-owned surfaces; never override customer/tenant branding.
+- [Exchange-only scope](exchange-only-scope.md) — develop only White Label Exchange sandbox and its tenant admin; all other products stay unchanged visual previews.
+- [Clerk UI test identities](clerk-testing-memberships.md) — grant the actual generated identity temporary tenant access; extra claim arguments do not override the session.

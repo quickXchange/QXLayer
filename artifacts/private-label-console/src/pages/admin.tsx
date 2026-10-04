@@ -1,4 +1,5 @@
-import { Link } from 'wouter';
+import { Link, Redirect } from 'wouter';
+import { usePrincipal } from '@/lib/principal';
 import { useGetPlatformOverview } from '@workspace/api-client-react';
 import { PageHeader, ErrorState, ListSkeleton, SandboxNote, EmptyState } from '@/components/app/bits';
 import { ago } from '@/lib/format';
@@ -8,6 +9,9 @@ import { useCan } from '@/lib/principal';
 export default function Admin() {
   const q = useGetPlatformOverview();
   const can = useCan();
+  const p = usePrincipal();
+  const home = p.role === 'client_admin' ? (p.memberships?.[0]?.tenantId ?? p.tenantId) : null;
+  if (home) return <Redirect to={`/clients/${home}/exchange`} />;
   const d = q.data;
   const stats = d ? [['Clients', d.totalTenants], ['Active in sandbox', d.activeTenants], ['Draft', d.draftTenants], ['Modules enabled', d.enabledModules]] : [];
   return (

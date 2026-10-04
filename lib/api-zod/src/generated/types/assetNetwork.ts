@@ -8,9 +8,13 @@
 
 export interface AssetNetwork {
   assetId: string;
+  assetNetworkId?: string;
   symbol: string;
   name: string;
   networkId: string;
   networkName: string;
   testnet: boolean;
+  /** @nullable */
+  logoUrl?: string | null;
+  decimals?: number;
 }

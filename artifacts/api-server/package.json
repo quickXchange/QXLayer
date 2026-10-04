@@ -10,6 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "verify:foundation": "tsx src/verification/foundation.ts",
     "verify:catalog": "tsx src/verification/landing-catalog.ts",
+    "verify:exchange": "tsx src/verification/exchange.ts",
+    "samples:exchange:dev": "tsx src/verification/exchange-sample.ts",
     "samples:plans:dev": "tsx src/verification/sample-sites.ts"
   },
   "dependencies": {

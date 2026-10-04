@@ -19,6 +19,7 @@ import Admin from '@/pages/admin';
 import Clients from '@/pages/clients';
 import ClientNew from '@/pages/client-new';
 import ClientDetail from '@/pages/client-detail';
+import Exchange from '@/pages/exchange';
 import Modules from '@/pages/modules';
 import Activity from '@/pages/activity';
 import Plans from '@/pages/plans';
@@ -129,7 +130,7 @@ function Protected({ children }: { children: ReactNode }) {
   );
 }
 const guard = (C: () => ReactNode) => () => <Protected><C /></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rExchange = guard(Exchange);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -160,6 +161,7 @@ function ClerkProviderWithRoutes() {
               <Route path="/admin" component={rAdmin} />
               <Route path="/clients" component={rClients} />
               <Route path="/clients/new" component={rNew} />
+              <Route path="/clients/:id/exchange/:section?/:orderId?" component={rExchange} />
               <Route path="/clients/:id" component={rDetail} />
               <Route path="/modules" component={rModules} />
               <Route path="/plans" component={rPlans} />

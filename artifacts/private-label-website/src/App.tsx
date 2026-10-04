@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import Entry from '@/pages/entry';
 import { SiteHome, FeaturePage, LegalPage } from '@/pages/site';
 import NotFound from '@/pages/not-found';
+import OrderTracking from '@/pages/order-tracking';
 import {
   Route,
   Switch,
@@ -55,6 +56,7 @@ function Router() {
       <Switch>
         <Route path="/" component={MainPlatformEntry} />
         <Route path="/sandbox/site-finder" component={Entry} />
+        <Route path="/:slug/orders/:orderId" component={OrderTracking} />
         <Route path="/:slug" component={SiteHome} />
         <Route path="/:slug/privacy">{() => <LegalPage kind="privacy" />}</Route>
         <Route path="/:slug/terms">{() => <LegalPage kind="terms" />}</Route>

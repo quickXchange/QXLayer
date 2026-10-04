@@ -9,7 +9,7 @@ import { humanize } from '@/lib/theme';
 
 const BelowFold = lazy(() => import('@/components/below-fold'));
 
-function Gate({ slug, ambient, children }: { slug: string; ambient?: boolean; children: (s: PublicSite) => ReactNode }) {
+export function Gate({ slug, ambient, children }: { slug: string; ambient?: boolean; children: (s: PublicSite) => ReactNode }) {
   const q = useGetPublicSite(slug, { query: { enabled: !!slug, queryKey: getGetPublicSiteQueryKey(slug), retry: false } });
   if (q.isLoading) return <SiteSkeleton />;
   if (q.isError || !q.data) return <Unavailable onRetry={() => void q.refetch()} />;

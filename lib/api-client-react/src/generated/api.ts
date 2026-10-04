@@ -32,9 +32,22 @@ import type {
   DomainVerification,
   EntitlementDefinition,
   EntitlementOverrideInput,
+  ExchangeAuditList,
+  ExchangeConfiguration,
+  ExchangeDashboard,
+  ExchangeOrder,
+  ExchangeOrderCreated,
+  ExchangeOrderInput,
+  ExchangeOrderList,
+  ExchangeQuote,
+  ExchangeQuoteInput,
+  ExchangeSettings,
+  ExchangeStatusInput,
   HealthStatus,
   LandingProduct,
   LandingProductInput,
+  ListExchangeAuditParams,
+  ListExchangeOrdersParams,
   ModuleDefinition,
   MutationStatus,
   Plan,
@@ -43,6 +56,7 @@ import type {
   PlatformOverview,
   ProductConfiguration,
   ProductModule,
+  PublicExchange,
   PublicSite,
   ResourceCreated,
   ResourceInput,
@@ -88,6 +102,871 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getListExchangeAuditUrl = (tenantId: string,
+    params?: ListExchangeAuditParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/tenants/${tenantId}/exchange/audit?${stringifiedParams}` : `/api/tenants/${tenantId}/exchange/audit`
+}
+
+export const listExchangeAudit = async (tenantId: string,
+    params?: ListExchangeAuditParams, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeAuditList> => {
+
+  return customFetch<ExchangeAuditList>(getListExchangeAuditUrl(tenantId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListExchangeAuditQueryKey = (tenantId: string,
+    params?: ListExchangeAuditParams,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange/audit`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListExchangeAuditQueryOptions = <TData = Awaited<ReturnType<typeof listExchangeAudit>>, TError = ErrorType<unknown>>(tenantId: string,
+    params?: ListExchangeAuditParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExchangeAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListExchangeAuditQueryKey(tenantId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listExchangeAudit>>> = ({ signal }) => listExchangeAudit(tenantId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listExchangeAudit>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListExchangeAuditQueryResult = NonNullable<Awaited<ReturnType<typeof listExchangeAudit>>>
+export type ListExchangeAuditQueryError = ErrorType<unknown>
+
+
+
+export function useListExchangeAudit<TData = Awaited<ReturnType<typeof listExchangeAudit>>, TError = ErrorType<unknown>>(
+ tenantId: string,
+    params?: ListExchangeAuditParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExchangeAudit>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListExchangeAuditQueryOptions(tenantId,params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetExchangeConfigurationUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange`
+}
+
+export const getExchangeConfiguration = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeConfiguration> => {
+
+  return customFetch<ExchangeConfiguration>(getGetExchangeConfigurationUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExchangeConfigurationQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange`
+    ] as const;
+    }
+
+
+export const getGetExchangeConfigurationQueryOptions = <TData = Awaited<ReturnType<typeof getExchangeConfiguration>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeConfiguration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExchangeConfigurationQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExchangeConfiguration>>> = ({ signal }) => getExchangeConfiguration(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExchangeConfiguration>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExchangeConfigurationQueryResult = NonNullable<Awaited<ReturnType<typeof getExchangeConfiguration>>>
+export type GetExchangeConfigurationQueryError = ErrorType<unknown>
+
+
+
+export function useGetExchangeConfiguration<TData = Awaited<ReturnType<typeof getExchangeConfiguration>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeConfiguration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExchangeConfigurationQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveExchangeConfigurationUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange`
+}
+
+export const saveExchangeConfiguration = async (tenantId: string,
+    exchangeSettings: ExchangeSettings, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeConfiguration> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ExchangeConfiguration>(getSaveExchangeConfigurationUrl(tenantId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeSettings)
+  }
+);}
+
+
+
+
+
+export const getSaveExchangeConfigurationMutationKey = () => ['saveExchangeConfiguration'] as const;
+
+export const getSaveExchangeConfigurationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveExchangeConfiguration>>, TError,SaveExchangeConfigurationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveExchangeConfiguration>>, TError,SaveExchangeConfigurationMutationVariables, TContext> => {
+
+const mutationKey = getSaveExchangeConfigurationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveExchangeConfiguration>>, SaveExchangeConfigurationMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  saveExchangeConfiguration(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveExchangeConfigurationMutationResult = NonNullable<Awaited<ReturnType<typeof saveExchangeConfiguration>>>
+    export type SaveExchangeConfigurationMutationBody = BodyType<ExchangeSettings>
+    export type SaveExchangeConfigurationMutationError = ErrorType<unknown>
+    export type SaveExchangeConfigurationMutationVariables = {tenantId: string;data: BodyType<ExchangeSettings>}
+
+    export const useSaveExchangeConfiguration = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveExchangeConfiguration>>, TError,SaveExchangeConfigurationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveExchangeConfiguration>>,
+        TError,
+        SaveExchangeConfigurationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveExchangeConfigurationMutationOptions(options));
+    }
+
+export const getListExchangeOrdersUrl = (tenantId: string,
+    params?: ListExchangeOrdersParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/tenants/${tenantId}/exchange/orders?${stringifiedParams}` : `/api/tenants/${tenantId}/exchange/orders`
+}
+
+export const listExchangeOrders = async (tenantId: string,
+    params?: ListExchangeOrdersParams, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeOrderList> => {
+
+  return customFetch<ExchangeOrderList>(getListExchangeOrdersUrl(tenantId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListExchangeOrdersQueryKey = (tenantId: string,
+    params?: ListExchangeOrdersParams,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange/orders`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListExchangeOrdersQueryOptions = <TData = Awaited<ReturnType<typeof listExchangeOrders>>, TError = ErrorType<unknown>>(tenantId: string,
+    params?: ListExchangeOrdersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExchangeOrders>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListExchangeOrdersQueryKey(tenantId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listExchangeOrders>>> = ({ signal }) => listExchangeOrders(tenantId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listExchangeOrders>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListExchangeOrdersQueryResult = NonNullable<Awaited<ReturnType<typeof listExchangeOrders>>>
+export type ListExchangeOrdersQueryError = ErrorType<unknown>
+
+
+
+export function useListExchangeOrders<TData = Awaited<ReturnType<typeof listExchangeOrders>>, TError = ErrorType<unknown>>(
+ tenantId: string,
+    params?: ListExchangeOrdersParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExchangeOrders>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListExchangeOrdersQueryOptions(tenantId,params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetExchangeOrderUrl = (tenantId: string,
+    orderId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/orders/${orderId}`
+}
+
+export const getExchangeOrder = async (tenantId: string,
+    orderId: string, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeOrder> => {
+
+  return customFetch<ExchangeOrder>(getGetExchangeOrderUrl(tenantId,orderId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExchangeOrderQueryKey = (tenantId: string,
+    orderId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange/orders/${orderId}`
+    ] as const;
+    }
+
+
+export const getGetExchangeOrderQueryOptions = <TData = Awaited<ReturnType<typeof getExchangeOrder>>, TError = ErrorType<unknown>>(tenantId: string,
+    orderId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExchangeOrderQueryKey(tenantId,orderId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExchangeOrder>>> = ({ signal }) => getExchangeOrder(tenantId,orderId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined && orderId !== null && orderId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExchangeOrder>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExchangeOrderQueryResult = NonNullable<Awaited<ReturnType<typeof getExchangeOrder>>>
+export type GetExchangeOrderQueryError = ErrorType<unknown>
+
+
+
+export function useGetExchangeOrder<TData = Awaited<ReturnType<typeof getExchangeOrder>>, TError = ErrorType<unknown>>(
+ tenantId: string,
+    orderId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExchangeOrderQueryOptions(tenantId,orderId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateExchangeOrderStatusUrl = (tenantId: string,
+    orderId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/orders/${orderId}`
+}
+
+export const updateExchangeOrderStatus = async (tenantId: string,
+    orderId: string,
+    exchangeStatusInput: ExchangeStatusInput, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeOrder> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ExchangeOrder>(getUpdateExchangeOrderStatusUrl(tenantId,orderId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeStatusInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateExchangeOrderStatusMutationKey = () => ['updateExchangeOrderStatus'] as const;
+
+export const getUpdateExchangeOrderStatusMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExchangeOrderStatus>>, TError,UpdateExchangeOrderStatusMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateExchangeOrderStatus>>, TError,UpdateExchangeOrderStatusMutationVariables, TContext> => {
+
+const mutationKey = getUpdateExchangeOrderStatusMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateExchangeOrderStatus>>, UpdateExchangeOrderStatusMutationVariables> = (props) => {
+          const {tenantId,orderId,data} = props ?? {};
+
+          return  updateExchangeOrderStatus(tenantId,orderId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateExchangeOrderStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateExchangeOrderStatus>>>
+    export type UpdateExchangeOrderStatusMutationBody = BodyType<ExchangeStatusInput>
+    export type UpdateExchangeOrderStatusMutationError = ErrorType<unknown>
+    export type UpdateExchangeOrderStatusMutationVariables = {tenantId: string;orderId: string;data: BodyType<ExchangeStatusInput>}
+
+    export const useUpdateExchangeOrderStatus = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExchangeOrderStatus>>, TError,UpdateExchangeOrderStatusMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateExchangeOrderStatus>>,
+        TError,
+        UpdateExchangeOrderStatusMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateExchangeOrderStatusMutationOptions(options));
+    }
+
+export const getGetExchangeDashboardUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/dashboard`
+}
+
+export const getExchangeDashboard = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeDashboard> => {
+
+  return customFetch<ExchangeDashboard>(getGetExchangeDashboardUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExchangeDashboardQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange/dashboard`
+    ] as const;
+    }
+
+
+export const getGetExchangeDashboardQueryOptions = <TData = Awaited<ReturnType<typeof getExchangeDashboard>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeDashboard>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExchangeDashboardQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExchangeDashboard>>> = ({ signal }) => getExchangeDashboard(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExchangeDashboard>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExchangeDashboardQueryResult = NonNullable<Awaited<ReturnType<typeof getExchangeDashboard>>>
+export type GetExchangeDashboardQueryError = ErrorType<unknown>
+
+
+
+export function useGetExchangeDashboard<TData = Awaited<ReturnType<typeof getExchangeDashboard>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeDashboard>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExchangeDashboardQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPublicExchangeUrl = (slug: string,) => {
+
+
+
+
+  return `/api/public/sites/${slug}/exchange`
+}
+
+export const getPublicExchange = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<PublicExchange> => {
+
+  return customFetch<PublicExchange>(getGetPublicExchangeUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicExchangeQueryKey = (slug: string,) => {
+    return [
+    `/api/public/sites/${slug}/exchange`
+    ] as const;
+    }
+
+
+export const getGetPublicExchangeQueryOptions = <TData = Awaited<ReturnType<typeof getPublicExchange>>, TError = ErrorType<unknown>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicExchange>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicExchangeQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicExchange>>> = ({ signal }) => getPublicExchange(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicExchange>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicExchangeQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicExchange>>>
+export type GetPublicExchangeQueryError = ErrorType<unknown>
+
+
+
+export function useGetPublicExchange<TData = Awaited<ReturnType<typeof getPublicExchange>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicExchange>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicExchangeQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateSandboxQuoteUrl = (slug: string,) => {
+
+
+
+
+  return `/api/public/sites/${slug}/exchange/quotes`
+}
+
+export const createSandboxQuote = async (slug: string,
+    exchangeQuoteInput: ExchangeQuoteInput, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeQuote> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ExchangeQuote>(getCreateSandboxQuoteUrl(slug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeQuoteInput)
+  }
+);}
+
+
+
+
+
+export const getCreateSandboxQuoteMutationKey = () => ['createSandboxQuote'] as const;
+
+export const getCreateSandboxQuoteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSandboxQuote>>, TError,CreateSandboxQuoteMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSandboxQuote>>, TError,CreateSandboxQuoteMutationVariables, TContext> => {
+
+const mutationKey = getCreateSandboxQuoteMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSandboxQuote>>, CreateSandboxQuoteMutationVariables> = (props) => {
+          const {slug,data} = props ?? {};
+
+          return  createSandboxQuote(slug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSandboxQuoteMutationResult = NonNullable<Awaited<ReturnType<typeof createSandboxQuote>>>
+    export type CreateSandboxQuoteMutationBody = BodyType<ExchangeQuoteInput>
+    export type CreateSandboxQuoteMutationError = ErrorType<unknown>
+    export type CreateSandboxQuoteMutationVariables = {slug: string;data: BodyType<ExchangeQuoteInput>}
+
+    export const useCreateSandboxQuote = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSandboxQuote>>, TError,CreateSandboxQuoteMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSandboxQuote>>,
+        TError,
+        CreateSandboxQuoteMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateSandboxQuoteMutationOptions(options));
+    }
+
+export const getCreateSandboxOrderUrl = (slug: string,) => {
+
+
+
+
+  return `/api/public/sites/${slug}/exchange/orders`
+}
+
+export const createSandboxOrder = async (slug: string,
+    exchangeOrderInput: ExchangeOrderInput, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeOrderCreated> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ExchangeOrderCreated>(getCreateSandboxOrderUrl(slug),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeOrderInput)
+  }
+);}
+
+
+
+
+
+export const getCreateSandboxOrderMutationKey = () => ['createSandboxOrder'] as const;
+
+export const getCreateSandboxOrderMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSandboxOrder>>, TError,CreateSandboxOrderMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSandboxOrder>>, TError,CreateSandboxOrderMutationVariables, TContext> => {
+
+const mutationKey = getCreateSandboxOrderMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSandboxOrder>>, CreateSandboxOrderMutationVariables> = (props) => {
+          const {slug,data} = props ?? {};
+
+          return  createSandboxOrder(slug,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSandboxOrderMutationResult = NonNullable<Awaited<ReturnType<typeof createSandboxOrder>>>
+    export type CreateSandboxOrderMutationBody = BodyType<ExchangeOrderInput>
+    export type CreateSandboxOrderMutationError = ErrorType<unknown>
+    export type CreateSandboxOrderMutationVariables = {slug: string;data: BodyType<ExchangeOrderInput>}
+
+    export const useCreateSandboxOrder = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSandboxOrder>>, TError,CreateSandboxOrderMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSandboxOrder>>,
+        TError,
+        CreateSandboxOrderMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateSandboxOrderMutationOptions(options));
+    }
+
+export const getTrackSandboxOrderUrl = (slug: string,
+    orderId: string,) => {
+
+
+
+
+  return `/api/public/sites/${slug}/exchange/orders/${orderId}`
+}
+
+export const trackSandboxOrder = async (slug: string,
+    orderId: string, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeOrder> => {
+
+  return customFetch<ExchangeOrder>(getTrackSandboxOrderUrl(slug,orderId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getTrackSandboxOrderQueryKey = (slug: string,
+    orderId: string,) => {
+    return [
+    `/api/public/sites/${slug}/exchange/orders/${orderId}`
+    ] as const;
+    }
+
+
+export const getTrackSandboxOrderQueryOptions = <TData = Awaited<ReturnType<typeof trackSandboxOrder>>, TError = ErrorType<unknown>>(slug: string,
+    orderId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackSandboxOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getTrackSandboxOrderQueryKey(slug,orderId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof trackSandboxOrder>>> = ({ signal }) => trackSandboxOrder(slug,orderId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined && orderId !== null && orderId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof trackSandboxOrder>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type TrackSandboxOrderQueryResult = NonNullable<Awaited<ReturnType<typeof trackSandboxOrder>>>
+export type TrackSandboxOrderQueryError = ErrorType<unknown>
+
+
+
+export function useTrackSandboxOrder<TData = Awaited<ReturnType<typeof trackSandboxOrder>>, TError = ErrorType<unknown>>(
+ slug: string,
+    orderId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof trackSandboxOrder>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getTrackSandboxOrderQueryOptions(slug,orderId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetPublicProductCatalogUrl = () => {
 

@@ -17,6 +17,105 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /tenants/{tenantId}/exchange/audit:
+    get:
+      operationId: listExchangeAudit
+      parameters:
+        - {$ref: "#/components/parameters/TenantId"}
+        - {name: page, in: query, schema: {type: integer, minimum: 1}}
+      responses:
+        "200": {description: Paginated tenant-scoped audit events, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeAuditList"}}}}
+  /tenants/{tenantId}/exchange:
+    parameters:
+      - {$ref: "#/components/parameters/TenantId"}
+    get:
+      operationId: getExchangeConfiguration
+      responses:
+        "200": {description: Tenant sandbox configuration, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeConfiguration"}}}}
+    put:
+      operationId: saveExchangeConfiguration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeSettings"}
+      responses:
+        "200": {description: Saved sandbox configuration, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeConfiguration"}}}}
+  /tenants/{tenantId}/exchange/orders:
+    get:
+      operationId: listExchangeOrders
+      parameters:
+        - {$ref: "#/components/parameters/TenantId"}
+        - {name: search, in: query, schema: {type: string, maxLength: 100}}
+        - {name: status, in: query, schema: {type: string}}
+        - {name: action, in: query, schema: {type: string}}
+        - {name: page, in: query, schema: {type: integer, minimum: 1}}
+      responses:
+        "200": {description: Paginated sandbox orders, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrderList"}}}}
+  /tenants/{tenantId}/exchange/orders/{orderId}:
+    parameters:
+      - {$ref: "#/components/parameters/TenantId"}
+      - {name: orderId, in: path, required: true, schema: {type: string, format: uuid}}
+    get:
+      operationId: getExchangeOrder
+      responses:
+        "200": {description: Tenant order details, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrder"}}}}
+    put:
+      operationId: updateExchangeOrderStatus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeStatusInput"}
+      responses:
+        "200": {description: Updated simulated order, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrder"}}}}
+  /tenants/{tenantId}/exchange/dashboard:
+    get:
+      operationId: getExchangeDashboard
+      parameters:
+        - {$ref: "#/components/parameters/TenantId"}
+      responses:
+        "200": {description: Sandbox exchange overview, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeDashboard"}}}}
+  /public/sites/{slug}/exchange:
+    get:
+      operationId: getPublicExchange
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+      responses:
+        "200": {description: Public tenant exchange, content: {application/json: {schema: {$ref: "#/components/schemas/PublicExchange"}}}}
+  /public/sites/{slug}/exchange/quotes:
+    post:
+      operationId: createSandboxQuote
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeQuoteInput"}
+      responses:
+        "200": {description: Signed sandbox quote, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeQuote"}}}}
+  /public/sites/{slug}/exchange/orders:
+    post:
+      operationId: createSandboxOrder
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeOrderInput"}
+      responses:
+        "201": {description: Simulated order and private tracking capability, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrderCreated"}}}}
+  /public/sites/{slug}/exchange/orders/{orderId}:
+    get:
+      operationId: trackSandboxOrder
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+        - {name: orderId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: trackingToken, in: header, required: true, schema: {type: string, minLength: 32, maxLength: 200}}
+      responses:
+        "200": {description: Capability-protected order tracking, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrder"}}}}
   /public/product-catalog:
     get:
       operationId: getPublicProductCatalog
@@ -675,6 +774,222 @@ components:
         type: string
         format: uuid
   schemas:
+    ExchangeAuditList:
+      type: object
+      required: [events, total, page, pageSize]
+      properties:
+        events: {type: array, items: {$ref: "#/components/schemas/ActivityEvent"}}
+        total: {type: integer}
+        page: {type: integer}
+        pageSize: {type: integer}
+    ExchangeAction:
+      type: string
+      enum: [swap, convert, buy, sell]
+    ExchangeAssetSettings:
+      type: object
+      required: [assetId, enabled, displayOrder, symbol, decimals, logoUrl, sandboxPlanRate]
+      properties:
+        assetId: {type: string, minLength: 1, maxLength: 80}
+        enabled: {type: boolean}
+        displayOrder: {type: integer, minimum: 0, maximum: 1000}
+        symbol: {type: string, minLength: 1, maxLength: 12}
+        decimals: {type: integer, minimum: 0, maximum: 18}
+        logoUrl: {type: ["string", "null"], maxLength: 2000}
+        sandboxPlanRate: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+    ExchangeNetworkSettings:
+      type: object
+      required: [assetNetworkId, enabled, available, minimum, maximum, fee, information]
+      properties:
+        assetNetworkId: {type: string, minLength: 1, maxLength: 80}
+        enabled: {type: boolean}
+        available: {type: boolean}
+        minimum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        maximum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        fee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        information: {type: string, maxLength: 500}
+    ExchangeRoute:
+      type: object
+      required: [id, source, destination, action, enabled, rate, minimum, maximum, feeBps, fixedFee, spreadBps, paymentMethodIds]
+      properties:
+        id: {type: string, format: uuid}
+        source: {type: string, minLength: 1, maxLength: 80}
+        destination: {type: string, minLength: 1, maxLength: 80}
+        action: {$ref: "#/components/schemas/ExchangeAction"}
+        enabled: {type: boolean}
+        rate: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        minimum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        maximum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        feeBps: {type: integer, minimum: 0, maximum: 5000}
+        fixedFee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        spreadBps: {type: integer, minimum: 0, maximum: 5000}
+        paymentMethodIds: {type: array, maxItems: 30, items: {type: string, format: uuid}}
+    ExchangePaymentMethod:
+      type: object
+      required: [id, label, enabled, currency, buy, sell]
+      properties:
+        id: {type: string, format: uuid}
+        label: {type: string, minLength: 2, maxLength: 80}
+        enabled: {type: boolean}
+        currency: {type: string, enum: [USD, EUR, GBP]}
+        buy: {type: boolean}
+        sell: {type: boolean}
+    ExchangeSettings:
+      type: object
+      required: [enabled, actions, assets, networks, routes, paymentMethods, fiatCurrency, fiatPlanRate, defaultAction, publicNote]
+      properties:
+        enabled: {type: boolean}
+        defaultAction: {$ref: "#/components/schemas/ExchangeAction"}
+        publicNote: {type: string, maxLength: 1000}
+        fiatCurrency: {type: string, enum: [USD, EUR, GBP]}
+        fiatPlanRate: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        actions:
+          type: object
+          required: [swap, convert, buy, sell]
+          properties:
+            swap: {type: boolean}
+            convert: {type: boolean}
+            buy: {type: boolean}
+            sell: {type: boolean}
+        assets: {type: array, maxItems: 100, items: {$ref: "#/components/schemas/ExchangeAssetSettings"}}
+        networks: {type: array, maxItems: 200, items: {$ref: "#/components/schemas/ExchangeNetworkSettings"}}
+        routes: {type: array, maxItems: 100, items: {$ref: "#/components/schemas/ExchangeRoute"}}
+        paymentMethods: {type: array, maxItems: 30, items: {$ref: "#/components/schemas/ExchangePaymentMethod"}}
+    ExchangeCatalogAsset:
+      type: object
+      required: [assetNetworkId, assetId, symbol, name, networkId, networkName, testnet]
+      properties:
+        assetNetworkId: {type: string}
+        assetId: {type: string}
+        symbol: {type: string}
+        name: {type: string}
+        networkId: {type: string}
+        networkName: {type: string}
+        testnet: {type: boolean}
+    ExchangeConfiguration:
+      type: object
+      required: [configuration, catalog, effectiveEnabled]
+      properties:
+        configuration: {$ref: "#/components/schemas/ExchangeSettings"}
+        catalog: {type: array, items: {$ref: "#/components/schemas/ExchangeCatalogAsset"}}
+        effectiveEnabled: {type: boolean}
+    ExchangeQuoteInput:
+      type: object
+      required: [action, source, destination, amount]
+      properties:
+        action: {$ref: "#/components/schemas/ExchangeAction"}
+        source: {type: string, minLength: 1, maxLength: 80}
+        destination: {type: string, minLength: 1, maxLength: 80}
+        amount: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        paymentMethodId: {type: string, format: uuid}
+    ExchangeQuote:
+      type: object
+      required: [token, expiresAt, routeId, action, source, destination, sourceSymbol, destinationSymbol, inputAmount, outputAmount, rate, fee, minimum, maximum, spreadBps, sandboxOnly]
+      properties:
+        token: {type: string}
+        expiresAt: {type: string, format: date-time}
+        routeId: {type: string, format: uuid}
+        action: {$ref: "#/components/schemas/ExchangeAction"}
+        source: {type: string}
+        destination: {type: string}
+        sourceSymbol: {type: string}
+        destinationSymbol: {type: string}
+        inputAmount: {type: string}
+        outputAmount: {type: string}
+        rate: {type: string}
+        fee: {type: string}
+        destinationFee: {type: string}
+        minimum: {type: string}
+        maximum: {type: string}
+        spreadBps: {type: integer}
+        sandboxOnly: {type: boolean, const: true}
+    ExchangeOrderInput:
+      type: object
+      required: [quoteToken, idempotencyKey]
+      properties:
+        quoteToken: {type: string, minLength: 40, maxLength: 12000}
+        idempotencyKey: {type: string, format: uuid}
+    ExchangeStatusInput:
+      type: object
+      required: [status, note]
+      properties:
+        status: {type: string, enum: [pending, processing, completed, cancelled, failed]}
+        note: {type: string, maxLength: 500}
+    ExchangeOrderEvent:
+      type: object
+      required: [status, at, note]
+      properties:
+        status: {type: string}
+        at: {type: string, format: date-time}
+        note: {type: string}
+    ExchangeOrder:
+      type: object
+      required: [id, status, action, source, destination, sourceSymbol, destinationSymbol, inputAmount, outputAmount, rate, fee, spreadBps, paymentMethod, createdAt, history, sandboxOnly]
+      properties:
+        id: {type: string, format: uuid}
+        status: {type: string}
+        action: {$ref: "#/components/schemas/ExchangeAction"}
+        source: {type: string}
+        destination: {type: string}
+        sourceSymbol: {type: string}
+        destinationSymbol: {type: string}
+        inputAmount: {type: string}
+        outputAmount: {type: string}
+        rate: {type: string}
+        fee: {type: string}
+        destinationFee: {type: string}
+        spreadBps: {type: integer}
+        paymentMethod: {type: ["string", "null"]}
+        createdAt: {type: string, format: date-time}
+        history: {type: array, items: {$ref: "#/components/schemas/ExchangeOrderEvent"}}
+        sandboxOnly: {type: boolean, const: true}
+    ExchangeOrderCreated:
+      type: object
+      required: [order, trackingToken]
+      properties:
+        order: {$ref: "#/components/schemas/ExchangeOrder"}
+        trackingToken: {type: string}
+    ExchangeOrderList:
+      type: object
+      required: [orders, total, page, pageSize]
+      properties:
+        orders: {type: array, items: {$ref: "#/components/schemas/ExchangeOrder"}}
+        total: {type: integer}
+        page: {type: integer}
+        pageSize: {type: integer}
+    ExchangeVolume:
+      type: object
+      required: [symbol, amount]
+      properties:
+        symbol: {type: string}
+        amount: {type: string}
+    ExchangeDashboard:
+      type: object
+      required: [enabled, total, pending, processing, completed, cancelled, failed, assets, networks, routes, volume, recentOrders]
+      properties:
+        enabled: {type: boolean}
+        total: {type: integer}
+        pending: {type: integer}
+        processing: {type: integer}
+        completed: {type: integer}
+        cancelled: {type: integer}
+        failed: {type: integer}
+        assets: {type: integer}
+        networks: {type: integer}
+        routes: {type: integer}
+        volume: {type: array, items: {$ref: "#/components/schemas/ExchangeVolume"}}
+        recentOrders: {type: array, items: {$ref: "#/components/schemas/ExchangeOrder"}}
+    PublicExchange:
+      type: object
+      required: [enabled, actions, assets, routes, paymentMethods, fiatCurrency, publicNote]
+      properties:
+        enabled: {type: boolean}
+        defaultAction: {$ref: "#/components/schemas/ExchangeAction"}
+        actions: {type: array, items: {$ref: "#/components/schemas/ExchangeAction"}}
+        assets: {type: array, items: {$ref: "#/components/schemas/AssetNetwork"}}
+        routes: {type: array, items: {$ref: "#/components/schemas/ExchangeRoute"}}
+        paymentMethods: {type: array, items: {$ref: "#/components/schemas/ExchangePaymentMethod"}}
+        fiatCurrency: {type: string}
+        publicNote: {type: string}
     LandingProductInput:
       type: object
       required: [visible, name, description, icon, startingPrice, setupFee, currency, billingPeriod, status, ctaLabel, displayOrder]
@@ -817,6 +1132,7 @@ components:
       properties:
         id: { type: string }
         eventType: { type: string }
+        actorId: {type: string}
         description: { type: string }
         tenantId: { type: ["string", "null"], format: uuid }
         createdAt: { type: string, format: date-time }
@@ -834,11 +1150,14 @@ components:
       type: object
       properties:
         assetId: { type: string }
+        assetNetworkId: {type: string}
         symbol: { type: string }
         name: { type: string }
         networkId: { type: string }
         networkName: { type: string }
         testnet: { type: boolean }
+        logoUrl: {type: ["string", "null"]}
+        decimals: {type: integer}
       required: [assetId, symbol, name, networkId, networkName, testnet]
     AssetNetworkCatalog:
       type: object

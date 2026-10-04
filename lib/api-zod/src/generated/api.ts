@@ -8,6 +8,732 @@
 import * as zod from 'zod';
 
 
+export const ListExchangeAuditParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+
+
+
+export const ListExchangeAuditQueryParams = zod.object({
+  "page": zod.coerce.number().int().min(1).optional()
+})
+
+export const ListExchangeAuditResponse = zod.object({
+  "events": zod.array(zod.object({
+  "id": zod.string(),
+  "eventType": zod.string(),
+  "actorId": zod.string().optional(),
+  "description": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date()
+})),
+  "total": zod.number().int(),
+  "page": zod.number().int(),
+  "pageSize": zod.number().int()
+})
+
+
+export const GetExchangeConfigurationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const getExchangeConfigurationResponseConfigurationPublicNoteMax = 1000;
+
+export const getExchangeConfigurationResponseConfigurationFiatPlanRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationAssetsItemAssetIdMax = 80;
+
+export const getExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMin = 0;
+export const getExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMax = 1000;
+
+export const getExchangeConfigurationResponseConfigurationAssetsItemSymbolMax = 12;
+
+export const getExchangeConfigurationResponseConfigurationAssetsItemDecimalsMin = 0;
+export const getExchangeConfigurationResponseConfigurationAssetsItemDecimalsMax = 18;
+
+export const getExchangeConfigurationResponseConfigurationAssetsItemLogoUrlMax = 2000;
+
+export const getExchangeConfigurationResponseConfigurationAssetsItemSandboxPlanRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationAssetsMax = 100;
+
+export const getExchangeConfigurationResponseConfigurationNetworksItemAssetNetworkIdMax = 80;
+
+export const getExchangeConfigurationResponseConfigurationNetworksItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationNetworksItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationNetworksItemInformationMax = 500;
+
+export const getExchangeConfigurationResponseConfigurationNetworksMax = 200;
+
+export const getExchangeConfigurationResponseConfigurationRoutesItemSourceMax = 80;
+
+export const getExchangeConfigurationResponseConfigurationRoutesItemDestinationMax = 80;
+
+export const getExchangeConfigurationResponseConfigurationRoutesItemRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationRoutesItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationRoutesItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMin = 0;
+export const getExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMax = 5000;
+
+export const getExchangeConfigurationResponseConfigurationRoutesItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMin = 0;
+export const getExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMax = 5000;
+
+export const getExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax = 30;
+
+export const getExchangeConfigurationResponseConfigurationRoutesMax = 100;
+
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin = 2;
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax = 80;
+
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsMax = 30;
+
+
+
+export const GetExchangeConfigurationResponse = zod.object({
+  "configuration": zod.object({
+  "enabled": zod.boolean(),
+  "defaultAction": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "publicNote": zod.string().max(getExchangeConfigurationResponseConfigurationPublicNoteMax),
+  "fiatCurrency": zod.enum(['USD', 'EUR', 'GBP']),
+  "fiatPlanRate": zod.string().regex(getExchangeConfigurationResponseConfigurationFiatPlanRateRegExp),
+  "actions": zod.object({
+  "swap": zod.boolean(),
+  "convert": zod.boolean(),
+  "buy": zod.boolean(),
+  "sell": zod.boolean()
+}),
+  "assets": zod.array(zod.object({
+  "assetId": zod.string().min(1).max(getExchangeConfigurationResponseConfigurationAssetsItemAssetIdMax),
+  "enabled": zod.boolean(),
+  "displayOrder": zod.number().int().min(getExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMin).max(getExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMax),
+  "symbol": zod.string().min(1).max(getExchangeConfigurationResponseConfigurationAssetsItemSymbolMax),
+  "decimals": zod.number().int().min(getExchangeConfigurationResponseConfigurationAssetsItemDecimalsMin).max(getExchangeConfigurationResponseConfigurationAssetsItemDecimalsMax),
+  "logoUrl": zod.string().max(getExchangeConfigurationResponseConfigurationAssetsItemLogoUrlMax).nullable(),
+  "sandboxPlanRate": zod.string().regex(getExchangeConfigurationResponseConfigurationAssetsItemSandboxPlanRateRegExp)
+})).max(getExchangeConfigurationResponseConfigurationAssetsMax),
+  "networks": zod.array(zod.object({
+  "assetNetworkId": zod.string().min(1).max(getExchangeConfigurationResponseConfigurationNetworksItemAssetNetworkIdMax),
+  "enabled": zod.boolean(),
+  "available": zod.boolean(),
+  "minimum": zod.string().regex(getExchangeConfigurationResponseConfigurationNetworksItemMinimumRegExp),
+  "maximum": zod.string().regex(getExchangeConfigurationResponseConfigurationNetworksItemMaximumRegExp),
+  "fee": zod.string().regex(getExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp),
+  "information": zod.string().max(getExchangeConfigurationResponseConfigurationNetworksItemInformationMax)
+})).max(getExchangeConfigurationResponseConfigurationNetworksMax),
+  "routes": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "source": zod.string().min(1).max(getExchangeConfigurationResponseConfigurationRoutesItemSourceMax),
+  "destination": zod.string().min(1).max(getExchangeConfigurationResponseConfigurationRoutesItemDestinationMax),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "enabled": zod.boolean(),
+  "rate": zod.string().regex(getExchangeConfigurationResponseConfigurationRoutesItemRateRegExp),
+  "minimum": zod.string().regex(getExchangeConfigurationResponseConfigurationRoutesItemMinimumRegExp),
+  "maximum": zod.string().regex(getExchangeConfigurationResponseConfigurationRoutesItemMaximumRegExp),
+  "feeBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMin).max(getExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMax),
+  "fixedFee": zod.string().regex(getExchangeConfigurationResponseConfigurationRoutesItemFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMin).max(getExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMax),
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(getExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax)
+})).max(getExchangeConfigurationResponseConfigurationRoutesMax),
+  "paymentMethods": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "label": zod.string().min(getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin).max(getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax),
+  "enabled": zod.boolean(),
+  "currency": zod.enum(['USD', 'EUR', 'GBP']),
+  "buy": zod.boolean(),
+  "sell": zod.boolean()
+})).max(getExchangeConfigurationResponseConfigurationPaymentMethodsMax)
+}),
+  "catalog": zod.array(zod.object({
+  "assetNetworkId": zod.string(),
+  "assetId": zod.string(),
+  "symbol": zod.string(),
+  "name": zod.string(),
+  "networkId": zod.string(),
+  "networkName": zod.string(),
+  "testnet": zod.boolean()
+})),
+  "effectiveEnabled": zod.boolean()
+})
+
+
+export const SaveExchangeConfigurationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const saveExchangeConfigurationBodyPublicNoteMax = 1000;
+
+export const saveExchangeConfigurationBodyFiatPlanRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyAssetsItemAssetIdMax = 80;
+
+export const saveExchangeConfigurationBodyAssetsItemDisplayOrderMin = 0;
+export const saveExchangeConfigurationBodyAssetsItemDisplayOrderMax = 1000;
+
+export const saveExchangeConfigurationBodyAssetsItemSymbolMax = 12;
+
+export const saveExchangeConfigurationBodyAssetsItemDecimalsMin = 0;
+export const saveExchangeConfigurationBodyAssetsItemDecimalsMax = 18;
+
+export const saveExchangeConfigurationBodyAssetsItemLogoUrlMax = 2000;
+
+export const saveExchangeConfigurationBodyAssetsItemSandboxPlanRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyAssetsMax = 100;
+
+export const saveExchangeConfigurationBodyNetworksItemAssetNetworkIdMax = 80;
+
+export const saveExchangeConfigurationBodyNetworksItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyNetworksItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyNetworksItemFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyNetworksItemInformationMax = 500;
+
+export const saveExchangeConfigurationBodyNetworksMax = 200;
+
+export const saveExchangeConfigurationBodyRoutesItemSourceMax = 80;
+
+export const saveExchangeConfigurationBodyRoutesItemDestinationMax = 80;
+
+export const saveExchangeConfigurationBodyRoutesItemRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyRoutesItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyRoutesItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyRoutesItemFeeBpsMin = 0;
+export const saveExchangeConfigurationBodyRoutesItemFeeBpsMax = 5000;
+
+export const saveExchangeConfigurationBodyRoutesItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyRoutesItemSpreadBpsMin = 0;
+export const saveExchangeConfigurationBodyRoutesItemSpreadBpsMax = 5000;
+
+export const saveExchangeConfigurationBodyRoutesItemPaymentMethodIdsMax = 30;
+
+export const saveExchangeConfigurationBodyRoutesMax = 100;
+
+export const saveExchangeConfigurationBodyPaymentMethodsItemLabelMin = 2;
+export const saveExchangeConfigurationBodyPaymentMethodsItemLabelMax = 80;
+
+export const saveExchangeConfigurationBodyPaymentMethodsMax = 30;
+
+
+
+export const SaveExchangeConfigurationBody = zod.object({
+  "enabled": zod.boolean(),
+  "defaultAction": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "publicNote": zod.string().max(saveExchangeConfigurationBodyPublicNoteMax),
+  "fiatCurrency": zod.enum(['USD', 'EUR', 'GBP']),
+  "fiatPlanRate": zod.string().regex(saveExchangeConfigurationBodyFiatPlanRateRegExp),
+  "actions": zod.object({
+  "swap": zod.boolean(),
+  "convert": zod.boolean(),
+  "buy": zod.boolean(),
+  "sell": zod.boolean()
+}),
+  "assets": zod.array(zod.object({
+  "assetId": zod.string().min(1).max(saveExchangeConfigurationBodyAssetsItemAssetIdMax),
+  "enabled": zod.boolean(),
+  "displayOrder": zod.number().int().min(saveExchangeConfigurationBodyAssetsItemDisplayOrderMin).max(saveExchangeConfigurationBodyAssetsItemDisplayOrderMax),
+  "symbol": zod.string().min(1).max(saveExchangeConfigurationBodyAssetsItemSymbolMax),
+  "decimals": zod.number().int().min(saveExchangeConfigurationBodyAssetsItemDecimalsMin).max(saveExchangeConfigurationBodyAssetsItemDecimalsMax),
+  "logoUrl": zod.string().max(saveExchangeConfigurationBodyAssetsItemLogoUrlMax).nullable(),
+  "sandboxPlanRate": zod.string().regex(saveExchangeConfigurationBodyAssetsItemSandboxPlanRateRegExp)
+})).max(saveExchangeConfigurationBodyAssetsMax),
+  "networks": zod.array(zod.object({
+  "assetNetworkId": zod.string().min(1).max(saveExchangeConfigurationBodyNetworksItemAssetNetworkIdMax),
+  "enabled": zod.boolean(),
+  "available": zod.boolean(),
+  "minimum": zod.string().regex(saveExchangeConfigurationBodyNetworksItemMinimumRegExp),
+  "maximum": zod.string().regex(saveExchangeConfigurationBodyNetworksItemMaximumRegExp),
+  "fee": zod.string().regex(saveExchangeConfigurationBodyNetworksItemFeeRegExp),
+  "information": zod.string().max(saveExchangeConfigurationBodyNetworksItemInformationMax)
+})).max(saveExchangeConfigurationBodyNetworksMax),
+  "routes": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "source": zod.string().min(1).max(saveExchangeConfigurationBodyRoutesItemSourceMax),
+  "destination": zod.string().min(1).max(saveExchangeConfigurationBodyRoutesItemDestinationMax),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "enabled": zod.boolean(),
+  "rate": zod.string().regex(saveExchangeConfigurationBodyRoutesItemRateRegExp),
+  "minimum": zod.string().regex(saveExchangeConfigurationBodyRoutesItemMinimumRegExp),
+  "maximum": zod.string().regex(saveExchangeConfigurationBodyRoutesItemMaximumRegExp),
+  "feeBps": zod.number().int().min(saveExchangeConfigurationBodyRoutesItemFeeBpsMin).max(saveExchangeConfigurationBodyRoutesItemFeeBpsMax),
+  "fixedFee": zod.string().regex(saveExchangeConfigurationBodyRoutesItemFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(saveExchangeConfigurationBodyRoutesItemSpreadBpsMin).max(saveExchangeConfigurationBodyRoutesItemSpreadBpsMax),
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationBodyRoutesItemPaymentMethodIdsMax)
+})).max(saveExchangeConfigurationBodyRoutesMax),
+  "paymentMethods": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "label": zod.string().min(saveExchangeConfigurationBodyPaymentMethodsItemLabelMin).max(saveExchangeConfigurationBodyPaymentMethodsItemLabelMax),
+  "enabled": zod.boolean(),
+  "currency": zod.enum(['USD', 'EUR', 'GBP']),
+  "buy": zod.boolean(),
+  "sell": zod.boolean()
+})).max(saveExchangeConfigurationBodyPaymentMethodsMax)
+})
+
+export const saveExchangeConfigurationResponseConfigurationPublicNoteMax = 1000;
+
+export const saveExchangeConfigurationResponseConfigurationFiatPlanRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationAssetsItemAssetIdMax = 80;
+
+export const saveExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMin = 0;
+export const saveExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMax = 1000;
+
+export const saveExchangeConfigurationResponseConfigurationAssetsItemSymbolMax = 12;
+
+export const saveExchangeConfigurationResponseConfigurationAssetsItemDecimalsMin = 0;
+export const saveExchangeConfigurationResponseConfigurationAssetsItemDecimalsMax = 18;
+
+export const saveExchangeConfigurationResponseConfigurationAssetsItemLogoUrlMax = 2000;
+
+export const saveExchangeConfigurationResponseConfigurationAssetsItemSandboxPlanRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationAssetsMax = 100;
+
+export const saveExchangeConfigurationResponseConfigurationNetworksItemAssetNetworkIdMax = 80;
+
+export const saveExchangeConfigurationResponseConfigurationNetworksItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationNetworksItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationNetworksItemInformationMax = 500;
+
+export const saveExchangeConfigurationResponseConfigurationNetworksMax = 200;
+
+export const saveExchangeConfigurationResponseConfigurationRoutesItemSourceMax = 80;
+
+export const saveExchangeConfigurationResponseConfigurationRoutesItemDestinationMax = 80;
+
+export const saveExchangeConfigurationResponseConfigurationRoutesItemRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationRoutesItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationRoutesItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMin = 0;
+export const saveExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMax = 5000;
+
+export const saveExchangeConfigurationResponseConfigurationRoutesItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMin = 0;
+export const saveExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMax = 5000;
+
+export const saveExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax = 30;
+
+export const saveExchangeConfigurationResponseConfigurationRoutesMax = 100;
+
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin = 2;
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax = 80;
+
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsMax = 30;
+
+
+
+export const SaveExchangeConfigurationResponse = zod.object({
+  "configuration": zod.object({
+  "enabled": zod.boolean(),
+  "defaultAction": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "publicNote": zod.string().max(saveExchangeConfigurationResponseConfigurationPublicNoteMax),
+  "fiatCurrency": zod.enum(['USD', 'EUR', 'GBP']),
+  "fiatPlanRate": zod.string().regex(saveExchangeConfigurationResponseConfigurationFiatPlanRateRegExp),
+  "actions": zod.object({
+  "swap": zod.boolean(),
+  "convert": zod.boolean(),
+  "buy": zod.boolean(),
+  "sell": zod.boolean()
+}),
+  "assets": zod.array(zod.object({
+  "assetId": zod.string().min(1).max(saveExchangeConfigurationResponseConfigurationAssetsItemAssetIdMax),
+  "enabled": zod.boolean(),
+  "displayOrder": zod.number().int().min(saveExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMin).max(saveExchangeConfigurationResponseConfigurationAssetsItemDisplayOrderMax),
+  "symbol": zod.string().min(1).max(saveExchangeConfigurationResponseConfigurationAssetsItemSymbolMax),
+  "decimals": zod.number().int().min(saveExchangeConfigurationResponseConfigurationAssetsItemDecimalsMin).max(saveExchangeConfigurationResponseConfigurationAssetsItemDecimalsMax),
+  "logoUrl": zod.string().max(saveExchangeConfigurationResponseConfigurationAssetsItemLogoUrlMax).nullable(),
+  "sandboxPlanRate": zod.string().regex(saveExchangeConfigurationResponseConfigurationAssetsItemSandboxPlanRateRegExp)
+})).max(saveExchangeConfigurationResponseConfigurationAssetsMax),
+  "networks": zod.array(zod.object({
+  "assetNetworkId": zod.string().min(1).max(saveExchangeConfigurationResponseConfigurationNetworksItemAssetNetworkIdMax),
+  "enabled": zod.boolean(),
+  "available": zod.boolean(),
+  "minimum": zod.string().regex(saveExchangeConfigurationResponseConfigurationNetworksItemMinimumRegExp),
+  "maximum": zod.string().regex(saveExchangeConfigurationResponseConfigurationNetworksItemMaximumRegExp),
+  "fee": zod.string().regex(saveExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp),
+  "information": zod.string().max(saveExchangeConfigurationResponseConfigurationNetworksItemInformationMax)
+})).max(saveExchangeConfigurationResponseConfigurationNetworksMax),
+  "routes": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "source": zod.string().min(1).max(saveExchangeConfigurationResponseConfigurationRoutesItemSourceMax),
+  "destination": zod.string().min(1).max(saveExchangeConfigurationResponseConfigurationRoutesItemDestinationMax),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "enabled": zod.boolean(),
+  "rate": zod.string().regex(saveExchangeConfigurationResponseConfigurationRoutesItemRateRegExp),
+  "minimum": zod.string().regex(saveExchangeConfigurationResponseConfigurationRoutesItemMinimumRegExp),
+  "maximum": zod.string().regex(saveExchangeConfigurationResponseConfigurationRoutesItemMaximumRegExp),
+  "feeBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMin).max(saveExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMax),
+  "fixedFee": zod.string().regex(saveExchangeConfigurationResponseConfigurationRoutesItemFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMin).max(saveExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMax),
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax)
+})).max(saveExchangeConfigurationResponseConfigurationRoutesMax),
+  "paymentMethods": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "label": zod.string().min(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax),
+  "enabled": zod.boolean(),
+  "currency": zod.enum(['USD', 'EUR', 'GBP']),
+  "buy": zod.boolean(),
+  "sell": zod.boolean()
+})).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsMax)
+}),
+  "catalog": zod.array(zod.object({
+  "assetNetworkId": zod.string(),
+  "assetId": zod.string(),
+  "symbol": zod.string(),
+  "name": zod.string(),
+  "networkId": zod.string(),
+  "networkName": zod.string(),
+  "testnet": zod.boolean()
+})),
+  "effectiveEnabled": zod.boolean()
+})
+
+
+export const ListExchangeOrdersParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const listExchangeOrdersQuerySearchMax = 100;
+
+
+
+
+export const ListExchangeOrdersQueryParams = zod.object({
+  "search": zod.coerce.string().max(listExchangeOrdersQuerySearchMax).optional(),
+  "status": zod.coerce.string().optional(),
+  "action": zod.coerce.string().optional(),
+  "page": zod.coerce.number().int().min(1).optional()
+})
+
+export const ListExchangeOrdersResponse = zod.object({
+  "orders": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "status": zod.string(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "spreadBps": zod.number().int(),
+  "paymentMethod": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "history": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})),
+  "sandboxOnly": zod.literal(true)
+})),
+  "total": zod.number().int(),
+  "page": zod.number().int(),
+  "pageSize": zod.number().int()
+})
+
+
+export const GetExchangeOrderParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "orderId": zod.coerce.string().uuid()
+})
+
+export const GetExchangeOrderResponse = zod.object({
+  "id": zod.string().uuid(),
+  "status": zod.string(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "spreadBps": zod.number().int(),
+  "paymentMethod": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "history": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})),
+  "sandboxOnly": zod.literal(true)
+})
+
+
+export const UpdateExchangeOrderStatusParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "orderId": zod.coerce.string().uuid()
+})
+
+export const updateExchangeOrderStatusBodyNoteMax = 500;
+
+
+
+export const UpdateExchangeOrderStatusBody = zod.object({
+  "status": zod.enum(['pending', 'processing', 'completed', 'cancelled', 'failed']),
+  "note": zod.string().max(updateExchangeOrderStatusBodyNoteMax)
+})
+
+export const UpdateExchangeOrderStatusResponse = zod.object({
+  "id": zod.string().uuid(),
+  "status": zod.string(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "spreadBps": zod.number().int(),
+  "paymentMethod": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "history": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})),
+  "sandboxOnly": zod.literal(true)
+})
+
+
+export const GetExchangeDashboardParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const GetExchangeDashboardResponse = zod.object({
+  "enabled": zod.boolean(),
+  "total": zod.number().int(),
+  "pending": zod.number().int(),
+  "processing": zod.number().int(),
+  "completed": zod.number().int(),
+  "cancelled": zod.number().int(),
+  "failed": zod.number().int(),
+  "assets": zod.number().int(),
+  "networks": zod.number().int(),
+  "routes": zod.number().int(),
+  "volume": zod.array(zod.object({
+  "symbol": zod.string(),
+  "amount": zod.string()
+})),
+  "recentOrders": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "status": zod.string(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "spreadBps": zod.number().int(),
+  "paymentMethod": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "history": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})),
+  "sandboxOnly": zod.literal(true)
+}))
+})
+
+
+export const GetPublicExchangeParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const getPublicExchangeResponseRoutesItemSourceMax = 80;
+
+export const getPublicExchangeResponseRoutesItemDestinationMax = 80;
+
+export const getPublicExchangeResponseRoutesItemRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getPublicExchangeResponseRoutesItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getPublicExchangeResponseRoutesItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getPublicExchangeResponseRoutesItemFeeBpsMin = 0;
+export const getPublicExchangeResponseRoutesItemFeeBpsMax = 5000;
+
+export const getPublicExchangeResponseRoutesItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getPublicExchangeResponseRoutesItemSpreadBpsMin = 0;
+export const getPublicExchangeResponseRoutesItemSpreadBpsMax = 5000;
+
+export const getPublicExchangeResponseRoutesItemPaymentMethodIdsMax = 30;
+
+export const getPublicExchangeResponsePaymentMethodsItemLabelMin = 2;
+export const getPublicExchangeResponsePaymentMethodsItemLabelMax = 80;
+
+
+
+export const GetPublicExchangeResponse = zod.object({
+  "enabled": zod.boolean(),
+  "defaultAction": zod.enum(['swap', 'convert', 'buy', 'sell']).optional(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "assets": zod.array(zod.object({
+  "assetId": zod.string(),
+  "assetNetworkId": zod.string().optional(),
+  "symbol": zod.string(),
+  "name": zod.string(),
+  "networkId": zod.string(),
+  "networkName": zod.string(),
+  "testnet": zod.boolean(),
+  "logoUrl": zod.string().nullish(),
+  "decimals": zod.number().int().optional()
+})),
+  "routes": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "source": zod.string().min(1).max(getPublicExchangeResponseRoutesItemSourceMax),
+  "destination": zod.string().min(1).max(getPublicExchangeResponseRoutesItemDestinationMax),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "enabled": zod.boolean(),
+  "rate": zod.string().regex(getPublicExchangeResponseRoutesItemRateRegExp),
+  "minimum": zod.string().regex(getPublicExchangeResponseRoutesItemMinimumRegExp),
+  "maximum": zod.string().regex(getPublicExchangeResponseRoutesItemMaximumRegExp),
+  "feeBps": zod.number().int().min(getPublicExchangeResponseRoutesItemFeeBpsMin).max(getPublicExchangeResponseRoutesItemFeeBpsMax),
+  "fixedFee": zod.string().regex(getPublicExchangeResponseRoutesItemFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(getPublicExchangeResponseRoutesItemSpreadBpsMin).max(getPublicExchangeResponseRoutesItemSpreadBpsMax),
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(getPublicExchangeResponseRoutesItemPaymentMethodIdsMax)
+})),
+  "paymentMethods": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "label": zod.string().min(getPublicExchangeResponsePaymentMethodsItemLabelMin).max(getPublicExchangeResponsePaymentMethodsItemLabelMax),
+  "enabled": zod.boolean(),
+  "currency": zod.enum(['USD', 'EUR', 'GBP']),
+  "buy": zod.boolean(),
+  "sell": zod.boolean()
+})),
+  "fiatCurrency": zod.string(),
+  "publicNote": zod.string()
+})
+
+
+export const CreateSandboxQuoteParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const createSandboxQuoteBodySourceMax = 80;
+
+export const createSandboxQuoteBodyDestinationMax = 80;
+
+export const createSandboxQuoteBodyAmountRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+
+
+export const CreateSandboxQuoteBody = zod.object({
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(createSandboxQuoteBodySourceMax),
+  "destination": zod.string().min(1).max(createSandboxQuoteBodyDestinationMax),
+  "amount": zod.string().regex(createSandboxQuoteBodyAmountRegExp),
+  "paymentMethodId": zod.string().uuid().optional()
+})
+
+export const CreateSandboxQuoteResponse = zod.object({
+  "token": zod.string(),
+  "expiresAt": zod.coerce.date(),
+  "routeId": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "minimum": zod.string(),
+  "maximum": zod.string(),
+  "spreadBps": zod.number().int(),
+  "sandboxOnly": zod.literal(true)
+})
+
+
+export const CreateSandboxOrderParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const createSandboxOrderBodyQuoteTokenMin = 40;
+export const createSandboxOrderBodyQuoteTokenMax = 12000;
+
+
+
+export const CreateSandboxOrderBody = zod.object({
+  "quoteToken": zod.string().min(createSandboxOrderBodyQuoteTokenMin).max(createSandboxOrderBodyQuoteTokenMax),
+  "idempotencyKey": zod.string().uuid()
+})
+
+export const CreateSandboxOrderResponse = zod.object({
+  "order": zod.object({
+  "id": zod.string().uuid(),
+  "status": zod.string(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "spreadBps": zod.number().int(),
+  "paymentMethod": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "history": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})),
+  "sandboxOnly": zod.literal(true)
+}),
+  "trackingToken": zod.string()
+})
+
+
+export const TrackSandboxOrderParams = zod.object({
+  "slug": zod.coerce.string(),
+  "orderId": zod.coerce.string().uuid()
+})
+
+export const trackSandboxOrderHeaderTrackingTokenMin = 32;
+export const trackSandboxOrderHeaderTrackingTokenMax = 200;
+
+
+
+export const TrackSandboxOrderHeader = zod.object({
+  "trackingToken": zod.string().min(trackSandboxOrderHeaderTrackingTokenMin).max(trackSandboxOrderHeaderTrackingTokenMax)
+})
+
+export const TrackSandboxOrderResponse = zod.object({
+  "id": zod.string().uuid(),
+  "status": zod.string(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "spreadBps": zod.number().int(),
+  "paymentMethod": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "history": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})),
+  "sandboxOnly": zod.literal(true)
+})
+
+
 export const getPublicProductCatalogResponseOneNameMin = 2;
 export const getPublicProductCatalogResponseOneNameMax = 100;
 
@@ -551,11 +1277,14 @@ export const ResolvePublicDomainResponse = zod.object({
   "features": zod.record(zod.string(), zod.boolean()),
   "assets": zod.array(zod.object({
   "assetId": zod.string(),
+  "assetNetworkId": zod.string().optional(),
   "symbol": zod.string(),
   "name": zod.string(),
   "networkId": zod.string(),
   "networkName": zod.string(),
-  "testnet": zod.boolean()
+  "testnet": zod.boolean(),
+  "logoUrl": zod.string().nullish(),
+  "decimals": zod.number().int().optional()
 }))
 })
 
@@ -598,6 +1327,7 @@ export const GetPlatformOverviewResponse = zod.object({
   "recentActivity": zod.array(zod.object({
   "id": zod.string(),
   "eventType": zod.string(),
+  "actorId": zod.string().optional(),
   "description": zod.string(),
   "tenantId": zod.string().uuid().nullable(),
   "createdAt": zod.coerce.date()
@@ -611,6 +1341,7 @@ export const GetPlatformOverviewResponse = zod.object({
 export const ListPlatformActivityResponseItem = zod.object({
   "id": zod.string(),
   "eventType": zod.string(),
+  "actorId": zod.string().optional(),
   "description": zod.string(),
   "tenantId": zod.string().uuid().nullable(),
   "createdAt": zod.coerce.date()
@@ -643,11 +1374,14 @@ export const ListModuleCatalogResponse = zod.array(ListModuleCatalogResponseItem
 export const ListSandboxAssetNetworksResponse = zod.object({
   "assets": zod.array(zod.object({
   "assetId": zod.string(),
+  "assetNetworkId": zod.string().optional(),
   "symbol": zod.string(),
   "name": zod.string(),
   "networkId": zod.string(),
   "networkName": zod.string(),
-  "testnet": zod.boolean()
+  "testnet": zod.boolean(),
+  "logoUrl": zod.string().nullish(),
+  "decimals": zod.number().int().optional()
 })),
   "sandboxOnly": zod.boolean()
 })
@@ -3177,11 +3911,14 @@ export const GetPublicSiteResponse = zod.object({
   "features": zod.record(zod.string(), zod.boolean()),
   "assets": zod.array(zod.object({
   "assetId": zod.string(),
+  "assetNetworkId": zod.string().optional(),
   "symbol": zod.string(),
   "name": zod.string(),
   "networkId": zod.string(),
   "networkName": zod.string(),
-  "testnet": zod.boolean()
+  "testnet": zod.boolean(),
+  "logoUrl": zod.string().nullish(),
+  "decimals": zod.number().int().optional()
 }))
 })
 

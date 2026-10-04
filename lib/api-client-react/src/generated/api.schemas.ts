@@ -5,6 +5,337 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export interface ActivityEvent {
+  id: string;
+  eventType: string;
+  actorId?: string;
+  description: string;
+  /** @nullable */
+  tenantId: string | null;
+  createdAt: string;
+}
+
+export interface ExchangeAuditList {
+  events: ActivityEvent[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export type ExchangeAction = typeof ExchangeAction[keyof typeof ExchangeAction];
+
+
+export const ExchangeAction = {
+  swap: 'swap',
+  convert: 'convert',
+  buy: 'buy',
+  sell: 'sell',
+} as const;
+
+export interface ExchangeAssetSettings {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  assetId: string;
+  enabled: boolean;
+  /**
+     * @minimum 0
+     * @maximum 1000
+     */
+  displayOrder: number;
+  /**
+     * @minLength 1
+     * @maxLength 12
+     */
+  symbol: string;
+  /**
+     * @minimum 0
+     * @maximum 18
+     */
+  decimals: number;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  logoUrl: string | null;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  sandboxPlanRate: string;
+}
+
+export interface ExchangeNetworkSettings {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  assetNetworkId: string;
+  enabled: boolean;
+  available: boolean;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  minimum: string;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  maximum: string;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  fee: string;
+  /** @maxLength 500 */
+  information: string;
+}
+
+export interface ExchangeRoute {
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  source: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  destination: string;
+  action: ExchangeAction;
+  enabled: boolean;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  rate: string;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  minimum: string;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  maximum: string;
+  /**
+     * @minimum 0
+     * @maximum 5000
+     */
+  feeBps: number;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  fixedFee: string;
+  /**
+     * @minimum 0
+     * @maximum 5000
+     */
+  spreadBps: number;
+  /** @maxItems 30 */
+  paymentMethodIds: string[];
+}
+
+export type ExchangePaymentMethodCurrency = typeof ExchangePaymentMethodCurrency[keyof typeof ExchangePaymentMethodCurrency];
+
+
+export const ExchangePaymentMethodCurrency = {
+  USD: 'USD',
+  EUR: 'EUR',
+  GBP: 'GBP',
+} as const;
+
+export interface ExchangePaymentMethod {
+  id: string;
+  /**
+     * @minLength 2
+     * @maxLength 80
+     */
+  label: string;
+  enabled: boolean;
+  currency: ExchangePaymentMethodCurrency;
+  buy: boolean;
+  sell: boolean;
+}
+
+export type ExchangeSettingsFiatCurrency = typeof ExchangeSettingsFiatCurrency[keyof typeof ExchangeSettingsFiatCurrency];
+
+
+export const ExchangeSettingsFiatCurrency = {
+  USD: 'USD',
+  EUR: 'EUR',
+  GBP: 'GBP',
+} as const;
+
+export type ExchangeSettingsActions = {
+  swap: boolean;
+  convert: boolean;
+  buy: boolean;
+  sell: boolean;
+};
+
+export interface ExchangeSettings {
+  enabled: boolean;
+  defaultAction: ExchangeAction;
+  /** @maxLength 1000 */
+  publicNote: string;
+  fiatCurrency: ExchangeSettingsFiatCurrency;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  fiatPlanRate: string;
+  actions: ExchangeSettingsActions;
+  /** @maxItems 100 */
+  assets: ExchangeAssetSettings[];
+  /** @maxItems 200 */
+  networks: ExchangeNetworkSettings[];
+  /** @maxItems 100 */
+  routes: ExchangeRoute[];
+  /** @maxItems 30 */
+  paymentMethods: ExchangePaymentMethod[];
+}
+
+export interface ExchangeCatalogAsset {
+  assetNetworkId: string;
+  assetId: string;
+  symbol: string;
+  name: string;
+  networkId: string;
+  networkName: string;
+  testnet: boolean;
+}
+
+export interface ExchangeConfiguration {
+  configuration: ExchangeSettings;
+  catalog: ExchangeCatalogAsset[];
+  effectiveEnabled: boolean;
+}
+
+export interface ExchangeQuoteInput {
+  action: ExchangeAction;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  source: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  destination: string;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  amount: string;
+  paymentMethodId?: string;
+}
+
+export interface ExchangeQuote {
+  token: string;
+  expiresAt: string;
+  routeId: string;
+  action: ExchangeAction;
+  source: string;
+  destination: string;
+  sourceSymbol: string;
+  destinationSymbol: string;
+  inputAmount: string;
+  outputAmount: string;
+  rate: string;
+  fee: string;
+  destinationFee?: string;
+  minimum: string;
+  maximum: string;
+  spreadBps: number;
+  sandboxOnly: true;
+}
+
+export interface ExchangeOrderInput {
+  /**
+     * @minLength 40
+     * @maxLength 12000
+     */
+  quoteToken: string;
+  idempotencyKey: string;
+}
+
+export type ExchangeStatusInputStatus = typeof ExchangeStatusInputStatus[keyof typeof ExchangeStatusInputStatus];
+
+
+export const ExchangeStatusInputStatus = {
+  pending: 'pending',
+  processing: 'processing',
+  completed: 'completed',
+  cancelled: 'cancelled',
+  failed: 'failed',
+} as const;
+
+export interface ExchangeStatusInput {
+  status: ExchangeStatusInputStatus;
+  /** @maxLength 500 */
+  note: string;
+}
+
+export interface ExchangeOrderEvent {
+  status: string;
+  at: string;
+  note: string;
+}
+
+export interface ExchangeOrder {
+  id: string;
+  status: string;
+  action: ExchangeAction;
+  source: string;
+  destination: string;
+  sourceSymbol: string;
+  destinationSymbol: string;
+  inputAmount: string;
+  outputAmount: string;
+  rate: string;
+  fee: string;
+  destinationFee?: string;
+  spreadBps: number;
+  /** @nullable */
+  paymentMethod: string | null;
+  createdAt: string;
+  history: ExchangeOrderEvent[];
+  sandboxOnly: true;
+}
+
+export interface ExchangeOrderCreated {
+  order: ExchangeOrder;
+  trackingToken: string;
+}
+
+export interface ExchangeOrderList {
+  orders: ExchangeOrder[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface ExchangeVolume {
+  symbol: string;
+  amount: string;
+}
+
+export interface ExchangeDashboard {
+  enabled: boolean;
+  total: number;
+  pending: number;
+  processing: number;
+  completed: number;
+  cancelled: number;
+  failed: number;
+  assets: number;
+  networks: number;
+  routes: number;
+  volume: ExchangeVolume[];
+  recentOrders: ExchangeOrder[];
+}
+
+export interface AssetNetwork {
+  assetId: string;
+  assetNetworkId?: string;
+  symbol: string;
+  name: string;
+  networkId: string;
+  networkName: string;
+  testnet: boolean;
+  /** @nullable */
+  logoUrl?: string | null;
+  decimals?: number;
+}
+
+export interface PublicExchange {
+  enabled: boolean;
+  defaultAction?: ExchangeAction;
+  actions: ExchangeAction[];
+  assets: AssetNetwork[];
+  routes: ExchangeRoute[];
+  paymentMethods: ExchangePaymentMethod[];
+  fiatCurrency: string;
+  publicNote: string;
+}
+
 export type LandingProductInputIcon = typeof LandingProductInputIcon[keyof typeof LandingProductInputIcon];
 
 
@@ -294,15 +625,6 @@ export interface CurrentPrincipal {
   memberships?: CurrentPrincipalMembershipsItem[];
 }
 
-export interface ActivityEvent {
-  id: string;
-  eventType: string;
-  description: string;
-  /** @nullable */
-  tenantId: string | null;
-  createdAt: string;
-}
-
 export interface PlatformOverview {
   totalTenants: number;
   activeTenants: number;
@@ -318,15 +640,6 @@ export interface ModuleDefinition {
   description: string;
   category: string;
   sandboxAvailable: boolean;
-}
-
-export interface AssetNetwork {
-  assetId: string;
-  symbol: string;
-  name: string;
-  networkId: string;
-  networkName: string;
-  testnet: boolean;
 }
 
 export interface AssetNetworkCatalog {
@@ -831,4 +1144,24 @@ export interface CapabilityStatus {
   status: string;
   message: string;
 }
+
+export type ListExchangeAuditParams = {
+/**
+ * @minimum 1
+ */
+page?: number;
+};
+
+export type ListExchangeOrdersParams = {
+/**
+ * @maxLength 100
+ */
+search?: string;
+status?: string;
+action?: string;
+/**
+ * @minimum 1
+ */
+page?: number;
+};
 

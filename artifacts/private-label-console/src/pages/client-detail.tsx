@@ -48,6 +48,7 @@ export default function ClientDetail() {
             {[['Client', t.name], ['Step', stepLabel(t.provisioningStep)], ['Environment', t.environment], ['Configuration', t.configurationComplete ? 'complete' : 'incomplete']].map(([l, v]) => (
               <div key={l} className="bg-card p-4"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="mt-1 text-sm capitalize">{v}</p></div>))}
           </div>
+          {showFn && <Link href={`/clients/${t.id}/exchange`} className="mb-6 block rounded-md border bg-card p-4 text-sm hover:bg-muted/50" data-testid="link-exchange-panel">Open exchange panel: orders, assets, routes, pricing and settings for this tenant</Link>}
           {!t.configurationComplete && <p className="mb-6 text-sm text-muted-foreground">Complete every section below before sandbox activation is available.</p>}
           {unassigned && !suspended && <p className="mb-6 text-sm text-muted-foreground">No plan is assigned, so configuration is read-only.</p>}
           {suspended && <p className="mb-6 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. {isSuper ? 'All configuration is read-only; only subscription controls stay editable. Unsuspend to resume changes.' : 'Configuration is read-only until your operator lifts the suspension.'}</p>}

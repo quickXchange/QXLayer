@@ -5,8 +5,13 @@ import { contextFor, type Principal } from "../authentication/service";
 import { lockTenant, requireFeature, resolveEntitlements } from "../entitlements/resolver";
 import { readRegistry } from "./service";
 import { pluginFor } from "./plugins";
+import { exchangeConfiguration } from "../../products/exchange/service";
+import { SaveExchangeConfigurationBody } from "@workspace/api-zod";
 
 export function productConfiguration(principal: Principal, tenantId: string, moduleKey: string, configuration?: Record<string, unknown>) {
+  if (moduleKey === "crypto_exchange" && configuration !== undefined) {
+    return exchangeConfiguration(principal, tenantId, SaveExchangeConfigurationBody.parse(configuration)).then(r => ({ configuration: r.configuration }));
+  }
   if (configuration && Buffer.byteLength(JSON.stringify(configuration)) > 32768) throw new HttpError(400, "Product configuration must be at most 32 KiB.");
   const check = (value: unknown) => {
     if (!value || typeof value !== "object") return;

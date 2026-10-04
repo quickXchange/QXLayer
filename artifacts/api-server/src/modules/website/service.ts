@@ -3,7 +3,7 @@ import { HttpError } from "../../lib/errors";
 import { readTenant } from "../tenants/service";
 import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
 
-async function publicTenantId(slug: string) {
+export async function publicTenantId(slug: string) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) throw new HttpError(404, "Website not available.");
   const id = await withDatabase({ actorId: "public-site", publicSlug: slug }, async (client) => {
     const r = await client.query("SELECT id FROM tenants WHERE slug=$1 AND status='active'", [slug]);
@@ -19,6 +19,7 @@ export async function getPublicSite(slug: string, feature?: string) {
     if (e.tenantStatus !== "active" || !e.features.website) throw new HttpError(404, "Website not available.");
     if (feature) requireFeature(e, feature);
     const t = await readTenant(client, id);
+    if (feature === "crypto_exchange") return { feature, status: "sandbox_ready", message: "White Label Exchange supports manually configured sandbox quotes, simulated orders and private tracking. No funds, wallets, deposit addresses, blockchain transactions or payments are involved." };
     if (feature) return { feature, status: "foundation_only", message: "This capability is entitled for this tenant. Product execution is deferred; no payment, exchange, wallet, blockchain, webhook delivery or Telegram connection is performed." };
     const assets = await client.query(
       `SELECT c.asset_id AS "assetId",a.symbol,a.name,c.network_id AS "networkId",n.name AS "networkName",n.testnet

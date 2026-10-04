@@ -65,7 +65,7 @@ responsive behavior, sandbox boundaries and measured verification results.
 - Do NOT connect to, modify, migrate, or depend on the existing QuickXchange project at this stage. This platform is independent; QuickXchange must remain untouched.
 - Build the foundation only. Do not build all crypto products at once.
 - Do not publish to production, connect real wallets/providers, accept real deposits, or request real provider secrets in this stage.
-- Core-first is the current priority. Complete the permanent reusable White Label Core and report architecture, registry, provisioning, entitlement resolution, security verification, readiness boundaries and first-client blockers. Do not automatically start the next crypto product.
+- Current product scope is defined in `.agents/memory/exchange-only-scope.md`. The reusable core remains the foundation; do not automatically start another crypto product.
 
 ## Gotchas
 

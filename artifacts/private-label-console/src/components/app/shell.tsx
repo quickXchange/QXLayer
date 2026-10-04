@@ -44,6 +44,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const p = usePrincipal();
   const { signOut } = useClerk();
+  const home = p.role === 'super_admin' ? null : (p.memberships?.[0]?.tenantId ?? p.tenantId);
+  const items = home ? [...nav, { href: `/clients/${home}/exchange`, label: 'Exchange', icon: Boxes }] : nav;
   const active = (h: string) => (h === '/admin' ? loc === h : loc.startsWith(h));
   return (
     <div className="grain min-h-[100dvh] md:flex">
@@ -51,7 +53,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <div className="flex items-center justify-between p-4 md:block md:p-0">
           <Link href="/admin" data-testid="link-logo"><Logo light /></Link>
           <nav className="mt-0 hidden md:mt-10 md:block md:space-y-1">
-            {nav.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
+            {items.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
               <Link key={n.href} href={n.href} data-testid={`link-nav-${n.label.toLowerCase()}`}
                 className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${active(n.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'hover:bg-sidebar-accent/60'}`}>
                 <n.icon className={`h-4 w-4 ${active(n.href) ? 'text-sidebar-primary' : ''}`} /> {n.label}
@@ -61,7 +63,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <Button data-testid="button-signout-mobile" size="icon" variant="ghost" className="md:hidden" onClick={() => signOut({ redirectUrl: '/' })}><LogOut className="h-4 w-4" /></Button>
         </div>
         <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:hidden">
-          {nav.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
+          {items.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
             <Link key={n.href} href={n.href} className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm ${active(n.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : ''}`}>{n.label}</Link>
           ))}
         </nav>

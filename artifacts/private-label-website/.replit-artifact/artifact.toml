@@ -1,5 +1,5 @@
 kind = "web"
-previewPath = "/private-label-website/nexa-sandbox"
+previewPath = "/private-label-website/exchange-sandbox"
 title = "White Label Client Sites"
 description = "Tenant-specific branded sandbox websites at /private-label-website/{slug}. Root forwards to the main platform; the development Site Finder is at /private-label-website/sandbox/site-finder."
 version = "1.0.0"

@@ -6,12 +6,14 @@ import tenantsRouter from "./tenants";
 import plansRouter from "./plans";
 import websiteRouter from "./website";
 import landingCatalogRouter from "./landing-catalog";
+import exchangeRouter from "./exchange";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(landingCatalogRouter);
 router.use(websiteRouter);
+router.use(exchangeRouter);
 router.use(catalogRouter);
 router.use(tenantsRouter);
 router.use(platformRouter);
