@@ -4,17 +4,22 @@ import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
-import { useGetCurrentPrincipal } from '@workspace/api-client-react';
+import { useGetCurrentPrincipal, getGetCurrentPrincipalQueryKey } from '@workspace/api-client-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
 import { AdminShell } from '@/components/app/shell';
-import { PrincipalContext } from '@/lib/principal';
+import { PrincipalContext, usePrincipal } from '@/lib/principal';
 import NotFound from '@/pages/not-found';
 import Home from '@/pages/home';
-import Unassigned from '@/pages/unassigned';
+import { CustomerShell } from '@/components/app/customer-shell';
+import { useAdminPanels } from '@/lib/customer';
+import { AccountDashboard, AccountOrders, AccountWhiteLabels, AdminPanels, ConfigureExchange, AccountProfile, NotProvisioned } from '@/pages/account';
+import WhiteLabelRequests from '@/pages/white-label-requests';
+import { useParams } from 'wouter';
 import Admin from '@/pages/admin';
 import Clients from '@/pages/clients';
 import ClientNew from '@/pages/client-new';
@@ -73,15 +78,15 @@ const clerkAppearance = {
 };
 
 const localization = {
-  signIn: { start: { title: 'Sign in to QXLayer', subtitle: 'Operator console, sandbox environment' } },
-  signUp: { start: { title: 'Request a QXLayer account', subtitle: 'Access is assigned by a platform operator after sign-up' } },
+  signIn: { start: { title: 'Sign in to QXLayer', subtitle: 'Your QXLayer account' } },
+  signUp: { start: { title: 'Create a QXLayer account', subtitle: 'Configure and request your White Label Exchange' } },
 };
 
 function AuthFrame({ children }: { children: ReactNode }) {
   return <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">{children}</div>;
 }
-const SignInPage = () => <AuthFrame><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} /></AuthFrame>;
-const SignUpPage = () => <AuthFrame><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} /></AuthFrame>;
+const SignInPage = () => <AuthFrame><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/admin`} /></AuthFrame>;
+const SignUpPage = () => <AuthFrame><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} fallbackRedirectUrl={`${basePath}/account`} /></AuthFrame>;
 
 function ClerkQueryClientCacheInvalidator() {
   const { addListener } = useClerk();
@@ -102,7 +107,7 @@ function HomeRedirect() {
 }
 
 function PrincipalGate({ children }: { children: ReactNode }) {
-  const q = useGetCurrentPrincipal();
+  const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: 10000 } });
   const { signOut } = useClerk();
   if (q.isLoading) return <div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div>;
   if (q.isError || !q.data) {
@@ -116,7 +121,7 @@ function PrincipalGate({ children }: { children: ReactNode }) {
   }
   return (
     <PrincipalContext.Provider value={q.data}>
-      {q.data.role === 'unassigned' ? <Unassigned /> : <AdminShell>{children}</AdminShell>}
+      {q.data.role === 'super_admin' ? <AdminShell>{children}</AdminShell> : <CustomerShell>{children}</CustomerShell>}
     </PrincipalContext.Provider>
   );
 }
@@ -129,8 +134,23 @@ function Protected({ children }: { children: ReactNode }) {
     </>
   );
 }
-const guard = (C: () => ReactNode) => () => <Protected><C /></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rExchange = guard(Exchange);
+function SuperOnly({ children }: { children: ReactNode }) {
+  const p = usePrincipal();
+  return p.role === 'super_admin' ? <>{children}</> : <Redirect to="/account" />;
+}
+function DeliveredOnly({ children }: { children: ReactNode }) {
+  const p = usePrincipal(); const { id = '' } = useParams<{ id: string }>();
+  const a = useAdminPanels();
+  if (p.role === 'super_admin') return <>{children}</>;
+  if (a.isLoading) return <Skeleton className="h-64 w-full" />;
+  if (a.isError) return <ErrorState what="your admin panels" onRetry={() => a.refetch()} />;
+  return a.data?.some((x) => x.tenantId === id) ? <>{children}</> : <NotProvisioned />;
+}
+const guard = (C: () => ReactNode) => () => <Protected><SuperOnly><C /></SuperOnly></Protected>;
+const open = (C: () => ReactNode) => () => <Protected><C /></Protected>;
+const rDelivered = () => <Protected><DeliveredOnly><Exchange /></DeliveredOnly></Protected>;
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests);
+const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -158,10 +178,17 @@ function ClerkProviderWithRoutes() {
               <Route path="/" component={HomeRedirect} />
               <Route path="/sign-in/*?" component={SignInPage} />
               <Route path="/sign-up/*?" component={SignUpPage} />
+              <Route path="/account" component={rAcc} />
+              <Route path="/account/orders" component={rOrd} />
+              <Route path="/account/white-labels" component={rWls} />
+              <Route path="/account/admin-panels" component={rPanels} />
+              <Route path="/account/configure" component={rCfg} />
+              <Route path="/account/profile/*?" component={rProf} />
+              <Route path="/white-label-requests" component={rWL} />
               <Route path="/admin" component={rAdmin} />
               <Route path="/clients" component={rClients} />
               <Route path="/clients/new" component={rNew} />
-              <Route path="/clients/:id/exchange/:section?/:orderId?" component={rExchange} />
+              <Route path="/clients/:id/exchange/:section?/:orderId?" component={rDelivered} />
               <Route path="/clients/:id" component={rDetail} />
               <Route path="/modules" component={rModules} />
               <Route path="/plans" component={rPlans} />

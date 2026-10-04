@@ -48,6 +48,7 @@ export async function readTenant(client: DatabaseClient, tenantId: string) {
      assetNetworkIds, ...exchangeProjection(row, effective),
      paymentsEnabled: Boolean(row.payments_enabled && effective.features.crypto_payments),
      allowGuestCheckout: Boolean(row.allow_guest_checkout && effective.features.crypto_payments), configurationComplete: complete,
+     exchangeProvisioned: completed.includes("exchange_provisioned"),
      websiteSettings: websiteSettings(row.brand_name, row.website_settings),
   };
 }
@@ -154,7 +155,7 @@ export function saveConfiguration(principal: Principal, tenantId: string, input:
 }
 
 export function activateTenant(principal: Principal, tenantId: string) {
-  if (principal.role !== "super_admin" && !principal.memberships.some((m) => m.tenantId === tenantId && m.role === "client_admin")) throw new HttpError(403, "Only a tenant administrator may activate configuration.");
+  requireSuperAdmin(principal);
   return withDatabase(contextFor(principal, tenantId, true), async (client) => {
     await client.query("SELECT id FROM tenants WHERE id = $1 FOR UPDATE", [tenantId]);
     const effective = await resolveEntitlements(client, tenantId);
@@ -162,7 +163,19 @@ export function activateTenant(principal: Principal, tenantId: string) {
     if (effective.overLimit) throw new HttpError(409, "Resolve over-limit resource usage before sandbox activation.");
     const tenant = await readTenant(client, tenantId);
     if (!tenant.configurationComplete) throw new HttpError(400, "Complete provisioning, select at least one module, and select sandbox assets for financial modules.");
-    await client.query("UPDATE tenants SET status='active',updated_at=now() WHERE id=$1", [tenantId]);
+    const exchange = await client.query("SELECT configuration FROM tenant_product_configuration WHERE tenant_id=$1 AND module_key='crypto_exchange'", [tenantId]);
+    if (exchange.rowCount) {
+      requireFeature(effective, "crypto_exchange");
+      const config = exchange.rows[0].configuration;
+      if (!config.routes?.some((r: { enabled: boolean; action: string }) => r.enabled && config.actions?.[r.action]) ||
+          !config.assets?.some((a: { enabled: boolean }) => a.enabled) ||
+          !config.networks?.some((n: { enabled: boolean; available: boolean }) => n.enabled && n.available)) {
+        throw new HttpError(400, "Finish the Exchange assets, available networks, actions and routes before provisioning.");
+      }
+    }
+    await client.query(`UPDATE tenants SET status='active',updated_at=now(),
+      completed_steps=CASE WHEN $2 AND NOT 'exchange_provisioned'=ANY(completed_steps)
+        THEN array_append(completed_steps,'exchange_provisioned') ELSE completed_steps END WHERE id=$1`, [tenantId, !!exchange.rowCount]);
     await audit(client, principal, tenantId, "tenant.sandbox_activated", "Activated configuration in sandbox only; no domain or financial execution launched");
     return readTenant(client, tenantId);
   });

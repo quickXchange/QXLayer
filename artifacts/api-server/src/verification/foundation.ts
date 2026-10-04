@@ -61,7 +61,8 @@ try {
   await expectDenied(() => saveAssets(clientAdmin, a.id, ["eth:mainnet"]), 400);
   await expectDenied(() => saveConfiguration(clientAdmin, a.id, { environment: "sandbox", exchangeEnabled: true, paymentsEnabled: true, allowGuestCheckout: true }), 403);
   await saveConfiguration(clientAdmin, a.id, { environment: "sandbox", exchangeEnabled: false, paymentsEnabled: true, allowGuestCheckout: true });
-  const active = GetTenantResponse.parse(await activateTenant(clientAdmin, a.id));
+  await expectDenied(() => activateTenant(clientAdmin, a.id), 403);
+  const active = GetTenantResponse.parse(await activateTenant(admin, a.id));
   assert.equal(active.status, "active");
   assert.equal(active.environment, "sandbox");
   assert.equal(active.configurationComplete, true);

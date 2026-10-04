@@ -28,6 +28,7 @@ import type {
   BrandInput,
   CapabilityStatus,
   CurrentPrincipal,
+  CustomerAdminPanel,
   DomainInput,
   DomainVerification,
   EntitlementDefinition,
@@ -35,6 +36,7 @@ import type {
   ExchangeAuditList,
   ExchangeConfiguration,
   ExchangeDashboard,
+  ExchangeDeliveryInput,
   ExchangeOrder,
   ExchangeOrderCreated,
   ExchangeOrderInput,
@@ -73,7 +75,10 @@ import type {
   TenantInput,
   TenantModulesInput,
   TenantSummary,
-  WebsiteSettings
+  WebsiteSettings,
+  WhiteLabelRequest,
+  WhiteLabelRequestInput,
+  WhiteLabelReviewInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -102,6 +107,467 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getListMyAdminPanelsUrl = () => {
+
+
+
+
+  return `/api/customer/admin-panels`
+}
+
+export const listMyAdminPanels = async ( options?: Parameters<typeof customFetch>[1]): Promise<CustomerAdminPanel[]> => {
+
+  return customFetch<CustomerAdminPanel[]>(getListMyAdminPanelsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyAdminPanelsQueryKey = () => {
+    return [
+    `/api/customer/admin-panels`
+    ] as const;
+    }
+
+
+export const getListMyAdminPanelsQueryOptions = <TData = Awaited<ReturnType<typeof listMyAdminPanels>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyAdminPanels>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyAdminPanelsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyAdminPanels>>> = ({ signal }) => listMyAdminPanels({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyAdminPanels>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyAdminPanelsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyAdminPanels>>>
+export type ListMyAdminPanelsQueryError = ErrorType<unknown>
+
+
+
+export function useListMyAdminPanels<TData = Awaited<ReturnType<typeof listMyAdminPanels>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyAdminPanels>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyAdminPanelsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListMyWhiteLabelRequestsUrl = () => {
+
+
+
+
+  return `/api/customer/white-label-requests`
+}
+
+export const listMyWhiteLabelRequests = async ( options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelRequest[]> => {
+
+  return customFetch<WhiteLabelRequest[]>(getListMyWhiteLabelRequestsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyWhiteLabelRequestsQueryKey = () => {
+    return [
+    `/api/customer/white-label-requests`
+    ] as const;
+    }
+
+
+export const getListMyWhiteLabelRequestsQueryOptions = <TData = Awaited<ReturnType<typeof listMyWhiteLabelRequests>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyWhiteLabelRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyWhiteLabelRequestsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyWhiteLabelRequests>>> = ({ signal }) => listMyWhiteLabelRequests({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyWhiteLabelRequests>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyWhiteLabelRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyWhiteLabelRequests>>>
+export type ListMyWhiteLabelRequestsQueryError = ErrorType<unknown>
+
+
+
+export function useListMyWhiteLabelRequests<TData = Awaited<ReturnType<typeof listMyWhiteLabelRequests>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyWhiteLabelRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyWhiteLabelRequestsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSubmitWhiteLabelRequestUrl = () => {
+
+
+
+
+  return `/api/customer/white-label-requests`
+}
+
+export const submitWhiteLabelRequest = async (whiteLabelRequestInput: WhiteLabelRequestInput, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelRequest> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WhiteLabelRequest>(getSubmitWhiteLabelRequestUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(whiteLabelRequestInput)
+  }
+);}
+
+
+
+
+
+export const getSubmitWhiteLabelRequestMutationKey = () => ['submitWhiteLabelRequest'] as const;
+
+export const getSubmitWhiteLabelRequestMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitWhiteLabelRequest>>, TError,SubmitWhiteLabelRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitWhiteLabelRequest>>, TError,SubmitWhiteLabelRequestMutationVariables, TContext> => {
+
+const mutationKey = getSubmitWhiteLabelRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitWhiteLabelRequest>>, SubmitWhiteLabelRequestMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitWhiteLabelRequest(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitWhiteLabelRequestMutationResult = NonNullable<Awaited<ReturnType<typeof submitWhiteLabelRequest>>>
+    export type SubmitWhiteLabelRequestMutationBody = BodyType<WhiteLabelRequestInput>
+    export type SubmitWhiteLabelRequestMutationError = ErrorType<unknown>
+    export type SubmitWhiteLabelRequestMutationVariables = {data: BodyType<WhiteLabelRequestInput>}
+
+    export const useSubmitWhiteLabelRequest = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitWhiteLabelRequest>>, TError,SubmitWhiteLabelRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitWhiteLabelRequest>>,
+        TError,
+        SubmitWhiteLabelRequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSubmitWhiteLabelRequestMutationOptions(options));
+    }
+
+export const getListWhiteLabelRequestsUrl = () => {
+
+
+
+
+  return `/api/operator/white-label-requests`
+}
+
+export const listWhiteLabelRequests = async ( options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelRequest[]> => {
+
+  return customFetch<WhiteLabelRequest[]>(getListWhiteLabelRequestsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListWhiteLabelRequestsQueryKey = () => {
+    return [
+    `/api/operator/white-label-requests`
+    ] as const;
+    }
+
+
+export const getListWhiteLabelRequestsQueryOptions = <TData = Awaited<ReturnType<typeof listWhiteLabelRequests>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWhiteLabelRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListWhiteLabelRequestsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listWhiteLabelRequests>>> = ({ signal }) => listWhiteLabelRequests({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listWhiteLabelRequests>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListWhiteLabelRequestsQueryResult = NonNullable<Awaited<ReturnType<typeof listWhiteLabelRequests>>>
+export type ListWhiteLabelRequestsQueryError = ErrorType<unknown>
+
+
+
+export function useListWhiteLabelRequests<TData = Awaited<ReturnType<typeof listWhiteLabelRequests>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listWhiteLabelRequests>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListWhiteLabelRequestsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getReviewWhiteLabelRequestUrl = (requestId: string,) => {
+
+
+
+
+  return `/api/operator/white-label-requests/${requestId}/review`
+}
+
+export const reviewWhiteLabelRequest = async (requestId: string,
+    whiteLabelReviewInput: WhiteLabelReviewInput, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelRequest> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WhiteLabelRequest>(getReviewWhiteLabelRequestUrl(requestId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(whiteLabelReviewInput)
+  }
+);}
+
+
+
+
+
+export const getReviewWhiteLabelRequestMutationKey = () => ['reviewWhiteLabelRequest'] as const;
+
+export const getReviewWhiteLabelRequestMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewWhiteLabelRequest>>, TError,ReviewWhiteLabelRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reviewWhiteLabelRequest>>, TError,ReviewWhiteLabelRequestMutationVariables, TContext> => {
+
+const mutationKey = getReviewWhiteLabelRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reviewWhiteLabelRequest>>, ReviewWhiteLabelRequestMutationVariables> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  reviewWhiteLabelRequest(requestId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReviewWhiteLabelRequestMutationResult = NonNullable<Awaited<ReturnType<typeof reviewWhiteLabelRequest>>>
+    export type ReviewWhiteLabelRequestMutationBody = BodyType<WhiteLabelReviewInput>
+    export type ReviewWhiteLabelRequestMutationError = ErrorType<unknown>
+    export type ReviewWhiteLabelRequestMutationVariables = {requestId: string;data: BodyType<WhiteLabelReviewInput>}
+
+    export const useReviewWhiteLabelRequest = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reviewWhiteLabelRequest>>, TError,ReviewWhiteLabelRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reviewWhiteLabelRequest>>,
+        TError,
+        ReviewWhiteLabelRequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getReviewWhiteLabelRequestMutationOptions(options));
+    }
+
+export const getProvisionWhiteLabelRequestUrl = (requestId: string,) => {
+
+
+
+
+  return `/api/operator/white-label-requests/${requestId}/provision`
+}
+
+export const provisionWhiteLabelRequest = async (requestId: string,
+    exchangeDeliveryInput: ExchangeDeliveryInput, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelRequest> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WhiteLabelRequest>(getProvisionWhiteLabelRequestUrl(requestId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeDeliveryInput)
+  }
+);}
+
+
+
+
+
+export const getProvisionWhiteLabelRequestMutationKey = () => ['provisionWhiteLabelRequest'] as const;
+
+export const getProvisionWhiteLabelRequestMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof provisionWhiteLabelRequest>>, TError,ProvisionWhiteLabelRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof provisionWhiteLabelRequest>>, TError,ProvisionWhiteLabelRequestMutationVariables, TContext> => {
+
+const mutationKey = getProvisionWhiteLabelRequestMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof provisionWhiteLabelRequest>>, ProvisionWhiteLabelRequestMutationVariables> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  provisionWhiteLabelRequest(requestId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProvisionWhiteLabelRequestMutationResult = NonNullable<Awaited<ReturnType<typeof provisionWhiteLabelRequest>>>
+    export type ProvisionWhiteLabelRequestMutationBody = BodyType<ExchangeDeliveryInput>
+    export type ProvisionWhiteLabelRequestMutationError = ErrorType<unknown>
+    export type ProvisionWhiteLabelRequestMutationVariables = {requestId: string;data: BodyType<ExchangeDeliveryInput>}
+
+    export const useProvisionWhiteLabelRequest = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof provisionWhiteLabelRequest>>, TError,ProvisionWhiteLabelRequestMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof provisionWhiteLabelRequest>>,
+        TError,
+        ProvisionWhiteLabelRequestMutationVariables,
+        TContext
+      > => {
+      return useMutation(getProvisionWhiteLabelRequestMutationOptions(options));
+    }
 
 export const getListExchangeAuditUrl = (tenantId: string,
     params?: ListExchangeAuditParams,) => {

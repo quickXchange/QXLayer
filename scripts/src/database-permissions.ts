@@ -12,6 +12,8 @@ try {
     if (core.rows[0].present) await pool.query(await readFile(new URL("../../lib/db/migrations/core-policies.sql", import.meta.url), "utf8"));
     const landing = await pool.query("SELECT to_regclass('public.landing_products') AS present");
     if (landing.rows[0].present) await pool.query(await readFile(new URL("../../lib/db/migrations/landing-catalog-policies.sql", import.meta.url), "utf8"));
+    const requests = await pool.query("SELECT to_regclass('public.white_label_requests') AS present");
+    if (requests.rows[0].present) await pool.query(await readFile(new URL("../../lib/db/migrations/development-customer-policies.sql", import.meta.url), "utf8"));
     process.stdout.write("Development RLS runtime grants, predicates, and FORCE RLS applied.\n");
   }
 } finally {

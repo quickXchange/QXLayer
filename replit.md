@@ -70,7 +70,7 @@ responsive behavior, sandbox boundaries and measured verification results.
 ## Gotchas
 
 - After schema pushes, run the development permission command before starting the API. See `.agents/memory/rls-policy-materialization.md` for the schema-tool behavior behind this requirement.
-- No public first-signup administrator endpoint exists. New accounts remain unassigned until explicit operator setup.
+- No public first-signup administrator endpoint exists. New accounts can use the customer workspace and submit Exchange requests immediately; tenant administrator access requires explicit Super Admin provisioning/ownership assignment.
 - Use the Zod namespace matching a generated schema for inferred types and caught validation errors; see `.agents/memory/validation-compatibility.md`.
 - Before any future production launch, replace owner-backed connection sessions with separately configured restricted runtime credentials and review deployment-side role/policy readiness. No production migration/startup DDL is provided here.
 

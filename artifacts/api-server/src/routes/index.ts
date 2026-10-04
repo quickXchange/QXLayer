@@ -7,12 +7,21 @@ import plansRouter from "./plans";
 import websiteRouter from "./website";
 import landingCatalogRouter from "./landing-catalog";
 import exchangeRouter from "./exchange";
+import customerRouter from "./customer";
+import { requireAuthentication, principalFrom } from "../middlewares/authentication";
+import { assertDeliveredExchangeAccess } from "../modules/customer/service";
+import { GetTenantParams } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(landingCatalogRouter);
 router.use(websiteRouter);
+router.use(customerRouter);
+router.use("/tenants/:tenantId", requireAuthentication, async (req, res, next) => {
+  await assertDeliveredExchangeAccess(principalFrom(res), GetTenantParams.parse(req.params).tenantId);
+  next();
+});
 router.use(exchangeRouter);
 router.use(catalogRouter);
 router.use(tenantsRouter);

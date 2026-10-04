@@ -1,0 +1,65 @@
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+import { pool, withDatabase } from "@workspace/db";
+import { resolvePrincipal } from "../modules/authentication/service";
+import { myAdminPanels, listRequests, submitRequest, reviewRequest, deliverRequest, assertDeliveredExchangeAccess } from "../modules/customer/service";
+import { activateTenant, createTenant } from "../modules/tenants/service";
+import { prepareCustomerFixtures, cleanCustomerFixtures } from "./customer-fixtures";
+if (process.env.NODE_ENV === "production") throw new Error("Development verification refused in production.");
+const suffix = randomUUID().slice(0, 8);
+const actors = [`user_workflowOperator${suffix}`, `user_workflowCustomer${suffix}`, `user_workflowOther${suffix}`];
+let fixture: Awaited<ReturnType<typeof prepareCustomerFixtures>> | undefined;
+let draftId: string | undefined;
+const denied = (fn: () => Promise<unknown>, status: number | string) => assert.rejects(async () => fn(), (e: any) => e.status === status || e.code === status);
+try {
+  await pool.query("INSERT INTO platform_admins (clerk_user_id) VALUES ($1)", [actors[0]]);
+  const op = await resolvePrincipal(actors[0]), a = await resolvePrincipal(actors[1]), b = await resolvePrincipal(actors[2]);
+  assert.equal(a.role, "unassigned");
+  assert.deepEqual(await myAdminPanels(a), []);
+  const input = { projectName: "My Exchange A", brandName: "My Exchange", preferredDomain: null, actions: ["swap", "convert", "buy", "sell"] as ("swap" | "convert" | "buy" | "sell")[], details: "Sandbox only", idempotencyKey: randomUUID() };
+  const submitted = await submitRequest(a, input);
+  assert.equal((await submitRequest(a, input)).id, submitted.id);
+  assert.equal((await listRequests(a)).length, 1);
+  assert.equal((await listRequests(b)).length, 0);
+  await denied(() => listRequests(a, true), 403);
+  const price = { status: "approved" as const, monthlyPrice: "149", setupPrice: "299", currency: "USD" as const, operatorNote: "Sandbox preparation" };
+  await denied(() => reviewRequest(a, submitted.id, price), 403);
+  await withDatabase({ actorId: a.userId, canWrite: true }, async c => {
+    assert.equal((await c.query("UPDATE white_label_requests SET status='approved',monthly_price='0' WHERE id=$1", [submitted.id])).rowCount, 0);
+  });
+  await denied(() => withDatabase({ actorId: a.userId, canWrite: true }, c => c.query("INSERT INTO white_label_requests (customer_user_id,idempotency_key,configuration) VALUES ($1,$2,'{}')", [b.userId, randomUUID()])), "42501");
+  fixture = await prepareCustomerFixtures(op, suffix);
+  const [first, second] = fixture.tenants;
+  const draft = await createTenant(op, { name: "Not delivered", slug: `workflow-draft-${suffix}`, planId: fixture.planId }); draftId = draft.id;
+  await pool.query("INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role) VALUES ($1,$2,'client_admin')", [draft.id, a.userId]);
+  const withDraft = await resolvePrincipal(a.userId);
+  assert.deepEqual(await myAdminPanels(withDraft), []);
+  await denied(() => assertDeliveredExchangeAccess(withDraft, draft.id), 403);
+  await denied(() => activateTenant(withDraft, draft.id), 403);
+  await denied(() => deliverRequest(a, submitted.id, first.id), 403);
+  await denied(() => deliverRequest(op, submitted.id, first.id), 409);
+  await reviewRequest(op, submitted.id, price);
+  await denied(() => deliverRequest(op, submitted.id, draft.id), 409);
+  await deliverRequest(op, submitted.id, first.id);
+  await deliverRequest(op, submitted.id, first.id);
+  const owner = await resolvePrincipal(a.userId);
+  assert.equal((await myAdminPanels(owner)).length, 1);
+  await assertDeliveredExchangeAccess(owner, first.id);
+  await denied(() => assertDeliveredExchangeAccess(b, first.id), 403);
+  assert.equal((await listRequests(a))[0].status, "provisioned");
+  const foreign = await submitRequest(b, { ...input, projectName: "Other customer", idempotencyKey: randomUUID() });
+  await reviewRequest(op, foreign.id, price);
+  await denied(() => deliverRequest(op, foreign.id, first.id), 409);
+  const additional = await submitRequest(owner, { ...input, projectName: "My Exchange B", idempotencyKey: randomUUID() });
+  await reviewRequest(op, additional.id, price);
+  await deliverRequest(op, additional.id, second.id);
+  assert.equal((await myAdminPanels(await resolvePrincipal(a.userId))).length, 2);
+  assert.deepEqual(await myAdminPanels(await resolvePrincipal(b.userId)), []);
+  await pool.query("UPDATE tenant_memberships SET active=false WHERE clerk_user_id=$1", [a.userId]);
+  assert.deepEqual(await myAdminPanels(await resolvePrincipal(a.userId)), []);
+  console.log("PASS: existing-session request submission/idempotency, customer RLS, Super-only review/pricing/provisioning, draft hidden/direct access denied, atomic ownership handoff, one/multiple panels, cross-customer denial, ownership revocation.");
+} finally {
+  if (fixture) await cleanCustomerFixtures([...fixture.tenants.map(t => t.id), ...(draftId ? [draftId] : [])], fixture.planId, actors);
+  else { await pool.query("DELETE FROM white_label_requests WHERE customer_user_id=ANY($1::text[])", [actors]); await pool.query("DELETE FROM platform_admins WHERE clerk_user_id=ANY($1::text[])", [actors]); }
+  await pool.end();
+}

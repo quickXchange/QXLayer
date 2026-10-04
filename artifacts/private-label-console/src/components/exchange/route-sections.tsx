@@ -9,7 +9,7 @@ import type { ExchangeRoute, ExchangePaymentMethod } from '@workspace/api-client
 
 const ACTIONS: [string, string][] = [['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy (fiat to crypto)'], ['sell', 'Sell (crypto to fiat)']];
 
-export function RoutesPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }) {
+export function RoutesPanel({ d, locked, action }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action'] }) {
   const s = d.draft!;
   const fiat = fiatId(s);
   const endpoints: [string, string][] = [...d.catalog.map((c) => [c.assetNetworkId, `${c.symbol} on ${c.networkName}`] as [string, string]), [fiat, `${s.fiatCurrency} (fiat)`]];
@@ -17,7 +17,7 @@ export function RoutesPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }
   const add = () => {
     const c0 = d.catalog[0]?.assetNetworkId; const c1 = d.catalog[1]?.assetNetworkId ?? c0;
     if (!c0) return;
-    d.patch({ routes: [...s.routes, { id: crypto.randomUUID(), source: c0, destination: c1 ?? c0, action: 'swap', enabled: false, rate: '', minimum: '0', maximum: '', fixedFee: '0', feeBps: 0, spreadBps: 0, paymentMethodIds: [] }] });
+    d.patch({ routes: [...s.routes, { id: crypto.randomUUID(), source: c0, destination: c1 ?? c0, action: action ?? 'swap', enabled: false, rate: '', minimum: '0', maximum: '', fixedFee: '0', feeBps: 0, spreadBps: 0, paymentMethodIds: [] }] });
   };
   const setAction = (r: ExchangeRoute, a: ExchangeRoute['action']) => {
     const c0 = d.catalog[0]?.assetNetworkId ?? ''; const c1 = d.catalog[1]?.assetNetworkId ?? c0;
@@ -27,11 +27,12 @@ export function RoutesPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }
   };
   const pms = s.paymentMethods.filter((p) => p.currency === s.fiatCurrency);
   return (
-    <Section n="X3" title="Routes" note="Each route is one directed pair with an explicit manual rate. Nothing is derived or fetched." footer={<DraftFooter d={d} locked={locked} />}>
+    <Section n="X3" title={action ? `Routes: ${action}` : 'Routes'} note="Each route is one directed pair with an explicit manual rate. Nothing is derived or fetched." footer={<DraftFooter d={d} locked={locked} />}>
       <SimNote />
       {s.routes.length === 0 && <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-routes">No routes yet. {d.catalog.length === 0 ? 'Select tenant assets first.' : 'Add a route and enter its manual rate.'}</p>}
       <div className="space-y-3">
         {s.routes.map((r, i) => {
+          if (action && r.action !== action) return null;
           const pay = r.action === 'buy' || r.action === 'sell';
           return (
             <fieldset key={r.id} disabled={locked} className="grid gap-3 rounded-md border p-4 md:grid-cols-4" data-testid={`row-route-${r.id}`}>

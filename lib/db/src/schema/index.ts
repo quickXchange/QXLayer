@@ -1,4 +1,5 @@
 export * from "./product-config";
+export * from "./white-label-requests";
 export * from "./landing-products";
 // Export your models here. Add one export per file
 // export * from "./posts";

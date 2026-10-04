@@ -5,6 +5,132 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export interface ExchangeDeliveryInput {
+  tenantId: string;
+}
+
+export type CustomerAdminPanelStatus = typeof CustomerAdminPanelStatus[keyof typeof CustomerAdminPanelStatus];
+
+
+export const CustomerAdminPanelStatus = {
+  active: 'active',
+  suspended: 'suspended',
+} as const;
+
+export type CustomerAdminPanelRole = typeof CustomerAdminPanelRole[keyof typeof CustomerAdminPanelRole];
+
+
+export const CustomerAdminPanelRole = {
+  client_admin: 'client_admin',
+  staff: 'staff',
+} as const;
+
+export interface CustomerAdminPanel {
+  tenantId: string;
+  name: string;
+  brandName: string;
+  slug: string;
+  status: CustomerAdminPanelStatus;
+  role: CustomerAdminPanelRole;
+}
+
+export type ExchangeAction = typeof ExchangeAction[keyof typeof ExchangeAction];
+
+
+export const ExchangeAction = {
+  swap: 'swap',
+  convert: 'convert',
+  buy: 'buy',
+  sell: 'sell',
+} as const;
+
+export interface WhiteLabelRequestInput {
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  projectName: string;
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  brandName: string;
+  /**
+     * @maxLength 253
+     * @nullable
+     */
+  preferredDomain?: string | null;
+  /**
+     * @minItems 1
+     * @maxItems 4
+     */
+  actions: ExchangeAction[];
+  /** @maxLength 1000 */
+  details: string;
+  idempotencyKey: string;
+}
+
+export type WhiteLabelReviewInputStatus = typeof WhiteLabelReviewInputStatus[keyof typeof WhiteLabelReviewInputStatus];
+
+
+export const WhiteLabelReviewInputStatus = {
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export type WhiteLabelReviewInputCurrency = typeof WhiteLabelReviewInputCurrency[keyof typeof WhiteLabelReviewInputCurrency];
+
+
+export const WhiteLabelReviewInputCurrency = {
+  USD: 'USD',
+  EUR: 'EUR',
+  GBP: 'GBP',
+} as const;
+
+export interface WhiteLabelReviewInput {
+  status: WhiteLabelReviewInputStatus;
+  /** @pattern ^\d{1,12}(\.\d{1,2})?$ */
+  monthlyPrice: string;
+  /** @pattern ^\d{1,12}(\.\d{1,2})?$ */
+  setupPrice: string;
+  currency: WhiteLabelReviewInputCurrency;
+  /** @maxLength 1000 */
+  operatorNote: string;
+}
+
+export type WhiteLabelRequestStatus = typeof WhiteLabelRequestStatus[keyof typeof WhiteLabelRequestStatus];
+
+
+export const WhiteLabelRequestStatus = {
+  submitted: 'submitted',
+  approved: 'approved',
+  rejected: 'rejected',
+  provisioned: 'provisioned',
+} as const;
+
+export interface WhiteLabelRequest {
+  id: string;
+  customerUserId: string;
+  projectName: string;
+  brandName: string;
+  /** @nullable */
+  preferredDomain: string | null;
+  actions: ExchangeAction[];
+  details: string;
+  status: WhiteLabelRequestStatus;
+  /** @nullable */
+  monthlyPrice: string | null;
+  /** @nullable */
+  setupPrice: string | null;
+  /** @nullable */
+  currency: string | null;
+  operatorNote: string;
+  /** @nullable */
+  tenantId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ActivityEvent {
   id: string;
   eventType: string;
@@ -21,16 +147,6 @@ export interface ExchangeAuditList {
   page: number;
   pageSize: number;
 }
-
-export type ExchangeAction = typeof ExchangeAction[keyof typeof ExchangeAction];
-
-
-export const ExchangeAction = {
-  swap: 'swap',
-  convert: 'convert',
-  buy: 'buy',
-  sell: 'sell',
-} as const;
 
 export interface ExchangeAssetSettings {
   /**
@@ -737,6 +853,7 @@ export const TenantSummaryEnvironment = {
 } as const;
 
 export interface TenantSummary {
+  exchangeProvisioned?: boolean;
   id: string;
   name: string;
   slug: string;

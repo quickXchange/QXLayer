@@ -11,6 +11,7 @@ import type { TenantStatus } from './tenantStatus';
 import type { TenantSummaryEnvironment } from './tenantSummaryEnvironment';
 
 export interface TenantSummary {
+  exchangeProvisioned?: boolean;
   id: string;
   name: string;
   slug: string;

@@ -8,6 +8,163 @@
 import * as zod from 'zod';
 
 
+export const ListMyAdminPanelsResponseItem = zod.object({
+  "tenantId": zod.string().uuid(),
+  "name": zod.string(),
+  "brandName": zod.string(),
+  "slug": zod.string(),
+  "status": zod.enum(['active', 'suspended']),
+  "role": zod.enum(['client_admin', 'staff'])
+})
+export const ListMyAdminPanelsResponse = zod.array(ListMyAdminPanelsResponseItem)
+
+
+export const ListMyWhiteLabelRequestsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "customerUserId": zod.string(),
+  "projectName": zod.string(),
+  "brandName": zod.string(),
+  "preferredDomain": zod.string().nullable(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "details": zod.string(),
+  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "monthlyPrice": zod.string().nullable(),
+  "setupPrice": zod.string().nullable(),
+  "currency": zod.string().nullable(),
+  "operatorNote": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListMyWhiteLabelRequestsResponse = zod.array(ListMyWhiteLabelRequestsResponseItem)
+
+
+export const submitWhiteLabelRequestBodyProjectNameMin = 2;
+export const submitWhiteLabelRequestBodyProjectNameMax = 100;
+
+export const submitWhiteLabelRequestBodyBrandNameMin = 2;
+export const submitWhiteLabelRequestBodyBrandNameMax = 100;
+
+export const submitWhiteLabelRequestBodyPreferredDomainMax = 253;
+
+export const submitWhiteLabelRequestBodyActionsMax = 4;
+
+export const submitWhiteLabelRequestBodyDetailsMax = 1000;
+
+
+
+export const SubmitWhiteLabelRequestBody = zod.object({
+  "projectName": zod.string().min(submitWhiteLabelRequestBodyProjectNameMin).max(submitWhiteLabelRequestBodyProjectNameMax),
+  "brandName": zod.string().min(submitWhiteLabelRequestBodyBrandNameMin).max(submitWhiteLabelRequestBodyBrandNameMax),
+  "preferredDomain": zod.string().max(submitWhiteLabelRequestBodyPreferredDomainMax).nullish(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])).min(1).max(submitWhiteLabelRequestBodyActionsMax),
+  "details": zod.string().max(submitWhiteLabelRequestBodyDetailsMax),
+  "idempotencyKey": zod.string().uuid()
+})
+
+export const SubmitWhiteLabelRequestResponse = zod.object({
+  "id": zod.string().uuid(),
+  "customerUserId": zod.string(),
+  "projectName": zod.string(),
+  "brandName": zod.string(),
+  "preferredDomain": zod.string().nullable(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "details": zod.string(),
+  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "monthlyPrice": zod.string().nullable(),
+  "setupPrice": zod.string().nullable(),
+  "currency": zod.string().nullable(),
+  "operatorNote": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const ListWhiteLabelRequestsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "customerUserId": zod.string(),
+  "projectName": zod.string(),
+  "brandName": zod.string(),
+  "preferredDomain": zod.string().nullable(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "details": zod.string(),
+  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "monthlyPrice": zod.string().nullable(),
+  "setupPrice": zod.string().nullable(),
+  "currency": zod.string().nullable(),
+  "operatorNote": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListWhiteLabelRequestsResponse = zod.array(ListWhiteLabelRequestsResponseItem)
+
+
+export const ReviewWhiteLabelRequestParams = zod.object({
+  "requestId": zod.coerce.string().uuid()
+})
+
+export const reviewWhiteLabelRequestBodyMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestBodySetupPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestBodyOperatorNoteMax = 1000;
+
+
+
+export const ReviewWhiteLabelRequestBody = zod.object({
+  "status": zod.enum(['approved', 'rejected']),
+  "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestBodyMonthlyPriceRegExp),
+  "setupPrice": zod.string().regex(reviewWhiteLabelRequestBodySetupPriceRegExp),
+  "currency": zod.enum(['USD', 'EUR', 'GBP']),
+  "operatorNote": zod.string().max(reviewWhiteLabelRequestBodyOperatorNoteMax)
+})
+
+export const ReviewWhiteLabelRequestResponse = zod.object({
+  "id": zod.string().uuid(),
+  "customerUserId": zod.string(),
+  "projectName": zod.string(),
+  "brandName": zod.string(),
+  "preferredDomain": zod.string().nullable(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "details": zod.string(),
+  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "monthlyPrice": zod.string().nullable(),
+  "setupPrice": zod.string().nullable(),
+  "currency": zod.string().nullable(),
+  "operatorNote": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const ProvisionWhiteLabelRequestParams = zod.object({
+  "requestId": zod.coerce.string().uuid()
+})
+
+export const ProvisionWhiteLabelRequestBody = zod.object({
+  "tenantId": zod.string().uuid()
+})
+
+export const ProvisionWhiteLabelRequestResponse = zod.object({
+  "id": zod.string().uuid(),
+  "customerUserId": zod.string(),
+  "projectName": zod.string(),
+  "brandName": zod.string(),
+  "preferredDomain": zod.string().nullable(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "details": zod.string(),
+  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "monthlyPrice": zod.string().nullable(),
+  "setupPrice": zod.string().nullable(),
+  "currency": zod.string().nullable(),
+  "operatorNote": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
 export const ListExchangeAuditParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
@@ -1397,6 +1554,7 @@ export const listTenantsResponseEnabledModulesItemRegExp = new RegExp('^[a-z][a-
 
 
 export const ListTenantsResponseItem = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -1476,6 +1634,7 @@ export const createTenantResponseTwoWebsiteSettingsTermsContentMax = 20000;
 
 
 export const CreateTenantResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -1583,6 +1742,7 @@ export const getTenantResponseTwoWebsiteSettingsTermsContentMax = 20000;
 
 
 export const GetTenantResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -1715,6 +1875,7 @@ export const updateTenantBrandResponseTwoWebsiteSettingsTermsContentMax = 20000;
 
 
 export const UpdateTenantBrandResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -1830,6 +1991,7 @@ export const updateTenantDomainResponseTwoWebsiteSettingsTermsContentMax = 20000
 
 
 export const UpdateTenantDomainResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -1947,6 +2109,7 @@ export const updateTenantModulesResponseTwoWebsiteSettingsTermsContentMax = 2000
 
 
 export const UpdateTenantModulesResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -2058,6 +2221,7 @@ export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsTermsContentMax
 
 
 export const UpdateTenantAssetsNetworksResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -2172,6 +2336,7 @@ export const updateTenantConfigurationResponseTwoWebsiteSettingsTermsContentMax 
 
 
 export const UpdateTenantConfigurationResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -2279,6 +2444,7 @@ export const activateTenantResponseTwoWebsiteSettingsTermsContentMax = 20000;
 
 
 export const ActivateTenantResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),
@@ -3713,6 +3879,7 @@ export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsTermsContentMa
 
 
 export const UpdateTenantWebsiteSettingsResponse = zod.object({
+  "exchangeProvisioned": zod.boolean().optional(),
   "id": zod.string().uuid(),
   "name": zod.string(),
   "slug": zod.string(),

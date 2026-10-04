@@ -17,6 +17,46 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /customer/admin-panels:
+    get:
+      operationId: listMyAdminPanels
+      responses:
+        "200": {description: Provisioned Exchange projects authorized for the current QXLayer session, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/CustomerAdminPanel"}}}}}
+  /customer/white-label-requests:
+    get:
+      operationId: listMyWhiteLabelRequests
+      responses:
+        "200": {description: Current customer's orders, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/WhiteLabelRequest"}}}}}
+    post:
+      operationId: submitWhiteLabelRequest
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelRequestInput"}}}}
+      responses:
+        "201": {description: Submitted Exchange request, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelRequest"}}}}
+  /operator/white-label-requests:
+    get:
+      operationId: listWhiteLabelRequests
+      responses:
+        "200": {description: Super Admin request queue, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/WhiteLabelRequest"}}}}}
+  /operator/white-label-requests/{requestId}/review:
+    put:
+      operationId: reviewWhiteLabelRequest
+      parameters:
+        - {name: requestId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelReviewInput"}}}}
+      responses:
+        "200": {description: Operator-reviewed request, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelRequest"}}}}
+  /operator/white-label-requests/{requestId}/provision:
+    post:
+      operationId: provisionWhiteLabelRequest
+      parameters:
+        - {name: requestId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeDeliveryInput"}
+      responses:
+        "200": {description: Completed handoff into the existing customer account, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelRequest"}}}}
   /tenants/{tenantId}/exchange/audit:
     get:
       operationId: listExchangeAudit
@@ -774,6 +814,58 @@ components:
         type: string
         format: uuid
   schemas:
+    ExchangeDeliveryInput:
+      type: object
+      required: [tenantId]
+      properties: {tenantId: {type: string, format: uuid}}
+    CustomerAdminPanel:
+      type: object
+      required: [tenantId, name, brandName, slug, status, role]
+      properties:
+        tenantId: {type: string, format: uuid}
+        name: {type: string}
+        brandName: {type: string}
+        slug: {type: string}
+        status: {type: string, enum: [active, suspended]}
+        role: {type: string, enum: [client_admin, staff]}
+    WhiteLabelRequestInput:
+      type: object
+      required: [projectName, brandName, actions, details, idempotencyKey]
+      properties:
+        projectName: {type: string, minLength: 2, maxLength: 100}
+        brandName: {type: string, minLength: 2, maxLength: 100}
+        preferredDomain: {type: ["string", "null"], maxLength: 253}
+        actions: {type: array, minItems: 1, maxItems: 4, uniqueItems: true, items: {$ref: "#/components/schemas/ExchangeAction"}}
+        details: {type: string, maxLength: 1000}
+        idempotencyKey: {type: string, format: uuid}
+    WhiteLabelReviewInput:
+      type: object
+      required: [status, monthlyPrice, setupPrice, currency, operatorNote]
+      properties:
+        status: {type: string, enum: [approved, rejected]}
+        monthlyPrice: {type: string, pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        setupPrice: {type: string, pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        currency: {type: string, enum: [USD, EUR, GBP]}
+        operatorNote: {type: string, maxLength: 1000}
+    WhiteLabelRequest:
+      type: object
+      required: [id, customerUserId, projectName, brandName, preferredDomain, actions, details, status, monthlyPrice, setupPrice, currency, operatorNote, tenantId, createdAt, updatedAt]
+      properties:
+        id: {type: string, format: uuid}
+        customerUserId: {type: string}
+        projectName: {type: string}
+        brandName: {type: string}
+        preferredDomain: {type: ["string", "null"]}
+        actions: {type: array, items: {$ref: "#/components/schemas/ExchangeAction"}}
+        details: {type: string}
+        status: {type: string, enum: [submitted, approved, rejected, provisioned]}
+        monthlyPrice: {type: ["string", "null"]}
+        setupPrice: {type: ["string", "null"]}
+        currency: {type: ["string", "null"]}
+        operatorNote: {type: string}
+        tenantId: {type: ["string", "null"], format: uuid}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
     ExchangeAuditList:
       type: object
       required: [events, total, page, pageSize]
@@ -1219,6 +1311,7 @@ components:
     TenantSummary:
       type: object
       properties:
+        exchangeProvisioned: {type: boolean}
         id: { type: string, format: uuid }
         name: { type: string }
         slug: { type: string }

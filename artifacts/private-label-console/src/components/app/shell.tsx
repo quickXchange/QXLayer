@@ -11,6 +11,7 @@ import { BrandLogo } from '@/components/brand-logo';
 const nav = [
   { href: '/admin', label: 'Overview', icon: LayoutGrid },
   { href: '/clients', label: 'Clients', icon: Users },
+  { href: '/white-label-requests', label: 'WL requests', icon: ScrollText, op: true },
   { href: '/plans', label: 'Plans', icon: Boxes, op: true },
   { href: '/add-ons', label: 'Add-ons', icon: Boxes, op: true },
   { href: '/landing-products', label: 'Landing', icon: LayoutGrid, op: true },
@@ -44,8 +45,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const p = usePrincipal();
   const { signOut } = useClerk();
-  const home = p.role === 'super_admin' ? null : (p.memberships?.[0]?.tenantId ?? p.tenantId);
-  const items = home ? [...nav, { href: `/clients/${home}/exchange`, label: 'Exchange', icon: Boxes }] : nav;
+  const items = nav;
   const active = (h: string) => (h === '/admin' ? loc === h : loc.startsWith(h));
   return (
     <div className="grain min-h-[100dvh] md:flex">

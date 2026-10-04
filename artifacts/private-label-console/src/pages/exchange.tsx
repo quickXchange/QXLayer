@@ -15,8 +15,8 @@ import { RoutesPanel, PaymentMethodsPanel, PricingPanel } from '@/components/exc
 import { SettingsPanel } from '@/components/exchange/settings-panel';
 import { AuditPanel } from '@/components/exchange/audit-panel';
 
-const TABS: [string, string][] = [['', 'Dashboard'], ['orders', 'Orders'], ['assets', 'Assets'], ['networks', 'Networks'], ['routes', 'Routes'], ['payment-methods', 'Payment methods'], ['pricing', 'Pricing'], ['branding', 'Branding'], ['website', 'Website'], ['staff', 'Staff'], ['api-keys', 'API keys'], ['audit', 'Audit'], ['settings', 'Settings']];
-const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'payment-methods', 'pricing', 'settings'];
+const TABS: [string, string][] = [['', 'Dashboard'], ['orders', 'Orders'], ['assets', 'Assets'], ['networks', 'Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['domain', 'Domain'], ['payment-methods', 'Payment methods'], ['pricing', 'Pricing'], ['branding', 'Branding'], ['website', 'Website'], ['staff', 'Staff'], ['api-keys', 'API keys'], ['audit', 'Audit'], ['settings', 'Settings']];
+const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'settings'];
 
 export default function Exchange() {
   const { id = '', section = '', orderId } = useParams<{ id: string; section?: string; orderId?: string }>();
@@ -46,10 +46,13 @@ export default function Exchange() {
   else if (sec === 'assets') body = <AssetsPanel tenant={t} d={d} locked={cfgLocked} catalogReadOnly={cfgLocked} />;
   else if (sec === 'networks') body = <NetworksPanel d={d} locked={cfgLocked} />;
   else if (sec === 'routes') body = <RoutesPanel d={d} locked={cfgLocked} />;
+  else if (sec === 'swap' || sec === 'convert' || sec === 'buy' || sec === 'sell') body = <RoutesPanel d={d} locked={cfgLocked} action={sec} />;
+  else if (sec === 'fees') body = <PricingPanel d={d} locked={cfgLocked} />;
+  else if (sec === 'domain') body = <div className="space-y-6"><DomainSection tenant={t} readOnly={ro('domains.manage')} /><DomainOwnershipSection tenant={t} readOnly={ro('domains.manage')} /></div>;
   else if (sec === 'payment-methods') body = <PaymentMethodsPanel d={d} locked={cfgLocked} />;
   else if (sec === 'pricing') body = <PricingPanel d={d} locked={cfgLocked} />;
   else if (sec === 'settings') body = <SettingsPanel tenantId={id} d={d} locked={cfgLocked} canManageSub={can.manageSubscription} features={F} />;
-  else if (sec === 'branding') body = <div className="space-y-6"><BrandSection tenant={t} readOnly={ro('branding.manage')} /><DomainSection tenant={t} readOnly={ro('domains.manage')} /><DomainOwnershipSection tenant={t} readOnly={ro('domains.manage')} /></div>;
+  else if (sec === 'branding') body = <div className="space-y-6"><BrandSection tenant={t} readOnly={ro('branding.manage')} /></div>;
   else if (sec === 'website') body = <WebsiteSection tenant={t} readOnly={ro('branding.manage')} />;
   else if (sec === 'staff') body = <div className="space-y-6"><StaffAccessSection tenantId={id} canEdit={can.manageStaffGrants && !suspended && !unassigned} />
     <ResourcesSection tenantId={id} allowed={{ staff: Number(sub?.limits.max_staff ?? 0) > 0, api_keys: false, webhooks: false, payment_methods: false }} readOnly={ro('resources.manage')} staffReadOnly={!can.manageStaffGrants || base} /></div>;
@@ -58,11 +61,11 @@ export default function Exchange() {
 
   return (
     <>
-      <Link href={can.role === 'super_admin' ? `/clients/${id}` : '/admin'} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="h-4 w-4" /> {can.role === 'super_admin' ? 'Client detail' : 'Home'}</Link>
+      <Link href={can.role === 'super_admin' ? `/clients/${id}` : '/account/white-labels'} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="h-4 w-4" /> {can.role === 'super_admin' ? 'Client detail' : 'My White Labels'}</Link>
       {q.isLoading ? <ListSkeleton /> : q.isError || !t ? <ErrorState what="this client" onRetry={() => q.refetch()} /> : (
         <>
           <PageHeader eyebrow={`${t.slug} · exchange sandbox`} title={`${t.brandName} exchange`}>
-            <Link href={`/clients/${id}`} className="text-sm text-copper hover:underline" data-testid="link-client-detail">Client detail</Link>
+            {can.role === 'super_admin' && <Link href={`/clients/${id}`} className="text-sm text-copper hover:underline" data-testid="link-client-detail">Client detail</Link>}
           </PageHeader>
           {suspended && <p className="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. Everything is read-only.</p>}
           {unassigned && !suspended && <p className="mb-4 text-sm text-muted-foreground">No plan is assigned, so everything is read-only.</p>}
