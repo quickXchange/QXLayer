@@ -30,6 +30,29 @@ and individual below-the-fold sections. Below-the-fold content is a lazy chunk.
 Public queries refresh every 30 seconds and on focus/reconnection.
 Direct capability pages still require the server's entitlement check.
 
+## Visual refinement and approval
+
+The customer-only visual upgrade adds a stronger tenant-colored atmosphere,
+flowing SVG network paths, soft particles, a larger illuminated widget, internal
+CTA lighting, more prominent asset controls, and redesigned product showcases.
+Configured counts are integrated into Supported Assets and animate only when
+visible; mobile uses a shorter count duration. Reduced-motion changes stop the
+count animation and decorative motion. Mobile keeps both hero actions on one row
+and brings the widget into view earlier.
+
+Customer styles are divided into base, atmosphere, widget, sections and showcase
+stylesheets. Capability logic, routing, theme preference behavior, backend,
+shared contracts and admin sources remain unchanged.
+
+Five approval screenshots are in `screenshots/customer-visual-upgrade/`:
+Nexa Desktop Dark, Nexa Mobile Dark, Nexa Light, Aster Desktop and Aster Mobile.
+The light screenshot uses the real theme switch, not a changed tenant default.
+Browser checks found no horizontal overflow, confirmed the mobile selector fits,
+observed no financial POST requests or browser exceptions, and confirmed no active
+animations with reduced motion. Protected API/admin/shared source checksums match
+their pre-redesign values. Wait for explicit user visual approval before any new
+backend phase; approval does not itself request that next phase.
+
 ## Tenant identities
 
 | Setting | Aster Sandbox | Nexa Sandbox |
@@ -80,19 +103,19 @@ Final production build (not published):
 
 | Asset | Minified | Gzip |
 |---|---:|---:|
-| Initial JavaScript | 379.99 kB | 122.33 kB |
-| Lazy below-fold JavaScript | 16.11 kB | 5.81 kB |
-| CSS | 113.47 kB | 19.42 kB |
+| Initial JavaScript | 380.13 kB | 122.39 kB |
+| Lazy below-fold JavaScript | 17.19 kB | 6.23 kB |
+| CSS | 130.01 kB | 21.90 kB |
 | HTML | 1.21 kB | 0.47 kB |
 
-Initial JavaScript + CSS: **141.75 kB gzip**; all JavaScript + CSS: **147.56 kB gzip**.
-Build took 3.55 seconds in the development container. These exclude font responses,
+Initial JavaScript + CSS: **144.29 kB gzip**; all JavaScript + CSS: **150.52 kB gzip**.
+Build took 3.04 seconds in the development container. These exclude font responses,
 transport headers and logos. Only the configured tenant font is loaded; SVG marks
 and coin glyphs do not require large media or additional coin-image requests.
 
-One unthrottled development-browser navigation measured FCP **1288 ms**,
+The earlier foundation's unthrottled development-browser navigation measured FCP **1288 ms**,
 DOMContentLoaded **1275.5 ms**, and load **1311.8 ms**. This is not a production
-benchmark or a mobile-throttled Core Web Vitals result.
+benchmark or a mobile-throttled Core Web Vitals result, and was not remeasured for the visual refinement.
 
 Backgrounds use CSS/SVG rather than video/canvas/animation dependencies. Desktop
 cursor lighting is removed on smaller screens, mobile blur/orb effects are reduced,

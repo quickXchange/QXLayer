@@ -1,0 +1,19 @@
+/* Individual section presentations */
+.s-feat{position:relative;padding:1.1rem .25rem 1.3rem;border-top:1px solid var(--s-line)}
+.s-feat::before{content:"";position:absolute;left:0;top:-1px;height:1px;width:2.5rem;background:var(--s-accent);transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.s-feat:hover::before{width:100%}
+.s-feat:hover{transform:none}
+.s-qr{box-shadow:0 0 0 4px color-mix(in srgb,var(--s-fg) 10%,transparent),0 18px 36px -16px var(--s-glow)}
+.s-notch{width:4.2rem;height:.3rem;border-radius:99px;margin:.5rem auto .1rem;background:color-mix(in srgb,var(--s-fg) 18%,transparent)}
+.s-phone{position:relative;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.s-phone::before{content:"";position:absolute;inset:-18% -14% auto;height:70%;z-index:-1;background:radial-gradient(closest-side,color-mix(in srgb,var(--s-glow) 22%,transparent),transparent);pointer-events:none}
+@media(min-width:768px){.s-phone-b{margin-top:3.5rem}.s-phone:hover{transform:translateY(-6px)}}
+.s-dots{display:inline-flex;gap:.3rem}
+.s-dots i{width:.55rem;height:.55rem;border-radius:50%;background:color-mix(in srgb,var(--s-fg) 22%,transparent)}
+.s-dots i:first-child{background:var(--s-accent)}
+.s-codewin{box-shadow:inset 0 1px 0 color-mix(in srgb,var(--s-fg) 12%,transparent),inset 0 0 0 1px var(--s-line),0 50px 90px -50px var(--s-glow)}
+.s-codewin pre{background:linear-gradient(180deg,transparent,color-mix(in srgb,var(--s-bg) 50%,transparent));min-height:11rem}
+.s-faq-item{transition:background-color .3s}
+.s-faq-item[data-open=true]{background:linear-gradient(90deg,color-mix(in srgb,var(--s-accent) 7%,transparent),transparent 70%);box-shadow:inset 2px 0 0 var(--s-accent)}
+.s-faq-item button{padding-left:.75rem;padding-right:.75rem}
+.s-faq-item .s-faq p{padding-left:calc(.75rem + 2.2rem);padding-right:.75rem}

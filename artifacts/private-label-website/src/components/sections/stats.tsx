@@ -1,5 +1,6 @@
 import type { Caps } from '@/lib/capabilities';
 import { Reveal } from '@/components/reveal';
+import { CountUp } from '@/components/count-up';
 
 export function Stats({ caps }: { caps: Caps }) {
   const items = [
@@ -9,19 +10,18 @@ export function Stats({ caps }: { caps: Caps }) {
   ].filter(Boolean) as { k: string; n: number; l: string }[];
   if (!items.length) return null;
   return (
-    <section className="s-section" style={{ paddingBlock: 'clamp(1.5rem,4vw,3rem)' }} data-testid="section-stats">
-      <div className="s-wrap">
-        <div className="grid gap-px overflow-hidden border sm:grid-cols-3" style={{ borderColor: 'var(--s-line)', background: 'var(--s-line)', borderRadius: 'var(--s-r2)' }}>
-          {items.map((i, idx) => (
-            <Reveal key={i.k} delay={idx * 90}>
-              <div className="flex items-baseline gap-4 px-6 py-6 sm:block" style={{ background: 'var(--s-panel)' }} data-testid={`stat-${i.k}`}>
-                <p className="text-5xl font-semibold tracking-tight" style={{ fontVariantNumeric: 'tabular-nums' }}>{i.n}</p>
-                <p className="s-muted text-sm sm:mt-2">{i.l}</p>
-              </div>
-            </Reveal>))}
-        </div>
-        <p className="s-muted mt-3 text-xs">Counts reflect this site&rsquo;s current configuration, not trading activity.</p>
+    <div className="mt-12 md:mt-16" data-testid="section-stats">
+      <div className="s-counts">
+        {items.map((i, idx) => (
+          <Reveal key={i.k} delay={idx * 120}>
+            <div data-testid={`stat-${i.k}`}>
+              <p className="s-count-n"><CountUp to={i.n} /></p>
+              <span className="s-count-rule" aria-hidden="true" />
+              <p className="s-muted mt-2 text-sm">{i.l}</p>
+            </div>
+          </Reveal>))}
       </div>
-    </section>
+      <p className="s-muted mt-5 text-xs">Counts reflect this site&rsquo;s current configuration, not trading activity.</p>
+    </div>
   );
 }

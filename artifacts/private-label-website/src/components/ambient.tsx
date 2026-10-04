@@ -8,21 +8,23 @@ export function Ambient() {
   const light = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth >= 1024;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const el = light.current;
-    if (!fine || reduce || !el) return;
+    if (!fine || motion.matches || !el) return;
     let raf = 0, x = 0, y = 0;
-    const move = (e: PointerEvent) => { x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(() => { raf = 0; el.style.transform = `translate3d(${x - 260}px, ${y - 260}px, 0)`; el.style.opacity = '1'; }); };
+    const move = (e: PointerEvent) => { if (window.innerWidth < 1024 || motion.matches) return; x = e.clientX; y = e.clientY; if (!raf) raf = requestAnimationFrame(() => { raf = 0; el.style.transform = `translate3d(${x - 260}px, ${y - 260}px, 0)`; el.style.opacity = '1'; }); };
     window.addEventListener('pointermove', move, { passive: true });
     return () => { window.removeEventListener('pointermove', move); if (raf) cancelAnimationFrame(raf); };
   }, []);
   return (
     <>
       <div className="s-ambient" aria-hidden="true">
-        <div className="s-grid" />
+        <div className="s-aurora" /><div className="s-grid" />
         <div className="s-orb s-orb-a" /><div className="s-orb s-orb-b" /><div className="s-orb s-orb-c" />
         <svg className="s-net" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMin slice" fill="none">
-          {LINKS.map(([a, b], i) => <line key={i} x1={NODES[a][0]} y1={NODES[a][1]} x2={NODES[b][0]} y2={NODES[b][1]} className="s-net-line" style={{ animationDelay: `${(i % 7) * -1.3}s` }} />)}
+          {LINKS.map(([a, b], i) => <line key={i} x1={NODES[a][0]} y1={NODES[a][1]} x2={NODES[b][0]} y2={NODES[b][1]} className="s-net-line" />)}
+          {LINKS.map(([a, b], i) => i % 2 === 0 && <line key={`f${i}`} x1={NODES[a][0]} y1={NODES[a][1]} x2={NODES[b][0]} y2={NODES[b][1]} className="s-net-flow" style={{ animationDelay: `${i * -0.9}s` }} />)}
+          {NODES.map(([x, y], i) => <circle key={`m${i}`} cx={x + 24} cy={y + 40} r={1.6} className="s-mote" style={{ animationDelay: `${i * -1.7}s` }} />)}
           {NODES.map(([x, y], i) => <circle key={i} cx={x} cy={y} r={i % 3 === 0 ? 3.4 : 2.4} className="s-net-node" style={{ animationDelay: `${(i % 5) * -1.1}s` }} />)}
         </svg>
         <div className="s-fade" />

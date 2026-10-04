@@ -17,7 +17,7 @@ export function PaymentMock({ site, compact }: { site: PublicSite; compact?: boo
     <div className="s-glowframe" data-testid="mock-payment"><div className="s-glowinner p-5 sm:p-6">
       <div className="flex items-center justify-between"><p className="text-sm font-semibold">Payment request</p><span className="s-badge">Illustrative</span></div>
       <div className="mt-5 flex items-start gap-5">
-        <div className="rounded-lg p-2" style={{ background: 'var(--s-fg)', color: 'var(--s-bg)' }}><Qr /></div>
+        <div className="s-qr rounded-lg p-2" style={{ background: 'var(--s-fg)', color: 'var(--s-bg)' }}><Qr /></div>
         <div className="flex-1 space-y-3 pt-1"><div className="s-bar w-2/3" /><div className="s-bar w-full" /><div className="s-bar w-1/2" /></div>
       </div>
       <div className="mt-5 flex items-center justify-between rounded-lg border px-4 py-3" style={{ borderColor: 'var(--s-line)' }}>
@@ -37,7 +37,7 @@ export function Payments({ site }: { site: PublicSite }) {
         <div>
           <SectionHead eyebrow="Crypto payments" title="Get paid in crypto, with a clear trail." body="Payments is part of this site's plan. The flows below are previews and are not live in the sandbox." />
           <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-            {f.map(([I, t, d], i) => <Reveal key={t} delay={i * 60}><li className="s-card s-tile h-full p-4" data-testid={`feature-payments-${i}`}><I size={20} style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" /><p className="mt-3 font-semibold">{t}</p><p className="s-muted mt-1 text-sm leading-relaxed">{d}</p></li></Reveal>)}
+            {f.map(([I, t, d], i) => <Reveal key={t} delay={i * 60}><li className="s-feat s-tile h-full" data-testid={`feature-payments-${i}`}><I size={20} style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" /><p className="mt-3 font-semibold">{t}</p><p className="s-muted mt-1 text-sm leading-relaxed">{d}</p></li></Reveal>)}
           </ul>
           <PreviewNote>Preview: payment creation is not available yet.</PreviewNote>
         </div>

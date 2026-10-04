@@ -24,8 +24,8 @@ export function Developers({ caps }: { caps: Caps }) {
           <ul className="mt-8 space-y-5">{f.map(([I, t, d], i) => <Reveal key={t} delay={i * 70}><li className="flex gap-4" data-testid={`feature-dev-${i}`}><span className="grid h-10 w-10 flex-none place-items-center border" style={{ borderRadius: 'var(--s-r1)', borderColor: 'var(--s-line)' }}><I size={18} style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" /></span><div><p className="font-semibold">{t}</p><p className="s-muted mt-1 text-sm leading-relaxed">{d}</p></div></li></Reveal>)}</ul>
         </div>
         <Reveal>
-          <div className="s-card overflow-hidden" data-testid="code-preview">
-            <div className="flex items-center justify-between border-b px-4 py-2.5" style={{ borderColor: 'var(--s-line)' }}><span className="s-mono text-xs s-muted">config-preview.json</span><span className="s-badge">Not live</span></div>
+          <div className="s-lit s-codewin overflow-hidden" data-testid="code-preview">
+            <div className="flex items-center justify-between border-b px-4 py-2.5" style={{ borderColor: 'var(--s-line)' }}><span className="flex items-center gap-3"><span className="s-dots" aria-hidden="true"><i /><i /><i /></span><span className="s-mono text-xs s-muted">config-preview.json</span></span><span className="s-badge">Not live</span></div>
             <pre className="s-code p-4" tabIndex={0} aria-label="Example configuration shape"><code>{CODE}</code></pre>
           </div>
           <PreviewNote>Placeholders only. No credentials or endpoints are shown.</PreviewNote>

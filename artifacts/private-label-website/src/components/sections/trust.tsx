@@ -18,10 +18,10 @@ export function Trust({ site }: { site: PublicSite }) {
   return (
     <Section id="about" tint>
       <SectionHead eyebrow="About and trust" title="What this site does, stated plainly." body="We describe only what exists today. No guarantees or regulatory claims are made here." />
-      <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
         {items.map(({ I, t, d, to }, i) => (
           <Reveal key={t} delay={(i % 3) * 70}>
-            <div className="s-card s-tile h-full p-5" data-testid={`trust-${i}`}>
+            <div className="s-feat s-tile h-full" data-testid={`trust-${i}`}>
               <I size={20} style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" />
               <p className="mt-4 font-semibold">{t}</p><p className="s-muted mt-1.5 text-sm leading-relaxed">{d}</p>
               {to && <Link href={to} className="mt-3 inline-block text-sm font-semibold underline underline-offset-4" style={{ color: 'var(--s-accent-ink)' }}>Read it</Link>}

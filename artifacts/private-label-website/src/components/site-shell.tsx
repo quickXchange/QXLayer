@@ -96,7 +96,7 @@ function Footer({ site, nav }: { site: PublicSite; nav: { id: string; label: str
   const col = 'mb-3 text-xs font-semibold uppercase tracking-[0.14em]';
   const lk = 'block py-1.5 text-sm s-muted transition-colors hover:text-[var(--s-fg)]';
   return (
-    <footer id="support" className="relative z-[2] mt-10 border-t" style={{ borderColor: 'var(--s-line)', background: 'var(--s-bg2)' }}>
+    <footer id="support" className="s-footer relative z-[2] mt-10 border-t" style={{ borderColor: 'var(--s-line)', background: 'var(--s-bg2)' }}>
       <div className="s-wrap grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-2.5"><BrandMark site={site} size={30} /><span className="text-lg font-semibold tracking-tight">{site.brandName}</span></div>

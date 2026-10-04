@@ -16,10 +16,10 @@ function Side({ label, asset, onPick, value, onValue, readOnly, fiat, error, id,
         <div className="mt-1.5 flex items-center gap-3">
           <input id={`amt-${id}`} className="s-amount" inputMode="decimal" autoComplete="off" placeholder="0.00" value={value} readOnly={readOnly} aria-invalid={!!error} aria-describedby={error ? `err-${id}` : undefined} onChange={(e) => { const v = e.target.value.replace(',', '.'); if (AMOUNT.test(v)) onValue?.(v); }} data-testid={`input-amount-${id}`} />
           {fiat ? (
-            <span className="s-pick" style={{ cursor: 'default' }} data-testid={`pill-fiat-${id}`}><span className="s-coin" style={{ width: 32, height: 32, background: 'var(--s-secondary)', color: 'var(--s-bg)' }}>Fi</span>Fiat</span>
+            <span className="s-pick" style={{ cursor: 'default' }} data-testid={`pill-fiat-${id}`}><span className="s-coin" style={{ width: 44, height: 44, background: 'var(--s-secondary)', color: 'var(--s-bg)' }}>Fi</span>Fiat</span>
           ) : (
             <button type="button" className="s-pick" onClick={onPick} disabled={!assetsAvailable} aria-haspopup="dialog" aria-label={`${label}: choose asset${asset ? `, ${asset.symbol} on ${asset.networkName}` : ''}`} data-testid={`button-asset-${id}`}>
-              {asset ? <Coin asset={asset} size={32} /> : <span className="s-coin" style={{ width: 32, height: 32, background: 'var(--s-secondary)' }}>?</span>}
+              {asset ? <Coin asset={asset} size={44} /> : <span className="s-coin" style={{ width: 44, height: 44, background: 'var(--s-secondary)' }}>?</span>}
               <span className="truncate">{asset ? asset.symbol : 'Select'}</span><ChevronDown size={15} aria-hidden="true" />
             </button>
           )}
@@ -84,7 +84,7 @@ export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps })
   return shell(
     <form onSubmit={submit} noValidate aria-label="Exchange (sandbox)">
       <div className="flex items-center justify-between gap-3">
-        <div role="tablist" aria-label="Exchange action" className="flex gap-1 overflow-x-auto">
+        <div role="tablist" aria-label="Exchange action" className="s-tabs overflow-x-auto">
           {caps.tabs.map((t) => <button key={t} type="button" role="tab" id={`tab-${t}`} aria-selected={tab === t} className="s-tab" onClick={() => { setTab(t); setTouched(false); reset(); }} data-testid={`tab-${t}`}>{LABEL[t]}</button>)}
         </div>
         <span className="s-badge shrink-0" data-testid="badge-sandbox">Sandbox</span>

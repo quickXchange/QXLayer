@@ -23,11 +23,11 @@ export function How({ caps }: { caps: Caps }) {
     <Section id="how" tint>
       <SectionHead eyebrow="How it works" title="Four steps, no detours." body="This describes the intended flow. Live execution is not enabled in the sandbox." />
       <Reveal className="relative mt-12">
-        <svg className="pointer-events-none absolute left-0 top-[26px] hidden h-2 w-full lg:block" viewBox="0 0 100 1" preserveAspectRatio="none" aria-hidden="true"><path d="M12.5 .5H87.5" pathLength={1} className="s-path" vectorEffect="non-scaling-stroke" fill="none" /></svg>
-        <ol className="relative grid gap-8 lg:grid-cols-4 lg:gap-6">
+        <svg className="pointer-events-none absolute left-0 top-[28px] hidden h-2 w-full lg:block" viewBox="0 0 100 1" preserveAspectRatio="none" aria-hidden="true"><path d="M12.5 .5H87.5" pathLength={1} className="s-path" vectorEffect="non-scaling-stroke" fill="none" /><path d="M12.5 .5H87.5" pathLength={1} className="s-path-flow" vectorEffect="non-scaling-stroke" fill="none" /></svg>
+        <ol className="s-steps relative grid gap-8 lg:grid-cols-4 lg:gap-6">
           {s.map(([t, d], i) => (
             <li key={t} className="flex gap-5 lg:block lg:text-center" data-testid={`step-${i + 1}`}>
-              <span className="s-mono grid h-[52px] w-[52px] flex-none place-items-center border text-sm font-semibold lg:mx-auto" style={{ borderRadius: '50%', borderColor: 'var(--s-accent)', background: 'var(--s-bg2)', color: 'var(--s-accent-ink)', position: 'relative' }}>0{i + 1}</span>
+              <span className="s-step-dot s-mono lg:mx-auto">0{i + 1}</span>
               <div className="lg:mt-5"><h3 className="text-lg font-semibold">{t}</h3><p className="s-muted mt-1.5 text-sm leading-relaxed">{d}</p></div>
             </li>))}
         </ol>

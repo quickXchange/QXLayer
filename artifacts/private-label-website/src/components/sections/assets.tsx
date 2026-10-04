@@ -2,9 +2,11 @@ import { useMemo, useState } from 'react';
 import type { PublicSite } from '@workspace/api-client-react';
 import { Section, SectionHead } from './common';
 import { Reveal } from '@/components/reveal';
+import type { Caps } from '@/lib/capabilities';
+import { Stats } from './stats';
 import { Coin, NetBadge, assetKey } from '@/components/asset-picker';
 
-export function Assets({ site }: { site: PublicSite }) {
+export function Assets({ site, caps }: { site: PublicSite; caps: Caps }) {
   const [net, setNet] = useState<string | null>(null);
   const nets = useMemo(() => Array.from(new Map(site.assets.map((a) => [a.networkId, a.networkName]))), [site.assets]);
   if (!site.assets.length) return null;
@@ -16,16 +18,23 @@ export function Assets({ site }: { site: PublicSite }) {
         <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filter by network">
           {[[null, 'All networks'] as const, ...nets.map(([id, n]) => [id, n] as const)].map(([id, n]) => <button key={id ?? 'all'} type="button" aria-pressed={net === id} onClick={() => setNet(id)} className="s-chip min-h-[40px] cursor-pointer px-4" style={net === id ? { borderColor: 'var(--s-accent)', color: 'var(--s-accent-ink)' } : undefined} data-testid={`filter-network-${id ?? 'all'}`}>{n}</button>)}
         </div>)}
+      {site.assets.length >= 3 && (
+        <div className="s-marquee mt-10" aria-hidden="true">
+          <div className="s-marquee-track">
+            {[0, 1].map((r) => <div key={r} className="flex gap-10">{site.assets.map((a) => <div key={assetKey(a)} className="s-marquee-item"><Coin asset={a} size={52} />{a.symbol}</div>)}</div>)}
+          </div>
+        </div>)}
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((a, i) => (
           <Reveal key={assetKey(a)} delay={Math.min(i, 6) * 60}>
-            <div className="s-card s-tile flex items-center gap-4 p-4" data-testid={`chip-asset-${a.assetId}-${a.networkId}`}>
-              <Coin asset={a} size={44} />
+            <div className="s-lit s-tile flex items-center gap-4 p-4" data-testid={`chip-asset-${a.assetId}-${a.networkId}`}>
+              <Coin asset={a} size={52} />
               <div className="min-w-0 flex-1"><p className="font-semibold">{a.symbol}</p><p className="s-muted truncate text-sm">{a.name}</p></div>
               <NetBadge a={a} />
             </div>
           </Reveal>))}
       </div>
+      <Stats caps={caps} />
     </Section>
   );
 }

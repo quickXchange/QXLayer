@@ -1,6 +1,5 @@
 import type { PublicSite } from '@workspace/api-client-react';
 import type { Caps } from '@/lib/capabilities';
-import { Stats } from './sections/stats';
 import { Assets } from './sections/assets';
 import { How } from './sections/how';
 import { Payments } from './sections/payments';
@@ -13,13 +12,12 @@ import { FinalCta } from './sections/cta';
 export default function BelowFold({ site, caps }: { site: PublicSite; caps: Caps }) {
   return (
     <>
-      <Stats caps={caps} />
-      <Assets site={site} />
+      <Assets site={site} caps={caps} />
       {caps.services > 0 && <How caps={caps} />}
       {caps.payments && <Payments site={site} />}
+      <Trust site={site} />
       {(caps.bot || caps.mini) && <Telegram caps={caps} brand={site.brandName} />}
       {caps.api && <Developers caps={caps} />}
-      <Trust site={site} />
       <Faq caps={caps} />
       <FinalCta site={site} caps={caps} />
     </>

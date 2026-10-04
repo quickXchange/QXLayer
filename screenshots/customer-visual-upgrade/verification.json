@@ -1,0 +1,70 @@
+{
+  "viewports": [
+    {
+      "name": "nexa-desktop-dark",
+      "theme": "dark",
+      "width": 1425,
+      "scrollWidth": 1425,
+      "payments": true,
+      "developers": true,
+      "headerMenu": "none",
+      "headerCta": "flex",
+      "widgetTop": 157
+    },
+    {
+      "name": "nexa-mobile-dark",
+      "theme": "dark",
+      "width": 390,
+      "scrollWidth": 390,
+      "payments": true,
+      "developers": true,
+      "headerMenu": "grid",
+      "headerCta": "none",
+      "widgetTop": 432.953125
+    },
+    {
+      "name": "nexa-light",
+      "theme": "light",
+      "width": 1425,
+      "scrollWidth": 1425,
+      "payments": true,
+      "developers": true,
+      "headerMenu": "none",
+      "headerCta": "flex",
+      "widgetTop": 157
+    },
+    {
+      "name": "aster-desktop",
+      "theme": "light",
+      "width": 1425,
+      "scrollWidth": 1425,
+      "payments": false,
+      "developers": false,
+      "headerMenu": "none",
+      "headerCta": "flex",
+      "widgetTop": 157
+    },
+    {
+      "name": "aster-mobile",
+      "theme": "light",
+      "width": 390,
+      "scrollWidth": 390,
+      "payments": false,
+      "developers": false,
+      "headerMenu": "grid",
+      "headerCta": "none",
+      "widgetTop": 409.640625
+    }
+  ],
+  "mobileSelector": {
+    "left": 23.5,
+    "right": 366.5,
+    "width": 390
+  },
+  "reducedMotion": {
+    "active": 0,
+    "scroll": "auto"
+  },
+  "financialPosts": [],
+  "browserErrors": []
+}

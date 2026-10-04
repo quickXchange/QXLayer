@@ -56,3 +56,73 @@ mtime_ms = 1791119350947
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fc758be9-7974-447d-b39b-365c6b4fb38b/e052e4e9-d7c8-4e32-aa54-a1ef6acd564f"
 storage_version_token = "1791119522257012"
 content_type = "image/jpeg"
+
+[[outputs]]
+id = "dPSZMwKJzmJN9B163ijRX"
+uri = "file://screenshots/customer-visual-upgrade/nexa-desktop-dark.jpg"
+type = "image"
+title = "Nexa Desktop Dark"
+description = "Desktop exchange layout with Nexa’s configured dark theme and branding."
+logical_id = "334c43dd-1fdf-4399-9b22-57d7d4b8c054"
+content_hash = "sha256:4272280afedc78f1b065e594ab56c04c9f86a77ddc286eac90b76da2d80906e5"
+size = 98357
+mtime_ms = 1791120756411
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/334c43dd-1fdf-4399-9b22-57d7d4b8c054/e8e2610c-5823-435c-a9b8-0a6caa8adca7"
+storage_version_token = "1791120801662240"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "-sEzOt2plU0S8k0-ZurTs"
+uri = "file://screenshots/customer-visual-upgrade/nexa-mobile-dark.jpg"
+type = "image"
+title = "Nexa Mobile Dark"
+description = "Compact mobile hero and illuminated exchange widget."
+logical_id = "865150e9-554f-4699-8a43-b7d5519026d3"
+content_hash = "sha256:57979db6895adbebd931472badf2e49b8dd8d7637d9f3255a52bd6ad1e8af25c"
+size = 60063
+mtime_ms = 1791120710259
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/865150e9-554f-4699-8a43-b7d5519026d3/5f8d73cd-8e99-4a92-a2b4-71da7f91d059"
+storage_version_token = "1791120802200272"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "v0vQ7mpQSHo-msfV_JY7z"
+uri = "file://screenshots/customer-visual-upgrade/nexa-light.jpg"
+type = "image"
+title = "Nexa Light"
+description = "Light mode selected through the existing theme switch; the tenant default remains unchanged."
+logical_id = "73fc2f40-d25d-4353-ba80-7893b610cdf0"
+content_hash = "sha256:fcc1f140582ad87b977ded8e1472d9e2d8e117efeee15679759c57358e91a6b0"
+size = 143738
+mtime_ms = 1791120712463
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/73fc2f40-d25d-4353-ba80-7893b610cdf0/6e9f68dd-d183-429e-9915-1c4973d92c35"
+storage_version_token = "1791120802729638"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "LgyiroySOhrXKE8bwr_qQ"
+uri = "file://screenshots/customer-visual-upgrade/aster-desktop.jpg"
+type = "image"
+title = "Aster Desktop"
+description = "Aster’s configured light theme, sharp surfaces and honest single-asset Swap state."
+logical_id = "0c483902-8445-46ac-be8e-3844a2c2b17e"
+content_hash = "sha256:28c237009cd9d703c1774f21a155c11980bfa45be8a5252fb87ef6f433e6aeed"
+size = 139660
+mtime_ms = 1791120714715
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0c483902-8445-46ac-be8e-3844a2c2b17e/0335c179-c76d-46ec-abb5-f75b8e742ed5"
+storage_version_token = "1791120803235826"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "t5N1eiRVLRbnMY0Vi22m2"
+uri = "file://screenshots/customer-visual-upgrade/aster-mobile.jpg"
+type = "image"
+title = "Aster Mobile"
+description = "Responsive Aster layout with the same disabled single-asset state."
+logical_id = "85fd8040-61fc-4f3f-8181-eea14cef2988"
+content_hash = "sha256:8668645e7295eb2a37a6e09f1a7345a67fe632ef5475ae41d8e2eb3e7709381c"
+size = 63712
+mtime_ms = 1791120716707
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/85fd8040-61fc-4f3f-8181-eea14cef2988/6c9025b0-2bf2-42f8-8276-ca758b1b9db5"
+storage_version_token = "1791120803805116"
+content_type = "image/jpeg"
