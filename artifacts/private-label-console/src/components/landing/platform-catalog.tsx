@@ -91,11 +91,11 @@ export function PlatformCatalog({ items, loading, error, onRetry, open, setOpen 
     <>
       <Section id="featured">
         <SectionHead eyebrow="Core products" title="The foundations, stated plainly" body="Status, price and readiness are shown exactly as published by the platform team. Every product below is a preview of a planned or sandbox service." />
-        <div className="mt-8">
+        <div className="mt-5">
           {loading ? skel(4, 'h-16') : error ? (
             <div className="s-card p-8" role="alert" data-testid="error-catalog"><p className="text-xl font-semibold">The product catalog could not be loaded</p><p className="s-muted mt-1 text-sm">No product information is shown until it can be read from the platform.</p><button type="button" className="s-btn s-btn-primary mt-5" onClick={onRetry} data-testid="button-retry-catalog"><RefreshCw size={16} />Retry</button></div>
           ) : items.length > 0 && (
-            <nav aria-label="Product index" className="flex flex-wrap gap-2" data-testid="nav-product-index">
+            <nav aria-label="Product index" className="sc-index flex flex-wrap gap-1.5" data-testid="nav-product-index">
               {items.map((p) => <a key={p.key} href={`#product-${p.key}`} className="s-badge" data-testid={`link-index-${p.key}`}>{p.name}</a>)}
             </nav>
           )}
@@ -104,7 +104,7 @@ export function PlatformCatalog({ items, loading, error, onRetry, open, setOpen 
 
       <Section id="products">
         <SectionHead eyebrow="Full catalog" title="Every product, in context" body="Pricing is a starting point and is shown as published. Where no price is published, pricing is on request." />
-        <div className="mt-10">
+        <div className="mt-6">
           {loading ? skel(8, 'h-60') : error ? null : items.length === 0 ? (
             <div className="s-card p-10 text-center" data-testid="empty-catalog"><p className="text-xl font-semibold">No products are published right now</p><p className="s-muted mt-1 text-sm">Check back soon.</p></div>
           ) : (

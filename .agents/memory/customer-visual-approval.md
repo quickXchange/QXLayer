@@ -22,7 +22,9 @@ The user-provided original website recording is the MASTER DESIGN when source ve
 
 For Products & Services, the user wants large premium product showcases, not many repetitive small cards. Major services need a strong headline, short description, pricing, CTA and a large realistic interface/product composition. Alternate text/visual sides on desktop; on mobile use text, CTA, then visual. Smaller cards are acceptable only for secondary products. Keep QXLayer's original identity; Monbits is product-presentation inspiration only, not a design to copy.
 
-**Why:** The user explicitly rejected the repetitive product grid and requested spacious product-specific dashboard/interface previews while limiting changes to catalog presentation.
+The user confirmed the new showcase direction is much better, but wants much more compact browsing, especially on mobile: ideally a major product fits about one natural viewport, with no giant illustration containers or pricing boxes. Pricing belongs naturally beside/above the CTA and stays catalog-controlled. Recognizable BTC, ETH, USDT, USDC, SOL and BNB logos are allowed in illustrative marketing renders only, never as claims of configured/live support. Reduce effects on mobile as well as reduced-motion settings.
+
+**Why:** The user explicitly rejected the repetitive product grid, approved the showcase direction, then asked for compact mobile composition and polished product renders rather than wireframes, limiting changes to catalog presentation.
 
 The user distinguishes QXLayer Main Platform from White Label Client Sites. Main platform preview/navigation must open the public landing page directly, including for signed-in visitors. The tenant Site Finder is a sandbox/development utility only, never the platform homepage.
 

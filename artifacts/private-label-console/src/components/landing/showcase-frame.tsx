@@ -6,7 +6,7 @@ export function ShowcaseFrame({ label, accent, children }: { label: string; acce
   const ref = useRef<HTMLDivElement>(null);
   const move = (e: React.PointerEvent<HTMLDivElement>) => {
     const el = ref.current;
-    if (!el || e.pointerType === 'touch' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!el || e.pointerType !== 'mouse' || window.matchMedia('(pointer:coarse)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
@@ -24,11 +24,13 @@ export function ShowcaseFrame({ label, accent, children }: { label: string; acce
     el.dataset.active = '0';
   };
   return (
+    <figure className="sc-fig">
     <div ref={ref} className="sc-stage" style={{ '--sc-light': accent ?? 'var(--s-primary)' } as CSSProperties} aria-hidden="true" onPointerMove={move} onPointerLeave={leave} onPointerDown={(e) => { if (e.pointerType === 'touch' && ref.current) { ref.current.dataset.active = '1'; window.setTimeout(() => { if (ref.current) ref.current.dataset.active = '0'; }, 900); } }}>
-      <span className="sc-badge s-mono">{label}</span>
       <div className="sc-glow" />
       {children}
     </div>
+    <figcaption className="sc-cap s-mono">Illustrative assets, not supported or live. {label}</figcaption>
+    </figure>
   );
 }
 
