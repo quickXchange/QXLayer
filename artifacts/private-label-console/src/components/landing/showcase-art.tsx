@@ -1,4 +1,5 @@
 import { useId, type CSSProperties, type ReactNode } from 'react';
+import { Logo } from './showcase-brand';
 
 /** Illustrative marketing coin marks. Not a statement of asset support. */
 export type CoinId = 'BTC' | 'ETH' | 'USDT' | 'USDC' | 'SOL' | 'BNB';
@@ -16,38 +17,18 @@ export const Coin = ({ c, size = 2 }: { c: CoinId; size?: number }) => {
   const id = `coin-${useId().replace(/:/g, '')}`;
   return <svg className="sc-coin" viewBox="0 0 32 32" style={{ width: `${size}em`, height: `${size}em` }} aria-hidden="true">{glyph(c, id)}<circle cx="16" cy="16" r="15.4" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth=".8" /><path d="M3 10A14 14 0 0 1 22 3" fill="none" stroke="rgba(255,255,255,.5)" strokeWidth="1.4" strokeLinecap="round" /></svg>;
 };
-export const CoinRow = ({ c, n }: { c: CoinId; n: string }) => <div className="sc-row2"><span className="sc-cr"><Coin c={c} size={1.7} />{n}</span><span className="sc-ph" /><em>Demo</em></div>;
-export const CoinStack = ({ items }: { items: CoinId[] }) => <div className="sc-cstack">{items.map((c) => <Coin key={c} c={c} size={2.6} />)}</div>;
+export const CoinStack = ({ items, size = 2.6 }: { items: CoinId[]; size?: number }) => <div className="sc-cstack">{items.map((c) => <Coin key={c} c={c} size={size} />)}</div>;
 export const Orb = ({ c, x, y, s = 4, d = 0 }: { c: CoinId; x: number; y: number; s?: number; d?: number }) => (
-  <div className="sc-orb" style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s` } as CSSProperties}><Coin c={c} size={s} /></div>
+  <div className="sc-orb sx" style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s` } as CSSProperties}><Coin c={c} size={s} /></div>
 );
 
-export const CardRender = ({ tilt = -7 }: { tilt?: number }) => (
-  <div className="sc-cc" style={{ transform: `perspective(60em) rotateY(${tilt}deg) rotateX(4deg) rotate(-4deg)` }}>
-    <div className="sc-cc-top"><b>YOUR BRAND</b><span className="sc-wave" /></div>
-    <div className="sc-chip2"><i /><i /><i /><i /></div>
-    <div className="sc-cc-num">•••• •••• •••• ••••</div>
-    <div className="sc-cc-bot"><span>CARDHOLDER</span><span className="sc-mc"><i /><i /></span></div>
-  </div>
-);
-
-export const Device = ({ droid, children }: { droid?: boolean; children: ReactNode }) => (
-  <div className={`sc-dev ${droid ? 'droid' : ''}`}><i className="sc-btn1" /><i className="sc-btn2" /><div className="sc-scr">{droid ? <i className="sc-punch" /> : <span className="sc-island" />}{children}</div><b className="sc-gloss" /></div>
-);
-
-export const Core = () => (
-  <div className="sc-core"><div className="sc-ring r1" /><div className="sc-ring r2" /><div className="sc-ring r3" /><div className="sc-orbm"><b>Core</b><small>Engine</small></div></div>
+/** Phone hardware. skin: tg / wa swap the screen theme. */
+export const Device = ({ droid, skin, children }: { droid?: boolean; skin?: 'tg' | 'wa' | 'tgm'; children: ReactNode }) => (
+  <div className={`sc-dev ${droid ? 'droid' : ''} ${skin ?? ''}`}><i className="sc-btn1" /><i className="sc-btn2" /><div className="sc-scr">{droid ? <i className="sc-punch" /> : <span className="sc-island" />}{children}</div><b className="sc-gloss" /></div>
 );
 
 export const Rack = ({ rows = 5, label }: { rows?: number; label: string }) => (
-  <div className="sc-rack"><small>{label}</small>{Array.from({ length: rows }, (_, i) => <div key={i} className="sc-unit"><i style={{ animationDelay: `${i * -.5}s` }} /><i style={{ animationDelay: `${i * -.9}s` }} /><span /><em /></div>)}</div>
+  <div className="sc-rack"><div className="sc-rack-h"><Logo s={1.3} /><small>{label}</small></div>{Array.from({ length: rows }, (_, i) => <div key={i} className="sc-unit"><i style={{ animationDelay: `${i * -.5}s` }} /><i style={{ animationDelay: `${i * -.9}s` }} /><span /><em /></div>)}</div>
 );
 
-export const Cube = ({ s = 5 }: { s?: number }) => <div className="sc-cube" style={{ width: `${s}em`, height: `${s}em` }}><i /><i /><i /></div>;
-
-export const Area = ({ pts }: { pts: number[] }) => {
-  const id = `area-${useId().replace(/:/g, '')}`;
-  const w = 200; const h = 70; const st = w / (pts.length - 1);
-  const d = pts.map((v, i) => `${i ? 'L' : 'M'}${i * st} ${h - v * h / 100}`).join('');
-  return <svg className="sc-area" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none"><defs><linearGradient id={id} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="var(--s-accent)" stopOpacity=".5" /><stop offset="1" stopColor="var(--s-accent)" stopOpacity="0" /></linearGradient></defs><path d={`${d}L${w} ${h}L0 ${h}Z`} fill={`url(#${id})`} /><path d={d} fill="none" stroke="var(--s-accent)" strokeWidth="2" vectorEffect="non-scaling-stroke" /></svg>;
-};
+export const Cube = ({ s = 5 }: { s?: number }) => <div className="sc-cube" style={{ width: `${s}em`, height: `${s}em`, ['--h' as string]: `${s / 2}em` } as CSSProperties}><i /><i /><i /></div>;

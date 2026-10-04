@@ -126,3 +126,87 @@ mtime_ms = 1791122069927
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/85fd8040-61fc-4f3f-8181-eea14cef2988/8c44a102-ed08-4f90-8b92-8277025c0aa1"
 storage_version_token = "1791122210710106"
 content_type = "image/jpeg"
+
+[[outputs]]
+id = "LqybwNYzDfHv6JOLDbBvy"
+uri = "file://screenshots/qxlayer/crypto_exchange-desktop-mobile.jpg"
+type = "image"
+title = "White Label Exchange — desktop & mobile"
+description = "Actual catalog screenshots in both dark and light mode. Mockup data is illustrative demo/sandbox data."
+logical_id = "b76e14d0-6048-4bd4-b600-14cc12eb17a7"
+content_hash = "sha256:82afc5edc4b962e86112f49f225fc25ef18bc2115995d9959035622abfae088d"
+size = 455894
+mtime_ms = 1791137651002
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/b76e14d0-6048-4bd4-b600-14cc12eb17a7/896e2006-f904-4471-9f7a-f67d65230ce5"
+storage_version_token = "1791137725215227"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "k2KLEHWETwzlLTilS9db9"
+uri = "file://screenshots/qxlayer/crypto_payments-desktop-mobile.jpg"
+type = "image"
+title = "Crypto Payment Gateway — desktop & mobile"
+description = "Actual catalog screenshots in both dark and light mode. Mockup data is illustrative demo/sandbox data."
+logical_id = "9a80c24e-ceaf-4975-8af2-c02502dc1bfe"
+content_hash = "sha256:cc1bd9966641df2e3823e6671bdd150ab0076df97341026b78deef31f7f6981a"
+size = 458807
+mtime_ms = 1791137651138
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/9a80c24e-ceaf-4975-8af2-c02502dc1bfe/3a5d1dfc-9a69-4c76-b208-04781ab98fd8"
+storage_version_token = "1791137725763716"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "6Xkq8MP85-9RgfZjBfZLt"
+uri = "file://screenshots/qxlayer/crypto_card-desktop-mobile.jpg"
+type = "image"
+title = "Crypto Card — desktop & mobile"
+description = "Actual catalog screenshots in both dark and light mode. Mockup data is illustrative demo/sandbox data."
+logical_id = "60d261b8-0ddf-43e9-b796-8612d1e917c1"
+content_hash = "sha256:7d4573ae454a122b20c44de4575e0b3e6d7e4b46cd187d41646c50c37a50a93c"
+size = 408438
+mtime_ms = 1791137651242
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/60d261b8-0ddf-43e9-b796-8612d1e917c1/9a2e5ff6-3177-4089-9645-3bb923048b7e"
+storage_version_token = "1791137726308571"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "oHu85TmqNK_1lLIV_ZPiM"
+uri = "file://screenshots/qxlayer/ios_app-desktop-mobile.jpg"
+type = "image"
+title = "iOS App — desktop & mobile"
+description = "Actual catalog screenshots in both dark and light mode. Mockup data is illustrative demo/sandbox data."
+logical_id = "a25718ab-43e4-4024-911e-33acc6070b5a"
+content_hash = "sha256:54ed11311d6235623656601a23d60fc9db94a9b0c04dcb63e7b8abf2953a5af0"
+size = 411351
+mtime_ms = 1791137651374
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/a25718ab-43e4-4024-911e-33acc6070b5a/3c72da1a-e712-4d6b-891d-703aa9989b41"
+storage_version_token = "1791137726832228"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "hbxf2bCJovt0gXda9LII_"
+uri = "file://screenshots/qxlayer/android_app-desktop-mobile.jpg"
+type = "image"
+title = "Android App — desktop & mobile"
+description = "Actual catalog screenshots in both dark and light mode. Mockup data is illustrative demo/sandbox data."
+logical_id = "f7e0866e-abb0-41b1-9e2d-ae4dd5603c6d"
+content_hash = "sha256:cc102a75d38644a2252d84f4a2c65e07218e63112008879b3070c26dc95cb54c"
+size = 395585
+mtime_ms = 1791137651482
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/f7e0866e-abb0-41b1-9e2d-ae4dd5603c6d/abf920c2-dadf-4127-a25c-3e361c1c0c26"
+storage_version_token = "1791137727355078"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "rmvVrEHp3lCgcQdrsPjNY"
+uri = "file://screenshots/qxlayer/product-visuals-gallery.html"
+type = "html"
+title = "QXLayer — full-resolution screenshot gallery"
+description = "20 screenshots: Exchange, Pay, Card, iOS and Android, each on desktop and mobile in dark and light mode. Includes individual image downloads."
+logical_id = "58f79bf1-a883-445c-93ce-e721855d2120"
+content_hash = "sha256:667f1f686943b3c9232d40d2a6bc87f89de55ebd6b21af8543aa10e673401359"
+size = 4613048
+mtime_ms = 1791137649922
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/58f79bf1-a883-445c-93ce-e721855d2120/8052a1fa-d14a-4774-8fe8-679ee5cb8093"
+storage_version_token = "1791137727912658"
+content_type = "text/html"

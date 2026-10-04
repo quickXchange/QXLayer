@@ -1,0 +1,182 @@
+[
+  {
+    "key": "crypto_exchange",
+    "size": "desktop",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/crypto_exchange-desktop-dark.jpg",
+    "height": 820,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_payments",
+    "size": "desktop",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/crypto_payments-desktop-dark.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_card",
+    "size": "desktop",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/crypto_card-desktop-dark.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "ios_app",
+    "size": "desktop",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/ios_app-desktop-dark.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "android_app",
+    "size": "desktop",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/android_app-desktop-dark.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_exchange",
+    "size": "desktop",
+    "mode": "light",
+    "file": "screenshots/qxlayer/crypto_exchange-desktop-light.jpg",
+    "height": 820,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_payments",
+    "size": "desktop",
+    "mode": "light",
+    "file": "screenshots/qxlayer/crypto_payments-desktop-light.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_card",
+    "size": "desktop",
+    "mode": "light",
+    "file": "screenshots/qxlayer/crypto_card-desktop-light.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "ios_app",
+    "size": "desktop",
+    "mode": "light",
+    "file": "screenshots/qxlayer/ios_app-desktop-light.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "android_app",
+    "size": "desktop",
+    "mode": "light",
+    "file": "screenshots/qxlayer/android_app-desktop-light.jpg",
+    "height": 792,
+    "width": 1120,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_exchange",
+    "size": "mobile",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/crypto_exchange-mobile-dark.jpg",
+    "height": 855,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_payments",
+    "size": "mobile",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/crypto_payments-mobile-dark.jpg",
+    "height": 768,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_card",
+    "size": "mobile",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/crypto_card-mobile-dark.jpg",
+    "height": 721,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "ios_app",
+    "size": "mobile",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/ios_app-mobile-dark.jpg",
+    "height": 869,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "android_app",
+    "size": "mobile",
+    "mode": "dark",
+    "file": "screenshots/qxlayer/android_app-mobile-dark.jpg",
+    "height": 869,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_exchange",
+    "size": "mobile",
+    "mode": "light",
+    "file": "screenshots/qxlayer/crypto_exchange-mobile-light.jpg",
+    "height": 855,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_payments",
+    "size": "mobile",
+    "mode": "light",
+    "file": "screenshots/qxlayer/crypto_payments-mobile-light.jpg",
+    "height": 768,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "crypto_card",
+    "size": "mobile",
+    "mode": "light",
+    "file": "screenshots/qxlayer/crypto_card-mobile-light.jpg",
+    "height": 721,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "ios_app",
+    "size": "mobile",
+    "mode": "light",
+    "file": "screenshots/qxlayer/ios_app-mobile-light.jpg",
+    "height": 869,
+    "width": 350,
+    "horizontalOverflow": false
+  },
+  {
+    "key": "android_app",
+    "size": "mobile",
+    "mode": "light",
+    "file": "screenshots/qxlayer/android_app-mobile-light.jpg",
+    "height": 869,
+    "width": 350,
+    "horizontalOverflow": false
+  }
+]
