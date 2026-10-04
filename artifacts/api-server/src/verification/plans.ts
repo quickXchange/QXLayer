@@ -156,6 +156,6 @@ export async function verifyPlans(f: { admin: Principal; clientAdmin: Principal;
   const emptyPolicies = await pool.query("SELECT policyname FROM pg_policies WHERE 'private_label_runtime'=ANY(roles::text[]) AND ((cmd='SELECT' AND qual IS NULL) OR (cmd='INSERT' AND with_check IS NULL) OR (cmd='ALL' AND (qual IS NULL OR with_check IS NULL)))");
   assert.equal(emptyPolicies.rowCount, 0, "Live RLS predicates must be materialized.");
   const secured = await pool.query("SELECT count(*)::int AS total FROM pg_class WHERE relrowsecurity AND relforcerowsecurity AND relnamespace='public'::regnamespace");
-  assert.equal(secured.rows[0].total, 27);
-  process.stdout.write("PASS: two distinct plans/tenants; fail-closed features; all eight quota boundaries; concurrent admission; exact decimals/current-month usage; catalog lifecycle/duplication; add-ons/override precedence; suspension; public branding/data isolation; audited changes; 27 live FORCE RLS tables.\n");
+  assert.equal(secured.rows[0].total, 29);
+  process.stdout.write("PASS: two distinct plans/tenants; fail-closed features; all eight quota boundaries; concurrent admission; exact decimals/current-month usage; catalog lifecycle/duplication; add-ons/override precedence; suspension; public branding/data isolation; audited changes; 29 live FORCE RLS tables.\n");
 }

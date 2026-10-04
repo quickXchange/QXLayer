@@ -24,6 +24,7 @@ export const tenantsTable = pgTable("tenants", {
   }),
   pgPolicy("tenants_create", { for: "insert", to: runtimeRole, withCheck: adminContext }),
   pgPolicy("tenants_update", { for: "update", to: runtimeRole, using: writable, withCheck: writable }),
+  pgPolicy("tenants_public_domain", { for: "select", to: runtimeRole, using: sql`status='active' AND id IN (SELECT tenant_id FROM tenant_domains WHERE status='verified' AND domain=nullif(current_setting('app.public_domain',true),''))` }),
 ]).enableRLS();
 
 export const insertTenantSchema = createInsertSchema(tenantsTable).omit({ id: true, createdAt: true, updatedAt: true });

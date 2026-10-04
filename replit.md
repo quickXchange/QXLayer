@@ -43,15 +43,15 @@ An independent multi-tenant administration and provisioning foundation, not a li
 - Use one modular monolith and one shared backend; channels must reuse tenant branding, assets, entitlements, pricing, orders, payments, and provider boundaries.
 - Administrator privileges are explicitly assigned by an operator, never inferred from sign-up order or browser-provided roles.
 - The development database owner bypasses RLS. Runtime transactions must switch to the restricted NOLOGIN, NOBYPASSRLS role and use transaction-local verified actor/tenant context.
-- Client administrators can edit their own permitted configuration; only super administrators manage plans, add-ons, subscriptions, overrides and suspension. Staff are read-only.
+- Client administrators can edit their tenant configuration and manage staff grants; only super administrators assign Client Admins or manage plans, add-ons, subscriptions, overrides, suspension and registry registration. Staff default to read-only and may receive four narrowly scoped configuration grants; staff never manage memberships.
 - Effective rights come from database plans → additive add-ons → replacing tenant overrides. Missing features deny and missing limits are zero. Direct legacy module writes cannot bypass this resolver.
 - Disabling or archiving a plan/add-on blocks new assignments, but retains existing assignments. Tenant suspension denies capability access and configuration mutations.
 - Plan prices are metadata only. Monthly usage guards are infrastructure for deferred engines, not evidence that financial execution exists.
-- Sandbox activation activates configuration only. Domain values are unverified references, not DNS connections or deployed websites.
+- Sandbox activation activates configuration only. Domains start unverified and may pass DNS TXT ownership checks; ownership verification never connects hosting or TLS.
 
 ## Product
 
-Super-admin and client-admin foundations; database-driven plans, generic feature/limit definitions, tenant subscriptions/add-ons/overrides, quota-checked sandbox resources, audited administration and one dynamically branded website. Exchange, payment, wallet, blockchain and Telegram execution is deferred. See `docs/plans-entitlements-website.md`.
+Permanent White Label Core: shared multi-tenant backend and console; a data-driven product registry, plans/add-ons/overrides, limits/usage, scoped roles, branding, navigation, DNS ownership and validated non-secret product metadata. Exchange remains the first non-executing sandbox product; no live product engines are integrated. Current architecture, registry, provisioning, security verification and first-client blockers: `docs/white-label-core.md`. Earlier plans/website phase documentation remains historical context.
 
 The customer website uses an original shared visual system, not QuickXchange's
 layout, widget or identity. Tenant differences must remain configuration-driven,
@@ -63,7 +63,7 @@ responsive behavior, sandbox boundaries and measured verification results.
 - Do NOT connect to, modify, migrate, or depend on the existing QuickXchange project at this stage. This platform is independent; QuickXchange must remain untouched.
 - Build the foundation only. Do not build all crypto products at once.
 - Do not publish to production, connect real wallets/providers, accept real deposits, or request real provider secrets in this stage.
-- Stop after this plans/entitlements/website phase and report implementation, database changes, resolution logic, enforcement, website structure, tests, pages and deferred items.
+- Core-first is the current priority. Complete the permanent reusable White Label Core and report architecture, registry, provisioning, entitlement resolution, security verification, readiness boundaries and first-client blockers. Do not automatically start the next crypto product.
 
 ## Gotchas
 

@@ -1,8 +1,14 @@
 import { Router } from "express";
 import { GetPublicSiteParams, GetPublicSiteResponse, GetPublicCapabilityParams, GetPublicCapabilityResponse } from "@workspace/api-zod";
 import { getPublicSite } from "../modules/website/service";
+import { ResolvePublicDomainParams, ResolvePublicDomainResponse } from "@workspace/api-zod";
+import { resolvePublicDomain } from "../modules/domains/service";
 
 const router = Router();
+router.get("/public/domains/:hostname", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(ResolvePublicDomainResponse.parse(await resolvePublicDomain(ResolvePublicDomainParams.parse(req.params).hostname)));
+});
 router.use("/public/sites", (_req, res, next) => {
   res.set("Cache-Control", "no-store"); // Suspension/entitlement changes must not serve stale access.
   next();

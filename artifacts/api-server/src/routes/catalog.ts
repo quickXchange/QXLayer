@@ -1,13 +1,19 @@
 import { Router } from "express";
 import { withDatabase } from "@workspace/db";
 import { ListModuleCatalogResponse, ListSandboxAssetNetworksResponse } from "@workspace/api-zod";
+import { ListProductRegistryResponse, RegisterProductModuleBody, RegisterProductModuleResponse } from "@workspace/api-zod";
+import { principalFrom, requireAuthentication, sameOriginMutation } from "../middlewares/authentication";
+import { readRegistry, registerProductModule } from "../modules/product-registry/service";
 
 const router = Router();
+router.get("/catalog/products", async (_req, res) => {
+  res.json(ListProductRegistryResponse.parse(await withDatabase({ actorId: "public-catalog" }, readRegistry)));
+});
+router.post("/catalog/products", requireAuthentication, sameOriginMutation, async (req, res) => {
+  res.status(201).json(RegisterProductModuleResponse.parse(await registerProductModule(principalFrom(res), RegisterProductModuleBody.parse(req.body))));
+});
 router.get("/modules", async (_req, res): Promise<void> => {
-  const modules = await withDatabase({ actorId: "public-catalog" }, async (client) => {
-    const result = await client.query("SELECT key,name,description,category,sandbox_available FROM module_catalog ORDER BY key");
-    return result.rows.map((m) => ({ key: m.key, name: m.name, description: m.description, category: m.category, sandboxAvailable: m.sandbox_available }));
-  });
+  const modules = await withDatabase({ actorId: "public-catalog" }, readRegistry);
   res.json(ListModuleCatalogResponse.parse(modules));
 });
 router.get("/asset-networks", async (_req, res): Promise<void> => {

@@ -17,6 +17,150 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /tenants/{tenantId}/administrators:
+    parameters: [{$ref: "#/components/parameters/TenantId"}]
+    get:
+      operationId: listTenantAdministrators
+      tags: [tenants]
+      responses:
+        "200":
+          description: Assigned Client Admins
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/ResourceItem"}}
+    post:
+      operationId: assignTenantAdministrator
+      tags: [tenants]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/TenantAdministratorInput"}
+      responses:
+        "201":
+          description: Client Admin assigned by Super Admin
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MutationStatus"}
+  /tenants/{tenantId}/administrators/{userId}:
+    put:
+      operationId: setTenantAdministratorStatus
+      tags: [tenants]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - {name: userId, in: path, required: true, schema: {type: string, pattern: "^user_[a-zA-Z0-9]+$"}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/TenantAdministratorStatusInput"}
+      responses:
+        "200":
+          description: Client Admin activation changed by Super Admin
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MutationStatus"}
+  /tenants/{tenantId}/products/{moduleKey}/configuration:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+      - {name: moduleKey, in: path, required: true, schema: {type: string, maxLength: 64, pattern: "^[a-z][a-z0-9_]*$"}}
+    get:
+      operationId: getProductConfiguration
+      tags: [tenants]
+      responses:
+        "200":
+          description: Tenant product settings only, never execution
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProductConfiguration"}
+    put:
+      operationId: setProductConfiguration
+      tags: [tenants]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProductConfiguration"}
+      responses:
+        "200":
+          description: Stored configuration
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProductConfiguration"}
+  /catalog/products:
+    get:
+      operationId: listProductRegistry
+      tags: [catalog]
+      responses:
+        "200":
+          description: Generic product registry
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/ProductModule"}}
+    post:
+      operationId: registerProductModule
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProductModule"}
+      responses:
+        "201":
+          description: Deferred module registered
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProductModule"}
+  /tenants/{tenantId}/staff/{userId}/permissions:
+    put:
+      operationId: setStaffPermissions
+      tags: [tenants]
+      parameters:
+        - $ref: "#/components/parameters/TenantId"
+        - {name: userId, in: path, required: true, schema: {type: string, pattern: "^user_[a-zA-Z0-9]+$"}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/StaffPermissions"}
+      responses:
+        "200":
+          description: Staff permissions saved
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/MutationStatus"}
+  /tenants/{tenantId}/domain-verification:
+    get:
+      operationId: getDomainVerification
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      responses:
+        "200":
+          description: DNS ownership challenge (not a hosting connection)
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/DomainVerification"}
+    post:
+      operationId: verifyTenantDomain
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      responses:
+        "200":
+          description: Ownership verified
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/DomainVerification"}
+  /public/domains/{hostname}:
+    get:
+      operationId: resolvePublicDomain
+      tags: [website]
+      parameters: [{name: hostname, in: path, required: true, schema: {type: string, maxLength: 253}}]
+      responses:
+        "200":
+          description: Active entitled tenant for a verified domain
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/PublicSite"}
   /healthz:
     get:
       operationId: healthCheck
@@ -494,6 +638,70 @@ components:
         type: string
         format: uuid
   schemas:
+    TenantAdministratorInput:
+      type: object
+      properties:
+        userId: {type: string, pattern: "^user_[a-zA-Z0-9]+$"}
+        label: {type: string, minLength: 2, maxLength: 120}
+      required: [userId, label]
+    TenantAdministratorStatusInput:
+      type: object
+      properties: {active: {type: boolean}}
+      required: [active]
+    ProductConfiguration:
+      type: object
+      properties:
+        configuration: {type: object, additionalProperties: {}}
+      required: [configuration]
+    ProductModule:
+      type: object
+      properties:
+        key: {type: string, maxLength: 64, pattern: "^[a-z][a-z0-9_]*$"}
+        name: {type: string, minLength: 2, maxLength: 120}
+        description: {type: string, maxLength: 3000}
+        category: {type: string, minLength: 2, maxLength: 80}
+        lifecycle: {type: string, enum: [core_ready, sandbox_only, deferred]}
+        sandboxAvailable: {type: boolean}
+        requiresAssetNetworks: {type: boolean}
+        features:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            properties:
+              key: {type: string, maxLength: 64, pattern: "^[a-z][a-z0-9_]*$"}
+              label: {type: string, minLength: 2, maxLength: 120}
+              dependsOn: {type: array, uniqueItems: true, maxItems: 20, items: {type: string, maxLength: 64}}
+            required: [key, label, dependsOn]
+        limits:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            properties:
+              key: {type: string, maxLength: 64, pattern: "^[a-z][a-z0-9_]*$"}
+              label: {type: string, minLength: 2, maxLength: 120}
+              valueType: {type: string, enum: [integer, decimal]}
+            required: [key, label, valueType]
+      required: [key, name, description, category, lifecycle, sandboxAvailable, requiresAssetNetworks, features, limits]
+    StaffPermissions:
+      type: object
+      properties:
+        permissions:
+          type: array
+          uniqueItems: true
+          maxItems: 4
+          items: {type: string, enum: [branding.manage, domains.manage, configuration.manage, resources.manage]}
+      required: [permissions]
+    DomainVerification:
+      type: object
+      properties:
+        domain: {type: ["string", "null"]}
+        status: {type: string, enum: [unconfigured, unverified, verified]}
+        txtName: {type: ["string", "null"]}
+        txtValue: {type: ["string", "null"]}
+        hostingConnected: {type: boolean}
+      required: [domain, status, txtName, txtValue, hostingConnected]
     HealthStatus:
       type: object
       properties:
@@ -512,7 +720,8 @@ components:
       enum: [brand, domain, modules, assets_networks, configuration, ready]
     ModuleKey:
       type: string
-      enum: [crypto_exchange, crypto_payments, telegram_bot, telegram_mini_app, website, merchant_api]
+      maxLength: 64
+      pattern: "^[a-z][a-z0-9_]*$"
     CurrentPrincipal:
       type: object
       properties:
@@ -521,6 +730,15 @@ components:
         role: { $ref: "#/components/schemas/Role" }
         tenantId: { type: ["string", "null"], format: uuid }
         sandboxOnly: { type: boolean }
+        memberships:
+          type: array
+          items:
+            type: object
+            properties:
+              tenantId: {type: string, format: uuid}
+              role: {type: string, enum: [client_admin, staff]}
+              permissions: {type: array, items: {type: string}}
+            required: [tenantId, role, permissions]
       required: [userId, email, role, tenantId, sandboxOnly]
     PlatformOverview:
       type: object
@@ -765,6 +983,16 @@ components:
     WebsiteSettings:
       type: object
       properties:
+        navigation:
+          type: array
+          maxItems: 12
+          items:
+            type: object
+            properties:
+              key: {type: string, enum: [exchange, payments, telegram, how, developers, about, faq]}
+              label: {type: string, minLength: 1, maxLength: 60}
+              visible: {type: boolean}
+            required: [key, label, visible]
         secondaryColor: {type: string, pattern: "^#[0-9A-Fa-f]{6}$"}
         glowColor: {type: string, pattern: "^#[0-9A-Fa-f]{6}$"}
         surfaceStyle: {type: string, enum: [solid, glass]}
@@ -798,7 +1026,12 @@ components:
       required: [label, reference]
     ResourceItem:
       type: object
-      properties: {id: {type: string}, label: {type: string}, reference: {type: ["string", "null"]}, status: {type: string}}
+      properties:
+        id: {type: string}
+        label: {type: string}
+        reference: {type: ["string", "null"]}
+        status: {type: string}
+        permissions: {type: array, items: {type: string}}
       required: [id, label, reference, status]
     ResourceCreated:
       type: object

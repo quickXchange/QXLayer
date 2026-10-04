@@ -29,6 +29,7 @@ import type {
   CapabilityStatus,
   CurrentPrincipal,
   DomainInput,
+  DomainVerification,
   EntitlementDefinition,
   EntitlementOverrideInput,
   HealthStatus,
@@ -38,15 +39,20 @@ import type {
   PlanInput,
   PlanStatusInput,
   PlatformOverview,
+  ProductConfiguration,
+  ProductModule,
   PublicSite,
   ResourceCreated,
   ResourceInput,
   ResourceItem,
+  StaffPermissions,
   SubscriptionAddonInput,
   SubscriptionPlanInput,
   SubscriptionView,
   SuspensionInput,
   Tenant,
+  TenantAdministratorInput,
+  TenantAdministratorStatusInput,
   TenantConfigurationInput,
   TenantInput,
   TenantModulesInput,
@@ -80,6 +86,854 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getListTenantAdministratorsUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/administrators`
+}
+
+export const listTenantAdministrators = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<ResourceItem[]> => {
+
+  return customFetch<ResourceItem[]>(getListTenantAdministratorsUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListTenantAdministratorsQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/administrators`
+    ] as const;
+    }
+
+
+export const getListTenantAdministratorsQueryOptions = <TData = Awaited<ReturnType<typeof listTenantAdministrators>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTenantAdministrators>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTenantAdministratorsQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTenantAdministrators>>> = ({ signal }) => listTenantAdministrators(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTenantAdministrators>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListTenantAdministratorsQueryResult = NonNullable<Awaited<ReturnType<typeof listTenantAdministrators>>>
+export type ListTenantAdministratorsQueryError = ErrorType<unknown>
+
+
+
+export function useListTenantAdministrators<TData = Awaited<ReturnType<typeof listTenantAdministrators>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTenantAdministrators>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListTenantAdministratorsQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAssignTenantAdministratorUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/administrators`
+}
+
+export const assignTenantAdministrator = async (tenantId: string,
+    tenantAdministratorInput: TenantAdministratorInput, options?: Parameters<typeof customFetch>[1]): Promise<MutationStatus> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MutationStatus>(getAssignTenantAdministratorUrl(tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(tenantAdministratorInput)
+  }
+);}
+
+
+
+
+
+export const getAssignTenantAdministratorMutationKey = () => ['assignTenantAdministrator'] as const;
+
+export const getAssignTenantAdministratorMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTenantAdministrator>>, TError,AssignTenantAdministratorMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof assignTenantAdministrator>>, TError,AssignTenantAdministratorMutationVariables, TContext> => {
+
+const mutationKey = getAssignTenantAdministratorMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignTenantAdministrator>>, AssignTenantAdministratorMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  assignTenantAdministrator(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignTenantAdministratorMutationResult = NonNullable<Awaited<ReturnType<typeof assignTenantAdministrator>>>
+    export type AssignTenantAdministratorMutationBody = BodyType<TenantAdministratorInput>
+    export type AssignTenantAdministratorMutationError = ErrorType<unknown>
+    export type AssignTenantAdministratorMutationVariables = {tenantId: string;data: BodyType<TenantAdministratorInput>}
+
+    export const useAssignTenantAdministrator = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTenantAdministrator>>, TError,AssignTenantAdministratorMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof assignTenantAdministrator>>,
+        TError,
+        AssignTenantAdministratorMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAssignTenantAdministratorMutationOptions(options));
+    }
+
+export const getSetTenantAdministratorStatusUrl = (tenantId: string,
+    userId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/administrators/${userId}`
+}
+
+export const setTenantAdministratorStatus = async (tenantId: string,
+    userId: string,
+    tenantAdministratorStatusInput: TenantAdministratorStatusInput, options?: Parameters<typeof customFetch>[1]): Promise<MutationStatus> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MutationStatus>(getSetTenantAdministratorStatusUrl(tenantId,userId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(tenantAdministratorStatusInput)
+  }
+);}
+
+
+
+
+
+export const getSetTenantAdministratorStatusMutationKey = () => ['setTenantAdministratorStatus'] as const;
+
+export const getSetTenantAdministratorStatusMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setTenantAdministratorStatus>>, TError,SetTenantAdministratorStatusMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setTenantAdministratorStatus>>, TError,SetTenantAdministratorStatusMutationVariables, TContext> => {
+
+const mutationKey = getSetTenantAdministratorStatusMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setTenantAdministratorStatus>>, SetTenantAdministratorStatusMutationVariables> = (props) => {
+          const {tenantId,userId,data} = props ?? {};
+
+          return  setTenantAdministratorStatus(tenantId,userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetTenantAdministratorStatusMutationResult = NonNullable<Awaited<ReturnType<typeof setTenantAdministratorStatus>>>
+    export type SetTenantAdministratorStatusMutationBody = BodyType<TenantAdministratorStatusInput>
+    export type SetTenantAdministratorStatusMutationError = ErrorType<unknown>
+    export type SetTenantAdministratorStatusMutationVariables = {tenantId: string;userId: string;data: BodyType<TenantAdministratorStatusInput>}
+
+    export const useSetTenantAdministratorStatus = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setTenantAdministratorStatus>>, TError,SetTenantAdministratorStatusMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setTenantAdministratorStatus>>,
+        TError,
+        SetTenantAdministratorStatusMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSetTenantAdministratorStatusMutationOptions(options));
+    }
+
+export const getGetProductConfigurationUrl = (tenantId: string,
+    moduleKey: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/products/${moduleKey}/configuration`
+}
+
+export const getProductConfiguration = async (tenantId: string,
+    moduleKey: string, options?: Parameters<typeof customFetch>[1]): Promise<ProductConfiguration> => {
+
+  return customFetch<ProductConfiguration>(getGetProductConfigurationUrl(tenantId,moduleKey),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProductConfigurationQueryKey = (tenantId: string,
+    moduleKey: string,) => {
+    return [
+    `/api/tenants/${tenantId}/products/${moduleKey}/configuration`
+    ] as const;
+    }
+
+
+export const getGetProductConfigurationQueryOptions = <TData = Awaited<ReturnType<typeof getProductConfiguration>>, TError = ErrorType<unknown>>(tenantId: string,
+    moduleKey: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProductConfiguration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProductConfigurationQueryKey(tenantId,moduleKey);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProductConfiguration>>> = ({ signal }) => getProductConfiguration(tenantId,moduleKey, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined && moduleKey !== null && moduleKey !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProductConfiguration>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetProductConfigurationQueryResult = NonNullable<Awaited<ReturnType<typeof getProductConfiguration>>>
+export type GetProductConfigurationQueryError = ErrorType<unknown>
+
+
+
+export function useGetProductConfiguration<TData = Awaited<ReturnType<typeof getProductConfiguration>>, TError = ErrorType<unknown>>(
+ tenantId: string,
+    moduleKey: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProductConfiguration>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetProductConfigurationQueryOptions(tenantId,moduleKey,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSetProductConfigurationUrl = (tenantId: string,
+    moduleKey: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/products/${moduleKey}/configuration`
+}
+
+export const setProductConfiguration = async (tenantId: string,
+    moduleKey: string,
+    productConfiguration: ProductConfiguration, options?: Parameters<typeof customFetch>[1]): Promise<ProductConfiguration> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProductConfiguration>(getSetProductConfigurationUrl(tenantId,moduleKey),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(productConfiguration)
+  }
+);}
+
+
+
+
+
+export const getSetProductConfigurationMutationKey = () => ['setProductConfiguration'] as const;
+
+export const getSetProductConfigurationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setProductConfiguration>>, TError,SetProductConfigurationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setProductConfiguration>>, TError,SetProductConfigurationMutationVariables, TContext> => {
+
+const mutationKey = getSetProductConfigurationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setProductConfiguration>>, SetProductConfigurationMutationVariables> = (props) => {
+          const {tenantId,moduleKey,data} = props ?? {};
+
+          return  setProductConfiguration(tenantId,moduleKey,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetProductConfigurationMutationResult = NonNullable<Awaited<ReturnType<typeof setProductConfiguration>>>
+    export type SetProductConfigurationMutationBody = BodyType<ProductConfiguration>
+    export type SetProductConfigurationMutationError = ErrorType<unknown>
+    export type SetProductConfigurationMutationVariables = {tenantId: string;moduleKey: string;data: BodyType<ProductConfiguration>}
+
+    export const useSetProductConfiguration = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setProductConfiguration>>, TError,SetProductConfigurationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setProductConfiguration>>,
+        TError,
+        SetProductConfigurationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSetProductConfigurationMutationOptions(options));
+    }
+
+export const getListProductRegistryUrl = () => {
+
+
+
+
+  return `/api/catalog/products`
+}
+
+export const listProductRegistry = async ( options?: Parameters<typeof customFetch>[1]): Promise<ProductModule[]> => {
+
+  return customFetch<ProductModule[]>(getListProductRegistryUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListProductRegistryQueryKey = () => {
+    return [
+    `/api/catalog/products`
+    ] as const;
+    }
+
+
+export const getListProductRegistryQueryOptions = <TData = Awaited<ReturnType<typeof listProductRegistry>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listProductRegistry>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListProductRegistryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProductRegistry>>> = ({ signal }) => listProductRegistry({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listProductRegistry>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListProductRegistryQueryResult = NonNullable<Awaited<ReturnType<typeof listProductRegistry>>>
+export type ListProductRegistryQueryError = ErrorType<unknown>
+
+
+
+export function useListProductRegistry<TData = Awaited<ReturnType<typeof listProductRegistry>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listProductRegistry>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListProductRegistryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRegisterProductModuleUrl = () => {
+
+
+
+
+  return `/api/catalog/products`
+}
+
+export const registerProductModule = async (productModule: ProductModule, options?: Parameters<typeof customFetch>[1]): Promise<ProductModule> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProductModule>(getRegisterProductModuleUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(productModule)
+  }
+);}
+
+
+
+
+
+export const getRegisterProductModuleMutationKey = () => ['registerProductModule'] as const;
+
+export const getRegisterProductModuleMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerProductModule>>, TError,RegisterProductModuleMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerProductModule>>, TError,RegisterProductModuleMutationVariables, TContext> => {
+
+const mutationKey = getRegisterProductModuleMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerProductModule>>, RegisterProductModuleMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerProductModule(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterProductModuleMutationResult = NonNullable<Awaited<ReturnType<typeof registerProductModule>>>
+    export type RegisterProductModuleMutationBody = BodyType<ProductModule>
+    export type RegisterProductModuleMutationError = ErrorType<unknown>
+    export type RegisterProductModuleMutationVariables = {data: BodyType<ProductModule>}
+
+    export const useRegisterProductModule = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerProductModule>>, TError,RegisterProductModuleMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof registerProductModule>>,
+        TError,
+        RegisterProductModuleMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRegisterProductModuleMutationOptions(options));
+    }
+
+export const getSetStaffPermissionsUrl = (tenantId: string,
+    userId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/staff/${userId}/permissions`
+}
+
+export const setStaffPermissions = async (tenantId: string,
+    userId: string,
+    staffPermissions: StaffPermissions, options?: Parameters<typeof customFetch>[1]): Promise<MutationStatus> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MutationStatus>(getSetStaffPermissionsUrl(tenantId,userId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(staffPermissions)
+  }
+);}
+
+
+
+
+
+export const getSetStaffPermissionsMutationKey = () => ['setStaffPermissions'] as const;
+
+export const getSetStaffPermissionsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setStaffPermissions>>, TError,SetStaffPermissionsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setStaffPermissions>>, TError,SetStaffPermissionsMutationVariables, TContext> => {
+
+const mutationKey = getSetStaffPermissionsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setStaffPermissions>>, SetStaffPermissionsMutationVariables> = (props) => {
+          const {tenantId,userId,data} = props ?? {};
+
+          return  setStaffPermissions(tenantId,userId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetStaffPermissionsMutationResult = NonNullable<Awaited<ReturnType<typeof setStaffPermissions>>>
+    export type SetStaffPermissionsMutationBody = BodyType<StaffPermissions>
+    export type SetStaffPermissionsMutationError = ErrorType<unknown>
+    export type SetStaffPermissionsMutationVariables = {tenantId: string;userId: string;data: BodyType<StaffPermissions>}
+
+    export const useSetStaffPermissions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setStaffPermissions>>, TError,SetStaffPermissionsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setStaffPermissions>>,
+        TError,
+        SetStaffPermissionsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSetStaffPermissionsMutationOptions(options));
+    }
+
+export const getGetDomainVerificationUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/domain-verification`
+}
+
+export const getDomainVerification = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<DomainVerification> => {
+
+  return customFetch<DomainVerification>(getGetDomainVerificationUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDomainVerificationQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/domain-verification`
+    ] as const;
+    }
+
+
+export const getGetDomainVerificationQueryOptions = <TData = Awaited<ReturnType<typeof getDomainVerification>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDomainVerification>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDomainVerificationQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDomainVerification>>> = ({ signal }) => getDomainVerification(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDomainVerification>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDomainVerificationQueryResult = NonNullable<Awaited<ReturnType<typeof getDomainVerification>>>
+export type GetDomainVerificationQueryError = ErrorType<unknown>
+
+
+
+export function useGetDomainVerification<TData = Awaited<ReturnType<typeof getDomainVerification>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDomainVerification>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDomainVerificationQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getVerifyTenantDomainUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/domain-verification`
+}
+
+export const verifyTenantDomain = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<DomainVerification> => {
+
+  return customFetch<DomainVerification>(getVerifyTenantDomainUrl(tenantId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getVerifyTenantDomainMutationKey = () => ['verifyTenantDomain'] as const;
+
+export const getVerifyTenantDomainMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyTenantDomain>>, TError,VerifyTenantDomainMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyTenantDomain>>, TError,VerifyTenantDomainMutationVariables, TContext> => {
+
+const mutationKey = getVerifyTenantDomainMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyTenantDomain>>, VerifyTenantDomainMutationVariables> = (props) => {
+          const {tenantId} = props ?? {};
+
+          return  verifyTenantDomain(tenantId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifyTenantDomainMutationResult = NonNullable<Awaited<ReturnType<typeof verifyTenantDomain>>>
+
+    export type VerifyTenantDomainMutationError = ErrorType<unknown>
+    export type VerifyTenantDomainMutationVariables = {tenantId: string}
+
+    export const useVerifyTenantDomain = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyTenantDomain>>, TError,VerifyTenantDomainMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof verifyTenantDomain>>,
+        TError,
+        VerifyTenantDomainMutationVariables,
+        TContext
+      > => {
+      return useMutation(getVerifyTenantDomainMutationOptions(options));
+    }
+
+export const getResolvePublicDomainUrl = (hostname: string,) => {
+
+
+
+
+  return `/api/public/domains/${hostname}`
+}
+
+export const resolvePublicDomain = async (hostname: string, options?: Parameters<typeof customFetch>[1]): Promise<PublicSite> => {
+
+  return customFetch<PublicSite>(getResolvePublicDomainUrl(hostname),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getResolvePublicDomainQueryKey = (hostname: string,) => {
+    return [
+    `/api/public/domains/${hostname}`
+    ] as const;
+    }
+
+
+export const getResolvePublicDomainQueryOptions = <TData = Awaited<ReturnType<typeof resolvePublicDomain>>, TError = ErrorType<unknown>>(hostname: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof resolvePublicDomain>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getResolvePublicDomainQueryKey(hostname);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof resolvePublicDomain>>> = ({ signal }) => resolvePublicDomain(hostname, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: hostname !== null && hostname !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof resolvePublicDomain>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ResolvePublicDomainQueryResult = NonNullable<Awaited<ReturnType<typeof resolvePublicDomain>>>
+export type ResolvePublicDomainQueryError = ErrorType<unknown>
+
+
+
+export function useResolvePublicDomain<TData = Awaited<ReturnType<typeof resolvePublicDomain>>, TError = ErrorType<unknown>>(
+ hostname: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof resolvePublicDomain>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getResolvePublicDomainQueryOptions(hostname,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getHealthCheckUrl = () => {
 

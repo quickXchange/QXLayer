@@ -5,6 +5,137 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export interface TenantAdministratorInput {
+  /** @pattern ^user_[a-zA-Z0-9]+$ */
+  userId: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  label: string;
+}
+
+export interface TenantAdministratorStatusInput {
+  active: boolean;
+}
+
+export type ProductConfigurationConfiguration = {[key: string]: unknown};
+
+export interface ProductConfiguration {
+  configuration: ProductConfigurationConfiguration;
+}
+
+export type ProductModuleLifecycle = typeof ProductModuleLifecycle[keyof typeof ProductModuleLifecycle];
+
+
+export const ProductModuleLifecycle = {
+  core_ready: 'core_ready',
+  sandbox_only: 'sandbox_only',
+  deferred: 'deferred',
+} as const;
+
+export type ProductModuleFeaturesItem = {
+  /**
+     * @maxLength 64
+     * @pattern ^[a-z][a-z0-9_]*$
+     */
+  key: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  label: string;
+  /**
+     * @maxItems 20
+     * @items.maxLength 64
+     */
+  dependsOn: string[];
+};
+
+export type ProductModuleLimitsItemValueType = typeof ProductModuleLimitsItemValueType[keyof typeof ProductModuleLimitsItemValueType];
+
+
+export const ProductModuleLimitsItemValueType = {
+  integer: 'integer',
+  decimal: 'decimal',
+} as const;
+
+export type ProductModuleLimitsItem = {
+  /**
+     * @maxLength 64
+     * @pattern ^[a-z][a-z0-9_]*$
+     */
+  key: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  label: string;
+  valueType: ProductModuleLimitsItemValueType;
+};
+
+export interface ProductModule {
+  /**
+     * @maxLength 64
+     * @pattern ^[a-z][a-z0-9_]*$
+     */
+  key: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 3000 */
+  description: string;
+  /**
+     * @minLength 2
+     * @maxLength 80
+     */
+  category: string;
+  lifecycle: ProductModuleLifecycle;
+  sandboxAvailable: boolean;
+  requiresAssetNetworks: boolean;
+  /** @maxItems 50 */
+  features: ProductModuleFeaturesItem[];
+  /** @maxItems 50 */
+  limits: ProductModuleLimitsItem[];
+}
+
+export type StaffPermissionsPermissionsItem = typeof StaffPermissionsPermissionsItem[keyof typeof StaffPermissionsPermissionsItem];
+
+
+export const StaffPermissionsPermissionsItem = {
+  brandingmanage: 'branding.manage',
+  domainsmanage: 'domains.manage',
+  configurationmanage: 'configuration.manage',
+  resourcesmanage: 'resources.manage',
+} as const;
+
+export interface StaffPermissions {
+  /** @maxItems 4 */
+  permissions: StaffPermissionsPermissionsItem[];
+}
+
+export type DomainVerificationStatus = typeof DomainVerificationStatus[keyof typeof DomainVerificationStatus];
+
+
+export const DomainVerificationStatus = {
+  unconfigured: 'unconfigured',
+  unverified: 'unverified',
+  verified: 'verified',
+} as const;
+
+export interface DomainVerification {
+  /** @nullable */
+  domain: string | null;
+  status: DomainVerificationStatus;
+  /** @nullable */
+  txtName: string | null;
+  /** @nullable */
+  txtValue: string | null;
+  hostingConnected: boolean;
+}
+
 export interface HealthStatus {
   status: string;
 }
@@ -40,17 +171,25 @@ export const ProvisioningStep = {
   ready: 'ready',
 } as const;
 
-export type ModuleKey = typeof ModuleKey[keyof typeof ModuleKey];
+/**
+ * @maxLength 64
+ * @pattern ^[a-z][a-z0-9_]*$
+ */
+export type ModuleKey = string;
+
+export type CurrentPrincipalMembershipsItemRole = typeof CurrentPrincipalMembershipsItemRole[keyof typeof CurrentPrincipalMembershipsItemRole];
 
 
-export const ModuleKey = {
-  crypto_exchange: 'crypto_exchange',
-  crypto_payments: 'crypto_payments',
-  telegram_bot: 'telegram_bot',
-  telegram_mini_app: 'telegram_mini_app',
-  website: 'website',
-  merchant_api: 'merchant_api',
+export const CurrentPrincipalMembershipsItemRole = {
+  client_admin: 'client_admin',
+  staff: 'staff',
 } as const;
+
+export type CurrentPrincipalMembershipsItem = {
+  tenantId: string;
+  role: CurrentPrincipalMembershipsItemRole;
+  permissions: string[];
+};
 
 export interface CurrentPrincipal {
   userId: string;
@@ -60,6 +199,7 @@ export interface CurrentPrincipal {
   /** @nullable */
   tenantId: string | null;
   sandboxOnly: boolean;
+  memberships?: CurrentPrincipalMembershipsItem[];
 }
 
 export interface ActivityEvent {
@@ -214,6 +354,19 @@ export const TenantThemeMode = {
   system: 'system',
 } as const;
 
+export type WebsiteSettingsNavigationItemKey = typeof WebsiteSettingsNavigationItemKey[keyof typeof WebsiteSettingsNavigationItemKey];
+
+
+export const WebsiteSettingsNavigationItemKey = {
+  exchange: 'exchange',
+  payments: 'payments',
+  telegram: 'telegram',
+  how: 'how',
+  developers: 'developers',
+  about: 'about',
+  faq: 'faq',
+} as const;
+
 export type WebsiteSettingsSurfaceStyle = typeof WebsiteSettingsSurfaceStyle[keyof typeof WebsiteSettingsSurfaceStyle];
 
 
@@ -265,7 +418,19 @@ export interface SiteLink {
   url: string;
 }
 
+export type WebsiteSettingsNavigationItem = {
+  key: WebsiteSettingsNavigationItemKey;
+  /**
+     * @minLength 1
+     * @maxLength 60
+     */
+  label: string;
+  visible: boolean;
+};
+
 export interface WebsiteSettings {
+  /** @maxItems 12 */
+  navigation?: WebsiteSettingsNavigationItem[];
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
   secondaryColor: string;
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
@@ -529,6 +694,7 @@ export interface ResourceItem {
   /** @nullable */
   reference: string | null;
   status: string;
+  permissions?: string[];
 }
 
 export interface ResourceCreated {

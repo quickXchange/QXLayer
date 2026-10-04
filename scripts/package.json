@@ -8,6 +8,7 @@
     "db:role:dev": "tsx ./src/database-permissions.ts --role-only",
     "db:permissions:dev": "tsx ./src/database-permissions.ts",
     "db:seed:dev": "tsx ./src/seed-catalog.ts",
+    "core:upgrade:dev": "tsx ./src/upgrade-core.ts",
     "access:assign:dev": "tsx ./src/assign-access.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

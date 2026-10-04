@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useInvalidateTenant } from '@/lib/invalidate';
@@ -19,23 +20,32 @@ const HEX = /^#[0-9A-Fa-f]{6}$/;
 const FONTS = ['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk'] as const;
 const DEFAULT: WebsiteSettings = { secondaryColor: '#8a7f6c', faviconUrl: null, fontKey: 'system', heroTitle: '', heroSubtitle: '', supportEmail: null, supportUrl: null, supportDetails: '', socialLinks: [], footerText: '', privacyContent: '', termsContent: '' };
 
-export function WebsiteSection({ tenant, readOnly }: { tenant: Tenant; readOnly?: boolean }) {
+type NavItem = NonNullable<WebsiteSettings['navigation']>[number];
+const NAV_DEFAULT: NavItem[] = [['exchange', 'Exchange'], ['payments', 'Payments'], ['telegram', 'Telegram'], ['how', 'How it works'], ['developers', 'Developers'], ['about', 'About'], ['faq', 'FAQ']].map(([key, label]) => ({ key, label, visible: true })) as NavItem[];
+const fullNav = (n?: NavItem[]) => { const have = n ?? []; return [...have, ...NAV_DEFAULT.filter((d) => !have.some((h) => h.key === d.key))]; };
+
+export function WebsiteSection({ tenant, readOnly, onSaved, saveLabel }: { tenant: Tenant; readOnly?: boolean; onSaved?: () => void; saveLabel?: string }) {
   const m = useUpdateTenantWebsiteSettings();
   const inv = useInvalidateTenant();
   const { toast } = useToast();
   const base = tenant.websiteSettings ?? { ...DEFAULT, heroTitle: tenant.brandName };
   const [f, setF] = useState(base);
+  const [nav, setNav] = useState<NavItem[]>(fullNav(base.navigation));
+  const [navTouched, setNavTouched] = useState(false);
+  useEffect(() => { setNav(fullNav(tenant.websiteSettings?.navigation)); setNavTouched(false); }, [tenant.websiteSettings]);
+  const move = (i: number, d: number) => { const j = i + d; if (j < 0 || j >= nav.length) return; const c = [...nav]; [c[i], c[j]] = [c[j], c[i]]; setNav(c); setNavTouched(true); };
+  const editNav = (i: number, p: Partial<NavItem>) => { setNav(nav.map((x, j) => (j === i ? { ...x, ...p } : x))); setNavTouched(true); };
   useEffect(() => setF(tenant.websiteSettings ?? { ...DEFAULT, heroTitle: tenant.brandName }), [tenant.websiteSettings, tenant.brandName]);
   const set = <K extends keyof WebsiteSettings>(k: K, v: WebsiteSettings[K]) => setF((s) => ({ ...s, [k]: v }));
   const nul = (v: string) => (v.trim() === '' ? null : v.trim());
   const err = !HEX.test(f.secondaryColor) ? 'Secondary color must be #RRGGBB' : f.heroTitle.trim().length < 2 ? 'Hero title needs 2+ characters'
-    : f.socialLinks.some((l) => !l.label.trim() || !/^https?:\/\//.test(l.url)) ? 'Social links need a label and an http(s) URL' : f.socialLinks.length > 12 ? 'At most 12 social links' : '';
+    : f.socialLinks.some((l) => !l.label.trim() || !/^https?:\/\//.test(l.url)) ? 'Social links need a label and an http(s) URL' : f.socialLinks.length > 12 ? 'At most 12 social links' : nav.some((x) => !x.label.trim() || x.label.length > 60) ? 'Navigation labels need 1 to 60 characters' : '';
   const links = f.socialLinks;
   const setLink = (i: number, p: Partial<SiteLink>) => set('socialLinks', links.map((l, j) => (j === i ? { ...l, ...p } : l)));
   return (
-    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { ...f, heroTitle: f.heroTitle.trim() } }, { onSuccess: () => { inv(tenant.id); toast({ title: 'Website settings saved' }); }, onError: (er) => toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }) }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { ...f, heroTitle: f.heroTitle.trim(), ...(navTouched ? { navigation: nav.map((x) => ({ ...x, label: x.label.trim() })) } : {}) } }, { onSuccess: () => { inv(tenant.id); toast({ title: 'Website settings saved' }); onSaved?.(); }, onError: (er) => toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }) }); }}>
       <Section n="06" title="Website" note="Advanced settings for the shared branded site. Custom domains stay unverified and are never served."
-        footer={<>{err && !readOnly && <span className="mr-auto text-sm text-destructive">{err}</span>}{readOnly ? <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only</span> : <Button data-testid="button-save-website" disabled={!!err || m.isPending}>{m.isPending ? 'Saving' : 'Save website'}</Button>}</>}>
+        footer={<>{err && !readOnly && <span className="mr-auto text-sm text-destructive">{err}</span>}{readOnly ? <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only</span> : <Button data-testid="button-save-website" disabled={!!err || m.isPending}>{m.isPending ? 'Saving' : saveLabel ?? 'Save website'}</Button>}</>}>
         <fieldset disabled={readOnly} className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1.5"><Label>Secondary color</Label>
             <div className="flex gap-2"><input type="color" aria-label="Secondary color" value={HEX.test(f.secondaryColor) ? f.secondaryColor : '#000000'} onChange={(e) => set('secondaryColor', e.target.value)} className="h-9 w-11 rounded border bg-transparent p-0.5" />
@@ -54,6 +64,16 @@ export function WebsiteSection({ tenant, readOnly }: { tenant: Tenant; readOnly?
               <div key={i} className="flex gap-2"><Input placeholder="Label" className="w-40" value={l.label} onChange={(e) => setLink(i, { label: e.target.value })} /><Input placeholder="https://" value={l.url} onChange={(e) => setLink(i, { url: e.target.value })} />
                 <Button type="button" variant="ghost" onClick={() => set('socialLinks', links.filter((_, j) => j !== i))}>Remove</Button></div>))}
             {!readOnly && links.length < 12 && <Button type="button" variant="outline" size="sm" data-testid="button-add-link" onClick={() => set('socialLinks', [...links, { label: '', url: '' }])}>Add link</Button>}</div>
+          <div className="space-y-2 md:col-span-2"><Label>Navigation</Label>
+            <p className="text-xs text-muted-foreground">Order, rename or hide links. Only links the client is entitled to appear on the site; hiding never grants access.</p>
+            {nav.map((x, i) => (
+              <div key={x.key} className="flex items-center gap-2" data-testid={`row-nav-${x.key}`}>
+                <span className="w-20 font-mono text-[11px] uppercase text-muted-foreground">{x.key}</span>
+                <Input data-testid={`input-nav-label-${x.key}`} value={x.label} onChange={(e) => editNav(i, { label: e.target.value })} />
+                <Switch data-testid={`switch-nav-${x.key}`} checked={x.visible} onCheckedChange={(v) => editNav(i, { visible: v })} aria-label={`Show ${x.key}`} />
+                <Button type="button" variant="ghost" size="sm" data-testid={`button-nav-up-${x.key}`} disabled={i === 0} onClick={() => move(i, -1)}>Up</Button>
+                <Button type="button" variant="ghost" size="sm" data-testid={`button-nav-down-${x.key}`} disabled={i === nav.length - 1} onClick={() => move(i, 1)}>Down</Button>
+              </div>))}</div>
           <div className="space-y-1.5 md:col-span-2"><Label>Footer text</Label><Textarea value={f.footerText} onChange={(e) => set('footerText', e.target.value)} /></div>
           <div className="space-y-1.5 md:col-span-2"><Label>Privacy policy</Label><Textarea className="min-h-32" value={f.privacyContent} onChange={(e) => set('privacyContent', e.target.value)} /></div>
           <div className="space-y-1.5 md:col-span-2"><Label>Terms of service</Label><Textarea className="min-h-32" value={f.termsContent} onChange={(e) => set('termsContent', e.target.value)} /></div>
@@ -119,14 +139,14 @@ function ResourcePanel({ tenantId, type, readOnly, canCreate }: { tenantId: stri
   );
 }
 
-export function ResourcesSection({ tenantId, allowed, readOnly, showAll }: { tenantId: string; allowed: Record<RType, boolean>; readOnly?: boolean; showAll?: boolean }) {
+export function ResourcesSection({ tenantId, allowed, readOnly, showAll, staffReadOnly }: { tenantId: string; allowed: Record<RType, boolean>; readOnly?: boolean; showAll?: boolean; staffReadOnly?: boolean }) {
   const types = (Object.keys(META) as RType[]).filter((t) => showAll || allowed[t]);
   if (types.length === 0) return null;
   return (
     <div className="space-y-6">
       {types.map((t, i) => (
         <Section key={t} n={`R${i + 1}`} title={META[t].title} note="Available through your effective rights." footer={<span />}>
-          <ResourcePanel tenantId={tenantId} type={t} readOnly={readOnly} canCreate={allowed[t]} />
+          <ResourcePanel tenantId={tenantId} type={t} readOnly={readOnly || (t === 'staff' && !!staffReadOnly)} canCreate={allowed[t]} />
         </Section>))}
     </div>
   );

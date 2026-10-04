@@ -6,14 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type ModuleKey = typeof ModuleKey[keyof typeof ModuleKey];
-
-
-export const ModuleKey = {
-  crypto_exchange: 'crypto_exchange',
-  crypto_payments: 'crypto_payments',
-  telegram_bot: 'telegram_bot',
-  telegram_mini_app: 'telegram_mini_app',
-  website: 'website',
-  merchant_api: 'merchant_api',
-} as const;
+/**
+ * @maxLength 64
+ * @pattern ^[a-z][a-z0-9_]*$
+ */
+export type ModuleKey = string;

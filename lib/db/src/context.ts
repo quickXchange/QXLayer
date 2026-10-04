@@ -8,6 +8,8 @@ export interface DatabaseContext {
   isSuperAdmin?: boolean;
   canWrite?: boolean;
   publicSlug?: string;
+  publicDomain?: string;
+  canManageStaff?: boolean;
 }
 
 /**
@@ -28,8 +30,10 @@ export async function withDatabase<T>(
               set_config('app.tenant_id', $2, true),
               set_config('app.is_super_admin', $3, true),
               set_config('app.can_write', $4, true),
-              set_config('app.public_slug', $5, true)`,
-      [context.actorId, context.tenantId ?? "", String(context.isSuperAdmin === true), String(context.canWrite === true), context.publicSlug ?? ""],
+              set_config('app.public_slug', $5, true),
+              set_config('app.public_domain', $6, true),
+              set_config('app.can_manage_staff', $7, true)`,
+      [context.actorId, context.tenantId ?? "", String(context.isSuperAdmin === true), String(context.canWrite === true), context.publicSlug ?? "", context.publicDomain ?? "", String(context.canManageStaff === true || context.isSuperAdmin === true)],
     );
     const result = await work(client);
     await client.query("COMMIT");

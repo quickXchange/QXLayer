@@ -4,6 +4,7 @@ import { HttpError } from "../../lib/errors";
 export interface Membership {
   tenantId: string;
   role: "client_admin" | "staff";
+  permissions?: string[];
 }
 export interface Principal {
   userId: string;
@@ -14,10 +15,10 @@ export interface Principal {
 export async function resolvePrincipal(userId: string): Promise<Principal> {
   return withDatabase({ actorId: userId }, async (client) => {
     const admins = await client.query("SELECT clerk_user_id FROM platform_admins WHERE clerk_user_id = $1 AND active = true", [userId]);
-    const memberships = await client.query<{ tenant_id: string; role: "client_admin" | "staff" }>(
-      "SELECT tenant_id, role FROM tenant_memberships WHERE clerk_user_id = $1 AND active = true ORDER BY created_at", [userId],
+    const memberships = await client.query<{ tenant_id: string; role: "client_admin" | "staff"; permissions: string[] }>(
+      "SELECT tenant_id, role, permissions FROM tenant_memberships WHERE clerk_user_id = $1 AND active = true ORDER BY created_at", [userId],
     );
-    const mapped = memberships.rows.map((m) => ({ tenantId: m.tenant_id, role: m.role }));
+    const mapped = memberships.rows.map((m) => ({ tenantId: m.tenant_id, role: m.role, permissions: m.permissions }));
     return {
       userId,
       role: admins.rowCount ? "super_admin" : mapped.some((m) => m.role === "client_admin") ? "client_admin" : mapped.length ? "staff" : "unassigned",
@@ -26,13 +27,13 @@ export async function resolvePrincipal(userId: string): Promise<Principal> {
   });
 }
 
-export function contextFor(principal: Principal, tenantId?: string, write = false): DatabaseContext {
+export function contextFor(principal: Principal, tenantId?: string, write = false, permission = "configuration.manage"): DatabaseContext {
   const isSuperAdmin = principal.role === "super_admin";
   if (principal.role === "unassigned") throw new HttpError(403, "An operator must explicitly assign administrator access.");
   const membership = principal.memberships.find((m) => m.tenantId === tenantId);
   if (!isSuperAdmin && (!tenantId || !membership)) throw new HttpError(403, "Tenant access denied.");
-  if (write && !isSuperAdmin && membership?.role !== "client_admin") throw new HttpError(403, "This role is read-only.");
-  return { actorId: principal.userId, tenantId, isSuperAdmin, canWrite: write };
+  if (write && !isSuperAdmin && membership?.role !== "client_admin" && !membership?.permissions?.includes(permission)) throw new HttpError(403, "This role lacks the required permission.");
+  return { actorId: principal.userId, tenantId, isSuperAdmin, canWrite: write, canManageStaff: isSuperAdmin || membership?.role === "client_admin" };
 }
 
 export function requireSuperAdmin(principal: Principal) {

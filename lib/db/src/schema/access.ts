@@ -19,6 +19,7 @@ export const tenantMembershipsTable = pgTable("tenant_memberships", {
   tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id),
   clerkUserId: text("clerk_user_id").notNull(),
   role: text("role").notNull().default("client_admin"),
+  permissions: text("permissions").array().notNull().default(sql`'{}'::text[]`),
   label: text("label").notNull().default(""),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -31,8 +32,8 @@ export const tenantMembershipsTable = pgTable("tenant_memberships", {
   }),
   pgPolicy("memberships_operator_write", {
     for: "all", to: runtimeRole,
-    using: sql`(${adminContext} OR (${tenantContext} AND role = 'staff' AND current_setting('app.can_write', true) = 'true'))`,
-    withCheck: sql`(${adminContext} OR (${tenantContext} AND role = 'staff' AND current_setting('app.can_write', true) = 'true'))`,
+    using: sql`(${adminContext} OR (${tenantContext} AND role = 'staff' AND current_setting('app.can_write', true) = 'true' AND current_setting('app.can_manage_staff', true) = 'true'))`,
+    withCheck: sql`(${adminContext} OR (${tenantContext} AND role = 'staff' AND current_setting('app.can_write', true) = 'true' AND current_setting('app.can_manage_staff', true) = 'true'))`,
   }),
 ]).enableRLS();
 

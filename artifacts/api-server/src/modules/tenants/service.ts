@@ -10,6 +10,9 @@ import { audit } from "../../lib/audit";
 import { readPlan } from "../entitlements/catalog";
 import { assertOperational, enforceLimit, requireFeature, resolveEntitlements } from "../entitlements/resolver";
 import { safeHttps, validateSettings, websiteSettings, type WebsiteSettings } from "../website/settings";
+import { readRegistry } from "../product-registry/service";
+import { newDomainChallenge } from "../domains/service";
+import { exchangeProjection, writeExchangeCompatibility } from "../../products/exchange/compatibility";
 export { audit } from "../../lib/audit";
 
 const steps = ["brand", "domain", "modules", "assets_networks", "configuration"] as const;
@@ -31,7 +34,7 @@ export async function readTenant(client: DatabaseClient, tenantId: string) {
   const completed = row.completed_steps as string[];
   const enabledModules = effective.enabledModules;
   const assetNetworkIds = assets.rows.map((a) => a.asset_network_id as string);
-  const financial = enabledModules.includes("crypto_exchange") || enabledModules.includes("crypto_payments");
+  const financial = (await readRegistry(client)).some((m) => enabledModules.includes(m.key) && m.requiresAssetNetworks);
   const complete = steps.every((s) => completed.includes(s)) && enabledModules.length > 0 && (!financial || assetNetworkIds.length > 0);
   return {
     id: row.id as string, name: row.name as string, slug: row.slug as string,
@@ -42,7 +45,7 @@ export async function readTenant(client: DatabaseClient, tenantId: string) {
     primaryColor: row.primary_color as string, accentColor: row.accent_color as string,
     themeMode: row.theme_mode as string, defaultLanguage: row.default_language as string,
     supportedLanguages: row.supported_languages as string[],
-     assetNetworkIds, exchangeEnabled: Boolean(row.exchange_enabled && effective.features.crypto_exchange),
+     assetNetworkIds, ...exchangeProjection(row, effective),
      paymentsEnabled: Boolean(row.payments_enabled && effective.features.crypto_payments),
      allowGuestCheckout: Boolean(row.allow_guest_checkout && effective.features.crypto_payments), configurationComplete: complete,
      websiteSettings: websiteSettings(row.brand_name, row.website_settings),
@@ -81,7 +84,7 @@ export async function createTenant(principal: Principal, input: z.infer<typeof C
 }
 
 async function saveStep(principal: Principal, tenantId: string, step: Step, work: (client: DatabaseClient) => Promise<void>) {
-  return withDatabase(contextFor(principal, tenantId, true), async (client) => {
+  return withDatabase(contextFor(principal, tenantId, true, step === "brand" ? "branding.manage" : step === "domain" ? "domains.manage" : "configuration.manage"), async (client) => {
     await client.query("SELECT id FROM tenants WHERE id = $1 FOR UPDATE", [tenantId]);
     const before = await readTenant(client, tenantId);
     assertOperational(await resolveEntitlements(client, tenantId));
@@ -118,7 +121,7 @@ export function saveDomain(principal: Principal, tenantId: string, raw: string |
     }
   }
   return saveStep(principal, tenantId, "domain", async (client) => {
-    if (domain) await client.query("INSERT INTO tenant_domains (tenant_id,domain) VALUES ($1,$2) ON CONFLICT (tenant_id) DO UPDATE SET domain=EXCLUDED.domain", [tenantId, domain]);
+    if (domain) await client.query("INSERT INTO tenant_domains (tenant_id,domain,verification_token) VALUES ($1,$2,$3) ON CONFLICT (tenant_id) DO UPDATE SET domain=EXCLUDED.domain,status=CASE WHEN tenant_domains.domain=EXCLUDED.domain THEN tenant_domains.status ELSE 'unverified' END,verified_at=CASE WHEN tenant_domains.domain=EXCLUDED.domain THEN tenant_domains.verified_at ELSE NULL END,verification_token=CASE WHEN tenant_domains.domain=EXCLUDED.domain THEN tenant_domains.verification_token ELSE EXCLUDED.verification_token END", [tenantId, domain, newDomainChallenge()]);
     else await client.query("DELETE FROM tenant_domains WHERE tenant_id=$1", [tenantId]);
   });
 }
@@ -131,7 +134,7 @@ export async function saveModules(principal: Principal, _tenantId: string, _keys
 export function saveAssets(principal: Principal, tenantId: string, ids: string[]) {
   return saveStep(principal, tenantId, "assets_networks", async (client) => {
     const effective = await resolveEntitlements(client, tenantId);
-    if (ids.length && !effective.features.crypto_exchange && !effective.features.crypto_payments) throw new HttpError(403, "No financial module is enabled for this tenant.");
+    if (ids.length && !(await readRegistry(client)).some((m) => effective.features[m.key] && m.requiresAssetNetworks)) throw new HttpError(403, "No asset-configurable module is enabled for this tenant.");
     const catalog = await client.query("SELECT id,asset_id,network_id FROM asset_network_catalog WHERE id = ANY($1::text[])", [ids]);
     if (catalog.rows.length !== new Set(ids).size) throw new HttpError(400, "Only configured sandbox asset/network pairs are supported.");
     enforceLimit(effective, "max_supported_assets", String(new Set(catalog.rows.map((r) => r.asset_id)).size));
@@ -144,13 +147,14 @@ export function saveAssets(principal: Principal, tenantId: string, ids: string[]
 export function saveConfiguration(principal: Principal, tenantId: string, input: z.infer<typeof UpdateTenantConfigurationBody>) {
   return saveStep(principal, tenantId, "configuration", async (client) => {
     const effective = await resolveEntitlements(client, tenantId);
-    if (input.exchangeEnabled) requireFeature(effective, "crypto_exchange");
+    await writeExchangeCompatibility(client, tenantId, input.exchangeEnabled, effective);
     if (input.paymentsEnabled || input.allowGuestCheckout) requireFeature(effective, "crypto_payments");
-    await client.query("UPDATE tenant_configuration SET environment='sandbox',exchange_enabled=$2,payments_enabled=$3,allow_guest_checkout=$4 WHERE tenant_id=$1", [tenantId, input.exchangeEnabled, input.paymentsEnabled, input.allowGuestCheckout]);
+    await client.query("UPDATE tenant_configuration SET environment='sandbox',payments_enabled=$2,allow_guest_checkout=$3 WHERE tenant_id=$1", [tenantId, input.paymentsEnabled, input.allowGuestCheckout]);
   });
 }
 
 export function activateTenant(principal: Principal, tenantId: string) {
+  if (principal.role !== "super_admin" && !principal.memberships.some((m) => m.tenantId === tenantId && m.role === "client_admin")) throw new HttpError(403, "Only a tenant administrator may activate configuration.");
   return withDatabase(contextFor(principal, tenantId, true), async (client) => {
     await client.query("SELECT id FROM tenants WHERE id = $1 FOR UPDATE", [tenantId]);
     const effective = await resolveEntitlements(client, tenantId);

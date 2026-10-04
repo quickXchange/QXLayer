@@ -3,6 +3,8 @@ import { Link, useLocation } from 'wouter';
 import { useCreateTenant, useListPlans, type Tenant } from '@workspace/api-client-react';
 import { PageHeader } from '@/components/app/bits';
 import { BrandSection, DomainSection, ModulesSection, AssetsSection, ConfigSection } from '@/components/app/sections';
+import { SubscriptionSections } from '@/components/app/subscription';
+import { WebsiteSection } from '@/components/app/advanced';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,7 +17,7 @@ import { useInvalidateTenant } from '@/lib/invalidate';
 import { useGetTenant, getGetTenantQueryKey } from '@workspace/api-client-react';
 import { useToast } from '@/hooks/use-toast';
 
-const steps = ['Create client', 'Brand', 'Domain', 'Modules (from plan)', 'Assets and networks', 'Configuration'];
+const steps = ['Create client', 'Plan, products, add-ons, limits', 'Brand', 'Website', 'Domain', 'Assets and networks', 'Configuration'];
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
 
 function Wizard({ initial }: { initial: Tenant }) {
@@ -23,16 +25,20 @@ function Wizard({ initial }: { initial: Tenant }) {
   const [, nav] = useLocation();
   const q = useGetTenant(initial.id, { query: { enabled: true, queryKey: getGetTenantQueryKey(initial.id), initialData: initial } });
   const t = q.data ?? initial;
-  const next = () => (step === 5 ? nav(`/clients/${t.id}`) : setStep(step + 1));
-  const common = { tenant: t, onSaved: next, saveLabel: step === 5 ? 'Save and finish' : 'Save and continue' };
+  const next = () => (step === 6 ? nav(`/clients/${t.id}`) : setStep(step + 1));
+  const common = { tenant: t, onSaved: next, saveLabel: step === 6 ? 'Save and finish' : 'Save and continue' };
   return (
     <div className="space-y-4">
-      {step > 1 && step < 5 && <button className="text-sm text-muted-foreground hover:text-foreground" onClick={next} data-testid="button-skip">Skip this step</button>}
-      {step === 1 && <BrandSection {...common} />}
-      {step === 2 && <DomainSection {...common} />}
-      {step === 3 && <ModulesSection {...common} />}
-      {step === 4 && <AssetsSection {...common} />}
-      {step === 5 && <ConfigSection {...common} />}
+      {step > 2 && step < 6 && <button className="text-sm text-muted-foreground hover:text-foreground" onClick={next} data-testid="button-skip">Skip this step</button>}
+      {step === 1 && (<>
+        <SubscriptionSections tenantId={t.id} canManage />
+        <ModulesSection {...common} saveLabel="Continue to brand" />
+      </>)}
+      {step === 2 && <BrandSection {...common} />}
+      {step === 3 && <WebsiteSection {...common} />}
+      {step === 4 && <DomainSection {...common} />}
+      {step === 5 && <AssetsSection {...common} />}
+      {step === 6 && <ConfigSection {...common} />}
       {step > 1 && <Button variant="ghost" onClick={() => setStep(step - 1)} data-testid="button-back">Back</Button>}
     </div>
   );
@@ -55,7 +61,7 @@ export default function ClientNew() {
   if (!can.createClients) return (<><PageHeader eyebrow="Tenants" title="New client" /><p className="text-sm text-muted-foreground" data-testid="text-forbidden">Only a super admin can create clients. <Link href="/clients" className="text-copper underline">Back to clients</Link></p></>);
   return (
     <>
-      <PageHeader eyebrow="Provisioning wizard" title="New client" />
+      <PageHeader eyebrow="White Label Core provisioning" title="New client" />
       <ol className="mb-8 flex flex-wrap gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-wider">
         {steps.map((l, i) => <li key={l} className={i === 0 ? (created ? 'text-muted-foreground line-through' : 'text-copper') : created ? 'text-muted-foreground' : 'text-muted-foreground/60'}>0{i + 1} {l}</li>)}
       </ol>

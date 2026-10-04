@@ -24,9 +24,12 @@ export const tenantDomainsTable = pgTable("tenant_domains", {
   tenantId: uuid("tenant_id").primaryKey().references(() => tenantsTable.id),
   domain: text("domain").notNull().unique(),
   status: text("status").notNull().default("unverified"),
+  verificationToken: text("verification_token"),
+  verifiedAt: timestamp("verified_at", { withTimezone: true }),
 }, () => [
-  check("domains_unverified_only", sql`status = 'unverified'`),
+  check("domains_valid_status", sql`status IN ('unverified', 'verified')`),
   ...tenantPolicies("tenant_domains"),
+  pgPolicy("tenant_domains_public_domain", { for: "select", to: runtimeRole, using: sql`status='verified' AND domain=nullif(current_setting('app.public_domain',true),'')` }),
 ]).enableRLS();
 
 export const tenantModulesTable = pgTable("tenant_modules", {

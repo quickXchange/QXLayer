@@ -42,8 +42,15 @@ export function navItems(site: PublicSite, c: Caps): NavItem[] {
   if (c.api) n.push({ id: 'developers', label: 'Developers' });
   n.push({ id: 'about', label: 'About' });
   if (c.faq.length) n.push({ id: 'faq', label: 'FAQ' });
-  void site;
-  return n;
+  const cfg = site.websiteSettings.navigation ?? [];
+  if (cfg.length === 0) return n;
+  const rank = (id: string) => { const i = cfg.findIndex((x) => x.key === id); return i < 0 ? cfg.length : i; };
+  return n
+    .filter((x) => cfg.find((c) => c.key === x.id)?.visible !== false)
+    .map((x) => { const l = cfg.find((c) => c.key === x.id)?.label.trim(); return l ? { ...x, label: l } : x; })
+    .map((x, i) => ({ x, i }))
+    .sort((a, b) => rank(a.x.id) - rank(b.x.id) || a.i - b.i)
+    .map(({ x }) => x);
 }
 export function primaryCta(c: Caps): NavItem {
   if (c.exchange !== 'off') return { id: 'exchange', label: 'Open exchange' };

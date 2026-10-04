@@ -7,14 +7,25 @@ export function usePrincipal() {
   if (!p) throw new Error('No principal');
   return p;
 }
-export function useCan() {
+export type Permission = 'branding.manage' | 'domains.manage' | 'configuration.manage' | 'resources.manage';
+export function useCan(tenantId?: string) {
   const p = usePrincipal();
+  const isSuper = p.role === 'super_admin';
+  const m = tenantId && p.memberships ? p.memberships.find((x) => x.tenantId === tenantId) : undefined;
+  // Legacy principals without memberships fall back to role and tenantId.
+  const legacyOk = !p.memberships && (!tenantId || p.tenantId === tenantId);
+  const role = isSuper ? p.role : m ? m.role : legacyOk || !tenantId ? p.role : 'unassigned';
+  const perms: string[] = m ? m.permissions : [];
+  const isAdmin = isSuper || role === 'client_admin';
   return {
-    createClients: p.role === 'super_admin',
-    editModules: p.role === 'super_admin',
-    editTenant: p.role === 'super_admin' || p.role === 'client_admin',
-    manageCatalog: p.role === 'super_admin',
-    manageSubscription: p.role === 'super_admin',
-    role: p.role,
+    createClients: isSuper,
+    editModules: isSuper,
+    editTenant: isAdmin,
+    manageCatalog: isSuper,
+    manageSubscription: isSuper,
+    manageStaffGrants: isAdmin,
+    has: (perm: Permission) => isAdmin || (role === 'staff' && perms.includes(perm)),
+    permissions: perms,
+    role,
   };
 }

@@ -20,7 +20,7 @@ function access(e: EffectiveEntitlements, type: ResourceType) {
 }
 async function readResources(client: DatabaseClient, tenantId: string, type: ResourceType) {
   switch (type) {
-    case "staff": return (await client.query("SELECT clerk_user_id AS id,COALESCE(NULLIF(label,''),clerk_user_id) AS label,clerk_user_id AS reference,'active' AS status FROM tenant_memberships WHERE tenant_id=$1 AND role='staff' AND active=true ORDER BY created_at", [tenantId])).rows;
+    case "staff": return (await client.query("SELECT clerk_user_id AS id,COALESCE(NULLIF(label,''),clerk_user_id) AS label,clerk_user_id AS reference,'active' AS status,permissions FROM tenant_memberships WHERE tenant_id=$1 AND role='staff' AND active=true ORDER BY created_at", [tenantId])).rows;
     case "api_keys": return (await client.query("SELECT id,label,NULL::text AS reference,CASE WHEN revoked_at IS NULL THEN 'sandbox · no execution scopes' ELSE 'revoked' END AS status FROM api_keys WHERE tenant_id=$1 ORDER BY label,id", [tenantId])).rows;
     case "webhooks": return (await client.query("SELECT id,label,url AS reference,'configured · delivery deferred' AS status FROM webhook_endpoints WHERE tenant_id=$1 ORDER BY label,id", [tenantId])).rows;
     case "payment_methods": return (await client.query("SELECT id,label,NULL::text AS reference,'sandbox configuration only' AS status FROM tenant_payment_methods WHERE tenant_id=$1 ORDER BY label,id", [tenantId])).rows;
@@ -35,7 +35,8 @@ export function listResources(principal: Principal, tenantId: string, type: Reso
 }
 export function createResource(principal: Principal, tenantId: string, type: ResourceType, input: Input) {
   if (input.label.trim().length < 2) throw new HttpError(400, "Resource label must contain at least two non-whitespace characters.");
-  return withDatabase(contextFor(principal, tenantId, true), async (client) => {
+  if (type === "staff") requireStaffManager(principal, tenantId);
+  return withDatabase(contextFor(principal, tenantId, true, "resources.manage"), async (client) => {
     await lockTenant(client, tenantId);
     const e = await resolveEntitlements(client, tenantId);
     access(e, type);
@@ -50,7 +51,7 @@ export function createResource(principal: Principal, tenantId: string, type: Res
         const existing = await client.query("SELECT role,active FROM tenant_memberships WHERE tenant_id=$1 AND clerk_user_id=$2", [tenantId, input.reference]);
         if (existing.rowCount && (existing.rows[0].active || existing.rows[0].role !== "staff")) throw new HttpError(409, "This user already has a tenant role; this endpoint cannot change administrator roles.");
         await client.query(
-          "INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role,label) VALUES ($1,$2,'staff',$3) ON CONFLICT (tenant_id,clerk_user_id) DO UPDATE SET active=true,label=EXCLUDED.label",
+          "INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role,label) VALUES ($1,$2,'staff',$3) ON CONFLICT (tenant_id,clerk_user_id) DO UPDATE SET active=true,label=EXCLUDED.label,permissions='{}'",
           [tenantId, input.reference, input.label.trim()],
         );
         id = input.reference;
@@ -84,7 +85,8 @@ export function createResource(principal: Principal, tenantId: string, type: Res
   });
 }
 export function removeResource(principal: Principal, tenantId: string, type: ResourceType, id: string) {
-  return withDatabase(contextFor(principal, tenantId, true), async (client) => {
+  if (type === "staff") requireStaffManager(principal, tenantId);
+  return withDatabase(contextFor(principal, tenantId, true, "resources.manage"), async (client) => {
     await lockTenant(client, tenantId);
     const effective = await resolveEntitlements(client, tenantId);
     assertOperational(effective);
@@ -99,6 +101,23 @@ export function removeResource(principal: Principal, tenantId: string, type: Res
     }
     if (!result.rowCount) throw new HttpError(404, "Active resource not found in this tenant.");
     await audit(client, principal, tenantId, `resource.${type}.removed`, `Removed/revoked ${type.replaceAll("_", " ")} configuration`, { resourceId: id });
+    return { ok: true };
+  });
+}
+
+export function requireStaffManager(principal: Principal, tenantId: string) {
+  if (principal.role !== "super_admin" && !principal.memberships.some((m) => m.tenantId === tenantId && m.role === "client_admin")) throw new HttpError(403, "Only a tenant administrator can manage staff access.");
+}
+export function setStaffPermissions(principal: Principal, tenantId: string, userId: string, permissions: string[]) {
+  requireStaffManager(principal, tenantId);
+  const allowed = ["branding.manage", "domains.manage", "configuration.manage", "resources.manage"];
+  if (permissions.some((p) => !allowed.includes(p)) || new Set(permissions).size !== permissions.length) throw new HttpError(400, "Unknown or duplicate staff permission.");
+  return withDatabase(contextFor(principal, tenantId, true), async (client) => {
+    await lockTenant(client, tenantId);
+    assertOperational(await resolveEntitlements(client, tenantId));
+    const result = await client.query("UPDATE tenant_memberships SET permissions=$3 WHERE tenant_id=$1 AND clerk_user_id=$2 AND role='staff' AND active=true RETURNING clerk_user_id", [tenantId, userId, permissions]);
+    if (!result.rowCount) throw new HttpError(404, "Active staff member not found.");
+    await audit(client, principal, tenantId, "staff.permissions.updated", "Updated staff permission grants", { staffUserId: userId, permissions });
     return { ok: true };
   });
 }

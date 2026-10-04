@@ -10,9 +10,48 @@ import {
 } from "@workspace/api-zod";
 import { requireAuthentication, principalFrom, sameOriginMutation } from "../middlewares/authentication";
 import { activateTenant, createTenant, getTenant, listTenants, saveAssets, saveBrand, saveConfiguration, saveDomain, saveModules } from "../modules/tenants/service";
+import { SetStaffPermissionsParams, SetStaffPermissionsBody, SetStaffPermissionsResponse, GetDomainVerificationParams, GetDomainVerificationResponse, VerifyTenantDomainParams, VerifyTenantDomainResponse, GetProductConfigurationParams, GetProductConfigurationResponse, SetProductConfigurationParams, SetProductConfigurationBody, SetProductConfigurationResponse } from "@workspace/api-zod";
+import { setStaffPermissions } from "../modules/entitlements/resources";
+import { getDomainVerification, verifyTenantDomain } from "../modules/domains/service";
+import { productConfiguration } from "../modules/product-registry/configuration";
+import { ListTenantAdministratorsParams, ListTenantAdministratorsResponse, AssignTenantAdministratorParams, AssignTenantAdministratorBody, AssignTenantAdministratorResponse, SetTenantAdministratorStatusParams, SetTenantAdministratorStatusBody, SetTenantAdministratorStatusResponse } from "@workspace/api-zod";
+import { listTenantAdministrators, assignTenantAdministrator, setTenantAdministratorStatus } from "../modules/tenants/administrators";
 
 const router = Router();
 router.use("/tenants", requireAuthentication, sameOriginMutation);
+router.get("/tenants/:tenantId/administrators", async (req, res) => {
+  const { tenantId } = ListTenantAdministratorsParams.parse(req.params);
+  res.json(ListTenantAdministratorsResponse.parse(await listTenantAdministrators(principalFrom(res), tenantId)));
+});
+router.post("/tenants/:tenantId/administrators", async (req, res) => {
+  const { tenantId } = AssignTenantAdministratorParams.parse(req.params);
+  const { userId, label } = AssignTenantAdministratorBody.parse(req.body);
+  res.status(201).json(AssignTenantAdministratorResponse.parse(await assignTenantAdministrator(principalFrom(res), tenantId, userId, label)));
+});
+router.put("/tenants/:tenantId/administrators/:userId", async (req, res) => {
+  const { tenantId, userId } = SetTenantAdministratorStatusParams.parse(req.params);
+  res.json(SetTenantAdministratorStatusResponse.parse(await setTenantAdministratorStatus(principalFrom(res), tenantId, userId, SetTenantAdministratorStatusBody.parse(req.body).active)));
+});
+router.put("/tenants/:tenantId/staff/:userId/permissions", async (req, res) => {
+  const { tenantId, userId } = SetStaffPermissionsParams.parse(req.params);
+  res.json(SetStaffPermissionsResponse.parse(await setStaffPermissions(principalFrom(res), tenantId, userId, SetStaffPermissionsBody.parse(req.body).permissions)));
+});
+router.get("/tenants/:tenantId/domain-verification", async (req, res) => {
+  const { tenantId } = GetDomainVerificationParams.parse(req.params);
+  res.json(GetDomainVerificationResponse.parse(await getDomainVerification(principalFrom(res), tenantId)));
+});
+router.post("/tenants/:tenantId/domain-verification", async (req, res) => {
+  const { tenantId } = VerifyTenantDomainParams.parse(req.params);
+  res.json(VerifyTenantDomainResponse.parse(await verifyTenantDomain(principalFrom(res), tenantId)));
+});
+router.get("/tenants/:tenantId/products/:moduleKey/configuration", async (req, res) => {
+  const { tenantId, moduleKey } = GetProductConfigurationParams.parse(req.params);
+  res.json(GetProductConfigurationResponse.parse(await productConfiguration(principalFrom(res), tenantId, moduleKey)));
+});
+router.put("/tenants/:tenantId/products/:moduleKey/configuration", async (req, res) => {
+  const { tenantId, moduleKey } = SetProductConfigurationParams.parse(req.params);
+  res.json(SetProductConfigurationResponse.parse(await productConfiguration(principalFrom(res), tenantId, moduleKey, SetProductConfigurationBody.parse(req.body).configuration)));
+});
 router.get("/tenants", async (_req, res): Promise<void> => {
   res.json(ListTenantsResponse.parse(await listTenants(principalFrom(res))));
 });

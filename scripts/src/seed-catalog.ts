@@ -1,14 +1,7 @@
 import { pool } from "@workspace/db";
+import { coreRegistry } from "./core-registry";
 
 if (process.env.NODE_ENV === "production") throw new Error("Development catalog setup refused in production.");
-const modules = [
-  ["crypto_exchange", "Crypto Exchange", "Exchange, swap, and convert product entitlement. Engine implementation is deferred.", "Financial"],
-  ["crypto_payments", "Crypto Payments", "Crypto payment gateway entitlement. Invoice execution is deferred.", "Financial"],
-  ["telegram_bot", "Telegram Bot", "Branded bot entitlement using the shared backend. Bot connection is deferred.", "Channels"],
-  ["telegram_mini_app", "Telegram Mini App", "Telegram web app entitlement using the same tenant configuration.", "Channels"],
-  ["website", "Website", "Shared dynamically branded sandbox website. No payment execution.", "Channels"],
-  ["merchant_api", "Merchant API", "Scoped developer API entitlement. Public merchant endpoints are deferred.", "Developer"],
-];
 const assets = [["btc", "BTC", "Bitcoin"], ["eth", "ETH", "Ethereum"], ["usdt", "USDT", "Tether"], ["sol", "SOL", "Solana"], ["bnb", "BNB", "BNB"]];
 const networks = [
   ["bitcoin-testnet", "Bitcoin Testnet"], ["ethereum-sepolia", "Ethereum Sepolia"],
@@ -38,10 +31,11 @@ const limits = [
 const client = await pool.connect();
 try {
   await client.query("BEGIN");
-  for (const [key, name, description, category] of modules) await client.query(
-    "INSERT INTO module_catalog (key,name,description,category) VALUES ($1,$2,$3,$4) ON CONFLICT (key) DO UPDATE SET description = EXCLUDED.description",
-    [key, name, description, category],
+  for (const m of coreRegistry) await client.query(
+    "INSERT INTO module_catalog (key,name,description,category,sandbox_available,definition) VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING",
+    [m.key, m.name, m.description, m.category, m.sandboxAvailable, JSON.stringify(m)],
   );
+  for (const m of coreRegistry) for (const f of [{ key: m.key, label: m.name }, ...m.features]) await client.query("INSERT INTO entitlement_definitions (key,label,kind,value_type) VALUES ($1,$2,'feature','boolean') ON CONFLICT DO NOTHING", [f.key, f.label]);
   for (const asset of assets) await client.query("INSERT INTO asset_catalog (id,symbol,name) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING", asset);
   for (const network of networks) await client.query("INSERT INTO network_catalog (id,name,testnet) VALUES ($1,$2,true) ON CONFLICT DO NOTHING", network);
   for (const [asset, network] of pairs) await client.query("INSERT INTO asset_network_catalog (id,asset_id,network_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING", [`${asset}:${network}`, asset, network]);

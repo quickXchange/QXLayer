@@ -8,6 +8,7 @@ import { requireEntitlement } from "../modules/entitlements/service";
 import { getBlockchainProvider } from "../modules/blockchain";
 import { savePlan } from "../modules/entitlements/catalog";
 import { planFixture, verifyPlans } from "./plans";
+import { verifyCore } from "./core";
 
 if (process.env.NODE_ENV === "production") throw new Error("Development verification refused in production.");
 const suffix = randomUUID().replaceAll("-", "");
@@ -98,10 +99,11 @@ try {
   ]]);
   assert.equal(policies.rows[0].total, 17);
   await verifyPlans({ admin, clientAdmin, a, b, pa, pb, suffix, planIds, addonIds });
+  await verifyCore({ admin, clientAdmin, staffId, aId: a.id, bId: b.id, suffix });
   process.stdout.write("PASS: foundation provisioning, role permissions, effective entitlements, RLS cross-tenant reads/writes, no-context isolation, non-bypass runtime role, composite foreign keys, sandbox constraints.\n");
 } finally {
   // Only this run's fixtures are removed, never user-created client records.
-  for (const table of ["audit_events", "tenant_usage_counters", "tenant_entitlement_overrides", "tenant_addons", "tenant_subscriptions", "tenant_payment_methods", "api_keys", "webhook_endpoints", "exchange_orders", "payment_invoices", "wallet_configurations", "pricing_rules", "tenant_asset_networks", "tenant_modules", "tenant_domains", "tenant_configuration", "tenant_branding", "tenant_memberships"]) {
+  for (const table of ["tenant_product_configuration", "audit_events", "tenant_usage_counters", "tenant_entitlement_overrides", "tenant_addons", "tenant_subscriptions", "tenant_payment_methods", "api_keys", "webhook_endpoints", "exchange_orders", "payment_invoices", "wallet_configurations", "pricing_rules", "tenant_asset_networks", "tenant_modules", "tenant_domains", "tenant_configuration", "tenant_branding", "tenant_memberships"]) {
     await pool.query(`DELETE FROM ${table} WHERE tenant_id = ANY($1::uuid[])`, [tenantIds]);
   }
   await pool.query("DELETE FROM tenants WHERE id = ANY($1::uuid[])", [tenantIds]);

@@ -8,6 +8,410 @@
 import * as zod from 'zod';
 
 
+export const ListTenantAdministratorsParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const ListTenantAdministratorsResponseItem = zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "reference": zod.string().nullable(),
+  "status": zod.string(),
+  "permissions": zod.array(zod.string()).optional()
+})
+export const ListTenantAdministratorsResponse = zod.array(ListTenantAdministratorsResponseItem)
+
+
+export const AssignTenantAdministratorParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const assignTenantAdministratorBodyUserIdRegExp = new RegExp('^user_[a-zA-Z0-9]+$');
+export const assignTenantAdministratorBodyLabelMin = 2;
+export const assignTenantAdministratorBodyLabelMax = 120;
+
+
+
+export const AssignTenantAdministratorBody = zod.object({
+  "userId": zod.string().regex(assignTenantAdministratorBodyUserIdRegExp),
+  "label": zod.string().min(assignTenantAdministratorBodyLabelMin).max(assignTenantAdministratorBodyLabelMax)
+})
+
+export const AssignTenantAdministratorResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const setTenantAdministratorStatusPathUserIdRegExp = new RegExp('^user_[a-zA-Z0-9]+$');
+
+
+export const SetTenantAdministratorStatusParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "userId": zod.coerce.string().regex(setTenantAdministratorStatusPathUserIdRegExp)
+})
+
+export const SetTenantAdministratorStatusBody = zod.object({
+  "active": zod.boolean()
+})
+
+export const SetTenantAdministratorStatusResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const getProductConfigurationPathModuleKeyMax = 64;
+
+
+export const getProductConfigurationPathModuleKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+
+
+export const GetProductConfigurationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "moduleKey": zod.coerce.string().max(getProductConfigurationPathModuleKeyMax).regex(getProductConfigurationPathModuleKeyRegExp)
+})
+
+export const GetProductConfigurationResponse = zod.object({
+  "configuration": zod.record(zod.string(), zod.unknown())
+})
+
+
+export const setProductConfigurationPathModuleKeyMax = 64;
+
+
+export const setProductConfigurationPathModuleKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+
+
+export const SetProductConfigurationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "moduleKey": zod.coerce.string().max(setProductConfigurationPathModuleKeyMax).regex(setProductConfigurationPathModuleKeyRegExp)
+})
+
+export const SetProductConfigurationBody = zod.object({
+  "configuration": zod.record(zod.string(), zod.unknown())
+})
+
+export const SetProductConfigurationResponse = zod.object({
+  "configuration": zod.record(zod.string(), zod.unknown())
+})
+
+
+export const listProductRegistryResponseKeyMax = 64;
+
+
+export const listProductRegistryResponseKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listProductRegistryResponseNameMin = 2;
+export const listProductRegistryResponseNameMax = 120;
+
+export const listProductRegistryResponseDescriptionMax = 3000;
+
+export const listProductRegistryResponseCategoryMin = 2;
+export const listProductRegistryResponseCategoryMax = 80;
+
+export const listProductRegistryResponseFeaturesItemKeyMax = 64;
+
+
+export const listProductRegistryResponseFeaturesItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listProductRegistryResponseFeaturesItemLabelMin = 2;
+export const listProductRegistryResponseFeaturesItemLabelMax = 120;
+
+export const listProductRegistryResponseFeaturesItemDependsOnItemMax = 64;
+
+export const listProductRegistryResponseFeaturesItemDependsOnMax = 20;
+
+export const listProductRegistryResponseFeaturesMax = 50;
+
+export const listProductRegistryResponseLimitsItemKeyMax = 64;
+
+
+export const listProductRegistryResponseLimitsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listProductRegistryResponseLimitsItemLabelMin = 2;
+export const listProductRegistryResponseLimitsItemLabelMax = 120;
+
+export const listProductRegistryResponseLimitsMax = 50;
+
+
+
+export const ListProductRegistryResponseItem = zod.object({
+  "key": zod.string().max(listProductRegistryResponseKeyMax).regex(listProductRegistryResponseKeyRegExp),
+  "name": zod.string().min(listProductRegistryResponseNameMin).max(listProductRegistryResponseNameMax),
+  "description": zod.string().max(listProductRegistryResponseDescriptionMax),
+  "category": zod.string().min(listProductRegistryResponseCategoryMin).max(listProductRegistryResponseCategoryMax),
+  "lifecycle": zod.enum(['core_ready', 'sandbox_only', 'deferred']),
+  "sandboxAvailable": zod.boolean(),
+  "requiresAssetNetworks": zod.boolean(),
+  "features": zod.array(zod.object({
+  "key": zod.string().max(listProductRegistryResponseFeaturesItemKeyMax).regex(listProductRegistryResponseFeaturesItemKeyRegExp),
+  "label": zod.string().min(listProductRegistryResponseFeaturesItemLabelMin).max(listProductRegistryResponseFeaturesItemLabelMax),
+  "dependsOn": zod.array(zod.string().max(listProductRegistryResponseFeaturesItemDependsOnItemMax)).max(listProductRegistryResponseFeaturesItemDependsOnMax)
+})).max(listProductRegistryResponseFeaturesMax),
+  "limits": zod.array(zod.object({
+  "key": zod.string().max(listProductRegistryResponseLimitsItemKeyMax).regex(listProductRegistryResponseLimitsItemKeyRegExp),
+  "label": zod.string().min(listProductRegistryResponseLimitsItemLabelMin).max(listProductRegistryResponseLimitsItemLabelMax),
+  "valueType": zod.enum(['integer', 'decimal'])
+})).max(listProductRegistryResponseLimitsMax)
+})
+export const ListProductRegistryResponse = zod.array(ListProductRegistryResponseItem)
+
+
+export const registerProductModuleBodyKeyMax = 64;
+
+
+export const registerProductModuleBodyKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const registerProductModuleBodyNameMin = 2;
+export const registerProductModuleBodyNameMax = 120;
+
+export const registerProductModuleBodyDescriptionMax = 3000;
+
+export const registerProductModuleBodyCategoryMin = 2;
+export const registerProductModuleBodyCategoryMax = 80;
+
+export const registerProductModuleBodyFeaturesItemKeyMax = 64;
+
+
+export const registerProductModuleBodyFeaturesItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const registerProductModuleBodyFeaturesItemLabelMin = 2;
+export const registerProductModuleBodyFeaturesItemLabelMax = 120;
+
+export const registerProductModuleBodyFeaturesItemDependsOnItemMax = 64;
+
+export const registerProductModuleBodyFeaturesItemDependsOnMax = 20;
+
+export const registerProductModuleBodyFeaturesMax = 50;
+
+export const registerProductModuleBodyLimitsItemKeyMax = 64;
+
+
+export const registerProductModuleBodyLimitsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const registerProductModuleBodyLimitsItemLabelMin = 2;
+export const registerProductModuleBodyLimitsItemLabelMax = 120;
+
+export const registerProductModuleBodyLimitsMax = 50;
+
+
+
+export const RegisterProductModuleBody = zod.object({
+  "key": zod.string().max(registerProductModuleBodyKeyMax).regex(registerProductModuleBodyKeyRegExp),
+  "name": zod.string().min(registerProductModuleBodyNameMin).max(registerProductModuleBodyNameMax),
+  "description": zod.string().max(registerProductModuleBodyDescriptionMax),
+  "category": zod.string().min(registerProductModuleBodyCategoryMin).max(registerProductModuleBodyCategoryMax),
+  "lifecycle": zod.enum(['core_ready', 'sandbox_only', 'deferred']),
+  "sandboxAvailable": zod.boolean(),
+  "requiresAssetNetworks": zod.boolean(),
+  "features": zod.array(zod.object({
+  "key": zod.string().max(registerProductModuleBodyFeaturesItemKeyMax).regex(registerProductModuleBodyFeaturesItemKeyRegExp),
+  "label": zod.string().min(registerProductModuleBodyFeaturesItemLabelMin).max(registerProductModuleBodyFeaturesItemLabelMax),
+  "dependsOn": zod.array(zod.string().max(registerProductModuleBodyFeaturesItemDependsOnItemMax)).max(registerProductModuleBodyFeaturesItemDependsOnMax)
+})).max(registerProductModuleBodyFeaturesMax),
+  "limits": zod.array(zod.object({
+  "key": zod.string().max(registerProductModuleBodyLimitsItemKeyMax).regex(registerProductModuleBodyLimitsItemKeyRegExp),
+  "label": zod.string().min(registerProductModuleBodyLimitsItemLabelMin).max(registerProductModuleBodyLimitsItemLabelMax),
+  "valueType": zod.enum(['integer', 'decimal'])
+})).max(registerProductModuleBodyLimitsMax)
+})
+
+export const registerProductModuleResponseKeyMax = 64;
+
+
+export const registerProductModuleResponseKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const registerProductModuleResponseNameMin = 2;
+export const registerProductModuleResponseNameMax = 120;
+
+export const registerProductModuleResponseDescriptionMax = 3000;
+
+export const registerProductModuleResponseCategoryMin = 2;
+export const registerProductModuleResponseCategoryMax = 80;
+
+export const registerProductModuleResponseFeaturesItemKeyMax = 64;
+
+
+export const registerProductModuleResponseFeaturesItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const registerProductModuleResponseFeaturesItemLabelMin = 2;
+export const registerProductModuleResponseFeaturesItemLabelMax = 120;
+
+export const registerProductModuleResponseFeaturesItemDependsOnItemMax = 64;
+
+export const registerProductModuleResponseFeaturesItemDependsOnMax = 20;
+
+export const registerProductModuleResponseFeaturesMax = 50;
+
+export const registerProductModuleResponseLimitsItemKeyMax = 64;
+
+
+export const registerProductModuleResponseLimitsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const registerProductModuleResponseLimitsItemLabelMin = 2;
+export const registerProductModuleResponseLimitsItemLabelMax = 120;
+
+export const registerProductModuleResponseLimitsMax = 50;
+
+
+
+export const RegisterProductModuleResponse = zod.object({
+  "key": zod.string().max(registerProductModuleResponseKeyMax).regex(registerProductModuleResponseKeyRegExp),
+  "name": zod.string().min(registerProductModuleResponseNameMin).max(registerProductModuleResponseNameMax),
+  "description": zod.string().max(registerProductModuleResponseDescriptionMax),
+  "category": zod.string().min(registerProductModuleResponseCategoryMin).max(registerProductModuleResponseCategoryMax),
+  "lifecycle": zod.enum(['core_ready', 'sandbox_only', 'deferred']),
+  "sandboxAvailable": zod.boolean(),
+  "requiresAssetNetworks": zod.boolean(),
+  "features": zod.array(zod.object({
+  "key": zod.string().max(registerProductModuleResponseFeaturesItemKeyMax).regex(registerProductModuleResponseFeaturesItemKeyRegExp),
+  "label": zod.string().min(registerProductModuleResponseFeaturesItemLabelMin).max(registerProductModuleResponseFeaturesItemLabelMax),
+  "dependsOn": zod.array(zod.string().max(registerProductModuleResponseFeaturesItemDependsOnItemMax)).max(registerProductModuleResponseFeaturesItemDependsOnMax)
+})).max(registerProductModuleResponseFeaturesMax),
+  "limits": zod.array(zod.object({
+  "key": zod.string().max(registerProductModuleResponseLimitsItemKeyMax).regex(registerProductModuleResponseLimitsItemKeyRegExp),
+  "label": zod.string().min(registerProductModuleResponseLimitsItemLabelMin).max(registerProductModuleResponseLimitsItemLabelMax),
+  "valueType": zod.enum(['integer', 'decimal'])
+})).max(registerProductModuleResponseLimitsMax)
+})
+
+
+export const setStaffPermissionsPathUserIdRegExp = new RegExp('^user_[a-zA-Z0-9]+$');
+
+
+export const SetStaffPermissionsParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "userId": zod.coerce.string().regex(setStaffPermissionsPathUserIdRegExp)
+})
+
+export const setStaffPermissionsBodyPermissionsMax = 4;
+
+
+
+export const SetStaffPermissionsBody = zod.object({
+  "permissions": zod.array(zod.enum(['branding.manage', 'domains.manage', 'configuration.manage', 'resources.manage'])).max(setStaffPermissionsBodyPermissionsMax)
+})
+
+export const SetStaffPermissionsResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const GetDomainVerificationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const GetDomainVerificationResponse = zod.object({
+  "domain": zod.string().nullable(),
+  "status": zod.enum(['unconfigured', 'unverified', 'verified']),
+  "txtName": zod.string().nullable(),
+  "txtValue": zod.string().nullable(),
+  "hostingConnected": zod.boolean()
+})
+
+
+export const VerifyTenantDomainParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const VerifyTenantDomainResponse = zod.object({
+  "domain": zod.string().nullable(),
+  "status": zod.enum(['unconfigured', 'unverified', 'verified']),
+  "txtName": zod.string().nullable(),
+  "txtValue": zod.string().nullable(),
+  "hostingConnected": zod.boolean()
+})
+
+
+export const resolvePublicDomainPathHostnameMax = 253;
+
+
+
+export const ResolvePublicDomainParams = zod.object({
+  "hostname": zod.coerce.string().max(resolvePublicDomainPathHostnameMax)
+})
+
+export const resolvePublicDomainResponseWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const resolvePublicDomainResponseWebsiteSettingsNavigationMax = 12;
+
+export const resolvePublicDomainResponseWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const resolvePublicDomainResponseWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const resolvePublicDomainResponseWebsiteSettingsFaqItemQuestionMin = 2;
+export const resolvePublicDomainResponseWebsiteSettingsFaqItemQuestionMax = 180;
+
+export const resolvePublicDomainResponseWebsiteSettingsFaqItemAnswerMin = 2;
+export const resolvePublicDomainResponseWebsiteSettingsFaqItemAnswerMax = 2000;
+
+export const resolvePublicDomainResponseWebsiteSettingsFaqMax = 16;
+
+export const resolvePublicDomainResponseWebsiteSettingsFaviconUrlMax = 2048;
+
+export const resolvePublicDomainResponseWebsiteSettingsHeroTitleMin = 2;
+export const resolvePublicDomainResponseWebsiteSettingsHeroTitleMax = 180;
+
+export const resolvePublicDomainResponseWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const resolvePublicDomainResponseWebsiteSettingsSupportEmailMax = 254;
+
+export const resolvePublicDomainResponseWebsiteSettingsSupportUrlMax = 2048;
+
+export const resolvePublicDomainResponseWebsiteSettingsSupportDetailsMax = 2000;
+
+export const resolvePublicDomainResponseWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const resolvePublicDomainResponseWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const resolvePublicDomainResponseWebsiteSettingsSocialLinksMax = 12;
+
+export const resolvePublicDomainResponseWebsiteSettingsFooterTextMax = 2000;
+
+export const resolvePublicDomainResponseWebsiteSettingsPrivacyContentMax = 20000;
+
+export const resolvePublicDomainResponseWebsiteSettingsTermsContentMax = 20000;
+
+
+
+export const ResolvePublicDomainResponse = zod.object({
+  "tenantSlug": zod.string(),
+  "brandName": zod.string(),
+  "logoUrl": zod.string().nullable(),
+  "primaryColor": zod.string(),
+  "accentColor": zod.string(),
+  "themeMode": zod.enum(['light', 'dark', 'system']),
+  "domain": zod.string().nullable(),
+  "sandboxOnly": zod.boolean(),
+  "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(resolvePublicDomainResponseWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(resolvePublicDomainResponseWebsiteSettingsNavigationMax).optional(),
+  "secondaryColor": zod.string().regex(resolvePublicDomainResponseWebsiteSettingsSecondaryColorRegExp),
+  "glowColor": zod.string().regex(resolvePublicDomainResponseWebsiteSettingsGlowColorRegExp).optional(),
+  "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
+  "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
+  "faq": zod.array(zod.object({
+  "question": zod.string().min(resolvePublicDomainResponseWebsiteSettingsFaqItemQuestionMin).max(resolvePublicDomainResponseWebsiteSettingsFaqItemQuestionMax),
+  "answer": zod.string().min(resolvePublicDomainResponseWebsiteSettingsFaqItemAnswerMin).max(resolvePublicDomainResponseWebsiteSettingsFaqItemAnswerMax)
+})).max(resolvePublicDomainResponseWebsiteSettingsFaqMax).optional(),
+  "faviconUrl": zod.string().max(resolvePublicDomainResponseWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(resolvePublicDomainResponseWebsiteSettingsHeroTitleMin).max(resolvePublicDomainResponseWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(resolvePublicDomainResponseWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(resolvePublicDomainResponseWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(resolvePublicDomainResponseWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(resolvePublicDomainResponseWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(resolvePublicDomainResponseWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(resolvePublicDomainResponseWebsiteSettingsSocialLinksItemUrlMax)
+})).max(resolvePublicDomainResponseWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(resolvePublicDomainResponseWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(resolvePublicDomainResponseWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(resolvePublicDomainResponseWebsiteSettingsTermsContentMax)
+}),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "assets": zod.array(zod.object({
+  "assetId": zod.string(),
+  "symbol": zod.string(),
+  "name": zod.string(),
+  "networkId": zod.string(),
+  "networkName": zod.string(),
+  "testnet": zod.boolean()
+}))
+})
+
+
 /**
  * Returns server health status
  * @summary Health check
@@ -25,7 +429,12 @@ export const GetCurrentPrincipalResponse = zod.object({
   "email": zod.string().nullable(),
   "role": zod.enum(['super_admin', 'client_admin', 'staff', 'unassigned']),
   "tenantId": zod.string().uuid().nullable(),
-  "sandboxOnly": zod.boolean()
+  "sandboxOnly": zod.boolean(),
+  "memberships": zod.array(zod.object({
+  "tenantId": zod.string().uuid(),
+  "role": zod.enum(['client_admin', 'staff']),
+  "permissions": zod.array(zod.string())
+})).optional()
 })
 
 
@@ -64,8 +473,14 @@ export const ListPlatformActivityResponse = zod.array(ListPlatformActivityRespon
 /**
  * @summary List available product modules
  */
+export const listModuleCatalogResponseKeyMax = 64;
+
+
+export const listModuleCatalogResponseKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+
+
 export const ListModuleCatalogResponseItem = zod.object({
-  "key": zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api']),
+  "key": zod.string().max(listModuleCatalogResponseKeyMax).regex(listModuleCatalogResponseKeyRegExp),
   "name": zod.string(),
   "description": zod.string(),
   "category": zod.string(),
@@ -93,6 +508,12 @@ export const ListSandboxAssetNetworksResponse = zod.object({
 /**
  * @summary List tenants visible to the current administrator
  */
+export const listTenantsResponseEnabledModulesItemMax = 64;
+
+
+export const listTenantsResponseEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+
+
 export const ListTenantsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "name": zod.string(),
@@ -100,7 +521,7 @@ export const ListTenantsResponseItem = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(listTenantsResponseEnabledModulesItemMax).regex(listTenantsResponseEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -126,6 +547,14 @@ export const CreateTenantBody = zod.object({
   "slug": zod.string().min(createTenantBodySlugMin).max(createTenantBodySlugMax).regex(createTenantBodySlugRegExp),
   "planId": zod.string().uuid()
 })
+
+export const createTenantResponseOneEnabledModulesItemMax = 64;
+
+
+export const createTenantResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const createTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const createTenantResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const createTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -171,7 +600,7 @@ export const CreateTenantResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(createTenantResponseOneEnabledModulesItemMax).regex(createTenantResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -188,6 +617,11 @@ export const CreateTenantResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(createTenantResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(createTenantResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(createTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -220,6 +654,14 @@ export const CreateTenantResponse = zod.object({
 export const GetTenantParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
+
+export const getTenantResponseOneEnabledModulesItemMax = 64;
+
+
+export const getTenantResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const getTenantResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const getTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -265,7 +707,7 @@ export const GetTenantResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(getTenantResponseOneEnabledModulesItemMax).regex(getTenantResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -282,6 +724,11 @@ export const GetTenantResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(getTenantResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(getTenantResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(getTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -340,6 +787,14 @@ export const UpdateTenantBrandBody = zod.object({
   "supportedLanguages": zod.array(zod.string().min(updateTenantBrandBodySupportedLanguagesItemMin).max(updateTenantBrandBodySupportedLanguagesItemMax))
 })
 
+export const updateTenantBrandResponseOneEnabledModulesItemMax = 64;
+
+
+export const updateTenantBrandResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantBrandResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsNavigationMax = 12;
+
 export const updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantBrandResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantBrandResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
@@ -384,7 +839,7 @@ export const UpdateTenantBrandResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(updateTenantBrandResponseOneEnabledModulesItemMax).regex(updateTenantBrandResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -401,6 +856,11 @@ export const UpdateTenantBrandResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(updateTenantBrandResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(updateTenantBrandResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(updateTenantBrandResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -441,6 +901,14 @@ export const updateTenantDomainBodyDomainMax = 253;
 export const UpdateTenantDomainBody = zod.object({
   "domain": zod.string().max(updateTenantDomainBodyDomainMax).nullable()
 })
+
+export const updateTenantDomainResponseOneEnabledModulesItemMax = 64;
+
+
+export const updateTenantDomainResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantDomainResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantDomainResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -486,7 +954,7 @@ export const UpdateTenantDomainResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(updateTenantDomainResponseOneEnabledModulesItemMax).regex(updateTenantDomainResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -503,6 +971,11 @@ export const UpdateTenantDomainResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(updateTenantDomainResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(updateTenantDomainResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(updateTenantDomainResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -536,9 +1009,23 @@ export const UpdateTenantModulesParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
 
+export const updateTenantModulesBodyModuleKeysItemMax = 64;
+
+
+export const updateTenantModulesBodyModuleKeysItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+
+
 export const UpdateTenantModulesBody = zod.object({
-  "moduleKeys": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api']))
+  "moduleKeys": zod.array(zod.string().max(updateTenantModulesBodyModuleKeysItemMax).regex(updateTenantModulesBodyModuleKeysItemRegExp))
 })
+
+export const updateTenantModulesResponseOneEnabledModulesItemMax = 64;
+
+
+export const updateTenantModulesResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantModulesResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantModulesResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -584,7 +1071,7 @@ export const UpdateTenantModulesResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(updateTenantModulesResponseOneEnabledModulesItemMax).regex(updateTenantModulesResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -601,6 +1088,11 @@ export const UpdateTenantModulesResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(updateTenantModulesResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(updateTenantModulesResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(updateTenantModulesResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -637,6 +1129,14 @@ export const UpdateTenantAssetsNetworksParams = zod.object({
 export const UpdateTenantAssetsNetworksBody = zod.object({
   "assetNetworkIds": zod.array(zod.string())
 })
+
+export const updateTenantAssetsNetworksResponseOneEnabledModulesItemMax = 64;
+
+
+export const updateTenantAssetsNetworksResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -682,7 +1182,7 @@ export const UpdateTenantAssetsNetworksResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(updateTenantAssetsNetworksResponseOneEnabledModulesItemMax).regex(updateTenantAssetsNetworksResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -699,6 +1199,11 @@ export const UpdateTenantAssetsNetworksResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(updateTenantAssetsNetworksResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -738,6 +1243,14 @@ export const UpdateTenantConfigurationBody = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean()
 })
+
+export const updateTenantConfigurationResponseOneEnabledModulesItemMax = 64;
+
+
+export const updateTenantConfigurationResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantConfigurationResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantConfigurationResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -783,7 +1296,7 @@ export const UpdateTenantConfigurationResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(updateTenantConfigurationResponseOneEnabledModulesItemMax).regex(updateTenantConfigurationResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -800,6 +1313,11 @@ export const UpdateTenantConfigurationResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(updateTenantConfigurationResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(updateTenantConfigurationResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(updateTenantConfigurationResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -832,6 +1350,14 @@ export const UpdateTenantConfigurationResponse = zod.object({
 export const ActivateTenantParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
+
+export const activateTenantResponseOneEnabledModulesItemMax = 64;
+
+
+export const activateTenantResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const activateTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const activateTenantResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const activateTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -877,7 +1403,7 @@ export const ActivateTenantResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(activateTenantResponseOneEnabledModulesItemMax).regex(activateTenantResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -894,6 +1420,11 @@ export const ActivateTenantResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(activateTenantResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(activateTenantResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(activateTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -2183,6 +2714,10 @@ export const UpdateTenantWebsiteSettingsParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
 
+export const updateTenantWebsiteSettingsBodyNavigationItemLabelMax = 60;
+
+export const updateTenantWebsiteSettingsBodyNavigationMax = 12;
+
 export const updateTenantWebsiteSettingsBodySecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantWebsiteSettingsBodyGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantWebsiteSettingsBodyFaqItemQuestionMin = 2;
@@ -2221,6 +2756,11 @@ export const updateTenantWebsiteSettingsBodyTermsContentMax = 20000;
 
 
 export const UpdateTenantWebsiteSettingsBody = zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(updateTenantWebsiteSettingsBodyNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(updateTenantWebsiteSettingsBodyNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsBodySecondaryColorRegExp),
   "glowColor": zod.string().regex(updateTenantWebsiteSettingsBodyGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -2244,6 +2784,14 @@ export const UpdateTenantWebsiteSettingsBody = zod.object({
   "privacyContent": zod.string().max(updateTenantWebsiteSettingsBodyPrivacyContentMax),
   "termsContent": zod.string().max(updateTenantWebsiteSettingsBodyTermsContentMax)
 })
+
+export const updateTenantWebsiteSettingsResponseOneEnabledModulesItemMax = 64;
+
+
+export const updateTenantWebsiteSettingsResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -2289,7 +2837,7 @@ export const UpdateTenantWebsiteSettingsResponse = zod.object({
   "brandName": zod.string(),
   "domain": zod.string().nullable(),
   "status": zod.enum(['draft', 'active', 'suspended']),
-  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "enabledModules": zod.array(zod.string().max(updateTenantWebsiteSettingsResponseOneEnabledModulesItemMax).regex(updateTenantWebsiteSettingsResponseOneEnabledModulesItemRegExp)),
   "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
   "environment": zod.enum(['sandbox']),
   "createdAt": zod.coerce.date()
@@ -2306,6 +2854,11 @@ export const UpdateTenantWebsiteSettingsResponse = zod.object({
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
@@ -2341,7 +2894,8 @@ export const ListTenantResourcesResponseItem = zod.object({
   "id": zod.string(),
   "label": zod.string(),
   "reference": zod.string().nullable(),
-  "status": zod.string()
+  "status": zod.string(),
+  "permissions": zod.array(zod.string()).optional()
 })
 export const ListTenantResourcesResponse = zod.array(ListTenantResourcesResponseItem)
 
@@ -2368,7 +2922,8 @@ export const CreateTenantResourceResponse = zod.object({
   "id": zod.string(),
   "label": zod.string(),
   "reference": zod.string().nullable(),
-  "status": zod.string()
+  "status": zod.string(),
+  "permissions": zod.array(zod.string()).optional()
 }),
   "issuedKey": zod.string().nullable()
 })
@@ -2391,6 +2946,10 @@ export const getPublicSitePathSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*
 export const GetPublicSiteParams = zod.object({
   "slug": zod.coerce.string().regex(getPublicSitePathSlugRegExp)
 })
+
+export const getPublicSiteResponseWebsiteSettingsNavigationItemLabelMax = 60;
+
+export const getPublicSiteResponseWebsiteSettingsNavigationMax = 12;
 
 export const getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const getPublicSiteResponseWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
@@ -2439,6 +2998,11 @@ export const GetPublicSiteResponse = zod.object({
   "domain": zod.string().nullable(),
   "sandboxOnly": zod.boolean(),
   "websiteSettings": zod.object({
+  "navigation": zod.array(zod.object({
+  "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
+  "label": zod.string().min(1).max(getPublicSiteResponseWebsiteSettingsNavigationItemLabelMax),
+  "visible": zod.boolean()
+})).max(getPublicSiteResponseWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp),
   "glowColor": zod.string().regex(getPublicSiteResponseWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),

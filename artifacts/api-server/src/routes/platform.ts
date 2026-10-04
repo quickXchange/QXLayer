@@ -19,7 +19,7 @@ async function activity(principal: Principal) {
 
 router.get("/me", (_req, res) => {
   const p = principalFrom(res);
-  res.json(GetCurrentPrincipalResponse.parse({ userId: p.userId, email: null, role: p.role, tenantId: p.memberships[0]?.tenantId ?? null, sandboxOnly: true }));
+  res.json(GetCurrentPrincipalResponse.parse({ userId: p.userId, email: null, role: p.role, tenantId: p.memberships[0]?.tenantId ?? null, sandboxOnly: true, memberships: p.memberships }));
 });
 router.get("/overview", async (_req, res): Promise<void> => {
   const p = principalFrom(res);

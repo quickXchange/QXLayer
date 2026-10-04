@@ -3,6 +3,7 @@ import { HttpError } from "../../lib/errors";
 import { contextFor, type Principal } from "../authentication/service";
 import { definitions, readAddon, readPlan, validateEntries, type Entry } from "./catalog";
 import { decimal, decimalString } from "./decimal";
+import { applyDependencies, readRegistry } from "../product-registry/service";
 
 export function currentPeriod(now = new Date()) { return now.toISOString().slice(0, 7); }
 export async function lockTenant(client: DatabaseClient, tenantId: string) {
@@ -47,13 +48,8 @@ export async function resolveEntitlements(client: DatabaseClient, tenantId: stri
     for (const key of Object.keys(limits)) limits[key] = "0";
     for (const key of Object.keys(sources)) sources[key] = `${status}: denied`;
   }
-  // Subfeatures cannot expose an unavailable parent module.
-  for (const key of ["swap", "convert", "buy", "sell"]) {
-    if (!features.crypto_exchange && features[key]) { features[key] = false; sources[key] = "crypto_exchange disabled"; }
-  }
-  for (const key of ["api_keys", "webhooks"]) {
-    if (!features.merchant_api && features[key]) { features[key] = false; sources[key] = "merchant_api disabled"; }
-  }
+  const registry = await readRegistry(client);
+  applyDependencies(features, sources, registry);
   const resource = await client.query(
     `SELECT
       (SELECT count(DISTINCT c.asset_id) FROM tenant_asset_networks t JOIN asset_network_catalog c ON c.id=t.asset_network_id WHERE t.tenant_id=$1)::text AS max_supported_assets,
@@ -72,7 +68,7 @@ export async function resolveEntitlements(client: DatabaseClient, tenantId: stri
   return {
     tenantId, tenantStatus: tenant.rows[0].status as string, status: status as "active" | "suspended" | "unassigned",
     plan, addons, overrides, features, limits, sources, usage,
-    enabledModules: ["crypto_exchange", "crypto_payments", "telegram_bot", "telegram_mini_app", "website", "merchant_api"].filter((key) => features[key]),
+    enabledModules: registry.filter((m) => features[m.key]).map((m) => m.key),
     overLimit: usage.some((u) => u.exceeded),
   };
 }
@@ -116,4 +112,18 @@ export async function consumeMonthlyUsage(client: DatabaseClient, tenantId: stri
       [tenantId, key, currentPeriod(), next],
     );
   }
+}
+
+/** Extension point for future trusted modules' monthly meters.
+ * Call in the SAME transaction as the admitted product write. No public meter API.
+ */
+export async function recordMonthlyUsage(client: DatabaseClient, tenantId: string, feature: string, key: string, increment: string) {
+  await lockTenant(client, tenantId);
+  const effective = await resolveEntitlements(client, tenantId);
+  requireFeature(effective, feature);
+  const current = effective.usage.find((u) => u.key === key)?.used ?? "0";
+  const next = decimalString(decimal(current) + decimal(increment));
+  await validateEntries(client, [{ key, value: next }]);
+  enforceLimit(effective, key, next);
+  await client.query("INSERT INTO tenant_usage_counters (tenant_id,key,period,used) VALUES ($1,$2,$3,$4) ON CONFLICT (tenant_id,key,period) DO UPDATE SET used=EXCLUDED.used", [tenantId, key, currentPeriod(), next]);
 }

@@ -5,15 +5,16 @@ import { PageHeader, ErrorState, ListSkeleton, StatusBadge, stepLabel } from '@/
 import { BrandSection, DomainSection, ModulesSection, AssetsSection, ConfigSection } from '@/components/app/sections';
 import { SubscriptionSections, useSubscription } from '@/components/app/subscription';
 import { WebsiteSection, ResourcesSection } from '@/components/app/advanced';
+import { DomainOwnershipSection, StaffAccessSection, ProductSettingsSection, AdministratorsSection } from '@/components/app/management';
 import { Button } from '@/components/ui/button';
-import { useCan } from '@/lib/principal';
+import { useCan, type Permission } from '@/lib/principal';
 import { useInvalidateTenant } from '@/lib/invalidate';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ClientDetail() {
   const { id = '' } = useParams<{ id: string }>();
   const q = useGetTenant(id, { query: { enabled: !!id, queryKey: getGetTenantQueryKey(id) } });
-  const can = useCan();
+  const can = useCan(id);
   const inv = useInvalidateTenant();
   const { toast } = useToast();
   const act = useActivateTenant();
@@ -23,7 +24,9 @@ export default function ClientDetail() {
   const isSuper = can.role === 'super_admin';
   const suspended = t?.status === 'suspended' || sub?.status === 'suspended';
   const unassigned = sub?.status === 'unassigned';
-  const ro = !can.editTenant || suspended || unassigned || !sub || subQ.isLoading;
+  const base = suspended || unassigned || !sub || subQ.isLoading;
+  const roFor = (p: Permission) => base || !can.has(p);
+  const ro = base || !can.editTenant;
   const F = sub?.features ?? {};
   const mods = sub?.enabledModules ?? t?.enabledModules ?? [];
   const showFn = isSuper || F.crypto_exchange === true || F.crypto_payments === true;
@@ -48,16 +51,20 @@ export default function ClientDetail() {
           {!t.configurationComplete && <p className="mb-6 text-sm text-muted-foreground">Complete every section below before sandbox activation is available.</p>}
           {unassigned && !suspended && <p className="mb-6 text-sm text-muted-foreground">No plan is assigned, so configuration is read-only.</p>}
           {suspended && <p className="mb-6 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. {isSuper ? 'All configuration is read-only; only subscription controls stay editable. Unsuspend to resume changes.' : 'Configuration is read-only until your operator lifts the suspension.'}</p>}
-          {!can.editTenant && <p className="mb-6 text-sm text-muted-foreground">Your role has read-only access to this client.</p>}
+          {!can.editTenant && <p className="mb-6 text-sm text-muted-foreground">{can.permissions.length ? 'You can edit only the sections granted to you; everything else is read-only.' : 'Your role has read-only access to this client.'}</p>}
           <div className="space-y-6">
             <SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} />
-            <BrandSection tenant={t} readOnly={ro} />
-            <DomainSection tenant={t} readOnly={ro} />
+            <BrandSection tenant={t} readOnly={roFor('branding.manage')} />
+            <DomainSection tenant={t} readOnly={roFor('domains.manage')} />
+            <DomainOwnershipSection tenant={t} readOnly={roFor('domains.manage')} />
             {(isSuper || mods.length > 0) && <ModulesSection tenant={t} readOnly />}
-            {showFn && <AssetsSection tenant={t} readOnly={ro} />}
-            {showFn && <ConfigSection tenant={t} readOnly={ro} />}
-            {(isSuper || F.website === true) && <WebsiteSection tenant={t} readOnly={ro} />}
-            <ResourcesSection tenantId={t.id} allowed={allowed} readOnly={ro} showAll={isSuper} />
+            {showFn && <AssetsSection tenant={t} readOnly={roFor('configuration.manage')} />}
+            {showFn && <ConfigSection tenant={t} readOnly={roFor('configuration.manage')} />}
+            <ProductSettingsSection tenantId={t.id} sub={sub} readOnly={roFor('configuration.manage')} showAll={isSuper} />
+            {(isSuper || F.website === true) && <WebsiteSection tenant={t} readOnly={roFor('branding.manage')} />}
+            {(isSuper || can.role === 'client_admin') && <AdministratorsSection tenantId={t.id} canManage={isSuper} />}
+            <StaffAccessSection tenantId={t.id} canEdit={can.manageStaffGrants && !suspended} />
+            <ResourcesSection tenantId={t.id} allowed={allowed} readOnly={roFor('resources.manage')} staffReadOnly={!can.manageStaffGrants} showAll={isSuper} />
           </div>
         </>)}
     </>

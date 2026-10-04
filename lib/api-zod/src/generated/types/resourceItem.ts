@@ -12,4 +12,5 @@ export interface ResourceItem {
   /** @nullable */
   reference: string | null;
   status: string;
+  permissions?: string[];
 }

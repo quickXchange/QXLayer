@@ -5,6 +5,7 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { CurrentPrincipalMembershipsItem } from './currentPrincipalMembershipsItem';
 import type { Role } from './role';
 
 export interface CurrentPrincipal {
@@ -15,4 +16,5 @@ export interface CurrentPrincipal {
   /** @nullable */
   tenantId: string | null;
   sandboxOnly: boolean;
+  memberships?: CurrentPrincipalMembershipsItem[];
 }

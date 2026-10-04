@@ -17,6 +17,8 @@ export default function Unassigned() {
         <KeyRound className="mt-8 h-6 w-6 text-copper" />
         <h1 className="font-display mt-3 text-4xl">Access not assigned</h1>
         <p className="mt-3 text-muted-foreground" data-testid="text-unassigned">You are signed in as <span className="font-mono text-foreground">{p.email ?? p.userId}</span>, but no role has been assigned to this account. Roles are never granted automatically. A platform operator must explicitly assign you to the platform or to a client.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Share this account ID with your platform operator to request Client Admin access:</p>
+        <code className="mt-2 block select-all break-all rounded-md border p-3 text-xs" data-testid="text-account-id">{p.userId}</code>
         <div className="mt-6 flex gap-2">
           <Button data-testid="button-recheck" variant="outline" onClick={() => qc.invalidateQueries({ queryKey: getGetCurrentPrincipalQueryKey() })}>Check again</Button>
           <Button data-testid="button-signout" variant="ghost" onClick={() => signOut({ redirectUrl: '/' })}>Sign out</Button>
