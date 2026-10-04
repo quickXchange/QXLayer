@@ -39,18 +39,18 @@ export function ConfigureExchange() {
         <p className="font-mono text-sm uppercase tracking-wider text-copper">{orderRef(done)}</p>
         <p className="font-display text-3xl">We have your request.</p>
         <p className="text-sm text-muted-foreground">A Super Admin will review your configuration. You are not charged and nothing is implemented until the order is approved.</p>
-        <div className="flex gap-2"><Button asChild><Link href={`/account/orders/${done.id}`}>View order {orderRef(done)}</Link></Button><Button asChild variant="outline"><Link href="/account/orders">My Orders</Link></Button></div>
+        <div className="flex flex-wrap gap-2"><Button asChild><Link href={`/account/orders/${done.id}`}>View order {orderRef(done)}</Link></Button><Button asChild variant="outline"><Link href="/account/orders">My Orders</Link></Button></div>
       </div></>
   );
   const last = step === STEPS.length - 1;
   return (
     <>
       <PageHeader eyebrow="White label" title="Configure Exchange" />
-      <ol className="mb-8 flex gap-1 overflow-x-auto" aria-label="Steps">
+      <ol className="mb-8 grid grid-cols-2 gap-x-3 gap-y-2 sm:grid-cols-4 xl:flex xl:gap-1" aria-label="Steps">
         {STEPS.map((s, i) => (
-          <li key={s} className="flex-1"><button type="button" disabled={i > maxStep || busy > 0} aria-current={i === step ? 'step' : undefined} onClick={() => go(i)} data-testid={`step-${s.toLowerCase()}`}
-            className={`flex w-full min-w-24 items-center gap-2 border-b-2 px-1 pb-2 text-left text-sm ${i === step ? 'border-primary' : i < step ? 'border-copper' : 'border-border text-muted-foreground'}`}>
-            <span className={`grid h-5 w-5 place-items-center rounded-full border font-mono text-[10px] ${i < step ? 'bg-copper text-primary-foreground' : ''}`}>{i < step ? <Check className="h-3 w-3" /> : i + 1}</span>{s}</button></li>))}
+          <li key={s} className="min-w-0 flex-1"><button type="button" disabled={i > maxStep || busy > 0} aria-current={i === step ? 'step' : undefined} onClick={() => go(i)} data-testid={`step-${s.toLowerCase()}`}
+            className={`flex w-full items-center gap-2 border-b-2 px-1 pb-2 text-left text-sm ${i === step ? 'border-primary' : i < step ? 'border-copper' : 'border-border text-muted-foreground'}`}>
+            <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border font-mono text-[10px] ${i < step ? 'bg-copper text-primary-foreground' : ''}`}>{i < step ? <Check className="h-3 w-3" /> : i + 1}</span>{s}</button></li>))}
       </ol>
       <form onSubmit={(e) => {
         e.preventDefault();
@@ -68,7 +68,7 @@ export function ConfigureExchange() {
         {step === 6 && <ReviewStep cfg={cfg} cat={cat.data} />}
         {err && <p role="alert" data-testid="text-error" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">{err}</p>}
         {busy > 0 && <p className="text-sm text-muted-foreground">Uploading files. Please wait.</p>}
-        <div className="flex items-center gap-3 border-t pt-4">
+        <div className="flex flex-wrap items-center gap-3 border-t pt-4">
           <Button type="button" variant="ghost" disabled={step === 0 || submit.isPending} onClick={() => go(step - 1)}>Back</Button>
           {problem && <span className="text-sm text-destructive">{problem}</span>}
           <div className="ml-auto">

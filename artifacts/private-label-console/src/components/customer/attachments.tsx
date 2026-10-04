@@ -13,13 +13,13 @@ export function AttachmentChip({ a, onRemove }: { a: Att; onRemove?: () => void 
     catch (e) { setErr((e as Error).message); } finally { setBusy(false); }
   };
   return (
-    <div className="flex items-center gap-3 rounded-md border bg-background p-2" data-testid={`file-${a.id}`}>
+    <div className="flex min-w-0 items-center gap-3 rounded-md border bg-background p-2" data-testid={`file-${a.id}`}>
       <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded border bg-muted">
         {img ? (url ? <img src={url} alt={a.fileName} className="h-full w-full object-contain" /> : fail ? <span className="text-[10px]">n/a</span> : <Loader2 className="h-4 w-4 animate-spin" />) : <Paperclip className="h-4 w-4 text-muted-foreground" />}
       </div>
-      <div className="min-w-0 flex-1"><p className="truncate text-sm">{a.fileName}</p><p className="font-mono text-[10px] uppercase text-muted-foreground">{a.category.replace('_', ' ')} · {fmtSize(a.size)}</p>{err && <p className="text-xs text-destructive">{err}</p>}</div>
-      <Button type="button" size="icon" variant="ghost" aria-label={`Download ${a.fileName}`} disabled={busy} onClick={dl}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}</Button>
-      {onRemove && <Button type="button" size="icon" variant="ghost" aria-label={`Remove ${a.fileName}`} onClick={onRemove}><X className="h-4 w-4" /></Button>}
+      <div className="min-w-0 flex-1"><p title={a.fileName} className="truncate text-sm">{a.fileName}</p><p className="text-[10px] uppercase text-muted-foreground">{a.category.replaceAll('_', ' ')} · {fmtSize(a.size)}</p>{err && <p className="break-words text-xs text-destructive">{err}</p>}</div>
+      <Button type="button" className="shrink-0" size="icon" variant="ghost" aria-label={`Download ${a.fileName}`} disabled={busy} onClick={dl}>{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}</Button>
+      {onRemove && <Button type="button" className="shrink-0" size="icon" variant="ghost" aria-label={`Remove ${a.fileName}`} onClick={onRemove}><X className="h-4 w-4" /></Button>}
     </div>
   );
 }
@@ -59,7 +59,7 @@ export function Uploader({ category, items, single, onAdd, onRemove, onBusy, lab
         <input ref={ref} type="file" hidden multiple={!single} accept={rule.exts.map((x) => `.${x}`).join(',')} onChange={(e) => pick(e.target.files)} aria-label={label} />
       </div>
       {errs.map((e, i) => <p key={i} role="alert" className="text-sm text-destructive">{e}</p>)}
-      {items.length > 0 && <div className="grid gap-2 md:grid-cols-2">{items.map((a) => <AttachmentChip key={a.id} a={a} onRemove={() => onRemove(a.id)} />)}</div>}
+      {items.length > 0 && <div className={`grid min-w-0 gap-2 ${!single && items.length > 1 ? 'md:grid-cols-2' : ''}`}>{items.map((a) => <AttachmentChip key={a.id} a={a} onRemove={() => onRemove(a.id)} />)}</div>}
     </div>
   );
 }

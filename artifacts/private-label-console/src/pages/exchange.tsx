@@ -1,4 +1,4 @@
-import { useParams, Link } from 'wouter';
+import { useParams, useLocation, Link } from 'wouter';
 import { useGetTenant, getGetTenantQueryKey } from '@workspace/api-client-react';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader, ErrorState, ListSkeleton } from '@/components/app/bits';
@@ -19,6 +19,7 @@ const TABS: [string, string][] = [['', 'Dashboard'], ['orders', 'Orders'], ['ass
 const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'settings'];
 
 export default function Exchange() {
+  const [, navigate] = useLocation();
   const { id = '', section = '', orderId } = useParams<{ id: string; section?: string; orderId?: string }>();
   const q = useGetTenant(id, { query: { enabled: !!id, queryKey: getGetTenantQueryKey(id) } });
   const can = useCan(id);
@@ -71,7 +72,12 @@ export default function Exchange() {
           {unassigned && !suspended && <p className="mb-4 text-sm text-muted-foreground">No plan is assigned, so everything is read-only.</p>}
           {!feature && !!sub && <p className="mb-4 text-sm text-muted-foreground" data-testid="text-no-feature">The crypto exchange feature is not part of this plan, so exchange settings are read-only.</p>}
           {needsDraft && d.dirty && !cfgLocked && <p className="mb-4 text-sm text-copper" data-testid="text-unsaved">Unsaved exchange changes. They are kept while you move between sections; save from any editable section.</p>}
-          <nav className="mb-6 flex gap-1 overflow-x-auto border-b pb-2" data-testid="nav-exchange">
+          <label className="mb-6 block space-y-1 text-sm md:hidden">Admin section
+            <select aria-label="Admin section" data-testid="select-exchange-section" value={sec} onChange={(e) => navigate(e.target.value ? `${root}/${e.target.value}` : root)} className="block h-11 w-full min-w-0 rounded-md border bg-card px-3">
+              {tabs.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+            </select>
+          </label>
+          <nav aria-label="Admin sections" className="mb-6 hidden flex-wrap gap-1 border-b pb-2 md:flex" data-testid="nav-exchange">
             {tabs.map(([k, l]) => <Link key={k} href={k ? `${root}/${k}` : root} data-testid={`tab-exchange-${k || 'dashboard'}`} className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm ${sec === k ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{l}</Link>)}
           </nav>
           {body}

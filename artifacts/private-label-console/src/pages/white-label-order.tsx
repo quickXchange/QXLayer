@@ -22,13 +22,13 @@ export default function WhiteLabelOrder() {
   return (
     <>
       <PageHeader eyebrow={`Order ${orderRef(o)}`} title={o.projectName}><OrderStatus status={o.status} /><Button asChild variant="outline" size="sm"><Link href="/white-label-requests">All orders</Link></Button></PageHeader>
-      <p className="mb-6 font-mono text-[11px] uppercase text-muted-foreground">Customer {o.customerUserId}</p>
-      <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
+      <p className="mb-6 text-sm text-muted-foreground [overflow-wrap:anywhere]">Customer: {o.companyName || o.brandName}</p>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px] [&>*]:min-w-0">
         <OrderSummary o={o} />
         <div className="space-y-4">
           <Box t="Review, pricing and status"><ReviewForm key={`${o.id}-${o.updatedAt}`} o={o} onDone={refresh} /></Box>
           <Box t="Delivery"><Delivery o={o} onDone={refresh} /></Box>
-          <Box t="Notes and history"><NoteForm id={o.id} onDone={refresh} /><div className="mt-5"><Timeline history={d.history} /></div></Box>
+          <Box t="Notes and history"><NoteForm id={o.id} onDone={refresh} /><div className="mt-5"><Timeline history={d.history} customerUserId={o.customerUserId} /></div></Box>
         </div>
       </div>
     </>

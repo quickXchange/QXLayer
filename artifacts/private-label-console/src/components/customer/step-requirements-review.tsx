@@ -14,7 +14,7 @@ export function RequirementsStep({ cfg, set, onBusy }: StepProps) {
   );
 }
 
-const Row = ({ k, v, strong }: { k: string; v: React.ReactNode; strong?: boolean }) => <div className={`flex justify-between gap-4 py-1.5 text-sm ${strong ? 'font-medium' : ''}`}><dt className="text-muted-foreground">{k}</dt><dd className="text-right">{v}</dd></div>;
+const Row = ({ k, v, strong }: { k: string; v: React.ReactNode; strong?: boolean }) => <div className={`flex justify-between gap-4 py-1.5 text-sm ${strong ? 'font-medium' : ''}`}><dt className="min-w-0 flex-1 break-words text-muted-foreground">{k}</dt><dd className="min-w-0 flex-[1.4] whitespace-pre-wrap text-right [overflow-wrap:anywhere]">{v}</dd></div>;
 const Sec = ({ t, children }: { t: string; children: React.ReactNode }) => <section className="rounded-md border bg-card p-4"><h3 className="mb-2 font-mono text-[11px] uppercase tracking-wider text-copper">{t}</h3>{children}</section>;
 
 export function ReviewStep({ cfg, cat }: { cfg: Cfg; cat?: Catalog }) {
@@ -29,14 +29,14 @@ export function ReviewStep({ cfg, cat }: { cfg: Cfg; cat?: Catalog }) {
     <div className="space-y-4">
       <Sec t="Project"><dl><Row k="Project" v={cfg.projectName} /><Row k="Brand" v={cfg.brandName} /><Row k="Company" v={cfg.companyName || '-'} /><Row k="Preferred domain" v={cfg.domain || '-'} /><Row k="Features" v={<span className="capitalize">{cfg.acts.join(', ')}</span>} /></dl></Sec>
       <Sec t="Design"><dl><Row k="Type" v={custom ? 'Custom design (paid review)' : 'Standard (Exchange master)'} />
-        <Row k="Colors" v={<span className="inline-flex items-center gap-2"><i className="h-4 w-4 rounded border" style={{ background: cfg.primary }} />{cfg.primary}<i className="h-4 w-4 rounded border" style={{ background: cfg.accent }} />{cfg.accent}</span>} /><Row k="Theme" v={<span className="capitalize">{cfg.theme}</span>} />
+        <Row k="Colors" v={<span className="flex flex-wrap justify-end gap-2">{[cfg.primary, cfg.accent].map((color, i) => <span key={i} className="inline-flex items-center gap-1.5"><i className="h-4 w-4 shrink-0 rounded border" style={{ background: color }} />{color}</span>)}</span>} /><Row k="Theme" v={<span className="capitalize">{cfg.theme}</span>} />
         {custom && <><Row k="Style" v={cfg.styleName} /><Row k="Description" v={cfg.description || '-'} /><Row k="Reference site" v={cfg.refUrl || '-'} /><Row k="Notes" v={cfg.notes || '-'} /></>}</dl>
         <div className="mt-3 grid gap-2 md:grid-cols-2">{[cfg.logo, cfg.favicon, ...(custom ? cfg.refs : [])].filter((a) => a != null).map((a) => <AttachmentChip key={a.id} a={a} />)}</div></Sec>
       <Sec t="Plan and add-ons">
         {plan ? <><Row k={`${plan.name} (${cfg.period})`} v={`${cash(pp, cur)} / ${per}`} /><Entitlements items={plan.entitlements} defs={cat?.definitions ?? []} />
           {addons.map((a) => <Row key={a.id} k={`Add-on: ${a.name}`} v={`${cash(periodPrice(a, cfg.period), a.currency)} / ${per}`} />)}</> : <p className="text-sm">No plan selected</p>}</Sec>
-      <Sec t="Requirements"><p className="whitespace-pre-wrap text-sm">{cfg.details || 'No details provided'}</p>{cfg.reqFiles.length > 0 && <div className="mt-3 grid gap-2 md:grid-cols-2">{cfg.reqFiles.map((a) => <AttachmentChip key={a.id} a={a} />)}</div>}</Sec>
-      <Sec t="Price breakdown (configured estimate)"><dl className="divide-y">
+      <Sec t="Requirements"><p className="whitespace-pre-wrap text-sm [overflow-wrap:anywhere]">{cfg.details || 'No details provided'}</p>{cfg.reqFiles.length > 0 && <div className="mt-3 grid gap-2 md:grid-cols-2">{cfg.reqFiles.map((a) => <AttachmentChip key={a.id} a={a} />)}</div>}</Sec>
+      <Sec t="Estimated pricing"><dl className="divide-y">
         <Row k={`Base plan recurring / ${per}`} v={cash(pp, cur)} /><Row k={`Add-ons recurring / ${per}`} v={unknownCount(addons.map((a) => periodPrice(a, cfg.period))) ? 'Partly requires review' : cash(sumNum(addons.map((a) => periodPrice(a, cfg.period))), cur)} />
         <Row k="Setup fees (plan and add-ons)" v={cash(setup, cur)} /><Row k="Customization fee" v={custom ? 'Requires review' : 'No customization requested'} />
         <Row strong k={`Known recurring subtotal / ${per}`} v={cash(rec, cur)} /><Row strong k="Known one-time setup subtotal" v={cash(setup, cur)} /></dl>

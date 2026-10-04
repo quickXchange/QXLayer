@@ -3,6 +3,7 @@ import { useReviewWhiteLabelRequest, useListPlans, useListAddons, type WhiteLabe
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ErrorState, ListSkeleton } from '@/components/app/bits';
 import { TERMINAL, errMsg, statusText, type WlOrder } from '@/lib/wl';
 
 const MANUAL = ['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready'];
@@ -30,14 +31,16 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
     review.mutate({ requestId: o.id, data: { status: st as WhiteLabelStatus, monthlyPrice: m === '' ? null : m, setupPrice: s === '' ? null : s, currency: cur.toUpperCase(), operatorNote: '', customizationPrice: cust === '' ? null : cust, approvedPlanId: pid || null, approvedAddonIds: aids, customDesignDecision: dec } }, { onSuccess: onDone, onError: (e) => setErr(errMsg(e)) });
   };
   if (ro) return <p className="text-sm text-muted-foreground">This order is {statusText(o.status)}. Status and prices are read-only; notes can still be added.</p>;
+  if (plans.isLoading || addons.isLoading) return <div role="status" aria-label="Loading review options"><ListSkeleton rows={3} /></div>;
+  if (plans.isError || addons.isError) return <ErrorState what="review options" onRetry={() => { plans.refetch(); addons.refetch(); }} />;
   return (
     <form onSubmit={(e) => { e.preventDefault(); save(status); }} className="space-y-4">
       <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2 [&>label]:block [&>label]:min-w-0 [&>label]:space-y-1.5 [&_select]:w-full">
         <label className="text-sm md:col-span-2">Status<select data-testid="select-status" className={sel} value={status} onChange={(e) => setStatus(e.target.value)}>{MANUAL.map((x) => <option key={x} value={x}>{statusText(x)}</option>)}</select></label>
         <label className="text-sm">Currency<Input data-testid="input-currency" value={cur} maxLength={3} onChange={(e) => setCur(e.target.value.toUpperCase())} /></label>
-        <label className="text-sm">Recurring<Input data-testid="input-monthly" value={m} onChange={(e) => setM(e.target.value)} placeholder="0.00" /></label>
-        <label className="text-sm">Setup<Input data-testid="input-setup" value={s} onChange={(e) => setS(e.target.value)} placeholder="0.00" /></label>
-        <label className="text-sm">Customization<Input data-testid="input-customization" value={cust} onChange={(e) => setCust(e.target.value)} placeholder="none" /></label>
+         <label className="text-sm">Recurring / {o.billingPeriod === 'yearly' ? 'year' : 'month'}<Input data-testid="input-monthly" inputMode="decimal" value={m} onChange={(e) => setM(e.target.value)} placeholder="0.00" /></label>
+         <label className="text-sm">Setup fee<Input data-testid="input-setup" inputMode="decimal" value={s} onChange={(e) => setS(e.target.value)} placeholder="0.00" /></label>
+         <label className="text-sm">Customization fee<Input data-testid="input-customization" inputMode="decimal" value={cust} onChange={(e) => setCust(e.target.value)} placeholder="Not quoted" /></label>
         {custom && <label className="text-sm">Custom design<select className={sel} value={dec} onChange={(e) => setDec(e.target.value as typeof dec)}><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></label>}
         <label className="text-sm md:col-span-2">Approved plan<select data-testid="select-plan" className={sel} value={pid} onChange={(e) => { setPid(e.target.value); setAids([]); const pc = (plans.data ?? []).find((p) => p.id === e.target.value)?.currency; if (pc) setCur(pc); }}><option value="">None</option>{(plans.data ?? []).map((p) => <option key={p.id} value={p.id}>{p.name}{o.requestedPlan?.id === p.id ? ' (requested)' : ''}</option>)}</select></label>
       </div>

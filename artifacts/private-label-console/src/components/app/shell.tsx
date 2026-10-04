@@ -60,17 +60,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
-          <Button data-testid="button-signout-mobile" size="icon" variant="ghost" className="md:hidden" onClick={() => signOut({ redirectUrl: '/' })}><LogOut className="h-4 w-4" /></Button>
+          <Button data-testid="button-signout-mobile" aria-label="Sign out" size="icon" variant="ghost" className="md:hidden" onClick={() => signOut({ redirectUrl: '/' })}><LogOut className="h-4 w-4" /></Button>
         </div>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:hidden">
+        <nav aria-label="Administration navigation" className="grid grid-cols-2 gap-1 px-3 pb-3 sm:grid-cols-3 md:hidden">
           {items.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
-            <Link key={n.href} href={n.href} className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm ${active(n.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : ''}`}>{n.label}</Link>
+            <Link key={n.href} href={n.href} aria-current={active(n.href) ? 'page' : undefined} className={`min-w-0 rounded-md px-3 py-2 text-sm ${active(n.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : ''}`}>{n.label}</Link>
           ))}
         </nav>
         <div className="hidden space-y-4 md:block">
           <Health />
           <div className="border-t border-sidebar-border pt-4">
-            <p data-testid="text-user-email" className="truncate text-sm">{p.email ?? p.userId}</p>
+            <p data-testid="text-user-email" className="truncate text-sm">{p.email ?? 'Your account'}</p>
             <p data-testid="text-user-role" className="font-mono text-[11px] uppercase tracking-wider text-sidebar-primary">{roleLabel[p.role]}</p>
             <button data-testid="button-signout" onClick={() => signOut({ redirectUrl: '/' })} className="mt-3 flex items-center gap-2 text-xs text-sidebar-foreground/70 hover:text-sidebar-accent-foreground"><LogOut className="h-3.5 w-3.5" /> Sign out</button>
           </div>

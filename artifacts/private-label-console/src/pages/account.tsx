@@ -34,10 +34,10 @@ const OPEN = ['new', 'submitted', 'reviewing', 'waiting_for_client', 'quote_read
 const DONE = ['delivered', 'provisioned'];
 
 function ReqRow({ x }: { x: WlOrder }) {
-  const rec = x.monthlyPrice == null ? 'Pending operator pricing' : `${cash(x.monthlyPrice, x.currency)} / ${x.billingPeriod === 'yearly' ? 'year' : 'month'}`;
+  const rec = x.monthlyPrice == null ? 'Quote pending' : `${cash(x.monthlyPrice, x.currency)} / ${x.billingPeriod === 'yearly' ? 'year' : 'month'}`;
   return (
     <Link href={`/account/orders/${x.id}`} className="block rounded-md border bg-card p-4 transition-colors hover:bg-muted/40" data-testid={`row-request-${x.id}`}>
-      <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-xl">{x.projectName} <span className="text-sm text-muted-foreground">{x.brandName}</span></p><OrderStatus status={x.status} /></div>
+      <div className="flex flex-wrap items-center justify-between gap-2"><p className="min-w-0 font-display text-xl [overflow-wrap:anywhere]">{x.projectName} <span className="text-sm text-muted-foreground">{x.brandName}</span></p><OrderStatus status={x.status} /></div>
       <p className="mt-1 font-mono text-[11px] uppercase text-copper">{orderRef(x)} · {new Date(x.createdAt).toLocaleDateString()}</p>
       <p className="mt-2 text-sm">Recurring: {rec} · Setup: {x.setupPrice == null ? 'Pending' : cash(x.setupPrice, x.currency)}</p>
       {x.operatorNote && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">Current note: {x.operatorNote}</p>}
@@ -67,12 +67,12 @@ export function AccountWhiteLabels() {
     <>
       <PageHeader eyebrow="Projects" title="My White Labels"><Button asChild variant="outline"><Link href="/account/configure">Configure Exchange</Link></Button></PageHeader>
       {loading ? <ListSkeleton /> : r.isError ? <ErrorState what="your orders" onRetry={() => r.refetch()} /> : a.isError ? <ErrorState what="your admin panels" onRetry={() => a.refetch()} /> : delivered.length + orphan.length === 0 ? (
-        <EmptyState title="No white labels yet" body="A project appears here once an operator delivers your order." action={<Button asChild><Link href="/account/orders">My Orders</Link></Button>} />
+        <EmptyState title="No white labels yet" body="Your project appears here once our team delivers your order." action={<Button asChild><Link href="/account/orders">My Orders</Link></Button>} />
       ) : <div className="grid gap-4 md:grid-cols-2">
         {delivered.map((x) => (
           <div key={x.id} className="rounded-md border bg-card p-5" data-testid={`card-wl-${x.id}`}>
-            <p className="font-mono text-[11px] uppercase text-copper">{orderRef(x)}</p><p className="font-display mt-1 text-2xl">{x.projectName}</p><p className="text-sm text-muted-foreground">{x.brandName}</p>
-            <div className="mt-4 flex gap-2">{x.tenantId && ids.includes(x.tenantId) && <Button asChild size="sm"><Link href={`/clients/${x.tenantId}/exchange`}>Open Admin</Link></Button>}<Button asChild size="sm" variant="outline"><Link href={`/account/orders/${x.id}`}>Order details</Link></Button></div>
+            <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-mono text-[11px] uppercase text-copper">{orderRef(x)}</p><OrderStatus status={x.status} /></div><p className="font-display mt-1 text-2xl [overflow-wrap:anywhere]">{x.projectName}</p><p className="text-sm text-muted-foreground">{x.brandName}</p>
+            <div className="mt-4 flex flex-wrap gap-2">{x.tenantId && ids.includes(x.tenantId) && <Button asChild size="sm"><Link href={`/clients/${x.tenantId}/exchange`}>Open Admin</Link></Button>}<Button asChild size="sm" variant="outline"><Link href={`/account/orders/${x.id}`}>Order details</Link></Button></div>
           </div>))}
         {orphan.map((p) => (
           <div key={p.tenantId} className="rounded-md border bg-card p-5" data-testid={`card-wl-panel-${p.tenantId}`}>
@@ -91,7 +91,7 @@ export function AdminPanels() {
     <>
       <PageHeader eyebrow="Delivered projects" title="My Admin Panels" />
       {a.isLoading ? <ListSkeleton rows={2} /> : a.isError ? <ErrorState what="your admin panels" onRetry={() => a.refetch()} /> : panels.length === 0 ? (
-        <EmptyState title="No admin panel is provisioned" body="An admin panel appears here after an operator delivers your Exchange." action={<Button asChild><Link href="/account">Back to Dashboard</Link></Button>} />
+        <EmptyState title="No Admin Panel yet" body="Your Admin Panel appears here after our team delivers your Exchange." action={<Button asChild><Link href="/account">Back to Dashboard</Link></Button>} />
       ) : <div className="grid gap-4 md:grid-cols-2">{panels.map((p) => (
         <div key={p.tenantId} className="rounded-md border bg-card p-5" data-testid={`card-panel-${p.tenantId}`}>
           <div className="flex items-center justify-between"><p className="font-display text-2xl">{p.brandName}</p><StatusBadge status={p.status} /></div>

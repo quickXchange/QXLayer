@@ -8,11 +8,11 @@ import { label } from '@/lib/format';
 export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: string; children?: ReactNode }) {
   return (
     <div className="rise mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-5">
-      <div>
+      <div className="min-w-0">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-copper">{eyebrow}</p>
-        <h1 className="font-display mt-1 text-4xl leading-none">{title}</h1>
+        <h1 className="font-display mt-1 text-4xl leading-none [overflow-wrap:anywhere]">{title}</h1>
       </div>
-      <div className="flex items-center gap-2">{children}</div>
+      <div className="flex flex-wrap items-center gap-2">{children}</div>
     </div>
   );
 }

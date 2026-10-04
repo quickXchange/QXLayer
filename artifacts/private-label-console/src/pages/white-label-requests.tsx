@@ -15,7 +15,7 @@ export default function WhiteLabelRequests() {
           <Link key={x.id} href={`/white-label-requests/${x.id}`} data-testid={`row-request-${x.id}`} className="grid gap-2 p-4 transition-colors hover:bg-muted/40 md:grid-cols-[120px_1.5fr_1fr_110px_130px_110px] md:items-center">
             <span className="font-mono text-xs text-copper">{orderRef(x)}</span>
             <span className="min-w-0"><span className="font-display block truncate text-xl">{x.projectName}</span><span className="block truncate text-xs text-muted-foreground">{x.brandName}{x.companyName ? ` · ${x.companyName}` : ''}</span></span>
-            <span className="min-w-0 truncate text-xs text-muted-foreground">{x.customerUserId}{x.preferredDomain ? ` · ${x.preferredDomain}` : ''}</span>
+            <span className="min-w-0 truncate text-xs text-muted-foreground" title={x.preferredDomain ?? undefined}>{x.preferredDomain || 'No preferred domain'}</span>
             <span className="text-xs capitalize">{x.design?.type ?? 'standard'}</span>
             <OrderStatus status={x.status} />
             <span className="text-xs text-muted-foreground">{new Date(x.createdAt).toLocaleDateString()}</span>
