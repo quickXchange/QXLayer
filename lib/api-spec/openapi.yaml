@@ -17,6 +17,43 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /public/product-catalog:
+    get:
+      operationId: getPublicProductCatalog
+      tags: [catalog]
+      responses:
+        "200":
+          description: Visible marketing products, not executable services
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/LandingProduct"}}
+  /landing-products:
+    get:
+      operationId: listLandingProducts
+      tags: [catalog]
+      responses:
+        "200":
+          description: Super Admin catalog including hidden products
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/LandingProduct"}}
+  /landing-products/{productKey}:
+    put:
+      operationId: updateLandingProduct
+      tags: [catalog]
+      parameters:
+        - {name: productKey, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 80, pattern: "^[a-z][a-z0-9_]*$"}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/LandingProductInput"}
+      responses:
+        "200":
+          description: Saved marketing product
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/LandingProduct"}
   /tenants/{tenantId}/administrators:
     parameters: [{$ref: "#/components/parameters/TenantId"}]
     get:
@@ -638,6 +675,29 @@ components:
         type: string
         format: uuid
   schemas:
+    LandingProductInput:
+      type: object
+      required: [visible, name, description, icon, startingPrice, setupFee, currency, billingPeriod, status, ctaLabel, displayOrder]
+      properties:
+        visible: {type: boolean}
+        name: {type: string, minLength: 2, maxLength: 100}
+        description: {type: string, minLength: 10, maxLength: 500}
+        icon: {type: string, enum: [exchange, card, payments, staking, earn, dex, content, telegram, miniapp, whatsapp, ios, android, engine, nodes, mining, kolo]}
+        startingPrice: {type: [string, "null"], pattern: "^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$"}
+        setupFee: {type: [string, "null"], pattern: "^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$"}
+        currency: {type: string, pattern: "^[A-Z]{3}$"}
+        billingPeriod: {type: string, enum: [monthly, yearly, one_time, on_request]}
+        status: {type: string, enum: [available, coming_soon]}
+        ctaLabel: {type: string, minLength: 2, maxLength: 40}
+        displayOrder: {type: integer, minimum: 0, maximum: 10000}
+    LandingProduct:
+      allOf:
+        - $ref: "#/components/schemas/LandingProductInput"
+        - type: object
+          required: [key, readiness]
+          properties:
+            key: {type: string}
+            readiness: {type: string, enum: [sandbox_only, planned]}
     TenantAdministratorInput:
       type: object
       properties:

@@ -12,6 +12,8 @@ const nav = [
   { href: '/clients', label: 'Clients', icon: Users },
   { href: '/plans', label: 'Plans', icon: Boxes, op: true },
   { href: '/add-ons', label: 'Add-ons', icon: Boxes, op: true },
+  { href: '/landing-products', label: 'Landing', icon: LayoutGrid, op: true },
+  { href: '/catalog-preview', label: 'Preview', icon: LayoutGrid },
   { href: '/modules', label: 'Modules', icon: Boxes },
   { href: '/activity', label: 'Activity', icon: ScrollText },
 ];

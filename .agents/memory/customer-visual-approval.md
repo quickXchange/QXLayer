@@ -8,9 +8,9 @@ The customer website must look significantly premium and visually impressive, wi
 
 **Why:** The user repeatedly rejected incremental polish/lighting passes as still too simple. They require a clear first-opening “wow” effect and a much stronger crypto/fintech identity, especially on mobile.
 
-The current priority is reusable core architecture for real client brands, not implementing all crypto products. Exchange remains the first sandbox product, separated from core. Future products must be registered generically and assigned through Plan → Add-on → Tenant Override. Preserve existing correct multi-tenant work and shared code; do not create per-customer codebase copies.
+Development remains focused on reusable core architecture and the non-executing Exchange sandbox, not implementing all crypto products. The user separately requested a premium main-platform catalog advertising future services with editable pricing. Displaying a service there is not permission to implement it. Future execution must still consume Plan → Add-on → Tenant Override. Preserve correct multi-tenant work and shared code; do not create per-customer codebase copies.
 
-**Why:** The user explicitly changed priority to the White Label Core and requested an audit before changes.
+**Why:** The user explicitly prioritized the White Label Core and later authorized a marketing catalog while again prohibiting future service implementations.
 
 **How to apply:** Do not publish/deploy, touch QuickXchange, connect live crypto/card/mining/staking providers, or start the next crypto product automatically after the core phase. Report architecture, registry, provisioning, entitlement flow, isolation verification, readiness boundaries and first-client blockers.
 

@@ -24,6 +24,8 @@ import Activity from '@/pages/activity';
 import Plans from '@/pages/plans';
 import PlanDetail from '@/pages/plan-detail';
 import Addons from '@/pages/addons';
+import LandingProducts from '@/pages/landing-products';
+import CatalogPreview from '@/pages/catalog-preview';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
@@ -129,7 +131,7 @@ function Protected({ children }: { children: ReactNode }) {
   );
 }
 const guard = (C: () => ReactNode) => () => <Protected><C /></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -166,6 +168,8 @@ function ClerkProviderWithRoutes() {
               <Route path="/plans/new" component={rPlan} />
               <Route path="/plans/:id" component={rPlan} />
               <Route path="/add-ons" component={rAddons} />
+              <Route path="/landing-products" component={rLanding} />
+              <Route path="/catalog-preview" component={CatalogPreview} />
               <Route path="/activity" component={rActivity} />
               <Route component={NotFound} />
             </Switch>

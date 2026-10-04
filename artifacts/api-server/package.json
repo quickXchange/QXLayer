@@ -9,6 +9,7 @@
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "verify:foundation": "tsx src/verification/foundation.ts",
+    "verify:catalog": "tsx src/verification/landing-catalog.ts",
     "samples:plans:dev": "tsx src/verification/sample-sites.ts"
   },
   "dependencies": {

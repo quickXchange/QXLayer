@@ -3,4 +3,4 @@
 - [OpenAPI body names](openapi-body-names.md) — named component request schemas avoid duplicate Orval Zod exports.
 - [Vite dependency cache](vite-dependency-cache.md) — React version errors can come from stale prebundles even when package resolution matches.
 - [Website CSS cascade](website-css-cascade.md) — layered visibility utilities can lose to custom display rules; verify mobile and desktop computed display.
-- [Core priority and visual preferences](customer-visual-approval.md) — core-first supersedes the visual approval gate; reusable modules, no live crypto, no publishing or QuickXchange changes.
+- [Core and catalog scope](customer-visual-approval.md) — premium catalog advertising is not service implementation; reusable core, no live crypto, publishing or QuickXchange changes.

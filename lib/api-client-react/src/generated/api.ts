@@ -33,6 +33,8 @@ import type {
   EntitlementDefinition,
   EntitlementOverrideInput,
   HealthStatus,
+  LandingProduct,
+  LandingProductInput,
   ModuleDefinition,
   MutationStatus,
   Plan,
@@ -86,6 +88,231 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetPublicProductCatalogUrl = () => {
+
+
+
+
+  return `/api/public/product-catalog`
+}
+
+export const getPublicProductCatalog = async ( options?: Parameters<typeof customFetch>[1]): Promise<LandingProduct[]> => {
+
+  return customFetch<LandingProduct[]>(getGetPublicProductCatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicProductCatalogQueryKey = () => {
+    return [
+    `/api/public/product-catalog`
+    ] as const;
+    }
+
+
+export const getGetPublicProductCatalogQueryOptions = <TData = Awaited<ReturnType<typeof getPublicProductCatalog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicProductCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicProductCatalogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicProductCatalog>>> = ({ signal }) => getPublicProductCatalog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicProductCatalog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicProductCatalogQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicProductCatalog>>>
+export type GetPublicProductCatalogQueryError = ErrorType<unknown>
+
+
+
+export function useGetPublicProductCatalog<TData = Awaited<ReturnType<typeof getPublicProductCatalog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicProductCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicProductCatalogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListLandingProductsUrl = () => {
+
+
+
+
+  return `/api/landing-products`
+}
+
+export const listLandingProducts = async ( options?: Parameters<typeof customFetch>[1]): Promise<LandingProduct[]> => {
+
+  return customFetch<LandingProduct[]>(getListLandingProductsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListLandingProductsQueryKey = () => {
+    return [
+    `/api/landing-products`
+    ] as const;
+    }
+
+
+export const getListLandingProductsQueryOptions = <TData = Awaited<ReturnType<typeof listLandingProducts>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listLandingProducts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListLandingProductsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listLandingProducts>>> = ({ signal }) => listLandingProducts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listLandingProducts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListLandingProductsQueryResult = NonNullable<Awaited<ReturnType<typeof listLandingProducts>>>
+export type ListLandingProductsQueryError = ErrorType<unknown>
+
+
+
+export function useListLandingProducts<TData = Awaited<ReturnType<typeof listLandingProducts>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listLandingProducts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListLandingProductsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateLandingProductUrl = (productKey: string,) => {
+
+
+
+
+  return `/api/landing-products/${productKey}`
+}
+
+export const updateLandingProduct = async (productKey: string,
+    landingProductInput: LandingProductInput, options?: Parameters<typeof customFetch>[1]): Promise<LandingProduct> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<LandingProduct>(getUpdateLandingProductUrl(productKey),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(landingProductInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateLandingProductMutationKey = () => ['updateLandingProduct'] as const;
+
+export const getUpdateLandingProductMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLandingProduct>>, TError,UpdateLandingProductMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateLandingProduct>>, TError,UpdateLandingProductMutationVariables, TContext> => {
+
+const mutationKey = getUpdateLandingProductMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateLandingProduct>>, UpdateLandingProductMutationVariables> = (props) => {
+          const {productKey,data} = props ?? {};
+
+          return  updateLandingProduct(productKey,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateLandingProductMutationResult = NonNullable<Awaited<ReturnType<typeof updateLandingProduct>>>
+    export type UpdateLandingProductMutationBody = BodyType<LandingProductInput>
+    export type UpdateLandingProductMutationError = ErrorType<unknown>
+    export type UpdateLandingProductMutationVariables = {productKey: string;data: BodyType<LandingProductInput>}
+
+    export const useUpdateLandingProduct = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateLandingProduct>>, TError,UpdateLandingProductMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateLandingProduct>>,
+        TError,
+        UpdateLandingProductMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateLandingProductMutationOptions(options));
+    }
 
 export const getListTenantAdministratorsUrl = (tenantId: string,) => {
 

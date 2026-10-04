@@ -8,6 +8,154 @@
 import * as zod from 'zod';
 
 
+export const getPublicProductCatalogResponseOneNameMin = 2;
+export const getPublicProductCatalogResponseOneNameMax = 100;
+
+export const getPublicProductCatalogResponseOneDescriptionMin = 10;
+export const getPublicProductCatalogResponseOneDescriptionMax = 500;
+
+export const getPublicProductCatalogResponseOneStartingPriceRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const getPublicProductCatalogResponseOneSetupFeeRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const getPublicProductCatalogResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getPublicProductCatalogResponseOneCtaLabelMin = 2;
+export const getPublicProductCatalogResponseOneCtaLabelMax = 40;
+
+export const getPublicProductCatalogResponseOneDisplayOrderMin = 0;
+export const getPublicProductCatalogResponseOneDisplayOrderMax = 10000;
+
+
+
+export const GetPublicProductCatalogResponseItem = zod.object({
+  "visible": zod.boolean(),
+  "name": zod.string().min(getPublicProductCatalogResponseOneNameMin).max(getPublicProductCatalogResponseOneNameMax),
+  "description": zod.string().min(getPublicProductCatalogResponseOneDescriptionMin).max(getPublicProductCatalogResponseOneDescriptionMax),
+  "icon": zod.enum(['exchange', 'card', 'payments', 'staking', 'earn', 'dex', 'content', 'telegram', 'miniapp', 'whatsapp', 'ios', 'android', 'engine', 'nodes', 'mining', 'kolo']),
+  "startingPrice": zod.string().regex(getPublicProductCatalogResponseOneStartingPriceRegExp).nullable(),
+  "setupFee": zod.string().regex(getPublicProductCatalogResponseOneSetupFeeRegExp).nullable(),
+  "currency": zod.string().regex(getPublicProductCatalogResponseOneCurrencyRegExp),
+  "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
+  "status": zod.enum(['available', 'coming_soon']),
+  "ctaLabel": zod.string().min(getPublicProductCatalogResponseOneCtaLabelMin).max(getPublicProductCatalogResponseOneCtaLabelMax),
+  "displayOrder": zod.number().int().min(getPublicProductCatalogResponseOneDisplayOrderMin).max(getPublicProductCatalogResponseOneDisplayOrderMax)
+}).and(zod.object({
+  "key": zod.string(),
+  "readiness": zod.enum(['sandbox_only', 'planned'])
+}))
+export const GetPublicProductCatalogResponse = zod.array(GetPublicProductCatalogResponseItem)
+
+
+export const listLandingProductsResponseOneNameMin = 2;
+export const listLandingProductsResponseOneNameMax = 100;
+
+export const listLandingProductsResponseOneDescriptionMin = 10;
+export const listLandingProductsResponseOneDescriptionMax = 500;
+
+export const listLandingProductsResponseOneStartingPriceRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const listLandingProductsResponseOneSetupFeeRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const listLandingProductsResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listLandingProductsResponseOneCtaLabelMin = 2;
+export const listLandingProductsResponseOneCtaLabelMax = 40;
+
+export const listLandingProductsResponseOneDisplayOrderMin = 0;
+export const listLandingProductsResponseOneDisplayOrderMax = 10000;
+
+
+
+export const ListLandingProductsResponseItem = zod.object({
+  "visible": zod.boolean(),
+  "name": zod.string().min(listLandingProductsResponseOneNameMin).max(listLandingProductsResponseOneNameMax),
+  "description": zod.string().min(listLandingProductsResponseOneDescriptionMin).max(listLandingProductsResponseOneDescriptionMax),
+  "icon": zod.enum(['exchange', 'card', 'payments', 'staking', 'earn', 'dex', 'content', 'telegram', 'miniapp', 'whatsapp', 'ios', 'android', 'engine', 'nodes', 'mining', 'kolo']),
+  "startingPrice": zod.string().regex(listLandingProductsResponseOneStartingPriceRegExp).nullable(),
+  "setupFee": zod.string().regex(listLandingProductsResponseOneSetupFeeRegExp).nullable(),
+  "currency": zod.string().regex(listLandingProductsResponseOneCurrencyRegExp),
+  "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
+  "status": zod.enum(['available', 'coming_soon']),
+  "ctaLabel": zod.string().min(listLandingProductsResponseOneCtaLabelMin).max(listLandingProductsResponseOneCtaLabelMax),
+  "displayOrder": zod.number().int().min(listLandingProductsResponseOneDisplayOrderMin).max(listLandingProductsResponseOneDisplayOrderMax)
+}).and(zod.object({
+  "key": zod.string(),
+  "readiness": zod.enum(['sandbox_only', 'planned'])
+}))
+export const ListLandingProductsResponse = zod.array(ListLandingProductsResponseItem)
+
+
+export const updateLandingProductPathProductKeyMax = 80;
+
+
+export const updateLandingProductPathProductKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+
+
+export const UpdateLandingProductParams = zod.object({
+  "productKey": zod.coerce.string().min(1).max(updateLandingProductPathProductKeyMax).regex(updateLandingProductPathProductKeyRegExp)
+})
+
+export const updateLandingProductBodyNameMin = 2;
+export const updateLandingProductBodyNameMax = 100;
+
+export const updateLandingProductBodyDescriptionMin = 10;
+export const updateLandingProductBodyDescriptionMax = 500;
+
+export const updateLandingProductBodyStartingPriceRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const updateLandingProductBodySetupFeeRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const updateLandingProductBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updateLandingProductBodyCtaLabelMin = 2;
+export const updateLandingProductBodyCtaLabelMax = 40;
+
+export const updateLandingProductBodyDisplayOrderMin = 0;
+export const updateLandingProductBodyDisplayOrderMax = 10000;
+
+
+
+export const UpdateLandingProductBody = zod.object({
+  "visible": zod.boolean(),
+  "name": zod.string().min(updateLandingProductBodyNameMin).max(updateLandingProductBodyNameMax),
+  "description": zod.string().min(updateLandingProductBodyDescriptionMin).max(updateLandingProductBodyDescriptionMax),
+  "icon": zod.enum(['exchange', 'card', 'payments', 'staking', 'earn', 'dex', 'content', 'telegram', 'miniapp', 'whatsapp', 'ios', 'android', 'engine', 'nodes', 'mining', 'kolo']),
+  "startingPrice": zod.string().regex(updateLandingProductBodyStartingPriceRegExp).nullable(),
+  "setupFee": zod.string().regex(updateLandingProductBodySetupFeeRegExp).nullable(),
+  "currency": zod.string().regex(updateLandingProductBodyCurrencyRegExp),
+  "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
+  "status": zod.enum(['available', 'coming_soon']),
+  "ctaLabel": zod.string().min(updateLandingProductBodyCtaLabelMin).max(updateLandingProductBodyCtaLabelMax),
+  "displayOrder": zod.number().int().min(updateLandingProductBodyDisplayOrderMin).max(updateLandingProductBodyDisplayOrderMax)
+})
+
+export const updateLandingProductResponseOneNameMin = 2;
+export const updateLandingProductResponseOneNameMax = 100;
+
+export const updateLandingProductResponseOneDescriptionMin = 10;
+export const updateLandingProductResponseOneDescriptionMax = 500;
+
+export const updateLandingProductResponseOneStartingPriceRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const updateLandingProductResponseOneSetupFeeRegExp = new RegExp('^(0|[1-9][0-9]{0,9})(\\.[0-9]{1,2})?$');
+export const updateLandingProductResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updateLandingProductResponseOneCtaLabelMin = 2;
+export const updateLandingProductResponseOneCtaLabelMax = 40;
+
+export const updateLandingProductResponseOneDisplayOrderMin = 0;
+export const updateLandingProductResponseOneDisplayOrderMax = 10000;
+
+
+
+export const UpdateLandingProductResponse = zod.object({
+  "visible": zod.boolean(),
+  "name": zod.string().min(updateLandingProductResponseOneNameMin).max(updateLandingProductResponseOneNameMax),
+  "description": zod.string().min(updateLandingProductResponseOneDescriptionMin).max(updateLandingProductResponseOneDescriptionMax),
+  "icon": zod.enum(['exchange', 'card', 'payments', 'staking', 'earn', 'dex', 'content', 'telegram', 'miniapp', 'whatsapp', 'ios', 'android', 'engine', 'nodes', 'mining', 'kolo']),
+  "startingPrice": zod.string().regex(updateLandingProductResponseOneStartingPriceRegExp).nullable(),
+  "setupFee": zod.string().regex(updateLandingProductResponseOneSetupFeeRegExp).nullable(),
+  "currency": zod.string().regex(updateLandingProductResponseOneCurrencyRegExp),
+  "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
+  "status": zod.enum(['available', 'coming_soon']),
+  "ctaLabel": zod.string().min(updateLandingProductResponseOneCtaLabelMin).max(updateLandingProductResponseOneCtaLabelMax),
+  "displayOrder": zod.number().int().min(updateLandingProductResponseOneDisplayOrderMin).max(updateLandingProductResponseOneDisplayOrderMax)
+}).and(zod.object({
+  "key": zod.string(),
+  "readiness": zod.enum(['sandbox_only', 'planned'])
+}))
+
+
 export const ListTenantAdministratorsParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })

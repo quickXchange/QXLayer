@@ -53,6 +53,8 @@ An independent multi-tenant administration and provisioning foundation, not a li
 
 Permanent White Label Core: shared multi-tenant backend and console; a data-driven product registry, plans/add-ons/overrides, limits/usage, scoped roles, branding, navigation, DNS ownership and validated non-secret product metadata. Exchange remains the first non-executing sandbox product; no live product engines are integrated. Current architecture, registry, provisioning, security verification and first-client blockers: `docs/white-label-core.md`. Earlier plans/website phase documentation remains historical context.
 
+The main platform landing page includes the editable marketing product catalog. Development installation: `pnpm --filter @workspace/scripts run catalog:upgrade:dev`; checks: `pnpm --filter @workspace/api-server run verify:catalog`. Setup, API, pricing and readiness boundaries: `docs/landing-product-catalog.md`.
+
 The customer website uses an original shared visual system, not QuickXchange's
 layout, widget or identity. Tenant differences must remain configuration-driven,
 never frontend forks. See `docs/customer-website.md` for branding controls,

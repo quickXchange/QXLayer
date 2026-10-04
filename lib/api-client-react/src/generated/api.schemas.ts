@@ -5,6 +5,98 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export type LandingProductInputIcon = typeof LandingProductInputIcon[keyof typeof LandingProductInputIcon];
+
+
+export const LandingProductInputIcon = {
+  exchange: 'exchange',
+  card: 'card',
+  payments: 'payments',
+  staking: 'staking',
+  earn: 'earn',
+  dex: 'dex',
+  content: 'content',
+  telegram: 'telegram',
+  miniapp: 'miniapp',
+  whatsapp: 'whatsapp',
+  ios: 'ios',
+  android: 'android',
+  engine: 'engine',
+  nodes: 'nodes',
+  mining: 'mining',
+  kolo: 'kolo',
+} as const;
+
+export type LandingProductInputBillingPeriod = typeof LandingProductInputBillingPeriod[keyof typeof LandingProductInputBillingPeriod];
+
+
+export const LandingProductInputBillingPeriod = {
+  monthly: 'monthly',
+  yearly: 'yearly',
+  one_time: 'one_time',
+  on_request: 'on_request',
+} as const;
+
+export type LandingProductInputStatus = typeof LandingProductInputStatus[keyof typeof LandingProductInputStatus];
+
+
+export const LandingProductInputStatus = {
+  available: 'available',
+  coming_soon: 'coming_soon',
+} as const;
+
+export interface LandingProductInput {
+  visible: boolean;
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  name: string;
+  /**
+     * @minLength 10
+     * @maxLength 500
+     */
+  description: string;
+  icon: LandingProductInputIcon;
+  /**
+     * @nullable
+     * @pattern ^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$
+     */
+  startingPrice: string | null;
+  /**
+     * @nullable
+     * @pattern ^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$
+     */
+  setupFee: string | null;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  billingPeriod: LandingProductInputBillingPeriod;
+  status: LandingProductInputStatus;
+  /**
+     * @minLength 2
+     * @maxLength 40
+     */
+  ctaLabel: string;
+  /**
+     * @minimum 0
+     * @maximum 10000
+     */
+  displayOrder: number;
+}
+
+export type LandingProductReadiness = typeof LandingProductReadiness[keyof typeof LandingProductReadiness];
+
+
+export const LandingProductReadiness = {
+  sandbox_only: 'sandbox_only',
+  planned: 'planned',
+} as const;
+
+export type LandingProduct = LandingProductInput & {
+  key: string;
+  readiness: LandingProductReadiness;
+};
+
 export interface TenantAdministratorInput {
   /** @pattern ^user_[a-zA-Z0-9]+$ */
   userId: string;
