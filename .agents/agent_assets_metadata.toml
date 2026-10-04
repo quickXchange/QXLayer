@@ -210,3 +210,59 @@ mtime_ms = 1791137649922
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/58f79bf1-a883-445c-93ce-e721855d2120/8052a1fa-d14a-4774-8fe8-679ee5cb8093"
 storage_version_token = "1791137727912658"
 content_type = "text/html"
+
+[[outputs]]
+id = "Nj9wRVhSsIbm5TyUJW3FG"
+uri = "file://artifacts/private-label-console/public/qxlayer-logo-dark.png"
+type = "image"
+title = "QXLayer — Dark Mode Logo"
+description = "Color-only purple, violet, blue and cyan variant. Original logo geometry and stacked lettering preserved; transparent background."
+logical_id = "537c3b8c-4100-49f2-9a8c-1dcfb07fde72"
+content_hash = "sha256:6b6609cd886ee545a969674d7c0c1870f5875d09401b90389b2d9c66abcbbd8f"
+size = 323688
+mtime_ms = 1791140289139
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/537c3b8c-4100-49f2-9a8c-1dcfb07fde72/bc91f7bd-5ccf-4c82-90a5-aede25cc8528"
+storage_version_token = "1791140340755201"
+content_type = "image/png"
+
+[[outputs]]
+id = "kUfske65mvxHFvtaqmk-G"
+uri = "file://artifacts/private-label-console/public/qxlayer-logo-light.png"
+type = "image"
+title = "QXLayer — Light Mode Logo"
+description = "Matching gradient with dark-violet lettering for light surfaces. Original shape, proportions and typography preserved."
+logical_id = "80f31f6f-cdbf-499e-ae06-a355f6cd8e5b"
+content_hash = "sha256:9dad744e7b12c45a0116bac75296011f6d64a6aaa89b511b2c9bb6ac485e61b4"
+size = 334682
+mtime_ms = 1791140291253
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/80f31f6f-cdbf-499e-ae06-a355f6cd8e5b/d7d13af9-e6c5-41ed-a066-519c3f3a10e7"
+storage_version_token = "1791140341309906"
+content_type = "image/png"
+
+[[outputs]]
+id = "XU1EuNDi8RpFdFL9pyUm2"
+uri = "file://artifacts/private-label-console/public/qxlayer-icon-dark.png"
+type = "image"
+title = "QXLayer — Dark Mode Icon"
+description = "The existing symbol isolated from the uploaded master, recolored without redrawing. Used to derive browser and touch icons."
+logical_id = "0e63c78b-28f3-4a94-88ad-ac22089bd36d"
+content_hash = "sha256:93bca8ca20ca0542d47691088fd1d133365cd268abbc0eae67ac84eb07326227"
+size = 230319
+mtime_ms = 1791140291971
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0e63c78b-28f3-4a94-88ad-ac22089bd36d/3f840247-55de-4f92-9fdc-120996787770"
+storage_version_token = "1791140341817166"
+content_type = "image/png"
+
+[[outputs]]
+id = "sJaL5IZn3hMtr_Cb4CA3F"
+uri = "file://artifacts/private-label-console/public/qxlayer-icon-light.png"
+type = "image"
+title = "QXLayer — Light Mode Icon"
+description = "Original symbol with the light-surface color treatment. No replacement or redesigned mark."
+logical_id = "02ae77af-7e79-406c-be92-72265a384311"
+content_hash = "sha256:4cb018dc426806cc9f79d0673b7aa623c601c7220f739337a5232339b05d34b6"
+size = 241317
+mtime_ms = 1791140292958
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/02ae77af-7e79-406c-be92-72265a384311/97a76677-9722-4229-9a85-ecc9a572143b"
+storage_version_token = "1791140342366603"
+content_type = "image/png"

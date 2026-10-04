@@ -7,6 +7,7 @@ import { resolveCaps } from '@site/lib/capabilities';
 import { PLATFORM_SITE } from '@/lib/platform-site';
 import { PlatformCatalog } from './platform-catalog';
 import { BrandLogo } from '@/components/brand-logo';
+import { QXLAYER_LIGHT_LOGO_URL, QXLAYER_LIGHT_ICON_URL } from '@/lib/brand';
 
 const NAV = [
   { id: 'exchange', label: 'Exchange' },
@@ -35,7 +36,7 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
   );
   return (
     <div data-testid="page-landing">
-      <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV, actions, footer }}>
+      <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV, actions, footer, lightLogoUrl: QXLAYER_LIGHT_LOGO_URL, lightFaviconUrl: QXLAYER_LIGHT_ICON_URL }}>
         <Hero site={PLATFORM_SITE} caps={caps} root={root} secondary={{ id: 'products', label: 'Browse products' }} />
         <PlatformCatalog items={items} loading={q.isLoading} error={q.isError} onRetry={() => void q.refetch()} open={open} setOpen={(p: LandingProduct | null) => setOpenKey(p ? p.key : null)} />
       </SiteShell>

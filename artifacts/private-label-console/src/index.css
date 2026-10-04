@@ -14,6 +14,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Console uses light surfaces; platform previews follow their own theme.
+   Keep these unlayered so visibility cannot lose to utility layers. */
+.qx-brand-dark { display: none; }
+.qx-brand-light { display: block; }
+.site[data-qx-theme="dark"] .qx-brand-dark { display: block; }
+.site[data-qx-theme="dark"] .qx-brand-light { display: none; }
+.site[data-qx-theme="light"] .qx-brand-dark { display: none; }
+.site[data-qx-theme="light"] .qx-brand-light { display: block; }
+
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));

@@ -26,7 +26,7 @@ import PlanDetail from '@/pages/plan-detail';
 import Addons from '@/pages/addons';
 import LandingProducts from '@/pages/landing-products';
 import CatalogPreview from '@/pages/catalog-preview';
-import { QXLAYER_LOGO_URL } from '@/lib/brand';
+import { QXLAYER_LIGHT_LOGO_URL } from '@/lib/brand';
 import { BrandLogo } from '@/components/brand-logo';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
@@ -44,7 +44,7 @@ if (!clerkPubKey) throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env fi
 const clerkAppearance = {
   theme: shadcn,
   cssLayerName: 'clerk',
-  options: { logoPlacement: 'inside' as const, logoLinkUrl: basePath || '/', logoImageUrl: new URL(QXLAYER_LOGO_URL, window.location.origin).href },
+  options: { logoPlacement: 'inside' as const, logoLinkUrl: basePath || '/', logoImageUrl: new URL(QXLAYER_LIGHT_LOGO_URL, window.location.origin).href },
   variables: {
     colorPrimary: '#12423f', colorForeground: '#12201f', colorMutedForeground: '#5a6664', colorDanger: '#b3382a',
     colorBackground: '#fbf8f2', colorInput: '#ffffff', colorInputForeground: '#12201f', colorNeutral: '#8a7f6c',

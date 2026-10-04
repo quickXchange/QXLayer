@@ -22,7 +22,7 @@ const nav = [
 export function Logo({ light }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <BrandLogo />
+      <BrandLogo theme={light ? 'dark' : 'light'} />
       <span className={`font-display text-xl leading-none ${light ? 'text-sidebar-accent-foreground' : ''}`}>QXLayer</span>
     </div>
   );

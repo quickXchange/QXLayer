@@ -22,12 +22,17 @@ function supportHref(site: PublicSite, anchor: (id: string) => string) {
   return { href: anchor('support'), external: false, anchor: true };
 }
 
-export interface PlatformShell { root: string; nav: { id: string; label: string }[]; actions: ReactNode; footer: ReactNode }
+export interface PlatformShell { root: string; nav: { id: string; label: string }[]; actions: ReactNode; footer: ReactNode; lightLogoUrl?: string; lightFaviconUrl?: string }
 
 export function SiteShell({ site, children, ambient = false, platform }: { site: PublicSite; children: ReactNode; ambient?: boolean; platform?: PlatformShell }) {
   const { dark, toggle } = useSiteTheme(site);
   const t = tokens(site, dark);
-  useDocumentMeta(site, themeColorMeta(site, dark));
+  const themedSite = platform && !dark ? {
+    ...site,
+    logoUrl: platform.lightLogoUrl ?? site.logoUrl,
+    websiteSettings: { ...site.websiteSettings, faviconUrl: platform.lightFaviconUrl ?? site.websiteSettings.faviconUrl },
+  } : site;
+  useDocumentMeta(themedSite, themeColorMeta(site, dark));
   const caps = resolveCaps(site);
   const nav = platform?.nav ?? navItems(site, caps);
   const cta = primaryCta(caps);
@@ -50,12 +55,12 @@ export function SiteShell({ site, children, ambient = false, platform }: { site:
     : <a href={sup.href} className={cls} data-testid="link-support" {...(sup.external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}>{label}</a>;
   const close = () => setOpen(false);
   return (
-    <div className="site min-h-[100dvh]" style={t as CSSProperties} data-surface={ws.surfaceStyle ?? 'solid'} data-testid="site-root">
+    <div className="site min-h-[100dvh]" style={t as CSSProperties} data-qx-theme={platform ? (dark ? 'dark' : 'light') : undefined} data-surface={ws.surfaceStyle ?? 'solid'} data-testid="site-root">
       {ambient && <Ambient />}
       <header className="s-header">
         <div className="s-wrap flex h-[68px] items-center gap-3">
           <Link href={base} className="flex min-w-0 items-center gap-2.5" data-testid="link-home">
-            <BrandMark site={site} />
+            <BrandMark site={themedSite} />
             <span className="truncate text-[1.05rem] font-semibold tracking-tight" data-testid="text-brand">{site.brandName}</span>
           </Link>
           <nav className="s-nav ml-6 hidden flex-1 items-center gap-0.5 lg:flex" aria-label="Primary">

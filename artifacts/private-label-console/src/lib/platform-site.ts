@@ -1,5 +1,5 @@
 import type { PublicSite } from '@workspace/api-client-react';
-import { QXLAYER_LOGO_URL } from './brand';
+import { QXLAYER_LOGO_URL, QXLAYER_ICON_URL } from './brand';
 
 /**
  * Frontend-only marketing presentation for the QXLayer platform home.
@@ -24,7 +24,7 @@ export const PLATFORM_SITE: PublicSite = {
     surfaceStyle: 'glass',
     borderRadius: 'rounded',
     fontKey: 'space-grotesk',
-    faviconUrl: QXLAYER_LOGO_URL,
+    faviconUrl: QXLAYER_ICON_URL,
     heroTitle: 'Digital finance.\nDistinctly yours.',
     heroSubtitle: 'A connected experience for conversion, payment configuration and merchant capabilities. Discover QXLayer in non-executing test mode, without moving real funds.',
     supportEmail: null,
