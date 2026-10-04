@@ -11,6 +11,21 @@ try {
   if (role === "super_admin") {
     await client.query("INSERT INTO platform_admins (clerk_user_id) VALUES ($1) ON CONFLICT (clerk_user_id) DO UPDATE SET active = true", [userId]);
   } else {
+    if (role === "staff") {
+      // Development-only source loading keeps artifact files outside this
+      // utility package's TypeScript compilation root; enforcement stays shared.
+      const [{ enforceLimit, resolveEntitlements }, { decimal, decimalString }] = await Promise.all([
+        import(new URL("../../artifacts/api-server/src/modules/entitlements/resolver.ts", import.meta.url).href),
+        import(new URL("../../artifacts/api-server/src/modules/entitlements/decimal.ts", import.meta.url).href),
+      ]);
+      const locked = await client.query("SELECT id FROM tenants WHERE id=$1 FOR UPDATE", [tenantId]);
+      if (!locked.rowCount) throw new Error("Tenant not found.");
+      const existing = await client.query("SELECT role,active FROM tenant_memberships WHERE tenant_id=$1 AND clerk_user_id=$2", [tenantId, userId]);
+      const effective = await resolveEntitlements(client, tenantId!);
+      const used = effective.usage.find((u: { key: string; used: string }) => u.key === "max_staff")?.used ?? "0";
+      const increment = existing.rows[0]?.active && existing.rows[0]?.role === "staff" ? "0" : "1";
+      enforceLimit(effective, "max_staff", decimalString(decimal(used) + decimal(increment)));
+    }
     await client.query(
       "INSERT INTO tenant_memberships (tenant_id, clerk_user_id, role) VALUES ($1,$2,$3) ON CONFLICT (tenant_id, clerk_user_id) DO UPDATE SET role = EXCLUDED.role, active = true",
       [tenantId, userId, role],

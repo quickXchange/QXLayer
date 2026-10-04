@@ -7,6 +7,7 @@
  */
 import type { TenantSummary } from './tenantSummary';
 import type { TenantThemeMode } from './tenantThemeMode';
+import type { WebsiteSettings } from './websiteSettings';
 
 export type Tenant = TenantSummary & ({
   /** @nullable */
@@ -21,4 +22,5 @@ export type Tenant = TenantSummary & ({
   paymentsEnabled: boolean;
   allowGuestCheckout: boolean;
   configurationComplete: boolean;
+  websiteSettings?: WebsiteSettings;
 });

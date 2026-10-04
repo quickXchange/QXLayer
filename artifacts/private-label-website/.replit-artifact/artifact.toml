@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/private-label-website/"
+title = "Private Label Website"
+description = "One shared sandbox customer-facing website template, using tenant branding tokens and server-resolved plan capabilities. Separate from the administration console; no payment execution or live integrations."
+version = "1.0.0"
+id = "artifacts/private-label-website"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/private-label-website/" ]
+localPort = 24270
+
+[services.development]
+run = "pnpm --filter @workspace/private-label-website run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/private-label-website", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/private-label-website/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24270"
+BASE_PATH = "/private-label-website/"

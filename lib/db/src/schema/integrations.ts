@@ -47,6 +47,7 @@ export const webhookEndpointsTable = pgTable("webhook_endpoints", {
   id: uuid("id").primaryKey().defaultRandom(),
   tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id),
   url: text("url").notNull(),
+  label: text("label").notNull().default("Webhook"),
   enabled: boolean("enabled").notNull().default(false),
   environment: text("environment").notNull().default("sandbox"),
 }, () => [

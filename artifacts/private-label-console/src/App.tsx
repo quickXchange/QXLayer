@@ -21,6 +21,9 @@ import ClientNew from '@/pages/client-new';
 import ClientDetail from '@/pages/client-detail';
 import Modules from '@/pages/modules';
 import Activity from '@/pages/activity';
+import Plans from '@/pages/plans';
+import PlanDetail from '@/pages/plan-detail';
+import Addons from '@/pages/addons';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
@@ -126,7 +129,7 @@ function Protected({ children }: { children: ReactNode }) {
   );
 }
 const guard = (C: () => ReactNode) => () => <Protected><C /></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -159,6 +162,10 @@ function ClerkProviderWithRoutes() {
               <Route path="/clients/new" component={rNew} />
               <Route path="/clients/:id" component={rDetail} />
               <Route path="/modules" component={rModules} />
+              <Route path="/plans" component={rPlans} />
+              <Route path="/plans/new" component={rPlan} />
+              <Route path="/plans/:id" component={rPlan} />
+              <Route path="/add-ons" component={rAddons} />
               <Route path="/activity" component={rActivity} />
               <Route component={NotFound} />
             </Switch>

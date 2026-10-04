@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   useListModuleCatalog, useListSandboxAssetNetworks, useUpdateTenantBrand, useUpdateTenantDomain,
-  useUpdateTenantModules, useUpdateTenantAssetsNetworks, useUpdateTenantConfiguration,
-  type Tenant, type ModuleKey, type BrandInput,
+  useUpdateTenantAssetsNetworks, useUpdateTenantConfiguration,
+  type Tenant, type BrandInput,
 } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useSubscription } from './subscription';
+import { usePrincipal } from '@/lib/principal';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -117,31 +119,22 @@ export function DomainSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   );
 }
 
-export function ModulesSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
-  const save = useSave(tenant.id, onSaved);
+export function ModulesSection({ tenant, onSaved, saveLabel }: SP) {
   const cat = useListModuleCatalog();
-  const m = useUpdateTenantModules();
-  const [sel, setSel] = useState<ModuleKey[]>(tenant.enabledModules);
-  const key = tenant.enabledModules.join(',');
-  useEffect(() => setSel(tenant.enabledModules), [key]); // eslint-disable-line react-hooks/exhaustive-deps
-  const toggle = (k: ModuleKey) => setSel((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
+  const sub = useSubscription(tenant.id);
+  const on = sub.data?.enabledModules ?? tenant.enabledModules;
   return (
-    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { moduleKeys: sel } }, { onSuccess: () => save.ok('Modules'), onError: save.fail }); }}>
-      <Section n="03" title="Modules" note="Entitlements only. Enabling a module grants access to the sandbox surface, nothing more."
-        footer={<SaveBtn id="modules" pending={m.isPending} readOnly={readOnly} label={saveLabel} />}>
-        {cat.isLoading ? <Skeleton className="h-40" /> : cat.isError ? <ErrorState what="module catalog" onRetry={() => cat.refetch()} /> : (
-          <div className="grid gap-2 md:grid-cols-2">
-            {cat.data?.map((mod) => (
-              <label key={mod.key} className={`flex gap-3 rounded-md border p-3 ${readOnly ? '' : 'cursor-pointer hover:bg-muted/50'} ${sel.includes(mod.key) ? 'border-primary bg-primary/5' : ''}`}>
-                <Checkbox data-testid={`checkbox-module-${mod.key}`} disabled={readOnly} checked={sel.includes(mod.key)} onCheckedChange={() => toggle(mod.key)} className="mt-0.5" />
-                <span><span className="block text-sm font-medium">{mod.name}</span><span className="block text-xs text-muted-foreground">{mod.description}</span></span>
-              </label>
-            ))}
-          </div>
-        )}
-        {readOnly && <p className="text-sm text-muted-foreground">Only a super admin can change modules.</p>}
-      </Section>
-    </form>
+    <Section n="03" title="Modules" note="Effective modules come from the plan, add-ons and overrides. Change the plan or overrides to change them."
+      footer={<><span className="mr-auto font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Set by plan assignment</span>{onSaved && <Button type="button" data-testid="button-continue-modules" onClick={onSaved}>{saveLabel ?? 'Continue'}</Button>}</>}>
+      {cat.isLoading || sub.isLoading ? <Skeleton className="h-40" /> : cat.isError ? <ErrorState what="module catalog" onRetry={() => cat.refetch()} /> : (
+        <div className="grid gap-2 md:grid-cols-2">
+          {cat.data?.filter((mod) => on.includes(mod.key)).map((mod) => (
+            <div key={mod.key} className="flex gap-3 rounded-md border border-primary bg-primary/5 p-3" data-testid={`module-${mod.key}`}>
+              <span><span className="block text-sm font-medium">{mod.name}</span><span className="block text-xs text-muted-foreground">{mod.description}</span></span>
+            </div>))}
+          {on.length === 0 && <p className="text-sm text-muted-foreground">No modules are enabled by the current subscription.</p>}
+        </div>)}
+    </Section>
   );
 }
 
@@ -184,25 +177,30 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
 export function ConfigSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   const save = useSave(tenant.id, onSaved);
   const m = useUpdateTenantConfiguration();
-  const init = { x: tenant.exchangeEnabled, p: tenant.paymentsEnabled, g: tenant.allowGuestCheckout };
-  const [f, setF] = useState(init);
+  const sub = useSubscription(tenant.id);
+  const p = usePrincipal();
+  const feats = sub.data?.features ?? {};
+  const avail = { x: feats.crypto_exchange === true, p: feats.crypto_payments === true, g: feats.crypto_payments === true };
+  const [f, setF] = useState({ x: tenant.exchangeEnabled, p: tenant.paymentsEnabled, g: tenant.allowGuestCheckout });
   useEffect(() => setF({ x: tenant.exchangeEnabled, p: tenant.paymentsEnabled, g: tenant.allowGuestCheckout }), [tenant.exchangeEnabled, tenant.paymentsEnabled, tenant.allowGuestCheckout]);
   const rows: [keyof typeof f, string, string][] = [
     ['x', 'Exchange flag', 'Marks the exchange surface as switched on in configuration.'],
     ['p', 'Payments flag', 'Marks the payments surface as switched on in configuration.'],
     ['g', 'Allow guest checkout', 'Permit sessions without a registered end-user.'],
   ];
+  const shown = rows.filter(([k]) => p.role !== 'client_admin' || avail[k]);
   return (
-    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { environment: 'sandbox', exchangeEnabled: f.x, paymentsEnabled: f.p, allowGuestCheckout: f.g } }, { onSuccess: () => save.ok('Configuration'), onError: save.fail }); }}>
-      <Section n="05" title="Configuration" note="Environment is fixed to sandbox."
-        footer={<SaveBtn id="config" pending={m.isPending} readOnly={readOnly} label={saveLabel} />}>
+    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { environment: 'sandbox', exchangeEnabled: avail.x && f.x, paymentsEnabled: avail.p && f.p, allowGuestCheckout: avail.g && f.g } }, { onSuccess: () => save.ok('Configuration'), onError: save.fail }); }}>
+      <Section n="05" title="Configuration" note="Environment is fixed to sandbox. Flags the subscription does not grant are saved as off."
+        footer={<SaveBtn id="config" pending={m.isPending} disabled={sub.isLoading} readOnly={readOnly} label={saveLabel} />}>
         <div className="flex items-center justify-between rounded-md border bg-muted/40 p-3"><span className="text-sm">Environment</span><span className="font-mono text-xs uppercase tracking-wider text-copper">sandbox</span></div>
-        {rows.map(([k, t, d]) => (
+        {shown.map(([k, t, d]) => (
           <div key={k} className="flex items-center justify-between gap-4">
-            <div><p className="text-sm font-medium">{t}</p><p className="text-xs text-muted-foreground">{d}</p></div>
-            <Switch data-testid={`switch-${k}`} disabled={readOnly} checked={f[k]} onCheckedChange={(v) => setF((s) => ({ ...s, [k]: v }))} />
+            <div><p className="text-sm font-medium">{t}</p><p className="text-xs text-muted-foreground">{avail[k] ? d : 'Not granted by the current subscription.'}</p></div>
+            <Switch data-testid={`switch-${k}`} disabled={readOnly || !avail[k]} checked={avail[k] && f[k]} onCheckedChange={(v) => setF((s) => ({ ...s, [k]: v }))} />
           </div>
         ))}
+        {shown.length === 0 && <p className="text-sm text-muted-foreground">No configurable options are available for your subscription.</p>}
       </Section>
     </form>
   );

@@ -6,7 +6,7 @@ const modules = [
   ["crypto_payments", "Crypto Payments", "Crypto payment gateway entitlement. Invoice execution is deferred.", "Financial"],
   ["telegram_bot", "Telegram Bot", "Branded bot entitlement using the shared backend. Bot connection is deferred.", "Channels"],
   ["telegram_mini_app", "Telegram Mini App", "Telegram web app entitlement using the same tenant configuration.", "Channels"],
-  ["website", "Website", "Branded website entitlement. Website rendering and builder are deferred.", "Channels"],
+  ["website", "Website", "Shared dynamically branded sandbox website. No payment execution.", "Channels"],
   ["merchant_api", "Merchant API", "Scoped developer API entitlement. Public merchant endpoints are deferred.", "Developer"],
 ];
 const assets = [["btc", "BTC", "Bitcoin"], ["eth", "ETH", "Ethereum"], ["usdt", "USDT", "Tether"], ["sol", "SOL", "Solana"], ["bnb", "BNB", "BNB"]];
@@ -18,6 +18,23 @@ const pairs = [
   ["btc", "bitcoin-testnet"], ["eth", "ethereum-sepolia"], ["usdt", "ethereum-sepolia"],
   ["sol", "solana-devnet"], ["bnb", "bsc-testnet"], ["usdt", "bsc-testnet"], ["usdt", "tron-nile"],
 ];
+const features = [
+  ["website", "Private-label website"], ["crypto_exchange", "Crypto Exchange"],
+  ["crypto_payments", "Crypto Payments"], ["swap", "Swap"], ["convert", "Convert"],
+  ["buy", "Buy"], ["sell", "Sell"], ["merchant_api", "Merchant API"],
+  ["api_keys", "Sandbox API key configuration"], ["webhooks", "Webhook configuration"],
+  ["telegram_bot", "Telegram Bot (deferred)"], ["telegram_mini_app", "Telegram Mini App (deferred)"],
+];
+const limits = [
+  ["max_supported_assets", "Supported assets", "integer"],
+  ["max_supported_networks", "Supported networks", "integer"],
+  ["max_payment_methods", "Payment method configurations", "integer"],
+  ["max_staff", "Staff members", "integer"],
+  ["max_api_keys", "Active API keys", "integer"],
+  ["max_webhooks", "Webhook configurations", "integer"],
+  ["max_monthly_transactions", "Monthly sandbox transaction units", "integer"],
+  ["max_monthly_volume", "Monthly volume in plan currency", "decimal"],
+];
 const client = await pool.connect();
 try {
   await client.query("BEGIN");
@@ -28,6 +45,12 @@ try {
   for (const asset of assets) await client.query("INSERT INTO asset_catalog (id,symbol,name) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING", asset);
   for (const network of networks) await client.query("INSERT INTO network_catalog (id,name,testnet) VALUES ($1,$2,true) ON CONFLICT DO NOTHING", network);
   for (const [asset, network] of pairs) await client.query("INSERT INTO asset_network_catalog (id,asset_id,network_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING", [`${asset}:${network}`, asset, network]);
+  for (const [key, label] of features) await client.query(
+    "INSERT INTO entitlement_definitions (key,label,kind,value_type) VALUES ($1,$2,'feature','boolean') ON CONFLICT DO NOTHING", [key, label],
+  );
+  for (const [key, label, valueType] of limits) await client.query(
+    "INSERT INTO entitlement_definitions (key,label,kind,value_type) VALUES ($1,$2,'limit',$3) ON CONFLICT DO NOTHING", [key, label, valueType],
+  );
   await client.query("COMMIT");
   process.stdout.write("Sandbox catalogs seeded; no wallets, secrets, customers, or financial transactions created.\n");
 } catch (error) {

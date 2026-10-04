@@ -114,6 +114,7 @@ export interface TenantInput {
      * @pattern ^[a-z0-9]+(?:-[a-z0-9]+)*$
      */
   slug: string;
+  planId: string;
 }
 
 export type BrandInputThemeMode = typeof BrandInputThemeMode[keyof typeof BrandInputThemeMode];
@@ -213,6 +214,65 @@ export const TenantThemeMode = {
   system: 'system',
 } as const;
 
+export type WebsiteSettingsFontKey = typeof WebsiteSettingsFontKey[keyof typeof WebsiteSettingsFontKey];
+
+
+export const WebsiteSettingsFontKey = {
+  system: 'system',
+  inter: 'inter',
+  manrope: 'manrope',
+  'dm-sans': 'dm-sans',
+  'space-grotesk': 'space-grotesk',
+} as const;
+
+export interface SiteLink {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  /** @maxLength 2048 */
+  url: string;
+}
+
+export interface WebsiteSettings {
+  /** @pattern ^#[0-9A-Fa-f]{6}$ */
+  secondaryColor: string;
+  /**
+     * @maxLength 2048
+     * @nullable
+     */
+  faviconUrl: string | null;
+  fontKey: WebsiteSettingsFontKey;
+  /**
+     * @minLength 2
+     * @maxLength 180
+     */
+  heroTitle: string;
+  /** @maxLength 1000 */
+  heroSubtitle: string;
+  /**
+     * @maxLength 254
+     * @nullable
+     */
+  supportEmail: string | null;
+  /**
+     * @maxLength 2048
+     * @nullable
+     */
+  supportUrl: string | null;
+  /** @maxLength 2000 */
+  supportDetails: string;
+  /** @maxItems 12 */
+  socialLinks: SiteLink[];
+  /** @maxLength 2000 */
+  footerText: string;
+  /** @maxLength 20000 */
+  privacyContent: string;
+  /** @maxLength 20000 */
+  termsContent: string;
+}
+
 export type Tenant = TenantSummary & ({
   /** @nullable */
   logoUrl: string | null;
@@ -226,5 +286,255 @@ export type Tenant = TenantSummary & ({
   paymentsEnabled: boolean;
   allowGuestCheckout: boolean;
   configurationComplete: boolean;
+  websiteSettings?: WebsiteSettings;
 });
+
+export type EntitlementValue = boolean | string;
+
+export interface EntitlementEntry {
+  /**
+     * @maxLength 80
+     * @pattern ^[a-z][a-z0-9_]*$
+     */
+  key: string;
+  value: EntitlementValue;
+}
+
+export type EntitlementDefinitionKind = typeof EntitlementDefinitionKind[keyof typeof EntitlementDefinitionKind];
+
+
+export const EntitlementDefinitionKind = {
+  feature: 'feature',
+  limit: 'limit',
+} as const;
+
+export type EntitlementDefinitionValueType = typeof EntitlementDefinitionValueType[keyof typeof EntitlementDefinitionValueType];
+
+
+export const EntitlementDefinitionValueType = {
+  boolean: 'boolean',
+  integer: 'integer',
+  decimal: 'decimal',
+} as const;
+
+export interface EntitlementDefinition {
+  key: string;
+  label: string;
+  kind: EntitlementDefinitionKind;
+  valueType: EntitlementDefinitionValueType;
+}
+
+export type PlanInputStatus = typeof PlanInputStatus[keyof typeof PlanInputStatus];
+
+
+export const PlanInputStatus = {
+  enabled: 'enabled',
+  disabled: 'disabled',
+  archived: 'archived',
+} as const;
+
+export interface PlanInput {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 3000 */
+  description: string;
+  /**
+     * @maxLength 18
+     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
+     */
+  monthlyPrice: string;
+  /**
+     * @maxLength 18
+     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
+     */
+  yearlyPrice: string;
+  /**
+     * @maxLength 18
+     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
+     */
+  setupFee: string;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  /** @maxLength 160 */
+  billingLabel: string;
+  /**
+     * @minimum 0
+     * @maximum 100000
+     */
+  displayOrder: number;
+  status: PlanInputStatus;
+  /** @maxItems 200 */
+  entitlements: EntitlementEntry[];
+}
+
+export type Plan = PlanInput & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PlanStatusInputStatus = typeof PlanStatusInputStatus[keyof typeof PlanStatusInputStatus];
+
+
+export const PlanStatusInputStatus = {
+  enabled: 'enabled',
+  disabled: 'disabled',
+  archived: 'archived',
+} as const;
+
+export interface PlanStatusInput {
+  status: PlanStatusInputStatus;
+}
+
+export interface AddonInput {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 3000 */
+  description: string;
+  enabled: boolean;
+  /** @maxItems 200 */
+  entitlements: EntitlementEntry[];
+}
+
+export type Addon = AddonInput & {
+  id: string;
+};
+
+export interface SubscriptionPlanInput {
+  planId: string;
+}
+
+export interface SubscriptionAddonInput {
+  addonIds: string[];
+}
+
+export type EntitlementOverride = EntitlementEntry & {
+  /**
+     * @minLength 2
+     * @maxLength 500
+     */
+  reason: string;
+};
+
+export interface EntitlementOverrideInput {
+  /** @maxItems 200 */
+  overrides: EntitlementOverride[];
+}
+
+export interface UsageItem {
+  key: string;
+  label: string;
+  used: string;
+  limit: string;
+  exceeded: boolean;
+}
+
+export type SubscriptionViewStatus = typeof SubscriptionViewStatus[keyof typeof SubscriptionViewStatus];
+
+
+export const SubscriptionViewStatus = {
+  active: 'active',
+  suspended: 'suspended',
+  unassigned: 'unassigned',
+} as const;
+
+export type SubscriptionViewFeatures = {[key: string]: boolean};
+
+export type SubscriptionViewLimits = {[key: string]: string};
+
+export type SubscriptionViewSources = {[key: string]: string};
+
+export interface SubscriptionView {
+  tenantId: string;
+  tenantStatus: string;
+  status: SubscriptionViewStatus;
+  plan: Plan | null;
+  addons: Addon[];
+  overrides: EntitlementOverride[];
+  features: SubscriptionViewFeatures;
+  limits: SubscriptionViewLimits;
+  sources: SubscriptionViewSources;
+  usage: UsageItem[];
+  enabledModules: string[];
+  overLimit: boolean;
+}
+
+export interface SuspensionInput {
+  suspended: boolean;
+  /**
+     * @minLength 2
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export interface ResourceInput {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  label: string;
+  /**
+     * @maxLength 2048
+     * @nullable
+     */
+  reference: string | null;
+}
+
+export interface ResourceItem {
+  id: string;
+  label: string;
+  /** @nullable */
+  reference: string | null;
+  status: string;
+}
+
+export interface ResourceCreated {
+  item: ResourceItem;
+  /** @nullable */
+  issuedKey: string | null;
+}
+
+export interface MutationStatus {
+  ok: boolean;
+}
+
+export type PublicSiteThemeMode = typeof PublicSiteThemeMode[keyof typeof PublicSiteThemeMode];
+
+
+export const PublicSiteThemeMode = {
+  light: 'light',
+  dark: 'dark',
+  system: 'system',
+} as const;
+
+export type PublicSiteFeatures = {[key: string]: boolean};
+
+export interface PublicSite {
+  tenantSlug: string;
+  brandName: string;
+  /** @nullable */
+  logoUrl: string | null;
+  primaryColor: string;
+  accentColor: string;
+  themeMode: PublicSiteThemeMode;
+  /** @nullable */
+  domain: string | null;
+  sandboxOnly: boolean;
+  websiteSettings: WebsiteSettings;
+  features: PublicSiteFeatures;
+  assets: AssetNetwork[];
+}
+
+export interface CapabilityStatus {
+  feature: string;
+  status: string;
+  message: string;
+}
 

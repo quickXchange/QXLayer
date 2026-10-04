@@ -13,6 +13,7 @@ An independent multi-tenant administration and provisioning foundation, not a li
 - `pnpm --filter @workspace/scripts run db:permissions:dev` — materialize runtime grants, RLS predicates, and FORCE RLS after every schema push
 - `pnpm --filter @workspace/scripts run db:seed:dev` — seed only sandbox catalogs
 - `pnpm --filter @workspace/api-server run verify:foundation` — development-only provisioning and tenant-isolation checks
+- `pnpm --filter @workspace/api-server run samples:plans:dev` — explicit development-only Aster/Nexa demonstrations; never an automatic startup seed
 - `pnpm --filter @workspace/scripts run access:assign:dev super_admin user_CLERKID` — explicit operator assignment, never automatic
 - For tenant roles, use `access:assign:dev client_admin user_CLERKID TENANT_UUID` or `staff`.
 - Required env: `DATABASE_URL` — Postgres connection string
@@ -29,6 +30,7 @@ An independent multi-tenant administration and provisioning foundation, not a li
 ## Where things live
 
 - `artifacts/private-label-console` — React console, public welcome, Clerk sign-in, and role-protected admin views
+- `artifacts/private-label-website` — one shared tenant website at `/private-label-website/:slug`
 - `artifacts/api-server/src/modules` — shared modular backend and explicitly deferred product contracts
 - `lib/db/src/schema` — Drizzle schema; `lib/db/src/context.ts` — transaction-local restricted-role access
 - `lib/db/migrations/development-*.sql` — development-only role and policy setup; never startup/deployment hooks
@@ -41,19 +43,22 @@ An independent multi-tenant administration and provisioning foundation, not a li
 - Use one modular monolith and one shared backend; channels must reuse tenant branding, assets, entitlements, pricing, orders, payments, and provider boundaries.
 - Administrator privileges are explicitly assigned by an operator, never inferred from sign-up order or browser-provided roles.
 - The development database owner bypasses RLS. Runtime transactions must switch to the restricted NOLOGIN, NOBYPASSRLS role and use transaction-local verified actor/tenant context.
-- Client administrators can edit their own brand/domain/assets/configuration; only super administrators change module entitlements. Staff are read-only.
+- Client administrators can edit their own permitted configuration; only super administrators manage plans, add-ons, subscriptions, overrides and suspension. Staff are read-only.
+- Effective rights come from database plans → additive add-ons → replacing tenant overrides. Missing features deny and missing limits are zero. Direct legacy module writes cannot bypass this resolver.
+- Disabling or archiving a plan/add-on blocks new assignments, but retains existing assignments. Tenant suspension denies capability access and configuration mutations.
+- Plan prices are metadata only. Monthly usage guards are infrastructure for deferred engines, not evidence that financial execution exists.
 - Sandbox activation activates configuration only. Domain values are unverified references, not DNS connections or deployed websites.
 
 ## Product
 
-Super-admin and client-admin foundations; persistent Client → Brand → Domain → Modules → Assets/Networks → Configuration provisioning; independent entitlements for crypto_exchange, crypto_payments, telegram_bot, telegram_mini_app, website, and merchant_api. Product execution is deferred.
+Super-admin and client-admin foundations; database-driven plans, generic feature/limit definitions, tenant subscriptions/add-ons/overrides, quota-checked sandbox resources, audited administration and one dynamically branded website. Exchange, payment, wallet, blockchain and Telegram execution is deferred. See `docs/plans-entitlements-website.md`.
 
 ## User preferences
 
 - Do NOT connect to, modify, migrate, or depend on the existing QuickXchange project at this stage. This platform is independent; QuickXchange must remain untouched.
 - Build the foundation only. Do not build all crypto products at once.
 - Do not publish to production, connect real wallets/providers, accept real deposits, or request real provider secrets in this stage.
-- Stop after the foundation and report the implementation, schema, structure, and recommended next work.
+- Stop after this plans/entitlements/website phase and report implementation, database changes, resolution logic, enforcement, website structure, tests, pages and deferred items.
 
 ## Gotchas
 

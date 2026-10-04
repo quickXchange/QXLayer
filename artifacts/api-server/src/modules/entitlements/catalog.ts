@@ -1,0 +1,145 @@
+import { withDatabase, type DatabaseClient } from "@workspace/db";
+import { CreatePlanBody, CreateAddonBody } from "@workspace/api-zod";
+import type { z } from "zod";
+import { HttpError } from "../../lib/errors";
+import { audit } from "../../lib/audit";
+import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
+import { isInteger, normalizeDecimal } from "./decimal";
+
+export type PlanInput = z.infer<typeof CreatePlanBody>;
+export type AddonInput = z.infer<typeof CreateAddonBody>;
+export type Entry = PlanInput["entitlements"][number];
+export interface Definition { key: string; label: string; kind: "feature" | "limit"; valueType: "boolean" | "integer" | "decimal"; }
+async function catalogLock(client: DatabaseClient, key: string, exclusive: boolean) {
+  // SELECT ... FOR SHARE also applies write RLS and hides a read-only catalog
+  // from client admins. Advisory locks coordinate versions without write access.
+  await client.query(exclusive
+    ? "SELECT pg_advisory_xact_lock(hashtextextended($1,0))"
+    : "SELECT pg_advisory_xact_lock_shared(hashtextextended($1,0))", [key]);
+}
+
+export async function definitions(client: DatabaseClient): Promise<Definition[]> {
+  const r = await client.query("SELECT key,label,kind,value_type AS \"valueType\" FROM entitlement_definitions ORDER BY kind,key");
+  return r.rows;
+}
+export async function validateEntries(client: DatabaseClient, entries: Entry[]) {
+  const defs = new Map((await definitions(client)).map((d) => [d.key, d]));
+  const seen = new Set<string>();
+  return entries.map((entry) => {
+    const def = defs.get(entry.key);
+    if (!def || seen.has(entry.key)) throw new HttpError(400, "Unknown or duplicate entitlement key.");
+    seen.add(entry.key);
+    if (def.kind === "feature") {
+      if (typeof entry.value !== "boolean") throw new HttpError(400, `${def.label} must be boolean.`);
+      return { ...entry };
+    }
+    if (typeof entry.value !== "string" || (def.valueType === "integer" && !isInteger(entry.value))) throw new HttpError(400, `${def.label} must be a nonnegative ${def.valueType}.`);
+    return { ...entry, value: normalizeDecimal(entry.value) };
+  });
+}
+export async function readPlan(client: DatabaseClient, id: string) {
+  await catalogLock(client, `plan:${id}`, false);
+  const r = await client.query("SELECT * FROM plans WHERE id=$1", [id]);
+  const p = r.rows[0];
+  if (!p) throw new HttpError(404, "Plan not found.");
+  const e = await client.query("SELECT key,value FROM plan_entitlements WHERE plan_id=$1 ORDER BY key", [id]);
+  return {
+    id: p.id as string, name: p.name as string, description: p.description as string,
+    monthlyPrice: p.monthly_price as string, yearlyPrice: p.yearly_price as string,
+    setupFee: p.setup_fee as string, currency: p.currency as string, billingLabel: p.billing_label as string,
+    displayOrder: p.display_order as number, status: p.status as "enabled" | "disabled" | "archived",
+    entitlements: e.rows as Entry[], createdAt: p.created_at as Date, updatedAt: p.updated_at as Date,
+  };
+}
+export async function readAddon(client: DatabaseClient, id: string) {
+  await catalogLock(client, `addon:${id}`, false);
+  const r = await client.query("SELECT * FROM addons WHERE id=$1", [id]);
+  const a = r.rows[0];
+  if (!a) throw new HttpError(404, "Add-on not found.");
+  const e = await client.query("SELECT key,value FROM addon_entitlements WHERE addon_id=$1 ORDER BY key", [id]);
+  return { id: a.id as string, name: a.name as string, description: a.description as string, enabled: a.enabled as boolean, entitlements: e.rows as Entry[] };
+}
+export async function listDefinitions(principal: Principal) {
+  if (principal.role === "unassigned") throw new HttpError(403, "Administrator access required.");
+  return withDatabase({ actorId: principal.userId, isSuperAdmin: principal.role === "super_admin" }, definitions);
+}
+export function listPlans(principal: Principal) {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal), async (client) => {
+    const ids = await client.query("SELECT id FROM plans ORDER BY display_order,name,id");
+    return Promise.all(ids.rows.map((r) => readPlan(client, r.id)));
+  });
+}
+export function getPlan(principal: Principal, id: string) {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal), (client) => readPlan(client, id));
+}
+export function listAddons(principal: Principal) {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal), async (client) => {
+    const ids = await client.query("SELECT id FROM addons ORDER BY name,id");
+    return Promise.all(ids.rows.map((r) => readAddon(client, r.id)));
+  });
+}
+async function writePlan(client: DatabaseClient, input: PlanInput, id?: string) {
+  if (input.name.trim().length < 2) throw new HttpError(400, "Plan name must contain at least two non-whitespace characters.");
+  const entries = await validateEntries(client, input.entitlements);
+  const args = [input.name.trim(), input.description, input.monthlyPrice, input.yearlyPrice, input.setupFee, input.currency, input.billingLabel, input.displayOrder, input.status];
+  const r = id
+    ? await client.query("UPDATE plans SET name=$1,description=$2,monthly_price=$3,yearly_price=$4,setup_fee=$5,currency=$6,billing_label=$7,display_order=$8,status=$9,updated_at=now() WHERE id=$10 RETURNING id", [...args, id])
+    : await client.query("INSERT INTO plans (name,description,monthly_price,yearly_price,setup_fee,currency,billing_label,display_order,status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id", args);
+  const planId = r.rows[0].id as string;
+  await client.query("DELETE FROM plan_entitlements WHERE plan_id=$1", [planId]);
+  for (const e of entries) await client.query("INSERT INTO plan_entitlements (plan_id,key,value) VALUES ($1,$2,$3::jsonb)", [planId, e.key, JSON.stringify(e.value)]);
+  return readPlan(client, planId);
+}
+export function savePlan(principal: Principal, input: PlanInput, id?: string) {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    if (id) { await catalogLock(client, `plan:${id}`, true); await client.query("SELECT id FROM plans WHERE id=$1 FOR UPDATE", [id]); }
+    const before = id ? await readPlan(client, id) : null;
+    const after = await writePlan(client, input, id);
+    await audit(client, principal, null, id ? "plan.updated" : "plan.created", `${id ? "Updated" : "Created"} plan ${after.name}; pricing is metadata only`, { planId: after.id, before, after });
+    return after;
+  });
+}
+export function duplicatePlan(principal: Principal, id: string) {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    const source = await readPlan(client, id);
+    const after = await writePlan(client, { ...source, name: `${source.name.slice(0, 110)} copy`, status: "disabled" });
+    await audit(client, principal, null, "plan.duplicated", `Duplicated plan ${source.name}`, { sourceId: id, after });
+    return after;
+  });
+}
+export function changePlanStatus(principal: Principal, id: string, status: PlanInput["status"]) {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    await catalogLock(client, `plan:${id}`, true);
+    await client.query("SELECT id FROM plans WHERE id=$1 FOR UPDATE", [id]);
+    const before = await readPlan(client, id);
+    await client.query("UPDATE plans SET status=$2,updated_at=now() WHERE id=$1", [id, status]);
+    const after = await readPlan(client, id);
+    await audit(client, principal, null, `plan.${status}`, `Set plan ${after.name} to ${status}; existing subscriptions retained`, { planId: id, before: before.status, after: status });
+    return after;
+  });
+}
+export function saveAddon(principal: Principal, input: AddonInput, id?: string) {
+  requireSuperAdmin(principal);
+  if (input.name.trim().length < 2) throw new HttpError(400, "Add-on name must contain at least two non-whitespace characters.");
+  return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    if (id) { await catalogLock(client, `addon:${id}`, true); await client.query("SELECT id FROM addons WHERE id=$1 FOR UPDATE", [id]); }
+    const before = id ? await readAddon(client, id) : null;
+    const entries = await validateEntries(client, input.entitlements);
+    if (entries.some((e) => e.value === false)) throw new HttpError(400, "Add-ons grant features; use tenant overrides to revoke a feature.");
+    const r = id
+      ? await client.query("UPDATE addons SET name=$1,description=$2,enabled=$3 WHERE id=$4 RETURNING id", [input.name.trim(), input.description, input.enabled, id])
+      : await client.query("INSERT INTO addons (name,description,enabled) VALUES ($1,$2,$3) RETURNING id", [input.name.trim(), input.description, input.enabled]);
+    const addonId = r.rows[0].id as string;
+    await client.query("DELETE FROM addon_entitlements WHERE addon_id=$1", [addonId]);
+    for (const e of entries) await client.query("INSERT INTO addon_entitlements (addon_id,key,value) VALUES ($1,$2,$3::jsonb)", [addonId, e.key, JSON.stringify(e.value)]);
+    const after = await readAddon(client, addonId);
+    await audit(client, principal, null, id ? "addon.updated" : "addon.created", `Saved add-on ${after.name}`, { before, after });
+    return after;
+  });
+}

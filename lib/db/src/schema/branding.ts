@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, pgPolicy, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, check, jsonb, pgPolicy, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { tenantsTable } from "./tenants";
 import { assetNetworksTable, modulesTable } from "./catalog";
@@ -14,6 +14,7 @@ export const tenantBrandingTable = pgTable("tenant_branding", {
   themeMode: text("theme_mode").notNull().default("system"),
   defaultLanguage: text("default_language").notNull().default("en"),
   supportedLanguages: text("supported_languages").array().notNull().default(sql`ARRAY['en']::text[]`),
+  websiteSettings: jsonb("website_settings").notNull().default({}),
 }, () => [
   check("branding_valid_mode", sql`theme_mode IN ('light', 'dark', 'system')`),
   ...tenantPolicies("tenant_branding"),

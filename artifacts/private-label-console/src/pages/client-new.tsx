@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useCreateTenant, type Tenant } from '@workspace/api-client-react';
+import { useCreateTenant, useListPlans, type Tenant } from '@workspace/api-client-react';
 import { PageHeader } from '@/components/app/bits';
 import { BrandSection, DomainSection, ModulesSection, AssetsSection, ConfigSection } from '@/components/app/sections';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorState } from '@/components/app/bits';
+// from '@/components/ui/label';
 import { useCan } from '@/lib/principal';
 import { useInvalidateTenant } from '@/lib/invalidate';
 import { useGetTenant, getGetTenantQueryKey } from '@workspace/api-client-react';
 import { useToast } from '@/hooks/use-toast';
 
-const steps = ['Create client', 'Brand', 'Domain', 'Modules', 'Assets and networks', 'Configuration'];
+const steps = ['Create client', 'Brand', 'Domain', 'Modules (from plan)', 'Assets and networks', 'Configuration'];
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
 
 function Wizard({ initial }: { initial: Tenant }) {
@@ -40,11 +44,14 @@ export default function ClientNew() {
   const [slug, setSlug] = useState('');
   const [touched, setTouched] = useState(false);
   const [created, setCreated] = useState<Tenant | null>(null);
+  const [planId, setPlanId] = useState('');
+  const plans = useListPlans();
+  const enabled = (plans.data ?? []).filter((p) => p.status === 'enabled').sort((a, b) => a.displayOrder - b.displayOrder);
   const m = useCreateTenant();
   const inv = useInvalidateTenant();
   const { toast } = useToast();
   const s = touched ? slug : slugify(name);
-  const valid = name.trim().length >= 2 && s.length >= 2 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s);
+  const valid = name.trim().length >= 2 && s.length >= 2 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(s) && !!planId;
   if (!can.createClients) return (<><PageHeader eyebrow="Tenants" title="New client" /><p className="text-sm text-muted-foreground" data-testid="text-forbidden">Only a super admin can create clients. <Link href="/clients" className="text-copper underline">Back to clients</Link></p></>);
   return (
     <>
@@ -54,10 +61,14 @@ export default function ClientNew() {
       </ol>
       <div className="max-w-3xl">
         {created ? <Wizard initial={created} /> : (
-          <form className="space-y-4 rounded-md border bg-card p-5" onSubmit={(e) => { e.preventDefault(); m.mutate({ data: { name: name.trim(), slug: s } }, { onSuccess: (t) => { inv(); setCreated(t); }, onError: (er) => toast({ title: 'Could not create client', description: (er as Error).message, variant: 'destructive' }) }); }}>
+          <form className="space-y-4 rounded-md border bg-card p-5" onSubmit={(e) => { e.preventDefault(); m.mutate({ data: { name: name.trim(), slug: s, planId } }, { onSuccess: (t) => { inv(); setCreated(t); }, onError: (er) => toast({ title: 'Could not create client', description: (er as Error).message, variant: 'destructive' }) }); }}>
             <div className="space-y-1.5"><Label>Client name</Label><Input data-testid="input-name" value={name} onChange={(e) => setName(e.target.value)} /></div>
             <div className="space-y-1.5"><Label>Slug</Label><Input data-testid="input-slug" className="font-mono" value={s} onChange={(e) => { setTouched(true); setSlug(e.target.value); }} />
               <p className="text-xs text-muted-foreground">Lowercase letters, numbers and hyphens.</p></div>
+            <div className="space-y-1.5"><Label>Plan</Label>
+              {plans.isLoading ? <Skeleton className="h-9" /> : plans.isError ? <ErrorState what="plans" onRetry={() => plans.refetch()} /> : enabled.length === 0 ? <p className="text-sm text-muted-foreground" data-testid="text-no-plans">No enabled plans. <Link href="/plans" className="text-copper underline">Enable or create a plan</Link> first.</p> : (
+                <Select value={planId} onValueChange={setPlanId}><SelectTrigger data-testid="select-plan"><SelectValue placeholder="Select an enabled plan" /></SelectTrigger>
+                  <SelectContent>{enabled.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent></Select>)}</div>
             <div className="flex justify-end"><Button data-testid="button-create" disabled={!valid || m.isPending}>{m.isPending ? 'Creating' : 'Create draft client'}</Button></div>
           </form>)}
       </div>

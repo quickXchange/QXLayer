@@ -327,8 +327,165 @@ paths:
           description: Tenant access denied
         "404":
           description: Tenant not found
+  /entitlement-definitions:
+    get:
+      operationId: listEntitlementDefinitions
+      tags: [catalog]
+      responses:
+        "200":
+          description: Generic feature and limit definitions
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/EntitlementDefinition"}}
+  /plans:
+    get:
+      operationId: listPlans
+      tags: [platform]
+      responses:
+        "200":
+          description: Database-driven plans
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: "#/components/schemas/Plan"}}
+    post:
+      operationId: createPlan
+      tags: [platform]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/PlanInput"}}}}
+      responses:
+        "201": {description: Plan created, content: {application/json: {schema: {$ref: "#/components/schemas/Plan"}}}}
+  /plans/{planId}:
+    parameters: [{$ref: "#/components/parameters/PlanId"}]
+    get:
+      operationId: getPlan
+      tags: [platform]
+      responses:
+        "200": {description: Plan detail, content: {application/json: {schema: {$ref: "#/components/schemas/Plan"}}}}
+    put:
+      operationId: updatePlan
+      tags: [platform]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/PlanInput"}}}}
+      responses:
+        "200": {description: Plan updated, content: {application/json: {schema: {$ref: "#/components/schemas/Plan"}}}}
+  /plans/{planId}/duplicate:
+    post:
+      operationId: duplicatePlan
+      tags: [platform]
+      parameters: [{$ref: "#/components/parameters/PlanId"}]
+      responses:
+        "201": {description: Independent disabled copy created, content: {application/json: {schema: {$ref: "#/components/schemas/Plan"}}}}
+  /plans/{planId}/status:
+    put:
+      operationId: setPlanStatus
+      tags: [platform]
+      parameters: [{$ref: "#/components/parameters/PlanId"}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/PlanStatusInput"}}}}
+      responses:
+        "200": {description: Plan lifecycle updated, content: {application/json: {schema: {$ref: "#/components/schemas/Plan"}}}}
+  /add-ons:
+    get:
+      operationId: listAddons
+      tags: [platform]
+      responses:
+        "200": {description: Add-on catalog, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/Addon"}}}}}
+    post:
+      operationId: createAddon
+      tags: [platform]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/AddonInput"}}}}
+      responses:
+        "201": {description: Add-on created, content: {application/json: {schema: {$ref: "#/components/schemas/Addon"}}}}
+  /add-ons/{addonId}:
+    put:
+      operationId: updateAddon
+      tags: [platform]
+      parameters: [{name: addonId, in: path, required: true, schema: {type: string, format: uuid}}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/AddonInput"}}}}
+      responses:
+        "200": {description: Add-on saved, content: {application/json: {schema: {$ref: "#/components/schemas/Addon"}}}}
+  /tenants/{tenantId}/subscription:
+    get:
+      operationId: getTenantSubscription
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      responses:
+        "200": {description: "Current plan, effective rights, overrides and live usage", content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionView"}}}}
+  /tenants/{tenantId}/subscription/plan:
+    put:
+      operationId: changeTenantPlan
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionPlanInput"}}}}
+      responses:
+        "200": {description: Plan changed without billing, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionView"}}}}
+  /tenants/{tenantId}/subscription/add-ons:
+    put:
+      operationId: setTenantAddons
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionAddonInput"}}}}
+      responses:
+        "200": {description: Tenant add-ons changed, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionView"}}}}
+  /tenants/{tenantId}/subscription/overrides:
+    put:
+      operationId: setTenantOverrides
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/EntitlementOverrideInput"}}}}
+      responses:
+        "200": {description: Tenant-only overrides replaced, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionView"}}}}
+  /tenants/{tenantId}/suspension:
+    put:
+      operationId: setTenantSuspension
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/SuspensionInput"}}}}
+      responses:
+        "200": {description: Tenant suspension saved, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionView"}}}}
+  /tenants/{tenantId}/website-settings:
+    put:
+      operationId: updateTenantWebsiteSettings
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/WebsiteSettings"}}}}
+      responses:
+        "200": {description: Shared template settings saved, content: {application/json: {schema: {$ref: "#/components/schemas/Tenant"}}}}
+  /tenants/{tenantId}/resources/{resourceType}:
+    parameters: [{$ref: "#/components/parameters/TenantId"}, {$ref: "#/components/parameters/ResourceType"}]
+    get:
+      operationId: listTenantResources
+      tags: [tenants]
+      responses:
+        "200": {description: Sandbox resource configuration, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/ResourceItem"}}}}}
+    post:
+      operationId: createTenantResource
+      tags: [tenants]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/ResourceInput"}}}}
+      responses:
+        "201": {description: Resource created with atomic quota enforcement, content: {application/json: {schema: {$ref: "#/components/schemas/ResourceCreated"}}}}
+  /tenants/{tenantId}/resources/{resourceType}/{resourceId}:
+    delete:
+      operationId: removeTenantResource
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}, {$ref: "#/components/parameters/ResourceType"}, {name: resourceId, in: path, required: true, schema: {type: string}}]
+      responses:
+        "200": {description: Resource removed or revoked, content: {application/json: {schema: {$ref: "#/components/schemas/MutationStatus"}}}}
+  /public/sites/{slug}:
+    get:
+      operationId: getPublicSite
+      tags: [catalog]
+      parameters: [{name: slug, in: path, required: true, schema: {type: string, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"}}]
+      responses:
+        "200": {description: Allowlisted public tenant website configuration, content: {application/json: {schema: {$ref: "#/components/schemas/PublicSite"}}}}
+  /public/sites/{slug}/capabilities/{feature}:
+    get:
+      operationId: getPublicCapability
+      tags: [catalog]
+      parameters: [{name: slug, in: path, required: true, schema: {type: string}}, {name: feature, in: path, required: true, schema: {type: string}}]
+      responses:
+        "200": {description: Enabled foundation entry point; no product execution, content: {application/json: {schema: {$ref: "#/components/schemas/CapabilityStatus"}}}}
 components:
   parameters:
+    PlanId: {name: planId, in: path, required: true, schema: {type: string, format: uuid}}
+    ResourceType: {name: resourceType, in: path, required: true, schema: {type: string, enum: [staff, api_keys, webhooks, payment_methods]}}
     TenantId:
       name: tenantId
       in: path
@@ -418,7 +575,8 @@ components:
       properties:
         name: { type: string, minLength: 2, maxLength: 120 }
         slug: { type: string, minLength: 2, maxLength: 48, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
-      required: [name, slug]
+        planId: { type: string, format: uuid }
+      required: [name, slug, planId]
     BrandInput:
       type: object
       properties:
@@ -497,5 +655,166 @@ components:
             paymentsEnabled: { type: boolean }
             allowGuestCheckout: { type: boolean }
             configurationComplete: { type: boolean }
+            websiteSettings: {$ref: "#/components/schemas/WebsiteSettings"}
           required: [logoUrl, primaryColor, accentColor, themeMode, defaultLanguage, supportedLanguages, assetNetworkIds, exchangeEnabled, paymentsEnabled, allowGuestCheckout, configurationComplete]
+    EntitlementValue:
+      oneOf: [{type: boolean}, {type: string, pattern: "^[0-9]+(?:\\.[0-9]{1,18})?$", maxLength: 38}]
+    EntitlementEntry:
+      type: object
+      properties:
+        key: {type: string, pattern: "^[a-z][a-z0-9_]*$", maxLength: 80}
+        value: {$ref: "#/components/schemas/EntitlementValue"}
+      required: [key, value]
+    EntitlementDefinition:
+      type: object
+      properties:
+        key: {type: string}
+        label: {type: string}
+        kind: {type: string, enum: [feature, limit]}
+        valueType: {type: string, enum: [boolean, integer, decimal]}
+      required: [key, label, kind, valueType]
+    PlanInput:
+      type: object
+      properties:
+        name: {type: string, minLength: 2, maxLength: 120}
+        description: {type: string, maxLength: 3000}
+        monthlyPrice: {type: string, pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
+        yearlyPrice: {type: string, pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
+        setupFee: {type: string, pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
+        currency: {type: string, pattern: "^[A-Z]{3}$"}
+        billingLabel: {type: string, maxLength: 160}
+        displayOrder: {type: integer, minimum: 0, maximum: 100000}
+        status: {type: string, enum: [enabled, disabled, archived]}
+        entitlements: {type: array, maxItems: 200, items: {$ref: "#/components/schemas/EntitlementEntry"}}
+      required: [name, description, monthlyPrice, yearlyPrice, setupFee, currency, billingLabel, displayOrder, status, entitlements]
+    Plan:
+      allOf:
+        - {$ref: "#/components/schemas/PlanInput"}
+        - type: object
+          properties:
+            id: {type: string, format: uuid}
+            createdAt: {type: string, format: date-time}
+            updatedAt: {type: string, format: date-time}
+          required: [id, createdAt, updatedAt]
+    PlanStatusInput:
+      type: object
+      properties: {status: {type: string, enum: [enabled, disabled, archived]}}
+      required: [status]
+    AddonInput:
+      type: object
+      properties:
+        name: {type: string, minLength: 2, maxLength: 120}
+        description: {type: string, maxLength: 3000}
+        enabled: {type: boolean}
+        entitlements: {type: array, maxItems: 200, items: {$ref: "#/components/schemas/EntitlementEntry"}}
+      required: [name, description, enabled, entitlements]
+    Addon:
+      allOf:
+        - {$ref: "#/components/schemas/AddonInput"}
+        - type: object
+          properties: {id: {type: string, format: uuid}}
+          required: [id]
+    SubscriptionPlanInput:
+      type: object
+      properties: {planId: {type: string, format: uuid}}
+      required: [planId]
+    SubscriptionAddonInput:
+      type: object
+      properties: {addonIds: {type: array, uniqueItems: true, items: {type: string, format: uuid}}}
+      required: [addonIds]
+    EntitlementOverride:
+      allOf:
+        - {$ref: "#/components/schemas/EntitlementEntry"}
+        - type: object
+          properties: {reason: {type: string, minLength: 2, maxLength: 500}}
+          required: [reason]
+    EntitlementOverrideInput:
+      type: object
+      properties: {overrides: {type: array, maxItems: 200, items: {$ref: "#/components/schemas/EntitlementOverride"}}}
+      required: [overrides]
+    UsageItem:
+      type: object
+      properties:
+        key: {type: string}
+        label: {type: string}
+        used: {type: string}
+        limit: {type: string}
+        exceeded: {type: boolean}
+      required: [key, label, used, limit, exceeded]
+    SubscriptionView:
+      type: object
+      properties:
+        tenantId: {type: string, format: uuid}
+        tenantStatus: {type: string}
+        status: {type: string, enum: [active, suspended, unassigned]}
+        plan:
+          oneOf: [{$ref: "#/components/schemas/Plan"}, {type: "null"}]
+        addons: {type: array, items: {$ref: "#/components/schemas/Addon"}}
+        overrides: {type: array, items: {$ref: "#/components/schemas/EntitlementOverride"}}
+        features: {type: object, additionalProperties: {type: boolean}}
+        limits: {type: object, additionalProperties: {type: string}}
+        sources: {type: object, additionalProperties: {type: string}}
+        usage: {type: array, items: {$ref: "#/components/schemas/UsageItem"}}
+        enabledModules: {type: array, items: {type: string}}
+        overLimit: {type: boolean}
+      required: [tenantId, tenantStatus, status, plan, addons, overrides, features, limits, sources, usage, enabledModules, overLimit]
+    SuspensionInput:
+      type: object
+      properties: {suspended: {type: boolean}, reason: {type: string, minLength: 2, maxLength: 500}}
+      required: [suspended, reason]
+    WebsiteSettings:
+      type: object
+      properties:
+        secondaryColor: {type: string, pattern: "^#[0-9A-Fa-f]{6}$"}
+        faviconUrl: {type: ["string", "null"], maxLength: 2048}
+        fontKey: {type: string, enum: [system, inter, manrope, dm-sans, space-grotesk]}
+        heroTitle: {type: string, minLength: 2, maxLength: 180}
+        heroSubtitle: {type: string, maxLength: 1000}
+        supportEmail: {type: ["string", "null"], maxLength: 254}
+        supportUrl: {type: ["string", "null"], maxLength: 2048}
+        supportDetails: {type: string, maxLength: 2000}
+        socialLinks: {type: array, maxItems: 12, items: {$ref: "#/components/schemas/SiteLink"}}
+        footerText: {type: string, maxLength: 2000}
+        privacyContent: {type: string, maxLength: 20000}
+        termsContent: {type: string, maxLength: 20000}
+      required: [secondaryColor, faviconUrl, fontKey, heroTitle, heroSubtitle, supportEmail, supportUrl, supportDetails, socialLinks, footerText, privacyContent, termsContent]
+    SiteLink:
+      type: object
+      properties: {label: {type: string, minLength: 1, maxLength: 80}, url: {type: string, maxLength: 2048}}
+      required: [label, url]
+    ResourceInput:
+      type: object
+      properties: {label: {type: string, minLength: 2, maxLength: 120}, reference: {type: ["string", "null"], maxLength: 2048}}
+      required: [label, reference]
+    ResourceItem:
+      type: object
+      properties: {id: {type: string}, label: {type: string}, reference: {type: ["string", "null"]}, status: {type: string}}
+      required: [id, label, reference, status]
+    ResourceCreated:
+      type: object
+      properties: {item: {$ref: "#/components/schemas/ResourceItem"}, issuedKey: {type: ["string", "null"]}}
+      required: [item, issuedKey]
+    MutationStatus:
+      type: object
+      properties: {ok: {type: boolean}}
+      required: [ok]
+    PublicSite:
+      type: object
+      properties:
+        tenantSlug: {type: string}
+        brandName: {type: string}
+        logoUrl: {type: ["string", "null"]}
+        primaryColor: {type: string}
+        accentColor: {type: string}
+        themeMode: {type: string, enum: [light, dark, system]}
+        domain: {type: ["string", "null"]}
+        sandboxOnly: {type: boolean}
+        websiteSettings: {$ref: "#/components/schemas/WebsiteSettings"}
+        features: {type: object, additionalProperties: {type: boolean}}
+        assets: {type: array, items: {$ref: "#/components/schemas/AssetNetwork"}}
+      required: [tenantSlug, brandName, logoUrl, primaryColor, accentColor, themeMode, domain, sandboxOnly, websiteSettings, features, assets]
+    CapabilityStatus:
+      type: object
+      properties: {feature: {type: string}, status: {type: string}, message: {type: string}}
+      required: [feature, status, message]
 

@@ -123,8 +123,37 @@ export const createTenantBodySlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$
 
 export const CreateTenantBody = zod.object({
   "name": zod.string().min(createTenantBodyNameMin).max(createTenantBodyNameMax),
-  "slug": zod.string().min(createTenantBodySlugMin).max(createTenantBodySlugMax).regex(createTenantBodySlugRegExp)
+  "slug": zod.string().min(createTenantBodySlugMin).max(createTenantBodySlugMax).regex(createTenantBodySlugRegExp),
+  "planId": zod.string().uuid()
 })
+
+export const createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const createTenantResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const createTenantResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const createTenantResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const createTenantResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const createTenantResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const createTenantResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const createTenantResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const createTenantResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const createTenantResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const createTenantResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const createTenantResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const createTenantResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const createTenantResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
 
 export const CreateTenantResponse = zod.object({
   "id": zod.string().uuid(),
@@ -148,7 +177,24 @@ export const CreateTenantResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(createTenantResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(createTenantResponseTwoWebsiteSettingsHeroTitleMin).max(createTenantResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(createTenantResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(createTenantResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(createTenantResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(createTenantResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(createTenantResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(createTenantResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(createTenantResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(createTenantResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(createTenantResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(createTenantResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
 
 
@@ -158,6 +204,34 @@ export const CreateTenantResponse = zod.object({
 export const GetTenantParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
+
+export const getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getTenantResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const getTenantResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const getTenantResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const getTenantResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const getTenantResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const getTenantResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const getTenantResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const getTenantResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const getTenantResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const getTenantResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const getTenantResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const getTenantResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const getTenantResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
 
 export const GetTenantResponse = zod.object({
   "id": zod.string().uuid(),
@@ -181,7 +255,24 @@ export const GetTenantResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(getTenantResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(getTenantResponseTwoWebsiteSettingsHeroTitleMin).max(getTenantResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(getTenantResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(getTenantResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(getTenantResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(getTenantResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(getTenantResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(getTenantResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(getTenantResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(getTenantResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(getTenantResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(getTenantResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
 
 
@@ -217,6 +308,34 @@ export const UpdateTenantBrandBody = zod.object({
   "supportedLanguages": zod.array(zod.string().min(updateTenantBrandBodySupportedLanguagesItemMin).max(updateTenantBrandBodySupportedLanguagesItemMax))
 })
 
+export const updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantBrandResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const updateTenantBrandResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
+
 export const UpdateTenantBrandResponse = zod.object({
   "id": zod.string().uuid(),
   "name": zod.string(),
@@ -239,7 +358,24 @@ export const UpdateTenantBrandResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(updateTenantBrandResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantBrandResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantBrandResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(updateTenantBrandResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
 
 
@@ -257,6 +393,34 @@ export const updateTenantDomainBodyDomainMax = 253;
 export const UpdateTenantDomainBody = zod.object({
   "domain": zod.string().max(updateTenantDomainBodyDomainMax).nullable()
 })
+
+export const updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantDomainResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const updateTenantDomainResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
 
 export const UpdateTenantDomainResponse = zod.object({
   "id": zod.string().uuid(),
@@ -280,7 +444,24 @@ export const UpdateTenantDomainResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(updateTenantDomainResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantDomainResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantDomainResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(updateTenantDomainResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
 
 
@@ -294,6 +475,34 @@ export const UpdateTenantModulesParams = zod.object({
 export const UpdateTenantModulesBody = zod.object({
   "moduleKeys": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api']))
 })
+
+export const updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantModulesResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const updateTenantModulesResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
 
 export const UpdateTenantModulesResponse = zod.object({
   "id": zod.string().uuid(),
@@ -317,7 +526,24 @@ export const UpdateTenantModulesResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(updateTenantModulesResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantModulesResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantModulesResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(updateTenantModulesResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
 
 
@@ -331,6 +557,34 @@ export const UpdateTenantAssetsNetworksParams = zod.object({
 export const UpdateTenantAssetsNetworksBody = zod.object({
   "assetNetworkIds": zod.array(zod.string())
 })
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
 
 export const UpdateTenantAssetsNetworksResponse = zod.object({
   "id": zod.string().uuid(),
@@ -354,7 +608,24 @@ export const UpdateTenantAssetsNetworksResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
 
 
@@ -371,6 +642,34 @@ export const UpdateTenantConfigurationBody = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean()
 })
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantConfigurationResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const updateTenantConfigurationResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
 
 export const UpdateTenantConfigurationResponse = zod.object({
   "id": zod.string().uuid(),
@@ -394,7 +693,24 @@ export const UpdateTenantConfigurationResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(updateTenantConfigurationResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantConfigurationResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantConfigurationResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(updateTenantConfigurationResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
 
 
@@ -404,6 +720,34 @@ export const UpdateTenantConfigurationResponse = zod.object({
 export const ActivateTenantParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
+
+export const activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const activateTenantResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const activateTenantResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const activateTenantResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const activateTenantResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const activateTenantResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const activateTenantResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const activateTenantResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const activateTenantResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const activateTenantResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const activateTenantResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const activateTenantResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const activateTenantResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const activateTenantResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
 
 export const ActivateTenantResponse = zod.object({
   "id": zod.string().uuid(),
@@ -427,7 +771,1542 @@ export const ActivateTenantResponse = zod.object({
   "exchangeEnabled": zod.boolean(),
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
-  "configurationComplete": zod.boolean()
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(activateTenantResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(activateTenantResponseTwoWebsiteSettingsHeroTitleMin).max(activateTenantResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(activateTenantResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(activateTenantResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(activateTenantResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(activateTenantResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(activateTenantResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(activateTenantResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(activateTenantResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(activateTenantResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(activateTenantResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(activateTenantResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
 }))
+
+
+export const ListEntitlementDefinitionsResponseItem = zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['feature', 'limit']),
+  "valueType": zod.enum(['boolean', 'integer', 'decimal'])
+})
+export const ListEntitlementDefinitionsResponse = zod.array(ListEntitlementDefinitionsResponseItem)
+
+
+export const listPlansResponseOneNameMin = 2;
+export const listPlansResponseOneNameMax = 120;
+
+export const listPlansResponseOneDescriptionMax = 3000;
+
+export const listPlansResponseOneMonthlyPriceMax = 18;
+
+
+export const listPlansResponseOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listPlansResponseOneYearlyPriceMax = 18;
+
+
+export const listPlansResponseOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listPlansResponseOneSetupFeeMax = 18;
+
+
+export const listPlansResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listPlansResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listPlansResponseOneBillingLabelMax = 160;
+
+export const listPlansResponseOneDisplayOrderMin = 0;
+export const listPlansResponseOneDisplayOrderMax = 100000;
+
+export const listPlansResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const listPlansResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listPlansResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listPlansResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listPlansResponseOneEntitlementsMax = 200;
+
+
+
+export const ListPlansResponseItem = zod.object({
+  "name": zod.string().min(listPlansResponseOneNameMin).max(listPlansResponseOneNameMax),
+  "description": zod.string().max(listPlansResponseOneDescriptionMax),
+  "monthlyPrice": zod.string().max(listPlansResponseOneMonthlyPriceMax).regex(listPlansResponseOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(listPlansResponseOneYearlyPriceMax).regex(listPlansResponseOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(listPlansResponseOneSetupFeeMax).regex(listPlansResponseOneSetupFeeRegExp),
+  "currency": zod.string().regex(listPlansResponseOneCurrencyRegExp),
+  "billingLabel": zod.string().max(listPlansResponseOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(listPlansResponseOneDisplayOrderMin).max(listPlansResponseOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listPlansResponseOneEntitlementsItemKeyMax).regex(listPlansResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listPlansResponseOneEntitlementsItemValueTwoMax).regex(listPlansResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(listPlansResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+export const ListPlansResponse = zod.array(ListPlansResponseItem)
+
+
+export const createPlanBodyNameMin = 2;
+export const createPlanBodyNameMax = 120;
+
+export const createPlanBodyDescriptionMax = 3000;
+
+export const createPlanBodyMonthlyPriceMax = 18;
+
+
+export const createPlanBodyMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanBodyYearlyPriceMax = 18;
+
+
+export const createPlanBodyYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanBodySetupFeeMax = 18;
+
+
+export const createPlanBodySetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const createPlanBodyBillingLabelMax = 160;
+
+export const createPlanBodyDisplayOrderMin = 0;
+export const createPlanBodyDisplayOrderMax = 100000;
+
+export const createPlanBodyEntitlementsItemKeyMax = 80;
+
+
+export const createPlanBodyEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const createPlanBodyEntitlementsItemValueTwoMax = 38;
+
+
+export const createPlanBodyEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const createPlanBodyEntitlementsMax = 200;
+
+
+
+export const CreatePlanBody = zod.object({
+  "name": zod.string().min(createPlanBodyNameMin).max(createPlanBodyNameMax),
+  "description": zod.string().max(createPlanBodyDescriptionMax),
+  "monthlyPrice": zod.string().max(createPlanBodyMonthlyPriceMax).regex(createPlanBodyMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(createPlanBodyYearlyPriceMax).regex(createPlanBodyYearlyPriceRegExp),
+  "setupFee": zod.string().max(createPlanBodySetupFeeMax).regex(createPlanBodySetupFeeRegExp),
+  "currency": zod.string().regex(createPlanBodyCurrencyRegExp),
+  "billingLabel": zod.string().max(createPlanBodyBillingLabelMax),
+  "displayOrder": zod.number().int().min(createPlanBodyDisplayOrderMin).max(createPlanBodyDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(createPlanBodyEntitlementsItemKeyMax).regex(createPlanBodyEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(createPlanBodyEntitlementsItemValueTwoMax).regex(createPlanBodyEntitlementsItemValueTwoRegExp)])
+})).max(createPlanBodyEntitlementsMax)
+})
+
+export const createPlanResponseOneNameMin = 2;
+export const createPlanResponseOneNameMax = 120;
+
+export const createPlanResponseOneDescriptionMax = 3000;
+
+export const createPlanResponseOneMonthlyPriceMax = 18;
+
+
+export const createPlanResponseOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanResponseOneYearlyPriceMax = 18;
+
+
+export const createPlanResponseOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanResponseOneSetupFeeMax = 18;
+
+
+export const createPlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const createPlanResponseOneBillingLabelMax = 160;
+
+export const createPlanResponseOneDisplayOrderMin = 0;
+export const createPlanResponseOneDisplayOrderMax = 100000;
+
+export const createPlanResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const createPlanResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const createPlanResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const createPlanResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const createPlanResponseOneEntitlementsMax = 200;
+
+
+
+export const CreatePlanResponse = zod.object({
+  "name": zod.string().min(createPlanResponseOneNameMin).max(createPlanResponseOneNameMax),
+  "description": zod.string().max(createPlanResponseOneDescriptionMax),
+  "monthlyPrice": zod.string().max(createPlanResponseOneMonthlyPriceMax).regex(createPlanResponseOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(createPlanResponseOneYearlyPriceMax).regex(createPlanResponseOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(createPlanResponseOneSetupFeeMax).regex(createPlanResponseOneSetupFeeRegExp),
+  "currency": zod.string().regex(createPlanResponseOneCurrencyRegExp),
+  "billingLabel": zod.string().max(createPlanResponseOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(createPlanResponseOneDisplayOrderMin).max(createPlanResponseOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(createPlanResponseOneEntitlementsItemKeyMax).regex(createPlanResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(createPlanResponseOneEntitlementsItemValueTwoMax).regex(createPlanResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(createPlanResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+export const GetPlanParams = zod.object({
+  "planId": zod.coerce.string().uuid()
+})
+
+export const getPlanResponseOneNameMin = 2;
+export const getPlanResponseOneNameMax = 120;
+
+export const getPlanResponseOneDescriptionMax = 3000;
+
+export const getPlanResponseOneMonthlyPriceMax = 18;
+
+
+export const getPlanResponseOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getPlanResponseOneYearlyPriceMax = 18;
+
+
+export const getPlanResponseOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getPlanResponseOneSetupFeeMax = 18;
+
+
+export const getPlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getPlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getPlanResponseOneBillingLabelMax = 160;
+
+export const getPlanResponseOneDisplayOrderMin = 0;
+export const getPlanResponseOneDisplayOrderMax = 100000;
+
+export const getPlanResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const getPlanResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getPlanResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getPlanResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getPlanResponseOneEntitlementsMax = 200;
+
+
+
+export const GetPlanResponse = zod.object({
+  "name": zod.string().min(getPlanResponseOneNameMin).max(getPlanResponseOneNameMax),
+  "description": zod.string().max(getPlanResponseOneDescriptionMax),
+  "monthlyPrice": zod.string().max(getPlanResponseOneMonthlyPriceMax).regex(getPlanResponseOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(getPlanResponseOneYearlyPriceMax).regex(getPlanResponseOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(getPlanResponseOneSetupFeeMax).regex(getPlanResponseOneSetupFeeRegExp),
+  "currency": zod.string().regex(getPlanResponseOneCurrencyRegExp),
+  "billingLabel": zod.string().max(getPlanResponseOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(getPlanResponseOneDisplayOrderMin).max(getPlanResponseOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getPlanResponseOneEntitlementsItemKeyMax).regex(getPlanResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getPlanResponseOneEntitlementsItemValueTwoMax).regex(getPlanResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(getPlanResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+export const UpdatePlanParams = zod.object({
+  "planId": zod.coerce.string().uuid()
+})
+
+export const updatePlanBodyNameMin = 2;
+export const updatePlanBodyNameMax = 120;
+
+export const updatePlanBodyDescriptionMax = 3000;
+
+export const updatePlanBodyMonthlyPriceMax = 18;
+
+
+export const updatePlanBodyMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanBodyYearlyPriceMax = 18;
+
+
+export const updatePlanBodyYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanBodySetupFeeMax = 18;
+
+
+export const updatePlanBodySetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updatePlanBodyBillingLabelMax = 160;
+
+export const updatePlanBodyDisplayOrderMin = 0;
+export const updatePlanBodyDisplayOrderMax = 100000;
+
+export const updatePlanBodyEntitlementsItemKeyMax = 80;
+
+
+export const updatePlanBodyEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updatePlanBodyEntitlementsItemValueTwoMax = 38;
+
+
+export const updatePlanBodyEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const updatePlanBodyEntitlementsMax = 200;
+
+
+
+export const UpdatePlanBody = zod.object({
+  "name": zod.string().min(updatePlanBodyNameMin).max(updatePlanBodyNameMax),
+  "description": zod.string().max(updatePlanBodyDescriptionMax),
+  "monthlyPrice": zod.string().max(updatePlanBodyMonthlyPriceMax).regex(updatePlanBodyMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(updatePlanBodyYearlyPriceMax).regex(updatePlanBodyYearlyPriceRegExp),
+  "setupFee": zod.string().max(updatePlanBodySetupFeeMax).regex(updatePlanBodySetupFeeRegExp),
+  "currency": zod.string().regex(updatePlanBodyCurrencyRegExp),
+  "billingLabel": zod.string().max(updatePlanBodyBillingLabelMax),
+  "displayOrder": zod.number().int().min(updatePlanBodyDisplayOrderMin).max(updatePlanBodyDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(updatePlanBodyEntitlementsItemKeyMax).regex(updatePlanBodyEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(updatePlanBodyEntitlementsItemValueTwoMax).regex(updatePlanBodyEntitlementsItemValueTwoRegExp)])
+})).max(updatePlanBodyEntitlementsMax)
+})
+
+export const updatePlanResponseOneNameMin = 2;
+export const updatePlanResponseOneNameMax = 120;
+
+export const updatePlanResponseOneDescriptionMax = 3000;
+
+export const updatePlanResponseOneMonthlyPriceMax = 18;
+
+
+export const updatePlanResponseOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanResponseOneYearlyPriceMax = 18;
+
+
+export const updatePlanResponseOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanResponseOneSetupFeeMax = 18;
+
+
+export const updatePlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updatePlanResponseOneBillingLabelMax = 160;
+
+export const updatePlanResponseOneDisplayOrderMin = 0;
+export const updatePlanResponseOneDisplayOrderMax = 100000;
+
+export const updatePlanResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const updatePlanResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updatePlanResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const updatePlanResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const updatePlanResponseOneEntitlementsMax = 200;
+
+
+
+export const UpdatePlanResponse = zod.object({
+  "name": zod.string().min(updatePlanResponseOneNameMin).max(updatePlanResponseOneNameMax),
+  "description": zod.string().max(updatePlanResponseOneDescriptionMax),
+  "monthlyPrice": zod.string().max(updatePlanResponseOneMonthlyPriceMax).regex(updatePlanResponseOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(updatePlanResponseOneYearlyPriceMax).regex(updatePlanResponseOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(updatePlanResponseOneSetupFeeMax).regex(updatePlanResponseOneSetupFeeRegExp),
+  "currency": zod.string().regex(updatePlanResponseOneCurrencyRegExp),
+  "billingLabel": zod.string().max(updatePlanResponseOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(updatePlanResponseOneDisplayOrderMin).max(updatePlanResponseOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(updatePlanResponseOneEntitlementsItemKeyMax).regex(updatePlanResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(updatePlanResponseOneEntitlementsItemValueTwoMax).regex(updatePlanResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(updatePlanResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+export const DuplicatePlanParams = zod.object({
+  "planId": zod.coerce.string().uuid()
+})
+
+export const duplicatePlanResponseOneNameMin = 2;
+export const duplicatePlanResponseOneNameMax = 120;
+
+export const duplicatePlanResponseOneDescriptionMax = 3000;
+
+export const duplicatePlanResponseOneMonthlyPriceMax = 18;
+
+
+export const duplicatePlanResponseOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const duplicatePlanResponseOneYearlyPriceMax = 18;
+
+
+export const duplicatePlanResponseOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const duplicatePlanResponseOneSetupFeeMax = 18;
+
+
+export const duplicatePlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const duplicatePlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const duplicatePlanResponseOneBillingLabelMax = 160;
+
+export const duplicatePlanResponseOneDisplayOrderMin = 0;
+export const duplicatePlanResponseOneDisplayOrderMax = 100000;
+
+export const duplicatePlanResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const duplicatePlanResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const duplicatePlanResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const duplicatePlanResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const duplicatePlanResponseOneEntitlementsMax = 200;
+
+
+
+export const DuplicatePlanResponse = zod.object({
+  "name": zod.string().min(duplicatePlanResponseOneNameMin).max(duplicatePlanResponseOneNameMax),
+  "description": zod.string().max(duplicatePlanResponseOneDescriptionMax),
+  "monthlyPrice": zod.string().max(duplicatePlanResponseOneMonthlyPriceMax).regex(duplicatePlanResponseOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(duplicatePlanResponseOneYearlyPriceMax).regex(duplicatePlanResponseOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(duplicatePlanResponseOneSetupFeeMax).regex(duplicatePlanResponseOneSetupFeeRegExp),
+  "currency": zod.string().regex(duplicatePlanResponseOneCurrencyRegExp),
+  "billingLabel": zod.string().max(duplicatePlanResponseOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(duplicatePlanResponseOneDisplayOrderMin).max(duplicatePlanResponseOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(duplicatePlanResponseOneEntitlementsItemKeyMax).regex(duplicatePlanResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(duplicatePlanResponseOneEntitlementsItemValueTwoMax).regex(duplicatePlanResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(duplicatePlanResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+export const SetPlanStatusParams = zod.object({
+  "planId": zod.coerce.string().uuid()
+})
+
+export const SetPlanStatusBody = zod.object({
+  "status": zod.enum(['enabled', 'disabled', 'archived'])
+})
+
+export const setPlanStatusResponseOneNameMin = 2;
+export const setPlanStatusResponseOneNameMax = 120;
+
+export const setPlanStatusResponseOneDescriptionMax = 3000;
+
+export const setPlanStatusResponseOneMonthlyPriceMax = 18;
+
+
+export const setPlanStatusResponseOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setPlanStatusResponseOneYearlyPriceMax = 18;
+
+
+export const setPlanStatusResponseOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setPlanStatusResponseOneSetupFeeMax = 18;
+
+
+export const setPlanStatusResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setPlanStatusResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const setPlanStatusResponseOneBillingLabelMax = 160;
+
+export const setPlanStatusResponseOneDisplayOrderMin = 0;
+export const setPlanStatusResponseOneDisplayOrderMax = 100000;
+
+export const setPlanStatusResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const setPlanStatusResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setPlanStatusResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const setPlanStatusResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setPlanStatusResponseOneEntitlementsMax = 200;
+
+
+
+export const SetPlanStatusResponse = zod.object({
+  "name": zod.string().min(setPlanStatusResponseOneNameMin).max(setPlanStatusResponseOneNameMax),
+  "description": zod.string().max(setPlanStatusResponseOneDescriptionMax),
+  "monthlyPrice": zod.string().max(setPlanStatusResponseOneMonthlyPriceMax).regex(setPlanStatusResponseOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(setPlanStatusResponseOneYearlyPriceMax).regex(setPlanStatusResponseOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(setPlanStatusResponseOneSetupFeeMax).regex(setPlanStatusResponseOneSetupFeeRegExp),
+  "currency": zod.string().regex(setPlanStatusResponseOneCurrencyRegExp),
+  "billingLabel": zod.string().max(setPlanStatusResponseOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(setPlanStatusResponseOneDisplayOrderMin).max(setPlanStatusResponseOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(setPlanStatusResponseOneEntitlementsItemKeyMax).regex(setPlanStatusResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setPlanStatusResponseOneEntitlementsItemValueTwoMax).regex(setPlanStatusResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(setPlanStatusResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))
+
+
+export const listAddonsResponseOneNameMin = 2;
+export const listAddonsResponseOneNameMax = 120;
+
+export const listAddonsResponseOneDescriptionMax = 3000;
+
+export const listAddonsResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const listAddonsResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listAddonsResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listAddonsResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listAddonsResponseOneEntitlementsMax = 200;
+
+
+
+export const ListAddonsResponseItem = zod.object({
+  "name": zod.string().min(listAddonsResponseOneNameMin).max(listAddonsResponseOneNameMax),
+  "description": zod.string().max(listAddonsResponseOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listAddonsResponseOneEntitlementsItemKeyMax).regex(listAddonsResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listAddonsResponseOneEntitlementsItemValueTwoMax).regex(listAddonsResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(listAddonsResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))
+export const ListAddonsResponse = zod.array(ListAddonsResponseItem)
+
+
+export const createAddonBodyNameMin = 2;
+export const createAddonBodyNameMax = 120;
+
+export const createAddonBodyDescriptionMax = 3000;
+
+export const createAddonBodyEntitlementsItemKeyMax = 80;
+
+
+export const createAddonBodyEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const createAddonBodyEntitlementsItemValueTwoMax = 38;
+
+
+export const createAddonBodyEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const createAddonBodyEntitlementsMax = 200;
+
+
+
+export const CreateAddonBody = zod.object({
+  "name": zod.string().min(createAddonBodyNameMin).max(createAddonBodyNameMax),
+  "description": zod.string().max(createAddonBodyDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(createAddonBodyEntitlementsItemKeyMax).regex(createAddonBodyEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(createAddonBodyEntitlementsItemValueTwoMax).regex(createAddonBodyEntitlementsItemValueTwoRegExp)])
+})).max(createAddonBodyEntitlementsMax)
+})
+
+export const createAddonResponseOneNameMin = 2;
+export const createAddonResponseOneNameMax = 120;
+
+export const createAddonResponseOneDescriptionMax = 3000;
+
+export const createAddonResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const createAddonResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const createAddonResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const createAddonResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const createAddonResponseOneEntitlementsMax = 200;
+
+
+
+export const CreateAddonResponse = zod.object({
+  "name": zod.string().min(createAddonResponseOneNameMin).max(createAddonResponseOneNameMax),
+  "description": zod.string().max(createAddonResponseOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(createAddonResponseOneEntitlementsItemKeyMax).regex(createAddonResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(createAddonResponseOneEntitlementsItemValueTwoMax).regex(createAddonResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(createAddonResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))
+
+
+export const UpdateAddonParams = zod.object({
+  "addonId": zod.coerce.string().uuid()
+})
+
+export const updateAddonBodyNameMin = 2;
+export const updateAddonBodyNameMax = 120;
+
+export const updateAddonBodyDescriptionMax = 3000;
+
+export const updateAddonBodyEntitlementsItemKeyMax = 80;
+
+
+export const updateAddonBodyEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateAddonBodyEntitlementsItemValueTwoMax = 38;
+
+
+export const updateAddonBodyEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const updateAddonBodyEntitlementsMax = 200;
+
+
+
+export const UpdateAddonBody = zod.object({
+  "name": zod.string().min(updateAddonBodyNameMin).max(updateAddonBodyNameMax),
+  "description": zod.string().max(updateAddonBodyDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(updateAddonBodyEntitlementsItemKeyMax).regex(updateAddonBodyEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(updateAddonBodyEntitlementsItemValueTwoMax).regex(updateAddonBodyEntitlementsItemValueTwoRegExp)])
+})).max(updateAddonBodyEntitlementsMax)
+})
+
+export const updateAddonResponseOneNameMin = 2;
+export const updateAddonResponseOneNameMax = 120;
+
+export const updateAddonResponseOneDescriptionMax = 3000;
+
+export const updateAddonResponseOneEntitlementsItemKeyMax = 80;
+
+
+export const updateAddonResponseOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateAddonResponseOneEntitlementsItemValueTwoMax = 38;
+
+
+export const updateAddonResponseOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const updateAddonResponseOneEntitlementsMax = 200;
+
+
+
+export const UpdateAddonResponse = zod.object({
+  "name": zod.string().min(updateAddonResponseOneNameMin).max(updateAddonResponseOneNameMax),
+  "description": zod.string().max(updateAddonResponseOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(updateAddonResponseOneEntitlementsItemKeyMax).regex(updateAddonResponseOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(updateAddonResponseOneEntitlementsItemValueTwoMax).regex(updateAddonResponseOneEntitlementsItemValueTwoRegExp)])
+})).max(updateAddonResponseOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))
+
+
+export const GetTenantSubscriptionParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const getTenantSubscriptionResponsePlanOneOneNameMin = 2;
+export const getTenantSubscriptionResponsePlanOneOneNameMax = 120;
+
+export const getTenantSubscriptionResponsePlanOneOneDescriptionMax = 3000;
+
+export const getTenantSubscriptionResponsePlanOneOneMonthlyPriceMax = 18;
+
+
+export const getTenantSubscriptionResponsePlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getTenantSubscriptionResponsePlanOneOneYearlyPriceMax = 18;
+
+
+export const getTenantSubscriptionResponsePlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getTenantSubscriptionResponsePlanOneOneSetupFeeMax = 18;
+
+
+export const getTenantSubscriptionResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getTenantSubscriptionResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getTenantSubscriptionResponsePlanOneOneBillingLabelMax = 160;
+
+export const getTenantSubscriptionResponsePlanOneOneDisplayOrderMin = 0;
+export const getTenantSubscriptionResponsePlanOneOneDisplayOrderMax = 100000;
+
+export const getTenantSubscriptionResponsePlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const getTenantSubscriptionResponsePlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getTenantSubscriptionResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getTenantSubscriptionResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getTenantSubscriptionResponsePlanOneOneEntitlementsMax = 200;
+
+export const getTenantSubscriptionResponseAddonsItemOneNameMin = 2;
+export const getTenantSubscriptionResponseAddonsItemOneNameMax = 120;
+
+export const getTenantSubscriptionResponseAddonsItemOneDescriptionMax = 3000;
+
+export const getTenantSubscriptionResponseAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const getTenantSubscriptionResponseAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getTenantSubscriptionResponseAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getTenantSubscriptionResponseAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getTenantSubscriptionResponseAddonsItemOneEntitlementsMax = 200;
+
+export const getTenantSubscriptionResponseOverridesItemOneKeyMax = 80;
+
+
+export const getTenantSubscriptionResponseOverridesItemOneKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getTenantSubscriptionResponseOverridesItemOneValueTwoMax = 38;
+
+
+export const getTenantSubscriptionResponseOverridesItemOneValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getTenantSubscriptionResponseOverridesItemTwoReasonMin = 2;
+export const getTenantSubscriptionResponseOverridesItemTwoReasonMax = 500;
+
+
+
+export const GetTenantSubscriptionResponse = zod.object({
+  "tenantId": zod.string().uuid(),
+  "tenantStatus": zod.string(),
+  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "plan": zod.union([zod.object({
+  "name": zod.string().min(getTenantSubscriptionResponsePlanOneOneNameMin).max(getTenantSubscriptionResponsePlanOneOneNameMax),
+  "description": zod.string().max(getTenantSubscriptionResponsePlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(getTenantSubscriptionResponsePlanOneOneMonthlyPriceMax).regex(getTenantSubscriptionResponsePlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(getTenantSubscriptionResponsePlanOneOneYearlyPriceMax).regex(getTenantSubscriptionResponsePlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(getTenantSubscriptionResponsePlanOneOneSetupFeeMax).regex(getTenantSubscriptionResponsePlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(getTenantSubscriptionResponsePlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(getTenantSubscriptionResponsePlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(getTenantSubscriptionResponsePlanOneOneDisplayOrderMin).max(getTenantSubscriptionResponsePlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getTenantSubscriptionResponsePlanOneOneEntitlementsItemKeyMax).regex(getTenantSubscriptionResponsePlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getTenantSubscriptionResponsePlanOneOneEntitlementsItemValueTwoMax).regex(getTenantSubscriptionResponsePlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(getTenantSubscriptionResponsePlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]),
+  "addons": zod.array(zod.object({
+  "name": zod.string().min(getTenantSubscriptionResponseAddonsItemOneNameMin).max(getTenantSubscriptionResponseAddonsItemOneNameMax),
+  "description": zod.string().max(getTenantSubscriptionResponseAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getTenantSubscriptionResponseAddonsItemOneEntitlementsItemKeyMax).regex(getTenantSubscriptionResponseAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getTenantSubscriptionResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(getTenantSubscriptionResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(getTenantSubscriptionResponseAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))),
+  "overrides": zod.array(zod.object({
+  "key": zod.string().max(getTenantSubscriptionResponseOverridesItemOneKeyMax).regex(getTenantSubscriptionResponseOverridesItemOneKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getTenantSubscriptionResponseOverridesItemOneValueTwoMax).regex(getTenantSubscriptionResponseOverridesItemOneValueTwoRegExp)])
+}).and(zod.object({
+  "reason": zod.string().min(getTenantSubscriptionResponseOverridesItemTwoReasonMin).max(getTenantSubscriptionResponseOverridesItemTwoReasonMax)
+}))),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "limits": zod.record(zod.string(), zod.string()),
+  "sources": zod.record(zod.string(), zod.string()),
+  "usage": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "used": zod.string(),
+  "limit": zod.string(),
+  "exceeded": zod.boolean()
+})),
+  "enabledModules": zod.array(zod.string()),
+  "overLimit": zod.boolean()
+})
+
+
+export const ChangeTenantPlanParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const ChangeTenantPlanBody = zod.object({
+  "planId": zod.string().uuid()
+})
+
+export const changeTenantPlanResponsePlanOneOneNameMin = 2;
+export const changeTenantPlanResponsePlanOneOneNameMax = 120;
+
+export const changeTenantPlanResponsePlanOneOneDescriptionMax = 3000;
+
+export const changeTenantPlanResponsePlanOneOneMonthlyPriceMax = 18;
+
+
+export const changeTenantPlanResponsePlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const changeTenantPlanResponsePlanOneOneYearlyPriceMax = 18;
+
+
+export const changeTenantPlanResponsePlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const changeTenantPlanResponsePlanOneOneSetupFeeMax = 18;
+
+
+export const changeTenantPlanResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const changeTenantPlanResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const changeTenantPlanResponsePlanOneOneBillingLabelMax = 160;
+
+export const changeTenantPlanResponsePlanOneOneDisplayOrderMin = 0;
+export const changeTenantPlanResponsePlanOneOneDisplayOrderMax = 100000;
+
+export const changeTenantPlanResponsePlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const changeTenantPlanResponsePlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const changeTenantPlanResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const changeTenantPlanResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const changeTenantPlanResponsePlanOneOneEntitlementsMax = 200;
+
+export const changeTenantPlanResponseAddonsItemOneNameMin = 2;
+export const changeTenantPlanResponseAddonsItemOneNameMax = 120;
+
+export const changeTenantPlanResponseAddonsItemOneDescriptionMax = 3000;
+
+export const changeTenantPlanResponseAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const changeTenantPlanResponseAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const changeTenantPlanResponseAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const changeTenantPlanResponseAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const changeTenantPlanResponseAddonsItemOneEntitlementsMax = 200;
+
+export const changeTenantPlanResponseOverridesItemOneKeyMax = 80;
+
+
+export const changeTenantPlanResponseOverridesItemOneKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const changeTenantPlanResponseOverridesItemOneValueTwoMax = 38;
+
+
+export const changeTenantPlanResponseOverridesItemOneValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const changeTenantPlanResponseOverridesItemTwoReasonMin = 2;
+export const changeTenantPlanResponseOverridesItemTwoReasonMax = 500;
+
+
+
+export const ChangeTenantPlanResponse = zod.object({
+  "tenantId": zod.string().uuid(),
+  "tenantStatus": zod.string(),
+  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "plan": zod.union([zod.object({
+  "name": zod.string().min(changeTenantPlanResponsePlanOneOneNameMin).max(changeTenantPlanResponsePlanOneOneNameMax),
+  "description": zod.string().max(changeTenantPlanResponsePlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(changeTenantPlanResponsePlanOneOneMonthlyPriceMax).regex(changeTenantPlanResponsePlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(changeTenantPlanResponsePlanOneOneYearlyPriceMax).regex(changeTenantPlanResponsePlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(changeTenantPlanResponsePlanOneOneSetupFeeMax).regex(changeTenantPlanResponsePlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(changeTenantPlanResponsePlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(changeTenantPlanResponsePlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(changeTenantPlanResponsePlanOneOneDisplayOrderMin).max(changeTenantPlanResponsePlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(changeTenantPlanResponsePlanOneOneEntitlementsItemKeyMax).regex(changeTenantPlanResponsePlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(changeTenantPlanResponsePlanOneOneEntitlementsItemValueTwoMax).regex(changeTenantPlanResponsePlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(changeTenantPlanResponsePlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]),
+  "addons": zod.array(zod.object({
+  "name": zod.string().min(changeTenantPlanResponseAddonsItemOneNameMin).max(changeTenantPlanResponseAddonsItemOneNameMax),
+  "description": zod.string().max(changeTenantPlanResponseAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(changeTenantPlanResponseAddonsItemOneEntitlementsItemKeyMax).regex(changeTenantPlanResponseAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(changeTenantPlanResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(changeTenantPlanResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(changeTenantPlanResponseAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))),
+  "overrides": zod.array(zod.object({
+  "key": zod.string().max(changeTenantPlanResponseOverridesItemOneKeyMax).regex(changeTenantPlanResponseOverridesItemOneKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(changeTenantPlanResponseOverridesItemOneValueTwoMax).regex(changeTenantPlanResponseOverridesItemOneValueTwoRegExp)])
+}).and(zod.object({
+  "reason": zod.string().min(changeTenantPlanResponseOverridesItemTwoReasonMin).max(changeTenantPlanResponseOverridesItemTwoReasonMax)
+}))),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "limits": zod.record(zod.string(), zod.string()),
+  "sources": zod.record(zod.string(), zod.string()),
+  "usage": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "used": zod.string(),
+  "limit": zod.string(),
+  "exceeded": zod.boolean()
+})),
+  "enabledModules": zod.array(zod.string()),
+  "overLimit": zod.boolean()
+})
+
+
+export const SetTenantAddonsParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const SetTenantAddonsBody = zod.object({
+  "addonIds": zod.array(zod.string().uuid())
+})
+
+export const setTenantAddonsResponsePlanOneOneNameMin = 2;
+export const setTenantAddonsResponsePlanOneOneNameMax = 120;
+
+export const setTenantAddonsResponsePlanOneOneDescriptionMax = 3000;
+
+export const setTenantAddonsResponsePlanOneOneMonthlyPriceMax = 18;
+
+
+export const setTenantAddonsResponsePlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantAddonsResponsePlanOneOneYearlyPriceMax = 18;
+
+
+export const setTenantAddonsResponsePlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantAddonsResponsePlanOneOneSetupFeeMax = 18;
+
+
+export const setTenantAddonsResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantAddonsResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const setTenantAddonsResponsePlanOneOneBillingLabelMax = 160;
+
+export const setTenantAddonsResponsePlanOneOneDisplayOrderMin = 0;
+export const setTenantAddonsResponsePlanOneOneDisplayOrderMax = 100000;
+
+export const setTenantAddonsResponsePlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const setTenantAddonsResponsePlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantAddonsResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const setTenantAddonsResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantAddonsResponsePlanOneOneEntitlementsMax = 200;
+
+export const setTenantAddonsResponseAddonsItemOneNameMin = 2;
+export const setTenantAddonsResponseAddonsItemOneNameMax = 120;
+
+export const setTenantAddonsResponseAddonsItemOneDescriptionMax = 3000;
+
+export const setTenantAddonsResponseAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const setTenantAddonsResponseAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantAddonsResponseAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const setTenantAddonsResponseAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantAddonsResponseAddonsItemOneEntitlementsMax = 200;
+
+export const setTenantAddonsResponseOverridesItemOneKeyMax = 80;
+
+
+export const setTenantAddonsResponseOverridesItemOneKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantAddonsResponseOverridesItemOneValueTwoMax = 38;
+
+
+export const setTenantAddonsResponseOverridesItemOneValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantAddonsResponseOverridesItemTwoReasonMin = 2;
+export const setTenantAddonsResponseOverridesItemTwoReasonMax = 500;
+
+
+
+export const SetTenantAddonsResponse = zod.object({
+  "tenantId": zod.string().uuid(),
+  "tenantStatus": zod.string(),
+  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "plan": zod.union([zod.object({
+  "name": zod.string().min(setTenantAddonsResponsePlanOneOneNameMin).max(setTenantAddonsResponsePlanOneOneNameMax),
+  "description": zod.string().max(setTenantAddonsResponsePlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(setTenantAddonsResponsePlanOneOneMonthlyPriceMax).regex(setTenantAddonsResponsePlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(setTenantAddonsResponsePlanOneOneYearlyPriceMax).regex(setTenantAddonsResponsePlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(setTenantAddonsResponsePlanOneOneSetupFeeMax).regex(setTenantAddonsResponsePlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(setTenantAddonsResponsePlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(setTenantAddonsResponsePlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(setTenantAddonsResponsePlanOneOneDisplayOrderMin).max(setTenantAddonsResponsePlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(setTenantAddonsResponsePlanOneOneEntitlementsItemKeyMax).regex(setTenantAddonsResponsePlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantAddonsResponsePlanOneOneEntitlementsItemValueTwoMax).regex(setTenantAddonsResponsePlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(setTenantAddonsResponsePlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]),
+  "addons": zod.array(zod.object({
+  "name": zod.string().min(setTenantAddonsResponseAddonsItemOneNameMin).max(setTenantAddonsResponseAddonsItemOneNameMax),
+  "description": zod.string().max(setTenantAddonsResponseAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(setTenantAddonsResponseAddonsItemOneEntitlementsItemKeyMax).regex(setTenantAddonsResponseAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantAddonsResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(setTenantAddonsResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(setTenantAddonsResponseAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))),
+  "overrides": zod.array(zod.object({
+  "key": zod.string().max(setTenantAddonsResponseOverridesItemOneKeyMax).regex(setTenantAddonsResponseOverridesItemOneKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantAddonsResponseOverridesItemOneValueTwoMax).regex(setTenantAddonsResponseOverridesItemOneValueTwoRegExp)])
+}).and(zod.object({
+  "reason": zod.string().min(setTenantAddonsResponseOverridesItemTwoReasonMin).max(setTenantAddonsResponseOverridesItemTwoReasonMax)
+}))),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "limits": zod.record(zod.string(), zod.string()),
+  "sources": zod.record(zod.string(), zod.string()),
+  "usage": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "used": zod.string(),
+  "limit": zod.string(),
+  "exceeded": zod.boolean()
+})),
+  "enabledModules": zod.array(zod.string()),
+  "overLimit": zod.boolean()
+})
+
+
+export const SetTenantOverridesParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const setTenantOverridesBodyOverridesItemOneKeyMax = 80;
+
+
+export const setTenantOverridesBodyOverridesItemOneKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantOverridesBodyOverridesItemOneValueTwoMax = 38;
+
+
+export const setTenantOverridesBodyOverridesItemOneValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantOverridesBodyOverridesItemTwoReasonMin = 2;
+export const setTenantOverridesBodyOverridesItemTwoReasonMax = 500;
+
+export const setTenantOverridesBodyOverridesMax = 200;
+
+
+
+export const SetTenantOverridesBody = zod.object({
+  "overrides": zod.array(zod.object({
+  "key": zod.string().max(setTenantOverridesBodyOverridesItemOneKeyMax).regex(setTenantOverridesBodyOverridesItemOneKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantOverridesBodyOverridesItemOneValueTwoMax).regex(setTenantOverridesBodyOverridesItemOneValueTwoRegExp)])
+}).and(zod.object({
+  "reason": zod.string().min(setTenantOverridesBodyOverridesItemTwoReasonMin).max(setTenantOverridesBodyOverridesItemTwoReasonMax)
+}))).max(setTenantOverridesBodyOverridesMax)
+})
+
+export const setTenantOverridesResponsePlanOneOneNameMin = 2;
+export const setTenantOverridesResponsePlanOneOneNameMax = 120;
+
+export const setTenantOverridesResponsePlanOneOneDescriptionMax = 3000;
+
+export const setTenantOverridesResponsePlanOneOneMonthlyPriceMax = 18;
+
+
+export const setTenantOverridesResponsePlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantOverridesResponsePlanOneOneYearlyPriceMax = 18;
+
+
+export const setTenantOverridesResponsePlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantOverridesResponsePlanOneOneSetupFeeMax = 18;
+
+
+export const setTenantOverridesResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantOverridesResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const setTenantOverridesResponsePlanOneOneBillingLabelMax = 160;
+
+export const setTenantOverridesResponsePlanOneOneDisplayOrderMin = 0;
+export const setTenantOverridesResponsePlanOneOneDisplayOrderMax = 100000;
+
+export const setTenantOverridesResponsePlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const setTenantOverridesResponsePlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantOverridesResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const setTenantOverridesResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantOverridesResponsePlanOneOneEntitlementsMax = 200;
+
+export const setTenantOverridesResponseAddonsItemOneNameMin = 2;
+export const setTenantOverridesResponseAddonsItemOneNameMax = 120;
+
+export const setTenantOverridesResponseAddonsItemOneDescriptionMax = 3000;
+
+export const setTenantOverridesResponseAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const setTenantOverridesResponseAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantOverridesResponseAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const setTenantOverridesResponseAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantOverridesResponseAddonsItemOneEntitlementsMax = 200;
+
+export const setTenantOverridesResponseOverridesItemOneKeyMax = 80;
+
+
+export const setTenantOverridesResponseOverridesItemOneKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantOverridesResponseOverridesItemOneValueTwoMax = 38;
+
+
+export const setTenantOverridesResponseOverridesItemOneValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantOverridesResponseOverridesItemTwoReasonMin = 2;
+export const setTenantOverridesResponseOverridesItemTwoReasonMax = 500;
+
+
+
+export const SetTenantOverridesResponse = zod.object({
+  "tenantId": zod.string().uuid(),
+  "tenantStatus": zod.string(),
+  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "plan": zod.union([zod.object({
+  "name": zod.string().min(setTenantOverridesResponsePlanOneOneNameMin).max(setTenantOverridesResponsePlanOneOneNameMax),
+  "description": zod.string().max(setTenantOverridesResponsePlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(setTenantOverridesResponsePlanOneOneMonthlyPriceMax).regex(setTenantOverridesResponsePlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(setTenantOverridesResponsePlanOneOneYearlyPriceMax).regex(setTenantOverridesResponsePlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(setTenantOverridesResponsePlanOneOneSetupFeeMax).regex(setTenantOverridesResponsePlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(setTenantOverridesResponsePlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(setTenantOverridesResponsePlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(setTenantOverridesResponsePlanOneOneDisplayOrderMin).max(setTenantOverridesResponsePlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(setTenantOverridesResponsePlanOneOneEntitlementsItemKeyMax).regex(setTenantOverridesResponsePlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantOverridesResponsePlanOneOneEntitlementsItemValueTwoMax).regex(setTenantOverridesResponsePlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(setTenantOverridesResponsePlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]),
+  "addons": zod.array(zod.object({
+  "name": zod.string().min(setTenantOverridesResponseAddonsItemOneNameMin).max(setTenantOverridesResponseAddonsItemOneNameMax),
+  "description": zod.string().max(setTenantOverridesResponseAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(setTenantOverridesResponseAddonsItemOneEntitlementsItemKeyMax).regex(setTenantOverridesResponseAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantOverridesResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(setTenantOverridesResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(setTenantOverridesResponseAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))),
+  "overrides": zod.array(zod.object({
+  "key": zod.string().max(setTenantOverridesResponseOverridesItemOneKeyMax).regex(setTenantOverridesResponseOverridesItemOneKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantOverridesResponseOverridesItemOneValueTwoMax).regex(setTenantOverridesResponseOverridesItemOneValueTwoRegExp)])
+}).and(zod.object({
+  "reason": zod.string().min(setTenantOverridesResponseOverridesItemTwoReasonMin).max(setTenantOverridesResponseOverridesItemTwoReasonMax)
+}))),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "limits": zod.record(zod.string(), zod.string()),
+  "sources": zod.record(zod.string(), zod.string()),
+  "usage": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "used": zod.string(),
+  "limit": zod.string(),
+  "exceeded": zod.boolean()
+})),
+  "enabledModules": zod.array(zod.string()),
+  "overLimit": zod.boolean()
+})
+
+
+export const SetTenantSuspensionParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const setTenantSuspensionBodyReasonMin = 2;
+export const setTenantSuspensionBodyReasonMax = 500;
+
+
+
+export const SetTenantSuspensionBody = zod.object({
+  "suspended": zod.boolean(),
+  "reason": zod.string().min(setTenantSuspensionBodyReasonMin).max(setTenantSuspensionBodyReasonMax)
+})
+
+export const setTenantSuspensionResponsePlanOneOneNameMin = 2;
+export const setTenantSuspensionResponsePlanOneOneNameMax = 120;
+
+export const setTenantSuspensionResponsePlanOneOneDescriptionMax = 3000;
+
+export const setTenantSuspensionResponsePlanOneOneMonthlyPriceMax = 18;
+
+
+export const setTenantSuspensionResponsePlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantSuspensionResponsePlanOneOneYearlyPriceMax = 18;
+
+
+export const setTenantSuspensionResponsePlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantSuspensionResponsePlanOneOneSetupFeeMax = 18;
+
+
+export const setTenantSuspensionResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantSuspensionResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const setTenantSuspensionResponsePlanOneOneBillingLabelMax = 160;
+
+export const setTenantSuspensionResponsePlanOneOneDisplayOrderMin = 0;
+export const setTenantSuspensionResponsePlanOneOneDisplayOrderMax = 100000;
+
+export const setTenantSuspensionResponsePlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const setTenantSuspensionResponsePlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantSuspensionResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const setTenantSuspensionResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantSuspensionResponsePlanOneOneEntitlementsMax = 200;
+
+export const setTenantSuspensionResponseAddonsItemOneNameMin = 2;
+export const setTenantSuspensionResponseAddonsItemOneNameMax = 120;
+
+export const setTenantSuspensionResponseAddonsItemOneDescriptionMax = 3000;
+
+export const setTenantSuspensionResponseAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const setTenantSuspensionResponseAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantSuspensionResponseAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const setTenantSuspensionResponseAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantSuspensionResponseAddonsItemOneEntitlementsMax = 200;
+
+export const setTenantSuspensionResponseOverridesItemOneKeyMax = 80;
+
+
+export const setTenantSuspensionResponseOverridesItemOneKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const setTenantSuspensionResponseOverridesItemOneValueTwoMax = 38;
+
+
+export const setTenantSuspensionResponseOverridesItemOneValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const setTenantSuspensionResponseOverridesItemTwoReasonMin = 2;
+export const setTenantSuspensionResponseOverridesItemTwoReasonMax = 500;
+
+
+
+export const SetTenantSuspensionResponse = zod.object({
+  "tenantId": zod.string().uuid(),
+  "tenantStatus": zod.string(),
+  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "plan": zod.union([zod.object({
+  "name": zod.string().min(setTenantSuspensionResponsePlanOneOneNameMin).max(setTenantSuspensionResponsePlanOneOneNameMax),
+  "description": zod.string().max(setTenantSuspensionResponsePlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(setTenantSuspensionResponsePlanOneOneMonthlyPriceMax).regex(setTenantSuspensionResponsePlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(setTenantSuspensionResponsePlanOneOneYearlyPriceMax).regex(setTenantSuspensionResponsePlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(setTenantSuspensionResponsePlanOneOneSetupFeeMax).regex(setTenantSuspensionResponsePlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(setTenantSuspensionResponsePlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(setTenantSuspensionResponsePlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(setTenantSuspensionResponsePlanOneOneDisplayOrderMin).max(setTenantSuspensionResponsePlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(setTenantSuspensionResponsePlanOneOneEntitlementsItemKeyMax).regex(setTenantSuspensionResponsePlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantSuspensionResponsePlanOneOneEntitlementsItemValueTwoMax).regex(setTenantSuspensionResponsePlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(setTenantSuspensionResponsePlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]),
+  "addons": zod.array(zod.object({
+  "name": zod.string().min(setTenantSuspensionResponseAddonsItemOneNameMin).max(setTenantSuspensionResponseAddonsItemOneNameMax),
+  "description": zod.string().max(setTenantSuspensionResponseAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(setTenantSuspensionResponseAddonsItemOneEntitlementsItemKeyMax).regex(setTenantSuspensionResponseAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantSuspensionResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(setTenantSuspensionResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(setTenantSuspensionResponseAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid()
+}))),
+  "overrides": zod.array(zod.object({
+  "key": zod.string().max(setTenantSuspensionResponseOverridesItemOneKeyMax).regex(setTenantSuspensionResponseOverridesItemOneKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(setTenantSuspensionResponseOverridesItemOneValueTwoMax).regex(setTenantSuspensionResponseOverridesItemOneValueTwoRegExp)])
+}).and(zod.object({
+  "reason": zod.string().min(setTenantSuspensionResponseOverridesItemTwoReasonMin).max(setTenantSuspensionResponseOverridesItemTwoReasonMax)
+}))),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "limits": zod.record(zod.string(), zod.string()),
+  "sources": zod.record(zod.string(), zod.string()),
+  "usage": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "used": zod.string(),
+  "limit": zod.string(),
+  "exceeded": zod.boolean()
+})),
+  "enabledModules": zod.array(zod.string()),
+  "overLimit": zod.boolean()
+})
+
+
+export const UpdateTenantWebsiteSettingsParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const updateTenantWebsiteSettingsBodySecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsBodyFaviconUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsBodyHeroTitleMin = 2;
+export const updateTenantWebsiteSettingsBodyHeroTitleMax = 180;
+
+export const updateTenantWebsiteSettingsBodyHeroSubtitleMax = 1000;
+
+export const updateTenantWebsiteSettingsBodySupportEmailMax = 254;
+
+export const updateTenantWebsiteSettingsBodySupportUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsBodySupportDetailsMax = 2000;
+
+export const updateTenantWebsiteSettingsBodySocialLinksItemLabelMax = 80;
+
+export const updateTenantWebsiteSettingsBodySocialLinksItemUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsBodySocialLinksMax = 12;
+
+export const updateTenantWebsiteSettingsBodyFooterTextMax = 2000;
+
+export const updateTenantWebsiteSettingsBodyPrivacyContentMax = 20000;
+
+export const updateTenantWebsiteSettingsBodyTermsContentMax = 20000;
+
+
+
+export const UpdateTenantWebsiteSettingsBody = zod.object({
+  "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsBodySecondaryColorRegExp),
+  "faviconUrl": zod.string().max(updateTenantWebsiteSettingsBodyFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(updateTenantWebsiteSettingsBodyHeroTitleMin).max(updateTenantWebsiteSettingsBodyHeroTitleMax),
+  "heroSubtitle": zod.string().max(updateTenantWebsiteSettingsBodyHeroSubtitleMax),
+  "supportEmail": zod.string().max(updateTenantWebsiteSettingsBodySupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(updateTenantWebsiteSettingsBodySupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(updateTenantWebsiteSettingsBodySupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantWebsiteSettingsBodySocialLinksItemLabelMax),
+  "url": zod.string().max(updateTenantWebsiteSettingsBodySocialLinksItemUrlMax)
+})).max(updateTenantWebsiteSettingsBodySocialLinksMax),
+  "footerText": zod.string().max(updateTenantWebsiteSettingsBodyFooterTextMax),
+  "privacyContent": zod.string().max(updateTenantWebsiteSettingsBodyPrivacyContentMax),
+  "termsContent": zod.string().max(updateTenantWebsiteSettingsBodyTermsContentMax)
+})
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaviconUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroTitleMin = 2;
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroTitleMax = 180;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSupportEmailMax = 254;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSupportUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSupportDetailsMax = 2000;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSocialLinksMax = 12;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFooterTextMax = 2000;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsPrivacyContentMax = 20000;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsTermsContentMax = 20000;
+
+
+
+export const UpdateTenantWebsiteSettingsResponse = zod.object({
+  "id": zod.string().uuid(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "brandName": zod.string(),
+  "domain": zod.string().nullable(),
+  "status": zod.enum(['draft', 'active', 'suspended']),
+  "enabledModules": zod.array(zod.enum(['crypto_exchange', 'crypto_payments', 'telegram_bot', 'telegram_mini_app', 'website', 'merchant_api'])),
+  "provisioningStep": zod.enum(['brand', 'domain', 'modules', 'assets_networks', 'configuration', 'ready']),
+  "environment": zod.enum(['sandbox']),
+  "createdAt": zod.coerce.date()
+}).and(zod.object({
+  "logoUrl": zod.string().nullable(),
+  "primaryColor": zod.string(),
+  "accentColor": zod.string(),
+  "themeMode": zod.enum(['light', 'dark', 'system']),
+  "defaultLanguage": zod.string(),
+  "supportedLanguages": zod.array(zod.string()),
+  "assetNetworkIds": zod.array(zod.string()),
+  "exchangeEnabled": zod.boolean(),
+  "paymentsEnabled": zod.boolean(),
+  "allowGuestCheckout": zod.boolean(),
+  "configurationComplete": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroTitleMin).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSocialLinksItemUrlMax)
+})).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsTermsContentMax)
+}).optional()
+}))
+
+
+export const ListTenantResourcesParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "resourceType": zod.enum(['staff', 'api_keys', 'webhooks', 'payment_methods'])
+})
+
+export const ListTenantResourcesResponseItem = zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "reference": zod.string().nullable(),
+  "status": zod.string()
+})
+export const ListTenantResourcesResponse = zod.array(ListTenantResourcesResponseItem)
+
+
+export const CreateTenantResourceParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "resourceType": zod.enum(['staff', 'api_keys', 'webhooks', 'payment_methods'])
+})
+
+export const createTenantResourceBodyLabelMin = 2;
+export const createTenantResourceBodyLabelMax = 120;
+
+export const createTenantResourceBodyReferenceMax = 2048;
+
+
+
+export const CreateTenantResourceBody = zod.object({
+  "label": zod.string().min(createTenantResourceBodyLabelMin).max(createTenantResourceBodyLabelMax),
+  "reference": zod.string().max(createTenantResourceBodyReferenceMax).nullable()
+})
+
+export const CreateTenantResourceResponse = zod.object({
+  "item": zod.object({
+  "id": zod.string(),
+  "label": zod.string(),
+  "reference": zod.string().nullable(),
+  "status": zod.string()
+}),
+  "issuedKey": zod.string().nullable()
+})
+
+
+export const RemoveTenantResourceParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "resourceType": zod.enum(['staff', 'api_keys', 'webhooks', 'payment_methods']),
+  "resourceId": zod.coerce.string()
+})
+
+export const RemoveTenantResourceResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const getPublicSitePathSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
+
+
+export const GetPublicSiteParams = zod.object({
+  "slug": zod.coerce.string().regex(getPublicSitePathSlugRegExp)
+})
+
+export const getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getPublicSiteResponseWebsiteSettingsFaviconUrlMax = 2048;
+
+export const getPublicSiteResponseWebsiteSettingsHeroTitleMin = 2;
+export const getPublicSiteResponseWebsiteSettingsHeroTitleMax = 180;
+
+export const getPublicSiteResponseWebsiteSettingsHeroSubtitleMax = 1000;
+
+export const getPublicSiteResponseWebsiteSettingsSupportEmailMax = 254;
+
+export const getPublicSiteResponseWebsiteSettingsSupportUrlMax = 2048;
+
+export const getPublicSiteResponseWebsiteSettingsSupportDetailsMax = 2000;
+
+export const getPublicSiteResponseWebsiteSettingsSocialLinksItemLabelMax = 80;
+
+export const getPublicSiteResponseWebsiteSettingsSocialLinksItemUrlMax = 2048;
+
+export const getPublicSiteResponseWebsiteSettingsSocialLinksMax = 12;
+
+export const getPublicSiteResponseWebsiteSettingsFooterTextMax = 2000;
+
+export const getPublicSiteResponseWebsiteSettingsPrivacyContentMax = 20000;
+
+export const getPublicSiteResponseWebsiteSettingsTermsContentMax = 20000;
+
+
+
+export const GetPublicSiteResponse = zod.object({
+  "tenantSlug": zod.string(),
+  "brandName": zod.string(),
+  "logoUrl": zod.string().nullable(),
+  "primaryColor": zod.string(),
+  "accentColor": zod.string(),
+  "themeMode": zod.enum(['light', 'dark', 'system']),
+  "domain": zod.string().nullable(),
+  "sandboxOnly": zod.boolean(),
+  "websiteSettings": zod.object({
+  "secondaryColor": zod.string().regex(getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp),
+  "faviconUrl": zod.string().max(getPublicSiteResponseWebsiteSettingsFaviconUrlMax).nullable(),
+  "fontKey": zod.enum(['system', 'inter', 'manrope', 'dm-sans', 'space-grotesk']),
+  "heroTitle": zod.string().min(getPublicSiteResponseWebsiteSettingsHeroTitleMin).max(getPublicSiteResponseWebsiteSettingsHeroTitleMax),
+  "heroSubtitle": zod.string().max(getPublicSiteResponseWebsiteSettingsHeroSubtitleMax),
+  "supportEmail": zod.string().max(getPublicSiteResponseWebsiteSettingsSupportEmailMax).nullable(),
+  "supportUrl": zod.string().max(getPublicSiteResponseWebsiteSettingsSupportUrlMax).nullable(),
+  "supportDetails": zod.string().max(getPublicSiteResponseWebsiteSettingsSupportDetailsMax),
+  "socialLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(getPublicSiteResponseWebsiteSettingsSocialLinksItemLabelMax),
+  "url": zod.string().max(getPublicSiteResponseWebsiteSettingsSocialLinksItemUrlMax)
+})).max(getPublicSiteResponseWebsiteSettingsSocialLinksMax),
+  "footerText": zod.string().max(getPublicSiteResponseWebsiteSettingsFooterTextMax),
+  "privacyContent": zod.string().max(getPublicSiteResponseWebsiteSettingsPrivacyContentMax),
+  "termsContent": zod.string().max(getPublicSiteResponseWebsiteSettingsTermsContentMax)
+}),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "assets": zod.array(zod.object({
+  "assetId": zod.string(),
+  "symbol": zod.string(),
+  "name": zod.string(),
+  "networkId": zod.string(),
+  "networkName": zod.string(),
+  "testnet": zod.boolean()
+}))
+})
+
+
+export const GetPublicCapabilityParams = zod.object({
+  "slug": zod.coerce.string(),
+  "feature": zod.coerce.string()
+})
+
+export const GetPublicCapabilityResponse = zod.object({
+  "feature": zod.string(),
+  "status": zod.string(),
+  "message": zod.string()
+})
 
 

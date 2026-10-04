@@ -18,7 +18,10 @@ export const tenantsTable = pgTable("tenants", {
 }, () => [
   check("tenants_sandbox_only", sql`environment = 'sandbox'`),
   check("tenants_valid_status", sql`status IN ('draft', 'active', 'suspended')`),
-  pgPolicy("tenants_read", { for: "select", to: runtimeRole, using: visible }),
+  pgPolicy("tenants_read", {
+    for: "select", to: runtimeRole,
+    using: sql`(${visible} OR (status = 'active' AND slug = nullif(current_setting('app.public_slug', true), '')))`,
+  }),
   pgPolicy("tenants_create", { for: "insert", to: runtimeRole, withCheck: adminContext }),
   pgPolicy("tenants_update", { for: "update", to: runtimeRole, using: writable, withCheck: writable }),
 ]).enableRLS();

@@ -52,8 +52,8 @@ Amounts are decimal strings in service contracts, not floating-point numbers. A 
 |---|---|
 | `wallet_configurations` | `id uuid PK`; `tenant_id uuid FK`; `asset_network_id text NOT NULL`; `strategy text NOT NULL DEFAULT 'sandbox'`; `environment text NOT NULL DEFAULT 'sandbox'`; CHECK environment=sandbox AND strategy=sandbox; composite FK `(tenant_id,asset_network_id)` → tenant_asset_networks |
 | `blockchain_provider_configs` | `id uuid PK`; `tenant_id uuid FK`; `network_id text NOT NULL`; `adapter text NOT NULL DEFAULT 'sandbox'`; `priority text NOT NULL DEFAULT 'primary'` constrained primary/secondary/manual; `environment text NOT NULL DEFAULT 'sandbox'`; CHECK environment=sandbox AND adapter=sandbox |
-| `api_keys` | `id uuid PK`; `tenant_id uuid FK`; `label text NOT NULL`; `key_hash text NOT NULL UNIQUE`; `scopes text[] NOT NULL DEFAULT {}`; sandbox-constrained `environment`; nullable `revoked_at timestamptz`. No raw keys are stored or issued. |
-| `webhook_endpoints` | `id uuid PK`; `tenant_id uuid FK`; `url text NOT NULL`; `enabled boolean NOT NULL DEFAULT false`; sandbox-constrained `environment`. No delivery worker or signing secret is configured. |
+| `api_keys` | `id uuid PK`; `tenant_id uuid FK`; `label text NOT NULL`; `key_hash text NOT NULL UNIQUE`; `scopes text[] NOT NULL DEFAULT {}`; sandbox-constrained `environment`; nullable `revoked_at timestamptz`. Sandbox keys are returned once; only hashes are stored and no execution scopes are assigned. |
+| `webhook_endpoints` | `id uuid PK`; `tenant_id uuid FK`; `label text NOT NULL`; `url text NOT NULL`; `enabled boolean NOT NULL DEFAULT false`; sandbox-constrained `environment`. No delivery worker or signing secret is configured. |
 | `notification_events` | `id uuid PK`; `tenant_id uuid FK`; `channel text NOT NULL`; `payload jsonb NOT NULL DEFAULT {}`; `status text NOT NULL DEFAULT 'sandbox_queued'`; sandbox-constrained `environment`. No outbound transport is configured. |
 | `audit_events` | `id uuid PK`; nullable `tenant_id uuid FK` for platform-wide operator events; `actor_id`, `event_type`, `description text NOT NULL`; `created_at NOT NULL DEFAULT now()`. Runtime privileges are SELECT/INSERT only; no update/delete. |
 
@@ -61,16 +61,22 @@ There are no private wallet keys, seed phrases, provider credentials, real depos
 
 ## Authorization and RLS
 
-- All 17 identity/tenant/business tables have both ENABLE RLS and FORCE RLS.
+- All 27 tenant/access/log/plan/subscription tables have both ENABLE RLS and FORCE RLS.
 - Runtime role: `private_label_runtime`, NOLOGIN, NOSUPERUSER, NOCREATEDB, NOCREATEROLE, NOINHERIT, NOBYPASSRLS.
 - Every API database transaction executes `SET LOCAL ROLE private_label_runtime` and transaction-local settings for the verified actor, selected tenant, super-admin status, and write permission.
 - The API resolves roles from explicit database assignments after verifying Clerk identity. It validates membership before setting tenant context.
 - Ordinary tenant reads require a matching tenant context; writes additionally require write permission. No-context sessions cannot read tenant data.
-- Super-admin context can cross tenant boundaries. Membership and module-entitlement writes require super-admin context.
+- Super-admin context can cross tenant boundaries. Catalog and subscription mutations require super-admin context; tenant Client Admin can manage quota-checked read-only staff, never administrator roles.
 - Platform-admin lookup is limited to the current actor. Audit inserts must match the actor context.
-- Runtime grants do not permit tenant deletion or platform-admin mutation. Shared catalogs are SELECT-only.
+- Runtime grants do not permit tenant deletion or platform-admin mutation. Shared asset/network/module catalogs are SELECT-only. Plan/entitlement/add-on catalogs are writable only under Super Admin RLS.
 - Transaction-local context is cleared by COMMIT/ROLLBACK before a connection returns to the pool.
 - Schema owner/setup connections bypass RLS and must never be mistaken for an isolation test. The verification command exercises the restricted role.
 
 The development-only access SQL materializes live PostgreSQL predicates and runtime grants after schema pushes.
 No startup-time DDL, production migration script, or deployment hook is included.
+
+## Plans and shared website extension
+
+The ten added tables and all added columns are described in `docs/plans-entitlements-website.md`.
+Tenant branding includes allowlisted JSON website settings; audit events include JSON change metadata.
+Existing `tenant_modules` rows are retained for compatibility, but do not grant effective access.

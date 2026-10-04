@@ -3,6 +3,8 @@ import { useGetTenant, getGetTenantQueryKey, useActivateTenant } from '@workspac
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader, ErrorState, ListSkeleton, StatusBadge, stepLabel } from '@/components/app/bits';
 import { BrandSection, DomainSection, ModulesSection, AssetsSection, ConfigSection } from '@/components/app/sections';
+import { SubscriptionSections, useSubscription } from '@/components/app/subscription';
+import { WebsiteSection, ResourcesSection } from '@/components/app/advanced';
 import { Button } from '@/components/ui/button';
 import { useCan } from '@/lib/principal';
 import { useInvalidateTenant } from '@/lib/invalidate';
@@ -16,6 +18,16 @@ export default function ClientDetail() {
   const { toast } = useToast();
   const act = useActivateTenant();
   const t = q.data;
+  const subQ = useSubscription(id);
+  const sub = subQ.data;
+  const isSuper = can.role === 'super_admin';
+  const suspended = t?.status === 'suspended' || sub?.status === 'suspended';
+  const unassigned = sub?.status === 'unassigned';
+  const ro = !can.editTenant || suspended || unassigned || !sub || subQ.isLoading;
+  const F = sub?.features ?? {};
+  const mods = sub?.enabledModules ?? t?.enabledModules ?? [];
+  const showFn = isSuper || F.crypto_exchange === true || F.crypto_payments === true;
+  const allowed = { staff: Number(sub?.limits.max_staff ?? 0) > 0, api_keys: F.api_keys === true, webhooks: F.webhooks === true, payment_methods: F.crypto_payments === true };
   return (
     <>
       <Link href="/clients" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="h-4 w-4" /> Clients</Link>
@@ -23,7 +35,7 @@ export default function ClientDetail() {
         <>
           <PageHeader eyebrow={`${t.slug} · sandbox`} title={t.brandName}>
             <StatusBadge status={t.status} />
-            {can.editTenant && t.status !== 'active' && (
+            {can.editTenant && t.status === 'draft' && !suspended && (
               <Button data-testid="button-activate" disabled={!t.configurationComplete || act.isPending}
                 onClick={() => act.mutate({ tenantId: t.id }, { onSuccess: () => { inv(t.id); toast({ title: 'Activated in sandbox' }); }, onError: (e) => toast({ title: 'Activation failed', description: (e as Error).message, variant: 'destructive' }) })}>
                 {act.isPending ? 'Activating' : 'Activate sandbox'}
@@ -34,13 +46,18 @@ export default function ClientDetail() {
               <div key={l} className="bg-card p-4"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="mt-1 text-sm capitalize">{v}</p></div>))}
           </div>
           {!t.configurationComplete && <p className="mb-6 text-sm text-muted-foreground">Complete every section below before sandbox activation is available.</p>}
+          {unassigned && !suspended && <p className="mb-6 text-sm text-muted-foreground">No plan is assigned, so configuration is read-only.</p>}
+          {suspended && <p className="mb-6 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. {isSuper ? 'All configuration is read-only; only subscription controls stay editable. Unsuspend to resume changes.' : 'Configuration is read-only until your operator lifts the suspension.'}</p>}
           {!can.editTenant && <p className="mb-6 text-sm text-muted-foreground">Your role has read-only access to this client.</p>}
           <div className="space-y-6">
-            <BrandSection tenant={t} readOnly={!can.editTenant} />
-            <DomainSection tenant={t} readOnly={!can.editTenant} />
-            <ModulesSection tenant={t} readOnly={!can.editModules} />
-            <AssetsSection tenant={t} readOnly={!can.editTenant} />
-            <ConfigSection tenant={t} readOnly={!can.editTenant} />
+            <SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} />
+            <BrandSection tenant={t} readOnly={ro} />
+            <DomainSection tenant={t} readOnly={ro} />
+            {(isSuper || mods.length > 0) && <ModulesSection tenant={t} readOnly />}
+            {showFn && <AssetsSection tenant={t} readOnly={ro} />}
+            {showFn && <ConfigSection tenant={t} readOnly={ro} />}
+            {(isSuper || F.website === true) && <WebsiteSection tenant={t} readOnly={ro} />}
+            <ResourcesSection tenantId={t.id} allowed={allowed} readOnly={ro} showAll={isSuper} />
           </div>
         </>)}
     </>

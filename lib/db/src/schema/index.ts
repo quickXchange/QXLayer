@@ -24,3 +24,4 @@ export * from "./branding";
 export * from "./commerce";
 export * from "./integrations";
 export * from "./audit";
+export * from "./plans";
