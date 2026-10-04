@@ -20,7 +20,7 @@
       "developers": true,
       "headerMenu": "grid",
       "headerCta": "none",
-      "widgetTop": 432.953125
+      "widgetTop": 378.046875
     },
     {
       "name": "nexa-light",
@@ -53,7 +53,17 @@
       "developers": false,
       "headerMenu": "grid",
       "headerCta": "none",
-      "widgetTop": 409.640625
+      "widgetTop": 356.25
+    }
+  ],
+  "additionalWidths": [
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 753,
+      "scrollWidth": 753
     }
   ],
   "mobileSelector": {

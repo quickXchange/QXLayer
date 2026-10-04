@@ -43,6 +43,18 @@ async function waitFor(expression) {
   }
   throw new Error(`Preview did not become ready: ${expression}`);
 }
+async function click(selector) {
+  const point = await evaluate(`(() => {
+    const el = document.querySelector(${JSON.stringify(selector)});
+    if (!el) throw new Error('Missing visual control');
+    el.scrollIntoView({block:'center',behavior:'instant'});
+    const r = el.getBoundingClientRect();
+    return {x:r.left+r.width/2,y:r.top+r.height/2};
+  })()`);
+  await call('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
+  await call('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
+  await call('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
+}
 const directory = 'screenshots/customer-visual-upgrade';
 await mkdir(directory, { recursive: true });
 await Promise.all([call('Page.enable'), call('Runtime.enable'), call('Network.enable')]);
@@ -88,16 +100,25 @@ for (const [slug, theme, width, height, name] of cases) {
 // Confirm a narrow selector and preserved non-executing action after captures.
 await call('Page.navigate', { url: `https://${process.env.REPLIT_DEV_DOMAIN}/private-label-website/nexa-sandbox` });
 await waitFor(`!!document.querySelector('[data-testid="input-amount-top"]')`);
-await evaluate(`document.querySelector('[data-testid="button-asset-top"]').click()`);
+const additionalWidths = [];
+for (const width of [320, 768]) {
+  await call('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 640 });
+  await sleep(100);
+  const dimensions = await evaluate(`({width:document.documentElement.clientWidth,scrollWidth:document.documentElement.scrollWidth})`);
+  assert.ok(dimensions.scrollWidth <= dimensions.width, `Nexa overflow at ${width}px`);
+  additionalWidths.push(dimensions);
+}
+await call('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+await click('[data-testid="button-asset-top"]');
 await waitFor(`!!document.querySelector('[data-testid="dialog-asset-picker"]')`);
 const dialog = await evaluate(`(()=>{const r=document.querySelector('[role="dialog"]').getBoundingClientRect();return {left:r.left,right:r.right,width:innerWidth}})()`);
 assert.ok(dialog.left >= 0 && dialog.right <= dialog.width, 'Selector exceeds mobile viewport');
 await call('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27 });
 await waitFor(`!document.querySelector('[data-testid="dialog-asset-picker"]')`);
-await evaluate(`document.querySelector('[data-testid="input-amount-top"]').focus()`);
+await click('[data-testid="input-amount-top"]');
 await call('Input.insertText', { text: '1.25' });
 await sleep(100);
-await evaluate(`document.querySelector('[data-testid="button-exchange-cta"]').click()`);
+await click('[data-testid="button-exchange-cta"]');
 await waitFor(`!!document.querySelector('[data-testid="status-sandbox"]')`);
 assert.match(await evaluate(`document.querySelector('[data-testid="status-sandbox"]').textContent`), /no order was created/i);
 
@@ -111,7 +132,7 @@ assert.equal(reduced.scroll, 'auto');
 assert.deepEqual(posts, []);
 assert.deepEqual(errors, []);
 await evaluate(`localStorage.removeItem('plw:theme:nexa-sandbox');localStorage.removeItem('plw:theme:aster-sandbox')`);
-await writeFile(`${directory}/verification.json`, JSON.stringify({ viewports: results, mobileSelector: dialog, reducedMotion: reduced, financialPosts: posts, browserErrors: errors }, null, 2));
-console.log(JSON.stringify({ viewports: results, mobileSelector: dialog, reducedMotion: reduced, posts: posts.length, errors: errors.length }, null, 2));
+await writeFile(`${directory}/verification.json`, JSON.stringify({ viewports: results, additionalWidths, mobileSelector: dialog, reducedMotion: reduced, financialPosts: posts, browserErrors: errors }, null, 2));
+console.log(JSON.stringify({ viewports: results, additionalWidths, mobileSelector: dialog, reducedMotion: reduced, posts: posts.length, errors: errors.length }, null, 2));
 await fetch(`${debug}/json/close/${target.id}`);
 ws.close();

@@ -41,7 +41,14 @@ count animation and decorative motion. Mobile keeps both hero actions on one row
 and brings the widget into view earlier.
 
 Customer styles are divided into base, atmosphere, widget, sections and showcase
-stylesheets. Capability logic, routing, theme preference behavior, backend,
+stylesheets, with a final instrument layer for deeper widget surfaces, traveling
+edge illumination, desktop pointer highlights and recessed input panels. Large
+atmospheric orbs stay static; mobile disables the widget sheen and pointer light.
+The tighter mobile hero places Nexa's widget around 378px from the top at 390px
+width, compared with around 433px before this refinement. Additional checks at
+320px and 768px found no horizontal overflow, and real pointer clicks confirmed
+that the picker and non-executing preview action still work.
+Capability logic, routing, theme preference behavior, backend,
 shared contracts and admin sources remain unchanged.
 
 Five approval screenshots are in `screenshots/customer-visual-upgrade/`:
@@ -103,13 +110,13 @@ Final production build (not published):
 
 | Asset | Minified | Gzip |
 |---|---:|---:|
-| Initial JavaScript | 380.13 kB | 122.39 kB |
+| Initial JavaScript | 381.05 kB | 122.65 kB |
 | Lazy below-fold JavaScript | 17.19 kB | 6.23 kB |
-| CSS | 130.01 kB | 21.90 kB |
+| CSS | 141.77 kB | 23.63 kB |
 | HTML | 1.21 kB | 0.47 kB |
 
-Initial JavaScript + CSS: **144.29 kB gzip**; all JavaScript + CSS: **150.52 kB gzip**.
-Build took 3.04 seconds in the development container. These exclude font responses,
+Initial JavaScript + CSS: **146.28 kB gzip**; all JavaScript + CSS: **152.51 kB gzip**.
+Build took 3.56 seconds in the development container. These exclude font responses,
 transport headers and logos. Only the configured tenant font is loaded; SVG marks
 and coin glyphs do not require large media or additional coin-image requests.
 

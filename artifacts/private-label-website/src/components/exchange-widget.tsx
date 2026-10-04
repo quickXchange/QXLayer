@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDownUp, ChevronDown, Info, ShieldCheck } from 'lucide-react';
 import type { AssetNetwork, PublicSite } from '@workspace/api-client-react';
 import type { Caps, ExchangeTab } from '@/lib/capabilities';
@@ -11,8 +11,8 @@ const NOQ = 'No pricing source is connected in this sandbox.';
 function Side({ label, asset, onPick, value, onValue, readOnly, fiat, error, id, assetsAvailable }: { label: string; asset: AssetNetwork | null; onPick?: () => void; value: string; onValue?: (v: string) => void; readOnly?: boolean; fiat?: boolean; error?: string | null; id: string; assetsAvailable: boolean }) {
   return (
     <div>
-      <div className="s-side" style={error ? { borderColor: '#d9485f' } : undefined}>
-        <div className="flex items-center justify-between"><label htmlFor={`amt-${id}`} className="s-muted text-xs font-medium">{label}</label></div>
+      <div className={`s-side${id === 'bottom' ? ' s-side-out' : ''}`} style={error ? { borderColor: '#d9485f' } : undefined}>
+        <div className="flex items-center justify-between"><label htmlFor={`amt-${id}`} className="s-lab">{label}</label></div>
         <div className="mt-1.5 flex items-center gap-3">
           <input id={`amt-${id}`} className="s-amount" inputMode="decimal" autoComplete="off" placeholder="0.00" value={value} readOnly={readOnly} aria-invalid={!!error} aria-describedby={error ? `err-${id}` : undefined} onChange={(e) => { const v = e.target.value.replace(',', '.'); if (AMOUNT.test(v)) onValue?.(v); }} data-testid={`input-amount-${id}`} />
           {fiat ? (
@@ -51,9 +51,25 @@ export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps })
   const noAssets = assets.length === 0;
   const amountError = touched ? (amount === '' || Number(amount) <= 0 ? 'Enter an amount greater than zero.' : null) : null;
   const reset = () => { setStatus(null); };
+  const frame = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = frame.current;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (!el || motion.matches || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    let raf = 0, px = 0, py = 0;
+    const move = (e: PointerEvent) => {
+      if (window.innerWidth < 1024 || motion.matches) return;
+      const r = el.getBoundingClientRect(); px = e.clientX - r.left; py = e.clientY - r.top;
+      if (!raf) raf = requestAnimationFrame(() => { raf = 0; el.style.setProperty('--sx', `${px}px`); el.style.setProperty('--sy', `${py}px`); el.style.setProperty('--so', '1'); });
+    };
+    const leave = () => el.style.setProperty('--so', '0');
+    el.addEventListener('pointermove', move, { passive: true });
+    el.addEventListener('pointerleave', leave);
+    return () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave); if (raf) cancelAnimationFrame(raf); };
+  }, []);
 
   const shell = (inner: React.ReactNode) => (
-    <div className="s-glowframe" data-testid="widget-exchange"><div className="s-glowinner p-4 sm:p-6">{inner}</div></div>
+    <div ref={frame} className="s-glowframe" data-testid="widget-exchange"><div className="s-glowinner p-3.5 sm:p-7"><div className="s-clip" aria-hidden="true"><span className="s-spec" /><span className="s-sheen" /></div>{inner}</div></div>
   );
   if (caps.exchange === 'empty') return shell(
     <div className="py-6 text-center" data-testid="state-exchange-empty">
@@ -113,7 +129,7 @@ export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps })
           <p className="s-muted pt-2 text-xs">{NOQ} Nothing here is an estimate.</p>
         </dl>
       )}
-      <button type="submit" className="s-btn s-btn-primary mt-5 w-full" style={{ minHeight: 52 }} disabled={noAssets || insufficient} data-testid="button-exchange-cta">Preview order (sandbox)</button>
+      <button type="submit" className="s-btn s-btn-primary s-cta-xl mt-5 w-full" disabled={noAssets || insufficient} data-testid="button-exchange-cta">Preview order (sandbox)</button>
       <div role="status" aria-live="polite" className="mt-3 min-h-[1.25rem]">
         {status && <p className="flex items-start gap-2 text-xs leading-relaxed" data-testid="status-sandbox"><ShieldCheck size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" />{status}</p>}
       </div>
