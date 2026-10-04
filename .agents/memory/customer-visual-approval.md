@@ -15,3 +15,9 @@ Development remains focused on reusable core architecture and the non-executing 
 **How to apply:** Do not publish/deploy, touch QuickXchange, connect live crypto/card/mining/staking providers, or start the next crypto product automatically after the core phase. Report architecture, registry, provisioning, entitlement flow, isolation verification, readiness boundaries and first-client blockers.
 
 **How to apply:** During any later visual iteration, check the actual first mobile viewport and composition, not only desktop glow strength. Honest sandbox notices remain necessary.
+
+Preserve the approved customer-facing landing-page design exactly when adding a product catalog. Add new sections in its existing visual language; do not replace its hero, background/effects, typography, navigation, colors/glow, spacing, Exchange widget, animations, theme behavior or responsive layouts. Restore from a saved working version, never from memory. Retain the catalog database and Super Admin controls, and do not alter the White Label Core or backend for visual restoration.
+
+**Why:** The user explicitly rejected the replacement beige/green catalog frontend and clarified that the catalog must be additive inside the previously approved design.
+
+**How to apply:** Identify the actual approved Exchange-widget page and compare it with the pre-catalog source before making frontend-only changes. Do not confuse the console welcome page with the premium customer website.
