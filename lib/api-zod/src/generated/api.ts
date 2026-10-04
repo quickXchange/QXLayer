@@ -8,6 +8,625 @@
 import * as zod from 'zod';
 
 
+export const getWhiteLabelCatalogResponsePlansItemOneNameMin = 2;
+export const getWhiteLabelCatalogResponsePlansItemOneNameMax = 120;
+
+export const getWhiteLabelCatalogResponsePlansItemOneDescriptionMax = 3000;
+
+export const getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceMax = 18;
+
+
+export const getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelCatalogResponsePlansItemOneYearlyPriceMax = 18;
+
+
+export const getWhiteLabelCatalogResponsePlansItemOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelCatalogResponsePlansItemOneSetupFeeMax = 18;
+
+
+export const getWhiteLabelCatalogResponsePlansItemOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelCatalogResponsePlansItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelCatalogResponsePlansItemOneBillingLabelMax = 160;
+
+export const getWhiteLabelCatalogResponsePlansItemOneDisplayOrderMin = 0;
+export const getWhiteLabelCatalogResponsePlansItemOneDisplayOrderMax = 100000;
+
+export const getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemKeyMax = 80;
+
+
+export const getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getWhiteLabelCatalogResponsePlansItemOneEntitlementsMax = 200;
+
+export const getWhiteLabelCatalogResponseAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelCatalogResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelCatalogResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelCatalogResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelCatalogResponseAddonsItemOneNameMin = 2;
+export const getWhiteLabelCatalogResponseAddonsItemOneNameMax = 120;
+
+export const getWhiteLabelCatalogResponseAddonsItemOneDescriptionMax = 3000;
+
+export const getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getWhiteLabelCatalogResponseAddonsItemOneEntitlementsMax = 200;
+
+
+
+export const GetWhiteLabelCatalogResponse = zod.object({
+  "plans": zod.array(zod.object({
+  "name": zod.string().min(getWhiteLabelCatalogResponsePlansItemOneNameMin).max(getWhiteLabelCatalogResponsePlansItemOneNameMax),
+  "description": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneDescriptionMax),
+  "monthlyPrice": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceMax).regex(getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneYearlyPriceMax).regex(getWhiteLabelCatalogResponsePlansItemOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneSetupFeeMax).regex(getWhiteLabelCatalogResponsePlansItemOneSetupFeeRegExp),
+  "currency": zod.string().regex(getWhiteLabelCatalogResponsePlansItemOneCurrencyRegExp),
+  "billingLabel": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(getWhiteLabelCatalogResponsePlansItemOneDisplayOrderMin).max(getWhiteLabelCatalogResponsePlansItemOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemKeyMax).regex(getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemValueTwoMax).regex(getWhiteLabelCatalogResponsePlansItemOneEntitlementsItemValueTwoRegExp)])
+})).max(getWhiteLabelCatalogResponsePlansItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}))),
+  "addons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(getWhiteLabelCatalogResponseAddonsItemOneNameMin).max(getWhiteLabelCatalogResponseAddonsItemOneNameMax),
+  "description": zod.string().max(getWhiteLabelCatalogResponseAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemKeyMax).regex(getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(getWhiteLabelCatalogResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(getWhiteLabelCatalogResponseAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))),
+  "definitions": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['feature', 'limit']),
+  "valueType": zod.enum(['boolean', 'integer', 'decimal'])
+}))
+})
+
+
+export const GetMyWhiteLabelRequestParams = zod.object({
+  "requestId": zod.coerce.string().uuid()
+})
+
+export const getMyWhiteLabelRequestResponseOrderDesignOneStyleNameMax = 100;
+
+export const getMyWhiteLabelRequestResponseOrderDesignOnePrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const getMyWhiteLabelRequestResponseOrderDesignOneAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const getMyWhiteLabelRequestResponseOrderDesignOneDescriptionMax = 5000;
+
+export const getMyWhiteLabelRequestResponseOrderDesignOneReferenceWebsiteUrlMax = 2048;
+
+export const getMyWhiteLabelRequestResponseOrderDesignOneNotesMax = 5000;
+
+export const getMyWhiteLabelRequestResponseOrderDesignOneReferenceAttachmentIdsMax = 10;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMin = 2;
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMax = 120;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDescriptionMax = 3000;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax = 18;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax = 18;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax = 160;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMin = 0;
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMax = 100000;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsMax = 200;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin = 2;
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax = 120;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneDescriptionMax = 3000;
+
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsMax = 200;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMin = 2;
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMax = 120;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDescriptionMax = 3000;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax = 18;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax = 18;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax = 160;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMin = 0;
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMax = 100000;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsMax = 200;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin = 2;
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax = 120;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneDescriptionMax = 3000;
+
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsMax = 200;
+
+
+
+export const GetMyWhiteLabelRequestResponse = zod.object({
+  "order": zod.object({
+  "id": zod.string().uuid(),
+  "customerUserId": zod.string(),
+  "projectName": zod.string(),
+  "brandName": zod.string(),
+  "preferredDomain": zod.string().nullable(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "details": zod.string(),
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "orderReference": zod.string().optional(),
+  "companyName": zod.string().nullish(),
+  "design": zod.union([zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(getMyWhiteLabelRequestResponseOrderDesignOneStyleNameMax),
+  "primaryColor": zod.string().regex(getMyWhiteLabelRequestResponseOrderDesignOnePrimaryColorRegExp),
+  "accentColor": zod.string().regex(getMyWhiteLabelRequestResponseOrderDesignOneAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(getMyWhiteLabelRequestResponseOrderDesignOneDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(getMyWhiteLabelRequestResponseOrderDesignOneReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(getMyWhiteLabelRequestResponseOrderDesignOneNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(getMyWhiteLabelRequestResponseOrderDesignOneReferenceAttachmentIdsMax)
+}),zod.null()]).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "requestedPlan": zod.union([zod.object({
+  "name": zod.string().min(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMin).max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMax),
+  "description": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMin).max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "requestedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin).max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax),
+  "description": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyMax).regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoMax).regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "approvedPlan": zod.union([zod.object({
+  "name": zod.string().min(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMin).max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMax),
+  "description": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMin).max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "approvedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin).max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax),
+  "description": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyMax).regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoMax).regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int(),
+  "category": zod.enum(['logo', 'favicon', 'design_reference', 'requirement']),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "customizationPrice": zod.string().nullish(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional(),
+  "monthlyPrice": zod.string().nullable(),
+  "setupPrice": zod.string().nullable(),
+  "currency": zod.string().nullable(),
+  "operatorNote": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}),
+  "history": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "kind": zod.enum(['status', 'note']),
+  "author": zod.string(),
+  "visibility": zod.enum(['internal', 'customer']),
+  "message": zod.string(),
+  "status": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const GetWhiteLabelRequestParams = zod.object({
+  "requestId": zod.coerce.string().uuid()
+})
+
+export const getWhiteLabelRequestResponseOrderDesignOneStyleNameMax = 100;
+
+export const getWhiteLabelRequestResponseOrderDesignOnePrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const getWhiteLabelRequestResponseOrderDesignOneAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const getWhiteLabelRequestResponseOrderDesignOneDescriptionMax = 5000;
+
+export const getWhiteLabelRequestResponseOrderDesignOneReferenceWebsiteUrlMax = 2048;
+
+export const getWhiteLabelRequestResponseOrderDesignOneNotesMax = 5000;
+
+export const getWhiteLabelRequestResponseOrderDesignOneReferenceAttachmentIdsMax = 10;
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMin = 2;
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMax = 120;
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneDescriptionMax = 3000;
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax = 18;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax = 18;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax = 160;
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMin = 0;
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMax = 100000;
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsMax = 200;
+
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin = 2;
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax = 120;
+
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneDescriptionMax = 3000;
+
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsMax = 200;
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMin = 2;
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMax = 120;
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneDescriptionMax = 3000;
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax = 18;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax = 18;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax = 160;
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMin = 0;
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMax = 100000;
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsMax = 200;
+
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin = 2;
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax = 120;
+
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneDescriptionMax = 3000;
+
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsMax = 200;
+
+
+
+export const GetWhiteLabelRequestResponse = zod.object({
+  "order": zod.object({
+  "id": zod.string().uuid(),
+  "customerUserId": zod.string(),
+  "projectName": zod.string(),
+  "brandName": zod.string(),
+  "preferredDomain": zod.string().nullable(),
+  "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
+  "details": zod.string(),
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "orderReference": zod.string().optional(),
+  "companyName": zod.string().nullish(),
+  "design": zod.union([zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(getWhiteLabelRequestResponseOrderDesignOneStyleNameMax),
+  "primaryColor": zod.string().regex(getWhiteLabelRequestResponseOrderDesignOnePrimaryColorRegExp),
+  "accentColor": zod.string().regex(getWhiteLabelRequestResponseOrderDesignOneAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(getWhiteLabelRequestResponseOrderDesignOneDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(getWhiteLabelRequestResponseOrderDesignOneReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(getWhiteLabelRequestResponseOrderDesignOneNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(getWhiteLabelRequestResponseOrderDesignOneReferenceAttachmentIdsMax)
+}),zod.null()]).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "requestedPlan": zod.union([zod.object({
+  "name": zod.string().min(getWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMin).max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMax),
+  "description": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMin).max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "requestedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin).max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax),
+  "description": zod.string().max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyMax).regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoMax).regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "approvedPlan": zod.union([zod.object({
+  "name": zod.string().min(getWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMin).max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMax),
+  "description": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMin).max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "approvedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin).max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax),
+  "description": zod.string().max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyMax).regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoMax).regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int(),
+  "category": zod.enum(['logo', 'favicon', 'design_reference', 'requirement']),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "customizationPrice": zod.string().nullish(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional(),
+  "monthlyPrice": zod.string().nullable(),
+  "setupPrice": zod.string().nullable(),
+  "currency": zod.string().nullable(),
+  "operatorNote": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+}),
+  "history": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "kind": zod.enum(['status', 'note']),
+  "author": zod.string(),
+  "visibility": zod.enum(['internal', 'customer']),
+  "message": zod.string(),
+  "status": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const AddWhiteLabelNoteParams = zod.object({
+  "requestId": zod.coerce.string().uuid()
+})
+
+export const addWhiteLabelNoteBodyMessageMax = 5000;
+
+
+
+export const AddWhiteLabelNoteBody = zod.object({
+  "message": zod.string().min(1).max(addWhiteLabelNoteBodyMessageMax),
+  "visibility": zod.enum(['internal', 'customer'])
+})
+
+export const AddWhiteLabelNoteResponse = zod.object({
+  "id": zod.string().uuid(),
+  "kind": zod.enum(['status', 'note']),
+  "author": zod.string(),
+  "visibility": zod.enum(['internal', 'customer']),
+  "message": zod.string(),
+  "status": zod.string().nullable(),
+  "createdAt": zod.coerce.date()
+})
+
+
 export const ListMyAdminPanelsResponseItem = zod.object({
   "tenantId": zod.string().uuid(),
   "name": zod.string(),
@@ -19,6 +638,124 @@ export const ListMyAdminPanelsResponseItem = zod.object({
 export const ListMyAdminPanelsResponse = zod.array(ListMyAdminPanelsResponseItem)
 
 
+export const listMyWhiteLabelRequestsResponseDesignOneStyleNameMax = 100;
+
+export const listMyWhiteLabelRequestsResponseDesignOnePrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const listMyWhiteLabelRequestsResponseDesignOneAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const listMyWhiteLabelRequestsResponseDesignOneDescriptionMax = 5000;
+
+export const listMyWhiteLabelRequestsResponseDesignOneReferenceWebsiteUrlMax = 2048;
+
+export const listMyWhiteLabelRequestsResponseDesignOneNotesMax = 5000;
+
+export const listMyWhiteLabelRequestsResponseDesignOneReferenceAttachmentIdsMax = 10;
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneNameMin = 2;
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneNameMax = 120;
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneDescriptionMax = 3000;
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax = 18;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax = 18;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax = 160;
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMin = 0;
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMax = 100000;
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsMax = 200;
+
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin = 2;
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax = 120;
+
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneDescriptionMax = 3000;
+
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsMax = 200;
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneNameMin = 2;
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneNameMax = 120;
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneDescriptionMax = 3000;
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax = 18;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax = 18;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax = 160;
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMin = 0;
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMax = 100000;
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsMax = 200;
+
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin = 2;
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax = 120;
+
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneDescriptionMax = 3000;
+
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsMax = 200;
+
+
+
 export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
@@ -27,7 +764,103 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
-  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "orderReference": zod.string().optional(),
+  "companyName": zod.string().nullish(),
+  "design": zod.union([zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(listMyWhiteLabelRequestsResponseDesignOneStyleNameMax),
+  "primaryColor": zod.string().regex(listMyWhiteLabelRequestsResponseDesignOnePrimaryColorRegExp),
+  "accentColor": zod.string().regex(listMyWhiteLabelRequestsResponseDesignOneAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(listMyWhiteLabelRequestsResponseDesignOneDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(listMyWhiteLabelRequestsResponseDesignOneReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(listMyWhiteLabelRequestsResponseDesignOneNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(listMyWhiteLabelRequestsResponseDesignOneReferenceAttachmentIdsMax)
+}),zod.null()]).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "requestedPlan": zod.union([zod.object({
+  "name": zod.string().min(listMyWhiteLabelRequestsResponseRequestedPlanOneOneNameMin).max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneNameMax),
+  "description": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMin).max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "requestedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin).max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax),
+  "description": zod.string().max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyMax).regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax).regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "approvedPlan": zod.union([zod.object({
+  "name": zod.string().min(listMyWhiteLabelRequestsResponseApprovedPlanOneOneNameMin).max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneNameMax),
+  "description": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMin).max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "approvedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin).max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax),
+  "description": zod.string().max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyMax).regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax).regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int(),
+  "category": zod.enum(['logo', 'favicon', 'design_reference', 'requirement']),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "customizationPrice": zod.string().nullish(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional(),
   "monthlyPrice": zod.string().nullable(),
   "setupPrice": zod.string().nullable(),
   "currency": zod.string().nullable(),
@@ -49,7 +882,25 @@ export const submitWhiteLabelRequestBodyPreferredDomainMax = 253;
 
 export const submitWhiteLabelRequestBodyActionsMax = 4;
 
-export const submitWhiteLabelRequestBodyDetailsMax = 1000;
+export const submitWhiteLabelRequestBodyDetailsMax = 10000;
+
+export const submitWhiteLabelRequestBodyCompanyNameMax = 150;
+
+export const submitWhiteLabelRequestBodyDesignStyleNameMax = 100;
+
+export const submitWhiteLabelRequestBodyDesignPrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const submitWhiteLabelRequestBodyDesignAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const submitWhiteLabelRequestBodyDesignDescriptionMax = 5000;
+
+export const submitWhiteLabelRequestBodyDesignReferenceWebsiteUrlMax = 2048;
+
+export const submitWhiteLabelRequestBodyDesignNotesMax = 5000;
+
+export const submitWhiteLabelRequestBodyDesignReferenceAttachmentIdsMax = 10;
+
+export const submitWhiteLabelRequestBodyRequestedAddonIdsMax = 20;
+
+export const submitWhiteLabelRequestBodyAttachmentIdsMax = 10;
 
 
 
@@ -59,8 +910,144 @@ export const SubmitWhiteLabelRequestBody = zod.object({
   "preferredDomain": zod.string().max(submitWhiteLabelRequestBodyPreferredDomainMax).nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])).min(1).max(submitWhiteLabelRequestBodyActionsMax),
   "details": zod.string().max(submitWhiteLabelRequestBodyDetailsMax),
+  "companyName": zod.string().max(submitWhiteLabelRequestBodyCompanyNameMax).nullish(),
+  "design": zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(submitWhiteLabelRequestBodyDesignStyleNameMax),
+  "primaryColor": zod.string().regex(submitWhiteLabelRequestBodyDesignPrimaryColorRegExp),
+  "accentColor": zod.string().regex(submitWhiteLabelRequestBodyDesignAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(submitWhiteLabelRequestBodyDesignDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(submitWhiteLabelRequestBodyDesignReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(submitWhiteLabelRequestBodyDesignNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(submitWhiteLabelRequestBodyDesignReferenceAttachmentIdsMax)
+}).optional(),
+  "requestedPlanId": zod.string().uuid().nullish(),
+  "requestedAddonIds": zod.array(zod.string().uuid()).max(submitWhiteLabelRequestBodyRequestedAddonIdsMax).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "attachmentIds": zod.array(zod.string().uuid()).max(submitWhiteLabelRequestBodyAttachmentIdsMax).optional(),
   "idempotencyKey": zod.string().uuid()
 })
+
+export const submitWhiteLabelRequestResponseDesignOneStyleNameMax = 100;
+
+export const submitWhiteLabelRequestResponseDesignOnePrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const submitWhiteLabelRequestResponseDesignOneAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const submitWhiteLabelRequestResponseDesignOneDescriptionMax = 5000;
+
+export const submitWhiteLabelRequestResponseDesignOneReferenceWebsiteUrlMax = 2048;
+
+export const submitWhiteLabelRequestResponseDesignOneNotesMax = 5000;
+
+export const submitWhiteLabelRequestResponseDesignOneReferenceAttachmentIdsMax = 10;
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneNameMin = 2;
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneNameMax = 120;
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax = 3000;
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax = 18;
+
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax = 18;
+
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax = 160;
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin = 0;
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax = 100000;
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsMax = 200;
+
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMin = 2;
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMax = 120;
+
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax = 3000;
+
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsMax = 200;
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneNameMin = 2;
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneNameMax = 120;
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax = 3000;
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax = 18;
+
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax = 18;
+
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax = 160;
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin = 0;
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax = 100000;
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsMax = 200;
+
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMin = 2;
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMax = 120;
+
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax = 3000;
+
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsMax = 200;
+
+
 
 export const SubmitWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
@@ -70,7 +1057,103 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
-  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "orderReference": zod.string().optional(),
+  "companyName": zod.string().nullish(),
+  "design": zod.union([zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(submitWhiteLabelRequestResponseDesignOneStyleNameMax),
+  "primaryColor": zod.string().regex(submitWhiteLabelRequestResponseDesignOnePrimaryColorRegExp),
+  "accentColor": zod.string().regex(submitWhiteLabelRequestResponseDesignOneAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(submitWhiteLabelRequestResponseDesignOneDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(submitWhiteLabelRequestResponseDesignOneReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(submitWhiteLabelRequestResponseDesignOneNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(submitWhiteLabelRequestResponseDesignOneReferenceAttachmentIdsMax)
+}),zod.null()]).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "requestedPlan": zod.union([zod.object({
+  "name": zod.string().min(submitWhiteLabelRequestResponseRequestedPlanOneOneNameMin).max(submitWhiteLabelRequestResponseRequestedPlanOneOneNameMax),
+  "description": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(submitWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(submitWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin).max(submitWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(submitWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "requestedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMin).max(submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMax),
+  "description": zod.string().max(submitWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyMax).regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax).regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(submitWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "approvedPlan": zod.union([zod.object({
+  "name": zod.string().min(submitWhiteLabelRequestResponseApprovedPlanOneOneNameMin).max(submitWhiteLabelRequestResponseApprovedPlanOneOneNameMax),
+  "description": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(submitWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(submitWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin).max(submitWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(submitWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "approvedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMin).max(submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMax),
+  "description": zod.string().max(submitWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyMax).regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax).regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(submitWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int(),
+  "category": zod.enum(['logo', 'favicon', 'design_reference', 'requirement']),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "customizationPrice": zod.string().nullish(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional(),
   "monthlyPrice": zod.string().nullable(),
   "setupPrice": zod.string().nullable(),
   "currency": zod.string().nullable(),
@@ -81,6 +1164,124 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
 })
 
 
+export const listWhiteLabelRequestsResponseDesignOneStyleNameMax = 100;
+
+export const listWhiteLabelRequestsResponseDesignOnePrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const listWhiteLabelRequestsResponseDesignOneAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const listWhiteLabelRequestsResponseDesignOneDescriptionMax = 5000;
+
+export const listWhiteLabelRequestsResponseDesignOneReferenceWebsiteUrlMax = 2048;
+
+export const listWhiteLabelRequestsResponseDesignOneNotesMax = 5000;
+
+export const listWhiteLabelRequestsResponseDesignOneReferenceAttachmentIdsMax = 10;
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneNameMin = 2;
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneNameMax = 120;
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneDescriptionMax = 3000;
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax = 18;
+
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax = 18;
+
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax = 160;
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMin = 0;
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMax = 100000;
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsMax = 200;
+
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin = 2;
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax = 120;
+
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneDescriptionMax = 3000;
+
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsMax = 200;
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneNameMin = 2;
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneNameMax = 120;
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneDescriptionMax = 3000;
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax = 18;
+
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax = 18;
+
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax = 160;
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMin = 0;
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMax = 100000;
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsMax = 200;
+
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin = 2;
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax = 120;
+
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneDescriptionMax = 3000;
+
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsMax = 200;
+
+
+
 export const ListWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
@@ -89,7 +1290,103 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
-  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "orderReference": zod.string().optional(),
+  "companyName": zod.string().nullish(),
+  "design": zod.union([zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(listWhiteLabelRequestsResponseDesignOneStyleNameMax),
+  "primaryColor": zod.string().regex(listWhiteLabelRequestsResponseDesignOnePrimaryColorRegExp),
+  "accentColor": zod.string().regex(listWhiteLabelRequestsResponseDesignOneAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(listWhiteLabelRequestsResponseDesignOneDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(listWhiteLabelRequestsResponseDesignOneReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(listWhiteLabelRequestsResponseDesignOneNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(listWhiteLabelRequestsResponseDesignOneReferenceAttachmentIdsMax)
+}),zod.null()]).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "requestedPlan": zod.union([zod.object({
+  "name": zod.string().min(listWhiteLabelRequestsResponseRequestedPlanOneOneNameMin).max(listWhiteLabelRequestsResponseRequestedPlanOneOneNameMax),
+  "description": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(listWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(listWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMin).max(listWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(listWhiteLabelRequestsResponseRequestedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "requestedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin).max(listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax),
+  "description": zod.string().max(listWhiteLabelRequestsResponseRequestedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyMax).regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax).regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(listWhiteLabelRequestsResponseRequestedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "approvedPlan": zod.union([zod.object({
+  "name": zod.string().min(listWhiteLabelRequestsResponseApprovedPlanOneOneNameMin).max(listWhiteLabelRequestsResponseApprovedPlanOneOneNameMax),
+  "description": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(listWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(listWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMin).max(listWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(listWhiteLabelRequestsResponseApprovedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "approvedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin).max(listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax),
+  "description": zod.string().max(listWhiteLabelRequestsResponseApprovedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyMax).regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax).regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(listWhiteLabelRequestsResponseApprovedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int(),
+  "category": zod.enum(['logo', 'favicon', 'design_reference', 'requirement']),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "customizationPrice": zod.string().nullish(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional(),
   "monthlyPrice": zod.string().nullable(),
   "setupPrice": zod.string().nullable(),
   "currency": zod.string().nullable(),
@@ -107,17 +1404,143 @@ export const ReviewWhiteLabelRequestParams = zod.object({
 
 export const reviewWhiteLabelRequestBodyMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestBodySetupPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
-export const reviewWhiteLabelRequestBodyOperatorNoteMax = 1000;
+export const reviewWhiteLabelRequestBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reviewWhiteLabelRequestBodyOperatorNoteMax = 5000;
+
+export const reviewWhiteLabelRequestBodyCustomizationPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestBodyApprovedAddonIdsMax = 20;
 
 
 
 export const ReviewWhiteLabelRequestBody = zod.object({
-  "status": zod.enum(['approved', 'rejected']),
-  "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestBodyMonthlyPriceRegExp),
-  "setupPrice": zod.string().regex(reviewWhiteLabelRequestBodySetupPriceRegExp),
-  "currency": zod.enum(['USD', 'EUR', 'GBP']),
-  "operatorNote": zod.string().max(reviewWhiteLabelRequestBodyOperatorNoteMax)
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestBodyMonthlyPriceRegExp).nullable(),
+  "setupPrice": zod.string().regex(reviewWhiteLabelRequestBodySetupPriceRegExp).nullable(),
+  "currency": zod.string().regex(reviewWhiteLabelRequestBodyCurrencyRegExp),
+  "operatorNote": zod.string().max(reviewWhiteLabelRequestBodyOperatorNoteMax),
+  "customizationPrice": zod.string().regex(reviewWhiteLabelRequestBodyCustomizationPriceRegExp).nullish(),
+  "approvedPlanId": zod.string().uuid().nullish(),
+  "approvedAddonIds": zod.array(zod.string().uuid()).max(reviewWhiteLabelRequestBodyApprovedAddonIdsMax).optional(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional()
 })
+
+export const reviewWhiteLabelRequestResponseDesignOneStyleNameMax = 100;
+
+export const reviewWhiteLabelRequestResponseDesignOnePrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const reviewWhiteLabelRequestResponseDesignOneAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const reviewWhiteLabelRequestResponseDesignOneDescriptionMax = 5000;
+
+export const reviewWhiteLabelRequestResponseDesignOneReferenceWebsiteUrlMax = 2048;
+
+export const reviewWhiteLabelRequestResponseDesignOneNotesMax = 5000;
+
+export const reviewWhiteLabelRequestResponseDesignOneReferenceAttachmentIdsMax = 10;
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneNameMin = 2;
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneNameMax = 120;
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax = 3000;
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax = 18;
+
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax = 18;
+
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax = 160;
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin = 0;
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax = 100000;
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsMax = 200;
+
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMin = 2;
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMax = 120;
+
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax = 3000;
+
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsMax = 200;
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneNameMin = 2;
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneNameMax = 120;
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax = 3000;
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax = 18;
+
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax = 18;
+
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax = 160;
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin = 0;
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax = 100000;
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsMax = 200;
+
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMin = 2;
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMax = 120;
+
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax = 3000;
+
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsMax = 200;
+
+
 
 export const ReviewWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
@@ -127,7 +1550,103 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
-  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "orderReference": zod.string().optional(),
+  "companyName": zod.string().nullish(),
+  "design": zod.union([zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(reviewWhiteLabelRequestResponseDesignOneStyleNameMax),
+  "primaryColor": zod.string().regex(reviewWhiteLabelRequestResponseDesignOnePrimaryColorRegExp),
+  "accentColor": zod.string().regex(reviewWhiteLabelRequestResponseDesignOneAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(reviewWhiteLabelRequestResponseDesignOneDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(reviewWhiteLabelRequestResponseDesignOneReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(reviewWhiteLabelRequestResponseDesignOneNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(reviewWhiteLabelRequestResponseDesignOneReferenceAttachmentIdsMax)
+}),zod.null()]).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "requestedPlan": zod.union([zod.object({
+  "name": zod.string().min(reviewWhiteLabelRequestResponseRequestedPlanOneOneNameMin).max(reviewWhiteLabelRequestResponseRequestedPlanOneOneNameMax),
+  "description": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(reviewWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin).max(reviewWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(reviewWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "requestedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMin).max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMax),
+  "description": zod.string().max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyMax).regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax).regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "approvedPlan": zod.union([zod.object({
+  "name": zod.string().min(reviewWhiteLabelRequestResponseApprovedPlanOneOneNameMin).max(reviewWhiteLabelRequestResponseApprovedPlanOneOneNameMax),
+  "description": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(reviewWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin).max(reviewWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(reviewWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "approvedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMin).max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMax),
+  "description": zod.string().max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyMax).regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax).regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int(),
+  "category": zod.enum(['logo', 'favicon', 'design_reference', 'requirement']),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "customizationPrice": zod.string().nullish(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional(),
   "monthlyPrice": zod.string().nullable(),
   "setupPrice": zod.string().nullable(),
   "currency": zod.string().nullable(),
@@ -146,6 +1665,124 @@ export const ProvisionWhiteLabelRequestBody = zod.object({
   "tenantId": zod.string().uuid()
 })
 
+export const provisionWhiteLabelRequestResponseDesignOneStyleNameMax = 100;
+
+export const provisionWhiteLabelRequestResponseDesignOnePrimaryColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const provisionWhiteLabelRequestResponseDesignOneAccentColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const provisionWhiteLabelRequestResponseDesignOneDescriptionMax = 5000;
+
+export const provisionWhiteLabelRequestResponseDesignOneReferenceWebsiteUrlMax = 2048;
+
+export const provisionWhiteLabelRequestResponseDesignOneNotesMax = 5000;
+
+export const provisionWhiteLabelRequestResponseDesignOneReferenceAttachmentIdsMax = 10;
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneNameMin = 2;
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneNameMax = 120;
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax = 3000;
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax = 18;
+
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax = 18;
+
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax = 160;
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin = 0;
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax = 100000;
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsMax = 200;
+
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMin = 2;
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMax = 120;
+
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax = 3000;
+
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsMax = 200;
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneNameMin = 2;
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneNameMax = 120;
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax = 3000;
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax = 18;
+
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax = 18;
+
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax = 18;
+
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax = 160;
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin = 0;
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax = 100000;
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsMax = 200;
+
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMin = 2;
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMax = 120;
+
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax = 3000;
+
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsMax = 200;
+
+
+
 export const ProvisionWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
@@ -154,7 +1791,103 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
-  "status": zod.enum(['submitted', 'approved', 'rejected', 'provisioned']),
+  "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
+  "orderReference": zod.string().optional(),
+  "companyName": zod.string().nullish(),
+  "design": zod.union([zod.object({
+  "type": zod.enum(['standard', 'custom']),
+  "styleName": zod.string().max(provisionWhiteLabelRequestResponseDesignOneStyleNameMax),
+  "primaryColor": zod.string().regex(provisionWhiteLabelRequestResponseDesignOnePrimaryColorRegExp),
+  "accentColor": zod.string().regex(provisionWhiteLabelRequestResponseDesignOneAccentColorRegExp),
+  "themePreference": zod.enum(['light', 'dark', 'both']),
+  "description": zod.string().max(provisionWhiteLabelRequestResponseDesignOneDescriptionMax),
+  "referenceWebsiteUrl": zod.string().max(provisionWhiteLabelRequestResponseDesignOneReferenceWebsiteUrlMax).nullable(),
+  "notes": zod.string().max(provisionWhiteLabelRequestResponseDesignOneNotesMax),
+  "logoAttachmentId": zod.string().uuid().nullable(),
+  "faviconAttachmentId": zod.string().uuid().nullable(),
+  "referenceAttachmentIds": zod.array(zod.string().uuid()).max(provisionWhiteLabelRequestResponseDesignOneReferenceAttachmentIdsMax)
+}),zod.null()]).optional(),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "requestedPlan": zod.union([zod.object({
+  "name": zod.string().min(provisionWhiteLabelRequestResponseRequestedPlanOneOneNameMin).max(provisionWhiteLabelRequestResponseRequestedPlanOneOneNameMax),
+  "description": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(provisionWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin).max(provisionWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(provisionWhiteLabelRequestResponseRequestedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "requestedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMin).max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMax),
+  "description": zod.string().max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyMax).regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoMax).regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "approvedPlan": zod.union([zod.object({
+  "name": zod.string().min(provisionWhiteLabelRequestResponseApprovedPlanOneOneNameMin).max(provisionWhiteLabelRequestResponseApprovedPlanOneOneNameMax),
+  "description": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp),
+  "yearlyPrice": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp),
+  "setupFee": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp),
+  "currency": zod.string().regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(provisionWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin).max(provisionWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(provisionWhiteLabelRequestResponseApprovedPlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})),zod.null()]).optional(),
+  "approvedAddons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "name": zod.string().min(provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMin).max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMax),
+  "description": zod.string().max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyMax).regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoMax).regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))).optional(),
+  "attachments": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "fileName": zod.string(),
+  "contentType": zod.string(),
+  "size": zod.number().int(),
+  "category": zod.enum(['logo', 'favicon', 'design_reference', 'requirement']),
+  "createdAt": zod.coerce.date()
+})).optional(),
+  "customizationPrice": zod.string().nullish(),
+  "customDesignDecision": zod.enum(['pending', 'approved', 'rejected']).optional(),
   "monthlyPrice": zod.string().nullable(),
   "setupPrice": zod.string().nullable(),
   "currency": zod.string().nullable(),
@@ -2967,6 +4700,10 @@ export const SetPlanStatusResponse = zod.object({
 }))
 
 
+export const listAddonsResponseOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listAddonsResponseOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listAddonsResponseOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const listAddonsResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const listAddonsResponseOneNameMin = 2;
 export const listAddonsResponseOneNameMax = 120;
 
@@ -2985,6 +4722,10 @@ export const listAddonsResponseOneEntitlementsMax = 200;
 
 
 export const ListAddonsResponseItem = zod.object({
+  "monthlyPrice": zod.string().regex(listAddonsResponseOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(listAddonsResponseOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(listAddonsResponseOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(listAddonsResponseOneCurrencyRegExp).optional(),
   "name": zod.string().min(listAddonsResponseOneNameMin).max(listAddonsResponseOneNameMax),
   "description": zod.string().max(listAddonsResponseOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -2993,11 +4734,16 @@ export const ListAddonsResponseItem = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(listAddonsResponseOneEntitlementsItemValueTwoMax).regex(listAddonsResponseOneEntitlementsItemValueTwoRegExp)])
 })).max(listAddonsResponseOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 export const ListAddonsResponse = zod.array(ListAddonsResponseItem)
 
 
+export const createAddonBodyMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const createAddonBodyYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const createAddonBodySetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const createAddonBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const createAddonBodyNameMin = 2;
 export const createAddonBodyNameMax = 120;
 
@@ -3016,6 +4762,10 @@ export const createAddonBodyEntitlementsMax = 200;
 
 
 export const CreateAddonBody = zod.object({
+  "monthlyPrice": zod.string().regex(createAddonBodyMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(createAddonBodyYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(createAddonBodySetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(createAddonBodyCurrencyRegExp).optional(),
   "name": zod.string().min(createAddonBodyNameMin).max(createAddonBodyNameMax),
   "description": zod.string().max(createAddonBodyDescriptionMax),
   "enabled": zod.boolean(),
@@ -3025,6 +4775,10 @@ export const CreateAddonBody = zod.object({
 })).max(createAddonBodyEntitlementsMax)
 })
 
+export const createAddonResponseOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const createAddonResponseOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const createAddonResponseOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const createAddonResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const createAddonResponseOneNameMin = 2;
 export const createAddonResponseOneNameMax = 120;
 
@@ -3043,6 +4797,10 @@ export const createAddonResponseOneEntitlementsMax = 200;
 
 
 export const CreateAddonResponse = zod.object({
+  "monthlyPrice": zod.string().regex(createAddonResponseOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(createAddonResponseOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(createAddonResponseOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(createAddonResponseOneCurrencyRegExp).optional(),
   "name": zod.string().min(createAddonResponseOneNameMin).max(createAddonResponseOneNameMax),
   "description": zod.string().max(createAddonResponseOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -3051,7 +4809,8 @@ export const CreateAddonResponse = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(createAddonResponseOneEntitlementsItemValueTwoMax).regex(createAddonResponseOneEntitlementsItemValueTwoRegExp)])
 })).max(createAddonResponseOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 
 
@@ -3059,6 +4818,10 @@ export const UpdateAddonParams = zod.object({
   "addonId": zod.coerce.string().uuid()
 })
 
+export const updateAddonBodyMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateAddonBodyYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateAddonBodySetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateAddonBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const updateAddonBodyNameMin = 2;
 export const updateAddonBodyNameMax = 120;
 
@@ -3077,6 +4840,10 @@ export const updateAddonBodyEntitlementsMax = 200;
 
 
 export const UpdateAddonBody = zod.object({
+  "monthlyPrice": zod.string().regex(updateAddonBodyMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(updateAddonBodyYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(updateAddonBodySetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(updateAddonBodyCurrencyRegExp).optional(),
   "name": zod.string().min(updateAddonBodyNameMin).max(updateAddonBodyNameMax),
   "description": zod.string().max(updateAddonBodyDescriptionMax),
   "enabled": zod.boolean(),
@@ -3086,6 +4853,10 @@ export const UpdateAddonBody = zod.object({
 })).max(updateAddonBodyEntitlementsMax)
 })
 
+export const updateAddonResponseOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateAddonResponseOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateAddonResponseOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateAddonResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const updateAddonResponseOneNameMin = 2;
 export const updateAddonResponseOneNameMax = 120;
 
@@ -3104,6 +4875,10 @@ export const updateAddonResponseOneEntitlementsMax = 200;
 
 
 export const UpdateAddonResponse = zod.object({
+  "monthlyPrice": zod.string().regex(updateAddonResponseOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(updateAddonResponseOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(updateAddonResponseOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(updateAddonResponseOneCurrencyRegExp).optional(),
   "name": zod.string().min(updateAddonResponseOneNameMin).max(updateAddonResponseOneNameMax),
   "description": zod.string().max(updateAddonResponseOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -3112,7 +4887,8 @@ export const UpdateAddonResponse = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(updateAddonResponseOneEntitlementsItemValueTwoMax).regex(updateAddonResponseOneEntitlementsItemValueTwoRegExp)])
 })).max(updateAddonResponseOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 
 
@@ -3153,6 +4929,10 @@ export const getTenantSubscriptionResponsePlanOneOneEntitlementsItemValueTwoMax 
 export const getTenantSubscriptionResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
 export const getTenantSubscriptionResponsePlanOneOneEntitlementsMax = 200;
 
+export const getTenantSubscriptionResponseAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getTenantSubscriptionResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getTenantSubscriptionResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const getTenantSubscriptionResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getTenantSubscriptionResponseAddonsItemOneNameMin = 2;
 export const getTenantSubscriptionResponseAddonsItemOneNameMax = 120;
 
@@ -3205,6 +4985,10 @@ export const GetTenantSubscriptionResponse = zod.object({
   "updatedAt": zod.coerce.date()
 })),zod.null()]),
   "addons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneCurrencyRegExp).optional(),
   "name": zod.string().min(getTenantSubscriptionResponseAddonsItemOneNameMin).max(getTenantSubscriptionResponseAddonsItemOneNameMax),
   "description": zod.string().max(getTenantSubscriptionResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -3213,7 +4997,8 @@ export const GetTenantSubscriptionResponse = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(getTenantSubscriptionResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(getTenantSubscriptionResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
 })).max(getTenantSubscriptionResponseAddonsItemOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))),
   "overrides": zod.array(zod.object({
   "key": zod.string().max(getTenantSubscriptionResponseOverridesItemOneKeyMax).regex(getTenantSubscriptionResponseOverridesItemOneKeyRegExp),
@@ -3277,6 +5062,10 @@ export const changeTenantPlanResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
 export const changeTenantPlanResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
 export const changeTenantPlanResponsePlanOneOneEntitlementsMax = 200;
 
+export const changeTenantPlanResponseAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const changeTenantPlanResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const changeTenantPlanResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const changeTenantPlanResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const changeTenantPlanResponseAddonsItemOneNameMin = 2;
 export const changeTenantPlanResponseAddonsItemOneNameMax = 120;
 
@@ -3329,6 +5118,10 @@ export const ChangeTenantPlanResponse = zod.object({
   "updatedAt": zod.coerce.date()
 })),zod.null()]),
   "addons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(changeTenantPlanResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(changeTenantPlanResponseAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(changeTenantPlanResponseAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(changeTenantPlanResponseAddonsItemOneCurrencyRegExp).optional(),
   "name": zod.string().min(changeTenantPlanResponseAddonsItemOneNameMin).max(changeTenantPlanResponseAddonsItemOneNameMax),
   "description": zod.string().max(changeTenantPlanResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -3337,7 +5130,8 @@ export const ChangeTenantPlanResponse = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(changeTenantPlanResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(changeTenantPlanResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
 })).max(changeTenantPlanResponseAddonsItemOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))),
   "overrides": zod.array(zod.object({
   "key": zod.string().max(changeTenantPlanResponseOverridesItemOneKeyMax).regex(changeTenantPlanResponseOverridesItemOneKeyRegExp),
@@ -3401,6 +5195,10 @@ export const setTenantAddonsResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
 export const setTenantAddonsResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
 export const setTenantAddonsResponsePlanOneOneEntitlementsMax = 200;
 
+export const setTenantAddonsResponseAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantAddonsResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantAddonsResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantAddonsResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const setTenantAddonsResponseAddonsItemOneNameMin = 2;
 export const setTenantAddonsResponseAddonsItemOneNameMax = 120;
 
@@ -3453,6 +5251,10 @@ export const SetTenantAddonsResponse = zod.object({
   "updatedAt": zod.coerce.date()
 })),zod.null()]),
   "addons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(setTenantAddonsResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(setTenantAddonsResponseAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(setTenantAddonsResponseAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(setTenantAddonsResponseAddonsItemOneCurrencyRegExp).optional(),
   "name": zod.string().min(setTenantAddonsResponseAddonsItemOneNameMin).max(setTenantAddonsResponseAddonsItemOneNameMax),
   "description": zod.string().max(setTenantAddonsResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -3461,7 +5263,8 @@ export const SetTenantAddonsResponse = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(setTenantAddonsResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(setTenantAddonsResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
 })).max(setTenantAddonsResponseAddonsItemOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))),
   "overrides": zod.array(zod.object({
   "key": zod.string().max(setTenantAddonsResponseOverridesItemOneKeyMax).regex(setTenantAddonsResponseOverridesItemOneKeyRegExp),
@@ -3545,6 +5348,10 @@ export const setTenantOverridesResponsePlanOneOneEntitlementsItemValueTwoMax = 3
 export const setTenantOverridesResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
 export const setTenantOverridesResponsePlanOneOneEntitlementsMax = 200;
 
+export const setTenantOverridesResponseAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantOverridesResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantOverridesResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantOverridesResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const setTenantOverridesResponseAddonsItemOneNameMin = 2;
 export const setTenantOverridesResponseAddonsItemOneNameMax = 120;
 
@@ -3597,6 +5404,10 @@ export const SetTenantOverridesResponse = zod.object({
   "updatedAt": zod.coerce.date()
 })),zod.null()]),
   "addons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(setTenantOverridesResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(setTenantOverridesResponseAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(setTenantOverridesResponseAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(setTenantOverridesResponseAddonsItemOneCurrencyRegExp).optional(),
   "name": zod.string().min(setTenantOverridesResponseAddonsItemOneNameMin).max(setTenantOverridesResponseAddonsItemOneNameMax),
   "description": zod.string().max(setTenantOverridesResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -3605,7 +5416,8 @@ export const SetTenantOverridesResponse = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(setTenantOverridesResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(setTenantOverridesResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
 })).max(setTenantOverridesResponseAddonsItemOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))),
   "overrides": zod.array(zod.object({
   "key": zod.string().max(setTenantOverridesResponseOverridesItemOneKeyMax).regex(setTenantOverridesResponseOverridesItemOneKeyRegExp),
@@ -3675,6 +5487,10 @@ export const setTenantSuspensionResponsePlanOneOneEntitlementsItemValueTwoMax = 
 export const setTenantSuspensionResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
 export const setTenantSuspensionResponsePlanOneOneEntitlementsMax = 200;
 
+export const setTenantSuspensionResponseAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantSuspensionResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantSuspensionResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const setTenantSuspensionResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const setTenantSuspensionResponseAddonsItemOneNameMin = 2;
 export const setTenantSuspensionResponseAddonsItemOneNameMax = 120;
 
@@ -3727,6 +5543,10 @@ export const SetTenantSuspensionResponse = zod.object({
   "updatedAt": zod.coerce.date()
 })),zod.null()]),
   "addons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(setTenantSuspensionResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(setTenantSuspensionResponseAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(setTenantSuspensionResponseAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(setTenantSuspensionResponseAddonsItemOneCurrencyRegExp).optional(),
   "name": zod.string().min(setTenantSuspensionResponseAddonsItemOneNameMin).max(setTenantSuspensionResponseAddonsItemOneNameMax),
   "description": zod.string().max(setTenantSuspensionResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -3735,7 +5555,8 @@ export const SetTenantSuspensionResponse = zod.object({
   "value": zod.union([zod.boolean(),zod.string().max(setTenantSuspensionResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(setTenantSuspensionResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
 })).max(setTenantSuspensionResponseAddonsItemOneEntitlementsMax)
 }).and(zod.object({
-  "id": zod.string().uuid()
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
 }))),
   "overrides": zod.array(zod.object({
   "key": zod.string().max(setTenantSuspensionResponseOverridesItemOneKeyMax).regex(setTenantSuspensionResponseOverridesItemOneKeyRegExp),

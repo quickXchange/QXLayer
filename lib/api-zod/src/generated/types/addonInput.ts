@@ -9,6 +9,23 @@ import type { EntitlementEntry } from './entitlementEntry';
 
 export interface AddonInput {
   /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  monthlyPrice?: string | null;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  yearlyPrice?: string | null;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  setupFee?: string | null;
+  /** @pattern ^[A-Z]{3}$ */
+  currency?: string;
+  /**
      * @minLength 2
      * @maxLength 120
      */

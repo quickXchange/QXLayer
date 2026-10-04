@@ -11,7 +11,7 @@ import { BrandLogo } from '@/components/brand-logo';
 const nav = [
   { href: '/admin', label: 'Overview', icon: LayoutGrid },
   { href: '/clients', label: 'Clients', icon: Users },
-  { href: '/white-label-requests', label: 'WL requests', icon: ScrollText, op: true },
+  { href: '/white-label-requests', label: 'White Label Orders', icon: ScrollText, op: true },
   { href: '/plans', label: 'Plans', icon: Boxes, op: true },
   { href: '/add-ons', label: 'Add-ons', icon: Boxes, op: true },
   { href: '/landing-products', label: 'Landing', icon: LayoutGrid, op: true },
@@ -54,7 +54,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <Link href="/admin" data-testid="link-logo"><Logo light /></Link>
           <nav className="mt-0 hidden md:mt-10 md:block md:space-y-1">
             {items.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
-              <Link key={n.href} href={n.href} data-testid={`link-nav-${n.label.toLowerCase()}`}
+              <Link key={n.href} href={n.href} data-testid={`link-nav-${n.label.toLowerCase().replace(/ /g, '')}`}
                 className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${active(n.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'hover:bg-sidebar-accent/60'}`}>
                 <n.icon className={`h-4 w-4 ${active(n.href) ? 'text-sidebar-primary' : ''}`} /> {n.label}
               </Link>

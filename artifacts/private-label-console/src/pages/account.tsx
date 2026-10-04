@@ -1,14 +1,12 @@
-import { useRef, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link } from 'wouter';
 import { UserProfile } from '@clerk/react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useSubmitWhiteLabelRequest, getListMyWhiteLabelRequestsQueryKey, type WhiteLabelRequest } from '@workspace/api-client-react';
 import { PageHeader, ErrorState, EmptyState, ListSkeleton, StatusBadge } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useAdminPanels, useMyRequests, money } from '@/lib/customer';
+import { ConfigureExchange } from '@/components/customer/configure';
+import { OrderStatus } from '@/components/customer/order-view';
+import { cash, orderRef, type WlOrder } from '@/lib/wl';
+import { useAdminPanels, useMyRequests } from '@/lib/customer';
 
 const Stat = ({ label, value, id }: { label: string; value: ReactNode; id: string }) => (
   <div className="rounded-md border bg-card p-5"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p><p data-testid={id} className="font-display mt-2 text-4xl">{value}</p></div>
@@ -16,15 +14,15 @@ const Stat = ({ label, value, id }: { label: string; value: ReactNode; id: strin
 
 export function AccountDashboard() {
   const r = useMyRequests(); const a = useAdminPanels();
-  const reqs = r.data ?? []; const panels = a.data ?? [];
+  const reqs = (r.data ?? []); const panels = a.data ?? [];
   return (
     <>
       <PageHeader eyebrow="Customer account" title="Dashboard"><Button asChild data-testid="button-configure"><Link href="/account/configure">Configure Exchange</Link></Button></PageHeader>
       {r.isLoading ? <ListSkeleton rows={2} /> : r.isError ? <ErrorState what="your requests" onRetry={() => r.refetch()} /> : (
         <div className="grid gap-4 md:grid-cols-4">
           <Stat id="stat-requests" label="Requests" value={reqs.length} />
-          <Stat id="stat-pending" label="Awaiting review" value={reqs.filter((x) => x.status === 'submitted').length} />
-          <Stat id="stat-approved" label="Approved" value={reqs.filter((x) => x.status === 'approved').length} />
+          <Stat id="stat-pending" label="Awaiting review" value={reqs.filter((x) => OPEN.includes(x.status)).length} />
+          <Stat id="stat-approved" label="Approved" value={reqs.filter((x) => ['approved', 'in_setup', 'customization', 'ready'].includes(x.status)).length} />
           <Stat id="stat-panels" label="Delivered panels" value={panels.length} />
         </div>)}
       {!r.isLoading && reqs.length === 0 && <div className="mt-8"><EmptyState title="No Exchange project yet" body="Configure a white-label Exchange and an operator will review it." action={<Button asChild><Link href="/account/configure">Configure Exchange</Link></Button>} /></div>}
@@ -32,33 +30,59 @@ export function AccountDashboard() {
   );
 }
 
-function ReqRow({ x, panelIds }: { x: WhiteLabelRequest; panelIds: string[] }) {
+const OPEN = ['new', 'submitted', 'reviewing', 'waiting_for_client', 'quote_ready'];
+const DONE = ['delivered', 'provisioned'];
+
+function ReqRow({ x }: { x: WlOrder }) {
+  const rec = x.monthlyPrice == null ? 'Pending operator pricing' : `${cash(x.monthlyPrice, x.currency)} / ${x.billingPeriod === 'yearly' ? 'year' : 'month'}`;
   return (
-    <div className="rounded-md border bg-card p-4" data-testid={`row-request-${x.id}`}>
-      <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-xl">{x.projectName} <span className="text-sm text-muted-foreground">{x.brandName}</span></p><StatusBadge status={x.status} /></div>
-      <p className="mt-1 font-mono text-[11px] uppercase text-copper">{x.actions.join(' / ')} · {new Date(x.createdAt).toLocaleDateString()}</p>
-      {x.details && <p className="mt-2 text-sm text-muted-foreground">{x.details}</p>}
-      <p className="mt-2 text-sm">Monthly: {money(x.monthlyPrice, x.currency)} · Setup: {money(x.setupPrice, x.currency)}</p>
-      {x.operatorNote && <p className="mt-1 text-sm">Operator note: {x.operatorNote}</p>}
-      {x.status === 'provisioned' && x.tenantId && panelIds.includes(x.tenantId) && <Button asChild size="sm" className="mt-3"><Link href={`/clients/${x.tenantId}/exchange`}>Open Admin</Link></Button>}
-    </div>
+    <Link href={`/account/orders/${x.id}`} className="block rounded-md border bg-card p-4 transition-colors hover:bg-muted/40" data-testid={`row-request-${x.id}`}>
+      <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-display text-xl">{x.projectName} <span className="text-sm text-muted-foreground">{x.brandName}</span></p><OrderStatus status={x.status} /></div>
+      <p className="mt-1 font-mono text-[11px] uppercase text-copper">{orderRef(x)} · {new Date(x.createdAt).toLocaleDateString()}</p>
+      <p className="mt-2 text-sm">Recurring: {rec} · Setup: {x.setupPrice == null ? 'Pending' : cash(x.setupPrice, x.currency)}</p>
+      {x.operatorNote && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">Current note: {x.operatorNote}</p>}
+    </Link>
   );
 }
 
-function RequestList({ title, eyebrow, withPanels }: { title: string; eyebrow: string; withPanels?: boolean }) {
-  const r = useMyRequests(); const a = useAdminPanels();
-  const reqs = r.data ?? []; const ids = (a.data ?? []).map((p) => p.tenantId);
+export function AccountOrders() {
+  const r = useMyRequests(); const reqs = (r.data ?? []);
   return (
     <>
-      <PageHeader eyebrow={eyebrow} title={title}><Button asChild variant="outline"><Link href="/account/configure">Configure Exchange</Link></Button></PageHeader>
+      <PageHeader eyebrow="Purchase and service requests" title="My Orders"><Button asChild variant="outline"><Link href="/account/configure">Configure Exchange</Link></Button></PageHeader>
       {r.isLoading ? <ListSkeleton /> : r.isError ? <ErrorState what="your requests" onRetry={() => r.refetch()} /> : reqs.length === 0 ? (
-        <EmptyState title={withPanels ? 'No white labels yet' : 'No orders yet'} body="Nothing has been requested. Configure an Exchange to get started." action={<Button asChild><Link href="/account/configure">Configure Exchange</Link></Button>} />
-      ) : <div className="space-y-3">{reqs.map((x) => <ReqRow key={x.id} x={x} panelIds={withPanels ? ids : []} />)}</div>}
+        <EmptyState title="No orders yet" body="Nothing has been requested. Configure an Exchange to get started." action={<Button asChild><Link href="/account/configure">Configure Exchange</Link></Button>} />
+      ) : <div className="space-y-3">{reqs.map((x) => <ReqRow key={x.id} x={x} />)}</div>}
     </>
   );
 }
-export const AccountOrders = () => <RequestList title="My Orders" eyebrow="Purchase and service requests" />;
-export const AccountWhiteLabels = () => <RequestList title="My White Labels" eyebrow="Projects" withPanels />;
+
+export function AccountWhiteLabels() {
+  const r = useMyRequests(); const a = useAdminPanels();
+  const delivered = (r.data ?? []).filter((x) => DONE.includes(x.status));
+  const panels = a.data ?? []; const ids = panels.map((p) => p.tenantId);
+  const orphan = panels.filter((p) => !delivered.some((x) => x.tenantId === p.tenantId));
+  const loading = r.isLoading || a.isLoading;
+  return (
+    <>
+      <PageHeader eyebrow="Projects" title="My White Labels"><Button asChild variant="outline"><Link href="/account/configure">Configure Exchange</Link></Button></PageHeader>
+      {loading ? <ListSkeleton /> : r.isError ? <ErrorState what="your orders" onRetry={() => r.refetch()} /> : a.isError ? <ErrorState what="your admin panels" onRetry={() => a.refetch()} /> : delivered.length + orphan.length === 0 ? (
+        <EmptyState title="No white labels yet" body="A project appears here once an operator delivers your order." action={<Button asChild><Link href="/account/orders">My Orders</Link></Button>} />
+      ) : <div className="grid gap-4 md:grid-cols-2">
+        {delivered.map((x) => (
+          <div key={x.id} className="rounded-md border bg-card p-5" data-testid={`card-wl-${x.id}`}>
+            <p className="font-mono text-[11px] uppercase text-copper">{orderRef(x)}</p><p className="font-display mt-1 text-2xl">{x.projectName}</p><p className="text-sm text-muted-foreground">{x.brandName}</p>
+            <div className="mt-4 flex gap-2">{x.tenantId && ids.includes(x.tenantId) && <Button asChild size="sm"><Link href={`/clients/${x.tenantId}/exchange`}>Open Admin</Link></Button>}<Button asChild size="sm" variant="outline"><Link href={`/account/orders/${x.id}`}>Order details</Link></Button></div>
+          </div>))}
+        {orphan.map((p) => (
+          <div key={p.tenantId} className="rounded-md border bg-card p-5" data-testid={`card-wl-panel-${p.tenantId}`}>
+            <p className="font-mono text-[11px] uppercase text-copper">{p.slug}</p><p className="font-display mt-1 text-2xl">{p.brandName}</p>
+            <Button asChild size="sm" className="mt-4"><Link href={`/clients/${p.tenantId}/exchange`}>Open Admin</Link></Button>
+          </div>))}
+      </div>}
+    </>
+  );
+}
 
 export function AdminPanels() {
   const a = useAdminPanels();
@@ -82,42 +106,7 @@ export function NotProvisioned() {
   return <EmptyState title="Not provisioned" body="This Exchange admin is not delivered to your account." action={<Button asChild><Link href="/account">Back to Dashboard</Link></Button>} />;
 }
 
-const ACTS = ['swap', 'convert', 'buy', 'sell'] as const;
-export function ConfigureExchange() {
-  const qc = useQueryClient(); const submit = useSubmitWhiteLabelRequest();
-  const [f, setF] = useState({ projectName: '', brandName: '', domain: '', details: '' });
-  const [acts, setActs] = useState<string[]>(['swap']);
-  const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
-  const key = useRef(crypto.randomUUID());
-  const valid = f.projectName.trim().length >= 2 && f.brandName.trim().length >= 2 && acts.length > 0;
-  const go = () => {
-    setErr(null);
-    submit.mutate({ data: { projectName: f.projectName.trim(), brandName: f.brandName.trim(), preferredDomain: f.domain.trim() || null, actions: ACTS.filter((x) => acts.includes(x)), details: f.details, idempotencyKey: key.current } }, {
-      onSuccess: () => { setDone(true); key.current = crypto.randomUUID(); setF({ projectName: '', brandName: '', domain: '', details: '' }); qc.invalidateQueries({ queryKey: getListMyWhiteLabelRequestsQueryKey() }); },
-      onError: (e) => setErr((e as { data?: { error?: string; message?: string }; message?: string }).data?.error ?? (e as { data?: { message?: string } }).data?.message ?? (e as Error).message ?? 'Submission failed'),
-    });
-  };
-  const set = (k: keyof typeof f) => (e: { target: { value: string } }) => { setDone(false); setF({ ...f, [k]: e.target.value }); };
-  return (
-    <>
-      <PageHeader eyebrow="White label" title="Configure Exchange" />
-      <form onSubmit={(e) => { e.preventDefault(); go(); }} className="max-w-xl space-y-4">
-        <p className="text-sm text-muted-foreground">Describe the Exchange you want. An operator reviews the request and sets pricing; nothing is charged here.</p>
-        <label className="block text-sm">Project name<Input data-testid="input-project" value={f.projectName} onChange={set('projectName')} maxLength={100} /></label>
-        <label className="block text-sm">Brand name<Input data-testid="input-brand" value={f.brandName} onChange={set('brandName')} maxLength={100} /></label>
-        <label className="block text-sm">Preferred domain (optional)<Input data-testid="input-domain" value={f.domain} onChange={set('domain')} maxLength={253} /></label>
-        <fieldset className="flex flex-wrap gap-5 text-sm"><legend className="mb-1">Actions</legend>
-          {ACTS.map((x) => <label key={x} className="flex items-center gap-2 capitalize"><Checkbox data-testid={`check-${x}`} checked={acts.includes(x)} onCheckedChange={(v) => setActs(v ? [...acts, x] : acts.filter((y) => y !== x))} />{x}</label>)}
-        </fieldset>
-        <label className="block text-sm">Details<Textarea data-testid="input-details" value={f.details} onChange={set('details')} maxLength={1000} /></label>
-        {err && <p role="alert" data-testid="text-error" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">{err}</p>}
-        {done && <p data-testid="text-submitted" className="rounded-md border p-3 text-sm">Request submitted. <Link href="/account/orders" className="text-copper underline">View My Orders</Link></p>}
-        <Button type="submit" data-testid="button-submit" disabled={!valid || submit.isPending}>{submit.isPending ? 'Submitting' : 'Submit request'}</Button>
-      </form>
-    </>
-  );
-}
+export { ConfigureExchange };
 
 export function AccountProfile() {
   return (<><PageHeader eyebrow="Your sign-in" title="Profile / Account" /><div className="overflow-x-auto"><UserProfile routing="hash" /></div></>);

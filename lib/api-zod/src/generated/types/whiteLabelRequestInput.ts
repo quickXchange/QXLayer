@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ExchangeAction } from './exchangeAction';
+import type { WhiteLabelDesign } from './whiteLabelDesign';
+import type { WhiteLabelRequestInputBillingPeriod } from './whiteLabelRequestInputBillingPeriod';
 
 export interface WhiteLabelRequestInput {
   /**
@@ -28,7 +30,20 @@ export interface WhiteLabelRequestInput {
      * @maxItems 4
      */
   actions: ExchangeAction[];
-  /** @maxLength 1000 */
+  /** @maxLength 10000 */
   details: string;
+  /**
+     * @maxLength 150
+     * @nullable
+     */
+  companyName?: string | null;
+  design?: WhiteLabelDesign;
+  /** @nullable */
+  requestedPlanId?: string | null;
+  /** @maxItems 20 */
+  requestedAddonIds?: string[];
+  billingPeriod?: WhiteLabelRequestInputBillingPeriod;
+  /** @maxItems 10 */
+  attachmentIds?: string[];
   idempotencyKey: string;
 }

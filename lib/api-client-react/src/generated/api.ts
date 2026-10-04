@@ -76,6 +76,10 @@ import type {
   TenantModulesInput,
   TenantSummary,
   WebsiteSettings,
+  WhiteLabelCatalog,
+  WhiteLabelEvent,
+  WhiteLabelNoteInput,
+  WhiteLabelOrderDetail,
   WhiteLabelRequest,
   WhiteLabelRequestInput,
   WhiteLabelReviewInput
@@ -107,6 +111,302 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetWhiteLabelCatalogUrl = () => {
+
+
+
+
+  return `/api/customer/white-label-catalog`
+}
+
+export const getWhiteLabelCatalog = async ( options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelCatalog> => {
+
+  return customFetch<WhiteLabelCatalog>(getGetWhiteLabelCatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWhiteLabelCatalogQueryKey = () => {
+    return [
+    `/api/customer/white-label-catalog`
+    ] as const;
+    }
+
+
+export const getGetWhiteLabelCatalogQueryOptions = <TData = Awaited<ReturnType<typeof getWhiteLabelCatalog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWhiteLabelCatalogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWhiteLabelCatalog>>> = ({ signal }) => getWhiteLabelCatalog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelCatalog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWhiteLabelCatalogQueryResult = NonNullable<Awaited<ReturnType<typeof getWhiteLabelCatalog>>>
+export type GetWhiteLabelCatalogQueryError = ErrorType<unknown>
+
+
+
+export function useGetWhiteLabelCatalog<TData = Awaited<ReturnType<typeof getWhiteLabelCatalog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWhiteLabelCatalogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetMyWhiteLabelRequestUrl = (requestId: string,) => {
+
+
+
+
+  return `/api/customer/white-label-requests/${requestId}`
+}
+
+export const getMyWhiteLabelRequest = async (requestId: string, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelOrderDetail> => {
+
+  return customFetch<WhiteLabelOrderDetail>(getGetMyWhiteLabelRequestUrl(requestId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyWhiteLabelRequestQueryKey = (requestId: string,) => {
+    return [
+    `/api/customer/white-label-requests/${requestId}`
+    ] as const;
+    }
+
+
+export const getGetMyWhiteLabelRequestQueryOptions = <TData = Awaited<ReturnType<typeof getMyWhiteLabelRequest>>, TError = ErrorType<unknown>>(requestId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyWhiteLabelRequest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyWhiteLabelRequestQueryKey(requestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyWhiteLabelRequest>>> = ({ signal }) => getMyWhiteLabelRequest(requestId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: requestId !== null && requestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyWhiteLabelRequest>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyWhiteLabelRequestQueryResult = NonNullable<Awaited<ReturnType<typeof getMyWhiteLabelRequest>>>
+export type GetMyWhiteLabelRequestQueryError = ErrorType<unknown>
+
+
+
+export function useGetMyWhiteLabelRequest<TData = Awaited<ReturnType<typeof getMyWhiteLabelRequest>>, TError = ErrorType<unknown>>(
+ requestId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyWhiteLabelRequest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyWhiteLabelRequestQueryOptions(requestId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetWhiteLabelRequestUrl = (requestId: string,) => {
+
+
+
+
+  return `/api/operator/white-label-requests/${requestId}`
+}
+
+export const getWhiteLabelRequest = async (requestId: string, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelOrderDetail> => {
+
+  return customFetch<WhiteLabelOrderDetail>(getGetWhiteLabelRequestUrl(requestId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWhiteLabelRequestQueryKey = (requestId: string,) => {
+    return [
+    `/api/operator/white-label-requests/${requestId}`
+    ] as const;
+    }
+
+
+export const getGetWhiteLabelRequestQueryOptions = <TData = Awaited<ReturnType<typeof getWhiteLabelRequest>>, TError = ErrorType<unknown>>(requestId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelRequest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWhiteLabelRequestQueryKey(requestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWhiteLabelRequest>>> = ({ signal }) => getWhiteLabelRequest(requestId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: requestId !== null && requestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelRequest>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWhiteLabelRequestQueryResult = NonNullable<Awaited<ReturnType<typeof getWhiteLabelRequest>>>
+export type GetWhiteLabelRequestQueryError = ErrorType<unknown>
+
+
+
+export function useGetWhiteLabelRequest<TData = Awaited<ReturnType<typeof getWhiteLabelRequest>>, TError = ErrorType<unknown>>(
+ requestId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelRequest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWhiteLabelRequestQueryOptions(requestId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getAddWhiteLabelNoteUrl = (requestId: string,) => {
+
+
+
+
+  return `/api/operator/white-label-requests/${requestId}/notes`
+}
+
+export const addWhiteLabelNote = async (requestId: string,
+    whiteLabelNoteInput: WhiteLabelNoteInput, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelEvent> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WhiteLabelEvent>(getAddWhiteLabelNoteUrl(requestId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(whiteLabelNoteInput)
+  }
+);}
+
+
+
+
+
+export const getAddWhiteLabelNoteMutationKey = () => ['addWhiteLabelNote'] as const;
+
+export const getAddWhiteLabelNoteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWhiteLabelNote>>, TError,AddWhiteLabelNoteMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addWhiteLabelNote>>, TError,AddWhiteLabelNoteMutationVariables, TContext> => {
+
+const mutationKey = getAddWhiteLabelNoteMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addWhiteLabelNote>>, AddWhiteLabelNoteMutationVariables> = (props) => {
+          const {requestId,data} = props ?? {};
+
+          return  addWhiteLabelNote(requestId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddWhiteLabelNoteMutationResult = NonNullable<Awaited<ReturnType<typeof addWhiteLabelNote>>>
+    export type AddWhiteLabelNoteMutationBody = BodyType<WhiteLabelNoteInput>
+    export type AddWhiteLabelNoteMutationError = ErrorType<unknown>
+    export type AddWhiteLabelNoteMutationVariables = {requestId: string;data: BodyType<WhiteLabelNoteInput>}
+
+    export const useAddWhiteLabelNote = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWhiteLabelNote>>, TError,AddWhiteLabelNoteMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addWhiteLabelNote>>,
+        TError,
+        AddWhiteLabelNoteMutationVariables,
+        TContext
+      > => {
+      return useMutation(getAddWhiteLabelNoteMutationOptions(options));
+    }
 
 export const getListMyAdminPanelsUrl = () => {
 

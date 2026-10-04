@@ -5,8 +5,14 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { Addon } from './addon';
 import type { ExchangeAction } from './exchangeAction';
-import type { WhiteLabelRequestStatus } from './whiteLabelRequestStatus';
+import type { Plan } from './plan';
+import type { WhiteLabelAttachment } from './whiteLabelAttachment';
+import type { WhiteLabelDesign } from './whiteLabelDesign';
+import type { WhiteLabelRequestBillingPeriod } from './whiteLabelRequestBillingPeriod';
+import type { WhiteLabelRequestCustomDesignDecision } from './whiteLabelRequestCustomDesignDecision';
+import type { WhiteLabelStatus } from './whiteLabelStatus';
 
 export interface WhiteLabelRequest {
   id: string;
@@ -17,7 +23,20 @@ export interface WhiteLabelRequest {
   preferredDomain: string | null;
   actions: ExchangeAction[];
   details: string;
-  status: WhiteLabelRequestStatus;
+  status: WhiteLabelStatus;
+  orderReference?: string;
+  /** @nullable */
+  companyName?: string | null;
+  design?: WhiteLabelDesign | null;
+  billingPeriod?: WhiteLabelRequestBillingPeriod;
+  requestedPlan?: Plan | null;
+  requestedAddons?: Addon[];
+  approvedPlan?: Plan | null;
+  approvedAddons?: Addon[];
+  attachments?: WhiteLabelAttachment[];
+  /** @nullable */
+  customizationPrice?: string | null;
+  customDesignDecision?: WhiteLabelRequestCustomDesignDecision;
   /** @nullable */
   monthlyPrice: string | null;
   /** @nullable */

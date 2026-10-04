@@ -9,4 +9,5 @@ import type { AddonInput } from './addonInput';
 
 export type Addon = AddonInput & {
   id: string;
+  pricingConfigured?: boolean;
 };

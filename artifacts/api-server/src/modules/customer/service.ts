@@ -1,16 +1,17 @@
 import { withDatabase } from "@workspace/db";
-import { SubmitWhiteLabelRequestBody, ReviewWhiteLabelRequestBody, type WhiteLabelRequestInput, type WhiteLabelReviewInput } from "@workspace/api-zod";
+import { SubmitWhiteLabelRequestBody, ReviewWhiteLabelRequestBody, AddWhiteLabelNoteBody, type WhiteLabelNoteInput, type WhiteLabelRequestInput, type WhiteLabelReviewInput } from "@workspace/api-zod";
+import { createHash } from "node:crypto";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { HttpError } from "../../lib/errors";
 import { audit } from "../../lib/audit";
 import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
-
-const columns = `id,customer_user_id AS "customerUserId",configuration,status,monthly_price AS "monthlyPrice",setup_price AS "setupPrice",currency,operator_note AS "operatorNote",tenant_id AS "tenantId",created_at AS "createdAt",updated_at AS "updatedAt"`;
-function view(row: Record<string, any>) {
-  const { configuration, ...rest } = row;
-  return { ...rest, ...configuration };
+import { requestColumns as columns, orderView, event, eventColumns, requestContext, assertTransition, assertFinalPricing } from "./order-model";
+import { catalogSelection } from "./order-catalog";
+function stable(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(stable);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, stable(v)]));
+  return value;
 }
-function requestContext(p: Principal, write = false) { return { actorId: p.userId, isSuperAdmin: p.role === "super_admin", canWrite: write }; }
 
 export function myAdminPanels(p: Principal) {
   if (p.role === "super_admin") return Promise.resolve([]);
@@ -32,7 +33,9 @@ export function listRequests(p: Principal, operator = false) {
   if (operator) requireSuperAdmin(p);
   return withDatabase(requestContext(p), async c => {
     const r = await c.query(`SELECT ${columns} FROM white_label_requests ${operator ? "" : "WHERE customer_user_id=$1"} ORDER BY created_at DESC`, operator ? [] : [p.userId]);
-    return r.rows.map(view);
+    const orders = [];
+    for (const row of r.rows) orders.push(await orderView(c, row));
+    return orders;
   });
 }
 export function submitRequest(p: Principal, raw: WhiteLabelRequestInput) {
@@ -42,24 +45,78 @@ export function submitRequest(p: Principal, raw: WhiteLabelRequestInput) {
   const configuration = { ...fields, projectName: fields.projectName.trim(), brandName: fields.brandName.trim(), preferredDomain: fields.preferredDomain?.trim() || null };
   if (configuration.projectName.length < 2 || configuration.brandName.length < 2 || new Set(input.actions).size !== input.actions.length) throw new HttpError(400, "Provide project and brand names and distinct Exchange actions.");
   return withDatabase(requestContext(p, true), async c => {
+    await c.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [`order-submit:${p.userId}:${idempotencyKey}`]);
+    const fingerprint = createHash("sha256").update(JSON.stringify(stable(configuration))).digest("hex");
+    const previous = await c.query(`SELECT ${columns} FROM white_label_requests WHERE customer_user_id=$1 AND idempotency_key=$2`, [p.userId, idempotencyKey]);
+    if (previous.rowCount) {
+      const old = previous.rows[0];
+      if (old.configuration.inputFingerprint ? old.configuration.inputFingerprint !== fingerprint :
+          Object.keys(configuration).some(k => JSON.stringify(old.configuration[k]) !== JSON.stringify(configuration[k as keyof typeof configuration]))) throw new HttpError(409, "This submission key belongs to another request.");
+      return orderView(c, old);
+    }
+    if (configuration.design?.referenceWebsiteUrl) {
+      let url: URL;
+      try { url = new URL(configuration.design.referenceWebsiteUrl); }
+      catch { throw new HttpError(400, "Enter a valid reference website URL."); }
+      if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) throw new HttpError(400, "Use a normal http or https reference website URL without credentials.");
+    }
+    if (configuration.design && !configuration.requestedPlanId) throw new HttpError(400, "Choose an available plan for this White Label request.");
+    const snapshot = await catalogSelection(c, configuration.requestedPlanId ?? null, configuration.requestedAddonIds ?? []);
+    const design = configuration.design;
+    const ids = [...new Set([...(configuration.attachmentIds ?? []), ...(design?.referenceAttachmentIds ?? []), design?.logoAttachmentId, design?.faviconAttachmentId].filter((x): x is string => !!x))];
+    if (ids.length > 20) throw new HttpError(400, "An order accepts up to 20 attachments.");
+    const files = await c.query("SELECT id,size,category FROM white_label_attachments WHERE id=ANY($1::uuid[]) AND owner_user_id=$2 AND request_id IS NULL FOR UPDATE", [ids, p.userId]);
+    if (files.rows.length !== ids.length) throw new HttpError(400, "An attachment is unavailable, already submitted, or does not belong to your account.");
+    if (files.rows.reduce((n, f) => n + f.size, 0) > 40 * 1024 * 1024) throw new HttpError(400, "Total order attachments cannot exceed 40 MB.");
+    const categoryFor = (id: string | null | undefined, category: string) => {
+      if (id && files.rows.find(f => f.id === id)?.category !== category) throw new HttpError(400, "Attachment category does not match its requested use.");
+    };
+    categoryFor(design?.logoAttachmentId, "logo"); categoryFor(design?.faviconAttachmentId, "favicon");
+    design?.referenceAttachmentIds.forEach(id => categoryFor(id, "design_reference"));
+    configuration.attachmentIds?.forEach(id => categoryFor(id, "requirement"));
     const inserted = await c.query(`INSERT INTO white_label_requests (customer_user_id,idempotency_key,configuration)
-      VALUES ($1,$2,$3) ON CONFLICT (customer_user_id,idempotency_key) DO NOTHING RETURNING ${columns}`, [p.userId, idempotencyKey, JSON.stringify(configuration)]);
+      VALUES ($1,$2,$3) ON CONFLICT (customer_user_id,idempotency_key) DO NOTHING RETURNING ${columns}`, [p.userId, idempotencyKey, JSON.stringify({ ...configuration, catalogSnapshot: snapshot, inputFingerprint: fingerprint })]);
     const row = inserted.rows[0] ?? (await c.query(`SELECT ${columns} FROM white_label_requests WHERE customer_user_id=$1 AND idempotency_key=$2`, [p.userId, idempotencyKey])).rows[0];
-    // JSONB object key ordering is not a client contract.
-    if (!row || Object.keys(configuration).some(k => JSON.stringify(row.configuration[k]) !== JSON.stringify(configuration[k as keyof typeof configuration]))) throw new HttpError(409, "This submission key belongs to another request.");
-    return view(row);
+    if (!row || row.configuration.inputFingerprint !== fingerprint) throw new HttpError(409, "This submission key belongs to another request.");
+    if (inserted.rowCount) {
+      await c.query("UPDATE white_label_attachments SET request_id=$1 WHERE id=ANY($2::uuid[]) AND owner_user_id=$3 AND request_id IS NULL", [row.id, ids, p.userId]);
+      await event(c, p, row.id, "status", "White Label request submitted. Configuration and attachments await Super Admin review.", "customer", "new");
+    }
+    return orderView(c, row);
   });
 }
 export function reviewRequest(p: Principal, id: string, raw: WhiteLabelReviewInput) {
   requireSuperAdmin(p);
   const input = ReviewWhiteLabelRequestBody.parse(raw);
   return withDatabase(requestContext(p, true), async c => {
-    const existing = await c.query("SELECT status FROM white_label_requests WHERE id=$1 FOR UPDATE", [id]);
+    const existing = await c.query(`SELECT ${columns} FROM white_label_requests WHERE id=$1 FOR UPDATE`, [id]);
     if (!existing.rowCount) throw new HttpError(404, "White Label request not found.");
-    if (existing.rows[0].status === "provisioned") throw new HttpError(409, "A delivered White Label cannot be reviewed again.");
-    const r = await c.query(`UPDATE white_label_requests SET status=$2,monthly_price=$3,setup_price=$4,currency=$5,operator_note=$6,updated_at=now() WHERE id=$1 RETURNING ${columns}`, [id, input.status, input.monthlyPrice, input.setupPrice, input.currency, input.operatorNote]);
+    const old = existing.rows[0];
+    assertTransition(old.status, input.status);
+    const selection = ["rejected", "cancelled"].includes(input.status) ? (old.approvedConfiguration ?? { plan: null, addons: [] }) :
+      await catalogSelection(c, input.approvedPlanId !== undefined ? input.approvedPlanId : (old.approvedConfiguration?.plan?.id ?? old.configuration.catalogSnapshot?.plan?.id ?? null),
+        input.approvedAddonIds ?? old.approvedConfiguration?.addons?.map((a: { id: string }) => a.id) ?? old.configuration.requestedAddonIds ?? []);
+    if (old.configuration.requestedPlanId && !selection.plan && !["rejected", "cancelled"].includes(input.status)) throw new HttpError(400, "Choose an approved plan for this order.");
+    const next = { ...old, monthlyPrice: input.monthlyPrice, setupPrice: input.setupPrice, currency: input.currency,
+      customizationPrice: input.customizationPrice === undefined ? old.customizationPrice : input.customizationPrice,
+      customDesignDecision: input.customDesignDecision ?? old.customDesignDecision };
+    if (["approved", "in_setup", "customization", "ready"].includes(input.status)) assertFinalPricing(next);
+    if (input.status === "quote_ready" && (next.monthlyPrice == null || next.setupPrice == null ||
+      (old.configuration.design?.type === "custom" && next.customizationPrice == null))) throw new HttpError(409, "Set the complete quotation before marking it Quote Ready.");
+    const r = await c.query(`UPDATE white_label_requests SET status=$2,monthly_price=$3,setup_price=$4,currency=$5,
+      customization_price=$6,custom_design_decision=$7,approved_configuration=$8,updated_at=now() WHERE id=$1 RETURNING ${columns}`,
+      [id, input.status, input.monthlyPrice, input.setupPrice, input.currency, next.customizationPrice, next.customDesignDecision, JSON.stringify(selection)]);
+    if (old.status !== input.status) await event(c, p, id, "status", `Status changed to ${input.status.replaceAll("_", " ")}.`, "customer", input.status);
+    if (old.monthlyPrice !== input.monthlyPrice || old.setupPrice !== input.setupPrice || old.customizationPrice !== next.customizationPrice || old.currency !== input.currency) {
+      await event(c, p, id, "note", `Quotation updated: recurring ${input.monthlyPrice ?? "requires review"}, setup ${input.setupPrice ?? "requires review"}, customization ${next.customizationPrice ?? "not quoted"} (${input.currency}).`);
+    }
+    if (input.operatorNote.trim() && input.operatorNote.trim() !== old.operatorNote) {
+      await event(c, p, id, "note", input.operatorNote.trim());
+      await c.query("UPDATE white_label_requests SET operator_note=$2 WHERE id=$1", [id, input.operatorNote.trim()]);
+      r.rows[0].operatorNote = input.operatorNote.trim();
+    }
     await audit(c, p, null, "white_label.request.reviewed", "Reviewed Exchange White Label request", { requestId: id, status: input.status });
-    return view(r.rows[0]);
+    return orderView(c, r.rows[0]);
   });
 }
 export function deliverRequest(p: Principal, id: string, tenantId: string) {
@@ -68,13 +125,18 @@ export function deliverRequest(p: Principal, id: string, tenantId: string) {
     const request = await c.query(`SELECT ${columns} FROM white_label_requests WHERE id=$1 FOR UPDATE`, [id]);
     if (!request.rowCount) throw new HttpError(404, "White Label request not found.");
     const row = request.rows[0];
-    if (row.status === "provisioned" && row.tenantId === tenantId) return view(row);
-    if (row.status !== "approved") throw new HttpError(409, "Approve the request and set final pricing before provisioning.");
+    if (row.status === "delivered" && row.tenantId === tenantId) return orderView(c, row);
+    if (!["approved", "in_setup", "customization", "ready"].includes(row.status)) throw new HttpError(409, "Approve the request and set final pricing before provisioning.");
+    assertFinalPricing(row);
     const tenant = await c.query("SELECT id,status,completed_steps FROM tenants WHERE id=$1 FOR UPDATE", [tenantId]);
     if (!tenant.rowCount || tenant.rows[0].status !== "active" || !tenant.rows[0].completed_steps.includes("exchange_provisioned")) throw new HttpError(409, "Finish Exchange setup and activate this tenant before handing it to the customer.");
     const effective = await resolveEntitlements(c, tenantId);
     requireFeature(effective, "website"); requireFeature(effective, "crypto_exchange");
     if (effective.overLimit) throw new HttpError(409, "Resolve this Exchange's plan limits before provisioning.");
+    const approved = row.approvedConfiguration;
+    if (approved?.plan && approved.plan.id !== effective.plan?.id) throw new HttpError(409, "Assign the reviewed plan to the prepared tenant before delivery.");
+    const actualAddons = await c.query("SELECT ta.addon_id FROM tenant_addons ta JOIN addons a ON a.id=ta.addon_id AND a.enabled WHERE ta.tenant_id=$1", [tenantId]);
+    if (approved?.addons?.some((a: { id: string }) => !actualAddons.rows.some(r => r.addon_id === a.id))) throw new HttpError(409, "Assign the reviewed add-ons to the prepared tenant before delivery.");
     const configured = await c.query("SELECT configuration FROM tenant_product_configuration WHERE tenant_id=$1 AND module_key='crypto_exchange'", [tenantId]);
     const settings = configured.rows[0]?.configuration;
     if (!settings || settings.referenceCurrency !== effective.plan?.currency) throw new HttpError(409, "Review and save the Exchange reference rates for the assigned plan before provisioning.");
@@ -87,8 +149,31 @@ export function deliverRequest(p: Principal, id: string, tenantId: string) {
     const used = await c.query("SELECT id FROM white_label_requests WHERE tenant_id=$1", [tenantId]);
     if (used.rowCount) throw new HttpError(409, "This Exchange has already been delivered.");
     await c.query("INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role,label,active) VALUES ($1,$2,'client_admin','Customer account owner',true) ON CONFLICT (tenant_id,clerk_user_id) DO UPDATE SET role='client_admin',active=true", [tenantId, row.customerUserId]);
-    const r = await c.query(`UPDATE white_label_requests SET status='provisioned',tenant_id=$2,updated_at=now() WHERE id=$1 RETURNING ${columns}`, [id, tenantId]);
+    const r = await c.query(`UPDATE white_label_requests SET status='delivered',tenant_id=$2,updated_at=now() WHERE id=$1 RETURNING ${columns}`, [id, tenantId]);
+    await event(c, p, id, "status", "White Label delivered to your existing QXLayer account. Your authorized Admin Panel is available.", "customer", "delivered");
     await audit(c, p, tenantId, "white_label.provisioned", "Delivered Exchange into the existing QXLayer customer account", { requestId: id });
-    return view(r.rows[0]);
+    return orderView(c, r.rows[0]);
+  });
+}
+
+export function orderDetail(p: Principal, id: string, operator = false) {
+  if (operator) requireSuperAdmin(p);
+  return withDatabase(requestContext(p), async c => {
+    const r = await c.query(`SELECT ${columns} FROM white_label_requests WHERE id=$1 ${operator ? "" : "AND customer_user_id=$2"}`, operator ? [id] : [id, p.userId]);
+    if (!r.rowCount) throw new HttpError(404, "White Label order not found.");
+    const history = await c.query(`SELECT ${eventColumns} FROM white_label_events WHERE request_id=$1 ${operator ? "" : "AND visibility='customer'"} ORDER BY created_at,id`, [id]);
+    return { order: await orderView(c, r.rows[0]), history: history.rows };
+  });
+}
+export function appendNote(p: Principal, id: string, raw: WhiteLabelNoteInput) {
+  requireSuperAdmin(p);
+  const note = AddWhiteLabelNoteBody.parse(raw);
+  if (!note.message.trim()) throw new HttpError(400, "Write a note message.");
+  return withDatabase(requestContext(p, true), async c => {
+    const r = await c.query("SELECT id FROM white_label_requests WHERE id=$1 FOR UPDATE", [id]);
+    if (!r.rowCount) throw new HttpError(404, "White Label order not found.");
+    const added = await event(c, p, id, "note", note.message.trim(), note.visibility);
+    if (note.visibility === "customer") await c.query("UPDATE white_label_requests SET operator_note=$2,updated_at=now() WHERE id=$1", [id, note.message.trim()]);
+    return added;
   });
 }

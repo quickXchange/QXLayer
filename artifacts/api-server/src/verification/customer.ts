@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { pool, withDatabase } from "@workspace/db";
 import { resolvePrincipal } from "../modules/authentication/service";
-import { myAdminPanels, listRequests, submitRequest, reviewRequest, deliverRequest, assertDeliveredExchangeAccess } from "../modules/customer/service";
+import { myAdminPanels, listRequests, submitRequest, reviewRequest, deliverRequest, assertDeliveredExchangeAccess, orderDetail, appendNote } from "../modules/customer/service";
+import { whiteLabelCatalog } from "../modules/customer/order-catalog";
 import { activateTenant, createTenant } from "../modules/tenants/service";
 import { prepareCustomerFixtures, cleanCustomerFixtures } from "./customer-fixtures";
 if (process.env.NODE_ENV === "production") throw new Error("Development verification refused in production.");
@@ -18,17 +19,42 @@ try {
   assert.deepEqual(await myAdminPanels(a), []);
   const input = { projectName: "My Exchange A", brandName: "My Exchange", preferredDomain: null, actions: ["swap", "convert", "buy", "sell"] as ("swap" | "convert" | "buy" | "sell")[], details: "Sandbox only", idempotencyKey: randomUUID() };
   const submitted = await submitRequest(a, input);
+  assert.match(submitted.orderReference, /^WL-\d{6,}$/);
+  assert.equal(submitted.status, "new");
   assert.equal((await submitRequest(a, input)).id, submitted.id);
   assert.equal((await listRequests(a)).length, 1);
   assert.equal((await listRequests(b)).length, 0);
   await denied(() => listRequests(a, true), 403);
   const price = { status: "approved" as const, monthlyPrice: "149", setupPrice: "299", currency: "USD" as const, operatorNote: "Sandbox preparation" };
   await denied(() => reviewRequest(a, submitted.id, price), 403);
+  await denied(() => orderDetail(b, submitted.id), 404);
+  await denied(() => appendNote(a, submitted.id, { message: "Escalation", visibility: "internal" }), 403);
+  await appendNote(op, submitted.id, { message: "PRIVATE WORKFLOW VERIFICATION", visibility: "internal" });
+  await appendNote(op, submitted.id, { message: "We are reviewing your project.", visibility: "customer" });
+  assert.ok((await orderDetail(op, submitted.id, true)).history.some(n => n.visibility === "internal"));
+  assert.ok(!(await orderDetail(a, submitted.id)).history.some(n => n.visibility === "internal" || n.message.includes("PRIVATE WORKFLOW")));
+  await withDatabase({ actorId: a.userId }, async c => assert.equal((await c.query("SELECT id FROM white_label_events WHERE request_id=$1 AND visibility='internal'", [submitted.id])).rowCount, 0));
+  await denied(() => reviewRequest(op, submitted.id, { ...price, status: "ready" }), 409);
   await withDatabase({ actorId: a.userId, canWrite: true }, async c => {
     assert.equal((await c.query("UPDATE white_label_requests SET status='approved',monthly_price='0' WHERE id=$1", [submitted.id])).rowCount, 0);
   });
   await denied(() => withDatabase({ actorId: a.userId, canWrite: true }, c => c.query("INSERT INTO white_label_requests (customer_user_id,idempotency_key,configuration) VALUES ($1,$2,'{}')", [b.userId, randomUUID()])), "42501");
   fixture = await prepareCustomerFixtures(op, suffix);
+  assert.ok((await whiteLabelCatalog(a)).plans.some(p => p.id === fixture!.planId));
+  const custom = await submitRequest(a, { ...input, companyName: "Verification Company", requestedPlanId: fixture.planId, requestedAddonIds: [], billingPeriod: "yearly", attachmentIds: [],
+    details: "Requirements ".repeat(200), idempotencyKey: randomUUID(),
+    design: { type: "custom", styleName: "Custom verification", primaryColor: "#112233", accentColor: "#abcdef", themePreference: "both", description: "Operator-reviewed paid customization",
+      referenceWebsiteUrl: "https://example.com", notes: "No automated implementation", logoAttachmentId: null, faviconAttachmentId: null, referenceAttachmentIds: [] } });
+  assert.equal(custom.companyName, "Verification Company");
+  assert.equal(custom.billingPeriod, "yearly");
+  assert.equal(custom.requestedPlan.id, fixture.planId);
+  await denied(() => reviewRequest(op, custom.id, price), 409);
+  await reviewRequest(op, custom.id, { ...price, customizationPrice: "500", customDesignDecision: "approved", approvedPlanId: fixture.planId, approvedAddonIds: [] });
+  await reviewRequest(op, custom.id, { ...price, monthlyPrice: "175", customizationPrice: "600", customDesignDecision: "approved", status: "in_setup" });
+  const customDetail = await orderDetail(a, custom.id);
+  assert.equal(customDetail.order.monthlyPrice, "175");
+  assert.equal(customDetail.order.customizationPrice, "600");
+  assert.ok(customDetail.history.some(h => h.status === "in_setup"));
   const [first, second] = fixture.tenants;
   const draft = await createTenant(op, { name: "Not delivered", slug: `workflow-draft-${suffix}`, planId: fixture.planId }); draftId = draft.id;
   await pool.query("INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role) VALUES ($1,$2,'client_admin')", [draft.id, a.userId]);
@@ -46,7 +72,7 @@ try {
   assert.equal((await myAdminPanels(owner)).length, 1);
   await assertDeliveredExchangeAccess(owner, first.id);
   await denied(() => assertDeliveredExchangeAccess(b, first.id), 403);
-  assert.equal((await listRequests(a))[0].status, "provisioned");
+  assert.equal((await listRequests(a)).find(r => r.id === submitted.id)?.status, "delivered");
   const foreign = await submitRequest(b, { ...input, projectName: "Other customer", idempotencyKey: randomUUID() });
   await reviewRequest(op, foreign.id, price);
   await denied(() => deliverRequest(op, foreign.id, first.id), 409);

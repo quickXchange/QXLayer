@@ -57,7 +57,9 @@ export async function readAddon(client: DatabaseClient, id: string) {
   const a = r.rows[0];
   if (!a) throw new HttpError(404, "Add-on not found.");
   const e = await client.query("SELECT key,value FROM addon_entitlements WHERE addon_id=$1 ORDER BY key", [id]);
-  return { id: a.id as string, name: a.name as string, description: a.description as string, enabled: a.enabled as boolean, entitlements: e.rows as Entry[] };
+  return { id: a.id as string, name: a.name as string, description: a.description as string, enabled: a.enabled as boolean, entitlements: e.rows as Entry[],
+    monthlyPrice: a.pricing_configured ? a.monthly_price as string : null, yearlyPrice: a.pricing_configured ? a.yearly_price as string : null,
+    setupFee: a.pricing_configured ? a.setup_fee as string : null, currency: a.currency as string, pricingConfigured: a.pricing_configured as boolean };
 }
 export async function listDefinitions(principal: Principal) {
   if (principal.role === "unassigned") throw new HttpError(403, "Administrator access required.");
@@ -135,6 +137,11 @@ export function saveAddon(principal: Principal, input: AddonInput, id?: string) 
     const r = id
       ? await client.query("UPDATE addons SET name=$1,description=$2,enabled=$3 WHERE id=$4 RETURNING id", [input.name.trim(), input.description, input.enabled, id])
       : await client.query("INSERT INTO addons (name,description,enabled) VALUES ($1,$2,$3) RETURNING id", [input.name.trim(), input.description, input.enabled]);
+    await client.query("UPDATE addons SET monthly_price=$2,yearly_price=$3,setup_fee=$4,currency=$5 WHERE id=$1", [
+      r.rows[0].id, input.monthlyPrice ?? before?.monthlyPrice ?? "0", input.yearlyPrice ?? before?.yearlyPrice ?? "0",
+      input.setupFee ?? before?.setupFee ?? "0", input.currency ?? before?.currency ?? "USD",
+    ]);
+    if (input.monthlyPrice != null && input.yearlyPrice != null && input.setupFee != null) await client.query("UPDATE addons SET pricing_configured=true WHERE id=$1", [r.rows[0].id]);
     const addonId = r.rows[0].id as string;
     await client.query("DELETE FROM addon_entitlements WHERE addon_id=$1", [addonId]);
     for (const e of entries) await client.query("INSERT INTO addon_entitlements (addon_id,key,value) VALUES ($1,$2,$3::jsonb)", [addonId, e.key, JSON.stringify(e.value)]);

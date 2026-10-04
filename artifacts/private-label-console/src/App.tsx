@@ -19,6 +19,8 @@ import { CustomerShell } from '@/components/app/customer-shell';
 import { useAdminPanels } from '@/lib/customer';
 import { AccountDashboard, AccountOrders, AccountWhiteLabels, AdminPanels, ConfigureExchange, AccountProfile, NotProvisioned } from '@/pages/account';
 import WhiteLabelRequests from '@/pages/white-label-requests';
+import WhiteLabelOrder from '@/pages/white-label-order';
+import AccountOrderDetail from '@/pages/account-order';
 import { useParams } from 'wouter';
 import Admin from '@/pages/admin';
 import Clients from '@/pages/clients';
@@ -149,8 +151,8 @@ function DeliveredOnly({ children }: { children: ReactNode }) {
 const guard = (C: () => ReactNode) => () => <Protected><SuperOnly><C /></SuperOnly></Protected>;
 const open = (C: () => ReactNode) => () => <Protected><C /></Protected>;
 const rDelivered = () => <Protected><DeliveredOnly><Exchange /></DeliveredOnly></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests);
-const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder);
+const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile), rOrdD = open(AccountOrderDetail);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
@@ -180,11 +182,13 @@ function ClerkProviderWithRoutes() {
               <Route path="/sign-up/*?" component={SignUpPage} />
               <Route path="/account" component={rAcc} />
               <Route path="/account/orders" component={rOrd} />
+              <Route path="/account/orders/:orderId" component={rOrdD} />
               <Route path="/account/white-labels" component={rWls} />
               <Route path="/account/admin-panels" component={rPanels} />
               <Route path="/account/configure" component={rCfg} />
               <Route path="/account/profile/*?" component={rProf} />
               <Route path="/white-label-requests" component={rWL} />
+              <Route path="/white-label-requests/:orderId" component={rWLO} />
               <Route path="/admin" component={rAdmin} />
               <Route path="/clients" component={rClients} />
               <Route path="/clients/new" component={rNew} />

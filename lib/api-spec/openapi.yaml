@@ -17,6 +17,30 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /customer/white-label-catalog:
+    get:
+      operationId: getWhiteLabelCatalog
+      responses:
+        "200": {description: Existing enabled Exchange plans and add-ons, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelCatalog"}}}}
+  /customer/white-label-requests/{requestId}:
+    get:
+      operationId: getMyWhiteLabelRequest
+      parameters: [{name: requestId, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses:
+        "200": {description: Own order with customer-visible history only, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelOrderDetail"}}}}
+  /operator/white-label-requests/{requestId}:
+    get:
+      operationId: getWhiteLabelRequest
+      parameters: [{name: requestId, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses:
+        "200": {description: Super Admin order and complete history, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelOrderDetail"}}}}
+  /operator/white-label-requests/{requestId}/notes:
+    post:
+      operationId: addWhiteLabelNote
+      parameters: [{name: requestId, in: path, required: true, schema: {type: string, format: uuid}}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelNoteInput"}}}}
+      responses:
+        "201": {description: Appended immutable note, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelEvent"}}}}
   /customer/admin-panels:
     get:
       operationId: listMyAdminPanels
@@ -814,6 +838,64 @@ components:
         type: string
         format: uuid
   schemas:
+    WhiteLabelStatus:
+      type: string
+      enum: [new, reviewing, waiting_for_client, quote_ready, approved, in_setup, customization, ready, delivered, rejected, cancelled]
+    WhiteLabelDesign:
+      type: object
+      required: [type, styleName, primaryColor, accentColor, themePreference, description, referenceWebsiteUrl, notes, logoAttachmentId, faviconAttachmentId, referenceAttachmentIds]
+      properties:
+        type: {type: string, enum: [standard, custom]}
+        styleName: {type: string, maxLength: 100}
+        primaryColor: {type: string, pattern: '^#[0-9a-fA-F]{6}$'}
+        accentColor: {type: string, pattern: '^#[0-9a-fA-F]{6}$'}
+        themePreference: {type: string, enum: [light, dark, both]}
+        description: {type: string, maxLength: 5000}
+        referenceWebsiteUrl: {type: ["string", "null"], maxLength: 2048}
+        notes: {type: string, maxLength: 5000}
+        logoAttachmentId: {type: ["string", "null"], format: uuid}
+        faviconAttachmentId: {type: ["string", "null"], format: uuid}
+        referenceAttachmentIds: {type: array, maxItems: 10, items: {type: string, format: uuid}}
+    WhiteLabelAttachment:
+      type: object
+      required: [id, fileName, contentType, size, category, createdAt]
+      properties:
+        id: {type: string, format: uuid}
+        fileName: {type: string}
+        contentType: {type: string}
+        size: {type: integer}
+        category: {type: string, enum: [logo, favicon, design_reference, requirement]}
+        createdAt: {type: string, format: date-time}
+    WhiteLabelCatalog:
+      type: object
+      required: [plans, addons, definitions]
+      properties:
+        plans: {type: array, items: {$ref: "#/components/schemas/Plan"}}
+        addons: {type: array, items: {$ref: "#/components/schemas/Addon"}}
+        definitions: {type: array, items: {$ref: "#/components/schemas/EntitlementDefinition"}}
+    WhiteLabelEvent:
+      type: object
+      required: [id, kind, author, visibility, message, status, createdAt]
+      properties:
+        id: {type: string, format: uuid}
+        kind: {type: string, enum: [status, note]}
+        author: {type: string}
+        visibility: {type: string, enum: [internal, customer]}
+        message: {type: string}
+        status: {type: ["string", "null"]}
+        createdAt: {type: string, format: date-time}
+    WhiteLabelNoteInput:
+      type: object
+      required: [message, visibility]
+      properties:
+        message: {type: string, minLength: 1, maxLength: 5000}
+        visibility: {type: string, enum: [internal, customer]}
+    WhiteLabelOrderDetail:
+      type: object
+      required: [order, history]
+      properties:
+        order: {$ref: "#/components/schemas/WhiteLabelRequest"}
+        history: {type: array, items: {$ref: "#/components/schemas/WhiteLabelEvent"}}
     ExchangeDeliveryInput:
       type: object
       required: [tenantId]
@@ -836,17 +918,27 @@ components:
         brandName: {type: string, minLength: 2, maxLength: 100}
         preferredDomain: {type: ["string", "null"], maxLength: 253}
         actions: {type: array, minItems: 1, maxItems: 4, uniqueItems: true, items: {$ref: "#/components/schemas/ExchangeAction"}}
-        details: {type: string, maxLength: 1000}
+        details: {type: string, maxLength: 10000}
+        companyName: {type: ["string", "null"], maxLength: 150}
+        design: {$ref: "#/components/schemas/WhiteLabelDesign"}
+        requestedPlanId: {type: ["string", "null"], format: uuid}
+        requestedAddonIds: {type: array, maxItems: 20, items: {type: string, format: uuid}}
+        billingPeriod: {type: string, enum: [monthly, yearly]}
+        attachmentIds: {type: array, maxItems: 10, items: {type: string, format: uuid}}
         idempotencyKey: {type: string, format: uuid}
     WhiteLabelReviewInput:
       type: object
       required: [status, monthlyPrice, setupPrice, currency, operatorNote]
       properties:
-        status: {type: string, enum: [approved, rejected]}
-        monthlyPrice: {type: string, pattern: '^\d{1,12}(\.\d{1,2})?$'}
-        setupPrice: {type: string, pattern: '^\d{1,12}(\.\d{1,2})?$'}
-        currency: {type: string, enum: [USD, EUR, GBP]}
-        operatorNote: {type: string, maxLength: 1000}
+        status: {$ref: "#/components/schemas/WhiteLabelStatus"}
+        monthlyPrice: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        setupPrice: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        currency: {type: string, pattern: '^[A-Z]{3}$'}
+        operatorNote: {type: string, maxLength: 5000}
+        customizationPrice: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        approvedPlanId: {type: ["string", "null"], format: uuid}
+        approvedAddonIds: {type: array, maxItems: 20, items: {type: string, format: uuid}}
+        customDesignDecision: {type: string, enum: [pending, approved, rejected]}
     WhiteLabelRequest:
       type: object
       required: [id, customerUserId, projectName, brandName, preferredDomain, actions, details, status, monthlyPrice, setupPrice, currency, operatorNote, tenantId, createdAt, updatedAt]
@@ -858,7 +950,18 @@ components:
         preferredDomain: {type: ["string", "null"]}
         actions: {type: array, items: {$ref: "#/components/schemas/ExchangeAction"}}
         details: {type: string}
-        status: {type: string, enum: [submitted, approved, rejected, provisioned]}
+        status: {$ref: "#/components/schemas/WhiteLabelStatus"}
+        orderReference: {type: string}
+        companyName: {type: ["string", "null"]}
+        design: {oneOf: [{$ref: "#/components/schemas/WhiteLabelDesign"}, {type: "null"}]}
+        billingPeriod: {type: string, enum: [monthly, yearly]}
+        requestedPlan: {oneOf: [{$ref: "#/components/schemas/Plan"}, {type: "null"}]}
+        requestedAddons: {type: array, items: {$ref: "#/components/schemas/Addon"}}
+        approvedPlan: {oneOf: [{$ref: "#/components/schemas/Plan"}, {type: "null"}]}
+        approvedAddons: {type: array, items: {$ref: "#/components/schemas/Addon"}}
+        attachments: {type: array, items: {$ref: "#/components/schemas/WhiteLabelAttachment"}}
+        customizationPrice: {type: ["string", "null"]}
+        customDesignDecision: {type: string, enum: [pending, approved, rejected]}
         monthlyPrice: {type: ["string", "null"]}
         setupPrice: {type: ["string", "null"]}
         currency: {type: ["string", "null"]}
@@ -1393,6 +1496,10 @@ components:
     AddonInput:
       type: object
       properties:
+        monthlyPrice: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        yearlyPrice: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        setupFee: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
+        currency: {type: string, pattern: '^[A-Z]{3}$'}
         name: {type: string, minLength: 2, maxLength: 120}
         description: {type: string, maxLength: 3000}
         enabled: {type: boolean}
@@ -1402,7 +1509,7 @@ components:
       allOf:
         - {$ref: "#/components/schemas/AddonInput"}
         - type: object
-          properties: {id: {type: string, format: uuid}}
+          properties: {id: {type: string, format: uuid}, pricingConfigured: {type: boolean}}
           required: [id]
     SubscriptionPlanInput:
       type: object

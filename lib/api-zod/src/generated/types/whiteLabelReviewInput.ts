@@ -5,16 +5,33 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
-import type { WhiteLabelReviewInputCurrency } from './whiteLabelReviewInputCurrency';
-import type { WhiteLabelReviewInputStatus } from './whiteLabelReviewInputStatus';
+import type { WhiteLabelReviewInputCustomDesignDecision } from './whiteLabelReviewInputCustomDesignDecision';
+import type { WhiteLabelStatus } from './whiteLabelStatus';
 
 export interface WhiteLabelReviewInput {
-  status: WhiteLabelReviewInputStatus;
-  /** @pattern ^\d{1,12}(\.\d{1,2})?$ */
-  monthlyPrice: string;
-  /** @pattern ^\d{1,12}(\.\d{1,2})?$ */
-  setupPrice: string;
-  currency: WhiteLabelReviewInputCurrency;
-  /** @maxLength 1000 */
+  status: WhiteLabelStatus;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  monthlyPrice: string | null;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  setupPrice: string | null;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  /** @maxLength 5000 */
   operatorNote: string;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  customizationPrice?: string | null;
+  /** @nullable */
+  approvedPlanId?: string | null;
+  /** @maxItems 20 */
+  approvedAddonIds?: string[];
+  customDesignDecision?: WhiteLabelReviewInputCustomDesignDecision;
 }

@@ -5,6 +5,325 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export type WhiteLabelStatus = typeof WhiteLabelStatus[keyof typeof WhiteLabelStatus];
+
+
+export const WhiteLabelStatus = {
+  new: 'new',
+  reviewing: 'reviewing',
+  waiting_for_client: 'waiting_for_client',
+  quote_ready: 'quote_ready',
+  approved: 'approved',
+  in_setup: 'in_setup',
+  customization: 'customization',
+  ready: 'ready',
+  delivered: 'delivered',
+  rejected: 'rejected',
+  cancelled: 'cancelled',
+} as const;
+
+export type WhiteLabelDesignType = typeof WhiteLabelDesignType[keyof typeof WhiteLabelDesignType];
+
+
+export const WhiteLabelDesignType = {
+  standard: 'standard',
+  custom: 'custom',
+} as const;
+
+export type WhiteLabelDesignThemePreference = typeof WhiteLabelDesignThemePreference[keyof typeof WhiteLabelDesignThemePreference];
+
+
+export const WhiteLabelDesignThemePreference = {
+  light: 'light',
+  dark: 'dark',
+  both: 'both',
+} as const;
+
+export interface WhiteLabelDesign {
+  type: WhiteLabelDesignType;
+  /** @maxLength 100 */
+  styleName: string;
+  /** @pattern ^#[0-9a-fA-F]{6}$ */
+  primaryColor: string;
+  /** @pattern ^#[0-9a-fA-F]{6}$ */
+  accentColor: string;
+  themePreference: WhiteLabelDesignThemePreference;
+  /** @maxLength 5000 */
+  description: string;
+  /**
+     * @maxLength 2048
+     * @nullable
+     */
+  referenceWebsiteUrl: string | null;
+  /** @maxLength 5000 */
+  notes: string;
+  /** @nullable */
+  logoAttachmentId: string | null;
+  /** @nullable */
+  faviconAttachmentId: string | null;
+  /** @maxItems 10 */
+  referenceAttachmentIds: string[];
+}
+
+export type WhiteLabelAttachmentCategory = typeof WhiteLabelAttachmentCategory[keyof typeof WhiteLabelAttachmentCategory];
+
+
+export const WhiteLabelAttachmentCategory = {
+  logo: 'logo',
+  favicon: 'favicon',
+  design_reference: 'design_reference',
+  requirement: 'requirement',
+} as const;
+
+export interface WhiteLabelAttachment {
+  id: string;
+  fileName: string;
+  contentType: string;
+  size: number;
+  category: WhiteLabelAttachmentCategory;
+  createdAt: string;
+}
+
+export type PlanInputStatus = typeof PlanInputStatus[keyof typeof PlanInputStatus];
+
+
+export const PlanInputStatus = {
+  enabled: 'enabled',
+  disabled: 'disabled',
+  archived: 'archived',
+} as const;
+
+export type EntitlementValue = boolean | string;
+
+export interface EntitlementEntry {
+  /**
+     * @maxLength 80
+     * @pattern ^[a-z][a-z0-9_]*$
+     */
+  key: string;
+  value: EntitlementValue;
+}
+
+export interface PlanInput {
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 3000 */
+  description: string;
+  /**
+     * @maxLength 18
+     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
+     */
+  monthlyPrice: string;
+  /**
+     * @maxLength 18
+     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
+     */
+  yearlyPrice: string;
+  /**
+     * @maxLength 18
+     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
+     */
+  setupFee: string;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  /** @maxLength 160 */
+  billingLabel: string;
+  /**
+     * @minimum 0
+     * @maximum 100000
+     */
+  displayOrder: number;
+  status: PlanInputStatus;
+  /** @maxItems 200 */
+  entitlements: EntitlementEntry[];
+}
+
+export type Plan = PlanInput & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export interface AddonInput {
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  monthlyPrice?: string | null;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  yearlyPrice?: string | null;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  setupFee?: string | null;
+  /** @pattern ^[A-Z]{3}$ */
+  currency?: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 3000 */
+  description: string;
+  enabled: boolean;
+  /** @maxItems 200 */
+  entitlements: EntitlementEntry[];
+}
+
+export type Addon = AddonInput & {
+  id: string;
+  pricingConfigured?: boolean;
+};
+
+export type EntitlementDefinitionKind = typeof EntitlementDefinitionKind[keyof typeof EntitlementDefinitionKind];
+
+
+export const EntitlementDefinitionKind = {
+  feature: 'feature',
+  limit: 'limit',
+} as const;
+
+export type EntitlementDefinitionValueType = typeof EntitlementDefinitionValueType[keyof typeof EntitlementDefinitionValueType];
+
+
+export const EntitlementDefinitionValueType = {
+  boolean: 'boolean',
+  integer: 'integer',
+  decimal: 'decimal',
+} as const;
+
+export interface EntitlementDefinition {
+  key: string;
+  label: string;
+  kind: EntitlementDefinitionKind;
+  valueType: EntitlementDefinitionValueType;
+}
+
+export interface WhiteLabelCatalog {
+  plans: Plan[];
+  addons: Addon[];
+  definitions: EntitlementDefinition[];
+}
+
+export type WhiteLabelEventKind = typeof WhiteLabelEventKind[keyof typeof WhiteLabelEventKind];
+
+
+export const WhiteLabelEventKind = {
+  status: 'status',
+  note: 'note',
+} as const;
+
+export type WhiteLabelEventVisibility = typeof WhiteLabelEventVisibility[keyof typeof WhiteLabelEventVisibility];
+
+
+export const WhiteLabelEventVisibility = {
+  internal: 'internal',
+  customer: 'customer',
+} as const;
+
+export interface WhiteLabelEvent {
+  id: string;
+  kind: WhiteLabelEventKind;
+  author: string;
+  visibility: WhiteLabelEventVisibility;
+  message: string;
+  /** @nullable */
+  status: string | null;
+  createdAt: string;
+}
+
+export type WhiteLabelNoteInputVisibility = typeof WhiteLabelNoteInputVisibility[keyof typeof WhiteLabelNoteInputVisibility];
+
+
+export const WhiteLabelNoteInputVisibility = {
+  internal: 'internal',
+  customer: 'customer',
+} as const;
+
+export interface WhiteLabelNoteInput {
+  /**
+     * @minLength 1
+     * @maxLength 5000
+     */
+  message: string;
+  visibility: WhiteLabelNoteInputVisibility;
+}
+
+export type ExchangeAction = typeof ExchangeAction[keyof typeof ExchangeAction];
+
+
+export const ExchangeAction = {
+  swap: 'swap',
+  convert: 'convert',
+  buy: 'buy',
+  sell: 'sell',
+} as const;
+
+export type WhiteLabelRequestBillingPeriod = typeof WhiteLabelRequestBillingPeriod[keyof typeof WhiteLabelRequestBillingPeriod];
+
+
+export const WhiteLabelRequestBillingPeriod = {
+  monthly: 'monthly',
+  yearly: 'yearly',
+} as const;
+
+export type WhiteLabelRequestCustomDesignDecision = typeof WhiteLabelRequestCustomDesignDecision[keyof typeof WhiteLabelRequestCustomDesignDecision];
+
+
+export const WhiteLabelRequestCustomDesignDecision = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface WhiteLabelRequest {
+  id: string;
+  customerUserId: string;
+  projectName: string;
+  brandName: string;
+  /** @nullable */
+  preferredDomain: string | null;
+  actions: ExchangeAction[];
+  details: string;
+  status: WhiteLabelStatus;
+  orderReference?: string;
+  /** @nullable */
+  companyName?: string | null;
+  design?: WhiteLabelDesign | null;
+  billingPeriod?: WhiteLabelRequestBillingPeriod;
+  requestedPlan?: Plan | null;
+  requestedAddons?: Addon[];
+  approvedPlan?: Plan | null;
+  approvedAddons?: Addon[];
+  attachments?: WhiteLabelAttachment[];
+  /** @nullable */
+  customizationPrice?: string | null;
+  customDesignDecision?: WhiteLabelRequestCustomDesignDecision;
+  /** @nullable */
+  monthlyPrice: string | null;
+  /** @nullable */
+  setupPrice: string | null;
+  /** @nullable */
+  currency: string | null;
+  operatorNote: string;
+  /** @nullable */
+  tenantId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WhiteLabelOrderDetail {
+  order: WhiteLabelRequest;
+  history: WhiteLabelEvent[];
+}
+
 export interface ExchangeDeliveryInput {
   tenantId: string;
 }
@@ -34,14 +353,12 @@ export interface CustomerAdminPanel {
   role: CustomerAdminPanelRole;
 }
 
-export type ExchangeAction = typeof ExchangeAction[keyof typeof ExchangeAction];
+export type WhiteLabelRequestInputBillingPeriod = typeof WhiteLabelRequestInputBillingPeriod[keyof typeof WhiteLabelRequestInputBillingPeriod];
 
 
-export const ExchangeAction = {
-  swap: 'swap',
-  convert: 'convert',
-  buy: 'buy',
-  sell: 'sell',
+export const WhiteLabelRequestInputBillingPeriod = {
+  monthly: 'monthly',
+  yearly: 'yearly',
 } as const;
 
 export interface WhiteLabelRequestInput {
@@ -65,70 +382,59 @@ export interface WhiteLabelRequestInput {
      * @maxItems 4
      */
   actions: ExchangeAction[];
-  /** @maxLength 1000 */
+  /** @maxLength 10000 */
   details: string;
+  /**
+     * @maxLength 150
+     * @nullable
+     */
+  companyName?: string | null;
+  design?: WhiteLabelDesign;
+  /** @nullable */
+  requestedPlanId?: string | null;
+  /** @maxItems 20 */
+  requestedAddonIds?: string[];
+  billingPeriod?: WhiteLabelRequestInputBillingPeriod;
+  /** @maxItems 10 */
+  attachmentIds?: string[];
   idempotencyKey: string;
 }
 
-export type WhiteLabelReviewInputStatus = typeof WhiteLabelReviewInputStatus[keyof typeof WhiteLabelReviewInputStatus];
+export type WhiteLabelReviewInputCustomDesignDecision = typeof WhiteLabelReviewInputCustomDesignDecision[keyof typeof WhiteLabelReviewInputCustomDesignDecision];
 
 
-export const WhiteLabelReviewInputStatus = {
+export const WhiteLabelReviewInputCustomDesignDecision = {
+  pending: 'pending',
   approved: 'approved',
   rejected: 'rejected',
-} as const;
-
-export type WhiteLabelReviewInputCurrency = typeof WhiteLabelReviewInputCurrency[keyof typeof WhiteLabelReviewInputCurrency];
-
-
-export const WhiteLabelReviewInputCurrency = {
-  USD: 'USD',
-  EUR: 'EUR',
-  GBP: 'GBP',
 } as const;
 
 export interface WhiteLabelReviewInput {
-  status: WhiteLabelReviewInputStatus;
-  /** @pattern ^\d{1,12}(\.\d{1,2})?$ */
-  monthlyPrice: string;
-  /** @pattern ^\d{1,12}(\.\d{1,2})?$ */
-  setupPrice: string;
-  currency: WhiteLabelReviewInputCurrency;
-  /** @maxLength 1000 */
-  operatorNote: string;
-}
-
-export type WhiteLabelRequestStatus = typeof WhiteLabelRequestStatus[keyof typeof WhiteLabelRequestStatus];
-
-
-export const WhiteLabelRequestStatus = {
-  submitted: 'submitted',
-  approved: 'approved',
-  rejected: 'rejected',
-  provisioned: 'provisioned',
-} as const;
-
-export interface WhiteLabelRequest {
-  id: string;
-  customerUserId: string;
-  projectName: string;
-  brandName: string;
-  /** @nullable */
-  preferredDomain: string | null;
-  actions: ExchangeAction[];
-  details: string;
-  status: WhiteLabelRequestStatus;
-  /** @nullable */
+  status: WhiteLabelStatus;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
   monthlyPrice: string | null;
-  /** @nullable */
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
   setupPrice: string | null;
-  /** @nullable */
-  currency: string | null;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  /** @maxLength 5000 */
   operatorNote: string;
+  /**
+     * @nullable
+     * @pattern ^\d{1,12}(\.\d{1,2})?$
+     */
+  customizationPrice?: string | null;
   /** @nullable */
-  tenantId: string | null;
-  createdAt: string;
-  updatedAt: string;
+  approvedPlanId?: string | null;
+  /** @maxItems 20 */
+  approvedAddonIds?: string[];
+  customDesignDecision?: WhiteLabelReviewInputCustomDesignDecision;
 }
 
 export interface ActivityEvent {
@@ -1012,93 +1318,6 @@ export type Tenant = TenantSummary & ({
   websiteSettings?: WebsiteSettings;
 });
 
-export type EntitlementValue = boolean | string;
-
-export interface EntitlementEntry {
-  /**
-     * @maxLength 80
-     * @pattern ^[a-z][a-z0-9_]*$
-     */
-  key: string;
-  value: EntitlementValue;
-}
-
-export type EntitlementDefinitionKind = typeof EntitlementDefinitionKind[keyof typeof EntitlementDefinitionKind];
-
-
-export const EntitlementDefinitionKind = {
-  feature: 'feature',
-  limit: 'limit',
-} as const;
-
-export type EntitlementDefinitionValueType = typeof EntitlementDefinitionValueType[keyof typeof EntitlementDefinitionValueType];
-
-
-export const EntitlementDefinitionValueType = {
-  boolean: 'boolean',
-  integer: 'integer',
-  decimal: 'decimal',
-} as const;
-
-export interface EntitlementDefinition {
-  key: string;
-  label: string;
-  kind: EntitlementDefinitionKind;
-  valueType: EntitlementDefinitionValueType;
-}
-
-export type PlanInputStatus = typeof PlanInputStatus[keyof typeof PlanInputStatus];
-
-
-export const PlanInputStatus = {
-  enabled: 'enabled',
-  disabled: 'disabled',
-  archived: 'archived',
-} as const;
-
-export interface PlanInput {
-  /**
-     * @minLength 2
-     * @maxLength 120
-     */
-  name: string;
-  /** @maxLength 3000 */
-  description: string;
-  /**
-     * @maxLength 18
-     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
-     */
-  monthlyPrice: string;
-  /**
-     * @maxLength 18
-     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
-     */
-  yearlyPrice: string;
-  /**
-     * @maxLength 18
-     * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
-     */
-  setupFee: string;
-  /** @pattern ^[A-Z]{3}$ */
-  currency: string;
-  /** @maxLength 160 */
-  billingLabel: string;
-  /**
-     * @minimum 0
-     * @maximum 100000
-     */
-  displayOrder: number;
-  status: PlanInputStatus;
-  /** @maxItems 200 */
-  entitlements: EntitlementEntry[];
-}
-
-export type Plan = PlanInput & {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type PlanStatusInputStatus = typeof PlanStatusInputStatus[keyof typeof PlanStatusInputStatus];
 
 
@@ -1111,23 +1330,6 @@ export const PlanStatusInputStatus = {
 export interface PlanStatusInput {
   status: PlanStatusInputStatus;
 }
-
-export interface AddonInput {
-  /**
-     * @minLength 2
-     * @maxLength 120
-     */
-  name: string;
-  /** @maxLength 3000 */
-  description: string;
-  enabled: boolean;
-  /** @maxItems 200 */
-  entitlements: EntitlementEntry[];
-}
-
-export type Addon = AddonInput & {
-  id: string;
-};
 
 export interface SubscriptionPlanInput {
   planId: string;

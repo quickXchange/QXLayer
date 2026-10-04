@@ -61,6 +61,11 @@ export const addonsTable = pgTable("addons", {
   name: text("name").notNull(),
   description: text("description").notNull().default(""),
   enabled: boolean("enabled").notNull().default(true),
+  monthlyPrice: numeric("monthly_price", { precision: 22, scale: 2 }).notNull().default("0"),
+  yearlyPrice: numeric("yearly_price", { precision: 22, scale: 2 }).notNull().default("0"),
+  setupFee: numeric("setup_fee", { precision: 22, scale: 2 }).notNull().default("0"),
+  currency: text("currency").notNull().default("USD"),
+  pricingConfigured: boolean("pricing_configured").notNull().default(false),
 }, () => catalogPolicies("addons")).enableRLS();
 
 export const addonEntitlementsTable = pgTable("addon_entitlements", {
