@@ -2,6 +2,14 @@
 
 This is the platform's public marketing surface, not a tenant website or an executing financial product. The public root remains signed-out; signed-in operators can preview the same page at `/catalog-preview`. Super Admins edit it at `/landing-products` through the **Landing catalog** console navigation.
 
+## Presentation
+
+The platform landing page reuses the pre-catalog customer website's actual hero, shell, Exchange widget, atmosphere, styles and theme implementation. It does not use the replacement beige/green catalog layout. Products, prices and the ecosystem map are additional below-hero sections in the approved visual language.
+
+Platform branding is presentation-only and is not a tenant or an entitlement configuration. The platform Exchange form has no configured assets, quote source or enabled transaction execution; its original controls and rate rows remain visible with unavailable rates and a disabled submission button. Existing tenant pages retain their own branding, configured assets, capabilities and original empty-state behavior. No platform catalog is added to tenant pages.
+
+This restoration edited current frontend source directly. It did not restore a checkpoint, roll back the project, change backend code or modify catalog records or migrations.
+
 ## Content and pricing
 
 All sixteen products are stored in `landing_products` and read from `/api/public/product-catalog`. Product names, descriptions, icons, starting prices, optional setup fees, three-letter currencies, billing periods, availability labels, CTA labels, visibility and ordering are database-backed. Only visible rows reach the public API. The editor includes hidden rows.

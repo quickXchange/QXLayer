@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import type { Caps } from '@/lib/capabilities';
+import type { Caps } from '../../lib/capabilities';
 import { Section, SectionHead } from './common';
 
 export function Faq({ caps }: { caps: Caps }) {

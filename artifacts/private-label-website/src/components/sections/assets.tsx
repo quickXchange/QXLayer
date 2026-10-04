@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import type { PublicSite } from '@workspace/api-client-react';
 import { Section, SectionHead } from './common';
-import { Reveal } from '@/components/reveal';
-import type { Caps } from '@/lib/capabilities';
+import { Reveal } from '../reveal';
+import type { Caps } from '../../lib/capabilities';
 import { Stats } from './stats';
-import { Coin, NetBadge, assetKey } from '@/components/asset-picker';
+import { Coin, NetBadge, assetKey } from '../asset-picker';
 
 export function Assets({ site, caps }: { site: PublicSite; caps: Caps }) {
   const [net, setNet] = useState<string | null>(null);

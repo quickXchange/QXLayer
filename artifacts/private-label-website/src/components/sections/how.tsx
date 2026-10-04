@@ -1,6 +1,6 @@
-import type { Caps } from '@/lib/capabilities';
+import type { Caps } from '../../lib/capabilities';
 import { Section, SectionHead } from './common';
-import { Reveal } from '@/components/reveal';
+import { Reveal } from '../reveal';
 
 function steps(c: Caps) {
   if (c.exchange !== 'off') return [

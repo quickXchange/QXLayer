@@ -2,12 +2,12 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import { Link } from 'wouter';
 import { LifeBuoy, Menu, Moon, Sun, X } from 'lucide-react';
 import type { PublicSite } from '@workspace/api-client-react';
-import { tokens, themeColorMeta } from '@/lib/theme';
-import { navItems, primaryCta, resolveCaps } from '@/lib/capabilities';
-import { useAnchors } from '@/lib/anchors';
-import { useSiteTheme } from '@/hooks/use-site-theme';
-import { useDocumentMeta } from '@/hooks/use-document-meta';
-import { Ambient } from '@/components/ambient';
+import { tokens, themeColorMeta } from '../lib/theme';
+import { navItems, primaryCta, resolveCaps } from '../lib/capabilities';
+import { useAnchors } from '../lib/anchors';
+import { useSiteTheme } from '../hooks/use-site-theme';
+import { useDocumentMeta } from '../hooks/use-document-meta';
+import { Ambient } from './ambient';
 
 export function BrandMark({ site, size = 32 }: { site: PublicSite; size?: number }) {
   const [broken, setBroken] = useState(false);
@@ -22,16 +22,18 @@ function supportHref(site: PublicSite, anchor: (id: string) => string) {
   return { href: anchor('support'), external: false, anchor: true };
 }
 
-export function SiteShell({ site, children, ambient = false }: { site: PublicSite; children: ReactNode; ambient?: boolean }) {
+export interface PlatformShell { root: string; nav: { id: string; label: string }[]; actions: ReactNode; footer: ReactNode }
+
+export function SiteShell({ site, children, ambient = false, platform }: { site: PublicSite; children: ReactNode; ambient?: boolean; platform?: PlatformShell }) {
   const { dark, toggle } = useSiteTheme(site);
   const t = tokens(site, dark);
   useDocumentMeta(site, themeColorMeta(site, dark));
   const caps = resolveCaps(site);
-  const nav = navItems(site, caps);
+  const nav = platform?.nav ?? navItems(site, caps);
   const cta = primaryCta(caps);
-  const { href, go } = useAnchors(site.tenantSlug);
+  const { href, go } = useAnchors(site.tenantSlug, platform?.root);
   const ws = site.websiteSettings;
-  const base = `/${site.tenantSlug}`;
+  const base = platform?.root ?? `/${site.tenantSlug}`;
   const [open, setOpen] = useState(false);
   const menuBtn = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -63,7 +65,7 @@ export function SiteShell({ site, children, ambient = false }: { site: PublicSit
             <button type="button" onClick={toggle} className="s-iconbtn" aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'} aria-pressed={dark} data-testid="button-theme">
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <span className="hidden lg:block">{supportLink('s-btn s-btn-ghost', 'Support')}</span>
+            <span className="hidden lg:block">{platform ? <span className="flex gap-2">{platform.actions}</span> : supportLink('s-btn s-btn-ghost', 'Support')}</span>
             <a href={href(cta.id)} onClick={go(cta.id)} className="s-btn s-btn-primary s-header-cta" data-testid="link-header-cta">{cta.label}</a>
             <button ref={menuBtn} type="button" className="s-iconbtn s-menu-trigger" aria-expanded={open} aria-controls="s-mobile-menu" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen((v) => !v)} data-testid="button-menu">
               {open ? <X size={20} /> : <Menu size={20} />}
@@ -76,14 +78,14 @@ export function SiteShell({ site, children, ambient = false }: { site: PublicSit
               {nav.map((n) => <a key={n.id} href={href(n.id)} onClick={go(n.id, close)} className="flex min-h-[48px] items-center rounded-md px-3 text-base font-medium hover:bg-[color-mix(in_srgb,var(--s-fg)_6%,transparent)]" data-testid={`link-mobile-${n.id}`}>{n.label}</a>)}
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 <a href={href(cta.id)} onClick={go(cta.id, close)} className="s-btn s-btn-primary s-menu-cta">{cta.label}</a>
-                {supportLink('s-btn s-btn-ghost', 'Support', close)}
+                {platform ? <span className="grid gap-2">{platform.actions}</span> : supportLink('s-btn s-btn-ghost', 'Support', close)}
               </div>
             </nav>
           </div>
         )}
       </header>
       <main className="relative z-[2]">{children}</main>
-      <Footer site={site} nav={nav} />
+      {platform ? platform.footer : <Footer site={site} nav={nav} />}
     </div>
   );
 }

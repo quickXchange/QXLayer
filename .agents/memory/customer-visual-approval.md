@@ -20,4 +20,4 @@ Preserve the approved customer-facing landing-page design exactly when adding a 
 
 **Why:** The user explicitly rejected the replacement beige/green catalog frontend and clarified that the catalog must be additive inside the previously approved design.
 
-**How to apply:** Identify the actual approved Exchange-widget page and compare it with the pre-catalog source before making frontend-only changes. Do not confuse the console welcome page with the premium customer website.
+**How to apply:** Identify the actual approved Exchange-widget page and compare it with the pre-catalog source before making frontend-only changes. Edit current frontend files using that source; do not restore a checkpoint or roll back the project when retaining the catalog backend. Do not confuse the console welcome page with the premium customer website.

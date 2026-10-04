@@ -1,7 +1,7 @@
 import { FlaskConical, KeyRound, Webhook, Code2 } from 'lucide-react';
-import type { Caps } from '@/lib/capabilities';
+import type { Caps } from '../../lib/capabilities';
 import { Section, SectionHead, PreviewNote } from './common';
-import { Reveal } from '@/components/reveal';
+import { Reveal } from '../reveal';
 
 const CODE = `// Configuration shape preview - not a live endpoint
 {

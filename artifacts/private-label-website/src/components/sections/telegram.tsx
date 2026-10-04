@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import type { Caps } from '@/lib/capabilities';
+import type { Caps } from '../../lib/capabilities';
 import { Section, SectionHead, PreviewNote } from './common';
-import { Reveal } from '@/components/reveal';
+import { Reveal } from '../reveal';
 
 function Phone({ title, children, tid }: { title: string; children: ReactNode; tid: string }) {
   return (

@@ -2,6 +2,14 @@
 @layer theme, base, clerk, components, utilities;
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import '../../private-label-website/src/styles/site-base.css';
+@import '../../private-label-website/src/styles/site-atmosphere.css';
+@import '../../private-label-website/src/styles/site-widget.css';
+@import '../../private-label-website/src/styles/site-sections.css';
+@import '../../private-label-website/src/styles/site-showcase.css';
+@import '../../private-label-website/src/styles/site-instrument.css';
+@import './styles/platform-catalog.css';
+@source "../../private-label-website/src";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));

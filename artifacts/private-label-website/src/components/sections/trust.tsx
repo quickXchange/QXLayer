@@ -2,7 +2,7 @@ import { Building2, Layers, LifeBuoy, FileText, FlaskConical, ToggleRight } from
 import { Link } from 'wouter';
 import type { PublicSite } from '@workspace/api-client-react';
 import { Section, SectionHead } from './common';
-import { Reveal } from '@/components/reveal';
+import { Reveal } from '../reveal';
 
 export function Trust({ site }: { site: PublicSite }) {
   const ws = site.websiteSettings;

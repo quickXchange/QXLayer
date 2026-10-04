@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { PublicSite } from '@workspace/api-client-react';
-import { fontLink } from '@/lib/theme';
+import { fontLink } from '../lib/theme';
 
 /** Applies tenant document metadata and restores everything on unmount. */
 export function useDocumentMeta(site: PublicSite, themeColor: string) {

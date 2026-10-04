@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDownUp, ChevronDown, Info, ShieldCheck } from 'lucide-react';
 import type { AssetNetwork, PublicSite } from '@workspace/api-client-react';
-import type { Caps, ExchangeTab } from '@/lib/capabilities';
-import { AssetPicker, Coin, NetBadge, assetKey } from '@/components/asset-picker';
+import type { Caps, ExchangeTab } from '../lib/capabilities';
+import { AssetPicker, Coin, NetBadge, assetKey } from './asset-picker';
 
 const LABEL: Record<ExchangeTab, string> = { swap: 'Swap', convert: 'Convert', buy: 'Buy', sell: 'Sell' };
 const AMOUNT = /^\d{0,12}(\.\d{0,18})?$/;
@@ -33,7 +33,7 @@ function Side({ label, asset, onPick, value, onValue, readOnly, fiat, error, id,
   );
 }
 
-export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps }) {
+export function ExchangeWidget({ site, caps, presentation = false }: { site: PublicSite; caps: Caps; presentation?: boolean }) {
   const assets = site.assets;
   const [tab, setTab] = useState<ExchangeTab>(caps.tabs[0] ?? 'swap');
   const [fromKey, setFromKey] = useState<string | null>(assets[0] ? assetKey(assets[0]) : null);
@@ -105,9 +105,9 @@ export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps })
         </div>
         <span className="s-badge shrink-0" data-testid="badge-sandbox">Sandbox</span>
       </div>
-      {noAssets ? (
+      {noAssets && !presentation ? (
         <div className="py-10 text-center" data-testid="state-widget-no-assets"><h3 className="text-lg font-semibold">No assets configured</h3><p className="s-muted mx-auto mt-2 max-w-xs text-sm">This tenant has not enabled any assets or networks yet, so there is nothing to exchange.</p></div>
-      ) : insufficient ? (
+      ) : insufficient && !presentation ? (
         <div className="s-insuff mt-5" data-testid="state-widget-insufficient">
           <div className="s-pairviz" aria-hidden="true">{assets[0] && <Coin asset={assets[0]} size={64} />}<span className="s-pairviz-line" /><span className="s-ghostcoin">2</span></div>
           <div className="flex items-start gap-3"><Info size={18} className="mt-0.5 shrink-0" style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" />
@@ -124,7 +124,7 @@ export function ExchangeWidget({ site, caps }: { site: PublicSite; caps: Caps })
           <p className="s-muted mt-2 text-xs" aria-live="polite" data-testid="text-receive-note">Receive amount appears once a quote is available.</p>
         </div>
       )}
-      {!noAssets && (
+      {(!noAssets || presentation) && (
         <dl className="s-ratebox mt-4 divide-y rounded-[var(--s-r2)] border px-4 py-2.5" style={{ borderColor: 'var(--s-line)' }} data-testid="panel-rate">
           {rate('rate', 'Rate')}{rate('min', 'Minimum')}{rate('max', 'Maximum')}{rate('fee', 'Network and service fee')}
           <p className="s-muted pt-2 text-xs">{NOQ} Nothing here is an estimate.</p>

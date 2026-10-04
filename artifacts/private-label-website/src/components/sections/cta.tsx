@@ -1,8 +1,8 @@
 import { ArrowRight } from 'lucide-react';
 import type { PublicSite } from '@workspace/api-client-react';
-import { primaryCta, type Caps } from '@/lib/capabilities';
-import { useAnchors } from '@/lib/anchors';
-import { Reveal } from '@/components/reveal';
+import { primaryCta, type Caps } from '../../lib/capabilities';
+import { useAnchors } from '../../lib/anchors';
+import { Reveal } from '../reveal';
 
 export function FinalCta({ site, caps }: { site: PublicSite; caps: Caps }) {
   const cta = primaryCta(caps);

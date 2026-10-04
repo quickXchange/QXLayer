@@ -50,6 +50,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src'),
+      '@site': path.resolve(import.meta.dirname, '..', 'private-label-website', 'src'),
       '@assets': path.resolve(
         import.meta.dirname,
         '..',

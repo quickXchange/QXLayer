@@ -6,9 +6,9 @@ export function scrollToId(id: string) {
   if (!el) return;
   el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
 }
-export function useAnchors(slug: string) {
+export function useAnchors(slug: string, root?: string) {
   const [loc, nav] = useLocation();
-  const base = `/${slug}`;
+  const base = root ?? `/${slug}`;
   const prefix = import.meta.env.BASE_URL.replace(/\/$/, '');
   return {
     href: (id: string) => `${prefix}${base}#${id}`,

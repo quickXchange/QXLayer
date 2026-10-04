@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Reveal } from '@/components/reveal';
+import { Reveal } from '../reveal';
 
 export function SectionHead({ eyebrow, title, body, center }: { eyebrow: string; title: string; body?: string; center?: boolean }) {
   return (

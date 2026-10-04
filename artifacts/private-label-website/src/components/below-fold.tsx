@@ -1,5 +1,5 @@
 import type { PublicSite } from '@workspace/api-client-react';
-import type { Caps } from '@/lib/capabilities';
+import type { Caps } from '../lib/capabilities';
 import { Assets } from './sections/assets';
 import { How } from './sections/how';
 import { Payments } from './sections/payments';

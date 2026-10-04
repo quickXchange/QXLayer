@@ -1,7 +1,7 @@
 import { Link2, QrCode, Wallet, LineChart, Plug } from 'lucide-react';
 import type { PublicSite } from '@workspace/api-client-react';
 import { Section, SectionHead, PreviewNote } from './common';
-import { Reveal } from '@/components/reveal';
+import { Reveal } from '../reveal';
 
 const Qr = () => {
   const cells: React.ReactElement[] = [];

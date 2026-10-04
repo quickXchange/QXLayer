@@ -1,6 +1,6 @@
-import type { Caps } from '@/lib/capabilities';
-import { Reveal } from '@/components/reveal';
-import { CountUp } from '@/components/count-up';
+import type { Caps } from '../../lib/capabilities';
+import { Reveal } from '../reveal';
+import { CountUp } from '../count-up';
 
 export function Stats({ caps }: { caps: Caps }) {
   const items = [
