@@ -1,6 +1,6 @@
 import { useId, type CSSProperties, type ReactNode } from 'react';
 import { Coin, type CoinId } from './showcase-art';
-import { Logo } from './showcase-brand';
+import { QXMark } from './showcase-brand';
 
 /** Data-dense presentational atoms. All values are fictional demo data. */
 export const Kpis = ({ items }: { items: [string, string, string?][] }) => (
@@ -36,7 +36,7 @@ export const St = ({ t, k = 'ok' }: { t: string; k?: 'ok' | 'wait' | 'off' }) =>
 export const Cn = ({ c, n }: { c: CoinId; n?: string }) => <span className="sx-cc2"><Coin c={c} size={1.5} />{n ?? c}</span>;
 
 export const Nav = ({ items, on = 0 }: { items: string[]; on?: number }) => (
-  <div className="sx-nav sx-nomob"><div className="sx-nav-logo"><Logo s={1.5} /></div>{items.map((t, i) => <span key={t} className={i === on ? 'on' : ''}>{t}</span>)}</div>
+  <div className="sx-nav sx-nomob">{items.map((t, i) => <span key={t} className={i === on ? 'on' : ''}>{t}</span>)}</div>
 );
 
 export const Fld = ({ l, v, r, sub }: { l: string; v: string; r?: ReactNode; sub?: string }) => (
@@ -68,7 +68,7 @@ export const Qr = () => {
   return (
     <div className="sx-qr">
       <svg viewBox="-1 -1 23 23" fill="#1b1340">{cells}{f(0, 0)}{f(14, 0)}{f(0, 14)}</svg>
-      <span><Logo s={1.2} /></span>
+      <span><QXMark s={1.8} theme="light" /></span>
     </div>
   );
 };

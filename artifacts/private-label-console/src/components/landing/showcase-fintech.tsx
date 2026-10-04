@@ -7,13 +7,13 @@ import { Bar, Btn, Chart, Chips, Cn, Cols, Donut, Fld, Kpis, Kv, Nav, Pair, Qr, 
 const CardVisuals = () => (
   <div className="sx-cards">
     <div className="sx-metal">
-      <div className="sx-cardtop"><Logo s={2} /><span className="sx-wave" /></div>
+      <div className="sx-cardtop"><Logo s={2} theme="dark" /><span className="sx-wave" /></div>
       <div className="sx-chip"><i /><i /><i /><i /></div>
       <div className="sx-pan">4821 0437 9150 7305</div>
       <div className="sx-cardbot"><span><small>Cardholder</small>Mira Valdesar</span><span><small>Valid</small>09/29</span><span className="sx-mc"><i /><i /></span></div>
     </div>
     <div className="sx-glass">
-      <div className="sx-cardtop"><Logo s={1.7} /><small>Virtual</small></div>
+      <div className="sx-cardtop"><Logo s={1.7} theme="dark" /><small>Virtual</small></div>
       <div className="sx-pan s">4821 7702 3318 0462</div>
       <div className="sx-cardbot"><span><small>Cardholder</small>Mira Valdesar</span><span><small>CVV</small>***</span></div>
     </div>
@@ -22,7 +22,7 @@ const CardVisuals = () => (
 
 export const fintechScenes: Record<string, () => ReactNode> = {
   crypto_exchange: () => <>
-    <L x={2} y={9} w={64} d={6}><Win title="Exchange admin dashboard">
+    <L x={2} y={9} w={64} d={6}><Win title="Exchange admin dashboard" brandSize={1.9}>
       <div className="sx-split"><Nav items={['Overview', 'Orders', 'Assets', 'Networks', 'Payment methods', 'Analytics']} />
         <div className="sx-grid">
           <Kpis items={[['Orders today', '1,284', '+6.1%'], ['Volume', '$2.41M', '+11.4%'], ['Fee income', '$7,318.20', '+4.9%'], ['Avg settle', '3m 42s', '-0:18']]} />
@@ -35,7 +35,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
           </div>
         </div>
       </div></Win></L>
-    <L x={60} y={12} w={37} d={18} z={5} fl={1} m><Win title="Swap / Convert">
+    <L x={60} y={12} w={37} d={18} z={5} fl={1} m><Win title="Swap / Convert" brandSize={1.8}>
       <Fld l="You send" v="0.0842" sub="$5,716.40" r={<Cn c="BTC" />} />
       <div className="sx-swap">&#8645;</div>
       <Fld l="You receive" v="1.7186" sub="$5,702.88" r={<Cn c="ETH" />} />
@@ -121,7 +121,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
   </>,
 
   dex: () => <>
-    <L x={34} y={10} w={32} d={20} z={5} fl={1} m><Win title="QXLayer Swap">
+    <L x={34} y={10} w={32} d={20} z={5} fl={1} m><Win title="Swap">
       <Fld l="From" v="1.000" sub="$3,327.40" r={<Cn c="ETH" />} />
       <div className="sx-swap">&#8645;</div>
       <Fld l="To (estimated)" v="19.098" sub="$3,321.10" r={<Cn c="SOL" />} />

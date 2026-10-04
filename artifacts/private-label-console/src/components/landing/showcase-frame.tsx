@@ -46,6 +46,6 @@ export function L({ x, y, w, d = 10, z = 1, fl, m, children }: { x: number; y: n
   );
 }
 
-export const Win = ({ title, children, tone }: { title: string; children: ReactNode; tone?: 'flat' }) => (
-  <div className={`sc-win ${tone ?? ''}`}><div className="sc-bar"><Logo s={1.4} /><b>{title}</b><u>Demo</u></div><div className="sc-body">{children}</div></div>
+export const Win = ({ title, children, tone, brandSize = 1.65 }: { title: string; children: ReactNode; tone?: 'flat'; brandSize?: number }) => (
+  <div className={`sc-win ${tone ?? ''}`}><div className="sc-bar"><Logo s={brandSize} /><b>{title}</b><u>Demo</u></div><div className="sc-body">{children}</div></div>
 );

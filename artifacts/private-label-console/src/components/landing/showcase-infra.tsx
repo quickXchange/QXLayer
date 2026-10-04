@@ -8,7 +8,7 @@ const Mod = ({ n, t, a, b, p }: { n: string; t: string; a: [string, string]; b: 
   <Win title={`${n} ${t}`}><Kv k={a[0]} v={a[1]} /><Kv k={b[0]} v={b[1]} /><Bar p={p} /></Win>
 );
 const Asic = ({ i }: { i: number }) => (
-  <div className="sx-asic"><span className="fan" /><span className="fan" /><div><Logo s={1.2} /><small>Unit {i + 1} / 110 TH/s</small></div><i style={{ animationDelay: `${i * -.7}s` }} /></div>
+  <div className="sx-asic"><span className="fan" /><span className="fan" /><div><Logo s={1.2} theme="dark" /><small>Unit {i + 1} / 110 TH/s</small></div><i style={{ animationDelay: `${i * -.7}s` }} /></div>
 );
 
 export const infraScenes: Record<string, () => ReactNode> = {

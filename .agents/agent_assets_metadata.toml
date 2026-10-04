@@ -266,3 +266,31 @@ mtime_ms = 1791140292958
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/02ae77af-7e79-406c-be92-72265a384311/97a76677-9722-4229-9a85-ecc9a572143b"
 storage_version_token = "1791140342366603"
 content_type = "image/png"
+
+[[outputs]]
+id = "21-OdFd5DTFMEISfpqBTT"
+uri = "file://screenshots/qxlayer/illustration-branding/crypto_exchange-1440-dark.png"
+type = "image"
+title = "Exchange Illustration — Desktop"
+description = "Larger official transparent logos in the dashboard and exchange preview, without duplicate wordmark text."
+logical_id = "542c7823-2e14-4944-ad29-d4cabb78bc13"
+content_hash = "sha256:9af7b1208f23a8f63cec101c9fe765852f40d46c5ff59e147ed2c17977f95b00"
+size = 293355
+mtime_ms = 1791140735106
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/542c7823-2e14-4944-ad29-d4cabb78bc13/56082aa8-bd59-417d-8168-9f49f1427dda"
+storage_version_token = "1791140823317240"
+content_type = "image/png"
+
+[[outputs]]
+id = "xr-64k2-VvjUJEETxOoX0"
+uri = "file://screenshots/qxlayer/illustration-branding/crypto_exchange-390-light.png"
+type = "image"
+title = "Exchange Illustration — Mobile"
+description = "Readable full-logo branding and aligned widget header in light mode."
+logical_id = "27acf1c1-b34f-44ec-bbd0-97488cef25d1"
+content_hash = "sha256:d3efaef276e99a73ff195f445651a36fcff91dfc2971150c7a4dc86c4d16a58e"
+size = 81932
+mtime_ms = 1791140753850
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/27acf1c1-b34f-44ec-bbd0-97488cef25d1/921723a1-f5e8-4ed6-a384-34dbbee13c96"
+storage_version_token = "1791140823820417"
+content_type = "image/png"

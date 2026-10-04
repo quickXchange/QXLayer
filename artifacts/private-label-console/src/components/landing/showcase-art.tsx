@@ -28,7 +28,7 @@ export const Device = ({ droid, skin, children }: { droid?: boolean; skin?: 'tg'
 );
 
 export const Rack = ({ rows = 5, label }: { rows?: number; label: string }) => (
-  <div className="sc-rack"><div className="sc-rack-h"><Logo s={1.3} /><small>{label}</small></div>{Array.from({ length: rows }, (_, i) => <div key={i} className="sc-unit"><i style={{ animationDelay: `${i * -.5}s` }} /><i style={{ animationDelay: `${i * -.9}s` }} /><span /><em /></div>)}</div>
+  <div className="sc-rack"><div className="sc-rack-h"><Logo s={1.3} theme="dark" /><small>{label}</small></div>{Array.from({ length: rows }, (_, i) => <div key={i} className="sc-unit"><i style={{ animationDelay: `${i * -.5}s` }} /><i style={{ animationDelay: `${i * -.9}s` }} /><span /><em /></div>)}</div>
 );
 
 export const Cube = ({ s = 5 }: { s?: number }) => <div className="sc-cube" style={{ width: `${s}em`, height: `${s}em`, ['--h' as string]: `${s / 2}em` } as CSSProperties}><i /><i /><i /></div>;

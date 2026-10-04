@@ -12,14 +12,14 @@ const Tab = ({ items, on }: { items: string[]; on: number }) => <div className="
 
 const IosWallet = () => <>
   <Sb />
-  <div className="ph-top"><Logo s={1.7} /><span className="ph-av">MV</span></div>
+  <div className="ph-top"><Logo s={1.7} theme="dark" /><span className="ph-av">MV</span></div>
   <div className="ph-bal"><small>Total balance</small><strong>$18,432.52</strong><em>+2.4% today / demo</em><Chart a={[30, 38, 34, 50, 46, 62, 58, 74]} h={3.2} /></div>
   <div className="ph-acts">{['Send', 'Receive', 'Swap', 'Buy'].map((t) => <span key={t}><i />{t}</span>)}</div>
   <Asset c="BTC" a="0.0842 BTC" v="$5,716.40" d="+1.8%" /><Asset c="ETH" a="1.62 ETH" v="$5,390.12" d="+3.2%" /><Asset c="USDT" a="4,120.00" v="$4,120.00" d="+0.0%" /><Asset c="SOL" a="18.4 SOL" v="$3,206.00" d="-0.7%" />
   <div style={{ flex: 1 }} /><Tab items={['Home', 'Markets', 'Swap', 'Card', 'Me']} on={0} />
 </>;
 const IosMarkets = () => <>
-  <Sb /><div className="ph-top"><Logo s={1.7} /><small>Markets</small></div>
+  <Sb /><div className="ph-top"><Logo s={1.7} theme="dark" /><small>Markets</small></div>
   <Chips items={['Favorites', 'Gainers', 'Volume']} />
   <Asset c="BTC" a="Bitcoin" v="$67,880" d="+1.8%" /><Asset c="ETH" a="Ethereum" v="$3,327" d="+3.2%" /><Asset c="SOL" a="Solana" v="$174.24" d="-0.7%" /><Asset c="USDT" a="Tether" v="$1.00" d="+0.0%" />
   <Chart a={[40, 52, 46, 60, 54, 70, 66]} h={4} />
@@ -27,7 +27,7 @@ const IosMarkets = () => <>
 </>;
 const DroidHome = () => <>
   <div className="and-sb"><b>9:41</b><span>5G</span></div>
-  <div className="and-bar"><Logo s={1.7} /><span className="ph-av">MV</span></div>
+  <div className="and-bar"><Logo s={1.7} theme="dark" /><span className="ph-av">MV</span></div>
   <div className="and-card"><small>Portfolio value</small><strong>$18,432.52</strong><em>Demo / sandbox account</em></div>
   <div className="and-chips">{['Send', 'Receive', 'Swap', 'Earn'].map((t, i) => <span key={t} className={i === 2 ? 'on' : ''}>{t}</span>)}</div>
   <small className="and-h">Recent activity</small>
@@ -39,7 +39,7 @@ const DroidHome = () => <>
 </>;
 const DroidSwap = () => <>
   <div className="and-sb"><b>9:41</b><span>5G</span></div>
-  <div className="and-bar"><Logo s={1.7} /><small>Swap</small></div>
+  <div className="and-bar"><Logo s={1.7} theme="dark" /><small>Swap</small></div>
   <div className="and-card flat"><small>You pay</small><strong>250.00</strong><span><Cn c="USDT" /></span></div>
   <div className="and-card flat"><small>You get (est.)</small><strong>0.0753</strong><span><Cn c="ETH" /></span></div>
   <Kv k="Rate" v="1 ETH = 3,327 USDT" /><Kv k="Network fee" v="$1.12" />
@@ -58,7 +58,7 @@ const TgChat = ({ mini }: { mini?: boolean }) => <>
   <div className="tg-in"><span>Message</span><i /></div>
 </>;
 const TgMini = () => <>
-  <div className="tgm-top"><Sb /><div className="tgm-h"><b>Close</b><Logo s={1.6} /><b>&hellip;</b></div></div>
+  <div className="tgm-top"><Sb /><div className="tgm-h"><b>Close</b><Logo s={1.6} theme="dark" /><b>&hellip;</b></div></div>
   <div className="tgm-body">
     <div className="ph-bal"><small>Wallet balance</small><strong>$6,204.18</strong><em>Mini App / demo</em></div>
     <div className="ph-acts">{['Swap', 'Pay', 'Earn', 'Card'].map((t) => <span key={t}><i />{t}</span>)}</div>
