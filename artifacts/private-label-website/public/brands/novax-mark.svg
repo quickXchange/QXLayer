@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="NovaX demo logo">
+  <rect width="64" height="64" rx="16" fill="#1C245C"/>
+  <path d="M15 47V17h8l18 21V17h8v30h-8L23 26v21z" fill="#F6B849"/>
+  <circle cx="50" cy="14" r="4" fill="#FFFFFF"/>
+</svg>

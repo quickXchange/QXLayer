@@ -2,6 +2,12 @@
 name: Customer website visual approval
 description: Visual preferences remain relevant, but the user has prioritized the permanent White Label Core.
 ---
+Tenant-branding demonstrations must use a real disposable customer and tenant, provisioned through the existing completed workflow, on the same White Label master frontend. Change tenant configuration and branding assets only; no separate customer frontend or mocked/intercepted API responses.
+
+**Why:** The user explicitly wants to verify that tenant configuration alone transforms the master template while preserving its structure, components and design.
+
+**How to apply:** Capture the actual customer-authorized screens, compare the master alongside the tenant, and check that pre-existing tenant and master records remain unchanged. A visual demonstration is not authorization to redesign or add functionality.
+
 The user explicitly replaced the visual-approval/backend gate with a priority to build the permanent White Label Core first. Do not require website approval to perform that core phase. Do not continue visual refinement instead of the requested platform work.
 
 The customer website must look significantly premium and visually impressive, with the exchange widget as the main centerpiece. Prioritize the actual first mobile viewport, a larger/cleaner/dominant widget, layered depth, visible elegant animated atmosphere and illuminated cards. Keep it professional, fast and trustworthy, with smooth/lightweight motion and multi-tenant branding preserved.

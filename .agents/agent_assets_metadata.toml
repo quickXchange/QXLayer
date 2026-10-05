@@ -294,3 +294,31 @@ mtime_ms = 1791140753850
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/27acf1c1-b34f-44ec-bbd0-97488cef25d1/921723a1-f5e8-4ed6-a384-34dbbee13c96"
 storage_version_token = "1791140823820417"
 content_type = "image/png"
+
+[[outputs]]
+id = "jliFQb0zz-7vK0ZbOFQrn"
+uri = "file://.agents/outputs/novax-visuals/master-vs-novax-desktop.jpg"
+type = "image"
+title = "Desktop — MASTER beside NovaX"
+description = "Actual screenshots at 1440×1000 each. Master left; NovaX right. Same shared frontend, layout and components; different tenant logo, name and colors."
+logical_id = "d506ce8e-e825-42f3-93aa-5345400badc2"
+content_hash = "sha256:df890fb62e7ea9dff23fdfd5ce94126efb89e04a40fcf065ed97b0e7d5e8c368"
+size = 339795
+mtime_ms = 1791164727420
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d506ce8e-e825-42f3-93aa-5345400badc2/0cacc4b9-dcf4-4d56-abce-16430a69973a"
+storage_version_token = "1791164776350297"
+content_type = "image/jpeg"
+
+[[outputs]]
+id = "JoC1WbpaQyK7tZ6ccyIhj"
+uri = "file://.agents/outputs/novax-visuals/master-vs-novax-mobile.jpg"
+type = "image"
+title = "Mobile — MASTER beside NovaX"
+description = "Actual screenshots at 390×844 each. Master left; NovaX right. Same responsive structure with tenant-only branding."
+logical_id = "d0b3ca82-f975-47b8-abe8-0c924b09b795"
+content_hash = "sha256:26e55b8d01d84b8eea2209c03574882848b5e921cb6043abe13911c93f501a64"
+size = 159238
+mtime_ms = 1791164727568
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d0b3ca82-f975-47b8-abe8-0c924b09b795/2d569224-b6fc-482e-a2bf-03b1c0b8b1da"
+storage_version_token = "1791164776902133"
+content_type = "image/jpeg"
