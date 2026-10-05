@@ -1,8 +1,16 @@
 import { getAuth } from "@clerk/express";
 import type { RequestHandler, Response } from "express";
 import { resolvePrincipal, type Principal } from "../modules/authentication/service";
+import { demoPrincipal, assertDemoRequest } from "../modules/demo/session";
 
 export const requireAuthentication: RequestHandler = async (req, res, next): Promise<void> => {
+  const demo = await demoPrincipal(req);
+  if (demo) {
+    assertDemoRequest(demo, req);
+    res.locals.principal = demo;
+    next();
+    return;
+  }
   const auth = getAuth(req);
   const userId = auth.userId;
   if (!userId) {

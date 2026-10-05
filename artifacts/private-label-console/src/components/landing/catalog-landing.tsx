@@ -6,6 +6,7 @@ import { Hero } from '@site/components/hero';
 import { resolveCaps } from '@site/lib/capabilities';
 import { PLATFORM_SITE } from '@/lib/platform-site';
 import { PlatformCatalog } from './platform-catalog';
+import { LiveDemo } from './live-demo';
 import { BrandLogo } from '@/components/brand-logo';
 import { QXLAYER_LIGHT_LOGO_URL, QXLAYER_LIGHT_ICON_URL } from '@/lib/brand';
 
@@ -29,7 +30,7 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
   const footer = (
     <footer className="s-footer relative z-[2] mt-10 border-t" style={{ borderColor: 'var(--s-line)', background: 'var(--s-bg2)' }}>
       <div className="s-wrap flex flex-col gap-1 py-6 text-xs s-muted sm:flex-row sm:justify-between">
-        <span className="flex items-center gap-2"><BrandLogo size={24} />QXLayer · <a href="/private-label-website/nexa-sandbox" data-testid="link-live-demo" className="underline">Live Demo (sandbox)</a></span>
+        <span className="flex items-center gap-2"><BrandLogo size={24} />QXLayer · <a href="/private-label-website/novax-live-demo" data-testid="link-live-demo" className="underline">Live Demo (sandbox)</a></span>
         <span className="s-mono uppercase tracking-widest">Sandbox environment - account requests are not purchases - no live finance</span>
       </div>
     </footer>
@@ -39,6 +40,7 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
       <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV, actions, footer, lightLogoUrl: QXLAYER_LIGHT_LOGO_URL, lightFaviconUrl: QXLAYER_LIGHT_ICON_URL }}>
         <Hero site={PLATFORM_SITE} caps={caps} root={root} secondary={{ id: 'products', label: 'Browse products' }} />
         <PlatformCatalog items={items} loading={q.isLoading} error={q.isError} onRetry={() => void q.refetch()} open={open} setOpen={(p: LandingProduct | null) => setOpenKey(p ? p.key : null)} />
+        <LiveDemo />
       </SiteShell>
     </div>
   );

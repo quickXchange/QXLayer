@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { guardPublicDemo } from "../modules/demo/public-sandbox";
 import {
   GetExchangeConfigurationParams, GetExchangeConfigurationResponse,
   SaveExchangeConfigurationBody, SaveExchangeConfigurationResponse,
@@ -31,8 +32,8 @@ router.use("/public/sites/:slug/exchange", sameOriginMutation, (req, res, next) 
   next();
 });
 router.get("/public/sites/:slug/exchange", async (req, res) => res.json(GetPublicExchangeResponse.parse(await publicExchange(GetPublicExchangeParams.parse(req.params).slug))));
-router.post("/public/sites/:slug/exchange/quotes", async (req, res) => res.json(CreateSandboxQuoteResponse.parse(await sandboxQuote(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxQuoteBody.parse(req.body)))));
-router.post("/public/sites/:slug/exchange/orders", async (req, res) => res.status(201).json(CreateSandboxOrderResponse.parse(await sandboxOrder(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxOrderBody.parse(req.body)))));
+router.post("/public/sites/:slug/exchange/quotes", guardPublicDemo, async (req, res) => res.json(CreateSandboxQuoteResponse.parse(await sandboxQuote(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxQuoteBody.parse(req.body)))));
+router.post("/public/sites/:slug/exchange/orders", guardPublicDemo, async (req, res) => res.status(201).json(CreateSandboxOrderResponse.parse(await sandboxOrder(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxOrderBody.parse(req.body)))));
 router.get("/public/sites/:slug/exchange/orders/:orderId", async (req, res) => {
   const { slug, orderId } = TrackSandboxOrderParams.parse(req.params);
   res.json(TrackSandboxOrderResponse.parse(await trackOrder(slug, orderId, req.get("trackingToken") ?? "")));

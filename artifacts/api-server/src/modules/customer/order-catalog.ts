@@ -3,10 +3,12 @@ import { definitions, readPlan, readAddon } from "../entitlements/catalog";
 import type { Principal } from "../authentication/service";
 import { HttpError } from "../../lib/errors";
 import { requestContext } from "./order-model";
+import { DEMO_PLAN_NAME } from "../demo/identity";
+import { demoEnabled } from "../demo/session";
 
 export async function catalogSelection(c: DatabaseClient, planId: string | null, addonIds: string[]) {
   const plan = planId ? await readPlan(c, planId) : null;
-  if (plan && (plan.status !== "enabled" || !["website", "crypto_exchange"].every(k => plan.entitlements.some(e => e.key === k && e.value === true)))) {
+  if (plan && ((demoEnabled() && plan.name === DEMO_PLAN_NAME) || plan.status !== "enabled" || !["website", "crypto_exchange"].every(k => plan.entitlements.some(e => e.key === k && e.value === true)))) {
     throw new HttpError(400, "Choose an enabled White Label Exchange plan.");
   }
   const addons = [];
@@ -21,7 +23,7 @@ export function whiteLabelCatalog(p: Principal) {
     const ids = await c.query("SELECT id FROM plans WHERE status='enabled' ORDER BY display_order,name,id");
     const candidates = [];
     for (const r of ids.rows) candidates.push(await readPlan(c, r.id));
-    const plans = candidates.filter(p => ["website", "crypto_exchange"].every(k => p.entitlements.some(e => e.key === k && e.value === true)));
+    const plans = candidates.filter(p => !(demoEnabled() && p.name === DEMO_PLAN_NAME) && ["website", "crypto_exchange"].every(k => p.entitlements.some(e => e.key === k && e.value === true)));
     const ai = await c.query("SELECT id FROM addons WHERE enabled ORDER BY name,id");
     const addons = [];
     for (const r of ai.rows) addons.push(await readAddon(c, r.id));

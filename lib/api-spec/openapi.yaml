@@ -17,6 +17,26 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /demo/session:
+    get:
+      operationId: getDemoSession
+      responses:
+        "200": {description: Current development sandbox demo session, content: {application/json: {schema: {$ref: "#/components/schemas/DemoSession"}}}}
+    post:
+      operationId: startDemoSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/DemoLoginInput"}
+      responses:
+        "200": {description: Restricted read-only demo session, content: {application/json: {schema: {$ref: "#/components/schemas/DemoSession"}}}}
+        "401": {description: Incorrect demo credentials}
+        "503": {description: Development demo not provisioned}
+    delete:
+      operationId: endDemoSession
+      responses:
+        "200": {description: Demo session ended, content: {application/json: {schema: {$ref: "#/components/schemas/DemoSession"}}}}
   /customer/white-label-catalog:
     get:
       operationId: getWhiteLabelCatalog
@@ -1295,6 +1315,7 @@ components:
     CurrentPrincipal:
       type: object
       properties:
+        demo: {type: boolean}
         userId: { type: string }
         email: { type: ["string", "null"] }
         role: { $ref: "#/components/schemas/Role" }
@@ -1310,6 +1331,20 @@ components:
               permissions: {type: array, items: {type: string}}
             required: [tenantId, role, permissions]
       required: [userId, email, role, tenantId, sandboxOnly]
+    DemoLoginInput:
+      type: object
+      additionalProperties: false
+      properties:
+        username: {type: string, maxLength: 100}
+        password: {type: string, maxLength: 100}
+      required: [username, password]
+    DemoSession:
+      type: object
+      properties:
+        active: {type: boolean}
+        tenantId: {type: ["string", "null"], format: uuid}
+        readOnly: {type: boolean}
+      required: [active, tenantId, readOnly]
     PlatformOverview:
       type: object
       properties:

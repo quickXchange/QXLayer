@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import healthRouter from "./health";
+import demoRouter from "./demo";
 import catalogRouter from "./catalog";
 import platformRouter from "./platform";
 import tenantsRouter from "./tenants";
@@ -16,6 +17,7 @@ import { GetTenantParams } from "@workspace/api-zod";
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(demoRouter);
 router.use(landingCatalogRouter);
 router.use(websiteRouter);
 router.use(customerRouter);

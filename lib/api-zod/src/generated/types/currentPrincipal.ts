@@ -9,6 +9,7 @@ import type { CurrentPrincipalMembershipsItem } from './currentPrincipalMembersh
 import type { Role } from './role';
 
 export interface CurrentPrincipal {
+  demo?: boolean;
   userId: string;
   /** @nullable */
   email: string | null;

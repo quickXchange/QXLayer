@@ -8,6 +8,38 @@
 import * as zod from 'zod';
 
 
+export const GetDemoSessionResponse = zod.object({
+  "active": zod.boolean(),
+  "tenantId": zod.string().uuid().nullable(),
+  "readOnly": zod.boolean()
+})
+
+
+export const startDemoSessionBodyUsernameMax = 100;
+
+export const startDemoSessionBodyPasswordMax = 100;
+
+
+
+export const StartDemoSessionBody = zod.object({
+  "username": zod.string().max(startDemoSessionBodyUsernameMax),
+  "password": zod.string().max(startDemoSessionBodyPasswordMax)
+})
+
+export const StartDemoSessionResponse = zod.object({
+  "active": zod.boolean(),
+  "tenantId": zod.string().uuid().nullable(),
+  "readOnly": zod.boolean()
+})
+
+
+export const EndDemoSessionResponse = zod.object({
+  "active": zod.boolean(),
+  "tenantId": zod.string().uuid().nullable(),
+  "readOnly": zod.boolean()
+})
+
+
 export const getWhiteLabelCatalogResponsePlansItemOneNameMin = 2;
 export const getWhiteLabelCatalogResponsePlansItemOneNameMax = 120;
 
@@ -3192,6 +3224,7 @@ export const HealthCheckResponse = zod.object({
  * @summary Get the signed-in platform identity and role
  */
 export const GetCurrentPrincipalResponse = zod.object({
+  "demo": zod.boolean().optional(),
   "userId": zod.string(),
   "email": zod.string().nullable(),
   "role": zod.enum(['super_admin', 'client_admin', 'staff', 'unassigned']),

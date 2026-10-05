@@ -180,7 +180,7 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
         <div role="tablist" aria-label="Exchange action" className="s-tabs overflow-x-auto">
           {tabs.map((t) => <button key={t} type="button" role="tab" id={`tab-${t}`} aria-selected={tab === t} className="s-tab" onClick={() => { setTab(t); setTouched(false); setPaymentMethodId(''); reset(); }} data-testid={`tab-${t}`}>{LABEL[t]}</button>)}
         </div>
-        <span className="s-badge shrink-0" data-testid="badge-sandbox">Sandbox</span>
+        <span className="s-badge shrink-0" data-testid="badge-sandbox">{site.tenantSlug === 'novax-live-demo' ? 'Sandbox Demo' : 'Sandbox'}</span>
       </div>
       {noAssets && !presentation ? (
         <div className="py-10 text-center" data-testid="state-widget-no-assets"><h3 className="text-lg font-semibold">No assets configured</h3><p className="s-muted mx-auto mt-2 max-w-xs text-sm">This tenant has not enabled any assets or networks yet, so there is nothing to exchange.</p></div>

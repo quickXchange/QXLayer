@@ -6,7 +6,7 @@ import { BrandSection, DomainSection } from '@/components/app/sections';
 import { useSubscription } from '@/components/app/subscription';
 import { WebsiteSection, ResourcesSection } from '@/components/app/advanced';
 import { DomainOwnershipSection, StaffAccessSection } from '@/components/app/management';
-import { useCan, type Permission } from '@/lib/principal';
+import { useCan, usePrincipal, type Permission } from '@/lib/principal';
 import { useExchangeDraft } from '@/components/exchange/use-exchange-draft';
 import { DashboardPanel } from '@/components/exchange/dashboard-panel';
 import { OrdersPanel, OrderDetail } from '@/components/exchange/orders-panel';
@@ -23,6 +23,7 @@ export default function Exchange() {
   const { id = '', section = '', orderId } = useParams<{ id: string; section?: string; orderId?: string }>();
   const q = useGetTenant(id, { query: { enabled: !!id, queryKey: getGetTenantQueryKey(id) } });
   const can = useCan(id);
+  const principal = usePrincipal();
   const subQ = useSubscription(id);
   const d = useExchangeDraft(id);
   const t = q.data; const sub = subQ.data;
@@ -62,7 +63,7 @@ export default function Exchange() {
 
   return (
     <>
-      <Link href={can.role === 'super_admin' ? `/clients/${id}` : '/account/white-labels'} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="h-4 w-4" /> {can.role === 'super_admin' ? 'Client detail' : 'My White Labels'}</Link>
+      {!principal.demo && <Link href={can.role === 'super_admin' ? `/clients/${id}` : '/account/white-labels'} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="h-4 w-4" /> {can.role === 'super_admin' ? 'Client detail' : 'My White Labels'}</Link>}
       {q.isLoading ? <ListSkeleton /> : q.isError || !t ? <ErrorState what="this client" onRetry={() => q.refetch()} /> : (
         <>
           <PageHeader eyebrow={`${t.slug} · exchange sandbox`} title={`${t.brandName} exchange`}>

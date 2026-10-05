@@ -1037,6 +1037,7 @@ export type CurrentPrincipalMembershipsItem = {
 };
 
 export interface CurrentPrincipal {
+  demo?: boolean;
   userId: string;
   /** @nullable */
   email: string | null;
@@ -1045,6 +1046,20 @@ export interface CurrentPrincipal {
   tenantId: string | null;
   sandboxOnly: boolean;
   memberships?: CurrentPrincipalMembershipsItem[];
+}
+
+export interface DemoLoginInput {
+  /** @maxLength 100 */
+  username: string;
+  /** @maxLength 100 */
+  password: string;
+}
+
+export interface DemoSession {
+  active: boolean;
+  /** @nullable */
+  tenantId: string | null;
+  readOnly: boolean;
 }
 
 export interface PlatformOverview {

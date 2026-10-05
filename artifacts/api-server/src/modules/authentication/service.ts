@@ -7,6 +7,7 @@ export interface Membership {
   permissions?: string[];
 }
 export interface Principal {
+  demo?: boolean;
   userId: string;
   role: "super_admin" | "client_admin" | "staff" | "unassigned";
   memberships: Membership[];
@@ -28,6 +29,9 @@ export async function resolvePrincipal(userId: string): Promise<Principal> {
 }
 
 export function contextFor(principal: Principal, tenantId?: string, write = false, permission = "configuration.manage"): DatabaseContext {
+  if (principal.demo && (write || tenantId !== principal.memberships[0]?.tenantId || principal.role !== "staff")) {
+    throw new HttpError(403, "The demo is restricted to read-only NovaX access.");
+  }
   const isSuperAdmin = principal.role === "super_admin";
   if (principal.role === "unassigned") throw new HttpError(403, "An operator must explicitly assign administrator access.");
   const membership = principal.memberships.find((m) => m.tenantId === tenantId);
@@ -37,5 +41,5 @@ export function contextFor(principal: Principal, tenantId?: string, write = fals
 }
 
 export function requireSuperAdmin(principal: Principal) {
-  if (principal.role !== "super_admin") throw new HttpError(403, "Super administrator access required.");
+  if (principal.demo || principal.role !== "super_admin") throw new HttpError(403, "Super administrator access required.");
 }

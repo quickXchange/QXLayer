@@ -29,6 +29,8 @@ import type {
   CapabilityStatus,
   CurrentPrincipal,
   CustomerAdminPanel,
+  DemoLoginInput,
+  DemoSession,
   DomainInput,
   DomainVerification,
   EntitlementDefinition,
@@ -111,6 +113,227 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetDemoSessionUrl = () => {
+
+
+
+
+  return `/api/demo/session`
+}
+
+export const getDemoSession = async ( options?: Parameters<typeof customFetch>[1]): Promise<DemoSession> => {
+
+  return customFetch<DemoSession>(getGetDemoSessionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDemoSessionQueryKey = () => {
+    return [
+    `/api/demo/session`
+    ] as const;
+    }
+
+
+export const getGetDemoSessionQueryOptions = <TData = Awaited<ReturnType<typeof getDemoSession>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDemoSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDemoSessionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDemoSession>>> = ({ signal }) => getDemoSession({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDemoSession>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDemoSessionQueryResult = NonNullable<Awaited<ReturnType<typeof getDemoSession>>>
+export type GetDemoSessionQueryError = ErrorType<unknown>
+
+
+
+export function useGetDemoSession<TData = Awaited<ReturnType<typeof getDemoSession>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDemoSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDemoSessionQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getStartDemoSessionUrl = () => {
+
+
+
+
+  return `/api/demo/session`
+}
+
+export const startDemoSession = async (demoLoginInput: DemoLoginInput, options?: Parameters<typeof customFetch>[1]): Promise<DemoSession> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<DemoSession>(getStartDemoSessionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(demoLoginInput)
+  }
+);}
+
+
+
+
+
+export const getStartDemoSessionMutationKey = () => ['startDemoSession'] as const;
+
+export const getStartDemoSessionMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startDemoSession>>, TError,StartDemoSessionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startDemoSession>>, TError,StartDemoSessionMutationVariables, TContext> => {
+
+const mutationKey = getStartDemoSessionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startDemoSession>>, StartDemoSessionMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  startDemoSession(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartDemoSessionMutationResult = NonNullable<Awaited<ReturnType<typeof startDemoSession>>>
+    export type StartDemoSessionMutationBody = BodyType<DemoLoginInput>
+    export type StartDemoSessionMutationError = ErrorType<void>
+    export type StartDemoSessionMutationVariables = {data: BodyType<DemoLoginInput>}
+
+    export const useStartDemoSession = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startDemoSession>>, TError,StartDemoSessionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof startDemoSession>>,
+        TError,
+        StartDemoSessionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getStartDemoSessionMutationOptions(options));
+    }
+
+export const getEndDemoSessionUrl = () => {
+
+
+
+
+  return `/api/demo/session`
+}
+
+export const endDemoSession = async ( options?: Parameters<typeof customFetch>[1]): Promise<DemoSession> => {
+
+  return customFetch<DemoSession>(getEndDemoSessionUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getEndDemoSessionMutationKey = () => ['endDemoSession'] as const;
+
+export const getEndDemoSessionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof endDemoSession>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof endDemoSession>>, TError,void, TContext> => {
+
+const mutationKey = getEndDemoSessionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof endDemoSession>>, void> = () => {
+
+
+          return  endDemoSession(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EndDemoSessionMutationResult = NonNullable<Awaited<ReturnType<typeof endDemoSession>>>
+
+    export type EndDemoSessionMutationError = ErrorType<unknown>
+
+
+    export const useEndDemoSession = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof endDemoSession>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof endDemoSession>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getEndDemoSessionMutationOptions(options));
+    }
 
 export const getGetWhiteLabelCatalogUrl = () => {
 

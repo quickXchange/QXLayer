@@ -4,7 +4,7 @@ import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
-import { useGetCurrentPrincipal, getGetCurrentPrincipalQueryKey } from '@workspace/api-client-react';
+import { useGetCurrentPrincipal, getGetCurrentPrincipalQueryKey, useGetDemoSession, getGetDemoSessionQueryKey } from '@workspace/api-client-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -15,6 +15,7 @@ import { AdminShell } from '@/components/app/shell';
 import { PrincipalContext, usePrincipal } from '@/lib/principal';
 import NotFound from '@/pages/not-found';
 import Home from '@/pages/home';
+import DemoAdmin from '@/pages/demo-admin';
 import { CustomerShell } from '@/components/app/customer-shell';
 import { useAdminPanels } from '@/lib/customer';
 import { AccountDashboard, AccountOrders, AccountWhiteLabels, AdminPanels, ConfigureExchange, AccountProfile, NotProvisioned } from '@/pages/account';
@@ -122,6 +123,10 @@ function PrincipalGate({ children }: { children: ReactNode }) {
       </div></ConsoleThemeScope>
     );
   }
+  if (q.data.demo && window.location.pathname !== `${basePath}/clients/${q.data.tenantId}/exchange`
+    && !window.location.pathname.startsWith(`${basePath}/clients/${q.data.tenantId}/exchange/`)) {
+    return <Redirect to={`/clients/${q.data.tenantId}/exchange`} />;
+  }
   return (
     <PrincipalContext.Provider value={q.data}>
       {q.data.role === 'super_admin' ? <AdminShell>{children}</AdminShell> : <CustomerShell>{children}</CustomerShell>}
@@ -130,6 +135,9 @@ function PrincipalGate({ children }: { children: ReactNode }) {
 }
 
 function Protected({ children }: { children: ReactNode }) {
+  const demo = useGetDemoSession({ query: { queryKey: getGetDemoSessionQueryKey(), retry: false, staleTime: 0, refetchInterval: 60000 } });
+  if (demo.data?.active) return <PrincipalGate>{children}</PrincipalGate>;
+  if (demo.isLoading) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   return (
     <>
       <Show when="signed-in"><PrincipalGate>{children}</PrincipalGate></Show>
@@ -179,6 +187,7 @@ function ClerkProviderWithRoutes() {
           <RoutedErrorBoundary>
             <Switch>
               <Route path="/" component={HomeRedirect} />
+              <Route path="/demo/admin" component={DemoAdmin} />
               <Route path="/sign-in/*?" component={SignInPage} />
               <Route path="/sign-up/*?" component={SignUpPage} />
               <Route path="/account" component={rAcc} />
