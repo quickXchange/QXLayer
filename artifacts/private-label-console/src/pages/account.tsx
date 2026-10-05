@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { Link } from 'wouter';
 import { UserProfile } from '@clerk/react';
 import { PageHeader, ErrorState, EmptyState, ListSkeleton, StatusBadge } from '@/components/app/bits';
@@ -7,10 +6,7 @@ import { ConfigureExchange } from '@/components/customer/configure';
 import { OrderStatus } from '@/components/customer/order-view';
 import { cash, orderRef, type WlOrder } from '@/lib/wl';
 import { useAdminPanels, useMyRequests } from '@/lib/customer';
-
-const Stat = ({ label, value, id }: { label: string; value: ReactNode; id: string }) => (
-  <div className="rounded-md border bg-card p-5"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p><p data-testid={id} className="font-display mt-2 text-4xl">{value}</p></div>
-);
+import { MetricCard } from '@/components/app/metrics';
 
 export function AccountDashboard() {
   const r = useMyRequests(); const a = useAdminPanels();
@@ -19,11 +15,11 @@ export function AccountDashboard() {
     <>
       <PageHeader eyebrow="Customer account" title="Dashboard"><Button asChild data-testid="button-configure"><Link href="/account/configure">Configure Exchange</Link></Button></PageHeader>
       {r.isLoading ? <ListSkeleton rows={2} /> : r.isError ? <ErrorState what="your requests" onRetry={() => r.refetch()} /> : (
-        <div className="grid gap-4 md:grid-cols-4">
-          <Stat id="stat-requests" label="Requests" value={reqs.length} />
-          <Stat id="stat-pending" label="Awaiting review" value={reqs.filter((x) => OPEN.includes(x.status)).length} />
-          <Stat id="stat-approved" label="Approved" value={reqs.filter((x) => ['approved', 'in_setup', 'customization', 'ready'].includes(x.status)).length} />
-          <Stat id="stat-panels" label="Delivered panels" value={panels.length} />
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <MetricCard id="stat-requests" label="Requests" value={reqs.length} />
+          <MetricCard id="stat-pending" label="Awaiting review" value={reqs.filter((x) => OPEN.includes(x.status)).length} />
+          <MetricCard id="stat-approved" label="Approved" value={reqs.filter((x) => ['approved', 'in_setup', 'customization', 'ready'].includes(x.status)).length} />
+          <MetricCard id="stat-panels" label="Delivered panels" value={panels.length} />
         </div>)}
       {!r.isLoading && reqs.length === 0 && <div className="mt-8"><EmptyState title="No Exchange project yet" body="Configure a white-label Exchange and an operator will review it." action={<Button asChild><Link href="/account/configure">Configure Exchange</Link></Button>} /></div>}
     </>
@@ -109,5 +105,13 @@ export function NotProvisioned() {
 export { ConfigureExchange };
 
 export function AccountProfile() {
-  return (<><PageHeader eyebrow="Your sign-in" title="Profile / Account" /><div className="overflow-x-auto"><UserProfile routing="hash" /></div></>);
+  return (<><PageHeader eyebrow="Your sign-in" title="Profile / Account" /><div className="overflow-x-auto"><UserProfile routing="hash" appearance={{
+    variables: {
+      colorPrimary: 'var(--s-primary)', colorForeground: 'var(--s-fg)',
+      colorMutedForeground: 'var(--s-muted)', colorBackground: 'var(--s-card)',
+      colorInput: 'var(--s-bg2)', colorInputForeground: 'var(--s-fg)',
+      colorNeutral: 'var(--s-muted)', colorDanger: 'hsl(var(--destructive))',
+      fontFamily: 'var(--s-font)', borderRadius: 'var(--s-r1)',
+    },
+  }} /></div></>);
 }

@@ -5,6 +5,7 @@ import { PageHeader, ErrorState, ListSkeleton, SandboxNote, EmptyState } from '@
 import { ago } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { useCan } from '@/lib/principal';
+import { MetricCard } from '@/components/app/metrics';
 
 export default function Admin() {
   const q = useGetPlatformOverview();
@@ -21,10 +22,9 @@ export default function Admin() {
       </PageHeader>
       {q.isLoading ? <ListSkeleton /> : q.isError || !d ? <ErrorState what="the overview" onRetry={() => q.refetch()} /> : (
         <div className="space-y-10">
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border bg-border md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {stats.map(([l, v]) => (
-              <div key={l} className="bg-card p-5"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{l}</p>
-                <p data-testid={`stat-${String(l).toLowerCase().replace(/\s/g, '-')}`} className="font-display mt-2 text-5xl">{v}</p></div>
+              <MetricCard key={l} label={String(l)} value={v} id={`stat-${String(l).toLowerCase().replace(/\s/g, '-')}`} />
             ))}
           </div>
           <SandboxNote />

@@ -7,6 +7,7 @@ import { usePrincipal } from '@/lib/principal';
 import { roleLabel } from '@/lib/format';
 import { Button } from '@/components/ui/button';
 import { BrandLogo } from '@/components/brand-logo';
+import { ConsoleFrame, type ConsoleNavItem } from '@/components/app/console-frame';
 
 const nav = [
   { href: '/admin', label: 'Overview', icon: LayoutGrid },
@@ -23,7 +24,7 @@ const nav = [
 export function Logo({ light }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <BrandLogo theme={light ? 'dark' : 'light'} />
+      <BrandLogo />
       <span className={`font-display text-xl leading-none ${light ? 'text-sidebar-accent-foreground' : ''}`}>QXLayer</span>
     </div>
   );
@@ -35,7 +36,7 @@ function Health() {
   const text = h.isLoading ? 'Checking API' : h.isError ? 'API unreachable' : `API ${h.data?.status}`;
   return (
     <div data-testid="status-health" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider">
-      <span className={`h-2 w-2 rounded-full ${h.isError ? 'bg-destructive' : ok || h.data ? 'bg-emerald-400' : 'bg-muted-foreground animate-pulse'}`} />
+      <span className={`h-2 w-2 rounded-full ${h.isError ? 'bg-destructive' : ok || h.data ? 'bg-emerald-500' : 'bg-muted-foreground animate-pulse'}`} />
       {text}
     </div>
   );
@@ -45,40 +46,24 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const p = usePrincipal();
   const { signOut } = useClerk();
-  const items = nav;
   const active = (h: string) => (h === '/admin' ? loc === h : loc.startsWith(h));
+  const items: ConsoleNavItem[] = nav.filter((n) => !n.op || p.role === 'super_admin').map((n) => ({
+    key: n.href, href: n.href, label: n.label, icon: n.icon, testId: `link-nav-${n.label.toLowerCase().replace(/ /g, '')}`, current: active(n.href),
+  }));
   return (
-    <div className="grain min-h-[100dvh] md:flex">
-      <aside className="bg-sidebar text-sidebar-foreground md:fixed md:inset-y-0 md:flex md:w-60 md:flex-col md:justify-between md:p-5">
-        <div className="flex items-center justify-between p-4 md:block md:p-0">
-          <Link href="/admin" data-testid="link-logo"><Logo light /></Link>
-          <nav className="mt-0 hidden md:mt-10 md:block md:space-y-1">
-            {items.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
-              <Link key={n.href} href={n.href} data-testid={`link-nav-${n.label.toLowerCase().replace(/ /g, '')}`}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${active(n.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'hover:bg-sidebar-accent/60'}`}>
-                <n.icon className={`h-4 w-4 ${active(n.href) ? 'text-sidebar-primary' : ''}`} /> {n.label}
-              </Link>
-            ))}
-          </nav>
-          <Button data-testid="button-signout-mobile" aria-label="Sign out" size="icon" variant="ghost" className="md:hidden" onClick={() => signOut({ redirectUrl: '/' })}><LogOut className="h-4 w-4" /></Button>
-        </div>
-        <nav aria-label="Administration navigation" className="grid grid-cols-2 gap-1 px-3 pb-3 sm:grid-cols-3 md:hidden">
-          {items.filter((n) => !n.op || p.role === 'super_admin').map((n) => (
-            <Link key={n.href} href={n.href} aria-current={active(n.href) ? 'page' : undefined} className={`min-w-0 rounded-md px-3 py-2 text-sm ${active(n.href) ? 'bg-sidebar-accent text-sidebar-accent-foreground' : ''}`}>{n.label}</Link>
-          ))}
-        </nav>
-        <div className="hidden space-y-4 md:block">
+    <ConsoleFrame homeHref="/admin" navLabel="Administration navigation" items={items} maxWidth="max-w-6xl"
+      mobileAction={<Button data-testid="button-signout-mobile" aria-label="Sign out" size="icon" variant="ghost" onClick={() => signOut({ redirectUrl: '/' })}><LogOut className="h-4 w-4" /></Button>}
+      footer={
+        <div className="space-y-4">
           <Health />
           <div className="border-t border-sidebar-border pt-4">
             <p data-testid="text-user-email" className="truncate text-sm">{p.email ?? 'Your account'}</p>
             <p data-testid="text-user-role" className="font-mono text-[11px] uppercase tracking-wider text-sidebar-primary">{roleLabel[p.role]}</p>
-            <button data-testid="button-signout" onClick={() => signOut({ redirectUrl: '/' })} className="mt-3 flex items-center gap-2 text-xs text-sidebar-foreground/70 hover:text-sidebar-accent-foreground"><LogOut className="h-3.5 w-3.5" /> Sign out</button>
+            <button data-testid="button-signout" onClick={() => signOut({ redirectUrl: '/' })} className="mt-3 flex items-center gap-2 text-xs"><LogOut className="h-3.5 w-3.5" /> Sign out</button>
           </div>
         </div>
-      </aside>
-      <main className="min-w-0 flex-1 md:ml-60">
-        <div className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">{children}</div>
-      </main>
-    </div>
+      }>
+      {children}
+    </ConsoleFrame>
   );
 }

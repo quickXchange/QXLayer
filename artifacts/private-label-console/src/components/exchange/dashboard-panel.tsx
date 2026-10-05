@@ -4,6 +4,7 @@ import { ErrorState, ListSkeleton, EmptyState } from '@/components/app/bits';
 import { ago } from '@/lib/format';
 import { SimNote } from './ui';
 import { OrderStatus } from './order-status';
+import { MetricCard } from '@/components/app/metrics';
 
 export function DashboardPanel({ tenantId }: { tenantId: string }) {
   const q = useGetExchangeDashboard(tenantId, { query: { queryKey: getGetExchangeDashboardQueryKey(tenantId) } });
@@ -16,8 +17,8 @@ export function DashboardPanel({ tenantId }: { tenantId: string }) {
     <div className="space-y-8">
       <SimNote />
       <p className="text-sm" data-testid="text-dashboard-enabled">Exchange is <b>{d.enabled ? 'enabled' : 'not enabled'}</b> for this tenant.</p>
-      <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border bg-border md:grid-cols-9">
-        {stats.map(([l, v]) => <div key={l} className="bg-card p-4"><p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="font-display mt-1 text-4xl" data-testid={`stat-exchange-${l.toLowerCase()}`}>{v}</p></div>)}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {stats.map(([l, v]) => <MetricCard key={l} label={l} value={v} id={`stat-exchange-${l.toLowerCase()}`} />)}
       </div>
       <section><h2 className="font-display mb-2 text-2xl">Input volume by asset</h2>
         {d.volume.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">No volume yet. Units are never summed across assets.</p> : (

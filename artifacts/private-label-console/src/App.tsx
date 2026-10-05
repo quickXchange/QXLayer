@@ -36,6 +36,7 @@ import LandingProducts from '@/pages/landing-products';
 import CatalogPreview from '@/pages/catalog-preview';
 import { QXLAYER_LIGHT_LOGO_URL } from '@/lib/brand';
 import { BrandLogo } from '@/components/brand-logo';
+import { ConsoleThemeScope } from '@/components/app/console-frame';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
@@ -111,14 +112,14 @@ function HomeRedirect() {
 function PrincipalGate({ children }: { children: ReactNode }) {
   const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: 10000 } });
   const { signOut } = useClerk();
-  if (q.isLoading) return <div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div>;
+  if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div></ConsoleThemeScope>;
   if (q.isError || !q.data) {
     return (
-      <div className="grid min-h-[100dvh] place-items-center px-5 text-center">
+      <ConsoleThemeScope><div className="grid min-h-[100dvh] place-items-center px-5 text-center">
         <div className="space-y-3"><BrandLogo size={48} className="mx-auto" /><p className="font-display text-3xl">Could not verify your access</p>
           <div className="flex justify-center gap-2"><Button data-testid="button-retry" onClick={() => q.refetch()}>Retry</Button>
             <Button variant="ghost" onClick={() => signOut({ redirectUrl: '/' })}>Sign out</Button></div></div>
-      </div>
+      </div></ConsoleThemeScope>
     );
   }
   return (

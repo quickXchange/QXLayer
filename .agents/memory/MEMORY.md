@@ -4,7 +4,7 @@
 - [Vite dependency cache](vite-dependency-cache.md) — React version errors can come from stale prebundles even when package resolution matches.
 - [Website CSS cascade](website-css-cascade.md) — layered visibility utilities can lose to custom display rules; verify mobile and desktop computed display.
 - [Core and catalog scope](customer-visual-approval.md) — premium catalog advertising is not service implementation; reusable core, no live crypto, publishing or QuickXchange changes.
-- [Official QXLayer brand](qxlayer-brand.md) — use the uploaded master intact on platform-owned surfaces; never override customer/tenant branding.
+- [Official QXLayer brand](qxlayer-brand.md) — official logo and one approved public-platform visual language for all consoles; tenant public sites keep their branding.
 - [Exchange-only scope](exchange-only-scope.md) — develop only White Label Exchange sandbox and its tenant admin; all other products stay unchanged visual previews.
 - [Clerk UI test identities](clerk-testing-memberships.md) — grant the actual generated identity temporary tenant access; extra claim arguments do not override the session.
 - [Customer account workflow](customer-account-workflow.md) — one existing QXLayer login; customer requests precede Super Admin delivery and conditional, authorized Admin Panel access.

@@ -1,6 +1,6 @@
 ---
 name: Official QXLayer brand
-description: User-approved master logo handling and the boundary between platform and tenant branding.
+description: User-approved master logo, shared platform visual language, and the boundary with tenant branding.
 ---
 
 The uploaded QXLayer image is the official master brand logo for the main platform, admin console, authentication, browser icons, and platform-owned product previews. Replace the former “Private Label” placeholder branding. Keep the original master untouched; never redesign or regenerate the logo.
@@ -16,3 +16,9 @@ Each complete Product & Services illustration should normally contain only one p
 **Why:** The user confirmed the transparent logo was correct, but first corrected small sizing and duplicate brand names, then explicitly rejected excessive repeated logos. They requested Apple-style product marketing: one strong brand placement, clean composition, lots of breathing room. This correction is limited to illustration branding, not the landing page, product section structure or tenant branding.
 
 **How to apply:** Keep preview branding separate from shared platform header/admin logo sizing. Use the contrast variant appropriate to the actual illustrated surface, including dark phone screens and hardware inside light-mode pages. Count visible identities across the entire scene, not separately per window or device. If the desktop primary interface is hidden on mobile, use exactly one mobile-only placement in the visible primary interface. Preserve UI details and compositions; remove excessive branding only.
+
+The approved public QXLayer Main Platform is the MASTER visual reference for authenticated Customer, Super Admin and White Label tenant management screens. Reuse its existing components and tokens, typography, purple/blue/cyan palette, ambient backgrounds and light/dark modes; do not create separate role-specific UI systems.
+
+**Why:** The user explicitly required all three consoles to belong to one platform, including cards, controls, tables, overlays, badges, spacing, logo placement and responsive navigation.
+
+**How to apply:** Keep shared presentation consistent while preserving role-specific navigation and business logic. Do not redesign the approved public landing page, change authentication, permissions, routes or the completed ordering workflow, invent billing/settings features, or publish without an explicit request. Tenant management uses QXLayer; tenant public websites keep their own branding.

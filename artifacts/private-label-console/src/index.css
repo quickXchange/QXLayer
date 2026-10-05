@@ -9,6 +9,7 @@
 @import '../../private-label-website/src/styles/site-showcase.css';
 @import '../../private-label-website/src/styles/site-instrument.css';
 @import './styles/platform-catalog.css';
+@import './styles/console.css';
 @source "../../private-label-website/src";
 @plugin "@tailwindcss/typography";
 

@@ -1,0 +1,75 @@
+/* QXLayer console: scoped to html.qx-console (set only while the authenticated console is mounted). */
+html.qx-console body{font-family:var(--s-font);background:var(--s-bg);color:var(--s-fg)}
+html.qx-console .qx-root{overflow-x:clip}
+html.qx-console .font-display,html.qx-console .qx-main :is(h1,h2,h3){font-family:var(--s-font);letter-spacing:-.03em;font-weight:650;text-wrap:balance}
+html.qx-console .qx-main h1{letter-spacing:-.04em}
+html.qx-console .text-copper{color:var(--s-accent-ink)}
+html.qx-console .bg-copper{background:var(--s-accent)}
+html.qx-console .grain::before{display:none}
+html.qx-console .qx-main :focus-visible,html.qx-console [role=dialog] :focus-visible{outline:2px solid var(--s-accent-ink);outline-offset:2px}
+html.qx-console .rise{animation-duration:.45s}
+@media (prefers-reduced-motion:reduce){html.qx-console *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* frame */
+.qx-side{padding:1.25rem;background:color-mix(in srgb,var(--s-bg) 78%,transparent);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);border-right:1px solid var(--s-line);z-index:30;overflow-y:auto}
+.qx-brand{color:var(--s-fg)}
+.qx-navlink{display:flex;align-items:center;gap:.75rem;min-height:40px;padding:.5rem .75rem;border-radius:var(--s-r1);font-size:.9rem;font-weight:500;color:var(--s-muted);border:1px solid transparent;transition:background-color .2s,border-color .2s,color .2s}
+.qx-navlink:hover{color:var(--s-fg);background:color-mix(in srgb,var(--s-fg) 6%,transparent)}
+.qx-navlink[aria-current=page]{color:var(--s-fg);background:color-mix(in srgb,var(--s-accent) 13%,transparent);border-color:color-mix(in srgb,var(--s-accent) 32%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--s-fg) 8%,transparent)}
+.qx-navlink[aria-current=page] svg{color:var(--s-accent-ink)}
+.qx-navlink-m{min-height:48px;font-size:1rem}
+.qx-side-foot{font-size:.875rem;color:var(--s-fg)}
+.qx-side-foot .text-sidebar-primary{color:var(--s-accent-ink)}
+.qx-side-foot button{color:var(--s-muted)}
+.qx-side-foot button:hover{color:var(--s-fg)}
+.qx-drawer{background:var(--s-bg);border-color:var(--s-line);max-height:calc(100dvh - 68px);overflow-y:auto}
+.qx-frame .s-header{position:sticky;top:0}
+
+/* buttons: source treatments */
+.qx-btn{transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .3s,background-color .2s,border-color .2s}
+html.qx-console .qx-btn{border-radius:var(--s-r1)}
+html.qx-console .qx-btn-primary{background:linear-gradient(180deg,color-mix(in srgb,var(--s-primary) 88%,#fff),var(--s-primary) 60%,color-mix(in srgb,var(--s-primary) 82%,#000));color:var(--s-primary-fg);border-color:transparent;box-shadow:inset 0 1px 0 rgb(255 255 255/.28),0 0 0 1px color-mix(in srgb,var(--s-primary) 70%,#000),0 12px 26px -16px var(--s-glow)}
+html.qx-console .qx-btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:inset 0 1px 0 rgb(255 255 255/.34),0 0 0 1px color-mix(in srgb,var(--s-primary) 70%,#000),0 16px 32px -14px var(--s-glow)}
+html.qx-console .qx-btn-primary:active:not(:disabled){transform:none}
+html.qx-console .qx-btn-ghost{border:1px solid var(--s-line);background:color-mix(in srgb,var(--s-fg) 4%,transparent);color:var(--s-fg);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--s-fg) 8%,transparent)}
+html.qx-console .qx-btn-ghost:hover:not(:disabled){border-color:color-mix(in srgb,var(--s-accent) 45%,transparent);background:color-mix(in srgb,var(--s-fg) 7%,transparent)}
+html.qx-console .qx-btn-plain{color:var(--s-fg)}
+html.qx-console .qx-btn-plain:hover:not(:disabled){background:color-mix(in srgb,var(--s-fg) 7%,transparent)}
+html.qx-console .qx-btn-danger{background:hsl(var(--destructive));color:hsl(var(--destructive-foreground));border-color:transparent}
+
+/* surfaces */
+html.qx-console .bg-card{background:color-mix(in srgb,var(--s-card) 70%,transparent);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border-color:var(--s-line);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--s-fg) 8%,transparent),0 24px 50px -40px var(--s-glow)}
+html.qx-console .qx-main :is(.bg-card,.bg-border):is(.rounded-md,.rounded-lg,.rounded-xl){border-radius:var(--s-r2)}
+html.qx-console .qx-badge{border-radius:999px}
+html.qx-console .qx-badge.bg-primary{background:color-mix(in srgb,var(--s-accent) 14%,transparent);border-color:color-mix(in srgb,var(--s-accent) 30%,transparent);color:var(--s-accent-ink)}
+html.qx-console .bg-popover,html.qx-console [role=dialog],html.qx-console [role=alertdialog]{border-color:var(--s-line)}
+html.qx-console [role=dialog],html.qx-console [role=alertdialog],html.qx-console [role=menu],html.qx-console [role=listbox]{box-shadow:0 30px 70px -30px var(--s-glow),0 0 0 1px var(--s-line)}
+html.qx-console .qx-main :is(table){font-size:.85rem}
+html.qx-console .qx-main :is(th){font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--s-muted)}
+html.qx-console .qx-main :is(tbody tr){transition:background-color .2s}
+html.qx-console .qx-main :is(tbody tr):hover{background:color-mix(in srgb,var(--s-fg) 4%,transparent)}
+html.qx-console :is(input:not([type=checkbox],[type=radio],[type=range],[type=file]),textarea,select){background-color:color-mix(in srgb,var(--s-fg) 4%,transparent);border-color:hsl(var(--input));color:var(--s-fg);transition:border-color .2s,box-shadow .2s}
+html.qx-console :is(input,textarea,select):focus-visible{border-color:var(--s-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--s-accent) 28%,transparent);outline:none}
+html.qx-console ::placeholder{color:var(--s-muted);opacity:.8}
+html.qx-console [data-radix-popper-content-wrapper],html.qx-console [role=dialog],html.qx-console [data-radix-toast-viewport]{font-family:var(--s-font)}
+html.qx-console .bg-black\/80{background:color-mix(in srgb,#04060c 72%,transparent);backdrop-filter:blur(3px)}
+
+/* status colours adapt to dark */
+html.qx-console.dark .bg-emerald-100{background:color-mix(in srgb,#34d399 18%,transparent)}
+html.qx-console.dark .text-emerald-900,html.qx-console.dark .text-emerald-600{color:#6ee7b7}
+html.qx-console.dark .bg-amber-100{background:color-mix(in srgb,#fbbf24 18%,transparent)}
+html.qx-console.dark .text-amber-900{color:#fcd34d}
+html.qx-console.dark .bg-sky-100{background:color-mix(in srgb,#38bdf8 18%,transparent)}
+html.qx-console.dark .text-sky-900{color:#7dd3fc}
+html.qx-console.dark .text-red-500{color:#fca5a5}
+
+/* Clerk UserProfile inside console */
+html.qx-console .qx-main .cl-rootBox{width:100%;max-width:100%;font-family:var(--s-font)}
+html.qx-console .qx-main :is(.cl-cardBox,.cl-card,.cl-scrollBox,.cl-pageScrollBox,.cl-navbar){background:transparent;box-shadow:none;border-color:var(--s-line);color:var(--s-fg)}
+html.qx-console .qx-main .cl-cardBox{border:1px solid var(--s-line);border-radius:var(--s-r2);width:100%;background:color-mix(in srgb,var(--s-card) 70%,transparent)}
+html.qx-console .qx-main :is(.cl-headerTitle,.cl-profileSectionTitleText,.cl-formFieldLabel,.cl-navbarButton,.cl-userPreviewMainIdentifier,.cl-userPreviewSecondaryIdentifier,.cl-profileSectionContent,.cl-menuButton,.cl-badge,.cl-accordionTriggerButton,.cl-formFieldInput,.cl-activeDeviceListItem){color:var(--s-fg)}
+html.qx-console .qx-main :is(.cl-headerSubtitle,.cl-profileSectionSubtitle,.cl-formFieldHintText,.cl-footerActionText){color:var(--s-muted)}
+html.qx-console .qx-main :is(.cl-profileSectionPrimaryButton,.cl-footerActionLink,.cl-formFieldAction){color:var(--s-accent-ink)}
+html.qx-console .qx-main .cl-formButtonPrimary{background:linear-gradient(180deg,color-mix(in srgb,var(--s-primary) 88%,#fff),var(--s-primary));color:var(--s-primary-fg)}
+html.qx-console .qx-main .cl-formFieldInput{background:color-mix(in srgb,var(--s-fg) 4%,transparent);border-color:hsl(var(--input))}
+html.qx-console .qx-main :is(.cl-profileSection,.cl-navbar){border-color:var(--s-line)}
