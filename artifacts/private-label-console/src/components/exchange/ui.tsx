@@ -20,11 +20,11 @@ export function Field({ label, children, className = '' }: { label: string; chil
   return <label className={`block space-y-1 ${className}`}><span className="block font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{label}</span>{children}</label>;
 }
 
-export function Pick({ value, onChange, options, disabled, testid }: { value: string; onChange: (v: string) => void; options: [string, string][]; disabled?: boolean; testid?: string }) {
+export function Pick({ value, onChange, options, disabled, testid, bounded = false }: { value: string; onChange: (v: string) => void; options: [string, string][]; disabled?: boolean; testid?: string; bounded?: boolean }) {
   return (
     <Select value={value} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger data-testid={testid}><SelectValue /></SelectTrigger>
-      <SelectContent>{options.map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
+      <SelectContent style={bounded ? { maxHeight: 'min(20rem, var(--radix-select-content-available-height, 70vh))', overflowY: 'auto' } : undefined}>{options.map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent>
     </Select>
   );
 }

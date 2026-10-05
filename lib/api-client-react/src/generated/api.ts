@@ -48,6 +48,7 @@ import type {
   ExchangeQuoteInput,
   ExchangeSettings,
   ExchangeStatusInput,
+  ExchangeVisualCatalog,
   HealthStatus,
   LandingProduct,
   LandingProductInput,
@@ -114,6 +115,77 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetExchangeVisualCatalogUrl = () => {
+
+
+
+
+  return `/api/exchange/visual-catalog`
+}
+
+export const getExchangeVisualCatalog = async ( options?: Parameters<typeof customFetch>[1]): Promise<ExchangeVisualCatalog> => {
+
+  return customFetch<ExchangeVisualCatalog>(getGetExchangeVisualCatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExchangeVisualCatalogQueryKey = () => {
+    return [
+    `/api/exchange/visual-catalog`
+    ] as const;
+    }
+
+
+export const getGetExchangeVisualCatalogQueryOptions = <TData = Awaited<ReturnType<typeof getExchangeVisualCatalog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeVisualCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExchangeVisualCatalogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExchangeVisualCatalog>>> = ({ signal }) => getExchangeVisualCatalog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExchangeVisualCatalog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExchangeVisualCatalogQueryResult = NonNullable<Awaited<ReturnType<typeof getExchangeVisualCatalog>>>
+export type GetExchangeVisualCatalogQueryError = ErrorType<unknown>
+
+
+
+export function useGetExchangeVisualCatalog<TData = Awaited<ReturnType<typeof getExchangeVisualCatalog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeVisualCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExchangeVisualCatalogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetDemoSessionUrl = () => {
 

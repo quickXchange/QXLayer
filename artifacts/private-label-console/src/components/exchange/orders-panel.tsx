@@ -18,6 +18,7 @@ import { stamp } from '@/lib/format';
 import { Pick, SimNote } from './ui';
 import { NEXT, OrderStatus } from './order-status';
 import { BulkBar, BulkBtn, DataTable, Logo, useConfirm, useSelection } from './bulk';
+import { VisualImg, useVisualCatalog } from './visual-catalog';
 import { isCalendarDate } from './ui-validate';
 
 const ALL = 'all';
@@ -130,7 +131,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
 }
 
 function Row({ l, v }: { l: string; v: React.ReactNode }) {
-  return <div className="bg-card p-3"><p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p><div className="mt-1 break-all text-sm">{v}</div></div>;
+  return <div className="min-w-0 bg-card p-3"><p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p><div className="mt-1 break-all text-sm">{v}</div></div>;
 }
 
 export function OrderDrawer({ tenantId, orderId, canEdit, onClose }: { tenantId: string; orderId: string | null; canEdit: boolean; onClose: () => void }) {
@@ -143,48 +144,99 @@ export function OrderDrawer({ tenantId, orderId, canEdit, onClose }: { tenantId:
   );
 }
 
+function Panel({ title, children, testid }: { title: string; children: React.ReactNode; testid?: string }) {
+  return <section className="space-y-2" data-testid={testid}><h3 className="font-display text-xl">{title}</h3>{children}</section>;
+}
+
+function Copy({ value, label }: { value: string; label: string }) {
+  const { toast } = useToast();
+  return <Button type="button" size="sm" variant="ghost" className="h-6 px-2 text-[10px]" data-testid={`button-copy-${label.toLowerCase().replace(/\W+/g, '-')}`} onClick={async () => {
+    try { if (!navigator.clipboard) throw new Error('Clipboard unavailable'); await navigator.clipboard.writeText(value); toast({ title: `${label} copied` }); }
+    catch (e) { toast({ title: 'Copy failed', description: (e as Error).message || 'Select and copy manually.', variant: 'destructive' }); }
+  }}>Copy</Button>;
+}
+
+const FIAT_NAMES: Record<string, string> = { USD: 'US dollar', EUR: 'Euro', GBP: 'Pound sterling' };
+
 function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId: string; canEdit: boolean }) {
   const { toast } = useToast(); const refresh = useRefresh(tenantId); const qc = useQueryClient();
   const key = getGetExchangeOrderQueryKey(tenantId, orderId);
   const q = useGetExchangeOrder(tenantId, orderId, { query: { queryKey: key } });
   const cfg = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
+  const vis = useVisualCatalog();
   const m = useUpdateExchangeOrderStatus(); const [ask, confirmNode] = useConfirm(!canEdit);
   const [note, setNote] = useState('');
   const o: ExchangeOrder | undefined = q.data;
   const next = o ? NEXT[o.status] ?? [] : [];
+  const va = vis.data?.assets ?? [];
+  // Only public identity (logo/name) is read from configuration; no internal fields are rendered.
   const ep = (id: string, sym: string) => {
-    if (id.startsWith('fiat:')) return { sym, net: 'Fiat', logo: null as string | null };
+    if (id.startsWith('fiat:')) {
+      const code = id.slice(5);
+      const art = va.find((a) => a.kind === 'currency' && a.code === code);
+      const flag = va.find((a) => a.kind === 'flag' && a.currencies.includes(code) && a.logoUrl === art?.logoUrl);
+      return { sym, fiat: true, code, name: FIAT_NAMES[code] ?? code, logo: art?.logoUrl ?? null, flag: flag?.logoUrl ?? null, flagName: flag?.name ?? null, net: 'Fiat', netLogo: null as string | null };
+    }
     const c = cfg.data?.catalog.find((x) => x.assetNetworkId === id);
-    return { sym, net: c?.networkName ?? 'Unknown network', logo: cfg.data?.configuration.assets.find((a) => a.assetId === c?.assetId)?.logoUrl ?? null };
+    const crypto = va.find((a) => a.kind === 'crypto' && (c ? a.recordId === c.assetId : a.code.toUpperCase() === sym.toUpperCase()));
+    const net = va.find((a) => a.kind === 'network' && a.recordId === c?.networkId);
+    const logo = cfg.data?.configuration.assets.find((a) => a.assetId === c?.assetId)?.logoUrl ?? crypto?.logoUrl ?? null;
+    return { sym, fiat: false, code: sym, name: c?.name ?? sym, logo, flag: null as string | null, flagName: null as string | null, net: c?.networkName ?? net?.name ?? 'Unknown network', netLogo: net?.logoUrl ?? null };
   };
+  const pm = o?.paymentMethod ? (cfg.data?.configuration.paymentMethods.find((p) => p.label === o.paymentMethod)?.logoUrl ?? va.find((a) => a.kind === 'payment-method' && a.name === o.paymentMethod)?.logoUrl ?? null) : null;
   const go = (status: string) => { if (m.isPending || !o || !canEdit || q.isFetching) return; const seen = o.status; m.mutate({ tenantId, orderId, data: { status: status as 'processing', expectedStatus: seen as 'pending', note: note.trim() } }, {
     onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); setNote(''); toast({ title: `Order marked ${status}` }); },
     onError: (e) => toast({ title: 'Status change failed', description: (e as Error).message, variant: 'destructive' }),
   }); };
-  const side = (l: string, id: string, sym: string, amt: string) => { const e = ep(id, sym); return <Row l={l} v={<span className="flex items-center gap-2"><Logo url={e.logo} label={e.sym} /><span><span className="font-mono">{amt} {e.sym}</span><span className="block text-xs text-muted-foreground">{e.net}</span></span></span>} />; };
+  const side = (l: string, id: string, sym: string, amt: string) => {
+    const e = ep(id, sym);
+    return (
+      <div className="min-w-0 flex-1 bg-card p-3" data-testid={`order-side-${l.toLowerCase()}`}>
+        <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p>
+        <div className="mt-2 flex items-center gap-2"><VisualImg url={e.logo} label={e.code} size={36} />
+          <div className="min-w-0"><p className="break-all font-mono text-base">{amt} {e.sym}</p><p className="truncate text-xs text-muted-foreground">{e.name}</p></div></div>
+        <div className="mt-2 flex items-center gap-2 text-xs">
+          {e.fiat ? (<>{e.flag ? <VisualImg url={e.flag} label={e.code} size={18} /> : null}<span>Fiat currency{e.flagName ? `, ${e.flagName} (currency mapping, not customer country)` : ''}</span></>) : (<><VisualImg url={e.netLogo} label={e.net} size={18} /><span>{e.net}</span></>)}
+        </div>
+      </div>);
+  };
   return (
     <>
       <SheetHeader><SheetTitle className="font-display text-2xl">{o ? `Order ${o.id.slice(0, 8)}` : 'Order'}</SheetTitle><SheetDescription>Sandbox order details. No funds move.</SheetDescription></SheetHeader>
       <div className="mt-4 space-y-5">
         {q.isLoading ? <ListSkeleton rows={3} /> : q.isError || !o ? <ErrorState what="this order" onRetry={() => q.refetch()} /> : (
           <>
-            <div className="flex items-center gap-3"><OrderStatus status={o.status} /><span className="font-mono text-[10px] uppercase text-copper">sandbox only</span></div>
-            <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2" data-testid="order-fields">
-              <Row l="Order ID" v={<span className="font-mono text-xs">{o.id}</span>} />
-              <Row l="Type" v={<span className="capitalize">{o.action}</span>} />
-              <Row l="Customer" v={o.customerName || 'Anonymous'} />
-              <Row l="Email" v={o.customerEmail || 'Not collected'} />
-              {side('Send', o.source, o.sourceSymbol, o.inputAmount)}
-              {side('Receive', o.destination, o.destinationSymbol, o.outputAmount)}
-              <Row l="Payment method" v={o.paymentMethod ?? 'none'} />
-              <Row l="Rate" v={<span className="font-mono">{o.rate}</span>} />
-              <Row l="Source fee" v={<span className="font-mono">{o.fee} {o.sourceSymbol}</span>} />
-              <Row l="Destination fee" v={<span className="font-mono">{o.destinationFee ?? '0'} {o.destinationSymbol}</span>} />
-              <Row l="Spread" v={`${o.spreadBps} bps`} />
-              <Row l="Created" v={stamp(o.createdAt)} />
-              <Row l="Updated" v={o.updatedAt ? stamp(o.updatedAt) : 'Not updated'} />
-            </div>
-            <section><h3 className="font-display mb-2 text-xl">Timeline</h3>
+            <div className="flex flex-wrap items-center gap-3"><OrderStatus status={o.status} /><span className="capitalize text-sm">{o.action}</span><span className="font-mono text-[10px] uppercase text-copper">sandbox only</span></div>
+            {vis.isError && <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="text-visual-unavailable">Artwork unavailable; showing text labels. <button type="button" className="underline" onClick={() => vis.refetch()}>Retry</button></p>}
+            <Panel title="Send → Receive" testid="order-exchange">
+              <div className="flex flex-col gap-px overflow-hidden rounded-md border bg-border sm:flex-row">{side('Send', o.source, o.sourceSymbol, o.inputAmount)}{side('Receive', o.destination, o.destinationSymbol, o.outputAmount)}</div>
+            </Panel>
+            <Panel title="Pricing">
+              <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2" data-testid="order-fields">
+                <Row l="Rate" v={<span className="font-mono"><span className="block">1 {o.sourceSymbol} =</span><span className="block">{o.rate} {o.destinationSymbol}</span></span>} />
+                <Row l="Spread" v={`${o.spreadBps} bps`} />
+                <Row l="Source fee" v={<span className="font-mono">{o.fee} {o.sourceSymbol}</span>} />
+                <Row l="Destination fee" v={<span className="font-mono">{o.destinationFee ?? '0'} {o.destinationSymbol}</span>} />
+              </div>
+            </Panel>
+            <Panel title="Payment">
+              <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
+                <Row l="Payment method" v={o.paymentMethod ? <span className="flex items-center gap-2"><VisualImg url={pm} label={o.paymentMethod} size={24} />{o.paymentMethod}</span> : 'None'} />
+                <Row l="Payment details" v={<span className="text-muted-foreground" data-testid="text-payment-not-collected">Not collected in this sandbox.</span>} />
+              </div>
+            </Panel>
+            <Panel title="Customer and order">
+              <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
+                <Row l="Order ID" v={<span className="flex flex-wrap items-center gap-1"><span className="font-mono text-xs">{o.id}</span><Copy value={o.id} label="Order ID" /></span>} />
+                <Row l="Type" v={<span className="capitalize">{o.action}</span>} />
+                <Row l="Customer" v={o.customerName || 'Anonymous'} />
+                <Row l="Email" v={o.customerEmail ? <span className="flex flex-wrap items-center gap-1">{o.customerEmail}<Copy value={o.customerEmail} label="Email" /></span> : 'Not collected'} />
+                <Row l="Created" v={stamp(o.createdAt)} />
+                <Row l="Updated" v={o.updatedAt ? stamp(o.updatedAt) : 'Not updated'} />
+              </div>
+              <div className="flex flex-wrap gap-1"><Copy value={`${o.inputAmount} ${o.sourceSymbol}`} label="Send amount" /><Copy value={`${o.outputAmount} ${o.destinationSymbol}`} label="Receive amount" /><Copy value={o.rate} label="Rate" /></div>
+            </Panel>
+            <section><h3 className="font-display mb-2 text-xl">Timeline and notes</h3>
               <ol className="space-y-2 border-l pl-4">{o.history.map((h, i) => <li key={i} data-testid={`row-history-${i}`}><OrderStatus status={h.status} /><span className="ml-2 font-mono text-xs text-muted-foreground">{stamp(h.at)}</span>{h.note && <p className="mt-1 text-sm">{h.note}</p>}</li>)}</ol></section>
             {next.length === 0 ? <p className="rounded-md border p-3 text-sm text-muted-foreground" data-testid="text-terminal">This order is {o.status}. Terminal orders cannot be reopened.</p> : !canEdit ? <p className="text-sm text-muted-foreground">Read only: updating orders needs configuration access, an active subscription and the exchange feature.</p> : (
               <section className="space-y-2 rounded-md border bg-card p-4"><h3 className="font-display text-xl">Update status</h3>

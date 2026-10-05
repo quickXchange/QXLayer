@@ -9,6 +9,7 @@ import { Section, AssetsSection } from '@/components/app/sections';
 import { useToast } from '@/hooks/use-toast';
 import { Dec, DraftFooter, Field, IntInput, Pick, SimNote, isDec, isInt } from './ui';
 import { BulkBar, BulkBtn, DataTable, FilterBar, NoMatch, EditDrawer, Logo, StatusPill, providerOptions, useConfirm, useSelection, useStaged } from './bulk';
+import { LogoChooser, VisualCatalogBrowser } from './visual-catalog';
 import type { ExchangeDraft } from './use-exchange-draft';
 
 export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Tenant; d: ExchangeDraft; locked: boolean; catalogReadOnly: boolean }) {
@@ -27,6 +28,7 @@ export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Te
   return (
     <div className="space-y-6">
       <AssetsSection tenant={tenant} readOnly={catalogReadOnly} onSaved={() => qc.invalidateQueries({ queryKey: getGetExchangeConfigurationQueryKey(tenant.id) })} />
+      <VisualCatalogBrowser />
       <Section n="X1" title="Asset details" note="Display and sandbox reference data for each tenant-selected asset. Only enabled assets can quote." footer={<DraftFooter d={d} locked={locked} />}>
         <SimNote />
         {s.assets.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-assets">No assets are selected for this tenant. Select sandbox assets and networks above.</p> : (
@@ -59,6 +61,7 @@ export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Te
           <div className="grid grid-cols-2 gap-3"><Field label="Display order"><IntInput value={f.displayOrder} onChange={(v) => set({ displayOrder: v })} /></Field><Field label="Precision"><IntInput value={f.decimals} onChange={(v) => set({ decimals: v })} /></Field></div>
           <Field label={`Plan rate (1 ${f.symbol || 'unit'} in plan currency)`}><Dec positive testid="input-asset-rate" value={f.sandboxPlanRate} onChange={(v) => set({ sandboxPlanRate: v })} placeholder="manual reference rate" /></Field>
           <Field label="Logo URL (HTTPS)"><Input placeholder="https://" value={f.logoUrl ?? ''} onChange={(e) => set({ logoUrl: e.target.value.trim() === '' ? null : e.target.value.trim() })} /></Field>
+          <Field label="Choose supplied logo"><LogoChooser kind="crypto" hint={f.symbol} current={f.logoUrl} disabled={locked} onPick={(u) => set({ logoUrl: u })} /></Field>
         </>)}
       </EditDrawer>
       <EditDrawer item={bulk ? { decimals: '', displayOrder: '', rate: '' } : null} itemKey="bulk-assets" title={`Bulk edit ${sel.count} assets`} note="Blank fields stay unchanged. Reviewed, then staged; Save persists." locked={locked} onClose={() => setBulk(false)} applyLabel="Review"

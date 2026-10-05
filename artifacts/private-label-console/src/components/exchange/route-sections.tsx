@@ -7,6 +7,7 @@ import { Section } from '@/components/app/sections';
 import { useToast } from '@/hooks/use-toast';
 import { Dec, DraftFooter, Field, IntInput, Pick, SimNote, isDec, isInt } from './ui';
 import { BulkBar, BulkBtn, DataTable, FilterBar, NoMatch, EditDrawer, Logo, StatusPill, providerOptions, useConfirm, useSelection, useStaged } from './bulk';
+import { LogoChooser, useVisualCatalog } from './visual-catalog';
 import { fiatId, type ExchangeDraft } from './use-exchange-draft';
 import type { ExchangeRoute, ExchangePaymentMethod } from '@workspace/api-client-react';
 
@@ -183,6 +184,7 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
             { h: 'Edit', cell: (p) => <Button size="sm" variant="outline" data-testid={`button-edit-method-${p.id}`} onClick={() => setEdit(p)}>Edit</Button> },
           ]} />}
         </>)}
+      {!locked && <CatalogAdd d={d} onAdded={setEdit} />}
       {!locked && <Button type="button" variant="outline" data-testid="button-add-method" onClick={() => { const m: ExchangePaymentMethod = { id: crypto.randomUUID(), label: '', enabled: false, currency: s.fiatCurrency, buy: true, sell: false, logoUrl: null, methodType: 'manual', minimum: '0', maximum: null, feeBps: 0, fixedFee: '0' }; d.patch({ paymentMethods: [...s.paymentMethods, m] }); setEdit(m); }}>Add payment method</Button>}
       <EditDrawer item={edit} itemKey={edit?.id ?? ''} title={edit?.label || 'New payment method'} note={`Amounts are in ${s.fiatCurrency}. Stages into the draft; Save to persist.`} locked={locked} onClose={() => setEdit(null)}
         onApply={(v) => { setMany([v.id], v); staged(1, 'payment method'); setEdit(null); }}>
@@ -192,6 +194,7 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
           <div className="grid grid-cols-2 gap-3"><Field label="Currency"><Pick disabled value={f.currency} onChange={() => undefined} options={[[s.fiatCurrency, s.fiatCurrency]]} /></Field><Field label="Type"><Pick value={f.methodType ?? 'manual'} onChange={(v) => set({ methodType: v as ExchangePaymentMethod['methodType'] })} options={TYPES} /></Field></div>
           <div className="flex gap-6 text-sm"><label className="flex items-center gap-2"><Checkbox checked={f.buy} onCheckedChange={(v) => set({ buy: v === true })} />Buy</label><label className="flex items-center gap-2"><Checkbox checked={f.sell} onCheckedChange={(v) => set({ sell: v === true })} />Sell</label></div>
           <Field label="Logo URL (HTTPS)"><Input placeholder="https://" value={f.logoUrl ?? ''} onChange={(e) => set({ logoUrl: e.target.value.trim() === '' ? null : e.target.value.trim() })} /></Field>
+          <Field label="Choose supplied logo"><LogoChooser kind="payment-method" hint={f.label} current={f.logoUrl} disabled={locked} onPick={(u) => set({ logoUrl: u })} /></Field>
           <div className="grid grid-cols-2 gap-3"><Field label="Minimum"><Dec value={f.minimum ?? '0'} onChange={(v) => set({ minimum: v })} /></Field><Field label="Maximum (blank = unlimited)"><Dec value={f.maximum ?? ''} onChange={(v) => set({ maximum: v === '' ? null : v })} placeholder="unlimited" /></Field></div>
           <div className="grid grid-cols-2 gap-3"><Field label="Fee (bps)"><IntInput value={f.feeBps ?? 0} onChange={(v) => set({ feeBps: v })} /></Field><Field label="Fixed fee"><Dec value={f.fixedFee ?? '0'} onChange={(v) => set({ fixedFee: v })} /></Field></div>
           <Field label="Reserve (sandbox metadata, blank = not set)"><Dec testid="input-method-reserve" value={f.reserve ?? ''} onChange={(v) => set({ reserve: v === '' ? undefined : v })} placeholder="not set" /></Field>
@@ -212,5 +215,22 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
       </EditDrawer>
       {confirmNode}
     </Section>
+  );
+}
+
+function CatalogAdd({ d, onAdded }: { d: ExchangeDraft; onAdded: (m: ExchangePaymentMethod) => void }) {
+  const q = useVisualCatalog(); const { toast } = useToast(); const s = d.draft!;
+  const items = (q.data?.assets ?? []).filter((a) => a.kind === 'payment-method');
+  if (items.length === 0) return null;
+  return (
+    <div className="mb-2 w-full sm:w-72" data-testid="add-method-from-catalog">
+      <Pick testid="select-add-from-catalog" bounded value="choose" onChange={(code) => {
+        const a = items.find((x) => x.code === code); if (!a) return;
+        const normalized = (v: string) => v.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (s.paymentMethods.some((p) => normalized(p.id) === normalized(a.code) || normalized(p.label) === normalized(a.name) || normalized(p.label) === normalized(a.code))) { toast({ title: `${a.name} already exists`, description: 'Edit the existing method instead.', variant: 'destructive' }); return; }
+        const m: ExchangePaymentMethod = { id: crypto.randomUUID(), label: a.name, enabled: false, currency: s.fiatCurrency, buy: true, sell: false, logoUrl: a.logoUrl, methodType: 'manual', minimum: '0', maximum: null, feeBps: 0, fixedFee: '0' };
+        d.patch({ paymentMethods: [...s.paymentMethods, m] }); onAdded(m);
+      }} options={[['choose', 'Add from catalog (starts disabled)'], ...items.map((a) => [a.code, a.name] as [string, string])]} />
+    </div>
   );
 }

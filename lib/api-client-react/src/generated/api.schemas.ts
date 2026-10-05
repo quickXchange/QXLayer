@@ -5,6 +5,42 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export type ExchangeVisualAssetKind = typeof ExchangeVisualAssetKind[keyof typeof ExchangeVisualAssetKind];
+
+
+export const ExchangeVisualAssetKind = {
+  crypto: 'crypto',
+  network: 'network',
+  'payment-method': 'payment-method',
+  flag: 'flag',
+  currency: 'currency',
+} as const;
+
+export interface ExchangeVisualAsset {
+  kind: ExchangeVisualAssetKind;
+  code: string;
+  name: string;
+  logoUrl: string;
+  alternatives: string[];
+  /** @nullable */
+  recordId: string | null;
+  countries: string[];
+  currencies: string[];
+}
+
+export interface ExchangeVisualUnavailable {
+  type: string;
+  code: string;
+  name: string;
+  reason: string;
+}
+
+export interface ExchangeVisualCatalog {
+  assets: ExchangeVisualAsset[];
+  unavailable: ExchangeVisualUnavailable[];
+  sandboxOnly: boolean;
+}
+
 export type WhiteLabelStatus = typeof WhiteLabelStatus[keyof typeof WhiteLabelStatus];
 
 

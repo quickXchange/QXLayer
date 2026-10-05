@@ -1,0 +1,6836 @@
+{
+  "assets": [
+    {
+      "kind": "crypto",
+      "code": "1INCH",
+      "name": "1inch",
+      "logoUrl": "/api/exchange/visual-assets/fc4cde763182b4b59a64bd8d57184f4946e338cd16e9529be325a14c9637e2e7.png",
+      "alternatives": [],
+      "recordId": "imported-1inch",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "AAVE",
+      "name": "Aave",
+      "logoUrl": "/api/exchange/visual-assets/5df3a36be8fb4acfad9202d7deb17ccdef62268185985076482ed5251df059b5.png",
+      "alternatives": [],
+      "recordId": "imported-aave",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ACE",
+      "name": "Fusionist",
+      "logoUrl": "/api/exchange/visual-assets/c996b3f2bd31d1d15090ea133417eefef5254bf55690c48cc490c2fd3dc582f0.png",
+      "alternatives": [],
+      "recordId": "imported-ace",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ACT",
+      "name": "Act I : The AI Prophecy",
+      "logoUrl": "/api/exchange/visual-assets/8a5ecff50412f1513b83e1a24e4730de60aed45b4a8a687f6cb283d6d261edac.png",
+      "alternatives": [],
+      "recordId": "imported-act",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ADA",
+      "name": "Cardano",
+      "logoUrl": "/api/exchange/visual-assets/c1257317f1853dd6848777550a9a17f65f74435382b22d9385377737a803c069.png",
+      "alternatives": [],
+      "recordId": "imported-ada",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ADX",
+      "name": "Ambire AdEx",
+      "logoUrl": "/api/exchange/visual-assets/c38a3900d747b0014f0b12f8d92118f9ae8d348b998664299c218a913b2557c4.png",
+      "alternatives": [],
+      "recordId": "imported-adx",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "AGLD",
+      "name": "Adventure Gold",
+      "logoUrl": "/api/exchange/visual-assets/849c05a9d1b363c1c063e2bda56b9a47bd1c7b71ffd6a202f84cb6033a461129.png",
+      "alternatives": [],
+      "recordId": "imported-agld",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "AGRS",
+      "name": "Agoras",
+      "logoUrl": "/api/exchange/visual-assets/26b63f101746357a5aa90d6adae58480412c1759579a2cc45a844c388866496d.png",
+      "alternatives": [],
+      "recordId": "imported-agrs",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ALGO",
+      "name": "Algorand",
+      "logoUrl": "/api/exchange/visual-assets/d339ac9912db83c24f7be2aab9c373c0562963100e8843c2244a1a7c70e2dfdb.png",
+      "alternatives": [],
+      "recordId": "imported-algo",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ALICE",
+      "name": "My Neighbor Alice",
+      "logoUrl": "/api/exchange/visual-assets/4ab6b10d2bbb5863a641363680da297b2ece66f884c9c5f53b4978307e3764aa.png",
+      "alternatives": [],
+      "recordId": "imported-alice",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ARB",
+      "name": "Arbitrum",
+      "logoUrl": "/api/exchange/visual-assets/7c9e8425179fd39933aeea9326684a7356721acd4bce9e99919e232f14135f23.png",
+      "alternatives": [],
+      "recordId": "imported-arb",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ATOM",
+      "name": "Cosmos",
+      "logoUrl": "/api/exchange/visual-assets/5bc992b9f953e6f213d36f414eeb4c7b3987a5b54ebecac9966c3c9d7c472ab5.png",
+      "alternatives": [],
+      "recordId": "imported-atom",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "AVAX",
+      "name": "Avalanche",
+      "logoUrl": "/api/exchange/visual-assets/0195b3b11e71fc3c80793f28f5b5170fde1108d194a561d6bcddee2e6924775a.png",
+      "alternatives": [],
+      "recordId": "imported-avax",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "BCH",
+      "name": "Bitcoin Cash",
+      "logoUrl": "/api/exchange/visual-assets/03a53cc37436a99ba854e42df693fa52d92d88cbbce362fa217efd0e85be5e1f.png",
+      "alternatives": [],
+      "recordId": "imported-bch",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "BNB",
+      "name": "BNB",
+      "logoUrl": "/api/exchange/visual-assets/7aef69406a4a5c74bd3569222a4fb3e534c8c6c1446755fdec7d7687bbf38a04.png",
+      "alternatives": [],
+      "recordId": "bnb",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "BTC",
+      "name": "Bitcoin",
+      "logoUrl": "/api/exchange/visual-assets/8022fd53c251f18cb39cefede445f1c78a3b265989232f0bb46b9c4622e55a9e.png",
+      "alternatives": [],
+      "recordId": "btc",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "DAI",
+      "name": "Dai",
+      "logoUrl": "/api/exchange/visual-assets/4d93468f9a57ce913cc25aac45c14955671e01d70c4b2329d078892b5e5cd84f.png",
+      "alternatives": [],
+      "recordId": "imported-dai",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "DOGE",
+      "name": "Dogecoin",
+      "logoUrl": "/api/exchange/visual-assets/4a789f36f6ca12a6d1901ab8441a9cab7a4a9a5fd4ba87c887c4d45c729fffce.png",
+      "alternatives": [],
+      "recordId": "imported-doge",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "DOT",
+      "name": "Polkadot",
+      "logoUrl": "/api/exchange/visual-assets/6051b0de048fea17d91be204b3c2025e16265c3a5e65759bf254186e77d41e6c.png",
+      "alternatives": [],
+      "recordId": "imported-dot",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "ETH",
+      "name": "Ethereum",
+      "logoUrl": "/api/exchange/visual-assets/99bf2102cc13a51bb226f931b8d0fa4c5b3ca9dc4179167e89d7ee3f677c3fdb.png",
+      "alternatives": [],
+      "recordId": "eth",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "LINK",
+      "name": "Chainlink",
+      "logoUrl": "/api/exchange/visual-assets/6180dd8f67f797ea2a3626cc1629bb9382f086b405ddf05084339db2b4aee353.png",
+      "alternatives": [],
+      "recordId": "imported-link",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "LTC",
+      "name": "Litecoin",
+      "logoUrl": "/api/exchange/visual-assets/7160750bcbc115ac8a3229bc1120fb59e96a737d607a57b42fa8e2b092a14159.png",
+      "alternatives": [],
+      "recordId": "imported-ltc",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "MATIC",
+      "name": "Polygon",
+      "logoUrl": "/api/exchange/visual-assets/488e64ba671bc0fed4613e2806137850a88405565f18acb97a3f6b2772a92f3e.png",
+      "alternatives": [],
+      "recordId": "imported-matic",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "POL",
+      "name": "Polygon",
+      "logoUrl": "/api/exchange/visual-assets/479dd7d35d0624c617a8ffdfcdb0f953186da58918acfabde7501996dbccf950.png",
+      "alternatives": [],
+      "recordId": "imported-pol",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "SHIB",
+      "name": "Shiba Inu",
+      "logoUrl": "/api/exchange/visual-assets/a8f6ffea983f46e8f2b83abe8561938c10de36484ca79ca5432683f4c2634ea6.png",
+      "alternatives": [],
+      "recordId": "imported-shib",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "SOL",
+      "name": "Solana",
+      "logoUrl": "/api/exchange/visual-assets/b9296ce1118a6d150e57049190aeb4c024199e0787e0c6198c244230b8d704f5.png",
+      "alternatives": [],
+      "recordId": "sol",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "TON",
+      "name": "Toncoin",
+      "logoUrl": "/api/exchange/visual-assets/62fa11637a09a5ca3bba816dc129f6642fb5938052d32ec98a2f2f350349b89d.png",
+      "alternatives": [],
+      "recordId": "imported-ton",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "TRX",
+      "name": "TRON",
+      "logoUrl": "/api/exchange/visual-assets/91329e8a180b0fc75f4b8b4cd252a64e4f13f33edf4aa6664fbde442cedff001.png",
+      "alternatives": [],
+      "recordId": "imported-trx",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "USDC",
+      "name": "USD Coin",
+      "logoUrl": "/api/exchange/visual-assets/7f9969d11eef1e08ded67abd495a65b4394bf8363515eaf5bbad4c089b98928b.png",
+      "alternatives": [],
+      "recordId": "imported-usdc",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "USDT",
+      "name": "Tether",
+      "logoUrl": "/api/exchange/visual-assets/9adc9724481b9ee1393ee384f3cc3e39fdbf21936c38fa581ea1536371d0ceae.png",
+      "alternatives": [],
+      "recordId": "usdt",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "XLM",
+      "name": "Stellar",
+      "logoUrl": "/api/exchange/visual-assets/acfff1433e08244ccc69a0996f423da6e82186b96b4d8d3795813c26783cc329.png",
+      "alternatives": [],
+      "recordId": "imported-xlm",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "XMR",
+      "name": "Monero",
+      "logoUrl": "/api/exchange/visual-assets/c050fde5b5f8be05b784ae2aa24bd3833a98e2cefbd1ac53f1dc799864be0d52.png",
+      "alternatives": [],
+      "recordId": "imported-xmr",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "crypto",
+      "code": "XRP",
+      "name": "XRP",
+      "logoUrl": "/api/exchange/visual-assets/0875539d872ac02066c129360ade039e835bd7b9b2320f3a4d24ed4ef72c3051.png",
+      "alternatives": [],
+      "recordId": "imported-xrp",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "flag",
+      "code": "AE",
+      "name": "United Arab Emirates flag",
+      "logoUrl": "/api/exchange/visual-assets/8db8bfc3d1a711967e44fbe237a52d75cd03a3dfbcefc9d78febd61c2973915e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AE"
+      ],
+      "currencies": [
+        "AED"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AF",
+      "name": "Afghanistan flag",
+      "logoUrl": "/api/exchange/visual-assets/adebcd50e61dd0e3c83c689f5e3c7f6ca5055ca5f4a54119e27bf9e8df7e5421.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AF"
+      ],
+      "currencies": [
+        "AFN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AG",
+      "name": "Antigua & Barbuda flag",
+      "logoUrl": "/api/exchange/visual-assets/73f382e91c9e9ba8e786696f20011a04c7e22354e37db61921f2c57645ec7385.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AG"
+      ],
+      "currencies": [
+        "XCD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AL",
+      "name": "Albania flag",
+      "logoUrl": "/api/exchange/visual-assets/173ec6b28100ddbaeb011b73b4776e50fc2545e14c81ad65e25c19b7137788be.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AL"
+      ],
+      "currencies": [
+        "ALL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AM",
+      "name": "Armenia flag",
+      "logoUrl": "/api/exchange/visual-assets/1eb2190d967efac59bb4f18f699b465f76dc3128593011e59243450cd593f846.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AM"
+      ],
+      "currencies": [
+        "AMD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AO",
+      "name": "Angola flag",
+      "logoUrl": "/api/exchange/visual-assets/0f10545c2991c7ad5332dff881c0e176de0a021260e722af7cfdd996ce9b497e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AO"
+      ],
+      "currencies": [
+        "AOA"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AR",
+      "name": "Argentina flag",
+      "logoUrl": "/api/exchange/visual-assets/0828d651a95f39cea1e5d9d2ee30ec4dbcf55d70bdea39c89ec80c83226ad86d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AR"
+      ],
+      "currencies": [
+        "ARS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AU",
+      "name": "Australia flag",
+      "logoUrl": "/api/exchange/visual-assets/b826e039804d5cf313bd7e22a40ea2239e8e22ddba7c19a8787dfaad1dda71aa.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AU"
+      ],
+      "currencies": [
+        "AUD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AW",
+      "name": "Aruba flag",
+      "logoUrl": "/api/exchange/visual-assets/2c9121a16748576e5bf0a2c24e5405ba42c9cae197ff213fadbdceb4cc706def.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AW"
+      ],
+      "currencies": [
+        "AWG"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "AZ",
+      "name": "Azerbaijan flag",
+      "logoUrl": "/api/exchange/visual-assets/963c074ace679c88a77f6a5db3bd0f3b98a169dae5ebd12abb6293ecda497280.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AZ"
+      ],
+      "currencies": [
+        "AZN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BA",
+      "name": "Bosnia & Herzegovina flag",
+      "logoUrl": "/api/exchange/visual-assets/1c83a2cf7e8366afb9d724f896902ec46a722739538349d6f41b0953d47f171f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BA"
+      ],
+      "currencies": [
+        "BAM"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BB",
+      "name": "Barbados flag",
+      "logoUrl": "/api/exchange/visual-assets/b38fe14e1e967ea658331d386e8028c5a02d2de70c8376b06deda6ea77a4938b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BB"
+      ],
+      "currencies": [
+        "BBD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BD",
+      "name": "Bangladesh flag",
+      "logoUrl": "/api/exchange/visual-assets/b509e5c29b8c32761c273449647d5a35c5301227b27ee786d353be7916bfddaf.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BD"
+      ],
+      "currencies": [
+        "BDT"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BG",
+      "name": "Bulgaria flag",
+      "logoUrl": "/api/exchange/visual-assets/829c1f5f6f403632fd4710b8b7f3a313408e5285e4540af97950408ff9a5abfe.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BG"
+      ],
+      "currencies": [
+        "BGN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BH",
+      "name": "Bahrain flag",
+      "logoUrl": "/api/exchange/visual-assets/4cb584ef406f6bc57ea9c935db43890b9719ae126fe1ad4fb10890709978162b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BH"
+      ],
+      "currencies": [
+        "BHD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BI",
+      "name": "Burundi flag",
+      "logoUrl": "/api/exchange/visual-assets/00f86f0400888d0ecf5a2b9bfa66f176af6095f413d53d622b6c061c1723cfd9.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BI"
+      ],
+      "currencies": [
+        "BIF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BM",
+      "name": "Bermuda flag",
+      "logoUrl": "/api/exchange/visual-assets/c5641664796bd1a0906af9f10543eca02aca8fa97104b2f92fd07e9670adf91c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BM"
+      ],
+      "currencies": [
+        "BMD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BN",
+      "name": "Brunei flag",
+      "logoUrl": "/api/exchange/visual-assets/cdb37ed23eed4e4a010d3e68db6d66048a7e90b4d465c735f6e6072564b0fa91.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BN"
+      ],
+      "currencies": [
+        "BND"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BO",
+      "name": "Bolivia flag",
+      "logoUrl": "/api/exchange/visual-assets/7d724dac914eaed951a3e3dd901350b9636cfbba0fc4d78f1fcf193c1f29e67b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BO"
+      ],
+      "currencies": [
+        "BOB",
+        "BOV"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BR",
+      "name": "Brazil flag",
+      "logoUrl": "/api/exchange/visual-assets/e0215eff9f53b0236db885963ac45d6baea52e10ce33ceafdbe0eb1820d21160.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BR"
+      ],
+      "currencies": [
+        "BRL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BS",
+      "name": "Bahamas flag",
+      "logoUrl": "/api/exchange/visual-assets/44946f0ba5ad43cabe8bfa6c52e0f7a9562f7ff336d58478577f3b3a19c1ef08.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BS"
+      ],
+      "currencies": [
+        "BSD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BT",
+      "name": "Bhutan flag",
+      "logoUrl": "/api/exchange/visual-assets/39a47be433cda95dab7521aed8609c61f3fe377524e5de397dbb9c75624dd822.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BT"
+      ],
+      "currencies": [
+        "BTN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BW",
+      "name": "Botswana flag",
+      "logoUrl": "/api/exchange/visual-assets/e89b9cb27040b2995d2f66fca2492eb19434c0793d80ff70ce6819f2540e40a0.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BW"
+      ],
+      "currencies": [
+        "BWP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BY",
+      "name": "Belarus flag",
+      "logoUrl": "/api/exchange/visual-assets/2af1ac1ecbfda4690e8b1b076def28e384aa69cbf5004ee37cef43665fd6e4f6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BY"
+      ],
+      "currencies": [
+        "BYN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "BZ",
+      "name": "Belize flag",
+      "logoUrl": "/api/exchange/visual-assets/99ff3a88d1493f5e00c8a4dd9f7eb379a004961f4503eb3e5598e388c911b583.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BZ"
+      ],
+      "currencies": [
+        "BZD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CA",
+      "name": "Canada flag",
+      "logoUrl": "/api/exchange/visual-assets/3cd6c2b9fe12bc0617ef4374b570ad87920bae757a95b104384fc301352c6942.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CA"
+      ],
+      "currencies": [
+        "CAD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CD",
+      "name": "Congo - Kinshasa flag",
+      "logoUrl": "/api/exchange/visual-assets/e2e70cf2f16e4ede17ec2a6d0b740c82b622e2cae6b3419d2217092f9c0872f4.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CD"
+      ],
+      "currencies": [
+        "CDF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CH",
+      "name": "Switzerland flag",
+      "logoUrl": "/api/exchange/visual-assets/a5ec3bbf0f3e686ea05ae17f51e8f3a287ad332217b679bbd393842b7d427859.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CH"
+      ],
+      "currencies": [
+        "CHE",
+        "CHF",
+        "CHW"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CL",
+      "name": "Chile flag",
+      "logoUrl": "/api/exchange/visual-assets/ca4d50dcf36926c82f02b895975f351a639b0aa1b91bb6ef776f4f07f225cc34.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CL"
+      ],
+      "currencies": [
+        "CLP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CM",
+      "name": "Cameroon flag",
+      "logoUrl": "/api/exchange/visual-assets/e00c6cbb0cb7364bc1b825e145ae6232d611d0e457dfa621b6bfafa3b7c76a7f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CM"
+      ],
+      "currencies": [
+        "XAF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CN",
+      "name": "China flag",
+      "logoUrl": "/api/exchange/visual-assets/ce797608958527808601798df00691aced6120bd600c0624161230020229dc99.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CN"
+      ],
+      "currencies": [
+        "CNY"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CO",
+      "name": "Colombia flag",
+      "logoUrl": "/api/exchange/visual-assets/ec3daa5a284fc6d10104a53fd16ea77eba9ac1044ffa629f953644c1de63dcd3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CO"
+      ],
+      "currencies": [
+        "COP",
+        "COU"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CR",
+      "name": "Costa Rica flag",
+      "logoUrl": "/api/exchange/visual-assets/f7e60b87265310b60217dcd26b24879222a7e5e13fe4c52ae1afdc3c6c737bbf.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CR"
+      ],
+      "currencies": [
+        "CRC"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CU",
+      "name": "Cuba flag",
+      "logoUrl": "/api/exchange/visual-assets/afba6d3e29d510e256c07b23f2afc00a9cea87296765138e5645fe995d24249f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CU"
+      ],
+      "currencies": [
+        "CUP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CV",
+      "name": "Cape Verde flag",
+      "logoUrl": "/api/exchange/visual-assets/bcbf0add799b13377bdf842e1f380ff630650d3b7dba2d8f1273093cfa6ceb0f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CV"
+      ],
+      "currencies": [
+        "CVE"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CW",
+      "name": "Curaçao flag",
+      "logoUrl": "/api/exchange/visual-assets/6e35d3452497a8e5766b9c00087b91d06e79fde18dfe6b74fb18ff72c6635bc1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CW"
+      ],
+      "currencies": [
+        "ANG"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "CZ",
+      "name": "Czechia flag",
+      "logoUrl": "/api/exchange/visual-assets/5f4ba801f6715e2d29f8b88f785bfc77a0dc1455a0f649626ad9a0cc66cd6df2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CZ"
+      ],
+      "currencies": [
+        "CZK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "DJ",
+      "name": "Djibouti flag",
+      "logoUrl": "/api/exchange/visual-assets/072cd869e9430e51fe7d48b0bd33c882b6365386c9987c03cb76f802597af936.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DJ"
+      ],
+      "currencies": [
+        "DJF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "DK",
+      "name": "Denmark flag",
+      "logoUrl": "/api/exchange/visual-assets/eb4ea9929e6491fd0444ea5da5b9a19dda089a2ac758ad63956cfbcc7fa81cc3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DK"
+      ],
+      "currencies": [
+        "DKK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "DO",
+      "name": "Dominican Republic flag",
+      "logoUrl": "/api/exchange/visual-assets/ed01134a6d931721c58fc34771e34e1d513e9e06e7241a1e6528172093c77880.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DO"
+      ],
+      "currencies": [
+        "DOP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "DZ",
+      "name": "Algeria flag",
+      "logoUrl": "/api/exchange/visual-assets/51bda9bdc313fa5418550d94d46f31e0c396f4e70c810b629fac0430f4b7e638.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DZ"
+      ],
+      "currencies": [
+        "DZD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "EG",
+      "name": "Egypt flag",
+      "logoUrl": "/api/exchange/visual-assets/07129395f46d9e71844fe9b485e05bf49741bc72a480b567297d6d865f3d8150.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "EG"
+      ],
+      "currencies": [
+        "EGP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "ER",
+      "name": "Eritrea flag",
+      "logoUrl": "/api/exchange/visual-assets/69f92c176c843d7c899eaa7beaa1f75a0499d49fbb24e2053ed98be77e176498.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ER"
+      ],
+      "currencies": [
+        "ERN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "ET",
+      "name": "Ethiopia flag",
+      "logoUrl": "/api/exchange/visual-assets/980ec719a0be7227e6769b9bf9198b182b743b9544326f4ef2566ecd3ebfeb94.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ET"
+      ],
+      "currencies": [
+        "ETB"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "EU",
+      "name": "European Union flag",
+      "logoUrl": "/api/exchange/visual-assets/cf15767517ce6ab1fc46a41b07fa66be2ab3db8085216be5abd43c1fbf36243d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "EU"
+      ],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "FJ",
+      "name": "Fiji flag",
+      "logoUrl": "/api/exchange/visual-assets/e2c0c872c02b315510c6923a7913d1783accabab0ea1eef103a3f23165af320f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "FJ"
+      ],
+      "currencies": [
+        "FJD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "FK",
+      "name": "Falkland Islands flag",
+      "logoUrl": "/api/exchange/visual-assets/3bb31afe510af3b8ad548e3f3f6ed746437d0598bcde5b66e542768572e19383.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "FK"
+      ],
+      "currencies": [
+        "FKP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GB",
+      "name": "United Kingdom flag",
+      "logoUrl": "/api/exchange/visual-assets/42f04826dd7a76e4ecdc9a55fb4a774a26e03a425ca1363628bb1c6f6ea1a87e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GB"
+      ],
+      "currencies": [
+        "GBP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GE",
+      "name": "Georgia flag",
+      "logoUrl": "/api/exchange/visual-assets/dfba0d29f581ff00c2e46b69cc90e0e9ff6371ab92fbe300664f6622f7ca0355.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GE"
+      ],
+      "currencies": [
+        "GEL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GH",
+      "name": "Ghana flag",
+      "logoUrl": "/api/exchange/visual-assets/a8c4320f89adc39f1c43f0100031e6acfce9299aed5bf035732d00d34d44ee88.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GH"
+      ],
+      "currencies": [
+        "GHS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GI",
+      "name": "Gibraltar flag",
+      "logoUrl": "/api/exchange/visual-assets/e5f4e6d23324e3b8682aad7033492640affac084ea7989e3f4c9a3f2a6347ee6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GI"
+      ],
+      "currencies": [
+        "GIP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GM",
+      "name": "Gambia flag",
+      "logoUrl": "/api/exchange/visual-assets/d4418b31447cb5b7ddfcc3b47f3075795700363cc97132d9ab8b2de417027b98.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GM"
+      ],
+      "currencies": [
+        "GMD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GN",
+      "name": "Guinea flag",
+      "logoUrl": "/api/exchange/visual-assets/4932e18d832d6a781bc00400b69136cc9406234d3800e1e66ea809550a84b423.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GN"
+      ],
+      "currencies": [
+        "GNF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GT",
+      "name": "Guatemala flag",
+      "logoUrl": "/api/exchange/visual-assets/d59addea6225e7eeb09efaee9a888aacc2b93651e1306a3de84764c6c729f821.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GT"
+      ],
+      "currencies": [
+        "GTQ"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "GY",
+      "name": "Guyana flag",
+      "logoUrl": "/api/exchange/visual-assets/910830b8f1f35c778f37eb37d47eea0ea952d1bf04070f7eaeb697d0f8ead948.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GY"
+      ],
+      "currencies": [
+        "GYD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "HK",
+      "name": "Hong Kong SAR China flag",
+      "logoUrl": "/api/exchange/visual-assets/4c7cbced68ee586af8b3d73a8d8a8c404deaa271da7204eb2afe5c1b070972eb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HK"
+      ],
+      "currencies": [
+        "HKD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "HN",
+      "name": "Honduras flag",
+      "logoUrl": "/api/exchange/visual-assets/d2dd47a43f01a52ffff72cc88bd0e4fc9b503dee57250d22f870c36346079c5d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HN"
+      ],
+      "currencies": [
+        "HNL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "HR",
+      "name": "Croatia flag",
+      "logoUrl": "/api/exchange/visual-assets/fa44157809f7739aabca54f3e27dfb1d7409ef17afe6ac18dd39294f124e205a.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HR"
+      ],
+      "currencies": [
+        "HRK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "HT",
+      "name": "Haiti flag",
+      "logoUrl": "/api/exchange/visual-assets/65839463e163fd812f732f606111c68961e9bb23aa9624c8c448605fe0e086a1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HT"
+      ],
+      "currencies": [
+        "HTG"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "HU",
+      "name": "Hungary flag",
+      "logoUrl": "/api/exchange/visual-assets/2025b7ca34eac130a257abc189273adb73f5749cb0eb7c5c6d865d433d842e0b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HU"
+      ],
+      "currencies": [
+        "HUF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "ID",
+      "name": "Indonesia flag",
+      "logoUrl": "/api/exchange/visual-assets/b9d9dea991a06a1211e93e8fa33adc6035ede25d07dc6e98cf97cc57fd94a340.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ID"
+      ],
+      "currencies": [
+        "IDR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "IL",
+      "name": "Israel flag",
+      "logoUrl": "/api/exchange/visual-assets/9e884f0c6d1001f8de2b478d3de9582f93fbbd9badcb31e3f52fefa3974ebc75.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IL"
+      ],
+      "currencies": [
+        "ILS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "IN",
+      "name": "India flag",
+      "logoUrl": "/api/exchange/visual-assets/ea9966697a16e75d64b4e6a9a468009944bd336e8098a34839033eb641329fcc.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IN"
+      ],
+      "currencies": [
+        "INR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "IQ",
+      "name": "Iraq flag",
+      "logoUrl": "/api/exchange/visual-assets/b0de86ef9c1cfb0067e0989bffa6f15579e0c78b331fc29a9e3469aea3cbec20.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IQ"
+      ],
+      "currencies": [
+        "IQD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "IR",
+      "name": "Iran flag",
+      "logoUrl": "/api/exchange/visual-assets/8e3015ef6405ba9c80a9c93897e3d75f21e4df303f3bcf8e363ea4c96cd06272.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IR"
+      ],
+      "currencies": [
+        "IRR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "IS",
+      "name": "Iceland flag",
+      "logoUrl": "/api/exchange/visual-assets/b14a90783cbe55b65c663efb67e1c235389f46d60d9601d28b36773016d520e2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IS"
+      ],
+      "currencies": [
+        "ISK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "JM",
+      "name": "Jamaica flag",
+      "logoUrl": "/api/exchange/visual-assets/44504dda9d5bff31dfbcf5c8cce7acf0bfb9a7b16a697aadca3f9c4e854b62eb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "JM"
+      ],
+      "currencies": [
+        "JMD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "JO",
+      "name": "Jordan flag",
+      "logoUrl": "/api/exchange/visual-assets/fb2b2896420258e37d2e27a1d07c6488b5ff14a587edfbe7c4153f93042b8424.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "JO"
+      ],
+      "currencies": [
+        "JOD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "JP",
+      "name": "Japan flag",
+      "logoUrl": "/api/exchange/visual-assets/e8e6f6e75bc02eeb35e5904edc13df9b5990da70ac1ff1daa7a9fcc61c709a03.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "JP"
+      ],
+      "currencies": [
+        "JPY"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KE",
+      "name": "Kenya flag",
+      "logoUrl": "/api/exchange/visual-assets/0c65788e07b97827d85662c06cd74e83ab6027c8915579821df896446b26d4d5.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KE"
+      ],
+      "currencies": [
+        "KES"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KG",
+      "name": "Kyrgyzstan flag",
+      "logoUrl": "/api/exchange/visual-assets/b6e67c6fce0ab4dcd376abf4b1656bd8bc9a654c8320d4eef45c810921a1c869.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KG"
+      ],
+      "currencies": [
+        "KGS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KH",
+      "name": "Cambodia flag",
+      "logoUrl": "/api/exchange/visual-assets/bdff20910e6d11f5c5b0a562d1302f4aad792255fcdc2e9a46bce1ed8fe8c56f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KH"
+      ],
+      "currencies": [
+        "KHR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KM",
+      "name": "Comoros flag",
+      "logoUrl": "/api/exchange/visual-assets/21e3ee9de83bf7ac6b57400e92f63d81f1f174624e9a2f408a5dd23d4d8f8f04.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KM"
+      ],
+      "currencies": [
+        "KMF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KP",
+      "name": "North Korea flag",
+      "logoUrl": "/api/exchange/visual-assets/2891274f3603b50b8eb795f50ba361b7b4586ecc1f42f900689decd527fcc386.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KP"
+      ],
+      "currencies": [
+        "KPW"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KR",
+      "name": "South Korea flag",
+      "logoUrl": "/api/exchange/visual-assets/4e0b6d5fa63e2fc1c3d86fda025a4c2129e52d5fc6551d8355e9385dd2d88f4b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KR"
+      ],
+      "currencies": [
+        "KRW"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KW",
+      "name": "Kuwait flag",
+      "logoUrl": "/api/exchange/visual-assets/ce62298731cb48e5f502af92203342f43bfa9568acfc6d2194c7227760e9184c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KW"
+      ],
+      "currencies": [
+        "KWD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KY",
+      "name": "Cayman Islands flag",
+      "logoUrl": "/api/exchange/visual-assets/30e1eff5519219c27ded9fed93ad3b2acdf898b7494411f23c2c5828d96a1e30.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KY"
+      ],
+      "currencies": [
+        "KYD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "KZ",
+      "name": "Kazakhstan flag",
+      "logoUrl": "/api/exchange/visual-assets/71a7d90e17ae74f6bf9572d9560b83d2d6ca047482fe2a229b770c67338f3848.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KZ"
+      ],
+      "currencies": [
+        "KZT"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "LA",
+      "name": "Laos flag",
+      "logoUrl": "/api/exchange/visual-assets/c0cbe90abd407b916c31bc6d2cceb90ff61cf78ce5de00173e993c67f4e4ca15.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LA"
+      ],
+      "currencies": [
+        "LAK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "LB",
+      "name": "Lebanon flag",
+      "logoUrl": "/api/exchange/visual-assets/2c69b33a241e21c003113bae58fda58a08113e265a94262f6d0de39277876462.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LB"
+      ],
+      "currencies": [
+        "LBP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "LK",
+      "name": "Sri Lanka flag",
+      "logoUrl": "/api/exchange/visual-assets/c6d5351f0c9d5611cdfaf64b6b5324db73b437bc9d4e4bdc8a70a7d66533df93.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LK"
+      ],
+      "currencies": [
+        "LKR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "LR",
+      "name": "Liberia flag",
+      "logoUrl": "/api/exchange/visual-assets/b722560baa4a55e843b78f3a3485ff4ad31e5acd659142add4ba3990be2578cb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LR"
+      ],
+      "currencies": [
+        "LRD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "LS",
+      "name": "Lesotho flag",
+      "logoUrl": "/api/exchange/visual-assets/66002ab481b35579ef88633fea8114d698990afdaf94b0173e9c9d614d126b49.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LS"
+      ],
+      "currencies": [
+        "LSL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "LY",
+      "name": "Libya flag",
+      "logoUrl": "/api/exchange/visual-assets/e2b019746d67350a9dcfc595616d0b73b868c8f3757f9516665e9141d8f0c117.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LY"
+      ],
+      "currencies": [
+        "LYD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MA",
+      "name": "Morocco flag",
+      "logoUrl": "/api/exchange/visual-assets/1f6f0d1bf2e6d69fc943eb0eb3a96a4e5f8473bfdd1bd6b5a4c903c6c7ee2fe2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MA"
+      ],
+      "currencies": [
+        "MAD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MD",
+      "name": "Moldova flag",
+      "logoUrl": "/api/exchange/visual-assets/a61c465c0aebd959715da03389b9aedcb9198ef840f578ef03cc2af0c76bfa31.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MD"
+      ],
+      "currencies": [
+        "MDL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MG",
+      "name": "Madagascar flag",
+      "logoUrl": "/api/exchange/visual-assets/00a570504860576bcb032613cb185013ce9400e05fd9c1fdc274f9664d27f9d6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MG"
+      ],
+      "currencies": [
+        "MGA"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MK",
+      "name": "North Macedonia flag",
+      "logoUrl": "/api/exchange/visual-assets/72a37e581f614d791fa6d88831d06c56a0f757e5a596d8fc1189b0d8147cfda6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MK"
+      ],
+      "currencies": [
+        "MKD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MM",
+      "name": "Myanmar (Burma) flag",
+      "logoUrl": "/api/exchange/visual-assets/2ebf5312f5a4d89646aba2320b3dce9918136bdfd42303819830fcc29e905edb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MM"
+      ],
+      "currencies": [
+        "MMK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MN",
+      "name": "Mongolia flag",
+      "logoUrl": "/api/exchange/visual-assets/4f89f928fbfa245916b324dc272363ab12dba689814a9d2112023205e8e69baf.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MN"
+      ],
+      "currencies": [
+        "MNT"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MO",
+      "name": "Macao SAR China flag",
+      "logoUrl": "/api/exchange/visual-assets/f163f905ead86c901f7345c72c8bb60a898281370a8c6ea8bb15566c570b40ca.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MO"
+      ],
+      "currencies": [
+        "MOP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MR",
+      "name": "Mauritania flag",
+      "logoUrl": "/api/exchange/visual-assets/1655e7ed2d848678e50138df15f3db7b37ed7a9c4f61cdf7e26cfec12d0e7057.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MR"
+      ],
+      "currencies": [
+        "MRU"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MU",
+      "name": "Mauritius flag",
+      "logoUrl": "/api/exchange/visual-assets/c35ef8388abd492cb6ddbb0b46e3be87244ec1088682de208a745c93c4852a80.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MU"
+      ],
+      "currencies": [
+        "MUR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MV",
+      "name": "Maldives flag",
+      "logoUrl": "/api/exchange/visual-assets/a825c00d340b88c63605d514c9c0e74ef17c0cf10caa0d0e46bb7ebee4788dd5.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MV"
+      ],
+      "currencies": [
+        "MVR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MW",
+      "name": "Malawi flag",
+      "logoUrl": "/api/exchange/visual-assets/81a7dc8d3f32fcdc7cd98408f9602f53176a7ea3645770e4d852fc3646a2e576.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MW"
+      ],
+      "currencies": [
+        "MWK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MX",
+      "name": "Mexico flag",
+      "logoUrl": "/api/exchange/visual-assets/baa6f7163f307c16a5d3e36c83a09fe46adbe16adfa866d4bb2d750a79d96b92.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MX"
+      ],
+      "currencies": [
+        "MXN",
+        "MXV"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MY",
+      "name": "Malaysia flag",
+      "logoUrl": "/api/exchange/visual-assets/1d3284c77094859fb63c1880af4f8f9a3916935a12faae060678c6e3455e956d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MY"
+      ],
+      "currencies": [
+        "MYR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "MZ",
+      "name": "Mozambique flag",
+      "logoUrl": "/api/exchange/visual-assets/649e978eea07a70c6e7303a5291476b3f224063070abf4f6a5f4ddcbba7c1cf6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MZ"
+      ],
+      "currencies": [
+        "MZN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "NA",
+      "name": "Namibia flag",
+      "logoUrl": "/api/exchange/visual-assets/ddc9fc887177f92e80fed16082c988924fbd19773ea33729fa3f2a1896d13814.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NA"
+      ],
+      "currencies": [
+        "NAD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "NG",
+      "name": "Nigeria flag",
+      "logoUrl": "/api/exchange/visual-assets/3dbebd9f8e31821d5fa22f976cfe9a338788fda81308f0d573e69fd9dfcce24e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NG"
+      ],
+      "currencies": [
+        "NGN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "NI",
+      "name": "Nicaragua flag",
+      "logoUrl": "/api/exchange/visual-assets/ed4fbc934d1bde93634e8904e0c1aec45587c95a2bbfbd024aa729e9adc956d6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NI"
+      ],
+      "currencies": [
+        "NIO"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "NO",
+      "name": "Norway flag",
+      "logoUrl": "/api/exchange/visual-assets/0d4b9a52f0a6bd264258baac791b39910a895bb6ca06f63477fa823a262febdc.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NO"
+      ],
+      "currencies": [
+        "NOK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "NP",
+      "name": "Nepal flag",
+      "logoUrl": "/api/exchange/visual-assets/f4a65e693806dbb31a5b2808a88d577c72ba0e8c5872fbd1e8600ff63a77c489.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NP"
+      ],
+      "currencies": [
+        "NPR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "NZ",
+      "name": "New Zealand flag",
+      "logoUrl": "/api/exchange/visual-assets/aa29843a365d4eb21d35932172232d7d591a35fc51ac95c040c356f0f16c447e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NZ"
+      ],
+      "currencies": [
+        "NZD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "OM",
+      "name": "Oman flag",
+      "logoUrl": "/api/exchange/visual-assets/38f39605556392f32fc4aa12e6db9a9c6984acd3cc7f3ccfbca9a014bc44796a.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "OM"
+      ],
+      "currencies": [
+        "OMR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PA",
+      "name": "Panama flag",
+      "logoUrl": "/api/exchange/visual-assets/8e8c7cf854aa3367d9ed9eda6c585540bde6369ef6163f435334216be4536200.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PA"
+      ],
+      "currencies": [
+        "PAB"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PE",
+      "name": "Peru flag",
+      "logoUrl": "/api/exchange/visual-assets/a35cf7c9bb6ac08e6d60d9683c78318746edc82284022aef02c9d6a07540045c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PE"
+      ],
+      "currencies": [
+        "PEN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PF",
+      "name": "French Polynesia flag",
+      "logoUrl": "/api/exchange/visual-assets/f04ae2415d82f1ca5b3e1803d9321374821baedee0dcf5e1b5660d8c83dde39f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PF"
+      ],
+      "currencies": [
+        "XPF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PG",
+      "name": "Papua New Guinea flag",
+      "logoUrl": "/api/exchange/visual-assets/d98adee3bf8945b389144b04bc49824c85711e1d473236971ac8a48939328064.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PG"
+      ],
+      "currencies": [
+        "PGK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PH",
+      "name": "Philippines flag",
+      "logoUrl": "/api/exchange/visual-assets/d554297356ab66a5061df4c73c3bb293381875d86175fa0508f7ac4f035eb721.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PH"
+      ],
+      "currencies": [
+        "PHP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PK",
+      "name": "Pakistan flag",
+      "logoUrl": "/api/exchange/visual-assets/2011fe01e332cfc8f16c861d4818bacf4ed1b6d9fa657cc246f86ab15a313768.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PK"
+      ],
+      "currencies": [
+        "PKR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PL",
+      "name": "Poland flag",
+      "logoUrl": "/api/exchange/visual-assets/da6d9e34f2007194b0082d4caac04d1744b7b27fc40098747d4bc62e0d5a5bb2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PL"
+      ],
+      "currencies": [
+        "PLN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "PY",
+      "name": "Paraguay flag",
+      "logoUrl": "/api/exchange/visual-assets/5bb06bf5b8f3ea2633dcfc0d417400786c69d6b1cb681208072f4658d2838af2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PY"
+      ],
+      "currencies": [
+        "PYG"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "QA",
+      "name": "Qatar flag",
+      "logoUrl": "/api/exchange/visual-assets/5332c024cb6bac6d7ca2f96347d2ce8cfc63f5bf2643a1d1e6ed6146e6b75a1d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "QA"
+      ],
+      "currencies": [
+        "QAR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "RO",
+      "name": "Romania flag",
+      "logoUrl": "/api/exchange/visual-assets/20c8e69585273d35ba38fe2cae0d0201445a3b410c9589f4f7053316662482e3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RO"
+      ],
+      "currencies": [
+        "RON"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "RS",
+      "name": "Serbia flag",
+      "logoUrl": "/api/exchange/visual-assets/5bc4c8297033b5b31ca9496dd1ad29232aa14389dc8c93db38f99faa707ebba3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RS"
+      ],
+      "currencies": [
+        "RSD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "RU",
+      "name": "Russia flag",
+      "logoUrl": "/api/exchange/visual-assets/eb1dbd977fdb824dcae7767ce9ec3a023e41158e81b5f524772609ddcb622025.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RU"
+      ],
+      "currencies": [
+        "RUB"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "RW",
+      "name": "Rwanda flag",
+      "logoUrl": "/api/exchange/visual-assets/21b67e23f19a1bca9b4ad87ff788b4992cebc00a6deeca1eb9c56c16b63c0de8.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RW"
+      ],
+      "currencies": [
+        "RWF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SA",
+      "name": "Saudi Arabia flag",
+      "logoUrl": "/api/exchange/visual-assets/7176d38f2e39fa7c96608f5ae85bb51ba964f1b9a972b33b0d04796fe4487f71.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SA"
+      ],
+      "currencies": [
+        "SAR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SB",
+      "name": "Solomon Islands flag",
+      "logoUrl": "/api/exchange/visual-assets/56e24d58d3912dcd3c89187ee9ec08ea09957055296e823007ad615a4485f751.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SB"
+      ],
+      "currencies": [
+        "SBD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SC",
+      "name": "Seychelles flag",
+      "logoUrl": "/api/exchange/visual-assets/b7a1ccdf0b210a2273426eaf334679dba7d3f5a90dddd91882beffa891bf3035.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SC"
+      ],
+      "currencies": [
+        "SCR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SD",
+      "name": "Sudan flag",
+      "logoUrl": "/api/exchange/visual-assets/305064d3c23eac774752898e1b3e9ff8ab7ecdfa45495be446dc520de8415727.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SD"
+      ],
+      "currencies": [
+        "SDG"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SE",
+      "name": "Sweden flag",
+      "logoUrl": "/api/exchange/visual-assets/426348d99d9cace2df6eaa6d6766d5a5ac21bb65a504a4ed974486cf96156b8f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SE"
+      ],
+      "currencies": [
+        "SEK"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SG",
+      "name": "Singapore flag",
+      "logoUrl": "/api/exchange/visual-assets/d8782c5cc56587009a4939e9c0a95402001114eacda264417cd8f1678ff9329d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SG"
+      ],
+      "currencies": [
+        "SGD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SH",
+      "name": "St. Helena flag",
+      "logoUrl": "/api/exchange/visual-assets/8ca5f24f5398983173fde419470d646b2e328a6cf9f98d77443a706dd204066d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SH"
+      ],
+      "currencies": [
+        "SHP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SL",
+      "name": "Sierra Leone flag",
+      "logoUrl": "/api/exchange/visual-assets/21d7e0663d2b8e1d455a0e1456c63dfbb273becdacbf7c1fa0e22d915f136cf4.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SL"
+      ],
+      "currencies": [
+        "SLE",
+        "SLL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SN",
+      "name": "Senegal flag",
+      "logoUrl": "/api/exchange/visual-assets/c0593c9c104142eadae2d76bd739b28a37d2218bf1ef4b37bf8fa9655bfab087.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SN"
+      ],
+      "currencies": [
+        "XOF"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SO",
+      "name": "Somalia flag",
+      "logoUrl": "/api/exchange/visual-assets/3a342342f94f00a74984e10743f4589e7856076df6686f05e3192cd0ee0300e1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SO"
+      ],
+      "currencies": [
+        "SOS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SR",
+      "name": "Suriname flag",
+      "logoUrl": "/api/exchange/visual-assets/098067b9dd5a6aac668c8883f9b96fe68865dc20a6f88a8859146900e389dd63.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SR"
+      ],
+      "currencies": [
+        "SRD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SS",
+      "name": "South Sudan flag",
+      "logoUrl": "/api/exchange/visual-assets/0f2a925c6daf8945ff257938e04b0609441f698010d80c9717904c71a54a235e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SS"
+      ],
+      "currencies": [
+        "SSP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "ST",
+      "name": "São Tomé & Príncipe flag",
+      "logoUrl": "/api/exchange/visual-assets/a95075950bff55641b4274439a909c6bda8005b22c397ef6315839ce9d0dec55.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ST"
+      ],
+      "currencies": [
+        "STN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SV",
+      "name": "El Salvador flag",
+      "logoUrl": "/api/exchange/visual-assets/cbd0f1c0170aad674c898a602f0e43fcf330640cbbab0653d6ae4f941f7cd83d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SV"
+      ],
+      "currencies": [
+        "SVC"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SY",
+      "name": "Syria flag",
+      "logoUrl": "/api/exchange/visual-assets/114f63ff44c34361216c25e49c65ade53ba07a4607e5e917b089c60a0df6c173.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SY"
+      ],
+      "currencies": [
+        "SYP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "SZ",
+      "name": "Eswatini flag",
+      "logoUrl": "/api/exchange/visual-assets/3d48fcbb07942d6d590bceb07f8462db36130a625022f12710e53c6cfdc51f77.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SZ"
+      ],
+      "currencies": [
+        "SZL"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TH",
+      "name": "Thailand flag",
+      "logoUrl": "/api/exchange/visual-assets/6b5a7a862ef01de1efd7ca3526655609ef7b05cd2ee6e14eacc0436bb93da555.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TH"
+      ],
+      "currencies": [
+        "THB"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TJ",
+      "name": "Tajikistan flag",
+      "logoUrl": "/api/exchange/visual-assets/597f154cc4f0bc5b4941c880fd2cd79c2a20a1b1d5845c86e934c4500fab78d8.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TJ"
+      ],
+      "currencies": [
+        "TJS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TM",
+      "name": "Turkmenistan flag",
+      "logoUrl": "/api/exchange/visual-assets/a03b94f68d3eec97f3cdc495ceb98af910087b2623a02dc233820dfcc2ec2085.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TM"
+      ],
+      "currencies": [
+        "TMT"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TN",
+      "name": "Tunisia flag",
+      "logoUrl": "/api/exchange/visual-assets/b0d8964ee6ff40309779e0a1ea2780926a85edf9f1715c22ecbd04e14a4be9b4.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TN"
+      ],
+      "currencies": [
+        "TND"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TO",
+      "name": "Tonga flag",
+      "logoUrl": "/api/exchange/visual-assets/aaf4a1b55742a45ae01330347e723ec9d9da9b15e1e9e05cd7d1910de91eef00.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TO"
+      ],
+      "currencies": [
+        "TOP"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TR",
+      "name": "Türkiye flag",
+      "logoUrl": "/api/exchange/visual-assets/f15da84b4e5b23f54b8177126f5711e6fd0db8d26a1b0d3cf7901d0aa8e6b7b1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TR"
+      ],
+      "currencies": [
+        "TRY"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TT",
+      "name": "Trinidad & Tobago flag",
+      "logoUrl": "/api/exchange/visual-assets/89fa29d1f4a553154be8ae34b5f6a31e4baf6197fee40d9103ada5b80de7e31b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TT"
+      ],
+      "currencies": [
+        "TTD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TW",
+      "name": "Taiwan flag",
+      "logoUrl": "/api/exchange/visual-assets/5e68330a1f2a298257ebbd3201512e8f947a688f4ff395df802ef7f15aeeb79b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TW"
+      ],
+      "currencies": [
+        "TWD"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "TZ",
+      "name": "Tanzania flag",
+      "logoUrl": "/api/exchange/visual-assets/0bdf0b45ec36def31a5ef9e162fe40bbca1d78a522bde23cb4f42d5929affdbc.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TZ"
+      ],
+      "currencies": [
+        "TZS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "UA",
+      "name": "Ukraine flag",
+      "logoUrl": "/api/exchange/visual-assets/542eaacd659923163edf3b1100c43bc137cc1ad9f0e394dee94de37d40ce1fca.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UA"
+      ],
+      "currencies": [
+        "UAH"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "UG",
+      "name": "Uganda flag",
+      "logoUrl": "/api/exchange/visual-assets/b0d36274f9eac739b04046783a38c18bebd42587a0b0b1cc3d31a32e1ec05374.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UG"
+      ],
+      "currencies": [
+        "UGX"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "US",
+      "name": "United States flag",
+      "logoUrl": "/api/exchange/visual-assets/e1792c011daad918fdbd99a21f7f46fd71018ffd052af5a7d7faf9954d593e31.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD",
+        "USN"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "UY",
+      "name": "Uruguay flag",
+      "logoUrl": "/api/exchange/visual-assets/856fc0e14ff877b68a68c89144852808e7a17b213d5f1dba4b9d27435c0b2f54.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UY"
+      ],
+      "currencies": [
+        "UYI",
+        "UYU",
+        "UYW"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "UZ",
+      "name": "Uzbekistan flag",
+      "logoUrl": "/api/exchange/visual-assets/7ce6e8b7f4dd2a5bc050f9e538d22fde2fd371df15b751e48a29c1c3cb3df00b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UZ"
+      ],
+      "currencies": [
+        "UZS"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "VE",
+      "name": "Venezuela flag",
+      "logoUrl": "/api/exchange/visual-assets/756f64b7ab11de19928d6ee6235079200ba45477ea150b7fc3ffbd94f4fbebfe.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "VE"
+      ],
+      "currencies": [
+        "VED",
+        "VES"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "VN",
+      "name": "Vietnam flag",
+      "logoUrl": "/api/exchange/visual-assets/bd236e52dc564431ea569bca0a7b81ae8e8663675cb24a7b6da43ff926cc147c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "VN"
+      ],
+      "currencies": [
+        "VND"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "VU",
+      "name": "Vanuatu flag",
+      "logoUrl": "/api/exchange/visual-assets/18232f22b21730b4ec64a83c709f6546465c4777c2a3ad759686c3c2dfbc2745.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "VU"
+      ],
+      "currencies": [
+        "VUV"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "WS",
+      "name": "Samoa flag",
+      "logoUrl": "/api/exchange/visual-assets/acedd8fb18df15e9483cc8c0f30f24b7ff2299ca9006c261040e88677c0df0b3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "WS"
+      ],
+      "currencies": [
+        "WST"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "YE",
+      "name": "Yemen flag",
+      "logoUrl": "/api/exchange/visual-assets/a92f3989182049dc218f7698c45d8cdfc64e6f945c71f20a9d188dd01698df2d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "YE"
+      ],
+      "currencies": [
+        "YER"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "ZA",
+      "name": "South Africa flag",
+      "logoUrl": "/api/exchange/visual-assets/6fbf0b68db7024ac996c92b1bbc62efe9a3bf12e469efaa29ae4fe0fa5c6da39.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ZA"
+      ],
+      "currencies": [
+        "ZAR"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "ZM",
+      "name": "Zambia flag",
+      "logoUrl": "/api/exchange/visual-assets/b64a4ec9612720033a3e8de806cfdd112a8ce48f35b2ec66e013d6c5e25e3445.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ZM"
+      ],
+      "currencies": [
+        "ZMW"
+      ]
+    },
+    {
+      "kind": "flag",
+      "code": "ZW",
+      "name": "Zimbabwe flag",
+      "logoUrl": "/api/exchange/visual-assets/f0b79e8841f06a4afed5a90142b1c202776dc1d1c82328f310458d7c0ee975d9.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ZW"
+      ],
+      "currencies": [
+        "ZWL"
+      ]
+    },
+    {
+      "kind": "network",
+      "code": "ADA",
+      "name": "Cardano",
+      "logoUrl": "/api/exchange/visual-assets/c1257317f1853dd6848777550a9a17f65f74435382b22d9385377737a803c069.png",
+      "alternatives": [],
+      "recordId": "imported-ada",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "ALGORAND",
+      "name": "Algorand",
+      "logoUrl": "/api/exchange/visual-assets/d339ac9912db83c24f7be2aab9c373c0562963100e8843c2244a1a7c70e2dfdb.png",
+      "alternatives": [],
+      "recordId": "imported-algorand",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "ARBITRUM",
+      "name": "Arbitrum One",
+      "logoUrl": "/api/exchange/visual-assets/7c9e8425179fd39933aeea9326684a7356721acd4bce9e99919e232f14135f23.png",
+      "alternatives": [],
+      "recordId": "imported-arbitrum",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "AVAXC",
+      "name": "Avalanche C-Chain",
+      "logoUrl": "/api/exchange/visual-assets/0195b3b11e71fc3c80793f28f5b5170fde1108d194a561d6bcddee2e6924775a.png",
+      "alternatives": [],
+      "recordId": "imported-avaxc",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "BCH",
+      "name": "Bitcoin Cash",
+      "logoUrl": "/api/exchange/visual-assets/03a53cc37436a99ba854e42df693fa52d92d88cbbce362fa217efd0e85be5e1f.png",
+      "alternatives": [],
+      "recordId": "imported-bch",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "BEP20",
+      "name": "BNB Smart Chain / BEP20",
+      "logoUrl": "/api/exchange/visual-assets/7aef69406a4a5c74bd3569222a4fb3e534c8c6c1446755fdec7d7687bbf38a04.png",
+      "alternatives": [],
+      "recordId": "bsc-testnet",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "BITCOIN",
+      "name": "Bitcoin",
+      "logoUrl": "/api/exchange/visual-assets/8022fd53c251f18cb39cefede445f1c78a3b265989232f0bb46b9c4622e55a9e.png",
+      "alternatives": [],
+      "recordId": "bitcoin-testnet",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "BNB",
+      "name": "BNB",
+      "logoUrl": "/api/exchange/visual-assets/7aef69406a4a5c74bd3569222a4fb3e534c8c6c1446755fdec7d7687bbf38a04.png",
+      "alternatives": [],
+      "recordId": "imported-bnb",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "DOGE",
+      "name": "Dogecoin",
+      "logoUrl": "/api/exchange/visual-assets/4a789f36f6ca12a6d1901ab8441a9cab7a4a9a5fd4ba87c887c4d45c729fffce.png",
+      "alternatives": [],
+      "recordId": "imported-doge",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "DOT",
+      "name": "Polkadot",
+      "logoUrl": "/api/exchange/visual-assets/6051b0de048fea17d91be204b3c2025e16265c3a5e65759bf254186e77d41e6c.png",
+      "alternatives": [],
+      "recordId": "imported-dot",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "ERC20",
+      "name": "Ethereum / ERC20",
+      "logoUrl": "/api/exchange/visual-assets/99bf2102cc13a51bb226f931b8d0fa4c5b3ca9dc4179167e89d7ee3f677c3fdb.png",
+      "alternatives": [],
+      "recordId": "ethereum-sepolia",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "LTC",
+      "name": "Litecoin",
+      "logoUrl": "/api/exchange/visual-assets/7160750bcbc115ac8a3229bc1120fb59e96a737d607a57b42fa8e2b092a14159.png",
+      "alternatives": [],
+      "recordId": "imported-ltc",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "POLYGON",
+      "name": "Polygon",
+      "logoUrl": "/api/exchange/visual-assets/488e64ba671bc0fed4613e2806137850a88405565f18acb97a3f6b2772a92f3e.png",
+      "alternatives": [],
+      "recordId": "imported-polygon",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "POLYGON_LEGACY",
+      "name": "Polygon PoS (legacy)",
+      "logoUrl": "/api/exchange/visual-assets/488e64ba671bc0fed4613e2806137850a88405565f18acb97a3f6b2772a92f3e.png",
+      "alternatives": [],
+      "recordId": "imported-polygon",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "SOL",
+      "name": "Solana",
+      "logoUrl": "/api/exchange/visual-assets/b9296ce1118a6d150e57049190aeb4c024199e0787e0c6198c244230b8d704f5.png",
+      "alternatives": [],
+      "recordId": "solana-devnet",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "SPL",
+      "name": "Solana / SPL",
+      "logoUrl": "/api/exchange/visual-assets/b9296ce1118a6d150e57049190aeb4c024199e0787e0c6198c244230b8d704f5.png",
+      "alternatives": [],
+      "recordId": "solana-devnet",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "TON",
+      "name": "The Open Network",
+      "logoUrl": "/api/exchange/visual-assets/62fa11637a09a5ca3bba816dc129f6642fb5938052d32ec98a2f2f350349b89d.png",
+      "alternatives": [],
+      "recordId": "imported-ton",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "TRC20",
+      "name": "TRON / TRC20",
+      "logoUrl": "/api/exchange/visual-assets/91329e8a180b0fc75f4b8b4cd252a64e4f13f33edf4aa6664fbde442cedff001.png",
+      "alternatives": [],
+      "recordId": "tron-nile",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "XLM",
+      "name": "Stellar",
+      "logoUrl": "/api/exchange/visual-assets/acfff1433e08244ccc69a0996f423da6e82186b96b4d8d3795813c26783cc329.png",
+      "alternatives": [],
+      "recordId": "imported-xlm",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "XMR",
+      "name": "Monero",
+      "logoUrl": "/api/exchange/visual-assets/c050fde5b5f8be05b784ae2aa24bd3833a98e2cefbd1ac53f1dc799864be0d52.png",
+      "alternatives": [],
+      "recordId": "imported-xmr",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "network",
+      "code": "XRPL",
+      "name": "XRP Ledger",
+      "logoUrl": "/api/exchange/visual-assets/0875539d872ac02066c129360ade039e835bd7b9b2320f3a4d24ed4ef72c3051.png",
+      "alternatives": [],
+      "recordId": "imported-xrpl",
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "BBVA",
+      "name": "BBVA",
+      "logoUrl": "/api/exchange/visual-assets/2d0dfd1a05384bfd9a9fa559b99096a8e81fa9f7579c954797fde3dd019de749.png",
+      "alternatives": [
+        "/api/exchange/visual-assets/11172c45a992fbce529a82a630dbfb5aaee8e8af314d778fe242d30dfa83ae31.png",
+        "/api/exchange/visual-assets/7c7418a1d794ac446e587c8ac9ea255d457b264e196efe4c474cd683a6e4d41b.png",
+        "/api/exchange/visual-assets/4bcf418a6d88bd392988e665b6ad62fd55e18184e250088b6474bcd55627de3d.png"
+      ],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "ACH",
+      "name": "ACH",
+      "logoUrl": "/api/exchange/visual-assets/1eb53a60d3f795972e4cb14bdd1df1cb0a15754b25b0f230941bae291324833c.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "ALIPAY",
+      "name": "Alipay",
+      "logoUrl": "/api/exchange/visual-assets/2331ab0327d802a8f87febc0793bd6d579d9aee18e4be6676a6666d6da391357.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "BKASH",
+      "name": "bKash",
+      "logoUrl": "/api/exchange/visual-assets/fd9c546f26373b0a1f1ca82392245bb7b621f04b11a7fc34e6c127a94e0b8a81.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "BDT"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "BUNQ",
+      "name": "bunq",
+      "logoUrl": "/api/exchange/visual-assets/1254ebc02e1e52e53ce80595a1d86eacfdb00d316594147c44700effed97f2be.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "CAIXABANK",
+      "name": "CaixaBank",
+      "logoUrl": "/api/exchange/visual-assets/7cad9acc0328b507786c8142aea9efcd10bb58cfc3556844f76c5c97e8929796.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "CAPITALIST",
+      "name": "Capitalist",
+      "logoUrl": "/api/exchange/visual-assets/07a2bb0e79a4a1dc58aa4e9469d812443c0cc6276752052ead5fda1e67ac5283.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "AED",
+        "EUR",
+        "GBP",
+        "KZT",
+        "TRY",
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "CASHAPP",
+      "name": "Cash App",
+      "logoUrl": "/api/exchange/visual-assets/09f9b47ff08d4247b62b4da9fd40f51eda17def6d18471a2d2b0b2f7059ea4bb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "CHAPS",
+      "name": "CHAPS",
+      "logoUrl": "/api/exchange/visual-assets/da344b6399fd4f8449a8a905d34c2a653b6ff3394b3825590823ddc647878710.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "GBP"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "COMMERZBANK",
+      "name": "Commerzbank",
+      "logoUrl": "/api/exchange/visual-assets/9ec7fe861620c4b1af43e4c7a1f79929716a51a95828677e98687f223cb8646b.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "EASYPAISA",
+      "name": "Easypaisa",
+      "logoUrl": "/api/exchange/visual-assets/9f52aa552e3dc76895c3560ec1b14e36f5e5524ddcbc82e6eae4754109e60288.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "PKR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "FASTER-PAYMENTS",
+      "name": "Faster Payments",
+      "logoUrl": "/api/exchange/visual-assets/c14f7f9f2ec3f53b0ed635759a76443cb7a3d2f8adbbcef2fa962352dfbf1137.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "GBP"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "FEDWIRE",
+      "name": "Fedwire",
+      "logoUrl": "/api/exchange/visual-assets/c818b0a2eae9a032683e42a59c12aa7f9732a60f4a130a9afe9463c9f6cb76d6.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "GCASH",
+      "name": "GCash",
+      "logoUrl": "/api/exchange/visual-assets/1a8dedf7e1ff8656f705c62ca59ee8e6ffe709757bcb66a89f714f48d25ca5b8.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "PHP"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "ICARD",
+      "name": "iCard",
+      "logoUrl": "/api/exchange/visual-assets/d274dafac665efce92151305fe17267b21c5dd4ce4704ac5e968cf522d7c9c8d.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "IMPS-NEFT-RTGS",
+      "name": "IMPS / NEFT / RTGS",
+      "logoUrl": "/api/exchange/visual-assets/828c38ad64f98bb0fa74bef1a60186b6734c588de2e8714e4a107ad7dbba2dc2.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "INR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "ING",
+      "name": "ING",
+      "logoUrl": "/api/exchange/visual-assets/ecd4be588b43949cd2dbfecfc445025b3da1d6fc5c9b51ae8ddaeb052f7a1d53.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "INTERAC",
+      "name": "Interac e-Transfer",
+      "logoUrl": "/api/exchange/visual-assets/935cdbe7d6ebd7f853353ac23cd6954b53324ca22642fa99ca3d646adc7db97a.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "CAD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "KZT",
+      "name": "Kaspi Bank",
+      "logoUrl": "/api/exchange/visual-assets/ce28c679dbcc9030bad680abc6ab023b3bc9ca3d3cb88196eeb0013d4fbf4018.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "KZT"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "MASTERCARD",
+      "name": "Mastercard",
+      "logoUrl": "/api/exchange/visual-assets/516f22f50682f7cffba614d11d74c0f22fe48d892d541c01fbf1583876801c80.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "MPESA-TANZANIA",
+      "name": "M-Pesa Tanzania",
+      "logoUrl": "/api/exchange/visual-assets/44ea786ef9f9ad7f0ee37ab3166580818da36d2cd2721f5a480cc8a06d801fa2.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "TZS"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "N26",
+      "name": "N26",
+      "logoUrl": "/api/exchange/visual-assets/632ff21d5c280ebae1d0978deb51be3b5c4f8cf58b15b9e712c7f9ed9a08c869.svg",
+      "alternatives": [
+        "/api/exchange/visual-assets/cf63b725f42a8648b516a2ebc3a44fac300f0de3730e47674e44cb47ae3cca04.webp"
+      ],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "NETELLER",
+      "name": "Neteller",
+      "logoUrl": "/api/exchange/visual-assets/e18c35c05f7f26778a9b8efa20dd85b383ab7e2c892b6f7e0b9a476a923db00b.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR",
+        "GBP",
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "PAYEER",
+      "name": "Payeer",
+      "logoUrl": "/api/exchange/visual-assets/5e234eb2c53eb5da7ecd4a4e8de5d17c2a2760954c54c64ed1b4509f46a5861c.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "PAYID-NPP",
+      "name": "PayID / NPP",
+      "logoUrl": "/api/exchange/visual-assets/bbd1a1b525b9357191f4dcba325aef63bbb9f8beedd867361eee1a7afeae171f.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "AUD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "PAYNOW",
+      "name": "PayNow",
+      "logoUrl": "/api/exchange/visual-assets/53965d33a75e79fa5cf275a4a03cb5220ad8b97334b114abc47faaf2fd92d9c9.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "SGD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "PAYPAL",
+      "name": "PayPal",
+      "logoUrl": "/api/exchange/visual-assets/b2189a2b9ee6675c4e098085ee7d9de6dc5fe80e01a505d14581c7b40e974be2.svg",
+      "alternatives": [
+        "/api/exchange/visual-assets/e457e77103976d68d8d8d06a77b30ba2913026d36d011ad9e7d390a99fb789b9.png"
+      ],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "PAYSERA",
+      "name": "Paysera",
+      "logoUrl": "/api/exchange/visual-assets/167465722858bfef4e0f39adbed6ac5192f23d26c903649de45596f1e45d6a78.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "PERFECT-MONEY",
+      "name": "Perfect Money",
+      "logoUrl": "/api/exchange/visual-assets/c19a0403738f73e4952f88de0ca9946fe8e5e70651a21de52521e33dfb22f1cb.jpg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "AED",
+        "EUR",
+        "GBP",
+        "KZT",
+        "TRY",
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "PIX",
+      "name": "Pix",
+      "logoUrl": "/api/exchange/visual-assets/17be616a98251e755d9728a5318a7f5a9e72bccc37c925959491a352089f0c44.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "PROMPTPAY",
+      "name": "PromptPay",
+      "logoUrl": "/api/exchange/visual-assets/09114ed246ac06ac8d9a395f8aaf7464aa5090e75b3b8d54231424e5cc1b515e.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "THB"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "REVOLUT",
+      "name": "Revolut",
+      "logoUrl": "/api/exchange/visual-assets/8177ccd1d696508de9dcea3e7672ad5c265ef5053c686badfce4f6ea8fbe7408.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "REVOLUT-EUR",
+      "name": "Revolut EUR",
+      "logoUrl": "/api/exchange/visual-assets/13e4b80c5871f2481b436f7b142adc24b10a027121267681a1a15f4f5498aa9f.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "REVOLUT-USD",
+      "name": "Revolut USD",
+      "logoUrl": "/api/exchange/visual-assets/13e4b80c5871f2481b436f7b142adc24b10a027121267681a1a15f4f5498aa9f.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "SEPA-INSTANT",
+      "name": "SEPA Instant",
+      "logoUrl": "/api/exchange/visual-assets/67a61c663d34007fe1125cd63b48d9c0f367b598bb0d4a6e464f0b75fdc20aee.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "SEPA-TRANSFER",
+      "name": "SEPA transfer",
+      "logoUrl": "/api/exchange/visual-assets/67a61c663d34007fe1125cd63b48d9c0f367b598bb0d4a6e464f0b75fdc20aee.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "SKRILL",
+      "name": "Skrill",
+      "logoUrl": "/api/exchange/visual-assets/537f3d77c14736c87711c369982cd71a99bc693242c2a49d22b992769f42cce8.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR",
+        "GBP",
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "SPEI",
+      "name": "SPEI",
+      "logoUrl": "/api/exchange/visual-assets/348ae538398583fddc862dbe374e5e0c07ec0384e5b4d52614ce54d532c40781.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "MXN"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "SWIFT-BANK-TRANSFER",
+      "name": "SWIFT bank transfer",
+      "logoUrl": "/api/exchange/visual-assets/0a3a902705e187cf3c05f1c7a8d5eabedb5301529051dddb54cfb5574b1187a5.jpg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "AED",
+        "AFN",
+        "ALL",
+        "AMD",
+        "ANG",
+        "AOA",
+        "ARS",
+        "AUD",
+        "AWG",
+        "AZN",
+        "BAM",
+        "BBD",
+        "BDT",
+        "BGN",
+        "BHD",
+        "BIF",
+        "BMD",
+        "BND",
+        "BOB",
+        "BOV",
+        "BRL",
+        "BSD",
+        "BTN",
+        "BWP",
+        "BYN",
+        "BZD",
+        "CAD",
+        "CDF",
+        "CHE",
+        "CHF",
+        "CHW",
+        "CLP",
+        "CNY",
+        "COP",
+        "COU",
+        "CRC",
+        "CUP",
+        "CVE",
+        "CZK",
+        "DJF",
+        "DKK",
+        "DOP",
+        "EGP",
+        "ERN",
+        "ETB",
+        "EUR",
+        "FJD",
+        "FKP",
+        "GBP",
+        "GEL",
+        "GHS",
+        "GIP",
+        "GMD",
+        "GNF",
+        "GTQ",
+        "GYD",
+        "HKD",
+        "HNL",
+        "HRK",
+        "HTG",
+        "HUF",
+        "IDR",
+        "ILS",
+        "INR",
+        "IQD",
+        "IRR",
+        "ISK",
+        "JMD",
+        "JOD",
+        "JPY",
+        "KES",
+        "KGS",
+        "KHR",
+        "KMF",
+        "KPW",
+        "KRW",
+        "KWD",
+        "KYD",
+        "KZT",
+        "LAK",
+        "LBP",
+        "LKR",
+        "LRD",
+        "LSL",
+        "LYD",
+        "MAD",
+        "MDL",
+        "MGA",
+        "MKD",
+        "MMK",
+        "MNT",
+        "MOP",
+        "MRU",
+        "MUR",
+        "MVR",
+        "MWK",
+        "MXN",
+        "MXV",
+        "MYR",
+        "MZN",
+        "NAD",
+        "NGN",
+        "NIO",
+        "NOK",
+        "NPR",
+        "NZD",
+        "OMR",
+        "PAB",
+        "PEN",
+        "PGK",
+        "PHP",
+        "PKR",
+        "PLN",
+        "PYG",
+        "QAR",
+        "RON",
+        "RSD",
+        "RUB",
+        "RWF",
+        "SAR",
+        "SBD",
+        "SCR",
+        "SDG",
+        "SEK",
+        "SGD",
+        "SHP",
+        "SLE",
+        "SOS",
+        "SRD",
+        "SSP",
+        "STN",
+        "SVC",
+        "SYP",
+        "SZL",
+        "THB",
+        "TJS",
+        "TMT",
+        "TND",
+        "TOP",
+        "TRY",
+        "TTD",
+        "TWD",
+        "TZS",
+        "UAH",
+        "UGX",
+        "USD",
+        "USN",
+        "UYI",
+        "UYU",
+        "UYW",
+        "UZS",
+        "VED",
+        "VES",
+        "VND",
+        "VUV",
+        "WST",
+        "XAF",
+        "XCD",
+        "XOF",
+        "XPF",
+        "YER",
+        "ZAR",
+        "ZMW",
+        "ZWL"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "TRY",
+      "name": "Zirrat",
+      "logoUrl": "/api/exchange/visual-assets/7a24603b318043116c193a8cd6c52514ff1b7d0c90706295d01f3ebf273b212d.jpg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "TRY"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "UPI",
+      "name": "UPI",
+      "logoUrl": "/api/exchange/visual-assets/95a966070ebe418e23b37a511d43beb243b732e68f7cb6dd680713c9784471b4.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "INR"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "VENMO",
+      "name": "Venmo",
+      "logoUrl": "/api/exchange/visual-assets/a729ac09796f95a2e6f47ec9e054b22afceed24eca0b8e1a65041479a535a5cb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "VISA",
+      "name": "Visa",
+      "logoUrl": "/api/exchange/visual-assets/3b08a91222072b41b8658fe714d0317a08c74823410f97976da0aa77b1733bac.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "VOLET",
+      "name": "Volet",
+      "logoUrl": "/api/exchange/visual-assets/add96223fa5d1d34b9cc3be87e0f28174fadfe2a04c34618e25daaa70a7c0fb7.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "EUR",
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "W0",
+      "name": "wio",
+      "logoUrl": "/api/exchange/visual-assets/b059093e4caf25d67b2a7d65b97389c417539481f524799dfd3e991ea6bd0412.jpg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "AED",
+        "EUR",
+        "GBP",
+        "KZT",
+        "TRY",
+        "USD"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "WECHAT-PAY",
+      "name": "WeChat Pay",
+      "logoUrl": "/api/exchange/visual-assets/b840aae1a8cd5e010a6435ad31f5a8152e1481bb6794ce7343a85a8f55a9d21c.png",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": [
+        "CNY"
+      ]
+    },
+    {
+      "kind": "payment-method",
+      "code": "WISE",
+      "name": "Wise",
+      "logoUrl": "/api/exchange/visual-assets/923438ea03b2fc19374f447091b8b534e58bb1b1e42c70be4771f4a64cd880cb.svg",
+      "alternatives": [
+        "/api/exchange/visual-assets/76963140a8abe4229a90b09e93063799174261c0aacc793ce4a72161eb98c1e1.png"
+      ],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "payment-method",
+      "code": "ZELLE",
+      "name": "Zelle",
+      "logoUrl": "/api/exchange/visual-assets/9e32a5745ebc43b8d20cc2f8ada0aecd47c29e29c74187beb2e64497d530a52f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [],
+      "currencies": []
+    },
+    {
+      "kind": "currency",
+      "code": "AED",
+      "name": "AED currency visual",
+      "logoUrl": "/api/exchange/visual-assets/8db8bfc3d1a711967e44fbe237a52d75cd03a3dfbcefc9d78febd61c2973915e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AE"
+      ],
+      "currencies": [
+        "AED"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "AFN",
+      "name": "AFN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/adebcd50e61dd0e3c83c689f5e3c7f6ca5055ca5f4a54119e27bf9e8df7e5421.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AF"
+      ],
+      "currencies": [
+        "AFN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ALL",
+      "name": "ALL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/173ec6b28100ddbaeb011b73b4776e50fc2545e14c81ad65e25c19b7137788be.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AL"
+      ],
+      "currencies": [
+        "ALL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "AMD",
+      "name": "AMD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/1eb2190d967efac59bb4f18f699b465f76dc3128593011e59243450cd593f846.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AM"
+      ],
+      "currencies": [
+        "AMD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ANG",
+      "name": "ANG currency visual",
+      "logoUrl": "/api/exchange/visual-assets/6e35d3452497a8e5766b9c00087b91d06e79fde18dfe6b74fb18ff72c6635bc1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CW"
+      ],
+      "currencies": [
+        "ANG"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "AOA",
+      "name": "AOA currency visual",
+      "logoUrl": "/api/exchange/visual-assets/0f10545c2991c7ad5332dff881c0e176de0a021260e722af7cfdd996ce9b497e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AO"
+      ],
+      "currencies": [
+        "AOA"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ARS",
+      "name": "ARS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/0828d651a95f39cea1e5d9d2ee30ec4dbcf55d70bdea39c89ec80c83226ad86d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AR"
+      ],
+      "currencies": [
+        "ARS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "AUD",
+      "name": "AUD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b826e039804d5cf313bd7e22a40ea2239e8e22ddba7c19a8787dfaad1dda71aa.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AU"
+      ],
+      "currencies": [
+        "AUD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "AWG",
+      "name": "AWG currency visual",
+      "logoUrl": "/api/exchange/visual-assets/2c9121a16748576e5bf0a2c24e5405ba42c9cae197ff213fadbdceb4cc706def.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AW"
+      ],
+      "currencies": [
+        "AWG"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "AZN",
+      "name": "AZN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/963c074ace679c88a77f6a5db3bd0f3b98a169dae5ebd12abb6293ecda497280.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AZ"
+      ],
+      "currencies": [
+        "AZN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BAM",
+      "name": "BAM currency visual",
+      "logoUrl": "/api/exchange/visual-assets/1c83a2cf7e8366afb9d724f896902ec46a722739538349d6f41b0953d47f171f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BA"
+      ],
+      "currencies": [
+        "BAM"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BBD",
+      "name": "BBD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b38fe14e1e967ea658331d386e8028c5a02d2de70c8376b06deda6ea77a4938b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BB"
+      ],
+      "currencies": [
+        "BBD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BDT",
+      "name": "BDT currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b509e5c29b8c32761c273449647d5a35c5301227b27ee786d353be7916bfddaf.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BD"
+      ],
+      "currencies": [
+        "BDT"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BGN",
+      "name": "BGN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/829c1f5f6f403632fd4710b8b7f3a313408e5285e4540af97950408ff9a5abfe.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BG"
+      ],
+      "currencies": [
+        "BGN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BHD",
+      "name": "BHD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/4cb584ef406f6bc57ea9c935db43890b9719ae126fe1ad4fb10890709978162b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BH"
+      ],
+      "currencies": [
+        "BHD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BIF",
+      "name": "BIF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/00f86f0400888d0ecf5a2b9bfa66f176af6095f413d53d622b6c061c1723cfd9.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BI"
+      ],
+      "currencies": [
+        "BIF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BMD",
+      "name": "BMD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/c5641664796bd1a0906af9f10543eca02aca8fa97104b2f92fd07e9670adf91c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BM"
+      ],
+      "currencies": [
+        "BMD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BND",
+      "name": "BND currency visual",
+      "logoUrl": "/api/exchange/visual-assets/cdb37ed23eed4e4a010d3e68db6d66048a7e90b4d465c735f6e6072564b0fa91.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BN"
+      ],
+      "currencies": [
+        "BND"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BOB",
+      "name": "BOB currency visual",
+      "logoUrl": "/api/exchange/visual-assets/7d724dac914eaed951a3e3dd901350b9636cfbba0fc4d78f1fcf193c1f29e67b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BO"
+      ],
+      "currencies": [
+        "BOB"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BOV",
+      "name": "BOV currency visual",
+      "logoUrl": "/api/exchange/visual-assets/7d724dac914eaed951a3e3dd901350b9636cfbba0fc4d78f1fcf193c1f29e67b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BO"
+      ],
+      "currencies": [
+        "BOV"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BRL",
+      "name": "BRL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e0215eff9f53b0236db885963ac45d6baea52e10ce33ceafdbe0eb1820d21160.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BR"
+      ],
+      "currencies": [
+        "BRL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BSD",
+      "name": "BSD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/44946f0ba5ad43cabe8bfa6c52e0f7a9562f7ff336d58478577f3b3a19c1ef08.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BS"
+      ],
+      "currencies": [
+        "BSD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BTN",
+      "name": "BTN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/39a47be433cda95dab7521aed8609c61f3fe377524e5de397dbb9c75624dd822.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BT"
+      ],
+      "currencies": [
+        "BTN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BWP",
+      "name": "BWP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e89b9cb27040b2995d2f66fca2492eb19434c0793d80ff70ce6819f2540e40a0.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BW"
+      ],
+      "currencies": [
+        "BWP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BYN",
+      "name": "BYN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/2af1ac1ecbfda4690e8b1b076def28e384aa69cbf5004ee37cef43665fd6e4f6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BY"
+      ],
+      "currencies": [
+        "BYN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "BZD",
+      "name": "BZD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/99ff3a88d1493f5e00c8a4dd9f7eb379a004961f4503eb3e5598e388c911b583.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "BZ"
+      ],
+      "currencies": [
+        "BZD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CAD",
+      "name": "CAD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/3cd6c2b9fe12bc0617ef4374b570ad87920bae757a95b104384fc301352c6942.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CA"
+      ],
+      "currencies": [
+        "CAD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CDF",
+      "name": "CDF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e2e70cf2f16e4ede17ec2a6d0b740c82b622e2cae6b3419d2217092f9c0872f4.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CD"
+      ],
+      "currencies": [
+        "CDF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CHE",
+      "name": "CHE currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a5ec3bbf0f3e686ea05ae17f51e8f3a287ad332217b679bbd393842b7d427859.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CH"
+      ],
+      "currencies": [
+        "CHE"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CHF",
+      "name": "CHF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a5ec3bbf0f3e686ea05ae17f51e8f3a287ad332217b679bbd393842b7d427859.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CH"
+      ],
+      "currencies": [
+        "CHF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CHW",
+      "name": "CHW currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a5ec3bbf0f3e686ea05ae17f51e8f3a287ad332217b679bbd393842b7d427859.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CH"
+      ],
+      "currencies": [
+        "CHW"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CLP",
+      "name": "CLP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ca4d50dcf36926c82f02b895975f351a639b0aa1b91bb6ef776f4f07f225cc34.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CL"
+      ],
+      "currencies": [
+        "CLP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CNY",
+      "name": "CNY currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ce797608958527808601798df00691aced6120bd600c0624161230020229dc99.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CN"
+      ],
+      "currencies": [
+        "CNY"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "COP",
+      "name": "COP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ec3daa5a284fc6d10104a53fd16ea77eba9ac1044ffa629f953644c1de63dcd3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CO"
+      ],
+      "currencies": [
+        "COP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "COU",
+      "name": "COU currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ec3daa5a284fc6d10104a53fd16ea77eba9ac1044ffa629f953644c1de63dcd3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CO"
+      ],
+      "currencies": [
+        "COU"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CRC",
+      "name": "CRC currency visual",
+      "logoUrl": "/api/exchange/visual-assets/f7e60b87265310b60217dcd26b24879222a7e5e13fe4c52ae1afdc3c6c737bbf.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CR"
+      ],
+      "currencies": [
+        "CRC"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CUP",
+      "name": "CUP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/afba6d3e29d510e256c07b23f2afc00a9cea87296765138e5645fe995d24249f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CU"
+      ],
+      "currencies": [
+        "CUP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CVE",
+      "name": "CVE currency visual",
+      "logoUrl": "/api/exchange/visual-assets/bcbf0add799b13377bdf842e1f380ff630650d3b7dba2d8f1273093cfa6ceb0f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CV"
+      ],
+      "currencies": [
+        "CVE"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "CZK",
+      "name": "CZK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/5f4ba801f6715e2d29f8b88f785bfc77a0dc1455a0f649626ad9a0cc66cd6df2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CZ"
+      ],
+      "currencies": [
+        "CZK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "DJF",
+      "name": "DJF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/072cd869e9430e51fe7d48b0bd33c882b6365386c9987c03cb76f802597af936.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DJ"
+      ],
+      "currencies": [
+        "DJF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "DKK",
+      "name": "DKK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/eb4ea9929e6491fd0444ea5da5b9a19dda089a2ac758ad63956cfbcc7fa81cc3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DK"
+      ],
+      "currencies": [
+        "DKK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "DOP",
+      "name": "DOP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ed01134a6d931721c58fc34771e34e1d513e9e06e7241a1e6528172093c77880.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DO"
+      ],
+      "currencies": [
+        "DOP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "DZD",
+      "name": "DZD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/51bda9bdc313fa5418550d94d46f31e0c396f4e70c810b629fac0430f4b7e638.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "DZ"
+      ],
+      "currencies": [
+        "DZD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "EGP",
+      "name": "EGP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/07129395f46d9e71844fe9b485e05bf49741bc72a480b567297d6d865f3d8150.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "EG"
+      ],
+      "currencies": [
+        "EGP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ERN",
+      "name": "ERN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/69f92c176c843d7c899eaa7beaa1f75a0499d49fbb24e2053ed98be77e176498.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ER"
+      ],
+      "currencies": [
+        "ERN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ETB",
+      "name": "ETB currency visual",
+      "logoUrl": "/api/exchange/visual-assets/980ec719a0be7227e6769b9bf9198b182b743b9544326f4ef2566ecd3ebfeb94.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ET"
+      ],
+      "currencies": [
+        "ETB"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "EUR",
+      "name": "EUR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/cf15767517ce6ab1fc46a41b07fa66be2ab3db8085216be5abd43c1fbf36243d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "EU"
+      ],
+      "currencies": [
+        "EUR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "FJD",
+      "name": "FJD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e2c0c872c02b315510c6923a7913d1783accabab0ea1eef103a3f23165af320f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "FJ"
+      ],
+      "currencies": [
+        "FJD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "FKP",
+      "name": "FKP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/3bb31afe510af3b8ad548e3f3f6ed746437d0598bcde5b66e542768572e19383.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "FK"
+      ],
+      "currencies": [
+        "FKP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GBP",
+      "name": "GBP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/42f04826dd7a76e4ecdc9a55fb4a774a26e03a425ca1363628bb1c6f6ea1a87e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GB"
+      ],
+      "currencies": [
+        "GBP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GEL",
+      "name": "GEL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/dfba0d29f581ff00c2e46b69cc90e0e9ff6371ab92fbe300664f6622f7ca0355.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GE"
+      ],
+      "currencies": [
+        "GEL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GHS",
+      "name": "GHS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a8c4320f89adc39f1c43f0100031e6acfce9299aed5bf035732d00d34d44ee88.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GH"
+      ],
+      "currencies": [
+        "GHS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GIP",
+      "name": "GIP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e5f4e6d23324e3b8682aad7033492640affac084ea7989e3f4c9a3f2a6347ee6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GI"
+      ],
+      "currencies": [
+        "GIP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GMD",
+      "name": "GMD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/d4418b31447cb5b7ddfcc3b47f3075795700363cc97132d9ab8b2de417027b98.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GM"
+      ],
+      "currencies": [
+        "GMD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GNF",
+      "name": "GNF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/4932e18d832d6a781bc00400b69136cc9406234d3800e1e66ea809550a84b423.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GN"
+      ],
+      "currencies": [
+        "GNF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GTQ",
+      "name": "GTQ currency visual",
+      "logoUrl": "/api/exchange/visual-assets/d59addea6225e7eeb09efaee9a888aacc2b93651e1306a3de84764c6c729f821.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GT"
+      ],
+      "currencies": [
+        "GTQ"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "GYD",
+      "name": "GYD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/910830b8f1f35c778f37eb37d47eea0ea952d1bf04070f7eaeb697d0f8ead948.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "GY"
+      ],
+      "currencies": [
+        "GYD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "HKD",
+      "name": "HKD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/4c7cbced68ee586af8b3d73a8d8a8c404deaa271da7204eb2afe5c1b070972eb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HK"
+      ],
+      "currencies": [
+        "HKD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "HNL",
+      "name": "HNL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/d2dd47a43f01a52ffff72cc88bd0e4fc9b503dee57250d22f870c36346079c5d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HN"
+      ],
+      "currencies": [
+        "HNL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "HRK",
+      "name": "HRK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/fa44157809f7739aabca54f3e27dfb1d7409ef17afe6ac18dd39294f124e205a.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HR"
+      ],
+      "currencies": [
+        "HRK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "HTG",
+      "name": "HTG currency visual",
+      "logoUrl": "/api/exchange/visual-assets/65839463e163fd812f732f606111c68961e9bb23aa9624c8c448605fe0e086a1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HT"
+      ],
+      "currencies": [
+        "HTG"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "HUF",
+      "name": "HUF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/2025b7ca34eac130a257abc189273adb73f5749cb0eb7c5c6d865d433d842e0b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "HU"
+      ],
+      "currencies": [
+        "HUF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "IDR",
+      "name": "IDR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b9d9dea991a06a1211e93e8fa33adc6035ede25d07dc6e98cf97cc57fd94a340.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ID"
+      ],
+      "currencies": [
+        "IDR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ILS",
+      "name": "ILS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/9e884f0c6d1001f8de2b478d3de9582f93fbbd9badcb31e3f52fefa3974ebc75.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IL"
+      ],
+      "currencies": [
+        "ILS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "INR",
+      "name": "INR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ea9966697a16e75d64b4e6a9a468009944bd336e8098a34839033eb641329fcc.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IN"
+      ],
+      "currencies": [
+        "INR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "IQD",
+      "name": "IQD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b0de86ef9c1cfb0067e0989bffa6f15579e0c78b331fc29a9e3469aea3cbec20.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IQ"
+      ],
+      "currencies": [
+        "IQD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "IRR",
+      "name": "IRR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/8e3015ef6405ba9c80a9c93897e3d75f21e4df303f3bcf8e363ea4c96cd06272.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IR"
+      ],
+      "currencies": [
+        "IRR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ISK",
+      "name": "ISK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b14a90783cbe55b65c663efb67e1c235389f46d60d9601d28b36773016d520e2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "IS"
+      ],
+      "currencies": [
+        "ISK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "JMD",
+      "name": "JMD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/44504dda9d5bff31dfbcf5c8cce7acf0bfb9a7b16a697aadca3f9c4e854b62eb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "JM"
+      ],
+      "currencies": [
+        "JMD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "JOD",
+      "name": "JOD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/fb2b2896420258e37d2e27a1d07c6488b5ff14a587edfbe7c4153f93042b8424.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "JO"
+      ],
+      "currencies": [
+        "JOD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "JPY",
+      "name": "JPY currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e8e6f6e75bc02eeb35e5904edc13df9b5990da70ac1ff1daa7a9fcc61c709a03.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "JP"
+      ],
+      "currencies": [
+        "JPY"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KES",
+      "name": "KES currency visual",
+      "logoUrl": "/api/exchange/visual-assets/0c65788e07b97827d85662c06cd74e83ab6027c8915579821df896446b26d4d5.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KE"
+      ],
+      "currencies": [
+        "KES"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KGS",
+      "name": "KGS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b6e67c6fce0ab4dcd376abf4b1656bd8bc9a654c8320d4eef45c810921a1c869.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KG"
+      ],
+      "currencies": [
+        "KGS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KHR",
+      "name": "KHR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/bdff20910e6d11f5c5b0a562d1302f4aad792255fcdc2e9a46bce1ed8fe8c56f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KH"
+      ],
+      "currencies": [
+        "KHR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KMF",
+      "name": "KMF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/21e3ee9de83bf7ac6b57400e92f63d81f1f174624e9a2f408a5dd23d4d8f8f04.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KM"
+      ],
+      "currencies": [
+        "KMF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KPW",
+      "name": "KPW currency visual",
+      "logoUrl": "/api/exchange/visual-assets/2891274f3603b50b8eb795f50ba361b7b4586ecc1f42f900689decd527fcc386.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KP"
+      ],
+      "currencies": [
+        "KPW"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KRW",
+      "name": "KRW currency visual",
+      "logoUrl": "/api/exchange/visual-assets/4e0b6d5fa63e2fc1c3d86fda025a4c2129e52d5fc6551d8355e9385dd2d88f4b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KR"
+      ],
+      "currencies": [
+        "KRW"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KWD",
+      "name": "KWD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ce62298731cb48e5f502af92203342f43bfa9568acfc6d2194c7227760e9184c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KW"
+      ],
+      "currencies": [
+        "KWD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KYD",
+      "name": "KYD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/30e1eff5519219c27ded9fed93ad3b2acdf898b7494411f23c2c5828d96a1e30.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KY"
+      ],
+      "currencies": [
+        "KYD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "KZT",
+      "name": "KZT currency visual",
+      "logoUrl": "/api/exchange/visual-assets/71a7d90e17ae74f6bf9572d9560b83d2d6ca047482fe2a229b770c67338f3848.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "KZ"
+      ],
+      "currencies": [
+        "KZT"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "LAK",
+      "name": "LAK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/c0cbe90abd407b916c31bc6d2cceb90ff61cf78ce5de00173e993c67f4e4ca15.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LA"
+      ],
+      "currencies": [
+        "LAK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "LBP",
+      "name": "LBP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/2c69b33a241e21c003113bae58fda58a08113e265a94262f6d0de39277876462.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LB"
+      ],
+      "currencies": [
+        "LBP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "LKR",
+      "name": "LKR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/c6d5351f0c9d5611cdfaf64b6b5324db73b437bc9d4e4bdc8a70a7d66533df93.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LK"
+      ],
+      "currencies": [
+        "LKR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "LRD",
+      "name": "LRD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b722560baa4a55e843b78f3a3485ff4ad31e5acd659142add4ba3990be2578cb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LR"
+      ],
+      "currencies": [
+        "LRD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "LSL",
+      "name": "LSL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/66002ab481b35579ef88633fea8114d698990afdaf94b0173e9c9d614d126b49.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LS"
+      ],
+      "currencies": [
+        "LSL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "LYD",
+      "name": "LYD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e2b019746d67350a9dcfc595616d0b73b868c8f3757f9516665e9141d8f0c117.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "LY"
+      ],
+      "currencies": [
+        "LYD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MAD",
+      "name": "MAD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/1f6f0d1bf2e6d69fc943eb0eb3a96a4e5f8473bfdd1bd6b5a4c903c6c7ee2fe2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MA"
+      ],
+      "currencies": [
+        "MAD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MDL",
+      "name": "MDL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a61c465c0aebd959715da03389b9aedcb9198ef840f578ef03cc2af0c76bfa31.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MD"
+      ],
+      "currencies": [
+        "MDL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MGA",
+      "name": "MGA currency visual",
+      "logoUrl": "/api/exchange/visual-assets/00a570504860576bcb032613cb185013ce9400e05fd9c1fdc274f9664d27f9d6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MG"
+      ],
+      "currencies": [
+        "MGA"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MKD",
+      "name": "MKD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/72a37e581f614d791fa6d88831d06c56a0f757e5a596d8fc1189b0d8147cfda6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MK"
+      ],
+      "currencies": [
+        "MKD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MMK",
+      "name": "MMK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/2ebf5312f5a4d89646aba2320b3dce9918136bdfd42303819830fcc29e905edb.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MM"
+      ],
+      "currencies": [
+        "MMK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MNT",
+      "name": "MNT currency visual",
+      "logoUrl": "/api/exchange/visual-assets/4f89f928fbfa245916b324dc272363ab12dba689814a9d2112023205e8e69baf.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MN"
+      ],
+      "currencies": [
+        "MNT"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MOP",
+      "name": "MOP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/f163f905ead86c901f7345c72c8bb60a898281370a8c6ea8bb15566c570b40ca.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MO"
+      ],
+      "currencies": [
+        "MOP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MRU",
+      "name": "MRU currency visual",
+      "logoUrl": "/api/exchange/visual-assets/1655e7ed2d848678e50138df15f3db7b37ed7a9c4f61cdf7e26cfec12d0e7057.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MR"
+      ],
+      "currencies": [
+        "MRU"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MUR",
+      "name": "MUR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/c35ef8388abd492cb6ddbb0b46e3be87244ec1088682de208a745c93c4852a80.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MU"
+      ],
+      "currencies": [
+        "MUR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MVR",
+      "name": "MVR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a825c00d340b88c63605d514c9c0e74ef17c0cf10caa0d0e46bb7ebee4788dd5.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MV"
+      ],
+      "currencies": [
+        "MVR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MWK",
+      "name": "MWK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/81a7dc8d3f32fcdc7cd98408f9602f53176a7ea3645770e4d852fc3646a2e576.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MW"
+      ],
+      "currencies": [
+        "MWK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MXN",
+      "name": "MXN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/baa6f7163f307c16a5d3e36c83a09fe46adbe16adfa866d4bb2d750a79d96b92.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MX"
+      ],
+      "currencies": [
+        "MXN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MXV",
+      "name": "MXV currency visual",
+      "logoUrl": "/api/exchange/visual-assets/baa6f7163f307c16a5d3e36c83a09fe46adbe16adfa866d4bb2d750a79d96b92.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MX"
+      ],
+      "currencies": [
+        "MXV"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MYR",
+      "name": "MYR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/1d3284c77094859fb63c1880af4f8f9a3916935a12faae060678c6e3455e956d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MY"
+      ],
+      "currencies": [
+        "MYR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "MZN",
+      "name": "MZN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/649e978eea07a70c6e7303a5291476b3f224063070abf4f6a5f4ddcbba7c1cf6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "MZ"
+      ],
+      "currencies": [
+        "MZN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "NAD",
+      "name": "NAD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ddc9fc887177f92e80fed16082c988924fbd19773ea33729fa3f2a1896d13814.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NA"
+      ],
+      "currencies": [
+        "NAD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "NGN",
+      "name": "NGN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/3dbebd9f8e31821d5fa22f976cfe9a338788fda81308f0d573e69fd9dfcce24e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NG"
+      ],
+      "currencies": [
+        "NGN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "NIO",
+      "name": "NIO currency visual",
+      "logoUrl": "/api/exchange/visual-assets/ed4fbc934d1bde93634e8904e0c1aec45587c95a2bbfbd024aa729e9adc956d6.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NI"
+      ],
+      "currencies": [
+        "NIO"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "NOK",
+      "name": "NOK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/0d4b9a52f0a6bd264258baac791b39910a895bb6ca06f63477fa823a262febdc.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NO"
+      ],
+      "currencies": [
+        "NOK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "NPR",
+      "name": "NPR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/f4a65e693806dbb31a5b2808a88d577c72ba0e8c5872fbd1e8600ff63a77c489.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NP"
+      ],
+      "currencies": [
+        "NPR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "NZD",
+      "name": "NZD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/aa29843a365d4eb21d35932172232d7d591a35fc51ac95c040c356f0f16c447e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "NZ"
+      ],
+      "currencies": [
+        "NZD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "OMR",
+      "name": "OMR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/38f39605556392f32fc4aa12e6db9a9c6984acd3cc7f3ccfbca9a014bc44796a.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "OM"
+      ],
+      "currencies": [
+        "OMR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "PAB",
+      "name": "PAB currency visual",
+      "logoUrl": "/api/exchange/visual-assets/8e8c7cf854aa3367d9ed9eda6c585540bde6369ef6163f435334216be4536200.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PA"
+      ],
+      "currencies": [
+        "PAB"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "PEN",
+      "name": "PEN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a35cf7c9bb6ac08e6d60d9683c78318746edc82284022aef02c9d6a07540045c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PE"
+      ],
+      "currencies": [
+        "PEN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "PGK",
+      "name": "PGK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/d98adee3bf8945b389144b04bc49824c85711e1d473236971ac8a48939328064.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PG"
+      ],
+      "currencies": [
+        "PGK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "PHP",
+      "name": "PHP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/d554297356ab66a5061df4c73c3bb293381875d86175fa0508f7ac4f035eb721.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PH"
+      ],
+      "currencies": [
+        "PHP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "PKR",
+      "name": "PKR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/2011fe01e332cfc8f16c861d4818bacf4ed1b6d9fa657cc246f86ab15a313768.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PK"
+      ],
+      "currencies": [
+        "PKR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "PLN",
+      "name": "PLN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/da6d9e34f2007194b0082d4caac04d1744b7b27fc40098747d4bc62e0d5a5bb2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PL"
+      ],
+      "currencies": [
+        "PLN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "PYG",
+      "name": "PYG currency visual",
+      "logoUrl": "/api/exchange/visual-assets/5bb06bf5b8f3ea2633dcfc0d417400786c69d6b1cb681208072f4658d2838af2.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PY"
+      ],
+      "currencies": [
+        "PYG"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "QAR",
+      "name": "QAR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/5332c024cb6bac6d7ca2f96347d2ce8cfc63f5bf2643a1d1e6ed6146e6b75a1d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "QA"
+      ],
+      "currencies": [
+        "QAR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "RON",
+      "name": "RON currency visual",
+      "logoUrl": "/api/exchange/visual-assets/20c8e69585273d35ba38fe2cae0d0201445a3b410c9589f4f7053316662482e3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RO"
+      ],
+      "currencies": [
+        "RON"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "RSD",
+      "name": "RSD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/5bc4c8297033b5b31ca9496dd1ad29232aa14389dc8c93db38f99faa707ebba3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RS"
+      ],
+      "currencies": [
+        "RSD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "RUB",
+      "name": "RUB currency visual",
+      "logoUrl": "/api/exchange/visual-assets/eb1dbd977fdb824dcae7767ce9ec3a023e41158e81b5f524772609ddcb622025.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RU"
+      ],
+      "currencies": [
+        "RUB"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "RWF",
+      "name": "RWF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/21b67e23f19a1bca9b4ad87ff788b4992cebc00a6deeca1eb9c56c16b63c0de8.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "RW"
+      ],
+      "currencies": [
+        "RWF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SAR",
+      "name": "SAR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/7176d38f2e39fa7c96608f5ae85bb51ba964f1b9a972b33b0d04796fe4487f71.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SA"
+      ],
+      "currencies": [
+        "SAR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SBD",
+      "name": "SBD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/56e24d58d3912dcd3c89187ee9ec08ea09957055296e823007ad615a4485f751.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SB"
+      ],
+      "currencies": [
+        "SBD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SCR",
+      "name": "SCR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b7a1ccdf0b210a2273426eaf334679dba7d3f5a90dddd91882beffa891bf3035.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SC"
+      ],
+      "currencies": [
+        "SCR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SDG",
+      "name": "SDG currency visual",
+      "logoUrl": "/api/exchange/visual-assets/305064d3c23eac774752898e1b3e9ff8ab7ecdfa45495be446dc520de8415727.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SD"
+      ],
+      "currencies": [
+        "SDG"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SEK",
+      "name": "SEK currency visual",
+      "logoUrl": "/api/exchange/visual-assets/426348d99d9cace2df6eaa6d6766d5a5ac21bb65a504a4ed974486cf96156b8f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SE"
+      ],
+      "currencies": [
+        "SEK"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SGD",
+      "name": "SGD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/d8782c5cc56587009a4939e9c0a95402001114eacda264417cd8f1678ff9329d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SG"
+      ],
+      "currencies": [
+        "SGD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SHP",
+      "name": "SHP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/8ca5f24f5398983173fde419470d646b2e328a6cf9f98d77443a706dd204066d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SH"
+      ],
+      "currencies": [
+        "SHP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SLE",
+      "name": "SLE currency visual",
+      "logoUrl": "/api/exchange/visual-assets/21d7e0663d2b8e1d455a0e1456c63dfbb273becdacbf7c1fa0e22d915f136cf4.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SL"
+      ],
+      "currencies": [
+        "SLE"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SLL",
+      "name": "SLL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/21d7e0663d2b8e1d455a0e1456c63dfbb273becdacbf7c1fa0e22d915f136cf4.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SL"
+      ],
+      "currencies": [
+        "SLL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SOS",
+      "name": "SOS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/3a342342f94f00a74984e10743f4589e7856076df6686f05e3192cd0ee0300e1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SO"
+      ],
+      "currencies": [
+        "SOS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SRD",
+      "name": "SRD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/098067b9dd5a6aac668c8883f9b96fe68865dc20a6f88a8859146900e389dd63.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SR"
+      ],
+      "currencies": [
+        "SRD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SSP",
+      "name": "SSP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/0f2a925c6daf8945ff257938e04b0609441f698010d80c9717904c71a54a235e.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SS"
+      ],
+      "currencies": [
+        "SSP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "STN",
+      "name": "STN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a95075950bff55641b4274439a909c6bda8005b22c397ef6315839ce9d0dec55.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ST"
+      ],
+      "currencies": [
+        "STN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SVC",
+      "name": "SVC currency visual",
+      "logoUrl": "/api/exchange/visual-assets/cbd0f1c0170aad674c898a602f0e43fcf330640cbbab0653d6ae4f941f7cd83d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SV"
+      ],
+      "currencies": [
+        "SVC"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SYP",
+      "name": "SYP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/114f63ff44c34361216c25e49c65ade53ba07a4607e5e917b089c60a0df6c173.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SY"
+      ],
+      "currencies": [
+        "SYP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "SZL",
+      "name": "SZL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/3d48fcbb07942d6d590bceb07f8462db36130a625022f12710e53c6cfdc51f77.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SZ"
+      ],
+      "currencies": [
+        "SZL"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "THB",
+      "name": "THB currency visual",
+      "logoUrl": "/api/exchange/visual-assets/6b5a7a862ef01de1efd7ca3526655609ef7b05cd2ee6e14eacc0436bb93da555.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TH"
+      ],
+      "currencies": [
+        "THB"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TJS",
+      "name": "TJS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/597f154cc4f0bc5b4941c880fd2cd79c2a20a1b1d5845c86e934c4500fab78d8.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TJ"
+      ],
+      "currencies": [
+        "TJS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TMT",
+      "name": "TMT currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a03b94f68d3eec97f3cdc495ceb98af910087b2623a02dc233820dfcc2ec2085.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TM"
+      ],
+      "currencies": [
+        "TMT"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TND",
+      "name": "TND currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b0d8964ee6ff40309779e0a1ea2780926a85edf9f1715c22ecbd04e14a4be9b4.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TN"
+      ],
+      "currencies": [
+        "TND"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TOP",
+      "name": "TOP currency visual",
+      "logoUrl": "/api/exchange/visual-assets/aaf4a1b55742a45ae01330347e723ec9d9da9b15e1e9e05cd7d1910de91eef00.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TO"
+      ],
+      "currencies": [
+        "TOP"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TRY",
+      "name": "TRY currency visual",
+      "logoUrl": "/api/exchange/visual-assets/f15da84b4e5b23f54b8177126f5711e6fd0db8d26a1b0d3cf7901d0aa8e6b7b1.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TR"
+      ],
+      "currencies": [
+        "TRY"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TTD",
+      "name": "TTD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/89fa29d1f4a553154be8ae34b5f6a31e4baf6197fee40d9103ada5b80de7e31b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TT"
+      ],
+      "currencies": [
+        "TTD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TWD",
+      "name": "TWD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/5e68330a1f2a298257ebbd3201512e8f947a688f4ff395df802ef7f15aeeb79b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TW"
+      ],
+      "currencies": [
+        "TWD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "TZS",
+      "name": "TZS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/0bdf0b45ec36def31a5ef9e162fe40bbca1d78a522bde23cb4f42d5929affdbc.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "TZ"
+      ],
+      "currencies": [
+        "TZS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "UAH",
+      "name": "UAH currency visual",
+      "logoUrl": "/api/exchange/visual-assets/542eaacd659923163edf3b1100c43bc137cc1ad9f0e394dee94de37d40ce1fca.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UA"
+      ],
+      "currencies": [
+        "UAH"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "UGX",
+      "name": "UGX currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b0d36274f9eac739b04046783a38c18bebd42587a0b0b1cc3d31a32e1ec05374.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UG"
+      ],
+      "currencies": [
+        "UGX"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "USD",
+      "name": "USD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e1792c011daad918fdbd99a21f7f46fd71018ffd052af5a7d7faf9954d593e31.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "USN",
+      "name": "USN currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e1792c011daad918fdbd99a21f7f46fd71018ffd052af5a7d7faf9954d593e31.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "US"
+      ],
+      "currencies": [
+        "USN"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "UYI",
+      "name": "UYI currency visual",
+      "logoUrl": "/api/exchange/visual-assets/856fc0e14ff877b68a68c89144852808e7a17b213d5f1dba4b9d27435c0b2f54.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UY"
+      ],
+      "currencies": [
+        "UYI"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "UYU",
+      "name": "UYU currency visual",
+      "logoUrl": "/api/exchange/visual-assets/856fc0e14ff877b68a68c89144852808e7a17b213d5f1dba4b9d27435c0b2f54.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UY"
+      ],
+      "currencies": [
+        "UYU"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "UYW",
+      "name": "UYW currency visual",
+      "logoUrl": "/api/exchange/visual-assets/856fc0e14ff877b68a68c89144852808e7a17b213d5f1dba4b9d27435c0b2f54.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UY"
+      ],
+      "currencies": [
+        "UYW"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "UZS",
+      "name": "UZS currency visual",
+      "logoUrl": "/api/exchange/visual-assets/7ce6e8b7f4dd2a5bc050f9e538d22fde2fd371df15b751e48a29c1c3cb3df00b.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "UZ"
+      ],
+      "currencies": [
+        "UZS"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "VED",
+      "name": "VED currency visual",
+      "logoUrl": "/api/exchange/visual-assets/756f64b7ab11de19928d6ee6235079200ba45477ea150b7fc3ffbd94f4fbebfe.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "VE"
+      ],
+      "currencies": [
+        "VED"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "VES",
+      "name": "VES currency visual",
+      "logoUrl": "/api/exchange/visual-assets/756f64b7ab11de19928d6ee6235079200ba45477ea150b7fc3ffbd94f4fbebfe.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "VE"
+      ],
+      "currencies": [
+        "VES"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "VND",
+      "name": "VND currency visual",
+      "logoUrl": "/api/exchange/visual-assets/bd236e52dc564431ea569bca0a7b81ae8e8663675cb24a7b6da43ff926cc147c.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "VN"
+      ],
+      "currencies": [
+        "VND"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "VUV",
+      "name": "VUV currency visual",
+      "logoUrl": "/api/exchange/visual-assets/18232f22b21730b4ec64a83c709f6546465c4777c2a3ad759686c3c2dfbc2745.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "VU"
+      ],
+      "currencies": [
+        "VUV"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "WST",
+      "name": "WST currency visual",
+      "logoUrl": "/api/exchange/visual-assets/acedd8fb18df15e9483cc8c0f30f24b7ff2299ca9006c261040e88677c0df0b3.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "WS"
+      ],
+      "currencies": [
+        "WST"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "XAF",
+      "name": "XAF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/e00c6cbb0cb7364bc1b825e145ae6232d611d0e457dfa621b6bfafa3b7c76a7f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "CM"
+      ],
+      "currencies": [
+        "XAF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "XCD",
+      "name": "XCD currency visual",
+      "logoUrl": "/api/exchange/visual-assets/73f382e91c9e9ba8e786696f20011a04c7e22354e37db61921f2c57645ec7385.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "AG"
+      ],
+      "currencies": [
+        "XCD"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "XOF",
+      "name": "XOF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/c0593c9c104142eadae2d76bd739b28a37d2218bf1ef4b37bf8fa9655bfab087.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "SN"
+      ],
+      "currencies": [
+        "XOF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "XPF",
+      "name": "XPF currency visual",
+      "logoUrl": "/api/exchange/visual-assets/f04ae2415d82f1ca5b3e1803d9321374821baedee0dcf5e1b5660d8c83dde39f.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "PF"
+      ],
+      "currencies": [
+        "XPF"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "YER",
+      "name": "YER currency visual",
+      "logoUrl": "/api/exchange/visual-assets/a92f3989182049dc218f7698c45d8cdfc64e6f945c71f20a9d188dd01698df2d.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "YE"
+      ],
+      "currencies": [
+        "YER"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ZAR",
+      "name": "ZAR currency visual",
+      "logoUrl": "/api/exchange/visual-assets/6fbf0b68db7024ac996c92b1bbc62efe9a3bf12e469efaa29ae4fe0fa5c6da39.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ZA"
+      ],
+      "currencies": [
+        "ZAR"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ZMW",
+      "name": "ZMW currency visual",
+      "logoUrl": "/api/exchange/visual-assets/b64a4ec9612720033a3e8de806cfdd112a8ce48f35b2ec66e013d6c5e25e3445.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ZM"
+      ],
+      "currencies": [
+        "ZMW"
+      ]
+    },
+    {
+      "kind": "currency",
+      "code": "ZWL",
+      "name": "ZWL currency visual",
+      "logoUrl": "/api/exchange/visual-assets/f0b79e8841f06a4afed5a90142b1c202776dc1d1c82328f310458d7c0ee975d9.svg",
+      "alternatives": [],
+      "recordId": null,
+      "countries": [
+        "ZW"
+      ],
+      "currencies": [
+        "ZWL"
+      ]
+    }
+  ],
+  "unavailable": [
+    {
+      "type": "crypto",
+      "name": "0G",
+      "code": "0G",
+      "reason": "Existing image sources unavailable; no substitute invented."
+    },
+    {
+      "type": "crypto",
+      "name": "DoubleZero",
+      "code": "2Z",
+      "reason": "Existing image sources unavailable; no substitute invented."
+    },
+    {
+      "type": "crypto",
+      "name": "AITECH Cloud Network",
+      "code": "ACN",
+      "reason": "Existing image sources unavailable; no substitute invented."
+    },
+    {
+      "type": "crypto",
+      "name": "Aevo",
+      "code": "AEVO",
+      "reason": "Existing image sources unavailable; no substitute invented."
+    },
+    {
+      "type": "crypto",
+      "name": "Sleepless AI Token",
+      "code": "AI",
+      "reason": "Existing image sources unavailable; no substitute invented."
+    },
+    {
+      "type": "crypto",
+      "name": "aixbt by Virtuals",
+      "code": "AIXBT",
+      "reason": "Existing image sources unavailable; no substitute invented."
+    },
+    {
+      "type": "payment-method",
+      "name": "Card payout",
+      "code": "card-payout",
+      "reason": "No standalone image; text/generic fallback only."
+    },
+    {
+      "type": "payment-method",
+      "name": "Cash pickup",
+      "code": "cash-pickup",
+      "reason": "No standalone image; text/generic fallback only."
+    },
+    {
+      "type": "network",
+      "name": "Base",
+      "code": "BASE",
+      "reason": "No standalone configured network image in this project; network uses text fallback."
+    },
+    {
+      "type": "network",
+      "name": "0G",
+      "code": "0G",
+      "reason": "No downloadable existing network/asset image source."
+    }
+  ],
+  "sandboxOnly": true,
+  "blobs": [
+    {
+      "filename": "fc4cde763182b4b59a64bd8d57184f4946e338cd16e9529be325a14c9637e2e7.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "5df3a36be8fb4acfad9202d7deb17ccdef62268185985076482ed5251df059b5.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "c996b3f2bd31d1d15090ea133417eefef5254bf55690c48cc490c2fd3dc582f0.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "8a5ecff50412f1513b83e1a24e4730de60aed45b4a8a687f6cb283d6d261edac.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "c1257317f1853dd6848777550a9a17f65f74435382b22d9385377737a803c069.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "c38a3900d747b0014f0b12f8d92118f9ae8d348b998664299c218a913b2557c4.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "849c05a9d1b363c1c063e2bda56b9a47bd1c7b71ffd6a202f84cb6033a461129.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "26b63f101746357a5aa90d6adae58480412c1759579a2cc45a844c388866496d.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "d339ac9912db83c24f7be2aab9c373c0562963100e8843c2244a1a7c70e2dfdb.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "4ab6b10d2bbb5863a641363680da297b2ece66f884c9c5f53b4978307e3764aa.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "7c9e8425179fd39933aeea9326684a7356721acd4bce9e99919e232f14135f23.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "5bc992b9f953e6f213d36f414eeb4c7b3987a5b54ebecac9966c3c9d7c472ab5.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "0195b3b11e71fc3c80793f28f5b5170fde1108d194a561d6bcddee2e6924775a.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "03a53cc37436a99ba854e42df693fa52d92d88cbbce362fa217efd0e85be5e1f.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "7aef69406a4a5c74bd3569222a4fb3e534c8c6c1446755fdec7d7687bbf38a04.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "8022fd53c251f18cb39cefede445f1c78a3b265989232f0bb46b9c4622e55a9e.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "4d93468f9a57ce913cc25aac45c14955671e01d70c4b2329d078892b5e5cd84f.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "4a789f36f6ca12a6d1901ab8441a9cab7a4a9a5fd4ba87c887c4d45c729fffce.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "6051b0de048fea17d91be204b3c2025e16265c3a5e65759bf254186e77d41e6c.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "99bf2102cc13a51bb226f931b8d0fa4c5b3ca9dc4179167e89d7ee3f677c3fdb.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "6180dd8f67f797ea2a3626cc1629bb9382f086b405ddf05084339db2b4aee353.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "7160750bcbc115ac8a3229bc1120fb59e96a737d607a57b42fa8e2b092a14159.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "488e64ba671bc0fed4613e2806137850a88405565f18acb97a3f6b2772a92f3e.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "479dd7d35d0624c617a8ffdfcdb0f953186da58918acfabde7501996dbccf950.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "a8f6ffea983f46e8f2b83abe8561938c10de36484ca79ca5432683f4c2634ea6.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "b9296ce1118a6d150e57049190aeb4c024199e0787e0c6198c244230b8d704f5.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "62fa11637a09a5ca3bba816dc129f6642fb5938052d32ec98a2f2f350349b89d.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "91329e8a180b0fc75f4b8b4cd252a64e4f13f33edf4aa6664fbde442cedff001.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "7f9969d11eef1e08ded67abd495a65b4394bf8363515eaf5bbad4c089b98928b.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "9adc9724481b9ee1393ee384f3cc3e39fdbf21936c38fa581ea1536371d0ceae.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "acfff1433e08244ccc69a0996f423da6e82186b96b4d8d3795813c26783cc329.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "c050fde5b5f8be05b784ae2aa24bd3833a98e2cefbd1ac53f1dc799864be0d52.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "0875539d872ac02066c129360ade039e835bd7b9b2320f3a4d24ed4ef72c3051.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "8db8bfc3d1a711967e44fbe237a52d75cd03a3dfbcefc9d78febd61c2973915e.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "adebcd50e61dd0e3c83c689f5e3c7f6ca5055ca5f4a54119e27bf9e8df7e5421.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "73f382e91c9e9ba8e786696f20011a04c7e22354e37db61921f2c57645ec7385.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "173ec6b28100ddbaeb011b73b4776e50fc2545e14c81ad65e25c19b7137788be.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "1eb2190d967efac59bb4f18f699b465f76dc3128593011e59243450cd593f846.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "0f10545c2991c7ad5332dff881c0e176de0a021260e722af7cfdd996ce9b497e.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "0828d651a95f39cea1e5d9d2ee30ec4dbcf55d70bdea39c89ec80c83226ad86d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b826e039804d5cf313bd7e22a40ea2239e8e22ddba7c19a8787dfaad1dda71aa.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2c9121a16748576e5bf0a2c24e5405ba42c9cae197ff213fadbdceb4cc706def.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "963c074ace679c88a77f6a5db3bd0f3b98a169dae5ebd12abb6293ecda497280.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "1c83a2cf7e8366afb9d724f896902ec46a722739538349d6f41b0953d47f171f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b38fe14e1e967ea658331d386e8028c5a02d2de70c8376b06deda6ea77a4938b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b509e5c29b8c32761c273449647d5a35c5301227b27ee786d353be7916bfddaf.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "829c1f5f6f403632fd4710b8b7f3a313408e5285e4540af97950408ff9a5abfe.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "4cb584ef406f6bc57ea9c935db43890b9719ae126fe1ad4fb10890709978162b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "00f86f0400888d0ecf5a2b9bfa66f176af6095f413d53d622b6c061c1723cfd9.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "c5641664796bd1a0906af9f10543eca02aca8fa97104b2f92fd07e9670adf91c.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "cdb37ed23eed4e4a010d3e68db6d66048a7e90b4d465c735f6e6072564b0fa91.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "7d724dac914eaed951a3e3dd901350b9636cfbba0fc4d78f1fcf193c1f29e67b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e0215eff9f53b0236db885963ac45d6baea52e10ce33ceafdbe0eb1820d21160.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "44946f0ba5ad43cabe8bfa6c52e0f7a9562f7ff336d58478577f3b3a19c1ef08.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "39a47be433cda95dab7521aed8609c61f3fe377524e5de397dbb9c75624dd822.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e89b9cb27040b2995d2f66fca2492eb19434c0793d80ff70ce6819f2540e40a0.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2af1ac1ecbfda4690e8b1b076def28e384aa69cbf5004ee37cef43665fd6e4f6.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "99ff3a88d1493f5e00c8a4dd9f7eb379a004961f4503eb3e5598e388c911b583.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "3cd6c2b9fe12bc0617ef4374b570ad87920bae757a95b104384fc301352c6942.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e2e70cf2f16e4ede17ec2a6d0b740c82b622e2cae6b3419d2217092f9c0872f4.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a5ec3bbf0f3e686ea05ae17f51e8f3a287ad332217b679bbd393842b7d427859.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ca4d50dcf36926c82f02b895975f351a639b0aa1b91bb6ef776f4f07f225cc34.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e00c6cbb0cb7364bc1b825e145ae6232d611d0e457dfa621b6bfafa3b7c76a7f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ce797608958527808601798df00691aced6120bd600c0624161230020229dc99.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ec3daa5a284fc6d10104a53fd16ea77eba9ac1044ffa629f953644c1de63dcd3.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "f7e60b87265310b60217dcd26b24879222a7e5e13fe4c52ae1afdc3c6c737bbf.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "afba6d3e29d510e256c07b23f2afc00a9cea87296765138e5645fe995d24249f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "bcbf0add799b13377bdf842e1f380ff630650d3b7dba2d8f1273093cfa6ceb0f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "6e35d3452497a8e5766b9c00087b91d06e79fde18dfe6b74fb18ff72c6635bc1.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "5f4ba801f6715e2d29f8b88f785bfc77a0dc1455a0f649626ad9a0cc66cd6df2.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "072cd869e9430e51fe7d48b0bd33c882b6365386c9987c03cb76f802597af936.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "eb4ea9929e6491fd0444ea5da5b9a19dda089a2ac758ad63956cfbcc7fa81cc3.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ed01134a6d931721c58fc34771e34e1d513e9e06e7241a1e6528172093c77880.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "51bda9bdc313fa5418550d94d46f31e0c396f4e70c810b629fac0430f4b7e638.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "07129395f46d9e71844fe9b485e05bf49741bc72a480b567297d6d865f3d8150.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "69f92c176c843d7c899eaa7beaa1f75a0499d49fbb24e2053ed98be77e176498.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "980ec719a0be7227e6769b9bf9198b182b743b9544326f4ef2566ecd3ebfeb94.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "cf15767517ce6ab1fc46a41b07fa66be2ab3db8085216be5abd43c1fbf36243d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e2c0c872c02b315510c6923a7913d1783accabab0ea1eef103a3f23165af320f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "3bb31afe510af3b8ad548e3f3f6ed746437d0598bcde5b66e542768572e19383.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "42f04826dd7a76e4ecdc9a55fb4a774a26e03a425ca1363628bb1c6f6ea1a87e.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "dfba0d29f581ff00c2e46b69cc90e0e9ff6371ab92fbe300664f6622f7ca0355.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a8c4320f89adc39f1c43f0100031e6acfce9299aed5bf035732d00d34d44ee88.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e5f4e6d23324e3b8682aad7033492640affac084ea7989e3f4c9a3f2a6347ee6.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "d4418b31447cb5b7ddfcc3b47f3075795700363cc97132d9ab8b2de417027b98.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "4932e18d832d6a781bc00400b69136cc9406234d3800e1e66ea809550a84b423.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "d59addea6225e7eeb09efaee9a888aacc2b93651e1306a3de84764c6c729f821.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "910830b8f1f35c778f37eb37d47eea0ea952d1bf04070f7eaeb697d0f8ead948.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "4c7cbced68ee586af8b3d73a8d8a8c404deaa271da7204eb2afe5c1b070972eb.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "d2dd47a43f01a52ffff72cc88bd0e4fc9b503dee57250d22f870c36346079c5d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "fa44157809f7739aabca54f3e27dfb1d7409ef17afe6ac18dd39294f124e205a.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "65839463e163fd812f732f606111c68961e9bb23aa9624c8c448605fe0e086a1.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2025b7ca34eac130a257abc189273adb73f5749cb0eb7c5c6d865d433d842e0b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b9d9dea991a06a1211e93e8fa33adc6035ede25d07dc6e98cf97cc57fd94a340.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "9e884f0c6d1001f8de2b478d3de9582f93fbbd9badcb31e3f52fefa3974ebc75.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ea9966697a16e75d64b4e6a9a468009944bd336e8098a34839033eb641329fcc.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b0de86ef9c1cfb0067e0989bffa6f15579e0c78b331fc29a9e3469aea3cbec20.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "8e3015ef6405ba9c80a9c93897e3d75f21e4df303f3bcf8e363ea4c96cd06272.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b14a90783cbe55b65c663efb67e1c235389f46d60d9601d28b36773016d520e2.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "44504dda9d5bff31dfbcf5c8cce7acf0bfb9a7b16a697aadca3f9c4e854b62eb.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "fb2b2896420258e37d2e27a1d07c6488b5ff14a587edfbe7c4153f93042b8424.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e8e6f6e75bc02eeb35e5904edc13df9b5990da70ac1ff1daa7a9fcc61c709a03.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "0c65788e07b97827d85662c06cd74e83ab6027c8915579821df896446b26d4d5.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b6e67c6fce0ab4dcd376abf4b1656bd8bc9a654c8320d4eef45c810921a1c869.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "bdff20910e6d11f5c5b0a562d1302f4aad792255fcdc2e9a46bce1ed8fe8c56f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "21e3ee9de83bf7ac6b57400e92f63d81f1f174624e9a2f408a5dd23d4d8f8f04.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2891274f3603b50b8eb795f50ba361b7b4586ecc1f42f900689decd527fcc386.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "4e0b6d5fa63e2fc1c3d86fda025a4c2129e52d5fc6551d8355e9385dd2d88f4b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ce62298731cb48e5f502af92203342f43bfa9568acfc6d2194c7227760e9184c.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "30e1eff5519219c27ded9fed93ad3b2acdf898b7494411f23c2c5828d96a1e30.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "71a7d90e17ae74f6bf9572d9560b83d2d6ca047482fe2a229b770c67338f3848.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "c0cbe90abd407b916c31bc6d2cceb90ff61cf78ce5de00173e993c67f4e4ca15.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2c69b33a241e21c003113bae58fda58a08113e265a94262f6d0de39277876462.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "c6d5351f0c9d5611cdfaf64b6b5324db73b437bc9d4e4bdc8a70a7d66533df93.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b722560baa4a55e843b78f3a3485ff4ad31e5acd659142add4ba3990be2578cb.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "66002ab481b35579ef88633fea8114d698990afdaf94b0173e9c9d614d126b49.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e2b019746d67350a9dcfc595616d0b73b868c8f3757f9516665e9141d8f0c117.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "1f6f0d1bf2e6d69fc943eb0eb3a96a4e5f8473bfdd1bd6b5a4c903c6c7ee2fe2.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a61c465c0aebd959715da03389b9aedcb9198ef840f578ef03cc2af0c76bfa31.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "00a570504860576bcb032613cb185013ce9400e05fd9c1fdc274f9664d27f9d6.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "72a37e581f614d791fa6d88831d06c56a0f757e5a596d8fc1189b0d8147cfda6.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2ebf5312f5a4d89646aba2320b3dce9918136bdfd42303819830fcc29e905edb.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "4f89f928fbfa245916b324dc272363ab12dba689814a9d2112023205e8e69baf.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "f163f905ead86c901f7345c72c8bb60a898281370a8c6ea8bb15566c570b40ca.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "1655e7ed2d848678e50138df15f3db7b37ed7a9c4f61cdf7e26cfec12d0e7057.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "c35ef8388abd492cb6ddbb0b46e3be87244ec1088682de208a745c93c4852a80.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a825c00d340b88c63605d514c9c0e74ef17c0cf10caa0d0e46bb7ebee4788dd5.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "81a7dc8d3f32fcdc7cd98408f9602f53176a7ea3645770e4d852fc3646a2e576.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "baa6f7163f307c16a5d3e36c83a09fe46adbe16adfa866d4bb2d750a79d96b92.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "1d3284c77094859fb63c1880af4f8f9a3916935a12faae060678c6e3455e956d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "649e978eea07a70c6e7303a5291476b3f224063070abf4f6a5f4ddcbba7c1cf6.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ddc9fc887177f92e80fed16082c988924fbd19773ea33729fa3f2a1896d13814.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "3dbebd9f8e31821d5fa22f976cfe9a338788fda81308f0d573e69fd9dfcce24e.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "ed4fbc934d1bde93634e8904e0c1aec45587c95a2bbfbd024aa729e9adc956d6.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "0d4b9a52f0a6bd264258baac791b39910a895bb6ca06f63477fa823a262febdc.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "f4a65e693806dbb31a5b2808a88d577c72ba0e8c5872fbd1e8600ff63a77c489.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "aa29843a365d4eb21d35932172232d7d591a35fc51ac95c040c356f0f16c447e.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "38f39605556392f32fc4aa12e6db9a9c6984acd3cc7f3ccfbca9a014bc44796a.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "8e8c7cf854aa3367d9ed9eda6c585540bde6369ef6163f435334216be4536200.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a35cf7c9bb6ac08e6d60d9683c78318746edc82284022aef02c9d6a07540045c.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "f04ae2415d82f1ca5b3e1803d9321374821baedee0dcf5e1b5660d8c83dde39f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "d98adee3bf8945b389144b04bc49824c85711e1d473236971ac8a48939328064.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "d554297356ab66a5061df4c73c3bb293381875d86175fa0508f7ac4f035eb721.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2011fe01e332cfc8f16c861d4818bacf4ed1b6d9fa657cc246f86ab15a313768.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "da6d9e34f2007194b0082d4caac04d1744b7b27fc40098747d4bc62e0d5a5bb2.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "5bb06bf5b8f3ea2633dcfc0d417400786c69d6b1cb681208072f4658d2838af2.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "5332c024cb6bac6d7ca2f96347d2ce8cfc63f5bf2643a1d1e6ed6146e6b75a1d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "20c8e69585273d35ba38fe2cae0d0201445a3b410c9589f4f7053316662482e3.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "5bc4c8297033b5b31ca9496dd1ad29232aa14389dc8c93db38f99faa707ebba3.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "eb1dbd977fdb824dcae7767ce9ec3a023e41158e81b5f524772609ddcb622025.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "21b67e23f19a1bca9b4ad87ff788b4992cebc00a6deeca1eb9c56c16b63c0de8.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "7176d38f2e39fa7c96608f5ae85bb51ba964f1b9a972b33b0d04796fe4487f71.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "56e24d58d3912dcd3c89187ee9ec08ea09957055296e823007ad615a4485f751.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b7a1ccdf0b210a2273426eaf334679dba7d3f5a90dddd91882beffa891bf3035.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "305064d3c23eac774752898e1b3e9ff8ab7ecdfa45495be446dc520de8415727.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "426348d99d9cace2df6eaa6d6766d5a5ac21bb65a504a4ed974486cf96156b8f.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "d8782c5cc56587009a4939e9c0a95402001114eacda264417cd8f1678ff9329d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "8ca5f24f5398983173fde419470d646b2e328a6cf9f98d77443a706dd204066d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "21d7e0663d2b8e1d455a0e1456c63dfbb273becdacbf7c1fa0e22d915f136cf4.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "c0593c9c104142eadae2d76bd739b28a37d2218bf1ef4b37bf8fa9655bfab087.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "3a342342f94f00a74984e10743f4589e7856076df6686f05e3192cd0ee0300e1.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "098067b9dd5a6aac668c8883f9b96fe68865dc20a6f88a8859146900e389dd63.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "0f2a925c6daf8945ff257938e04b0609441f698010d80c9717904c71a54a235e.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a95075950bff55641b4274439a909c6bda8005b22c397ef6315839ce9d0dec55.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "cbd0f1c0170aad674c898a602f0e43fcf330640cbbab0653d6ae4f941f7cd83d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "114f63ff44c34361216c25e49c65ade53ba07a4607e5e917b089c60a0df6c173.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "3d48fcbb07942d6d590bceb07f8462db36130a625022f12710e53c6cfdc51f77.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "6b5a7a862ef01de1efd7ca3526655609ef7b05cd2ee6e14eacc0436bb93da555.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "597f154cc4f0bc5b4941c880fd2cd79c2a20a1b1d5845c86e934c4500fab78d8.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a03b94f68d3eec97f3cdc495ceb98af910087b2623a02dc233820dfcc2ec2085.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b0d8964ee6ff40309779e0a1ea2780926a85edf9f1715c22ecbd04e14a4be9b4.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "aaf4a1b55742a45ae01330347e723ec9d9da9b15e1e9e05cd7d1910de91eef00.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "f15da84b4e5b23f54b8177126f5711e6fd0db8d26a1b0d3cf7901d0aa8e6b7b1.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "89fa29d1f4a553154be8ae34b5f6a31e4baf6197fee40d9103ada5b80de7e31b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "5e68330a1f2a298257ebbd3201512e8f947a688f4ff395df802ef7f15aeeb79b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "0bdf0b45ec36def31a5ef9e162fe40bbca1d78a522bde23cb4f42d5929affdbc.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "542eaacd659923163edf3b1100c43bc137cc1ad9f0e394dee94de37d40ce1fca.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b0d36274f9eac739b04046783a38c18bebd42587a0b0b1cc3d31a32e1ec05374.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e1792c011daad918fdbd99a21f7f46fd71018ffd052af5a7d7faf9954d593e31.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "856fc0e14ff877b68a68c89144852808e7a17b213d5f1dba4b9d27435c0b2f54.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "7ce6e8b7f4dd2a5bc050f9e538d22fde2fd371df15b751e48a29c1c3cb3df00b.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "756f64b7ab11de19928d6ee6235079200ba45477ea150b7fc3ffbd94f4fbebfe.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "bd236e52dc564431ea569bca0a7b81ae8e8663675cb24a7b6da43ff926cc147c.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "18232f22b21730b4ec64a83c709f6546465c4777c2a3ad759686c3c2dfbc2745.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "acedd8fb18df15e9483cc8c0f30f24b7ff2299ca9006c261040e88677c0df0b3.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "a92f3989182049dc218f7698c45d8cdfc64e6f945c71f20a9d188dd01698df2d.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "6fbf0b68db7024ac996c92b1bbc62efe9a3bf12e469efaa29ae4fe0fa5c6da39.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "b64a4ec9612720033a3e8de806cfdd112a8ce48f35b2ec66e013d6c5e25e3445.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "f0b79e8841f06a4afed5a90142b1c202776dc1d1c82328f310458d7c0ee975d9.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "2d0dfd1a05384bfd9a9fa559b99096a8e81fa9f7579c954797fde3dd019de749.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "11172c45a992fbce529a82a630dbfb5aaee8e8af314d778fe242d30dfa83ae31.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "7c7418a1d794ac446e587c8ac9ea255d457b264e196efe4c474cd683a6e4d41b.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "4bcf418a6d88bd392988e665b6ad62fd55e18184e250088b6474bcd55627de3d.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "1eb53a60d3f795972e4cb14bdd1df1cb0a15754b25b0f230941bae291324833c.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "2331ab0327d802a8f87febc0793bd6d579d9aee18e4be6676a6666d6da391357.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "fd9c546f26373b0a1f1ca82392245bb7b621f04b11a7fc34e6c127a94e0b8a81.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "1254ebc02e1e52e53ce80595a1d86eacfdb00d316594147c44700effed97f2be.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "7cad9acc0328b507786c8142aea9efcd10bb58cfc3556844f76c5c97e8929796.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "07a2bb0e79a4a1dc58aa4e9469d812443c0cc6276752052ead5fda1e67ac5283.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "09f9b47ff08d4247b62b4da9fd40f51eda17def6d18471a2d2b0b2f7059ea4bb.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "da344b6399fd4f8449a8a905d34c2a653b6ff3394b3825590823ddc647878710.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "9ec7fe861620c4b1af43e4c7a1f79929716a51a95828677e98687f223cb8646b.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "9f52aa552e3dc76895c3560ec1b14e36f5e5524ddcbc82e6eae4754109e60288.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "c14f7f9f2ec3f53b0ed635759a76443cb7a3d2f8adbbcef2fa962352dfbf1137.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "c818b0a2eae9a032683e42a59c12aa7f9732a60f4a130a9afe9463c9f6cb76d6.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "1a8dedf7e1ff8656f705c62ca59ee8e6ffe709757bcb66a89f714f48d25ca5b8.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "d274dafac665efce92151305fe17267b21c5dd4ce4704ac5e968cf522d7c9c8d.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "828c38ad64f98bb0fa74bef1a60186b6734c588de2e8714e4a107ad7dbba2dc2.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "ecd4be588b43949cd2dbfecfc445025b3da1d6fc5c9b51ae8ddaeb052f7a1d53.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "935cdbe7d6ebd7f853353ac23cd6954b53324ca22642fa99ca3d646adc7db97a.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "ce28c679dbcc9030bad680abc6ab023b3bc9ca3d3cb88196eeb0013d4fbf4018.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "516f22f50682f7cffba614d11d74c0f22fe48d892d541c01fbf1583876801c80.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "44ea786ef9f9ad7f0ee37ab3166580818da36d2cd2721f5a480cc8a06d801fa2.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "632ff21d5c280ebae1d0978deb51be3b5c4f8cf58b15b9e712c7f9ed9a08c869.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "cf63b725f42a8648b516a2ebc3a44fac300f0de3730e47674e44cb47ae3cca04.webp",
+      "contentType": "image/webp"
+    },
+    {
+      "filename": "e18c35c05f7f26778a9b8efa20dd85b383ab7e2c892b6f7e0b9a476a923db00b.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "5e234eb2c53eb5da7ecd4a4e8de5d17c2a2760954c54c64ed1b4509f46a5861c.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "bbd1a1b525b9357191f4dcba325aef63bbb9f8beedd867361eee1a7afeae171f.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "53965d33a75e79fa5cf275a4a03cb5220ad8b97334b114abc47faaf2fd92d9c9.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "b2189a2b9ee6675c4e098085ee7d9de6dc5fe80e01a505d14581c7b40e974be2.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "e457e77103976d68d8d8d06a77b30ba2913026d36d011ad9e7d390a99fb789b9.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "167465722858bfef4e0f39adbed6ac5192f23d26c903649de45596f1e45d6a78.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "c19a0403738f73e4952f88de0ca9946fe8e5e70651a21de52521e33dfb22f1cb.jpg",
+      "contentType": "image/jpeg"
+    },
+    {
+      "filename": "17be616a98251e755d9728a5318a7f5a9e72bccc37c925959491a352089f0c44.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "09114ed246ac06ac8d9a395f8aaf7464aa5090e75b3b8d54231424e5cc1b515e.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "8177ccd1d696508de9dcea3e7672ad5c265ef5053c686badfce4f6ea8fbe7408.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "13e4b80c5871f2481b436f7b142adc24b10a027121267681a1a15f4f5498aa9f.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "67a61c663d34007fe1125cd63b48d9c0f367b598bb0d4a6e464f0b75fdc20aee.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "537f3d77c14736c87711c369982cd71a99bc693242c2a49d22b992769f42cce8.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "348ae538398583fddc862dbe374e5e0c07ec0384e5b4d52614ce54d532c40781.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "0a3a902705e187cf3c05f1c7a8d5eabedb5301529051dddb54cfb5574b1187a5.jpg",
+      "contentType": "image/jpeg"
+    },
+    {
+      "filename": "7a24603b318043116c193a8cd6c52514ff1b7d0c90706295d01f3ebf273b212d.jpg",
+      "contentType": "image/jpeg"
+    },
+    {
+      "filename": "95a966070ebe418e23b37a511d43beb243b732e68f7cb6dd680713c9784471b4.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "a729ac09796f95a2e6f47ec9e054b22afceed24eca0b8e1a65041479a535a5cb.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "3b08a91222072b41b8658fe714d0317a08c74823410f97976da0aa77b1733bac.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "add96223fa5d1d34b9cc3be87e0f28174fadfe2a04c34618e25daaa70a7c0fb7.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "b059093e4caf25d67b2a7d65b97389c417539481f524799dfd3e991ea6bd0412.jpg",
+      "contentType": "image/jpeg"
+    },
+    {
+      "filename": "b840aae1a8cd5e010a6435ad31f5a8152e1481bb6794ce7343a85a8f55a9d21c.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "923438ea03b2fc19374f447091b8b534e58bb1b1e42c70be4771f4a64cd880cb.svg",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "filename": "76963140a8abe4229a90b09e93063799174261c0aacc793ce4a72161eb98c1e1.png",
+      "contentType": "image/png"
+    },
+    {
+      "filename": "9e32a5745ebc43b8d20cc2f8ada0aecd47c29e29c74187beb2e64497d530a52f.svg",
+      "contentType": "image/svg+xml"
+    }
+  ]
+}

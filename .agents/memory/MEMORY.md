@@ -16,3 +16,4 @@
 - [Public Exchange demo](public-exchange-demo.md) — public credentials use read-only expiring sessions, not editable Clerk accounts; preserve delivered customer assignments.
 - [Production parity policy](production-parity-policy.md) — current Development is authoritative; compare read-only first, never restore deleted configuration or blindly republish.
 - [Exchange filter safety](exchange-admin-filter-safety.md) — Payment Methods alone preserves hidden selections; zero matches must not hide filters or Reset.
+- [Exchange visual identity](exchange-visual-catalog-policy.md) — catalog variants are not new records; currency flags are not customer countries; order privacy differs from authorized configuration.

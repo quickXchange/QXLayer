@@ -12,13 +12,35 @@ import {
   ListExchangeOrdersQueryParams, ListExchangeOrdersResponse,
   ListExchangeAuditQueryParams, ListExchangeAuditResponse,
   ListExchangeCustomersResponse,
+  GetExchangeVisualCatalogResponse,
 } from "@workspace/api-zod";
 import { requireAuthentication, principalFrom, sameOriginMutation } from "../middlewares/authentication";
 import { exchangeAudit, exchangeConfiguration, exchangeCustomers, exchangeDashboard, publicExchange, sandboxOrder, sandboxQuote, tenantOrder, tenantOrders, trackOrder } from "../products/exchange/service";
 import { containsCredential } from "../products/exchange/providers";
 import { HttpError } from "../lib/errors";
+import { visualCatalog, visualFile } from "../products/exchange/visual-assets";
 
 const router = Router();
+router.get("/exchange/visual-catalog", (_req, res) => {
+  res.set("Cache-Control", "public,max-age=300");
+  res.json(GetExchangeVisualCatalogResponse.parse(visualCatalog));
+});
+router.get("/exchange/visual-assets/:filename", async (req, res) => {
+  const filename = String(req.params.filename);
+  const entry = (visualCatalog.blobs as { filename: string; contentType: string }[]).find(b => b.filename === filename);
+  if (!entry) throw new HttpError(404, "Visual asset not found.");
+  const file = visualFile(entry.filename);
+  if (!(await file.exists())[0]) throw new HttpError(404, "Visual asset is unavailable.");
+  res.set({
+    "Content-Type": entry.contentType,
+    "Cache-Control": "public,max-age=31536000,immutable",
+    "X-Content-Type-Options": "nosniff",
+    "Content-Security-Policy": "default-src 'none'; img-src data:; style-src 'unsafe-inline'; sandbox",
+  });
+  const stream = file.createReadStream();
+  stream.on("error", error => { req.log.error({ err: error }, "Visual asset stream failed"); res.destroy(); });
+  stream.pipe(res);
+});
 // Short-lived process-local rate limiting adds an outer abuse guard. Quota admission
 // and idempotency still use database locks, so they stay correct across processes.
 const buckets = new Map<string, { until: number; used: number }>();

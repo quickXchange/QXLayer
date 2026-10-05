@@ -434,3 +434,17 @@ mtime_ms = 1791231366508
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0098ade9-e564-4fcd-825f-7b4b596b5724/f1ef0225-18df-491d-8403-401fcbf47b52"
 storage_version_token = "1791231443637169"
 content_type = "text/csv"
+
+[[outputs]]
+id = "iyDKEeAFR-2NE7caTk5Gx"
+uri = "file://reports/qxlayer-development-asset-import.html"
+type = "html"
+title = "QXLayer Development Asset Import Report"
+description = "Complete import inventory, matches, variants, skipped relationships, missing artwork, View Order changes and verification results."
+logical_id = "9ee614c0-9abf-48b0-82b0-98abef3f8309"
+content_hash = "sha256:706ba5935a07493bedaa250c9886e15c22554edb0606a4b301d000db78a15f06"
+size = 55551
+mtime_ms = 1791243902872
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/9ee614c0-9abf-48b0-82b0-98abef3f8309/63d051a2-801b-4a37-9958-bd31ea019a94"
+storage_version_token = "1791243903500217"
+content_type = "text/html"

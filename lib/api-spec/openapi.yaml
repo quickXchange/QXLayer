@@ -17,6 +17,16 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /exchange/visual-catalog:
+    get:
+      operationId: getExchangeVisualCatalog
+      responses:
+        "200":
+          description: Public visual identities only; no tenant or order data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExchangeVisualCatalog"
   /demo/session:
     get:
       operationId: getDemoSession
@@ -868,6 +878,39 @@ components:
         type: string
         format: uuid
   schemas:
+    ExchangeVisualAsset:
+      type: object
+      required: [kind, code, name, logoUrl, alternatives, recordId, countries, currencies]
+      properties:
+        kind:
+          type: string
+          enum: [crypto, network, payment-method, flag, currency]
+        code: {type: string}
+        name: {type: string}
+        logoUrl: {type: string}
+        alternatives: {type: array, items: {type: string}}
+        recordId: {type: [string, "null"]}
+        countries: {type: array, items: {type: string}}
+        currencies: {type: array, items: {type: string}}
+    ExchangeVisualUnavailable:
+      type: object
+      required: [type, code, name, reason]
+      properties:
+        type: {type: string}
+        code: {type: string}
+        name: {type: string}
+        reason: {type: string}
+    ExchangeVisualCatalog:
+      type: object
+      required: [assets, unavailable, sandboxOnly]
+      properties:
+        assets:
+          type: array
+          items: {$ref: "#/components/schemas/ExchangeVisualAsset"}
+        unavailable:
+          type: array
+          items: {$ref: "#/components/schemas/ExchangeVisualUnavailable"}
+        sandboxOnly: {type: boolean}
     WhiteLabelStatus:
       type: string
       enum: [new, reviewing, waiting_for_client, quote_ready, approved, in_setup, customization, ready, delivered, rejected, cancelled]

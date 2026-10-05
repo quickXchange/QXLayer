@@ -6,6 +6,12 @@ import { decimal } from "../../modules/entitlements/decimal";
 import { requireFeature, type EffectiveEntitlements } from "../../modules/entitlements/resolver";
 import { safeHttps } from "../../modules/website/settings";
 import { containsCredential, PROVIDER_CATALOG } from "./providers";
+import { isImportedVisualUrl } from "./visual-assets";
+
+function safeExchangeLogo(value: string | null) {
+  if (value && isImportedVisualUrl(value)) return;
+  safeHttps(value);
+}
 
 export const ACTIONS = ["swap", "convert", "buy", "sell"] as const;
 export function emptySettings(): ExchangeSettings {
@@ -54,7 +60,7 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
   for (const a of s.assets) {
     if (assetIds && !assetIds.has(a.assetId)) throw new HttpError(400, "Select the asset in tenant Assets & Networks before configuring it.");
     if (!/^[A-Za-z0-9._-]+$/.test(a.symbol)) throw new HttpError(400, "Invalid asset symbol.");
-    safeHttps(a.logoUrl);
+    safeExchangeLogo(a.logoUrl);
   }
   for (const n of s.networks) {
     if (networkIds && !networkIds.has(n.assetNetworkId)) throw new HttpError(400, "Network is not selected for this tenant.");
@@ -66,7 +72,7 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
     if (m.currency !== s.fiatCurrency) throw new HttpError(400, "Payment method currency must match exchange fiat currency.");
     if (m.enabled && m.buy) requireFeature(e, "buy");
     if (m.enabled && m.sell) requireFeature(e, "sell");
-    safeHttps(m.logoUrl ?? null);
+    safeExchangeLogo(m.logoUrl ?? null);
     if (m.maximum != null && decimal(m.maximum) < decimal(m.minimum ?? "0")) throw new HttpError(400, "Payment method maximum must be at least its minimum.");
   }
   const fiat = `fiat:${s.fiatCurrency}`;

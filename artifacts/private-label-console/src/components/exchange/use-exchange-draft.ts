@@ -7,6 +7,7 @@ import {
 } from '@workspace/api-client-react';
 import { useToast } from '@/hooks/use-toast';
 import { useInvalidateTenant } from '@/lib/invalidate';
+import { isAllowedLogo } from './visual-catalog';
 import { gtDec, isDec, isInt, isPos } from './ui-validate';
 
 export interface ExchangeDraft {
@@ -29,7 +30,7 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
     if (!isInt(a.decimals, 18)) e.push(`${a.symbol}: precision must be an integer 0 to 18`);
     if (!isInt(a.displayOrder, 1000)) e.push(`${a.symbol}: display order must be a whole number 0 to 1000`);
     if (!isDec(a.sandboxPlanRate)) e.push(`${a.symbol}: plan-currency reference rate must be a decimal string`);
-    if (a.logoUrl && !/^https:\/\//.test(a.logoUrl)) e.push(`${a.symbol}: logo must be an HTTPS URL`);
+    if (a.logoUrl && !isAllowedLogo(a.logoUrl)) e.push(`${a.symbol}: logo must be an HTTPS URL or a supplied catalog logo`);
   });
   s.networks.forEach((n) => {
     const c = cat.get(n.assetNetworkId); const nm = c ? `${c.symbol} on ${c.networkName}` : n.assetNetworkId;
@@ -38,7 +39,7 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
   });
   s.paymentMethods.forEach((p) => {
     if (!p.label.trim()) e.push('Every payment method needs a label');
-    if (p.logoUrl && !/^https:\/\//.test(p.logoUrl)) e.push(`${p.label || 'Payment method'}: logo must be an HTTPS URL`);
+    if (p.logoUrl && !isAllowedLogo(p.logoUrl)) e.push(`${p.label || 'Payment method'}: logo must be an HTTPS URL or a supplied catalog logo`);
     if (p.minimum !== undefined && !isDec(p.minimum)) e.push(`${p.label || 'Payment method'}: minimum must be a decimal string`);
     if (p.maximum != null && (!isDec(p.maximum) || (isDec(p.minimum ?? '0') && gtDec(p.minimum ?? '0', p.maximum)))) e.push(`${p.label || 'Payment method'}: maximum must be a decimal not below the minimum`);
     if (p.feeBps !== undefined && !isInt(p.feeBps, 5000)) e.push(`${p.label || 'Payment method'}: fee is integer basis points 0 to 5000`);

@@ -8,6 +8,27 @@
 import * as zod from 'zod';
 
 
+export const GetExchangeVisualCatalogResponse = zod.object({
+  "assets": zod.array(zod.object({
+  "kind": zod.enum(['crypto', 'network', 'payment-method', 'flag', 'currency']),
+  "code": zod.string(),
+  "name": zod.string(),
+  "logoUrl": zod.string(),
+  "alternatives": zod.array(zod.string()),
+  "recordId": zod.string().nullable(),
+  "countries": zod.array(zod.string()),
+  "currencies": zod.array(zod.string())
+})),
+  "unavailable": zod.array(zod.object({
+  "type": zod.string(),
+  "code": zod.string(),
+  "name": zod.string(),
+  "reason": zod.string()
+})),
+  "sandboxOnly": zod.boolean()
+})
+
+
 export const GetDemoSessionResponse = zod.object({
   "active": zod.boolean(),
   "tenantId": zod.string().uuid().nullable(),
