@@ -7,5 +7,5 @@
 - [Official QXLayer brand](qxlayer-brand.md) — official logo and one approved public-platform visual language for all consoles; tenant public sites keep their branding.
 - [Exchange-only scope](exchange-only-scope.md) — develop only White Label Exchange sandbox and its tenant admin; all other products stay unchanged visual previews.
 - [Clerk UI test identities](clerk-testing-memberships.md) — grant the actual generated identity temporary tenant access; extra claim arguments do not override the session.
-- [Customer account workflow](customer-account-workflow.md) — one existing QXLayer login; customer requests precede Super Admin delivery and conditional, authorized Admin Panel access.
+- [Account and owner access](customer-account-workflow.md) — one login, permanent owner access, and operator-controlled customer/Admin Panel delivery.
 - [Artifact build context](artifact-build-context.md) — standalone shell builds do not inherit managed workflow service variables.

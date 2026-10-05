@@ -26,3 +26,9 @@ Requested plans, add-ons and custom designs express customer intent; they do not
 **Why:** The user requires existing-catalog indicative pricing followed by Super Admin review and final pricing, with no invented prices or automatic custom-design generation.
 
 **How to apply:** Retain the original requested configuration alongside operator-reviewed selections. Internal notes must never reach customer responses; notes and status history are append-only.
+
+The platform creator's existing account has permanent Platform Owner/Super Admin access. This is real persisted authorization, not a visual fixture or temporary test grant.
+
+**Why:** The user explicitly requested permanent ownership on their existing account, with no replacement account, password change, role mocks or temporary permissions.
+
+**How to apply:** Never remove the owner's grant during test cleanup. Cleanup may remove only disposable grants introduced by that test. Confirm the exact existing identity before ownership changes; do not guess from recently created accounts or use a generated test identity as the owner.
