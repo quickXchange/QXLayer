@@ -1985,6 +1985,8 @@ export const getExchangeConfigurationResponseConfigurationNetworksItemMaximumReg
 export const getExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const getExchangeConfigurationResponseConfigurationNetworksItemInformationMax = 500;
 
+export const getExchangeConfigurationResponseConfigurationNetworksItemProviderIdMax = 80;
+
 export const getExchangeConfigurationResponseConfigurationNetworksMax = 200;
 
 export const getExchangeConfigurationResponseConfigurationRoutesItemSourceMax = 80;
@@ -2003,12 +2005,30 @@ export const getExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMax
 
 export const getExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax = 30;
 
+export const getExchangeConfigurationResponseConfigurationRoutesItemProviderIdMax = 80;
+
 export const getExchangeConfigurationResponseConfigurationRoutesMax = 100;
 
 export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin = 2;
 export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax = 80;
 
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemLogoUrlMax = 2000;
+
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMin = 0;
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax = 5000;
+
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const getExchangeConfigurationResponseConfigurationPaymentMethodsMax = 30;
+
+export const getExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax = 80;
+
+export const getExchangeConfigurationResponseConfigurationProvidersItemLabelMax = 100;
+
+export const getExchangeConfigurationResponseConfigurationProvidersItemEndpointMax = 2000;
+
+export const getExchangeConfigurationResponseConfigurationProvidersMax = 20;
 
 
 
@@ -2041,7 +2061,8 @@ export const GetExchangeConfigurationResponse = zod.object({
   "minimum": zod.string().regex(getExchangeConfigurationResponseConfigurationNetworksItemMinimumRegExp),
   "maximum": zod.string().regex(getExchangeConfigurationResponseConfigurationNetworksItemMaximumRegExp),
   "fee": zod.string().regex(getExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp),
-  "information": zod.string().max(getExchangeConfigurationResponseConfigurationNetworksItemInformationMax)
+  "information": zod.string().max(getExchangeConfigurationResponseConfigurationNetworksItemInformationMax),
+  "providerId": zod.string().max(getExchangeConfigurationResponseConfigurationNetworksItemProviderIdMax).optional()
 })).max(getExchangeConfigurationResponseConfigurationNetworksMax),
   "routes": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -2055,7 +2076,8 @@ export const GetExchangeConfigurationResponse = zod.object({
   "feeBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMin).max(getExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMax),
   "fixedFee": zod.string().regex(getExchangeConfigurationResponseConfigurationRoutesItemFixedFeeRegExp),
   "spreadBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMin).max(getExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMax),
-  "paymentMethodIds": zod.array(zod.string().uuid()).max(getExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax)
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(getExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax),
+  "providerId": zod.string().max(getExchangeConfigurationResponseConfigurationRoutesItemProviderIdMax).optional()
 })).max(getExchangeConfigurationResponseConfigurationRoutesMax),
   "paymentMethods": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -2063,8 +2085,20 @@ export const GetExchangeConfigurationResponse = zod.object({
   "enabled": zod.boolean(),
   "currency": zod.enum(['USD', 'EUR', 'GBP']),
   "buy": zod.boolean(),
-  "sell": zod.boolean()
-})).max(getExchangeConfigurationResponseConfigurationPaymentMethodsMax)
+  "sell": zod.boolean(),
+  "logoUrl": zod.string().max(getExchangeConfigurationResponseConfigurationPaymentMethodsItemLogoUrlMax).nullish(),
+  "methodType": zod.enum(['bank', 'card', 'manual']).optional(),
+  "minimum": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemMinimumRegExp).optional(),
+  "maximum": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemMaximumRegExp).nullish(),
+  "feeBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMin).max(getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax).optional(),
+  "fixedFee": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp).optional()
+})).max(getExchangeConfigurationResponseConfigurationPaymentMethodsMax),
+  "providers": zod.array(zod.object({
+  "providerId": zod.string().max(getExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax),
+  "enabled": zod.boolean(),
+  "label": zod.string().max(getExchangeConfigurationResponseConfigurationProvidersItemLabelMax).optional(),
+  "endpoint": zod.string().max(getExchangeConfigurationResponseConfigurationProvidersItemEndpointMax).nullish()
+})).max(getExchangeConfigurationResponseConfigurationProvidersMax).optional()
 }),
   "catalog": zod.array(zod.object({
   "assetNetworkId": zod.string(),
@@ -2075,7 +2109,16 @@ export const GetExchangeConfigurationResponse = zod.object({
   "networkName": zod.string(),
   "testnet": zod.boolean()
 })),
-  "effectiveEnabled": zod.boolean()
+  "effectiveEnabled": zod.boolean(),
+  "providerCatalog": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "status": zod.enum(['sandbox', 'configuration_only', 'coming_soon']),
+  "functional": zod.boolean(),
+  "credentialSupport": zod.boolean(),
+  "capabilities": zod.array(zod.string())
+})).optional()
 })
 
 
@@ -2108,6 +2151,8 @@ export const saveExchangeConfigurationBodyNetworksItemMaximumRegExp = new RegExp
 export const saveExchangeConfigurationBodyNetworksItemFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const saveExchangeConfigurationBodyNetworksItemInformationMax = 500;
 
+export const saveExchangeConfigurationBodyNetworksItemProviderIdMax = 80;
+
 export const saveExchangeConfigurationBodyNetworksMax = 200;
 
 export const saveExchangeConfigurationBodyRoutesItemSourceMax = 80;
@@ -2126,12 +2171,30 @@ export const saveExchangeConfigurationBodyRoutesItemSpreadBpsMax = 5000;
 
 export const saveExchangeConfigurationBodyRoutesItemPaymentMethodIdsMax = 30;
 
+export const saveExchangeConfigurationBodyRoutesItemProviderIdMax = 80;
+
 export const saveExchangeConfigurationBodyRoutesMax = 100;
 
 export const saveExchangeConfigurationBodyPaymentMethodsItemLabelMin = 2;
 export const saveExchangeConfigurationBodyPaymentMethodsItemLabelMax = 80;
 
+export const saveExchangeConfigurationBodyPaymentMethodsItemLogoUrlMax = 2000;
+
+export const saveExchangeConfigurationBodyPaymentMethodsItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyPaymentMethodsItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMin = 0;
+export const saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMax = 5000;
+
+export const saveExchangeConfigurationBodyPaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const saveExchangeConfigurationBodyPaymentMethodsMax = 30;
+
+export const saveExchangeConfigurationBodyProvidersItemProviderIdMax = 80;
+
+export const saveExchangeConfigurationBodyProvidersItemLabelMax = 100;
+
+export const saveExchangeConfigurationBodyProvidersItemEndpointMax = 2000;
+
+export const saveExchangeConfigurationBodyProvidersMax = 20;
 
 
 
@@ -2163,7 +2226,8 @@ export const SaveExchangeConfigurationBody = zod.object({
   "minimum": zod.string().regex(saveExchangeConfigurationBodyNetworksItemMinimumRegExp),
   "maximum": zod.string().regex(saveExchangeConfigurationBodyNetworksItemMaximumRegExp),
   "fee": zod.string().regex(saveExchangeConfigurationBodyNetworksItemFeeRegExp),
-  "information": zod.string().max(saveExchangeConfigurationBodyNetworksItemInformationMax)
+  "information": zod.string().max(saveExchangeConfigurationBodyNetworksItemInformationMax),
+  "providerId": zod.string().max(saveExchangeConfigurationBodyNetworksItemProviderIdMax).optional()
 })).max(saveExchangeConfigurationBodyNetworksMax),
   "routes": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -2177,7 +2241,8 @@ export const SaveExchangeConfigurationBody = zod.object({
   "feeBps": zod.number().int().min(saveExchangeConfigurationBodyRoutesItemFeeBpsMin).max(saveExchangeConfigurationBodyRoutesItemFeeBpsMax),
   "fixedFee": zod.string().regex(saveExchangeConfigurationBodyRoutesItemFixedFeeRegExp),
   "spreadBps": zod.number().int().min(saveExchangeConfigurationBodyRoutesItemSpreadBpsMin).max(saveExchangeConfigurationBodyRoutesItemSpreadBpsMax),
-  "paymentMethodIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationBodyRoutesItemPaymentMethodIdsMax)
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationBodyRoutesItemPaymentMethodIdsMax),
+  "providerId": zod.string().max(saveExchangeConfigurationBodyRoutesItemProviderIdMax).optional()
 })).max(saveExchangeConfigurationBodyRoutesMax),
   "paymentMethods": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -2185,8 +2250,20 @@ export const SaveExchangeConfigurationBody = zod.object({
   "enabled": zod.boolean(),
   "currency": zod.enum(['USD', 'EUR', 'GBP']),
   "buy": zod.boolean(),
-  "sell": zod.boolean()
-})).max(saveExchangeConfigurationBodyPaymentMethodsMax)
+  "sell": zod.boolean(),
+  "logoUrl": zod.string().max(saveExchangeConfigurationBodyPaymentMethodsItemLogoUrlMax).nullish(),
+  "methodType": zod.enum(['bank', 'card', 'manual']).optional(),
+  "minimum": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemMinimumRegExp).optional(),
+  "maximum": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemMaximumRegExp).nullish(),
+  "feeBps": zod.number().int().min(saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMin).max(saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMax).optional(),
+  "fixedFee": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemFixedFeeRegExp).optional()
+})).max(saveExchangeConfigurationBodyPaymentMethodsMax),
+  "providers": zod.array(zod.object({
+  "providerId": zod.string().max(saveExchangeConfigurationBodyProvidersItemProviderIdMax),
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangeConfigurationBodyProvidersItemLabelMax).optional(),
+  "endpoint": zod.string().max(saveExchangeConfigurationBodyProvidersItemEndpointMax).nullish()
+})).max(saveExchangeConfigurationBodyProvidersMax).optional()
 })
 
 export const saveExchangeConfigurationResponseConfigurationPublicNoteMax = 1000;
@@ -2214,6 +2291,8 @@ export const saveExchangeConfigurationResponseConfigurationNetworksItemMaximumRe
 export const saveExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const saveExchangeConfigurationResponseConfigurationNetworksItemInformationMax = 500;
 
+export const saveExchangeConfigurationResponseConfigurationNetworksItemProviderIdMax = 80;
+
 export const saveExchangeConfigurationResponseConfigurationNetworksMax = 200;
 
 export const saveExchangeConfigurationResponseConfigurationRoutesItemSourceMax = 80;
@@ -2232,12 +2311,30 @@ export const saveExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMa
 
 export const saveExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax = 30;
 
+export const saveExchangeConfigurationResponseConfigurationRoutesItemProviderIdMax = 80;
+
 export const saveExchangeConfigurationResponseConfigurationRoutesMax = 100;
 
 export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin = 2;
 export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax = 80;
 
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLogoUrlMax = 2000;
+
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMin = 0;
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax = 5000;
+
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const saveExchangeConfigurationResponseConfigurationPaymentMethodsMax = 30;
+
+export const saveExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax = 80;
+
+export const saveExchangeConfigurationResponseConfigurationProvidersItemLabelMax = 100;
+
+export const saveExchangeConfigurationResponseConfigurationProvidersItemEndpointMax = 2000;
+
+export const saveExchangeConfigurationResponseConfigurationProvidersMax = 20;
 
 
 
@@ -2270,7 +2367,8 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "minimum": zod.string().regex(saveExchangeConfigurationResponseConfigurationNetworksItemMinimumRegExp),
   "maximum": zod.string().regex(saveExchangeConfigurationResponseConfigurationNetworksItemMaximumRegExp),
   "fee": zod.string().regex(saveExchangeConfigurationResponseConfigurationNetworksItemFeeRegExp),
-  "information": zod.string().max(saveExchangeConfigurationResponseConfigurationNetworksItemInformationMax)
+  "information": zod.string().max(saveExchangeConfigurationResponseConfigurationNetworksItemInformationMax),
+  "providerId": zod.string().max(saveExchangeConfigurationResponseConfigurationNetworksItemProviderIdMax).optional()
 })).max(saveExchangeConfigurationResponseConfigurationNetworksMax),
   "routes": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -2284,7 +2382,8 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "feeBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMin).max(saveExchangeConfigurationResponseConfigurationRoutesItemFeeBpsMax),
   "fixedFee": zod.string().regex(saveExchangeConfigurationResponseConfigurationRoutesItemFixedFeeRegExp),
   "spreadBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMin).max(saveExchangeConfigurationResponseConfigurationRoutesItemSpreadBpsMax),
-  "paymentMethodIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax)
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationResponseConfigurationRoutesItemPaymentMethodIdsMax),
+  "providerId": zod.string().max(saveExchangeConfigurationResponseConfigurationRoutesItemProviderIdMax).optional()
 })).max(saveExchangeConfigurationResponseConfigurationRoutesMax),
   "paymentMethods": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -2292,8 +2391,20 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "enabled": zod.boolean(),
   "currency": zod.enum(['USD', 'EUR', 'GBP']),
   "buy": zod.boolean(),
-  "sell": zod.boolean()
-})).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsMax)
+  "sell": zod.boolean(),
+  "logoUrl": zod.string().max(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLogoUrlMax).nullish(),
+  "methodType": zod.enum(['bank', 'card', 'manual']).optional(),
+  "minimum": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemMinimumRegExp).optional(),
+  "maximum": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemMaximumRegExp).nullish(),
+  "feeBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMin).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax).optional(),
+  "fixedFee": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp).optional()
+})).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsMax),
+  "providers": zod.array(zod.object({
+  "providerId": zod.string().max(saveExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax),
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangeConfigurationResponseConfigurationProvidersItemLabelMax).optional(),
+  "endpoint": zod.string().max(saveExchangeConfigurationResponseConfigurationProvidersItemEndpointMax).nullish()
+})).max(saveExchangeConfigurationResponseConfigurationProvidersMax).optional()
 }),
   "catalog": zod.array(zod.object({
   "assetNetworkId": zod.string(),
@@ -2304,7 +2415,16 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "networkName": zod.string(),
   "testnet": zod.boolean()
 })),
-  "effectiveEnabled": zod.boolean()
+  "effectiveEnabled": zod.boolean(),
+  "providerCatalog": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "status": zod.enum(['sandbox', 'configuration_only', 'coming_soon']),
+  "functional": zod.boolean(),
+  "credentialSupport": zod.boolean(),
+  "capabilities": zod.array(zod.string())
+})).optional()
 })
 
 
@@ -2314,6 +2434,8 @@ export const ListExchangeOrdersParams = zod.object({
 
 export const listExchangeOrdersQuerySearchMax = 100;
 
+export const listExchangeOrdersQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const listExchangeOrdersQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
 
 
 
@@ -2321,6 +2443,9 @@ export const ListExchangeOrdersQueryParams = zod.object({
   "search": zod.coerce.string().max(listExchangeOrdersQuerySearchMax).optional(),
   "status": zod.coerce.string().optional(),
   "action": zod.coerce.string().optional(),
+  "from": zod.coerce.string().regex(listExchangeOrdersQueryFromRegExp).optional(),
+  "to": zod.coerce.string().regex(listExchangeOrdersQueryToRegExp).optional(),
+  "customer": zod.enum(['anonymous']).optional(),
   "page": zod.coerce.number().int().min(1).optional()
 })
 
@@ -2346,6 +2471,9 @@ export const ListExchangeOrdersResponse = zod.object({
   "at": zod.coerce.date(),
   "note": zod.string()
 })),
+  "updatedAt": zod.coerce.date().optional(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
   "sandboxOnly": zod.literal(true)
 })),
   "total": zod.number().int(),
@@ -2380,6 +2508,9 @@ export const GetExchangeOrderResponse = zod.object({
   "at": zod.coerce.date(),
   "note": zod.string()
 })),
+  "updatedAt": zod.coerce.date().optional(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
   "sandboxOnly": zod.literal(true)
 })
 
@@ -2419,6 +2550,9 @@ export const UpdateExchangeOrderStatusResponse = zod.object({
   "at": zod.coerce.date(),
   "note": zod.string()
 })),
+  "updatedAt": zod.coerce.date().optional(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
   "sandboxOnly": zod.literal(true)
 })
 
@@ -2438,6 +2572,8 @@ export const GetExchangeDashboardResponse = zod.object({
   "assets": zod.number().int(),
   "networks": zod.number().int(),
   "routes": zod.number().int(),
+  "customers": zod.number().int().optional(),
+  "paymentMethods": zod.number().int().optional(),
   "volume": zod.array(zod.object({
   "symbol": zod.string(),
   "amount": zod.string()
@@ -2463,9 +2599,27 @@ export const GetExchangeDashboardResponse = zod.object({
   "at": zod.coerce.date(),
   "note": zod.string()
 })),
+  "updatedAt": zod.coerce.date().optional(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
   "sandboxOnly": zod.literal(true)
 }))
 })
+
+
+export const ListExchangeCustomersParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const ListExchangeCustomersResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullable(),
+  "orders": zod.number().int(),
+  "lastActivity": zod.coerce.date(),
+  "status": zod.enum(['unidentified'])
+})
+export const ListExchangeCustomersResponse = zod.array(ListExchangeCustomersResponseItem)
 
 
 export const GetPublicExchangeParams = zod.object({
@@ -2488,9 +2642,19 @@ export const getPublicExchangeResponseRoutesItemSpreadBpsMax = 5000;
 
 export const getPublicExchangeResponseRoutesItemPaymentMethodIdsMax = 30;
 
+export const getPublicExchangeResponseRoutesItemProviderIdMax = 80;
+
 export const getPublicExchangeResponsePaymentMethodsItemLabelMin = 2;
 export const getPublicExchangeResponsePaymentMethodsItemLabelMax = 80;
 
+export const getPublicExchangeResponsePaymentMethodsItemLogoUrlMax = 2000;
+
+export const getPublicExchangeResponsePaymentMethodsItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getPublicExchangeResponsePaymentMethodsItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getPublicExchangeResponsePaymentMethodsItemFeeBpsMin = 0;
+export const getPublicExchangeResponsePaymentMethodsItemFeeBpsMax = 5000;
+
+export const getPublicExchangeResponsePaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 
 
 export const GetPublicExchangeResponse = zod.object({
@@ -2520,7 +2684,8 @@ export const GetPublicExchangeResponse = zod.object({
   "feeBps": zod.number().int().min(getPublicExchangeResponseRoutesItemFeeBpsMin).max(getPublicExchangeResponseRoutesItemFeeBpsMax),
   "fixedFee": zod.string().regex(getPublicExchangeResponseRoutesItemFixedFeeRegExp),
   "spreadBps": zod.number().int().min(getPublicExchangeResponseRoutesItemSpreadBpsMin).max(getPublicExchangeResponseRoutesItemSpreadBpsMax),
-  "paymentMethodIds": zod.array(zod.string().uuid()).max(getPublicExchangeResponseRoutesItemPaymentMethodIdsMax)
+  "paymentMethodIds": zod.array(zod.string().uuid()).max(getPublicExchangeResponseRoutesItemPaymentMethodIdsMax),
+  "providerId": zod.string().max(getPublicExchangeResponseRoutesItemProviderIdMax).optional()
 })),
   "paymentMethods": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -2528,7 +2693,13 @@ export const GetPublicExchangeResponse = zod.object({
   "enabled": zod.boolean(),
   "currency": zod.enum(['USD', 'EUR', 'GBP']),
   "buy": zod.boolean(),
-  "sell": zod.boolean()
+  "sell": zod.boolean(),
+  "logoUrl": zod.string().max(getPublicExchangeResponsePaymentMethodsItemLogoUrlMax).nullish(),
+  "methodType": zod.enum(['bank', 'card', 'manual']).optional(),
+  "minimum": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemMinimumRegExp).optional(),
+  "maximum": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemMaximumRegExp).nullish(),
+  "feeBps": zod.number().int().min(getPublicExchangeResponsePaymentMethodsItemFeeBpsMin).max(getPublicExchangeResponsePaymentMethodsItemFeeBpsMax).optional(),
+  "fixedFee": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemFixedFeeRegExp).optional()
 })),
   "fiatCurrency": zod.string(),
   "publicNote": zod.string()
@@ -2611,6 +2782,9 @@ export const CreateSandboxOrderResponse = zod.object({
   "at": zod.coerce.date(),
   "note": zod.string()
 })),
+  "updatedAt": zod.coerce.date().optional(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
   "sandboxOnly": zod.literal(true)
 }),
   "trackingToken": zod.string()
@@ -2652,6 +2826,9 @@ export const TrackSandboxOrderResponse = zod.object({
   "at": zod.coerce.date(),
   "note": zod.string()
 })),
+  "updatedAt": zod.coerce.date().optional(),
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
   "sandboxOnly": zod.literal(true)
 })
 

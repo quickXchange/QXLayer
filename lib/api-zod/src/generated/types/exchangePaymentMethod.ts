@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ExchangePaymentMethodCurrency } from './exchangePaymentMethodCurrency';
+import type { ExchangePaymentMethodMethodType } from './exchangePaymentMethodMethodType';
 
 export interface ExchangePaymentMethod {
   id: string;
@@ -18,4 +19,24 @@ export interface ExchangePaymentMethod {
   currency: ExchangePaymentMethodCurrency;
   buy: boolean;
   sell: boolean;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  logoUrl?: string | null;
+  methodType?: ExchangePaymentMethodMethodType;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  minimum?: string;
+  /**
+     * @nullable
+     * @pattern ^\d{1,18}(\.\d{1,18})?$
+     */
+  maximum?: string | null;
+  /**
+     * @minimum 0
+     * @maximum 5000
+     */
+  feeBps?: number;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  fixedFee?: string;
 }

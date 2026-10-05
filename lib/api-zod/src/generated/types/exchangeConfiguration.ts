@@ -6,10 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ExchangeCatalogAsset } from './exchangeCatalogAsset';
+import type { ExchangeProvider } from './exchangeProvider';
 import type { ExchangeSettings } from './exchangeSettings';
 
 export interface ExchangeConfiguration {
   configuration: ExchangeSettings;
   catalog: ExchangeCatalogAsset[];
   effectiveEnabled: boolean;
+  providerCatalog?: ExchangeProvider[];
 }

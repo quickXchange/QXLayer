@@ -22,16 +22,27 @@ export function calculateQuote(s: ExchangeSettings, catalog: ExchangeCatalogAsse
   const source = endpoint(input.source), destination = endpoint(input.destination);
   if (amount % (10n ** BigInt(18 - source.decimals)) !== 0n) throw new HttpError(400, `Source amount supports at most ${source.decimals} decimal places.`);
   let paymentMethod: string | null = null;
+  let paymentFeeBps = 0n, paymentFixedFee = 0n, paymentMinimum = 0n, paymentMaximum: bigint | null = null;
   if (input.action === "buy" || input.action === "sell") {
     const method = s.paymentMethods.find(m => m.id === input.paymentMethodId && m.enabled && m[input.action as "buy" | "sell"] && route.paymentMethodIds.includes(m.id));
     if (!method) throw new HttpError(400, "Select an enabled sandbox payment method for this route.");
     paymentMethod = method.label;
+    paymentFeeBps = BigInt(method.feeBps ?? 0);
+    paymentFixedFee = decimal(method.fixedFee ?? "0");
+    paymentMinimum = decimal(method.minimum ?? "0");
+    paymentMaximum = method.maximum != null ? decimal(method.maximum) : null;
   } else if (input.paymentMethodId) throw new HttpError(400, "Payment methods apply only to Buy or Sell.");
   const effectiveRate = decimal(route.rate) * (BPS - BigInt(route.spreadBps)) / BPS;
   // All service fees are in SOURCE units. Destination network fees are OUTPUT units.
-  const fee = amount * BigInt(route.feeBps) / BPS + decimal(route.fixedFee) + source.networkFee;
+  const buyFee = input.action === "buy" ? amount * paymentFeeBps / BPS + paymentFixedFee : 0n;
+  const fee = amount * BigInt(route.feeBps) / BPS + decimal(route.fixedFee) + source.networkFee + buyFee;
   if (fee >= amount) throw new HttpError(400, "The amount does not cover the configured sandbox fees.");
   let output = (amount - fee) * effectiveRate / SCALE - destination.networkFee;
+  const fiatAmount = input.action === "sell" ? output : amount;
+  if ((input.action === "buy" || input.action === "sell") &&
+      (fiatAmount < paymentMinimum || (paymentMaximum != null && fiatAmount > paymentMaximum))) throw new HttpError(400, "Fiat amount is outside this payment method's minimum/maximum.");
+  const sellFee = input.action === "sell" ? output * paymentFeeBps / BPS + paymentFixedFee : 0n;
+  output -= sellFee;
   const quantum = 10n ** BigInt(18 - destination.decimals);
   output = output > 0n ? output / quantum * quantum : 0n;
   if (output <= 0n) throw new HttpError(400, "The calculated output is below the destination precision or fees.");
@@ -46,7 +57,7 @@ export function calculateQuote(s: ExchangeSettings, catalog: ExchangeCatalogAsse
     sourceSymbol: source.symbol, destinationSymbol: destination.symbol,
     inputAmount: decimalString(amount), outputAmount: decimalString(output),
     rate: decimalString(effectiveRate), fee: decimalString(fee),
-    destinationFee: decimalString(destination.networkFee),
+    destinationFee: decimalString(destination.networkFee + sellFee),
     minimum: route.minimum, maximum: route.maximum, spreadBps: route.spreadBps, sandboxOnly: true,
   };
   return { quote, volume: decimalString(volume), paymentMethod };

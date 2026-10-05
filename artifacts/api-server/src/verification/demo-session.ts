@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
-import { GetDemoSessionResponse, GetCurrentPrincipalResponse, GetTenantResponse, ListTenantsResponse, GetExchangeConfigurationResponse, CreateSandboxQuoteResponse, CreateSandboxOrderResponse, TrackSandboxOrderResponse } from "@workspace/api-zod";
+import { GetDemoSessionResponse, GetCurrentPrincipalResponse, GetTenantResponse, ListTenantsResponse, GetExchangeConfigurationResponse, ListExchangeCustomersResponse, CreateSandboxQuoteResponse, CreateSandboxOrderResponse, TrackSandboxOrderResponse } from "@workspace/api-zod";
 const base = process.env.DEMO_VERIFY_BASE ?? "http://localhost";
 const origin = new URL(base).origin;
 let cookie = "";
@@ -34,6 +34,13 @@ try {
   const settings = GetExchangeConfigurationResponse.parse(await request(`${root}/exchange`, 200));
   assert.deepEqual(settings.configuration.actions, { swap: true, convert: true, buy: true, sell: true });
   assert.equal(settings.configuration.routes.length, 18);
+  assert.equal(settings.providerCatalog?.filter(p => p.functional).length, 1);
+  assert.ok(settings.providerCatalog?.every(p => !p.credentialSupport));
+  const customers = ListExchangeCustomersResponse.parse(await request(`${root}/exchange/customers`, 200));
+  assert.ok(customers.every((c: { id: string; email: string | null }) => c.id === "anonymous" && c.email === null));
+  await request(`${root}/exchange/orders?from=2026-02-30`, 400);
+  await request(`${root}/exchange/orders?from=2026-12-01&to=2026-01-01`, 400);
+  await request(`/tenants/${randomUUID()}/exchange/customers`, 403);
   for (const action of ["swap", "convert", "buy", "sell"] as const) {
     const route = settings.configuration.routes.find(r => r.action === action)!;
     const q = CreateSandboxQuoteResponse.parse(await request("/public/sites/novax-live-demo/exchange/quotes", 200, "POST", {

@@ -26,5 +26,10 @@ export interface ExchangeOrder {
   paymentMethod: string | null;
   createdAt: Date;
   history: ExchangeOrderEvent[];
+  updatedAt?: Date;
+  /** @nullable */
+  customerName?: string | null;
+  /** @nullable */
+  customerEmail?: string | null;
   sandboxOnly: true;
 }

@@ -6,7 +6,7 @@ import { resolvePrincipal, contextFor } from "../modules/authentication/service"
 import { createTenant, saveAssets } from "../modules/tenants/service";
 import { savePlan } from "../modules/entitlements/catalog";
 import { planFixture } from "./plans";
-import { exchangeAudit, exchangeConfiguration, sandboxQuote, sandboxOrder, trackOrder, tenantOrder, tenantOrders, exchangeDashboard, publicExchange } from "../products/exchange/service";
+import { exchangeAudit, exchangeConfiguration, exchangeCustomers, sandboxQuote, sandboxOrder, trackOrder, tenantOrder, tenantOrders, exchangeDashboard, publicExchange } from "../products/exchange/service";
 import { calculateQuote } from "../products/exchange/calculation";
 import { getSubscription } from "../modules/entitlements/resolver";
 import { setTenantOverrides } from "../modules/entitlements/subscriptions";
@@ -55,6 +55,29 @@ try {
   const input = { action: "swap" as const, source: src, destination: dest, amount: "1" };
   const calculated = calculateQuote({ ...configuration, routes: configuration.routes.map(r => ({ ...r, feeBps: 100, spreadBps: 100 })) }, catalog, input);
   assert.equal(calculated.quote.fee, "0.01"); assert.equal(calculated.quote.outputAmount, "1.9602");
+  const paymentPricing = { ...configuration, paymentMethods: configuration.paymentMethods.map(m => ({ ...m, minimum: "0.5", maximum: "10", feeBps: 100, fixedFee: "0.1" })) };
+  const buyPrice = calculateQuote(paymentPricing, catalog, { action: "buy", source: "fiat:USD", destination: dest, amount: "1", paymentMethodId: methodId });
+  assert.equal(buyPrice.quote.fee, "0.11"); assert.equal(buyPrice.quote.outputAmount, "1.78");
+  const sellPrice = calculateQuote(paymentPricing, catalog, { action: "sell", source: src, destination: "fiat:USD", amount: "1", paymentMethodId: methodId });
+  assert.equal(sellPrice.quote.destinationFee, "0.12"); assert.equal(sellPrice.quote.outputAmount, "1.88");
+  assert.throws(() => calculateQuote(paymentPricing, catalog, { action: "buy", source: "fiat:USD", destination: dest, amount: "0.1", paymentMethodId: methodId }));
+  const narrowMethods = { ...paymentPricing, paymentMethods: paymentPricing.paymentMethods.map(m => ({ ...m, maximum: "1.5" })) };
+  assert.throws(() => calculateQuote(narrowMethods, catalog, { action: "sell", source: src, destination: "fiat:USD", amount: "1", paymentMethodId: methodId }));
+  const providerConfig: ExchangeSettings = { ...configuration,
+    providers: [{ providerId: "changenow", enabled: true, label: "Future adapter", endpoint: "https://example.com/api" }],
+    routes: configuration.routes.map(r => ({ ...r, providerId: r.action === "convert" ? "changenow" : "manual" })),
+    networks: configuration.networks.map(n => ({ ...n, providerId: "node-rpc" })) };
+  const providerSaved = await exchangeConfiguration(client, a.id, providerConfig);
+  assert.equal(providerSaved.configuration.providers?.[0].providerId, "changenow");
+  assert.equal(providerSaved.providerCatalog.filter(p => p.functional).length, 1);
+  assert.ok(providerSaved.providerCatalog.every(p => !p.credentialSupport));
+  assert.equal((await sandboxQuote(a.slug, input)).sandboxOnly, true);
+  await denied(() => exchangeConfiguration(client, a.id, { ...providerConfig, providers: [{ providerId: "unknown", enabled: true }] }), 400);
+  await denied(() => exchangeConfiguration(client, a.id, { ...providerConfig, providers: [{ providerId: "quickx", enabled: true, endpoint: "https://example.com?token=dummy" }] }), 400);
+  await denied(() => exchangeConfiguration(client, a.id, { ...providerConfig, providers: [{ providerId: "quickx", enabled: true, endpoint: "https://demo:dummy@example.com" }] }), 400);
+  await denied(() => exchangeConfiguration(client, a.id, { ...providerConfig, providers: [{ providerId: "quickx", enabled: true, apiKey: "dummy-not-a-credential" }] } as unknown as ExchangeSettings), 400);
+  await denied(() => exchangeConfiguration(client, a.id, { ...providerConfig, routes: providerConfig.routes.map(r => ({ ...r, providerId: "node-rpc" })) }), 400);
+  await exchangeConfiguration(client, a.id, configuration);
   assert.throws(() => calculateQuote(configuration, catalog, { ...input, amount: "0.000000001" }));
   assert.throws(() => calculateQuote({ ...configuration, networks: configuration.networks.map(n => ({ ...n, available: false })) }, catalog, input));
   await denied(() => sandboxQuote(a.slug, { ...input, amount: "0" }), 400);
@@ -95,6 +118,20 @@ try {
   assert.equal((await tenantOrders(client, a.id, { action: "buy" })).total, 1);
   assert.equal((await tenantOrders(client, a.id, { search: created.order.id })).total, 1);
   assert.equal((await exchangeDashboard(client, a.id)).total, 4);
+  assert.equal((await exchangeDashboard(client, a.id)).customers, 0);
+  assert.equal((await exchangeDashboard(client, a.id)).paymentMethods, 1);
+  const today = new Date().toISOString().slice(0, 10);
+  assert.equal((await tenantOrders(client, a.id, { from: today, to: today, customer: "anonymous" })).total, 4);
+  assert.equal((await tenantOrders(client, a.id, { to: "2000-01-01" })).total, 0);
+  await denied(() => tenantOrders(client, a.id, { from: "2026-02-30" }), 400);
+  await denied(() => tenantOrders(client, a.id, { from: "2026-12-01", to: "2026-01-01" }), 400);
+  await denied(() => tenantOrders(client, a.id, { customer: "another-tenant-customer" }), 400);
+  const customers = await exchangeCustomers(client, a.id);
+  assert.equal(customers.length, 1); assert.equal(customers[0].orders, 4); assert.equal(customers[0].email, null);
+  await denied(() => exchangeCustomers(client, b.id), 403);
+  const orderDetails = await tenantOrder(client, a.id, created.order.id);
+  assert.equal(orderDetails.customerName, null); assert.equal(orderDetails.customerEmail, null);
+  assert.ok(new Date(orderDetails.updatedAt!).getTime() >= new Date(orderDetails.createdAt).getTime());
   assert.ok((await exchangeAudit(client, a.id)).events.every(event => event.tenantId === a.id));
   await denied(() => exchangeAudit(client, b.id), 403);
   await denied(() => tenantOrders(client, b.id, {}), 403);
@@ -106,7 +143,7 @@ try {
   await denied(() => sandboxQuote(a.slug, input), 409);
   await setTenantOverrides(admin, a.id, [{ key: "swap", value: false, reason: "Verification entitlement denial" }]);
   await denied(() => sandboxQuote(a.slug, input), 403);
-  console.log("PASS: four actions, integer pricing/rounding, route and payment validation, signed/expired/config-changed quotes, application tenant/capability isolation, read-only staff, status history and terminal guards, search/dashboard, idempotency and concurrent monthly-quota admission.");
+  console.log("PASS: four actions, integer pricing/rounding, fiat payment fees/limits, configuration-only provider catalog/assignments, credential rejection, customer privacy/date filters, route/payment validation, signed/expired/config-changed quotes, tenant isolation, read-only staff, status history and terminal guards, audited bulk configuration, dashboard, idempotency and concurrent monthly-quota admission.");
 } finally {
   for (const table of ["exchange_orders", "pricing_rules", "audit_events", "tenant_usage_counters", "tenant_payment_methods", "tenant_product_configuration", "tenant_entitlement_overrides", "tenant_subscriptions", "tenant_memberships", "tenant_asset_networks", "tenant_configuration", "tenant_branding", "tenant_domains"]) {
     await pool.query(`DELETE FROM ${table} WHERE tenant_id=ANY($1::uuid[])`, [tenants]);

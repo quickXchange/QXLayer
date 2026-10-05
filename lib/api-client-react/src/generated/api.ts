@@ -37,6 +37,7 @@ import type {
   EntitlementOverrideInput,
   ExchangeAuditList,
   ExchangeConfiguration,
+  ExchangeCustomer,
   ExchangeDashboard,
   ExchangeDeliveryInput,
   ExchangeOrder,
@@ -1632,6 +1633,77 @@ export function useGetExchangeDashboard<TData = Awaited<ReturnType<typeof getExc
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetExchangeDashboardQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListExchangeCustomersUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/customers`
+}
+
+export const listExchangeCustomers = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeCustomer[]> => {
+
+  return customFetch<ExchangeCustomer[]>(getListExchangeCustomersUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListExchangeCustomersQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange/customers`
+    ] as const;
+    }
+
+
+export const getListExchangeCustomersQueryOptions = <TData = Awaited<ReturnType<typeof listExchangeCustomers>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExchangeCustomers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListExchangeCustomersQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listExchangeCustomers>>> = ({ signal }) => listExchangeCustomers(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listExchangeCustomers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListExchangeCustomersQueryResult = NonNullable<Awaited<ReturnType<typeof listExchangeCustomers>>>
+export type ListExchangeCustomersQueryError = ErrorType<unknown>
+
+
+
+export function useListExchangeCustomers<TData = Awaited<ReturnType<typeof listExchangeCustomers>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listExchangeCustomers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListExchangeCustomersQueryOptions(tenantId,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

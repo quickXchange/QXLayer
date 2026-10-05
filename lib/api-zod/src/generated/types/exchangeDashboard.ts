@@ -19,6 +19,8 @@ export interface ExchangeDashboard {
   assets: number;
   networks: number;
   routes: number;
+  customers?: number;
+  paymentMethods?: number;
   volume: ExchangeVolume[];
   recentOrders: ExchangeOrder[];
 }

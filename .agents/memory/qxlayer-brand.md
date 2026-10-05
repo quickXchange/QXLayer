@@ -22,3 +22,9 @@ The approved public QXLayer Main Platform is the MASTER visual reference for aut
 **Why:** The user explicitly required all three consoles to belong to one platform, including cards, controls, tables, overlays, badges, spacing, logo placement and responsive navigation.
 
 **How to apply:** Keep shared presentation consistent while preserving role-specific navigation and business logic. Do not redesign the approved public landing page, change authentication, permissions, routes or the completed ordering workflow, invent billing/settings features, or publish without an explicit request. Tenant management uses QXLayer; tenant public websites keep their own branding.
+
+Exchange Admin upgrades may transfer advanced organization, management workflows, bulk controls and drawers, but not an older exchange panel's visual design. Keep the existing QXLayer design system, sidebar, colors/gradients, typography, cards, tables, buttons, icons, themes and responsive style.
+
+**Why:** The user repeated “DO NOT redesign the Admin Panel” and explicitly requested functionality/organization only, not a new or duplicated Admin Panel.
+
+**How to apply:** Reuse the existing Exchange modules and components. Limit changes to tenant administration and its supporting APIs; leave the landing page, customer website design, Super Admin design, authentication architecture and existing customer data unchanged.

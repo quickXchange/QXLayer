@@ -501,6 +501,8 @@ export interface ExchangeNetworkSettings {
   fee: string;
   /** @maxLength 500 */
   information: string;
+  /** @maxLength 80 */
+  providerId?: string;
 }
 
 export interface ExchangeRoute {
@@ -537,6 +539,8 @@ export interface ExchangeRoute {
   spreadBps: number;
   /** @maxItems 30 */
   paymentMethodIds: string[];
+  /** @maxLength 80 */
+  providerId?: string;
 }
 
 export type ExchangePaymentMethodCurrency = typeof ExchangePaymentMethodCurrency[keyof typeof ExchangePaymentMethodCurrency];
@@ -546,6 +550,15 @@ export const ExchangePaymentMethodCurrency = {
   USD: 'USD',
   EUR: 'EUR',
   GBP: 'GBP',
+} as const;
+
+export type ExchangePaymentMethodMethodType = typeof ExchangePaymentMethodMethodType[keyof typeof ExchangePaymentMethodMethodType];
+
+
+export const ExchangePaymentMethodMethodType = {
+  bank: 'bank',
+  card: 'card',
+  manual: 'manual',
 } as const;
 
 export interface ExchangePaymentMethod {
@@ -559,6 +572,58 @@ export interface ExchangePaymentMethod {
   currency: ExchangePaymentMethodCurrency;
   buy: boolean;
   sell: boolean;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  logoUrl?: string | null;
+  methodType?: ExchangePaymentMethodMethodType;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  minimum?: string;
+  /**
+     * @nullable
+     * @pattern ^\d{1,18}(\.\d{1,18})?$
+     */
+  maximum?: string | null;
+  /**
+     * @minimum 0
+     * @maximum 5000
+     */
+  feeBps?: number;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  fixedFee?: string;
+}
+
+export type ExchangeProviderStatus = typeof ExchangeProviderStatus[keyof typeof ExchangeProviderStatus];
+
+
+export const ExchangeProviderStatus = {
+  sandbox: 'sandbox',
+  configuration_only: 'configuration_only',
+  coming_soon: 'coming_soon',
+} as const;
+
+export interface ExchangeProvider {
+  id: string;
+  name: string;
+  category: string;
+  status: ExchangeProviderStatus;
+  functional: boolean;
+  credentialSupport: boolean;
+  capabilities: string[];
+}
+
+export interface ExchangeProviderConfiguration {
+  /** @maxLength 80 */
+  providerId: string;
+  enabled: boolean;
+  /** @maxLength 100 */
+  label?: string;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  endpoint?: string | null;
 }
 
 export type ExchangeSettingsFiatCurrency = typeof ExchangeSettingsFiatCurrency[keyof typeof ExchangeSettingsFiatCurrency];
@@ -594,6 +659,8 @@ export interface ExchangeSettings {
   routes: ExchangeRoute[];
   /** @maxItems 30 */
   paymentMethods: ExchangePaymentMethod[];
+  /** @maxItems 20 */
+  providers?: ExchangeProviderConfiguration[];
 }
 
 export interface ExchangeCatalogAsset {
@@ -610,6 +677,7 @@ export interface ExchangeConfiguration {
   configuration: ExchangeSettings;
   catalog: ExchangeCatalogAsset[];
   effectiveEnabled: boolean;
+  providerCatalog?: ExchangeProvider[];
 }
 
 export interface ExchangeQuoteInput {
@@ -699,7 +767,29 @@ export interface ExchangeOrder {
   paymentMethod: string | null;
   createdAt: string;
   history: ExchangeOrderEvent[];
+  updatedAt?: string;
+  /** @nullable */
+  customerName?: string | null;
+  /** @nullable */
+  customerEmail?: string | null;
   sandboxOnly: true;
+}
+
+export type ExchangeCustomerStatus = typeof ExchangeCustomerStatus[keyof typeof ExchangeCustomerStatus];
+
+
+export const ExchangeCustomerStatus = {
+  unidentified: 'unidentified',
+} as const;
+
+export interface ExchangeCustomer {
+  id: string;
+  name: string;
+  /** @nullable */
+  email: string | null;
+  orders: number;
+  lastActivity: string;
+  status: ExchangeCustomerStatus;
 }
 
 export interface ExchangeOrderCreated {
@@ -730,6 +820,8 @@ export interface ExchangeDashboard {
   assets: number;
   networks: number;
   routes: number;
+  customers?: number;
+  paymentMethods?: number;
   volume: ExchangeVolume[];
   recentOrders: ExchangeOrder[];
 }
@@ -1494,8 +1586,24 @@ search?: string;
 status?: string;
 action?: string;
 /**
+ * @pattern ^\d{4}-\d{2}-\d{2}$
+ */
+from?: string;
+/**
+ * @pattern ^\d{4}-\d{2}-\d{2}$
+ */
+to?: string;
+customer?: ListExchangeOrdersCustomer;
+/**
  * @minimum 1
  */
 page?: number;
 };
+
+export type ListExchangeOrdersCustomer = typeof ListExchangeOrdersCustomer[keyof typeof ListExchangeOrdersCustomer];
+
+
+export const ListExchangeOrdersCustomer = {
+  anonymous: 'anonymous',
+} as const;
 

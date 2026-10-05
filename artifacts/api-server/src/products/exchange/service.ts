@@ -73,10 +73,19 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
       await client.query("UPDATE tenant_configuration SET exchange_enabled=$2 WHERE tenant_id=$1", [tenantId, s.enabled]);
       await client.query("UPDATE tenants SET completed_steps=CASE WHEN 'configuration'=ANY(completed_steps) THEN completed_steps ELSE array_append(completed_steps,'configuration') END,updated_at=now() WHERE id=$1", [tenantId]);
       await audit(client, principal, tenantId, "exchange.configuration.saved", "Updated White Label Exchange sandbox settings", { routes: s.routes.length, enabled: s.enabled });
-      for (const key of ["assets", "networks", "routes", "paymentMethods"] as const) {
-        const before = result.configuration[key] as unknown as Record<string, unknown>[], after = s[key] as unknown as Record<string, unknown>[];
-        if (JSON.stringify(before) !== JSON.stringify(after)) await audit(client, principal, tenantId, `exchange.${key}.changed`, `Updated sandbox exchange ${key}`, { beforeCount: before.length, afterCount: after.length });
+      for (const key of ["assets", "networks", "routes", "paymentMethods", "providers"] as const) {
+        const before = (result.configuration[key] ?? []) as unknown as Record<string, unknown>[], after = (s[key] ?? []) as unknown as Record<string, unknown>[];
+        if (JSON.stringify(before) !== JSON.stringify(after)) {
+          const identify = (v: Record<string, unknown>) => v.id ?? v.assetId ?? v.assetNetworkId ?? v.providerId;
+          const prior = new Map(before.map(v => [identify(v), v]));
+          const changed = after.filter(v => JSON.stringify(prior.get(identify(v))) !== JSON.stringify(v)).length +
+            before.filter(v => !after.some(a => identify(a) === identify(v))).length;
+          await audit(client, principal, tenantId, `exchange.${key}.changed`, `Updated sandbox exchange ${key}`, { beforeCount: before.length, afterCount: after.length, changedCount: changed });
+          if (changed > 1) await audit(client, principal, tenantId, "exchange.bulk.changed", `Applied changes to ${changed} ${key}`, { section: key, changedCount: changed });
+        }
       }
+      const price = (r: ExchangeSettings["routes"][number]) => [r.id, r.rate, r.feeBps, r.fixedFee, r.spreadBps, r.minimum, r.maximum];
+      if (JSON.stringify(result.configuration.routes.map(price)) !== JSON.stringify(s.routes.map(price))) await audit(client, principal, tenantId, "exchange.pricing.changed", "Updated sandbox route pricing, fees or limits", {});
       result.configuration = s;
     }
     const legacy = await client.query("SELECT exchange_enabled FROM tenant_configuration WHERE tenant_id=$1", [tenantId]);
@@ -135,7 +144,9 @@ function serializeOrder(row: OrderRow): ExchangeOrder {
   return { id: row.id, status: row.status, action: r.action, source: r.source, destination: r.destination,
     sourceSymbol: r.sourceSymbol, destinationSymbol: r.destinationSymbol, inputAmount: r.inputAmount,
     outputAmount: r.outputAmount, rate: r.rate, fee: r.fee, destinationFee: r.destinationFee ?? "0", spreadBps: r.spreadBps,
-    paymentMethod: r.paymentMethod, createdAt: row.created_at, history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true };
+    paymentMethod: r.paymentMethod, createdAt: row.created_at,
+    updatedAt: new Date(r.history.at(-1)?.at ?? row.created_at), customerName: null, customerEmail: null,
+    history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true };
 }
 async function orderRow(client: DatabaseClient, tenantId: string, id: string, lock = false) {
   const r = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE tenant_id=$1 AND id=$2 AND request->>'product'='crypto_exchange'${lock ? " FOR UPDATE" : ""}`, [tenantId, id]);
@@ -185,18 +196,22 @@ export function tenantOrder(principal: Principal, tenantId: string, id: string, 
       row.request.history.push({ status: input.status, at: new Date().toISOString(), note: input.note || "Status updated by tenant administrator (simulation only)." });
       await client.query("UPDATE exchange_orders SET status=$3,request=$4 WHERE tenant_id=$1 AND id=$2", [tenantId, id, input.status, JSON.stringify(row.request)]);
       await audit(client, principal, tenantId, "exchange.order.status_changed", "Changed simulated exchange order status", { orderId: id, from: row.status, to: input.status });
+      if (input.note.startsWith("Bulk:")) await audit(client, principal, tenantId, "exchange.orders.bulk_item", "Applied bulk workflow to a simulated order", { orderId: id, from: row.status, to: input.status });
       row.status = input.status;
     }
     return serializeOrder(row);
   });
 }
-export function tenantOrders(principal: Principal, tenantId: string, query: { search?: string; status?: string; action?: string; page?: number }) {
+export function tenantOrders(principal: Principal, tenantId: string, query: { search?: string; status?: string; action?: string; page?: number; from?: string; to?: string; customer?: string }) {
   return withDatabase(contextFor(principal, tenantId), async client => {
+    for (const date of [query.from, query.to]) if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date)) throw new HttpError(400, "Use valid calendar dates in YYYY-MM-DD format.");
+    if (query.from && query.to && query.from > query.to) throw new HttpError(400, "Start date must not be after end date.");
+    if (query.customer && query.customer !== "anonymous") throw new HttpError(400, "Sandbox orders do not collect customer identity.");
     const page = query.page ?? 1, pageSize = 25;
-    const filter = "tenant_id=$1 AND request->>'product'='crypto_exchange' AND ($2='' OR status=$2) AND ($3='' OR request->>'action'=$3) AND ($4='' OR id::text ILIKE '%'||$4||'%' OR request->>'sourceSymbol' ILIKE '%'||$4||'%' OR request->>'destinationSymbol' ILIKE '%'||$4||'%')";
-    const args = [tenantId, query.status ?? "", query.action ?? "", query.search ?? ""];
+    const filter = "tenant_id=$1 AND request->>'product'='crypto_exchange' AND ($2='' OR status=$2) AND ($3='' OR request->>'action'=$3) AND ($4='' OR id::text ILIKE '%'||$4||'%' OR request->>'sourceSymbol' ILIKE '%'||$4||'%' OR request->>'destinationSymbol' ILIKE '%'||$4||'%') AND ($5::timestamptz IS NULL OR created_at >= $5::timestamptz) AND ($6::timestamptz IS NULL OR created_at < $6::timestamptz + interval '1 day')";
+    const args = [tenantId, query.status ?? "", query.action ?? "", query.search ?? "", query.from ? `${query.from}T00:00:00Z` : null, query.to ? `${query.to}T00:00:00Z` : null];
     const count = await client.query(`SELECT count(*)::int AS total FROM exchange_orders WHERE ${filter}`, args);
-    const rows = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE ${filter} ORDER BY created_at DESC,id DESC LIMIT $5 OFFSET $6`, [...args, pageSize, (page - 1) * pageSize]);
+    const rows = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE ${filter} ORDER BY created_at DESC,id DESC LIMIT $7 OFFSET $8`, [...args, pageSize, (page - 1) * pageSize]);
     return { orders: rows.rows.map(serializeOrder), total: count.rows[0].total as number, page, pageSize };
   });
 }
@@ -214,7 +229,18 @@ export function exchangeDashboard(principal: Principal, tenantId: string) {
     return { enabled: s.enabled && legacy.rows[0]?.exchange_enabled === true && e.features.crypto_exchange === true && e.features.website === true && e.tenantStatus === "active" && e.status === "active" && !e.overLimit, total: Object.values(counts).reduce((a, b) => a + b, 0),
       pending: counts.pending ?? 0, processing: counts.processing ?? 0, completed: counts.completed ?? 0, cancelled: counts.cancelled ?? 0, failed: counts.failed ?? 0,
       assets: s.assets.filter(a => a.enabled && catalog.some(c => c.assetId === a.assetId)).length,
-      networks: enabledNetworks.length, routes: s.routes.filter(r => r.enabled).length, volume: volume.rows, recentOrders: recent.rows.map(serializeOrder) };
+      networks: new Set(enabledNetworks.map(n => catalog.find(c => c.assetNetworkId === n.assetNetworkId)!.networkId)).size,
+      customers: 0, paymentMethods: s.paymentMethods.filter(m => m.enabled && (m.buy || m.sell)).length,
+      routes: s.routes.filter(r => r.enabled).length, volume: volume.rows, recentOrders: recent.rows.map(serializeOrder) };
+  });
+}
+export function exchangeCustomers(principal: Principal, tenantId: string) {
+  return withDatabase(contextFor(principal, tenantId), async client => {
+    // No identity is collected by the current sandbox. Never fabricate names, emails,
+    // accounts or a count of unique people from anonymous order records.
+    const r = await client.query("SELECT count(*)::int AS orders, max(COALESCE((request->'history'->-1->>'at')::timestamptz,created_at)) AS last FROM exchange_orders WHERE tenant_id=$1 AND request->>'product'='crypto_exchange'", [tenantId]);
+    return r.rows[0].orders ? [{ id: "anonymous", name: "Anonymous sandbox visitors", email: null,
+      orders: r.rows[0].orders as number, lastActivity: r.rows[0].last as Date, status: "unidentified" as const }] : [];
   });
 }
 export function exchangeAudit(principal: Principal, tenantId: string, page = 1) {

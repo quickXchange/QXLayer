@@ -41,4 +41,6 @@ export interface ExchangeRoute {
   spreadBps: number;
   /** @maxItems 30 */
   paymentMethodIds: string[];
+  /** @maxLength 80 */
+  providerId?: string;
 }

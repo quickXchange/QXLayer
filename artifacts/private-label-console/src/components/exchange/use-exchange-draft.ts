@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   useGetExchangeConfiguration, getGetExchangeConfigurationQueryKey, useSaveExchangeConfiguration,
-  getGetExchangeDashboardQueryKey, getListExchangeOrdersQueryKey,
-  type ExchangeSettings, type ExchangeCatalogAsset,
+  getGetExchangeDashboardQueryKey, getListExchangeOrdersQueryKey, getListExchangeAuditQueryKey,
+  type ExchangeSettings, type ExchangeCatalogAsset, type ExchangeProvider,
 } from '@workspace/api-client-react';
 import { useToast } from '@/hooks/use-toast';
 import { useInvalidateTenant } from '@/lib/invalidate';
@@ -11,7 +11,7 @@ import { gtDec, isDec, isInt, isPos } from './ui-validate';
 
 export interface ExchangeDraft {
   loading: boolean; error: boolean; refetch: () => void;
-  draft: ExchangeSettings | null; catalog: ExchangeCatalogAsset[]; effectiveEnabled: boolean;
+  draft: ExchangeSettings | null; catalog: ExchangeCatalogAsset[]; providerCatalog: ExchangeProvider[]; effectiveEnabled: boolean;
   patch: (p: Partial<ExchangeSettings>) => void;
   dirty: boolean; errors: string[]; saveError: string | null; saving: boolean;
   save: () => void; discard: () => void;
@@ -38,6 +38,11 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
   });
   s.paymentMethods.forEach((p) => {
     if (!p.label.trim()) e.push('Every payment method needs a label');
+    if (p.logoUrl && !/^https:\/\//.test(p.logoUrl)) e.push(`${p.label || 'Payment method'}: logo must be an HTTPS URL`);
+    if (p.minimum !== undefined && !isDec(p.minimum)) e.push(`${p.label || 'Payment method'}: minimum must be a decimal string`);
+    if (p.maximum != null && (!isDec(p.maximum) || (isDec(p.minimum ?? '0') && gtDec(p.minimum ?? '0', p.maximum)))) e.push(`${p.label || 'Payment method'}: maximum must be a decimal not below the minimum`);
+    if (p.feeBps !== undefined && !isInt(p.feeBps, 5000)) e.push(`${p.label || 'Payment method'}: fee is integer basis points 0 to 5000`);
+    if (p.fixedFee !== undefined && !isDec(p.fixedFee)) e.push(`${p.label || 'Payment method'}: fixed fee must be a decimal string`);
     if (p.currency !== s.fiatCurrency) e.push(`${p.label || 'Payment method'}: currency must match ${s.fiatCurrency}`);
     if (p.enabled && !p.buy && !p.sell) e.push(`${p.label || 'Payment method'}: enable Buy or Sell`);
   });
@@ -58,6 +63,9 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
       const a = s.assets.find((x) => x.assetId === sc.assetId);
       if (!a || !isPos(a.sandboxPlanRate)) e.push(`${nm}: ${sc.symbol} needs a positive plan-currency reference rate to quote`);
     }
+  });
+  (s.providers ?? []).forEach((p) => {
+    if (p.endpoint) { let ok = false; try { const u = new URL(p.endpoint); ok = u.protocol === 'https:' && !u.username && !u.password && !u.search && !u.hash; } catch { ok = false; } if (!ok) e.push(`${p.label || p.providerId}: endpoint must be a public HTTPS URL without credentials, query or fragment`); }
   });
   if (s.enabled && !s.actions[s.defaultAction]) e.push('Default action must be an enabled action when the exchange is enabled');
   if (s.publicNote.length > 1000) e.push('Public note is limited to 1000 characters');
@@ -107,11 +115,12 @@ export function useExchangeDraft(tenantId: string): ExchangeDraft {
         qc.setQueryData(key, r); setDraft(r.configuration); setSaved(JSON.stringify(r.configuration)); serverRef.current = r.configuration;
         qc.invalidateQueries({ queryKey: getGetExchangeDashboardQueryKey(tenantId) });
         qc.invalidateQueries({ queryKey: getListExchangeOrdersQueryKey(tenantId) });
+        qc.invalidateQueries({ queryKey: getListExchangeAuditQueryKey(tenantId) });
         inv(tenantId); toast({ title: 'Exchange settings saved' });
       },
       onError: (e) => { const msg = (e as Error)?.message ?? 'Request rejected'; setSaveError(msg); toast({ title: 'Save failed', description: msg, variant: 'destructive' }); },
     });
   };
   const discard = () => { if (serverRef.current) { setDraft(serverRef.current); setSaveError(null); } };
-  return { loading: q.isLoading, error: q.isError, refetch: () => { q.refetch(); }, draft, catalog, effectiveEnabled: q.data?.effectiveEnabled ?? false, patch, dirty, errors, saveError, saving: m.isPending, save, discard };
+  return { loading: q.isLoading, error: q.isError, refetch: () => { q.refetch(); }, draft, catalog, providerCatalog: q.data?.providerCatalog ?? [], effectiveEnabled: q.data?.effectiveEnabled ?? false, patch, dirty, errors, saveError, saving: m.isPending, save, discard };
 }

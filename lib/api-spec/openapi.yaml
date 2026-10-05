@@ -133,6 +133,9 @@ paths:
         - {name: search, in: query, schema: {type: string, maxLength: 100}}
         - {name: status, in: query, schema: {type: string}}
         - {name: action, in: query, schema: {type: string}}
+        - {name: from, in: query, schema: {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}}
+        - {name: to, in: query, schema: {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}}
+        - {name: customer, in: query, schema: {type: string, enum: [anonymous]}}
         - {name: page, in: query, schema: {type: integer, minimum: 1}}
       responses:
         "200": {description: Paginated sandbox orders, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrderList"}}}}
@@ -160,6 +163,13 @@ paths:
         - {$ref: "#/components/parameters/TenantId"}
       responses:
         "200": {description: Sandbox exchange overview, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeDashboard"}}}}
+  /tenants/{tenantId}/exchange/customers:
+    get:
+      operationId: listExchangeCustomers
+      parameters:
+        - {$ref: "#/components/parameters/TenantId"}
+      responses:
+        "200": {description: Tenant-scoped customer summary; sandbox orders do not collect identity, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/ExchangeCustomer"}}}}}
   /public/sites/{slug}/exchange:
     get:
       operationId: getPublicExchange
@@ -1022,6 +1032,7 @@ components:
         maximum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
         fee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
         information: {type: string, maxLength: 500}
+        providerId: {type: string, maxLength: 80}
     ExchangeRoute:
       type: object
       required: [id, source, destination, action, enabled, rate, minimum, maximum, feeBps, fixedFee, spreadBps, paymentMethodIds]
@@ -1038,6 +1049,7 @@ components:
         fixedFee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
         spreadBps: {type: integer, minimum: 0, maximum: 5000}
         paymentMethodIds: {type: array, maxItems: 30, items: {type: string, format: uuid}}
+        providerId: {type: string, maxLength: 80}
     ExchangePaymentMethod:
       type: object
       required: [id, label, enabled, currency, buy, sell]
@@ -1048,6 +1060,31 @@ components:
         currency: {type: string, enum: [USD, EUR, GBP]}
         buy: {type: boolean}
         sell: {type: boolean}
+        logoUrl: {type: ["string", "null"], maxLength: 2000}
+        methodType: {type: string, enum: [bank, card, manual]}
+        minimum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        maximum: {type: ["string", "null"], pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        feeBps: {type: integer, minimum: 0, maximum: 5000}
+        fixedFee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+    ExchangeProvider:
+      type: object
+      required: [id, name, category, status, functional, credentialSupport, capabilities]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        category: {type: string}
+        status: {type: string, enum: [sandbox, configuration_only, coming_soon]}
+        functional: {type: boolean}
+        credentialSupport: {type: boolean}
+        capabilities: {type: array, items: {type: string}}
+    ExchangeProviderConfiguration:
+      type: object
+      required: [providerId, enabled]
+      properties:
+        providerId: {type: string, maxLength: 80}
+        enabled: {type: boolean}
+        label: {type: string, maxLength: 100}
+        endpoint: {type: ["string", "null"], maxLength: 2000}
     ExchangeSettings:
       type: object
       required: [enabled, actions, assets, networks, routes, paymentMethods, fiatCurrency, fiatPlanRate, defaultAction, publicNote]
@@ -1069,6 +1106,7 @@ components:
         networks: {type: array, maxItems: 200, items: {$ref: "#/components/schemas/ExchangeNetworkSettings"}}
         routes: {type: array, maxItems: 100, items: {$ref: "#/components/schemas/ExchangeRoute"}}
         paymentMethods: {type: array, maxItems: 30, items: {$ref: "#/components/schemas/ExchangePaymentMethod"}}
+        providers: {type: array, maxItems: 20, items: {$ref: "#/components/schemas/ExchangeProviderConfiguration"}}
     ExchangeCatalogAsset:
       type: object
       required: [assetNetworkId, assetId, symbol, name, networkId, networkName, testnet]
@@ -1087,6 +1125,7 @@ components:
         configuration: {$ref: "#/components/schemas/ExchangeSettings"}
         catalog: {type: array, items: {$ref: "#/components/schemas/ExchangeCatalogAsset"}}
         effectiveEnabled: {type: boolean}
+        providerCatalog: {type: array, items: {$ref: "#/components/schemas/ExchangeProvider"}}
     ExchangeQuoteInput:
       type: object
       required: [action, source, destination, amount]
@@ -1156,7 +1195,20 @@ components:
         paymentMethod: {type: ["string", "null"]}
         createdAt: {type: string, format: date-time}
         history: {type: array, items: {$ref: "#/components/schemas/ExchangeOrderEvent"}}
+        updatedAt: {type: string, format: date-time}
+        customerName: {type: ["string", "null"]}
+        customerEmail: {type: ["string", "null"]}
         sandboxOnly: {type: boolean, const: true}
+    ExchangeCustomer:
+      type: object
+      required: [id, name, email, orders, lastActivity, status]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        email: {type: ["string", "null"]}
+        orders: {type: integer}
+        lastActivity: {type: string, format: date-time}
+        status: {type: string, enum: [unidentified]}
     ExchangeOrderCreated:
       type: object
       required: [order, trackingToken]
@@ -1191,6 +1243,8 @@ components:
         assets: {type: integer}
         networks: {type: integer}
         routes: {type: integer}
+        customers: {type: integer}
+        paymentMethods: {type: integer}
         volume: {type: array, items: {$ref: "#/components/schemas/ExchangeVolume"}}
         recentOrders: {type: array, items: {$ref: "#/components/schemas/ExchangeOrder"}}
     PublicExchange:

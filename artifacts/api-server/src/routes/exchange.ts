@@ -11,9 +11,11 @@ import {
   UpdateExchangeOrderStatusBody, UpdateExchangeOrderStatusResponse,
   ListExchangeOrdersQueryParams, ListExchangeOrdersResponse,
   ListExchangeAuditQueryParams, ListExchangeAuditResponse,
+  ListExchangeCustomersResponse,
 } from "@workspace/api-zod";
 import { requireAuthentication, principalFrom, sameOriginMutation } from "../middlewares/authentication";
-import { exchangeAudit, exchangeConfiguration, exchangeDashboard, publicExchange, sandboxOrder, sandboxQuote, tenantOrder, tenantOrders, trackOrder } from "../products/exchange/service";
+import { exchangeAudit, exchangeConfiguration, exchangeCustomers, exchangeDashboard, publicExchange, sandboxOrder, sandboxQuote, tenantOrder, tenantOrders, trackOrder } from "../products/exchange/service";
+import { containsCredential } from "../products/exchange/providers";
 import { HttpError } from "../lib/errors";
 
 const router = Router();
@@ -40,8 +42,13 @@ router.get("/public/sites/:slug/exchange/orders/:orderId", async (req, res) => {
 });
 router.use("/tenants/:tenantId/exchange", requireAuthentication, sameOriginMutation, (_req, res, next) => { res.set("Cache-Control", "no-store"); next(); });
 router.get("/tenants/:tenantId/exchange", async (req, res) => res.json(GetExchangeConfigurationResponse.parse(await exchangeConfiguration(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId))));
-router.put("/tenants/:tenantId/exchange", async (req, res) => res.json(SaveExchangeConfigurationResponse.parse(await exchangeConfiguration(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId, SaveExchangeConfigurationBody.parse(req.body)))));
+router.put("/tenants/:tenantId/exchange", async (req, res) => {
+  // Check before Zod strips unknown keys: never accept credentials as configuration metadata.
+  if (containsCredential(req.body)) throw new HttpError(400, "Provider credentials are not supported. Do not submit API keys or secrets.");
+  res.json(SaveExchangeConfigurationResponse.parse(await exchangeConfiguration(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId, SaveExchangeConfigurationBody.parse(req.body))));
+});
 router.get("/tenants/:tenantId/exchange/dashboard", async (req, res) => res.json(GetExchangeDashboardResponse.parse(await exchangeDashboard(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId))));
+router.get("/tenants/:tenantId/exchange/customers", async (req, res) => res.json(ListExchangeCustomersResponse.parse(await exchangeCustomers(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId))));
 router.get("/tenants/:tenantId/exchange/audit", async (req, res) => res.json(ListExchangeAuditResponse.parse(await exchangeAudit(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId, ListExchangeAuditQueryParams.parse(req.query).page))));
 router.get("/tenants/:tenantId/exchange/orders", async (req, res) => res.json(ListExchangeOrdersResponse.parse(await tenantOrders(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId, ListExchangeOrdersQueryParams.parse(req.query)))));
 router.get("/tenants/:tenantId/exchange/orders/:orderId", async (req, res) => {

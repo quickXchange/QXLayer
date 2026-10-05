@@ -14,3 +14,9 @@ Exchange Buy/Sell simulation and sandbox payment-method labels must use Exchange
 **Why:** The existing foundation groups gateway checkout separately. Reusing that gate for Exchange would incorrectly require developing/enabling a different product, contrary to the user's Exchange-only scope.
 
 **How to apply:** Keep gateway configuration and its existing resource APIs unchanged. Admit simulated Exchange actions through their dedicated sandbox surface and action rights. Complete exchange provisioning without changing gateway checkout flags.
+
+Provider catalog and assignment controls are preparation for future integrations, not permission to connect providers or execute real transactions. Clearly distinguish functional manual sandbox behavior from Configuration Only, Not Connected and Coming Soon entries.
+
+**Why:** The user requested provider organization while explicitly prohibiting unverified connectivity claims and real execution; selecting a provider must never silently create a real transaction.
+
+**How to apply:** Preserve sandbox behavior regardless of future provider selection. Do not accept provider credentials until a verified integration and secure secret handling are implemented. Do not invent revenue or customer identities to fill administration views.

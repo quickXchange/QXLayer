@@ -5,6 +5,7 @@ import { HttpError } from "../../lib/errors";
 import { decimal } from "../../modules/entitlements/decimal";
 import { requireFeature, type EffectiveEntitlements } from "../../modules/entitlements/resolver";
 import { safeHttps } from "../../modules/website/settings";
+import { containsCredential, PROVIDER_CATALOG } from "./providers";
 
 export const ACTIONS = ["swap", "convert", "buy", "sell"] as const;
 export function emptySettings(): ExchangeSettings {
@@ -21,12 +22,13 @@ export async function readExchange(client: DatabaseClient, tenantId: string) {
      FROM tenant_asset_networks t JOIN asset_network_catalog c ON c.id=t.asset_network_id
      JOIN asset_catalog a ON a.id=c.asset_id JOIN network_catalog n ON n.id=c.network_id
      WHERE t.tenant_id=$1 ORDER BY a.symbol,n.name`, [tenantId])).rows as ExchangeCatalogAsset[];
-  return { configuration, catalog };
+  return { configuration, catalog, providerCatalog: PROVIDER_CATALOG };
 }
 function unique(values: string[], label: string) {
   if (values.length !== new Set(values).size) throw new HttpError(400, `Duplicate ${label}.`);
 }
 export function validateExchange(value: unknown, e: EffectiveEntitlements, catalog?: ExchangeCatalogAsset[]) {
+  if (containsCredential(value)) throw new HttpError(400, "Provider credentials are not supported. Do not submit API keys or secrets.");
   const s = SaveExchangeConfigurationBody.parse(value);
   if (Buffer.byteLength(JSON.stringify(s)) > 32768) throw new HttpError(400, "Exchange configuration must be at most 32 KiB.");
   for (const action of ACTIONS) if (s.actions[action]) requireFeature(e, action);
@@ -35,6 +37,18 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
   unique(s.routes.map(r => r.id), "route identifiers");
   unique(s.routes.map(r => `${r.action}:${r.source}:${r.destination}`), "routes for an action and pair");
   unique(s.paymentMethods.map(m => m.id), "payment methods");
+  unique((s.providers ?? []).map(p => p.providerId), "providers");
+  for (const p of s.providers ?? []) {
+    if (!PROVIDER_CATALOG.some(c => c.id === p.providerId)) throw new HttpError(400, "Unknown provider catalog entry.");
+    safeHttps(p.endpoint ?? null);
+    if (p.endpoint) {
+      const url = new URL(p.endpoint);
+      if (url.username || url.password || url.search || url.hash) throw new HttpError(400, "Use a public HTTPS endpoint without credentials, query parameters or fragments.");
+    }
+  }
+  const assignment = (id: string | undefined, capability: string) => {
+    if (id && !PROVIDER_CATALOG.some(p => p.id === id && p.capabilities.includes(capability))) throw new HttpError(400, "Provider assignment is not supported for this function.");
+  };
   const assetIds = catalog && new Set(catalog.map(a => a.assetId));
   const networkIds = catalog && new Set(catalog.map(a => a.assetNetworkId));
   for (const a of s.assets) {
@@ -45,12 +59,15 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
   for (const n of s.networks) {
     if (networkIds && !networkIds.has(n.assetNetworkId)) throw new HttpError(400, "Network is not selected for this tenant.");
     if (decimal(n.maximum) < decimal(n.minimum)) throw new HttpError(400, "Network maximum must be at least its minimum.");
+    assignment(n.providerId, "swap");
   }
   for (const m of s.paymentMethods) {
     if (!m.label.trim()) throw new HttpError(400, "Payment method label is required.");
     if (m.currency !== s.fiatCurrency) throw new HttpError(400, "Payment method currency must match exchange fiat currency.");
     if (m.enabled && m.buy) requireFeature(e, "buy");
     if (m.enabled && m.sell) requireFeature(e, "sell");
+    safeHttps(m.logoUrl ?? null);
+    if (m.maximum != null && decimal(m.maximum) < decimal(m.minimum ?? "0")) throw new HttpError(400, "Payment method maximum must be at least its minimum.");
   }
   const fiat = `fiat:${s.fiatCurrency}`;
   const validEndpoint = (id: string) => id === fiat || s.networks.some(n => n.assetNetworkId === id);
@@ -62,6 +79,7 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
     if (decimal(r.rate) <= 0n || decimal(r.maximum) < decimal(r.minimum) || decimal(r.maximum) === 0n) throw new HttpError(400, "Set a positive rate and valid nonzero route limits.");
     if (r.enabled) requireFeature(e, r.action);
     if (r.paymentMethodIds.some(id => !s.paymentMethods.some(m => m.id === id))) throw new HttpError(400, "Route payment method does not belong to this exchange.");
+    assignment(r.providerId, r.action);
   }
   return s;
 }

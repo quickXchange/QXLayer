@@ -1,94 +1,194 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import {
   useListExchangeOrders, getListExchangeOrdersQueryKey, useGetExchangeOrder, getGetExchangeOrderQueryKey,
-  useUpdateExchangeOrderStatus, getGetExchangeDashboardQueryKey, type ListExchangeOrdersParams,
+  useUpdateExchangeOrderStatus, getGetExchangeDashboardQueryKey, getListExchangeAuditQueryKey, getListExchangeCustomersQueryKey,
+  useGetExchangeConfiguration, getGetExchangeConfigurationQueryKey, type ListExchangeOrdersParams, type ExchangeOrder,
 } from '@workspace/api-client-react';
-import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ErrorState, ListSkeleton, EmptyState } from '@/components/app/bits';
 import { useToast } from '@/hooks/use-toast';
 import { useInvalidateTenant } from '@/lib/invalidate';
 import { stamp } from '@/lib/format';
 import { Pick, SimNote } from './ui';
 import { NEXT, OrderStatus } from './order-status';
+import { BulkBar, BulkBtn, DataTable, Logo, useSelection } from './bulk';
+import { isCalendarDate } from './ui-validate';
 
 const ALL = 'all';
-export function OrdersPanel({ tenantId }: { tenantId: string }) {
-  const [, nav] = useLocation();
-  const [text, setText] = useState('');
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState(ALL);
-  const [action, setAction] = useState(ALL);
+
+function useRefresh(tenantId: string) {
+  const qc = useQueryClient(); const inv = useInvalidateTenant();
+  return (orderId?: string) => {
+    qc.invalidateQueries({ queryKey: getListExchangeOrdersQueryKey(tenantId) });
+    qc.invalidateQueries({ queryKey: getGetExchangeDashboardQueryKey(tenantId) });
+    qc.invalidateQueries({ queryKey: getListExchangeAuditQueryKey(tenantId) });
+    qc.invalidateQueries({ queryKey: getListExchangeCustomersQueryKey(tenantId) });
+    if (orderId) qc.invalidateQueries({ queryKey: getGetExchangeOrderQueryKey(tenantId, orderId) });
+    inv(tenantId);
+  };
+}
+
+export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; canEdit: boolean; orderId?: string }) {
+  const [, nav] = useLocation(); const { toast } = useToast(); const refresh = useRefresh(tenantId);
+  const m = useUpdateExchangeOrderStatus();
+  const [text, setText] = useState(''); const [search, setSearch] = useState('');
+  const [status, setStatus] = useState(ALL); const [action, setAction] = useState(ALL);
+  const [customer, setCustomer] = useState(() => (new URLSearchParams(window.location.search).get('customer') === 'anonymous' ? 'anonymous' : ALL));
+  const [from, setFrom] = useState(''); const [to, setTo] = useState('');
+   const [range, setRange] = useState({ from: '', to: '' });
+   const [dateError, setDateError] = useState('');
   const [page, setPage] = useState(1);
-  const params: ListExchangeOrdersParams = { ...(search ? { search } : {}), ...(status !== ALL ? { status } : {}), ...(action !== ALL ? { action } : {}), page };
+  const [openId, setOpenId] = useState<string | null>(orderId ?? null);
+  const [step, setStep] = useState<null | 'form' | 'review'>(null);
+  const [target, setTarget] = useState(''); const [note, setNote] = useState('');
+  const [busy, setBusy] = useState(false); const [failures, setFailures] = useState<string[]>([]);
+   const params: ListExchangeOrdersParams = { ...(search ? { search } : {}), ...(status !== ALL ? { status } : {}), ...(action !== ALL ? { action } : {}), ...(customer === 'anonymous' ? { customer: 'anonymous' as const } : {}), ...(range.from ? { from: range.from } : {}), ...(range.to ? { to: range.to } : {}), page };
   const q = useListExchangeOrders(tenantId, params, { query: { queryKey: getListExchangeOrdersQueryKey(tenantId, params), placeholderData: keepPreviousData } });
   const d = q.data;
+  const orders = d?.orders ?? [];
+  const sel = useSelection(orders.map((o) => o.id));
   const pages = d ? Math.max(1, Math.ceil(d.total / d.pageSize)) : 1;
-  const base = `/clients/${tenantId}/exchange/orders`;
+  const chosen = orders.filter((o) => sel.has(o.id));
+  const allowed = chosen.length === 0 ? [] : (NEXT[chosen[0].status] ?? []).filter((s) => chosen.every((o) => (NEXT[o.status] ?? []).includes(s)));
+  const reset = () => { setPage(1); sel.clear(); };
+  const close = () => { setOpenId(null); if (orderId) nav(`/clients/${tenantId}/exchange/orders`); };
+  const run = async () => {
+    if (busy) return; setBusy(true); setFailures([]);
+    const bad: string[] = []; let ok = 0;
+    for (const o of chosen) {
+      try { await m.mutateAsync({ tenantId, orderId: o.id, data: { status: target as 'processing', note: `Bulk: Mark ${target}. ${note.trim()}`.trim().slice(0, 500) } }); ok++; }
+      catch (e) { bad.push(`${o.id.slice(0, 8)}: ${(e as Error)?.message ?? 'rejected'}`); }
+    }
+    setBusy(false); setStep(null); setNote(''); setFailures(bad); sel.clear(); refresh();
+    toast({ title: bad.length ? `${ok} updated, ${bad.length} failed` : `${ok} order${ok === 1 ? '' : 's'} marked ${target}`, description: bad.length ? 'See the failure list above the table.' : undefined, variant: bad.length ? 'destructive' : undefined });
+  };
   return (
     <div className="space-y-4">
       <SimNote />
-      <form className="flex flex-wrap items-end gap-2" onSubmit={(e) => { e.preventDefault(); setSearch(text.trim()); setPage(1); }}>
-        <Input data-testid="input-order-search" className="w-64" placeholder="Search order id, symbol" value={text} onChange={(e) => setText(e.target.value)} />
-        <div className="w-40"><Pick testid="select-order-status" value={status} onChange={(v) => { setStatus(v); setPage(1); }} options={[[ALL, 'Any status'], ['pending', 'Pending'], ['processing', 'Processing'], ['completed', 'Completed'], ['cancelled', 'Cancelled'], ['failed', 'Failed']]} /></div>
-        <div className="w-40"><Pick testid="select-order-action" value={action} onChange={(v) => { setAction(v); setPage(1); }} options={[[ALL, 'Any action'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell']]} /></div>
+       <form className="flex flex-wrap items-end gap-2" onSubmit={(e) => {
+         e.preventDefault();
+         if ([from, to].some((v) => v && !isCalendarDate(v))) { setDateError('Enter complete, valid dates before searching.'); return; }
+         if (from && to && from > to) { setDateError('From date must be on or before To date.'); return; }
+         setDateError(''); setRange({ from, to }); setSearch(text.trim()); reset();
+       }}>
+        <Input data-testid="input-order-search" className="w-full sm:w-64" placeholder="Search order id, symbol" value={text} onChange={(e) => setText(e.target.value)} />
+        <div className="w-36"><Pick testid="select-order-status" value={status} onChange={(v) => { setStatus(v); reset(); }} options={[[ALL, 'Any status'], ['pending', 'Pending'], ['processing', 'Processing'], ['completed', 'Completed'], ['cancelled', 'Cancelled'], ['failed', 'Failed']]} /></div>
+        <div className="w-36"><Pick testid="select-order-action" value={action} onChange={(v) => { setAction(v); reset(); }} options={[[ALL, 'Any type'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell']]} /></div>
+        <div className="w-44"><Pick testid="select-order-customer" value={customer} onChange={(v) => { setCustomer(v); reset(); }} options={[[ALL, 'Any customer'], ['anonymous', 'Anonymous visitors']]} /></div>
+         <label className="text-xs text-muted-foreground">From<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-from" value={from} onChange={(e) => { setFrom(e.target.value); setDateError(''); }} /></label>
+         <label className="text-xs text-muted-foreground">To<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-to" value={to} onChange={(e) => { setTo(e.target.value); setDateError(''); }} /></label>
         <Button data-testid="button-order-search">Search</Button>
       </form>
-      {q.isLoading ? <ListSkeleton /> : q.isError || !d ? <ErrorState what="orders" onRetry={() => q.refetch()} /> : d.orders.length === 0 ? <EmptyState title="No orders match" body="Adjust the filters, or wait for simulated orders from this tenant's widget." /> : (
+       {dateError && <p role="alert" data-testid="text-order-date-error" className="text-sm text-destructive">{dateError}</p>}
+      {failures.length > 0 && <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-bulk-failures"><p className="font-medium">{failures.length} order{failures.length === 1 ? '' : 's'} failed</p><ul className="font-mono text-xs">{failures.map((f) => <li key={f}>{f}</li>)}</ul></div>}
+      {q.isLoading ? <ListSkeleton /> : q.isError || !d ? <ErrorState what="orders" onRetry={() => q.refetch()} /> : orders.length === 0 ? <EmptyState title="No orders match" body="Adjust the filters, or wait for simulated orders from this tenant's widget." /> : (
         <>
-          <div className="overflow-x-auto rounded-md border bg-card">
-            <table className="w-full text-left text-sm"><thead className="border-b font-mono text-[10px] uppercase tracking-wider text-muted-foreground"><tr>{['Order', 'Action', 'Input', 'Output', 'Status', 'Created'].map((h) => <th key={h} className="px-3 py-2 font-normal">{h}</th>)}</tr></thead>
-              <tbody className="divide-y">{d.orders.map((o) => (
-                <tr key={o.id} className="cursor-pointer hover:bg-muted/50" data-testid={`row-order-${o.id}`} onClick={() => nav(`${base}/${o.id}`)}>
-                  <td className="px-3 py-2 font-mono text-xs"><Link href={`${base}/${o.id}`} onClick={(e) => e.stopPropagation()}>{o.id.slice(0, 8)}</Link></td>
-                  <td className="px-3 py-2 capitalize">{o.action}</td>
-                  <td className="px-3 py-2 font-mono text-xs">{o.inputAmount} {o.sourceSymbol}</td>
-                  <td className="px-3 py-2 font-mono text-xs">{o.outputAmount} {o.destinationSymbol}</td>
-                  <td className="px-3 py-2"><OrderStatus status={o.status} /></td>
-                  <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{stamp(o.createdAt)}</td></tr>))}</tbody></table>
-          </div>
+          <BulkBar sel={sel} noun="orders" locked={!canEdit} testid="orders">
+            <BulkBtn sel={sel} locked={!canEdit || allowed.length === 0} testid="button-bulk-status-orders" onClick={() => { setTarget(allowed[0]); setStep('form'); }}>Update status</BulkBtn>
+          </BulkBar>
+          {sel.count > 0 && allowed.length === 0 && <p className="text-xs text-muted-foreground" data-testid="text-no-common-status">The selected orders share no allowed next status (terminal orders cannot be reopened).</p>}
+           <DataTable testid="order" rows={orders} getId={(o) => o.id} sel={sel} locked={!canEdit} onRowClick={(o) => setOpenId(o.id)} cols={[
+            { h: 'Order', cell: (o) => <button type="button" className="font-mono text-xs text-copper hover:underline" data-testid={`link-order-${o.id}`} onClick={() => setOpenId(o.id)}>{o.id.slice(0, 8)}</button> },
+            { h: 'Type', cell: (o) => <span className="capitalize">{o.action}</span> },
+            { h: 'Customer', cell: (o) => <span className="text-xs">{o.customerName || 'Anonymous'}</span> },
+            { h: 'Send', cell: (o) => <span className="font-mono text-xs">{o.inputAmount} {o.sourceSymbol}</span> },
+            { h: 'Receive', cell: (o) => <span className="font-mono text-xs">{o.outputAmount} {o.destinationSymbol}</span> },
+            { h: 'Status', cell: (o) => <OrderStatus status={o.status} /> },
+            { h: 'Created', cell: (o) => <span className="font-mono text-xs text-muted-foreground">{stamp(o.createdAt)}</span> },
+            { h: 'Open', cell: (o) => <Button size="sm" variant="outline" data-testid={`button-open-order-${o.id}`} onClick={() => setOpenId(o.id)}>Details</Button> },
+          ]} />
           <div className="flex items-center justify-between text-sm"><span className="font-mono text-xs text-muted-foreground" data-testid="text-order-total">{d.total} orders, page {d.page} of {pages}</span>
-            <div className="flex gap-2"><Button variant="outline" size="sm" data-testid="button-page-prev" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</Button><Button variant="outline" size="sm" data-testid="button-page-next" disabled={page >= pages} onClick={() => setPage(page + 1)}>Next</Button></div></div>
+            <div className="flex gap-2"><Button variant="outline" size="sm" data-testid="button-page-prev" disabled={page <= 1} onClick={() => { setPage(page - 1); sel.clear(); }}>Previous</Button><Button variant="outline" size="sm" data-testid="button-page-next" disabled={page >= pages} onClick={() => { setPage(page + 1); sel.clear(); }}>Next</Button></div></div>
         </>)}
+      <Dialog open={step !== null} onOpenChange={(v) => { if (!v && !busy) setStep(null); }}>
+        <DialogContent data-testid="dialog-bulk-status">
+          <DialogHeader><DialogTitle>Update {chosen.length} order{chosen.length === 1 ? '' : 's'}</DialogTitle><DialogDescription>Simulated workflow only. Only statuses allowed for every selected order are offered. Orders are updated one by one.</DialogDescription></DialogHeader>
+          {step === 'form' ? (
+            <div className="space-y-3"><Pick testid="select-bulk-status" value={target} onChange={setTarget} options={allowed.map((s) => [s, `Mark ${s}`] as [string, string])} />
+              <Textarea data-testid="input-bulk-note" maxLength={450} placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} /></div>
+          ) : (
+            <div className="space-y-1 text-sm" data-testid="text-bulk-preview"><p>Orders: <b>{chosen.length}</b></p><p>New status: <b className="capitalize">{target}</b></p><p>Note: {note.trim() || 'none'}</p></div>)}
+          <DialogFooter>
+            <Button variant="ghost" disabled={busy} onClick={() => (step === 'review' ? setStep('form') : setStep(null))}>{step === 'review' ? 'Back' : 'Cancel'}</Button>
+            {step === 'form' ? <Button data-testid="button-bulk-review" disabled={!target} onClick={() => setStep('review')}>Review</Button> : <Button data-testid="button-bulk-apply" disabled={busy} onClick={run}>{busy ? 'Applying' : `Apply to ${chosen.length}`}</Button>}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <OrderDrawer tenantId={tenantId} orderId={openId} canEdit={canEdit} onClose={close} />
     </div>
   );
 }
 
-export function OrderDetail({ tenantId, orderId, canEdit }: { tenantId: string; orderId: string; canEdit: boolean }) {
-  const qc = useQueryClient(); const inv = useInvalidateTenant(); const { toast } = useToast();
+function Row({ l, v }: { l: string; v: React.ReactNode }) {
+  return <div className="bg-card p-3"><p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p><div className="mt-1 break-all text-sm">{v}</div></div>;
+}
+
+export function OrderDrawer({ tenantId, orderId, canEdit, onClose }: { tenantId: string; orderId: string | null; canEdit: boolean; onClose: () => void }) {
+  return (
+    <Sheet open={!!orderId} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <SheetContent className="w-full overflow-y-auto sm:max-w-xl" data-testid="drawer-order">
+        {orderId && <DrawerBody key={orderId} tenantId={tenantId} orderId={orderId} canEdit={canEdit} />}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId: string; canEdit: boolean }) {
+  const { toast } = useToast(); const refresh = useRefresh(tenantId); const qc = useQueryClient();
   const key = getGetExchangeOrderQueryKey(tenantId, orderId);
   const q = useGetExchangeOrder(tenantId, orderId, { query: { queryKey: key } });
+  const cfg = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
   const m = useUpdateExchangeOrderStatus();
   const [note, setNote] = useState('');
-  const o = q.data;
+  const o: ExchangeOrder | undefined = q.data;
   const next = o ? NEXT[o.status] ?? [] : [];
-  const go = (status: string) => m.mutate({ tenantId, orderId, data: { status: status as 'processing', note: note.trim() } }, {
-    onSuccess: (r) => { qc.setQueryData(key, r); qc.invalidateQueries({ queryKey: getListExchangeOrdersQueryKey(tenantId) }); qc.invalidateQueries({ queryKey: getGetExchangeDashboardQueryKey(tenantId) }); inv(tenantId); setNote(''); toast({ title: `Order marked ${status}` }); },
+  const ep = (id: string, sym: string) => {
+    if (id.startsWith('fiat:')) return { sym, net: 'Fiat', logo: null as string | null };
+    const c = cfg.data?.catalog.find((x) => x.assetNetworkId === id);
+    return { sym, net: c?.networkName ?? 'Unknown network', logo: cfg.data?.configuration.assets.find((a) => a.assetId === c?.assetId)?.logoUrl ?? null };
+  };
+  const go = (status: string) => { if (m.isPending) return; m.mutate({ tenantId, orderId, data: { status: status as 'processing', note: note.trim() } }, {
+    onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); setNote(''); toast({ title: `Order marked ${status}` }); },
     onError: (e) => toast({ title: 'Status change failed', description: (e as Error).message, variant: 'destructive' }),
-  });
+  }); };
+  const side = (l: string, id: string, sym: string, amt: string) => { const e = ep(id, sym); return <Row l={l} v={<span className="flex items-center gap-2"><Logo url={e.logo} label={e.sym} /><span><span className="font-mono">{amt} {e.sym}</span><span className="block text-xs text-muted-foreground">{e.net}</span></span></span>} />; };
   return (
-    <div className="space-y-5">
-      <Link href={`/clients/${tenantId}/exchange/orders`} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back-orders"><ArrowLeft className="h-4 w-4" /> Orders</Link>
-      <SimNote />
-      {q.isLoading ? <ListSkeleton rows={3} /> : q.isError || !o ? <ErrorState what="this order" onRetry={() => q.refetch()} /> : (
-        <>
-          <div className="flex items-center gap-3"><h2 className="font-display text-3xl">Order {o.id.slice(0, 8)}</h2><OrderStatus status={o.status} /><span className="font-mono text-[10px] uppercase text-copper">sandbox only</span></div>
-          <div className="grid gap-px overflow-hidden rounded-md border bg-border md:grid-cols-4">
-            {[['Action', o.action], ['Input', `${o.inputAmount} ${o.sourceSymbol}`], ['Output', `${o.outputAmount} ${o.destinationSymbol}`], ['Rate', o.rate], ['Source fee', `${o.fee} ${o.sourceSymbol}`], ['Destination fee', `${o.destinationFee ?? '0'} ${o.destinationSymbol}`], ['Spread', `${o.spreadBps} bps`], ['Payment method', o.paymentMethod ?? 'none'], ['Created', stamp(o.createdAt)]].map(([l, v]) => (
-              <div key={l} className="bg-card p-3"><p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="mt-1 break-all font-mono text-sm capitalize">{v}</p></div>))}
-          </div>
-          <section><h3 className="font-display mb-2 text-xl">History</h3>
-            <ol className="space-y-2 border-l pl-4">{o.history.map((h, i) => <li key={i} data-testid={`row-history-${i}`}><OrderStatus status={h.status} /><span className="ml-2 font-mono text-xs text-muted-foreground">{stamp(h.at)}</span>{h.note && <p className="mt-1 text-sm">{h.note}</p>}</li>)}</ol></section>
-          {next.length === 0 ? <p className="rounded-md border p-3 text-sm text-muted-foreground" data-testid="text-terminal">This order is {o.status}. Terminal orders cannot be reopened.</p> : !canEdit ? <p className="text-sm text-muted-foreground">Read only: updating orders needs configuration access, an active subscription and the exchange feature.</p> : (
-            <section className="space-y-2 rounded-md border bg-card p-4"><h3 className="font-display text-xl">Update status</h3>
-              <p className="text-xs text-muted-foreground">Simulated workflow only. Pending moves to processing, cancelled or failed. Processing moves to completed, cancelled or failed. No funds move.</p>
-              <Textarea data-testid="input-status-note" placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
-              <div className="flex flex-wrap gap-2">{next.map((s) => <Button key={s} data-testid={`button-status-${s}`} variant={s === 'completed' || s === 'processing' ? 'default' : 'outline'} disabled={m.isPending} onClick={() => go(s)}>Mark {s}</Button>)}</div></section>)}
-        </>)}
-    </div>
+    <>
+      <SheetHeader><SheetTitle className="font-display text-2xl">{o ? `Order ${o.id.slice(0, 8)}` : 'Order'}</SheetTitle><SheetDescription>Sandbox order details. No funds move.</SheetDescription></SheetHeader>
+      <div className="mt-4 space-y-5">
+        {q.isLoading ? <ListSkeleton rows={3} /> : q.isError || !o ? <ErrorState what="this order" onRetry={() => q.refetch()} /> : (
+          <>
+            <div className="flex items-center gap-3"><OrderStatus status={o.status} /><span className="font-mono text-[10px] uppercase text-copper">sandbox only</span></div>
+            <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2" data-testid="order-fields">
+              <Row l="Order ID" v={<span className="font-mono text-xs">{o.id}</span>} />
+              <Row l="Type" v={<span className="capitalize">{o.action}</span>} />
+              <Row l="Customer" v={o.customerName || 'Anonymous'} />
+              <Row l="Email" v={o.customerEmail || 'Not collected'} />
+              {side('Send', o.source, o.sourceSymbol, o.inputAmount)}
+              {side('Receive', o.destination, o.destinationSymbol, o.outputAmount)}
+              <Row l="Payment method" v={o.paymentMethod ?? 'none'} />
+              <Row l="Rate" v={<span className="font-mono">{o.rate}</span>} />
+              <Row l="Source fee" v={<span className="font-mono">{o.fee} {o.sourceSymbol}</span>} />
+              <Row l="Destination fee" v={<span className="font-mono">{o.destinationFee ?? '0'} {o.destinationSymbol}</span>} />
+              <Row l="Spread" v={`${o.spreadBps} bps`} />
+              <Row l="Created" v={stamp(o.createdAt)} />
+              <Row l="Updated" v={o.updatedAt ? stamp(o.updatedAt) : 'Not updated'} />
+            </div>
+            <section><h3 className="font-display mb-2 text-xl">Timeline</h3>
+              <ol className="space-y-2 border-l pl-4">{o.history.map((h, i) => <li key={i} data-testid={`row-history-${i}`}><OrderStatus status={h.status} /><span className="ml-2 font-mono text-xs text-muted-foreground">{stamp(h.at)}</span>{h.note && <p className="mt-1 text-sm">{h.note}</p>}</li>)}</ol></section>
+            {next.length === 0 ? <p className="rounded-md border p-3 text-sm text-muted-foreground" data-testid="text-terminal">This order is {o.status}. Terminal orders cannot be reopened.</p> : !canEdit ? <p className="text-sm text-muted-foreground">Read only: updating orders needs configuration access, an active subscription and the exchange feature.</p> : (
+              <section className="space-y-2 rounded-md border bg-card p-4"><h3 className="font-display text-xl">Update status</h3>
+                <p className="text-xs text-muted-foreground">Simulated workflow only. No funds move.</p>
+                <Textarea data-testid="input-status-note" maxLength={500} placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
+                <div className="flex flex-wrap gap-2">{next.map((s) => <Button key={s} data-testid={`button-status-${s}`} variant={s === 'completed' || s === 'processing' ? 'default' : 'outline'} disabled={m.isPending} onClick={() => go(s)}>Mark {s}</Button>)}</div></section>)}
+          </>)}
+      </div>
+    </>
   );
 }

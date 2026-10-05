@@ -22,4 +22,6 @@ export interface ExchangeNetworkSettings {
   fee: string;
   /** @maxLength 500 */
   information: string;
+  /** @maxLength 80 */
+  providerId?: string;
 }
