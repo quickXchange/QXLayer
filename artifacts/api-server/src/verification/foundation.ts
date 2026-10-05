@@ -9,6 +9,8 @@ import { getBlockchainProvider } from "../modules/blockchain";
 import { savePlan } from "../modules/entitlements/catalog";
 import { planFixture, verifyPlans } from "./plans";
 import { verifyCore } from "./core";
+import { assignTenantAdministrator } from "../modules/tenants/administrators";
+import { activity } from "../routes/platform";
 
 if (process.env.NODE_ENV === "production") throw new Error("Development verification refused in production.");
 const suffix = randomUUID().replaceAll("-", "");
@@ -70,21 +72,16 @@ try {
   await requireEntitlement(clientAdmin, a.id, "crypto_payments");
   await expectDenied(() => requireEntitlement(clientAdmin, a.id, "merchant_api"), 403);
 
-  await withDatabase(contextFor(clientAdmin, a.id, true), async (db) => {
-    const role = await db.query("SELECT current_user, rolsuper, rolbypassrls FROM pg_roles WHERE rolname=current_user");
-    assert.equal(role.rows[0].current_user, "private_label_runtime");
-    assert.equal(role.rows[0].rolsuper, false);
-    assert.equal(role.rows[0].rolbypassrls, false);
-    assert.equal((await db.query("SELECT tenant_id FROM tenant_branding WHERE tenant_id=$1", [b.id])).rowCount, 0);
-    assert.equal((await db.query("UPDATE tenant_branding SET brand_name='not allowed' WHERE tenant_id=$1", [b.id])).rowCount, 0);
-    assert.equal((await db.query("DELETE FROM tenant_modules WHERE tenant_id=$1", [a.id])).rowCount, 0);
-  });
-  await expectDenied(() => withDatabase(contextFor(clientAdmin, a.id, true), (db) => db.query("INSERT INTO tenant_domains (tenant_id,domain) VALUES ($1,$2)", [b.id, `denied-${suffix}.example`])), "42501");
-  await expectDenied(() => withDatabase(contextFor(clientAdmin, a.id, true), (db) => db.query("INSERT INTO platform_admins (clerk_user_id) VALUES ($1)", [clientId])), "42501");
-  await withDatabase({ actorId: clientId }, async (db) => {
-    assert.equal((await db.query("SELECT id FROM tenants")).rowCount, 0);
-    assert.equal((await db.query("SELECT tenant_id FROM tenant_branding")).rowCount, 0);
-  });
+  await expectDenied(() => saveDomain(clientAdmin, b.id, `denied-${suffix}.example`), 403);
+  await expectDenied(() => assignTenantAdministrator(clientAdmin, a.id, `user_denied${suffix}`, "Denied"), 403);
+  await expectDenied(() => getTenant(unknown, a.id), 403);
+  const feed = await activity(clientAdmin);
+  assert.ok(feed.length > 0);
+  assert.ok(feed.every(e => e.tenantId === a.id), "Activity must be filtered by authorized tenant without RLS.");
+  const ownerFeed = await activity(admin);
+  assert.ok(ownerFeed.some(e => e.tenantId === b.id), "Super Admin retains cross-tenant activity.");
+  await expectDenied(() => withDatabase(contextFor(clientAdmin, a.id), db =>
+    db.query("UPDATE tenant_branding SET brand_name=brand_name WHERE tenant_id=$1", [a.id])), "25006");
   const pricing = await pool.query("INSERT INTO pricing_rules (tenant_id,name) VALUES ($1,'Verification') RETURNING id", [b.id]);
   await expectDenied(() => withDatabase(contextFor(clientAdmin, a.id, true), (db) => db.query(
     "INSERT INTO exchange_orders (tenant_id,pricing_rule_id) VALUES ($1,$2)", [a.id, pricing.rows[0].id],
@@ -93,15 +90,11 @@ try {
   await expectDenied(() => withDatabase(contextFor(clientAdmin, a.id, true), (db) => db.query("INSERT INTO wallet_configurations (tenant_id,asset_network_id,strategy) VALUES ($1,$2,'hot_wallet')", [a.id, "eth:ethereum-sepolia"])), "23514");
   await expectDenied(async () => getBlockchainProvider("live"), 501);
   assert.deepEqual(await getBlockchainProvider("sandbox").health(), { status: "not_connected", sandbox: true });
-  const policies = await pool.query("SELECT count(*)::int AS total FROM pg_class WHERE relname = ANY($1::text[]) AND relrowsecurity AND relforcerowsecurity", [[
-    "tenants", "platform_admins", "tenant_memberships", "tenant_branding", "tenant_domains", "tenant_modules",
-    "tenant_asset_networks", "tenant_configuration", "pricing_rules", "exchange_orders", "payment_invoices",
-    "wallet_configurations", "blockchain_provider_configs", "api_keys", "webhook_endpoints", "notification_events", "audit_events",
-  ]]);
-  assert.equal(policies.rows[0].total, 17);
+  const policies = await pool.query("SELECT count(*)::int AS total FROM pg_policies WHERE schemaname='public'");
+  assert.equal(policies.rows[0].total, 0);
   await verifyPlans({ admin, clientAdmin, a, b, pa, pb, suffix, planIds, addonIds });
   await verifyCore({ admin, clientAdmin, staffId, aId: a.id, bId: b.id, suffix });
-  process.stdout.write("PASS: foundation provisioning, role permissions, effective entitlements, RLS cross-tenant reads/writes, no-context isolation, non-bypass runtime role, composite foreign keys, sandbox constraints.\n");
+  process.stdout.write("PASS: foundation provisioning, application role/tenant permissions, scoped activity, read-only transactions, effective entitlements, composite foreign keys, sandbox constraints.\n");
 } finally {
   // Only this run's fixtures are removed, never user-created client records.
   for (const table of ["tenant_product_configuration", "audit_events", "tenant_usage_counters", "tenant_entitlement_overrides", "tenant_addons", "tenant_subscriptions", "tenant_payment_methods", "api_keys", "webhook_endpoints", "exchange_orders", "payment_invoices", "wallet_configurations", "pricing_rules", "tenant_asset_networks", "tenant_modules", "tenant_domains", "tenant_configuration", "tenant_branding", "tenant_memberships"]) {

@@ -1,6 +1,5 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, integer, numeric, pgPolicy, pgTable, text } from "drizzle-orm/pg-core";
-import { adminContext, runtimeRole } from "./rls";
+import { boolean, check, integer, numeric, pgTable, text } from "drizzle-orm/pg-core";
 import { modulesTable } from "./catalog";
 
 // Marketing metadata only. This table cannot grant rights or load product code.
@@ -25,10 +24,4 @@ export const landingProductsTable = pgTable("landing_products", {
   check("landing_products_status", sql`${t.status} IN ('available','coming_soon')`),
   check("landing_products_icon", sql`${t.icon} IN ('exchange','card','payments','staking','earn','dex','content','telegram','miniapp','whatsapp','ios','android','engine','nodes','mining','kolo')`),
   check("landing_products_copy", sql`length(btrim(${t.name})) BETWEEN 2 AND 100 AND length(btrim(${t.description})) BETWEEN 10 AND 500 AND length(btrim(${t.ctaLabel})) BETWEEN 2 AND 40`),
-  pgPolicy("landing_products_read", { for: "select", to: runtimeRole, using: sql`${adminContext} OR visible=true` }),
-  pgPolicy("landing_products_write", {
-    for: "all", to: runtimeRole,
-    using: sql`${adminContext} AND current_setting('app.can_write',true)='true'`,
-    withCheck: sql`${adminContext} AND current_setting('app.can_write',true)='true'`,
-  }),
-]).enableRLS();
+]);

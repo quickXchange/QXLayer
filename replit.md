@@ -9,8 +9,7 @@ An independent multi-tenant administration and provisioning foundation, not a li
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `pnpm --filter @workspace/scripts run db:role:dev` — create restricted runtime role before the first schema push
-- `pnpm --filter @workspace/scripts run db:permissions:dev` — materialize runtime grants, RLS predicates, and FORCE RLS after every schema push
+- `pnpm --filter @workspace/scripts run db:access:dev` — one-time development cleanup of legacy RLS/custom-role metadata; verifies all table data is unchanged
 - `pnpm --filter @workspace/scripts run db:seed:dev` — seed only sandbox catalogs
 - `pnpm --filter @workspace/api-server run verify:foundation` — development-only provisioning and tenant-isolation checks
 - `pnpm --filter @workspace/api-server run samples:plans:dev` — explicit development-only Aster/Nexa demonstrations; never an automatic startup seed
@@ -42,7 +41,7 @@ An independent multi-tenant administration and provisioning foundation, not a li
 
 - Use one modular monolith and one shared backend; channels must reuse tenant branding, assets, entitlements, pricing, orders, payments, and provider boundaries.
 - Administrator privileges are explicitly assigned by an operator, never inferred from sign-up order or browser-provided roles.
-- The development database owner bypasses RLS. Runtime transactions must switch to the restricted NOLOGIN, NOBYPASSRLS role and use transaction-local verified actor/tenant context.
+- PostgreSQL uses the configured connection login, including the existing owner login. There is no RLS or custom runtime-role dependency. Server-side role checks, membership checks, customer ownership checks and explicitly tenant-scoped SQL enforce access. Never rely on transaction settings to filter rows. Read-only request transactions reject writes.
 - Client administrators can edit their tenant configuration and manage staff grants; only super administrators assign Client Admins or manage plans, add-ons, subscriptions, overrides, suspension and registry registration. Staff default to read-only and may receive four narrowly scoped configuration grants; staff never manage memberships.
 - Effective rights come from database plans → additive add-ons → replacing tenant overrides. Missing features deny and missing limits are zero. Direct legacy module writes cannot bypass this resolver.
 - Disabling or archiving a plan/add-on blocks new assignments, but retains existing assignments. Tenant suspension denies capability access and configuration mutations.
@@ -69,10 +68,10 @@ responsive behavior, sandbox boundaries and measured verification results.
 
 ## Gotchas
 
-- After schema pushes, run the development permission command before starting the API. See `.agents/memory/rls-policy-materialization.md` for the schema-tool behavior behind this requirement.
+- Schema pushes require no custom role, grants or RLS policy setup. Never reintroduce database RLS or custom-role switching as a startup/deployment hook.
 - No public first-signup administrator endpoint exists. New accounts can use the customer workspace and submit Exchange requests immediately; tenant administrator access requires explicit Super Admin provisioning/ownership assignment.
 - Use the Zod namespace matching a generated schema for inferred types and caught validation errors; see `.agents/memory/validation-compatibility.md`.
-- Before any future production launch, replace owner-backed connection sessions with separately configured restricted runtime credentials and review deployment-side role/policy readiness. No production migration/startup DDL is provided here.
+- Keep database credentials server-side. Use the configured PostgreSQL login without custom-role provisioning. No production migration/build/startup DDL is provided here.
 
 ## Pointers
 

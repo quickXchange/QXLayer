@@ -1,4 +1,4 @@
-- [RLS policy materialization](rls-policy-materialization.md) — verify live predicates; schema pushes may create policy metadata without expressions.
+- [PostgreSQL restore dependencies](postgres-restore-dependencies.md) — custom-role ACLs, not just policies, can break managed publishing preparation.
 - [Validation namespaces](validation-compatibility.md) — mixed Zod namespaces can erase inferred types and prevent validation-error matching.
 - [OpenAPI body names](openapi-body-names.md) — named component request schemas avoid duplicate Orval Zod exports.
 - [Vite dependency cache](vite-dependency-cache.md) — React version errors can come from stale prebundles even when package resolution matches.

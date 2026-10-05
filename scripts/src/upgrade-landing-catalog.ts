@@ -5,7 +5,7 @@ if (process.env.NODE_ENV === "production") throw new Error("Development-only cat
 const client = await pool.connect();
 try {
   await client.query("BEGIN");
-  for (const file of ["development-landing-catalog.sql", "landing-catalog-policies.sql"]) {
+  for (const file of ["development-landing-catalog.sql"]) {
     await client.query(await readFile(new URL(`../../lib/db/migrations/${file}`, import.meta.url), "utf8"));
   }
   await client.query("COMMIT");

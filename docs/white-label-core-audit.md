@@ -10,7 +10,7 @@ The user explicitly reprioritized the permanent platform core over website visua
 - Shared tenant creation/configuration services and persistent provisioning progress.
 - Branding and website settings, font/favicon/theme/support/social/legal configuration.
 - One shared branded website, non-executing Exchange sandbox.
-- Runtime restricted role, transaction-local actor/tenant context, FORCE RLS and audit writes.
+- Explicit server-side role/membership/ownership checks, tenant-scoped SQL, read-only request transactions and audit writes.
 - API credential one-time issuance/hash-only storage/revocation, webhook endpoint configuration with delivery explicitly deferred.
 
 ## Gaps to strengthen

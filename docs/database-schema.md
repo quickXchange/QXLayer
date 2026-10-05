@@ -1,6 +1,6 @@
 # PostgreSQL Schema — Sandbox Foundation
 
-Source: `lib/db/src/schema`. There are **21 application tables**: four global catalog tables and 17 RLS-protected identity/tenant/business tables.
+Source: `lib/db/src/schema`. PostgreSQL retains the application's global catalogs and identity/tenant/business tables. Access is enforced by server-side authorization and explicitly scoped queries.
 UUID primary keys use `gen_random_uuid()` unless otherwise noted. Timestamps are `timestamptz`.
 Every tenant-owned table has `tenant_id` referencing `tenants.id`; `tenants.id` is the tenant root.
 The platform administrator table is global and identity-scoped. Catalogs are global, shared, and read-only at runtime.
@@ -59,20 +59,19 @@ Amounts are decimal strings in service contracts, not floating-point numbers. A 
 
 There are no private wallet keys, seed phrases, provider credentials, real deposit addresses, or webhook secrets in these tables.
 
-## Authorization and RLS
+## Application authorization
 
-- All 27 tenant/access/log/plan/subscription tables have both ENABLE RLS and FORCE RLS.
-- Runtime role: `private_label_runtime`, NOLOGIN, NOSUPERUSER, NOCREATEDB, NOCREATEROLE, NOINHERIT, NOBYPASSRLS.
-- Every API database transaction executes `SET LOCAL ROLE private_label_runtime` and transaction-local settings for the verified actor, selected tenant, super-admin status, and write permission.
+- Database RLS and the custom runtime-role dependency have been removed. Requests use the configured PostgreSQL login, including the existing owner login.
+- Every API database operation runs in a transaction. Read requests use `BEGIN READ ONLY`; authorized writes use `BEGIN`. Transaction-local actor/tenant settings are context, not row filtering.
 - The API resolves roles from explicit database assignments after verifying Clerk identity. It validates membership before setting tenant context.
-- Ordinary tenant reads require a matching tenant context; writes additionally require write permission. No-context sessions cannot read tenant data.
-- Super-admin context can cross tenant boundaries. Catalog and subscription mutations require super-admin context; tenant Client Admin can manage quota-checked read-only staff, never administrator roles.
-- Platform-admin lookup is limited to the current actor. Audit inserts must match the actor context.
-- Runtime grants do not permit tenant deletion or platform-admin mutation. Shared asset/network/module catalogs are SELECT-only. Plan/entitlement/add-on catalogs are writable only under Super Admin RLS.
+- Ordinary tenant services validate membership and scope SQL by the authorized tenant ID; writes additionally validate the required permission. Unassigned users cannot call administrator services.
+- Super Admin services can cross tenant boundaries. Catalog and subscription mutations require explicit Super Admin checks; tenant Client Admins can manage quota-checked staff, never administrator roles.
+- Customer order, history and attachment services check customer ownership. Internal notes are excluded from customer responses. Activity feeds explicitly filter by authorized tenant.
+- Privileged database credentials are never supplied to customers. Direct SQL under the configured login is privileged and is not a tenant-isolation boundary.
 - Transaction-local context is cleared by COMMIT/ROLLBACK before a connection returns to the pool.
-- Schema owner/setup connections bypass RLS and must never be mistaken for an isolation test. The verification command exercises the restricted role.
+- Verification exercises application/service authorization, cross-tenant denial and read-only transactions, rather than claiming raw owner SQL is tenant-isolated.
 
-The development-only access SQL materializes live PostgreSQL predicates and runtime grants after schema pushes.
+The explicit development access cleanup removes legacy policies, disables RLS and revokes/drops only the obsolete role. It compares every public table's row counts and content fingerprints in one transaction; mismatches roll back the cleanup. No tables or records are deleted or recreated.
 No startup-time DDL, production migration script, or deployment hook is included.
 
 ## Plans and shared website extension

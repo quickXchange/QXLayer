@@ -17,7 +17,7 @@ Clerk verified identity
        branding / website settings / navigation
        domain ownership / verified public-domain lookup
        resources / monthly meters / quota admission / audit
-  -> PostgreSQL tenant rows + FORCE RLS policies
+  -> PostgreSQL tenant rows + application-authorized scoped queries
 
 One administration console -> the same typed OpenAPI API
 One public website renderer -> allowlisted public tenant projection
@@ -120,8 +120,8 @@ The expanded suite verifies:
 
 - Distinct plans and tenant-specific rights; missing-feature denial; additive add-ons and replacing overrides.
 - All eight existing quota boundaries, exact decimals, monthly meters and concurrent admission.
-- Cross-tenant reads/writes, no-context isolation, composite foreign keys and sandbox constraints.
-- Twenty-nine live tables with FORCE RLS, and materialized policy predicates—not merely policy names.
+- Application cross-tenant denial, unassigned-user denial, composite foreign keys and sandbox constraints.
+- No database RLS or custom-role dependency; read-only transactions reject mutations.
 - New registry/configuration tables' restrictions, deferred-only registration, uniqueness and dependency validation.
 - Product settings persistence, cross-tenant denial, secret-field rejection and parent-feature denial.
 - Staff grant/revocation, own-tenant branding edits, forbidden domain edits and forbidden membership escalation.
@@ -135,9 +135,9 @@ The signed-in browser pass verified registry registration/reload, the provisioni
 
 The tester flagged an unsupported `?tenant=` URL supplied in the test instructions. The actual website contract is `/private-label-website/<slug>`; manual slug entry navigated there correctly, and a separate screenshot of that canonical URL confirmed the branded page and saved navigation without application changes. Counts animate from zero only after entering the viewport; their target values derive from actual configured assets/networks/capabilities, not simulated activity.
 
-Runtime queries set verified actor/tenant/write/staff-manager/public-slug/domain context transaction-locally and switch to `private_label_runtime`, a restricted NOBYPASSRLS role. Staff may receive `branding.manage`, `domains.manage`, `configuration.manage`, `resources.manage`; none permits staff to manage memberships. The membership SQL policy independently requires staff-manager context for membership writes.
+Runtime queries use the configured PostgreSQL login and verified transaction-local context. Server-side checks validate roles, memberships, customer ownership and write permissions; queries explicitly filter by the authorized tenant/customer. Staff may receive `branding.manage`, `domains.manage`, `configuration.manage`, `resources.manage`; none permits staff to manage memberships.
 
-The development connection itself is owner-backed and bypasses RLS outside restricted runtime transactions. This is not a recommendation to issue database credentials to customers. Database context is trusted server infrastructure, not a client-supplied authorization claim.
+The configured connection is currently owner-backed, as explicitly approved. Database credentials remain server-side; customers never receive them. Database context is trusted server infrastructure, not a client-supplied authorization claim. Transaction settings do not filter rows; RLS and custom-role switching are not used.
 
 Public website responses are allowlisted. Product configuration, private memberships, credential material, internal audit metadata and subscriptions are not published. Same-origin mutation checks remain in force. Generic settings are bounded JSON with secret-looking field-name rejection; this is not a secrets vault or a complete secret-content detector.
 
@@ -168,8 +168,8 @@ DNS verification proves control at verification time. It does not connect hostin
 
 Before production onboarding:
 
-1. Review and apply versioned migrations on the target database through an operator-controlled production process; verify role grants and every live RLS predicate there.
-2. Configure separately restricted runtime database credentials and separate operational/admin privileges; do not ship owner-backed runtime credentials as the production model.
+1. Review schema changes before publishing; do not delete/reset data or run production migration DDL from build/startup hooks.
+2. Use the configured PostgreSQL login without a custom runtime-role dependency. Keep credentials server-side and verify application authorization on the target environment.
 3. Confirm the production identity-provider configuration, intended client account IDs, privilege assignment and revocation procedures.
 4. Connect the approved hosting/domain/TLS routing and explicit tenant host dispatch. Add operational DNS monitoring/revalidation before relying on custom domains.
 5. Establish backups/restoration, monitoring, abuse/rate controls, audit retention, credential handling and support/incident procedures.
@@ -184,12 +184,12 @@ Existing development database:
 
 ```sh
 pnpm --filter @workspace/scripts run core:upgrade:dev
-pnpm --filter @workspace/scripts run db:permissions:dev
+pnpm --filter @workspace/scripts run db:access:dev
 pnpm --filter @workspace/api-server run verify:foundation
 ```
 
-The additive core upgrade creates generic product configuration, adds membership permissions/domain challenge/manifest fields, backfills only empty built-in definitions, preserves current IDs/assignments, and leaves existing domains unverified. It installs explicit SQL policies because schema tools may omit their predicates.
+The additive core upgrade creates generic product configuration, adds membership permissions/domain challenge/manifest fields, backfills only empty built-in definitions, preserves current IDs/assignments, and leaves existing domains unverified. It does not install policies or custom-role grants.
 
-Fresh development setup: run `db:role:dev`, push the schema, run `db:permissions:dev`, seed with `db:seed:dev`, run `core:upgrade:dev`, then run `db:permissions:dev` and the verification suite. These script names refer to `@workspace/scripts`; all development setup/upgrade helpers refuse production.
+Fresh development setup: push the schema, seed with `db:seed:dev`, run `core:upgrade:dev` if upgrading an older schema, then run the verification suite. For an existing development database with legacy policies, explicitly run `db:access:dev` once. These script names refer to `@workspace/scripts`; all development setup/upgrade helpers refuse production.
 
-After every later schema push, reapply development permissions; that helper also reapplies the core policies when the new table exists. Schema declarations mirror staff-manager/domain/catalog predicates so later pushes do not deliberately regress their intended definitions. There is no automatic startup production DDL.
+Later schema pushes require no policy materialization or custom-role provisioning. Never reintroduce those dependencies through migrations, startup or build hooks. There is no automatic startup production DDL.

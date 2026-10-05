@@ -7,7 +7,7 @@ Develop only White Label Exchange as a multi-tenant sandbox, followed by its ten
 
 **Why:** The user explicitly corrected the scope. Crypto Payment Gateway, Crypto Card, Crypto Engine, Staking API, Earn API, DEX, Telegram Bot, Telegram Mini App, WhatsApp Bot, iOS App, Android App, RPC/Nodes, Cloud Mining, Articles/Content and Kolo remain visual product previews/planned services.
 
-**How to apply:** Keep all other products exactly as they appear on Products & Services: do not remove, redesign, or build their backend functionality. Preserve the approved Landing Page and Exchange Widget design. Reuse tenant architecture, plans, entitlements, branding, assets/networks, authorization and RLS. Exchange supports Swap, Convert, Buy and Sell only as sandbox configuration, quotes, simulated orders and tracking. No real crypto, wallets, deposit addresses, blockchain monitoring, providers, payments, production execution, publishing or deployment.
+**How to apply:** Keep all other products exactly as they appear on Products & Services: do not remove, redesign, or build their backend functionality. Preserve the approved Landing Page and Exchange Widget design. Reuse tenant architecture, plans, entitlements, branding, assets/networks and application authorization. Exchange supports Swap, Convert, Buy and Sell only as sandbox configuration, quotes, simulated orders and tracking. No real crypto, wallets, deposit addresses, blockchain monitoring, providers, payments, production execution, publishing or deployment.
 
 Exchange Buy/Sell simulation and sandbox payment-method labels must use Exchange action entitlements, not the Crypto Payment Gateway entitlement or its guest-checkout control.
 

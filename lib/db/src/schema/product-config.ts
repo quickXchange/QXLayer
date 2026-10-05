@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import { check, jsonb, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { tenantsTable } from "./tenants";
 import { modulesTable } from "./catalog";
-import { tenantPolicies } from "./rls";
 
 export const tenantProductConfigurationTable = pgTable("tenant_product_configuration", {
   tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id),
@@ -12,5 +11,4 @@ export const tenantProductConfigurationTable = pgTable("tenant_product_configura
 }, (t) => [
   primaryKey({ columns: [t.tenantId, t.moduleKey] }),
   check("product_configuration_object", sql`jsonb_typeof(configuration) = 'object'`),
-  ...tenantPolicies("tenant_product_configuration"),
-]).enableRLS();
+]);

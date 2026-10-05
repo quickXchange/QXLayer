@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import { check, foreignKey, jsonb, numeric, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { tenantsTable } from "./tenants";
-import { tenantPolicies } from "./rls";
 
 // Storage contracts only. No financial execution endpoints exist in this foundation.
 export const pricingRulesTable = pgTable("pricing_rules", {
@@ -15,8 +14,7 @@ export const pricingRulesTable = pgTable("pricing_rules", {
   unique("pricing_id_tenant_unique").on(t.id, t.tenantId),
   check("pricing_sandbox_only", sql`environment = 'sandbox'`),
   check("pricing_nonnegative_fee", sql`fee_bps >= 0`),
-  ...tenantPolicies("pricing_rules"),
-]).enableRLS();
+]);
 
 export const ordersTable = pgTable("exchange_orders", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -30,8 +28,7 @@ export const ordersTable = pgTable("exchange_orders", {
   unique("orders_id_tenant_unique").on(t.id, t.tenantId),
   foreignKey({ columns: [t.pricingRuleId, t.tenantId], foreignColumns: [pricingRulesTable.id, pricingRulesTable.tenantId] }),
   check("orders_sandbox_only", sql`environment = 'sandbox'`),
-  ...tenantPolicies("exchange_orders"),
-]).enableRLS();
+]);
 
 export const paymentsTable = pgTable("payment_invoices", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -46,8 +43,7 @@ export const paymentsTable = pgTable("payment_invoices", {
   check("payments_sandbox_only", sql`environment = 'sandbox'`),
   check("payments_positive_amount", sql`amount > 0`),
   check("payments_valid_status", sql`status IN ('pending','waiting_for_payment','payment_detected','confirming','paid','expired','underpaid','overpaid','failed','refunded')`),
-  ...tenantPolicies("payment_invoices"),
-]).enableRLS();
+]);
 
 export const insertPricingRuleSchema = createInsertSchema(pricingRulesTable);
 export const insertOrderSchema = createInsertSchema(ordersTable);

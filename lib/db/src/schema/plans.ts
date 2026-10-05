@@ -1,20 +1,6 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, integer, jsonb, numeric, pgPolicy, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, check, integer, jsonb, numeric, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { tenantsTable } from "./tenants";
-import { adminContext, runtimeRole, tenantAccess, tenantPolicies } from "./rls";
-
-function catalogPolicies(name: string) {
-  return [
-    pgPolicy(`${name}_read`, { for: "select", to: runtimeRole, using: sql`true` }),
-    pgPolicy(`${name}_operator_write`, { for: "all", to: runtimeRole, using: adminContext, withCheck: adminContext }),
-  ];
-}
-function operatorTenantPolicies(name: string) {
-  return [
-    pgPolicy(`${name}_read`, { for: "select", to: runtimeRole, using: tenantAccess }),
-    pgPolicy(`${name}_operator_write`, { for: "all", to: runtimeRole, using: adminContext, withCheck: adminContext }),
-  ];
-}
 
 // A new feature/limit is a catalog row, not a column or a tier in application code.
 export const entitlementDefinitionsTable = pgTable("entitlement_definitions", {
@@ -24,8 +10,7 @@ export const entitlementDefinitionsTable = pgTable("entitlement_definitions", {
   valueType: text("value_type").notNull(),
 }, () => [
   check("entitlement_definition_kind_type", sql`(kind = 'feature' AND value_type = 'boolean') OR (kind = 'limit' AND value_type IN ('integer','decimal'))`),
-  ...catalogPolicies("entitlement_definitions"),
-]).enableRLS();
+]);
 
 export const plansTable = pgTable("plans", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -44,8 +29,7 @@ export const plansTable = pgTable("plans", {
   check("plans_status", sql`status IN ('enabled','disabled','archived')`),
   check("plans_nonnegative_metadata", sql`monthly_price >= 0 AND yearly_price >= 0 AND setup_fee >= 0 AND display_order >= 0`),
   check("plans_currency", sql`currency ~ '^[A-Z]{3}$'`),
-  ...catalogPolicies("plans"),
-]).enableRLS();
+]);
 
 export const planEntitlementsTable = pgTable("plan_entitlements", {
   planId: uuid("plan_id").notNull().references(() => plansTable.id),
@@ -53,8 +37,7 @@ export const planEntitlementsTable = pgTable("plan_entitlements", {
   value: jsonb("value").$type<boolean | string>().notNull(),
 }, (t) => [
   primaryKey({ columns: [t.planId, t.key] }),
-  ...catalogPolicies("plan_entitlements"),
-]).enableRLS();
+]);
 
 export const addonsTable = pgTable("addons", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -66,7 +49,7 @@ export const addonsTable = pgTable("addons", {
   setupFee: numeric("setup_fee", { precision: 22, scale: 2 }).notNull().default("0"),
   currency: text("currency").notNull().default("USD"),
   pricingConfigured: boolean("pricing_configured").notNull().default(false),
-}, () => catalogPolicies("addons")).enableRLS();
+});
 
 export const addonEntitlementsTable = pgTable("addon_entitlements", {
   addonId: uuid("addon_id").notNull().references(() => addonsTable.id),
@@ -74,8 +57,7 @@ export const addonEntitlementsTable = pgTable("addon_entitlements", {
   value: jsonb("value").$type<boolean | string>().notNull(),
 }, (t) => [
   primaryKey({ columns: [t.addonId, t.key] }),
-  ...catalogPolicies("addon_entitlements"),
-]).enableRLS();
+]);
 
 export const tenantSubscriptionsTable = pgTable("tenant_subscriptions", {
   tenantId: uuid("tenant_id").primaryKey().references(() => tenantsTable.id),
@@ -86,16 +68,14 @@ export const tenantSubscriptionsTable = pgTable("tenant_subscriptions", {
 }, () => [
   check("subscription_status", sql`status IN ('active','suspended')`),
   check("subscription_resume_status", sql`resume_status IN ('draft','active')`),
-  ...operatorTenantPolicies("tenant_subscriptions"),
-]).enableRLS();
+]);
 
 export const tenantAddonsTable = pgTable("tenant_addons", {
   tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id),
   addonId: uuid("addon_id").notNull().references(() => addonsTable.id),
 }, (t) => [
   primaryKey({ columns: [t.tenantId, t.addonId] }),
-  ...operatorTenantPolicies("tenant_addons"),
-]).enableRLS();
+]);
 
 export const tenantEntitlementOverridesTable = pgTable("tenant_entitlement_overrides", {
   tenantId: uuid("tenant_id").notNull().references(() => tenantsTable.id),
@@ -104,8 +84,7 @@ export const tenantEntitlementOverridesTable = pgTable("tenant_entitlement_overr
   reason: text("reason").notNull(),
 }, (t) => [
   primaryKey({ columns: [t.tenantId, t.key] }),
-  ...operatorTenantPolicies("tenant_entitlement_overrides"),
-]).enableRLS();
+]);
 
 // UTC monthly counters. Resource counts are read from their actual tenant tables.
 export const tenantUsageCountersTable = pgTable("tenant_usage_counters", {
@@ -117,8 +96,7 @@ export const tenantUsageCountersTable = pgTable("tenant_usage_counters", {
   primaryKey({ columns: [t.tenantId, t.key, t.period] }),
   check("usage_nonnegative", sql`used >= 0`),
   check("usage_month_format", sql`period ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'`),
-  ...tenantPolicies("tenant_usage_counters"),
-]).enableRLS();
+]);
 
 export const tenantPaymentMethodsTable = pgTable("tenant_payment_methods", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -127,5 +105,4 @@ export const tenantPaymentMethodsTable = pgTable("tenant_payment_methods", {
   environment: text("environment").notNull().default("sandbox"),
 }, () => [
   check("payment_methods_sandbox", sql`environment = 'sandbox'`),
-  ...tenantPolicies("tenant_payment_methods"),
-]).enableRLS();
+]);

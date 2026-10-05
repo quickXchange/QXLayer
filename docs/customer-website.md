@@ -5,7 +5,7 @@
 The existing `private-label-website` artifact is the only customer frontend.
 There are no Aster/Nexa component branches or tenant forks. Brand values and
 effective capability flags come from `GET /api/public/sites/:slug`.
-Administration screens, plans, limits, add-ons, overrides and RLS were not redesigned.
+Administration screens, plans, limits, add-ons and overrides were not redesigned. Database authorization now follows the application-level model documented in `database-schema.md`.
 No database schema migration was needed; additional settings use existing branding JSON.
 
 The original visual system uses layered brand-tinted surfaces, SVG network
@@ -140,7 +140,7 @@ the production build and type checks succeed.
 - Workspace typecheck and final website production build passed.
 - Existing foundation regression passed: feature denial, all eight quota boundaries,
   concurrent admission, exact decimal/current-month accounting, add-on/override
-  resolution, tenant isolation, non-bypass runtime role and 27 live FORCE RLS tables.
+  resolution, application tenant isolation, scoped activity and read-only transactions.
 - Website configuration regression passed: validation, legacy-form preservation,
   explicit FAQ clearing, whitespace rejection and unsafe CSS-value rejection.
 - Pure frontend regression passed: 2,048 light/dark palettes, 4.5:1 text/fill contrast,

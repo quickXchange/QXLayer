@@ -19,7 +19,7 @@ Everything in this build is development/sandbox only. Nothing has been published
 - Sandbox configuration flags and activation checks. Enabling an entitlement does not create a working product.
 - Overview counts and audit activity derived from database records, with no invented revenue or volume metrics.
 - Parameterized database access, generated request/response validation, explicit role checks, same-origin mutation checks, and request-size limits.
-- RLS on all 17 identity/tenant/business tables; four shared catalogs are read-only to the runtime role.
+- Server-side authorization and tenant/customer-scoped SQL protect private data; catalog mutations require explicit operator permission.
 - Tenant-local compound foreign keys for order-to-pricing and wallet-to-asset references prevent cross-tenant references.
 
 ## Prepared, not implemented as products
@@ -43,7 +43,7 @@ Generated OpenAPI React Query client
          │
 Express API: Clerk identity → DB role/membership → tenant context → service
          │
-PostgreSQL restricted runtime role + transaction-local context + RLS
+PostgreSQL configured login + explicit service authorization + scoped SQL
          │
 Shared tenant configuration and independent entitlement records
 ```
@@ -70,10 +70,10 @@ artifacts/
       pricing/ orders/ payments/ wallets/
       blockchain/ api-keys/ webhooks/ notifications/
       shared/                  Sandbox service contracts
-    verification/              Direct development service/RLS checks
+    verification/              Direct development service authorization checks
 lib/
   db/src/schema/               Access, tenants, catalog, branding, commerce,
-                               integrations, audit, and RLS definitions
+                               integrations, audit, and relational constraints
   db/src/context.ts            Restricted-role transaction helper
   db/migrations/               Development-only role and policy setup SQL
   api-spec/                    OpenAPI source of truth
@@ -101,9 +101,7 @@ There is no public self-promotion endpoint and no first-signup privilege rule.
 ## Development setup on a fresh database
 
 ```sh
-pnpm --filter @workspace/scripts run db:role:dev
 pnpm --filter @workspace/db run push
-pnpm --filter @workspace/scripts run db:permissions:dev
 pnpm --filter @workspace/scripts run db:seed:dev
 pnpm run typecheck
 pnpm --filter @workspace/api-server run verify:foundation
@@ -113,13 +111,13 @@ Repeat the permission command after any development schema push. Nothing runs DD
 These setup/access/verification commands explicitly refuse `NODE_ENV=production`.
 No production migration script or deployment hook has been created.
 
-The current development connection belongs to a schema owner that can bypass RLS. Runtime requests switch to a restricted role for each transaction; setup commands intentionally use the owner.
+Runtime requests use the configured PostgreSQL login. RLS and custom-role switching are not required. Server-side authorization and scoped SQL are the tenant/customer access boundary; read-only transactions reject accidental writes.
 Before a future production launch, configure truly restricted runtime login credentials, validate role/policy readiness separately, and perform a security and deployment review. This development foundation is not a live-finance certification.
 
 ## Verification
 
 Full workspace TypeScript checking passes.
-Direct service/database verification covers persistent provisioning and activation, client/staff restrictions, denied unassigned access, independent entitlements, cross-tenant RLS reads/writes, missing-context isolation, role escalation denial, restricted non-bypass role properties, composite foreign keys, and sandbox-only constraints.
+Direct service/database verification covers persistent provisioning and activation, client/staff restrictions, denied unassigned access, independent entitlements, application cross-tenant denial, scoped activity, role escalation denial, read-only transactions, composite foreign keys, and sandbox-only constraints.
 Verification creates only temporary named fixtures and removes its own records afterward.
 
 No authenticated browser journey or real financial execution was tested. The first build does not use browser end-to-end tests or external provider calls.

@@ -1,6 +1,4 @@
-import { sql } from "drizzle-orm";
-import { boolean, jsonb, pgPolicy, pgTable, text } from "drizzle-orm/pg-core";
-import { adminContext, runtimeRole } from "./rls";
+import { boolean, jsonb, pgTable, text } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 
 export const modulesTable = pgTable("module_catalog", {
@@ -10,10 +8,7 @@ export const modulesTable = pgTable("module_catalog", {
   category: text("category").notNull(),
   sandboxAvailable: boolean("sandbox_available").notNull().default(true),
   definition: jsonb("definition").notNull().default({}),
-}, () => [
-  pgPolicy("module_catalog_read", { for: "select", to: runtimeRole, using: sql`true` }),
-  pgPolicy("module_catalog_register", { for: "insert", to: runtimeRole, withCheck: sql`${adminContext} AND current_setting('app.can_write',true)='true'` }),
-]).enableRLS();
+});
 
 export const assetsTable = pgTable("asset_catalog", {
   id: text("id").primaryKey(),

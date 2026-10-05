@@ -15,3 +15,4 @@ export const db = drizzle(pool, { schema });
 
 export * from "./schema";
 export * from "./context";
+export { applicationTableNames } from "./schema-table-names";

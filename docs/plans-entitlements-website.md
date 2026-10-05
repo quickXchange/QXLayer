@@ -6,7 +6,7 @@ This is an independent sandbox platform. QuickXchange is not connected, copied, 
 
 ## Database
 
-Ten new RLS-protected tables extend the foundation:
+Ten plan and entitlement tables extend the foundation:
 
 - `entitlement_definitions`: registered keys, labels, feature/limit kind and boolean/integer/decimal value type.
 - `plans`: editable name, description, monthly/yearly prices, setup fee, currency, billing label, display order and lifecycle status.
@@ -18,7 +18,7 @@ Ten new RLS-protected tables extend the foundation:
 - `tenant_usage_counters`: UTC monthly counters keyed generically by tenant, entitlement key and month.
 - `tenant_payment_methods`: sandbox label-only configuration, never a payment provider connection.
 
-Additional columns: `tenant_branding.website_settings` contains allowlisted advanced website settings; `audit_events.metadata` records changes; staff membership and webhook records have labels. There are now 27 FORCE RLS tables. Development permission setup materializes actual predicates after schema pushes. Runtime uses the restricted NOBYPASSRLS role.
+Additional columns: `tenant_branding.website_settings` contains allowlisted advanced website settings; `audit_events.metadata` records changes; staff membership and webhook records have labels. Runtime uses the configured PostgreSQL login. Access checks and tenant filtering are explicit in application services; schema setup requires no RLS or custom role.
 
 Every newly created tenant must select an enabled plan. Any pre-existing tenant without a subscription is explicitly unassigned and cannot perform tenant configuration or product operations; the operator must assign a plan. No default tier or administrator is inferred.
 
@@ -45,7 +45,7 @@ New registered keys flow through the resolver and generic editors without a plan
 - Sandbox API keys are hashed at rest and shown once. They have no execution scopes or merchant authentication endpoint yet. Webhooks remain disabled with delivery deferred. Payment methods are labels only; no wallet/provider reference is accepted.
 - Monthly transaction and plan-currency volume admission uses UTC month counters, exact 18-decimal arithmetic, tenant serialization and transactional updates. It is an internal guard for future engines, not a transaction endpoint. A future engine must normalize quoted volume to the plan currency and call it in the same transaction as its business write. Current deferred engines perform no financial writes and return an explicit unavailable response.
 - Brand/domain/assets/config/website mutations and activation cannot bypass suspension. Read-only administration remains available. Suspension is reversed to the previous active/draft state.
-- Shared catalog versions use transaction advisory read/write locks: PostgreSQL row-locking SELECTs would apply write-denying RLS to read-only tenant readers.
+- Shared catalog versions use transaction advisory read/write locks, allowing read-only transactions to coordinate with catalog writers.
 
 ## Website structure and safety
 
@@ -56,7 +56,7 @@ New registered keys flow through the resolver and generic editors without a plan
 - `/:slug/:feature`: entitlement-gated foundation-only capability pages.
 - `/:slug/privacy` and `/:slug/terms`: tenant-authored text, escaped rather than rendered as raw HTML.
 
-The public API resolves an explicit active tenant slug under narrowly scoped RLS, then returns only brand name/logo, colors, theme, advanced website settings, effective feature flags and configured sandbox assets. It does not return tenant UUIDs, plan/pricing records, usage, overrides, staff, keys or webhook configuration. Unknown, suspended, unassigned or website-unentitled tenants have no public site. Disabled capability URLs receive server-side rejection. Responses are `no-store`.
+The public API explicitly resolves an active tenant slug and scopes queries by that tenant, then returns only brand name/logo, colors, theme, advanced website settings, effective feature flags and configured sandbox assets. It does not return tenant UUIDs, plan/pricing records, usage, overrides, staff, keys or webhook configuration. Unknown, suspended, unassigned or website-unentitled tenants have no public site. Disabled capability URLs receive server-side rejection. Responses are `no-store`.
 
 CSS tokens and document settings apply primary/secondary/accent colors, light/dark/system theme, curated font choices, logo/favicon, hero copy, support, social links, footer, privacy and terms. URLs must use HTTPS without credentials. No uploads or stored file bytes are added in this phase.
 
@@ -80,7 +80,7 @@ Domains remain unverified configuration and are not activated or used as live cu
 - all eight quota boundaries, distinct asset/network counts, concurrent creation at capacity and exact monthly-volume boundaries;
 - no data deletion on downgrade, cleanup, suspension, no activation bypass and resuming prior status;
 - website branding/feature/asset isolation and the public-safe response allowlist;
-- restricted-role cross-tenant reads/writes, no-context denial, role escalation denial, tenant-composite foreign keys, sandbox constraints, audit events and live RLS predicates.
+- application cross-tenant reads/writes denial, unassigned-user denial, role escalation denial, read-only transactions, tenant-composite foreign keys, sandbox constraints and audit events.
 
 All verification fixtures and synthetic administrator grants are removed in `finally`.
 

@@ -3,7 +3,6 @@ import { boolean, check, foreignKey, jsonb, pgTable, text, timestamp, uuid } fro
 import { createInsertSchema } from "drizzle-zod";
 import { tenantsTable } from "./tenants";
 import { tenantAssetsNetworksTable } from "./branding";
-import { tenantPolicies } from "./rls";
 
 export const walletConfigurationsTable = pgTable("wallet_configurations", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -14,8 +13,7 @@ export const walletConfigurationsTable = pgTable("wallet_configurations", {
 }, (t) => [
   foreignKey({ columns: [t.tenantId, t.assetNetworkId], foreignColumns: [tenantAssetsNetworksTable.tenantId, tenantAssetsNetworksTable.assetNetworkId] }),
   check("wallets_sandbox_only", sql`environment = 'sandbox' AND strategy = 'sandbox'`),
-  ...tenantPolicies("wallet_configurations"),
-]).enableRLS();
+]);
 
 export const blockchainProvidersTable = pgTable("blockchain_provider_configs", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -27,8 +25,7 @@ export const blockchainProvidersTable = pgTable("blockchain_provider_configs", {
 }, () => [
   check("providers_sandbox_only", sql`environment = 'sandbox' AND adapter = 'sandbox'`),
   check("providers_valid_priority", sql`priority IN ('primary', 'secondary', 'manual')`),
-  ...tenantPolicies("blockchain_provider_configs"),
-]).enableRLS();
+]);
 
 export const apiKeysTable = pgTable("api_keys", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -40,8 +37,7 @@ export const apiKeysTable = pgTable("api_keys", {
   revokedAt: timestamp("revoked_at", { withTimezone: true }),
 }, () => [
   check("api_keys_sandbox_only", sql`environment = 'sandbox'`),
-  ...tenantPolicies("api_keys"),
-]).enableRLS();
+]);
 
 export const webhookEndpointsTable = pgTable("webhook_endpoints", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -52,8 +48,7 @@ export const webhookEndpointsTable = pgTable("webhook_endpoints", {
   environment: text("environment").notNull().default("sandbox"),
 }, () => [
   check("webhooks_sandbox_only", sql`environment = 'sandbox'`),
-  ...tenantPolicies("webhook_endpoints"),
-]).enableRLS();
+]);
 
 export const notificationsTable = pgTable("notification_events", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -64,8 +59,7 @@ export const notificationsTable = pgTable("notification_events", {
   environment: text("environment").notNull().default("sandbox"),
 }, () => [
   check("notifications_sandbox_only", sql`environment = 'sandbox'`),
-  ...tenantPolicies("notification_events"),
-]).enableRLS();
+]);
 
 export const insertWalletConfigurationSchema = createInsertSchema(walletConfigurationsTable);
 export const insertBlockchainProviderSchema = createInsertSchema(blockchainProvidersTable);

@@ -146,17 +146,16 @@ export async function verifyPlans(f: { admin: Principal; clientAdmin: Principal;
   await setTenantSuspension(admin, a.id, false, "Resume prior active state");
   assert.equal((await getSubscription(clientAdmin, a.id)).tenantStatus, "active");
   await denied(() => setTenantOverrides(admin, a.id, [{ key: "max_staff", value: "1.5", reason: "Invalid integer" }]), 400);
-  await withDatabase(contextFor(clientAdmin, a.id, true), async (db) => {
-    for (const table of ["tenant_subscriptions", "tenant_addons", "tenant_entitlement_overrides", "tenant_usage_counters", "tenant_payment_methods"]) assert.equal((await db.query(`SELECT tenant_id FROM ${table} WHERE tenant_id=$1`, [b.id])).rowCount, 0);
-    assert.equal((await db.query("UPDATE tenant_subscriptions SET plan_id=$2 WHERE tenant_id=$1", [a.id, pb.id])).rowCount, 0);
-    assert.equal((await db.query("UPDATE plans SET name='unauthorized' WHERE id=$1", [pb.id])).rowCount, 0);
-  });
-  await denied(() => withDatabase(contextFor(clientAdmin, a.id, true), (db) => db.query("INSERT INTO tenant_entitlement_overrides (tenant_id,key,value,reason) VALUES ($1,'website','true','denied')", [a.id])), "42501");
+  await denied(() => getSubscription(clientAdmin, b.id), 403);
+  await denied(() => changeTenantPlan(clientAdmin, a.id, pb.id), 403);
+  await denied(() => savePlan(clientAdmin, { ...pb, name: "Unauthorized" }, pb.id), 403);
+  await denied(() => setTenantOverrides(clientAdmin, a.id, [{ key: "website", value: true, reason: "Denied" }]), 403);
+  await denied(() => listResources(clientAdmin, b.id, "staff"), 403);
   const events = await pool.query("SELECT DISTINCT event_type FROM audit_events WHERE actor_id=$1", [admin.userId]);
   for (const event of ["plan.created", "plan.updated", "plan.duplicated", "plan.disabled", "plan.archived", "subscription.plan_changed", "subscription.addons_changed", "subscription.overrides_changed", "tenant.suspended", "tenant.unsuspended"]) assert.ok(events.rows.some((r) => r.event_type === event), event);
-  const emptyPolicies = await pool.query("SELECT policyname FROM pg_policies WHERE 'private_label_runtime'=ANY(roles::text[]) AND ((cmd='SELECT' AND qual IS NULL) OR (cmd='INSERT' AND with_check IS NULL) OR (cmd='ALL' AND (qual IS NULL OR with_check IS NULL)))");
-  assert.equal(emptyPolicies.rowCount, 0, "Live RLS predicates must be materialized.");
-  const secured = await pool.query("SELECT count(*)::int AS total FROM pg_class WHERE relrowsecurity AND relforcerowsecurity AND relnamespace='public'::regnamespace");
-  assert.ok(secured.rows[0].total >= 29, "All core tables must retain FORCE RLS; additive catalogs may increase the total.");
-  process.stdout.write(`PASS: two distinct plans/tenants; fail-closed features; all eight quota boundaries; concurrent admission; exact decimals/current-month usage; catalog lifecycle/duplication; add-ons/override precedence; suspension; public branding/data isolation; audited changes; ${secured.rows[0].total} live FORCE RLS tables.\n`);
+  const secured = await pool.query("SELECT count(*)::int AS total FROM pg_class WHERE (relrowsecurity OR relforcerowsecurity) AND relnamespace='public'::regnamespace");
+  assert.equal(secured.rows[0].total, 0, "Database RLS must remain disabled.");
+  const runtimeRole = await pool.query("SELECT 1 FROM pg_roles WHERE rolname='private_label_runtime'");
+  assert.equal(runtimeRole.rowCount, 0, "Retired custom role must not be recreated.");
+  process.stdout.write("PASS: two distinct plans/tenants; fail-closed features; all eight quota boundaries; concurrent admission; exact decimals/current-month usage; catalog lifecycle/duplication; add-ons/override precedence; suspension; application tenant isolation; audited changes; no RLS/custom-role dependency.\n");
 }

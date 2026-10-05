@@ -33,12 +33,10 @@ try {
   await appendNote(op, submitted.id, { message: "We are reviewing your project.", visibility: "customer" });
   assert.ok((await orderDetail(op, submitted.id, true)).history.some(n => n.visibility === "internal"));
   assert.ok(!(await orderDetail(a, submitted.id)).history.some(n => n.visibility === "internal" || n.message.includes("PRIVATE WORKFLOW")));
-  await withDatabase({ actorId: a.userId }, async c => assert.equal((await c.query("SELECT id FROM white_label_events WHERE request_id=$1 AND visibility='internal'", [submitted.id])).rowCount, 0));
   await denied(() => reviewRequest(op, submitted.id, { ...price, status: "ready" }), 409);
-  await withDatabase({ actorId: a.userId, canWrite: true }, async c => {
-    assert.equal((await c.query("UPDATE white_label_requests SET status='approved',monthly_price='0' WHERE id=$1", [submitted.id])).rowCount, 0);
-  });
-  await denied(() => withDatabase({ actorId: a.userId, canWrite: true }, c => c.query("INSERT INTO white_label_requests (customer_user_id,idempotency_key,configuration) VALUES ($1,$2,'{}')", [b.userId, randomUUID()])), "42501");
+   assert.equal((await orderDetail(a, submitted.id)).order.status, "new");
+   assert.equal((await orderDetail(a, submitted.id)).order.monthlyPrice, null);
+   await denied(() => orderDetail(a, submitted.id, true), 403);
   fixture = await prepareCustomerFixtures(op, suffix);
   assert.ok((await whiteLabelCatalog(a)).plans.some(p => p.id === fixture!.planId));
   const custom = await submitRequest(a, { ...input, companyName: "Verification Company", requestedPlanId: fixture.planId, requestedAddonIds: [], billingPeriod: "yearly", attachmentIds: [],
@@ -83,7 +81,7 @@ try {
   assert.deepEqual(await myAdminPanels(await resolvePrincipal(b.userId)), []);
   await pool.query("UPDATE tenant_memberships SET active=false WHERE clerk_user_id=$1", [a.userId]);
   assert.deepEqual(await myAdminPanels(await resolvePrincipal(a.userId)), []);
-  console.log("PASS: existing-session request submission/idempotency, customer RLS, Super-only review/pricing/provisioning, draft hidden/direct access denied, atomic ownership handoff, one/multiple panels, cross-customer denial, ownership revocation.");
+  console.log("PASS: existing-session request submission/idempotency, application customer isolation, Super-only review/pricing/provisioning, draft hidden/direct access denied, atomic ownership handoff, one/multiple panels, cross-customer denial, ownership revocation.");
 } finally {
   if (fixture) await cleanCustomerFixtures([...fixture.tenants.map(t => t.id), ...(draftId ? [draftId] : [])], fixture.planId, actors);
   else { await pool.query("DELETE FROM white_label_requests WHERE customer_user_id=ANY($1::text[])", [actors]); await pool.query("DELETE FROM platform_admins WHERE clerk_user_id=ANY($1::text[])", [actors]); }

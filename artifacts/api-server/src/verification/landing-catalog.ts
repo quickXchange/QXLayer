@@ -34,9 +34,6 @@ try {
     const principal: Principal = { userId: `user_other${suffix}`, role, memberships: [] };
     await assert.rejects(async () => listProducts(principal), (e: unknown) => (e as { status: number }).status === 403);
     await assert.rejects(async () => saveProduct(principal, key, fixture), (e: unknown) => (e as { status: number }).status === 403);
-    await withDatabase({ actorId: principal.userId, canWrite: true }, async (client) => {
-      assert.equal((await client.query("UPDATE landing_products SET name='Denied' WHERE key=$1", [key])).rowCount, 0);
-    });
   }
   await saveProduct(admin, key, { ...fixture, visible: false, startingPrice: null, setupFee: null, status: "available" });
   assert.equal((await publicProducts()).some((p) => p.key === key), false);
@@ -44,7 +41,6 @@ try {
   assert.equal(hidden?.readiness, "planned"); // A display-status change cannot enable execution.
   assert.equal(hidden?.startingPrice, null);
   await withDatabase({ actorId: "public:verification" }, async (client) => {
-    assert.equal((await client.query("SELECT key FROM landing_products WHERE key=$1", [key])).rowCount, 0);
     await assert.rejects(() => client.query("INSERT INTO landing_products (key,name,description,icon) VALUES ('denied','Denied','Forbidden insert','engine')"));
   });
   for (const invalid of [
@@ -56,13 +52,12 @@ try {
   await assert.rejects(async () => saveProduct(admin, key, { ...fixture, name: "   " }));
   await assert.rejects(async () => saveProduct(admin, `absent_${suffix}`, fixture), (e: unknown) => (e as { status: number }).status === 404);
   const policy = await pool.query("SELECT relrowsecurity,relforcerowsecurity FROM pg_class WHERE relname='landing_products'");
-  assert.equal(policy.rows[0].relrowsecurity, true);
-  assert.equal(policy.rows[0].relforcerowsecurity, true);
+  assert.equal(policy.rows[0].relrowsecurity, false);
+  assert.equal(policy.rows[0].relforcerowsecurity, false);
   const predicates = await pool.query("SELECT qual,with_check FROM pg_policies WHERE tablename='landing_products'");
-  assert.equal(predicates.rows.every((p) => p.qual !== null), true);
-  assert.equal(predicates.rows.some((p) => p.with_check?.includes("app.can_write")), true);
+  assert.equal(predicates.rowCount, 0);
   assert.equal((await pool.query("SELECT count(*)::int AS n FROM audit_events WHERE actor_id=$1 AND event_type='landing_catalog.updated'", [actor])).rows[0].n, 2);
-  process.stdout.write("PASS: marketing pricing persistence, hidden-row RLS, Super Admin-only edits, immutable readiness, validation, materialized FORCE RLS, audit, and public projection.\n");
+  process.stdout.write("PASS: marketing pricing persistence, public visibility filtering, Super Admin-only edits, immutable readiness, validation, read-only transactions, audit, and public projection.\n");
 } finally {
   await pool.query("DELETE FROM audit_events WHERE actor_id=$1", [actor]);
   await pool.query("DELETE FROM landing_products WHERE key=$1", [key]);

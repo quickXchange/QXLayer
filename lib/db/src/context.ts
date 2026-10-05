@@ -13,8 +13,9 @@ export interface DatabaseContext {
 }
 
 /**
- * Every runtime request uses a restricted role and transaction-local context.
- * The schema owner connection is reserved for development setup commands.
+ * Use the configured PostgreSQL connection; authorization belongs to server
+ * services and their explicitly scoped queries, not database RLS or custom roles.
+ * Read-only requests cannot execute database mutations.
  * ROLLBACK/COMMIT clear the context before the connection returns to the pool.
  */
 export async function withDatabase<T>(
@@ -23,8 +24,7 @@ export async function withDatabase<T>(
 ): Promise<T> {
   const client = await pool.connect();
   try {
-    await client.query("BEGIN");
-    await client.query("SET LOCAL ROLE private_label_runtime");
+    await client.query(context.canWrite === true ? "BEGIN" : "BEGIN READ ONLY");
     await client.query(
       `SELECT set_config('app.actor_id', $1, true),
               set_config('app.tenant_id', $2, true),

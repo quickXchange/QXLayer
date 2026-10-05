@@ -11,7 +11,7 @@ export type AddonInput = z.infer<typeof CreateAddonBody>;
 export type Entry = PlanInput["entitlements"][number];
 export interface Definition { key: string; label: string; kind: "feature" | "limit"; valueType: "boolean" | "integer" | "decimal"; }
 async function catalogLock(client: DatabaseClient, key: string, exclusive: boolean) {
-  // SELECT ... FOR SHARE also applies write RLS and hides a read-only catalog
+  // Advisory locking coordinates catalog readers without requiring write access
   // from client admins. Advisory locks coordinate versions without write access.
   await client.query(exclusive
     ? "SELECT pg_advisory_xact_lock(hashtextextended($1,0))"

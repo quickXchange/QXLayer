@@ -8,9 +8,14 @@ import { listTenants } from "../modules/tenants/service";
 const router = Router();
 router.use(requireAuthentication);
 
-async function activity(principal: Principal) {
+export async function activity(principal: Principal) {
   const query = async (tenantId?: string) => withDatabase(contextFor(principal, tenantId), async (client) => {
-    const result = await client.query("SELECT id,tenant_id,event_type,description,created_at FROM audit_events ORDER BY created_at DESC LIMIT 30");
+    const result = await client.query(
+      `SELECT id,tenant_id,event_type,description,created_at FROM audit_events
+       ${principal.role === "super_admin" ? "" : "WHERE tenant_id=$1"}
+       ORDER BY created_at DESC LIMIT 30`,
+      principal.role === "super_admin" ? [] : [tenantId],
+    );
     return result.rows.map((e) => ({ id: e.id, tenantId: e.tenant_id, eventType: e.event_type, description: e.description, createdAt: e.created_at as Date }));
   });
   const rows = principal.role === "super_admin" ? await query() : (await Promise.all(principal.memberships.map((m) => query(m.tenantId)))).flat();

@@ -16,7 +16,6 @@ try {
   const domains = await c.query("SELECT tenant_id FROM tenant_domains WHERE verification_token IS NULL");
   for (const row of domains.rows) await c.query("UPDATE tenant_domains SET verification_token=$2 WHERE tenant_id=$1", [row.tenant_id, `wl-core-${randomBytes(24).toString("hex")}`]);
   await c.query("COMMIT");
-  await c.query(await readFile(new URL("../../lib/db/migrations/core-policies.sql", import.meta.url), "utf8"));
   process.stdout.write("Additive development core upgrade applied. Existing clients and assignments preserved.\n");
 } catch (e) { await c.query("ROLLBACK"); throw e; }
 finally { c.release(); await pool.end(); }
