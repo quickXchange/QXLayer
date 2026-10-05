@@ -1,4 +1,5 @@
-import { useParams, useLocation, Link } from 'wouter';
+import { useLayoutEffect } from 'react';
+import { useParams, Link } from 'wouter';
 import { useGetTenant, getGetTenantQueryKey } from '@workspace/api-client-react';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader, ErrorState, ListSkeleton } from '@/components/app/bits';
@@ -16,12 +17,14 @@ import { SettingsPanel } from '@/components/exchange/settings-panel';
 import { ProvidersPanel } from '@/components/exchange/providers-panel';
 import { CustomersPanel } from '@/components/exchange/customers-panel';
 import { AuditPanel } from '@/components/exchange/audit-panel';
+import { ExchangeAdminNavigation } from '@/components/exchange/admin-navigation';
+import { useConsoleNavigation } from '@/components/app/console-frame';
 
 const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
 const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'providers', 'settings'];
 
 export default function Exchange() {
-  const [, navigate] = useLocation();
+  const setNavigation = useConsoleNavigation();
   const { id = '', section = '', orderId } = useParams<{ id: string; section?: string; orderId?: string }>();
   const q = useGetTenant(id, { query: { enabled: !!id, queryKey: getGetTenantQueryKey(id) } });
   const can = useCan(id);
@@ -36,10 +39,14 @@ export default function Exchange() {
   const feature = F.crypto_exchange === true;
   const ro = (p: Permission) => base || !can.has(p);
   const cfgLocked = base || !can.has('configuration.manage') || !feature;
-  const tabs = TABS.filter(([k]) => k !== 'website' || can.role === 'super_admin' || F.website === true);
+  const showWebsite = can.role === 'super_admin' || F.website === true;
   const root = `/clients/${id}/exchange`;
   const sec = TABS.some(([k]) => k === section) ? section : '';
   const needsDraft = DRAFT_SECTIONS.includes(sec);
+  useLayoutEffect(() => {
+    setNavigation?.({ label: 'White Label Admin navigation', content: <ExchangeAdminNavigation root={root} section={sec} showWebsite={showWebsite} /> });
+    return () => setNavigation?.(null);
+  }, [setNavigation, root, sec, showWebsite]);
 
   let body;
   if (!t) body = null;
@@ -62,7 +69,9 @@ export default function Exchange() {
   else if (sec === 'website') body = <div className="space-y-6"><Guide title="Website settings" note="Public site content and presentation." links={[['branding', 'Branding'], ['domain', 'Domain']]} root={root} /><WebsiteSection tenant={t} readOnly={ro('branding.manage')} /></div>;
   else if (sec === 'staff') body = <div className="space-y-6"><PermissionMap /><StaffAccessSection tenantId={id} canEdit={can.manageStaffGrants && !suspended && !unassigned} />
     <ResourcesSection tenantId={id} allowed={{ staff: Number(sub?.limits.max_staff ?? 0) > 0, api_keys: false, webhooks: false, payment_methods: false }} readOnly={ro('resources.manage')} staffReadOnly={!can.manageStaffGrants || base} /></div>;
-  else if (sec === 'api-keys') body = <ResourcesSection tenantId={id} allowed={{ staff: false, api_keys: F.api_keys === true, webhooks: false, payment_methods: false }} readOnly={ro('resources.manage')} />;
+  else if (sec === 'api-keys') body = F.api_keys === true
+    ? <ResourcesSection tenantId={id} allowed={{ staff: false, api_keys: true, webhooks: false, payment_methods: false }} readOnly={ro('resources.manage')} />
+    : <div className="space-y-3" data-testid="text-api-keys-unavailable"><h2 className="font-display text-2xl">API Keys</h2><p className="text-sm text-muted-foreground">API Keys are not included in this tenant's effective plan. No keys can be issued from this section.</p></div>;
   else body = <AuditPanel tenantId={id} />;
 
   return (
@@ -77,14 +86,6 @@ export default function Exchange() {
           {unassigned && !suspended && <p className="mb-4 text-sm text-muted-foreground">No plan is assigned, so everything is read-only.</p>}
           {!feature && !!sub && <p className="mb-4 text-sm text-muted-foreground" data-testid="text-no-feature">The crypto exchange feature is not part of this plan, so exchange settings are read-only.</p>}
           {needsDraft && d.dirty && !cfgLocked && <p className="mb-4 text-sm text-copper" data-testid="text-unsaved">Unsaved exchange changes. They are kept while you move between sections; save from any editable section.</p>}
-          <label className="mb-6 block space-y-1 text-sm md:hidden">Admin section
-            <select aria-label="Admin section" data-testid="select-exchange-section" value={sec} onChange={(e) => navigate(e.target.value ? `${root}/${e.target.value}` : root)} className="block h-11 w-full min-w-0 rounded-md border bg-card px-3">
-              {tabs.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-            </select>
-          </label>
-          <nav aria-label="Admin sections" className="mb-6 hidden flex-wrap gap-1 border-b pb-2 md:flex" data-testid="nav-exchange">
-            {tabs.map(([k, l]) => <Link key={k} href={k ? `${root}/${k}` : root} data-testid={`tab-exchange-${k || 'dashboard'}`} className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm ${sec === k ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}>{l}</Link>)}
-          </nav>
           {body}
         </>)}
     </>

@@ -350,3 +350,59 @@ mtime_ms = 1791217527313
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e44d9408-8835-46bf-a6ea-0b7b04793d40/5cad695d-0c52-47c5-8576-1b824adc8178"
 storage_version_token = "1791217555542344"
 content_type = "text/html"
+
+[[outputs]]
+id = "kBnItPjISgwXQURfa6VKs"
+uri = "file://screenshots/exchange-admin-navigation/desktop.png"
+type = "image"
+title = "Desktop — White Label Admin"
+description = "Existing QXLayer styling with grouped sidebar navigation and the current Orders table."
+logical_id = "d9a2d6b7-0072-4b6a-84aa-93e0455ee445"
+content_hash = "sha256:0c644d82d7f5e7980fcc2e62afbdc752e9633a4b0c80c6a6e34c5e939dec6b26"
+size = 686815
+mtime_ms = 1791228912109
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d9a2d6b7-0072-4b6a-84aa-93e0455ee445/ddd5daf9-dcf1-44b5-9d8b-7cafb44809aa"
+storage_version_token = "1791229339098803"
+content_type = "image/png"
+
+[[outputs]]
+id = "-PAigg4lczPa63_8dIls6"
+uri = "file://screenshots/exchange-admin-navigation/mobile.png"
+type = "image"
+title = "Mobile — White Label Admin"
+description = "Phone-width Admin content with navigation collapsed into the menu."
+logical_id = "a2ca18c6-d4d9-4c33-a6d2-b026e0efeda1"
+content_hash = "sha256:861618c7c8e3eeeaa4644dac3670f0da088bf5eff474d1295f9e8568f8c26b14"
+size = 210364
+mtime_ms = 1791228945893
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/a2ca18c6-d4d9-4c33-a6d2-b026e0efeda1/8806c9a7-9ffc-40c9-8ff0-d7cd5781f7a8"
+storage_version_token = "1791229339648393"
+content_type = "image/png"
+
+[[outputs]]
+id = "_3GdDR1gRXWRSJVNYr8Y-"
+uri = "file://screenshots/exchange-admin-navigation/mobile-menu.png"
+type = "image"
+title = "Mobile — Grouped navigation"
+description = "Collapsible Admin groups in the mobile menu."
+logical_id = "a0c68fd7-953f-4127-bc4e-1c0da3eb6316"
+content_hash = "sha256:53c60943ef7d928c04f40cb49e4df99a2dbdbe812d08011112cc23d8e877434a"
+size = 38549
+mtime_ms = 1791228961061
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/a0c68fd7-953f-4127-bc4e-1c0da3eb6316/c96e1ccd-f0ee-45f1-88ae-b9515ad768b8"
+storage_version_token = "1791229340188080"
+content_type = "image/png"
+
+[[outputs]]
+id = "Sc4sMPcnAOaJxlH9Rn5un"
+uri = "file://screenshots/exchange-admin-navigation/mobile-order.png"
+type = "image"
+title = "Mobile — Order Details"
+description = "Full-width Order Details sheet, preserving the demo’s read-only permissions."
+logical_id = "69394727-228c-47cc-b96b-49c4a794d7e8"
+content_hash = "sha256:52fbf5744a5aac697d93b6d68ee70dc9a8e74a1b79cb5c829177a04274e502c2"
+size = 61275
+mtime_ms = 1791228994060
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/69394727-228c-47cc-b96b-49c4a794d7e8/987dd416-e552-4344-9010-585d29132a0d"
+storage_version_token = "1791229340671351"
+content_type = "image/png"

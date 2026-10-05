@@ -27,4 +27,4 @@ Exchange Admin upgrades may transfer advanced organization, management workflows
 
 **Why:** The user repeated “DO NOT redesign the Admin Panel” and explicitly requested functionality/organization only, not a new or duplicated Admin Panel.
 
-**How to apply:** Reuse the existing Exchange modules and components. Limit changes to tenant administration and its supporting APIs; leave the landing page, customer website design, Super Admin design, authentication architecture and existing customer data unchanged.
+**How to apply:** Reuse the existing Exchange modules and components. Limit changes to tenant administration and its supporting APIs; leave the landing page, customer website design, Super Admin design, authentication architecture and existing customer data unchanged. For navigation-only requests, preserve all section functionality and bulk controls without changing colors, cards, tables, typography, backgrounds or the QXLayer visual style; apply the same organization to the NovaX demo.

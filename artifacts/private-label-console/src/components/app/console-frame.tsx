@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ElementType, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type Dispatch, type ElementType, type ReactNode, type SetStateAction } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { Ambient } from '@site/components/ambient';
@@ -9,6 +9,13 @@ export interface ConsoleNavItem { key: string; href: string; label: string; icon
 
 /** Applies the shared QXLayer theme and renders children inside the themed root. */
 const ThemeCtx = createContext<{ dark: boolean; toggle: () => void } | null>(null);
+type NavigationOverride = { content: ReactNode; label: string };
+const NavigationCtx = createContext<Dispatch<SetStateAction<NavigationOverride | null>> | null>(null);
+
+/** Exchange pages can populate the existing sidebar without changing other consoles. */
+export function useConsoleNavigation() {
+  return useContext(NavigationCtx);
+}
 
 export function ConsoleThemeScope({ children }: { children: ReactNode }) {
   const { dark, toggle, vars } = useConsoleTheme();
@@ -46,17 +53,33 @@ function Inner({ homeHref, navLabel, items, footer, mobileAction, maxWidth, chil
   const desktop = useDesktop();
   const [loc] = useLocation();
   const [open, setOpen] = useState(false);
+  const [navigation, setNavigation] = useState<NavigationOverride | null>(null);
   const btn = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   useEffect(() => { setOpen(false); }, [loc]);
   useEffect(() => { if (desktop) setOpen(false); }, [desktop]);
   useEffect(() => {
+    if (!open || !navigation) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previous; };
+  }, [open, navigation]);
+  useEffect(() => {
     if (!open) return;
-    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') { setOpen(false); btn.current?.focus(); } };
+    const k = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setOpen(false); btn.current?.focus(); }
+      if (e.key === 'Tab' && navigation) {
+        const controls = [btn.current, ...Array.from(panel.current?.querySelectorAll<HTMLElement>('a,button') ?? [])]
+          .filter((el): el is HTMLElement => !!el && el.getClientRects().length > 0);
+        const first = controls[0]; const last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    };
     document.addEventListener('keydown', k);
     panel.current?.querySelector<HTMLElement>('a,button')?.focus();
     return () => document.removeEventListener('keydown', k);
-  }, [open]);
+  }, [open, navigation]);
   const themeBtn = (
     <button type="button" onClick={toggle} className="s-iconbtn" aria-label={dark ? 'Switch to light theme' : 'Switch to dark theme'} aria-pressed={dark} data-testid="button-theme">
       {dark ? <Sun size={18} /> : <Moon size={18} />}
@@ -69,12 +92,12 @@ function Inner({ homeHref, navLabel, items, footer, mobileAction, maxWidth, chil
     </Link>
   ));
   return (
-    <div className="qx-frame min-h-[100dvh] md:flex">
+    <NavigationCtx.Provider value={setNavigation}><div className="qx-frame min-h-[100dvh] md:flex">
       {desktop ? (
         <aside className="qx-side md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:justify-between">
           <div>
             <div className="flex items-center justify-between gap-2">{<Brand href={homeHref} />}{themeBtn}</div>
-            <nav aria-label={navLabel} className="qx-nav mt-8 flex flex-col gap-1">{links(false)}</nav>
+            <nav aria-label={navigation?.label ?? navLabel} className="qx-nav mt-8 flex flex-col gap-1">{navigation?.content ?? links(false)}</nav>
           </div>
           <div className="qx-side-foot">{footer}</div>
         </aside>
@@ -90,17 +113,21 @@ function Inner({ homeHref, navLabel, items, footer, mobileAction, maxWidth, chil
             </div>
           </div>
           {open && (
-            <div id="qx-mobile-menu" ref={panel} className="s-mobile-menu qx-drawer border-t">
-              <nav aria-label={navLabel} className="grid gap-1 p-3">{links(true)}</nav>
+            <div id="qx-mobile-menu" ref={panel} className="s-mobile-menu qx-drawer border-t"
+              style={navigation ? { position: 'absolute', top: 68, left: 0, right: 0 } : undefined}>
+              <nav aria-label={navigation?.label ?? navLabel} className="grid gap-1 p-3"
+                onClick={navigation ? (event) => {
+                  if ((event.target as HTMLElement).closest('a')) { setOpen(false); btn.current?.focus(); }
+                } : undefined}>{navigation?.content ?? links(true)}</nav>
               <div className="qx-side-foot border-t p-4">{footer}</div>
             </div>
           )}
         </header>
       )}
       <main className="qx-main min-w-0 flex-1 md:ml-64">
-        <div className={`mx-auto ${maxWidth} px-5 py-8 md:px-10 md:py-12`}>{children}</div>
+        <div className={`mx-auto ${navigation ? 'max-w-none' : maxWidth} px-5 py-8 md:px-10 md:py-12`}>{children}</div>
       </main>
-    </div>
+    </div></NavigationCtx.Provider>
   );
 }
 
