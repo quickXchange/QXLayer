@@ -14,3 +14,4 @@
 - [Workspace package installer](workspace-package-installer.md) — root refreshes need a temporary pnpm root-check setting; the package callback rejects CLI flags and empty lists.
 - [Dependency security review](dependency-security-review-policy.md) — no unsupported major overrides to clear scanners; distinguish bounded non-exploitability from an upstream fix.
 - [Public Exchange demo](public-exchange-demo.md) — public credentials use read-only expiring sessions, not editable Clerk accounts; preserve delivered customer assignments.
+- [Production parity policy](production-parity-policy.md) — current Development is authoritative; compare read-only first, never restore deleted configuration or blindly republish.
