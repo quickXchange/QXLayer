@@ -7,7 +7,7 @@ Verify live PostgreSQL policy predicates and exercise access under a non-bypass 
 
 **Why:** In this environment, drizzle-kit push created the expected policy names and target roles but left USING/WITH CHECK expressions null. Identity lookup then denied all rows despite correctly assigned access. Check constraints did materialize correctly.
 
-**How to apply:** After development schema changes, use the explicit development access setup and the tenant-isolation verification. Inspect pg_policies predicates when authorization unexpectedly returns empty data. A successful schema push alone is insufficient evidence of working RLS.
+**How to apply:** After development schema changes, use the explicit development access setup and the tenant-isolation verification. Inspect pg_policies predicates when authorization unexpectedly returns empty data. Also compare the read-only publishing schema diff against live policy predicates: the publishing preview has generated role-targeted CREATE POLICY statements without the existing USING/WITH CHECK clauses. A successful schema push or role bootstrap alone is insufficient evidence of working RLS.
 
 For shared read-only catalogs, avoid row-locking SELECTs as the tenant reader.
 
