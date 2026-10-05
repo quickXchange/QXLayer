@@ -14,3 +14,9 @@ For shared read-only catalogs, avoid row-locking SELECTs as the tenant reader.
 **Why:** PostgreSQL applies write-related RLS to `SELECT ... FOR SHARE`; a catalog's legitimate read policy can therefore return no rows when its write policy is Super-Admin-only.
 
 **How to apply:** Coordinate catalog-version reads and edits with transaction advisory shared/exclusive locks, while leaving tenant readers under their normal SELECT policy.
+
+Verify custom-role portability before publishing through Replit's managed database restore.
+
+**Why:** Publishing failed during development-data preparation, before application compilation, because restored policies referenced a custom NOLOGIN runtime role absent from the restore environment. The production database also lacked that role. Development-only role setup is not production provisioning.
+
+**How to apply:** Diagnose restore-stage role failures separately from build errors. Require supported provisioning of the restricted role, membership, and grants before policy restoration; consult publishing support when that infrastructure step is unavailable. Do not bypass the problem by disabling RLS, targeting unrestricted roles, using an owner-backed runtime, or adding production migration/build/startup DDL.
