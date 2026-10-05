@@ -322,3 +322,17 @@ mtime_ms = 1791164727568
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d0b3ca82-f975-47b8-abe8-0c924b09b795/2d569224-b6fc-482e-a2bf-03b1c0b8b1da"
 storage_version_token = "1791164776902133"
 content_type = "image/jpeg"
+
+[[outputs]]
+id = "dz-CCOIm1s1_Ip4gxOUjE"
+uri = "file://docs/authorization-security-audit.html"
+type = "html"
+title = "Final authorization and security audit"
+description = "Full results, 73-route inventory, 206 database/tooling call sites, test evidence and the two remaining publishing blockers."
+logical_id = "9e94f2e9-1ba8-4403-a57a-c8f93ab863b7"
+content_hash = "sha256:15e60421b5a71070bf1a08438663031e8d2264f5092d3b3e3a3f6e14427e7c93"
+size = 73847
+mtime_ms = 1791215084096
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/9e94f2e9-1ba8-4403-a57a-c8f93ab863b7/c04c4d11-fdd7-462e-bcc4-ce121f97ea55"
+storage_version_token = "1791215084645223"
+content_type = "text/html"

@@ -11,3 +11,4 @@
 - [Artifact build context](artifact-build-context.md) — standalone shell builds do not inherit managed workflow service variables.
 - [GitHub publishing](github-publishing.md) — native Git and GitHub App authentication differ; API history exports must preserve exact commit bytes.
 - [Publishing domain](publishing-domain.md) — quicklychan.xyz is the user's intended custom domain for this project's published app.
+- [Workspace package installer](workspace-package-installer.md) — root refreshes need a temporary pnpm root-check setting; the package callback rejects CLI flags and empty lists.

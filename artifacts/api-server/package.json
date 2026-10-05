@@ -12,6 +12,7 @@
     "verify:catalog": "tsx src/verification/landing-catalog.ts",
     "verify:exchange": "tsx src/verification/exchange.ts",
     "verify:customer": "tsx src/verification/customer.ts",
+    "verify:authorization": "tsx src/verification/multi-tenant-security.ts",
     "samples:exchange:dev": "tsx src/verification/exchange-sample.ts",
     "samples:plans:dev": "tsx src/verification/sample-sites.ts"
   },

@@ -1,0 +1,371 @@
+{
+  "environment": "development",
+  "checks": [
+    {
+      "method": "POST",
+      "path": "/api/catalog/products",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/customer/admin-panels",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/customer/white-label-catalog",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/customer/white-label-requests/:requestId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/white-label-requests/:requestId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/white-label-requests/:requestId/notes",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/customer/white-label-requests",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/customer/white-label-requests",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/operator/white-label-requests",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/operator/white-label-requests/:requestId/review",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/operator/white-label-requests/:requestId/provision",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/exchange",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/exchange",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/exchange/dashboard",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/exchange/audit",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/exchange/orders",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/exchange/orders/:orderId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/exchange/orders/:orderId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/landing-products",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/landing-products/:productKey",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/customer/order-attachments",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/customer/order-attachments/:id/content",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/entitlement-definitions",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/plans",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/plans",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/plans/:planId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/plans/:planId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/plans/:planId/duplicate",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/plans/:planId/status",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/add-ons",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/add-ons",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/add-ons/:addonId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/subscription",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/subscription/plan",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/subscription/add-ons",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/subscription/overrides",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/suspension",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/website-settings",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/resources/:resourceType",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/tenants/:tenantId/resources/:resourceType",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/tenants/:tenantId/resources/:resourceType/:resourceId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/overview",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/activity",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/administrators",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/tenants/:tenantId/administrators",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/administrators/:userId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/staff/:userId/permissions",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/domain-verification",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/tenants/:tenantId/domain-verification",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId/products/:moduleKey/configuration",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/products/:moduleKey/configuration",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/tenants",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/tenants/:tenantId",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/brand",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/domain",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/modules",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/assets-networks",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/tenants/:tenantId/configuration",
+      "status": 401,
+      "pass": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/tenants/:tenantId/launch",
+      "status": 401,
+      "pass": true
+    }
+  ]
+}
