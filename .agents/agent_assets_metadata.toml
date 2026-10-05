@@ -406,3 +406,31 @@ mtime_ms = 1791228994060
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/69394727-228c-47cc-b96b-49c4a794d7e8/987dd416-e552-4344-9010-585d29132a0d"
 storage_version_token = "1791229340671351"
 content_type = "image/png"
+
+[[outputs]]
+id = "2VZyrBVT5LCuFDMmsd3N7"
+uri = "file://reports/qxlayer-production-sync-plan.html"
+type = "html"
+title = "QXLayer Production Synchronization Plan"
+description = "Read-only proposal: exact 36-table counts, all 392 row keys, inclusion/exclusion decisions, identity hold, media inventory, minimal CSS fix, rollback and verification."
+logical_id = "e2864b8b-ea63-43fd-aa61-0fdd75cb281e"
+content_hash = "sha256:a3ac2ddc1a66f5e462118974f120cb77ccf856dea5a81e8420d003d010e566d5"
+size = 79113
+mtime_ms = 1791231366360
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e2864b8b-ea63-43fd-aa61-0fdd75cb281e/3a05cd3c-682b-443a-bedc-533cb8e84369"
+storage_version_token = "1791231443106523"
+content_type = "text/html"
+
+[[outputs]]
+id = "nsn084CRzs1Mut0C7aur_"
+uri = "file://reports/qxlayer-production-row-manifest.csv"
+type = "table"
+title = "Complete Row-by-Row Synchronization Manifest"
+description = "392 current Development row keys: 83 proposed configuration rows, 1 held owner assignment and 308 excluded rows. No credentials or executable migration."
+logical_id = "0098ade9-e564-4fcd-825f-7b4b596b5724"
+content_hash = "sha256:1f1d113f99c5c8f25e4bb5bba680b827fc9bdbefd6f06572a4040dd73877cc4b"
+size = 84336
+mtime_ms = 1791231366508
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0098ade9-e564-4fcd-825f-7b4b596b5724/f1ef0225-18df-491d-8403-401fcbf47b52"
+storage_version_token = "1791231443637169"
+content_type = "text/csv"

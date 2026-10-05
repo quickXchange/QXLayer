@@ -9,8 +9,8 @@ Publicly advertised demo credentials must not authenticate a shared editable Cle
 
 **How to apply:** Reuse the normal provisioned Exchange and staff/read-only UI. Enforce the demo boundary on the server and deny privileged/global/customer-account paths. If editable demo controls are introduced later, use visitor-isolated disposable state rather than writes to the shared tenant.
 
-A requested demo brand or slug may already belong to a delivered customer. Check its delivery and membership history before reuse; preserve the existing customer's assignments and choose a separate dedicated demo slug when there is a collision.
+A requested demo brand or slug may already belong to a delivered tenant, including a demonstration retained for inspection. Check its delivery purpose and membership history before reuse; preserve existing Development assignments and choose a separate dedicated demo slug when there is a collision. Delivered status alone does not make a fixture legitimate for Production synchronization.
 
 **Why:** The initially proposed NovaX demo slug already belonged to a delivered customer tenant. Its matching display name was not proof that it was disposable demo data.
 
-**How to apply:** Never repurpose a delivered customer merely because its branding matches the requested demo. Reuse only a confirmed dedicated demo, and keep provisioning idempotent.
+**How to apply:** Never repurpose a delivered tenant merely because its branding matches the requested demo. Reuse only a confirmed dedicated demo, keep provisioning idempotent, and exclude an explicitly disposable delivery from Production unless the user approves reclassification.
