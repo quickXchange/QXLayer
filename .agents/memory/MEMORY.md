@@ -9,3 +9,4 @@
 - [Clerk UI test identities](clerk-testing-memberships.md) — grant the actual generated identity temporary tenant access; extra claim arguments do not override the session.
 - [Account and owner access](customer-account-workflow.md) — one login, permanent owner access, and operator-controlled customer/Admin Panel delivery.
 - [Artifact build context](artifact-build-context.md) — standalone shell builds do not inherit managed workflow service variables.
+- [GitHub publishing](github-publishing.md) — native Git and GitHub App authentication differ; API history exports must preserve exact commit bytes.
