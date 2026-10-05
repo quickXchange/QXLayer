@@ -14,3 +14,9 @@ Production synchronization requires explicit approval of a row-level inclusion/e
 **Why:** The user explicitly separated legitimate configuration transfer from demonstration data and deferred both Live Demo and homepage-widget behavior.
 
 **How to apply:** A delivered status alone does not establish Production legitimacy; inspect the current request's stated purpose. Leave excluded Development records intact. Verify existing access references against the target Clerk user store before promising usable ownership; managed Development and Production identities are isolated.
+
+Check the available Production write capability before declaring a synchronization executable or asking the user to resolve owner identity. An approved scope and confirmed owner are not sufficient execution readiness.
+
+**Why:** The readiness discussion proceeded despite the Agent's managed Production SQL channel being read-only. User approval does not lift that platform restriction.
+
+**How to apply:** Distinguish data readiness, identity evidence, execution capability and permission to execute. Do not bypass read-only access with credentials, a bootstrap endpoint, startup imports or publishing. Report blocked Production work separately from verified Development-only fixes.

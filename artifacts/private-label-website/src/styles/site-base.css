@@ -8,7 +8,7 @@ html.s-smooth{scroll-behavior:smooth}
 .s-muted{color:var(--s-muted)}
 .s-mono{font-family:ui-monospace,'SF Mono',Menlo,monospace}
 .s-display{font-size:clamp(2.3rem,4.7vw,4.15rem);line-height:1.02;letter-spacing:-.045em;font-weight:680;text-wrap:balance}
-.s-display-grad{background:linear-gradient(180deg,var(--s-fg) 35%,color-mix(in srgb,var(--s-fg) 62%,var(--s-accent-ink)));-webkit-background-clip:text;background-clip:text;color:transparent}
+.s-display-grad{background-image:linear-gradient(180deg,var(--s-fg) 35%,color-mix(in srgb,var(--s-fg) 62%,var(--s-accent-ink)));-webkit-background-clip:text;background-clip:text;color:transparent}
 .s-h2{font-size:clamp(1.9rem,4.4vw,3.35rem);line-height:1.04;letter-spacing:-.035em;font-weight:650;text-wrap:balance}
 .s-eyebrow{display:inline-flex;align-items:center;gap:.6rem;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--s-accent-ink)}
 .s-eyebrow::before{content:"";width:1.6rem;height:1px;background:linear-gradient(90deg,transparent,var(--s-accent))}
