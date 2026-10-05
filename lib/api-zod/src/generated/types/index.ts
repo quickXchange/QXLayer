@@ -61,6 +61,7 @@ export * from './exchangeSettings';
 export * from './exchangeSettingsActions';
 export * from './exchangeSettingsFiatCurrency';
 export * from './exchangeStatusInput';
+export * from './exchangeStatusInputExpectedStatus';
 export * from './exchangeStatusInputStatus';
 export * from './exchangeVolume';
 export * from './healthStatus';

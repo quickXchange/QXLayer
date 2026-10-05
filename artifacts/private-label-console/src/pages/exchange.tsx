@@ -6,7 +6,7 @@ import { PageHeader, ErrorState, ListSkeleton } from '@/components/app/bits';
 import { BrandSection, DomainSection } from '@/components/app/sections';
 import { useSubscription } from '@/components/app/subscription';
 import { WebsiteSection, ResourcesSection } from '@/components/app/advanced';
-import { DomainOwnershipSection, StaffAccessSection } from '@/components/app/management';
+import { DomainOwnershipSection } from '@/components/app/management';
 import { useCan, usePrincipal, type Permission } from '@/lib/principal';
 import { useExchangeDraft } from '@/components/exchange/use-exchange-draft';
 import { DashboardPanel } from '@/components/exchange/dashboard-panel';
@@ -16,6 +16,7 @@ import { RoutesPanel, PaymentMethodsPanel, PricingPanel } from '@/components/exc
 import { SettingsPanel } from '@/components/exchange/settings-panel';
 import { ProvidersPanel } from '@/components/exchange/providers-panel';
 import { CustomersPanel } from '@/components/exchange/customers-panel';
+import { StaffPanel } from '@/components/exchange/staff-panel';
 import { AuditPanel } from '@/components/exchange/audit-panel';
 import { ExchangeAdminNavigation } from '@/components/exchange/admin-navigation';
 import { useConsoleNavigation } from '@/components/app/console-frame';
@@ -38,7 +39,7 @@ export default function Exchange() {
   const base = suspended || unassigned || !sub || subQ.isLoading;
   const feature = F.crypto_exchange === true;
   const ro = (p: Permission) => base || !can.has(p);
-  const cfgLocked = base || !can.has('configuration.manage') || !feature;
+  const cfgLocked = base || !can.has('configuration.manage') || !feature || d.saving;
   const showWebsite = can.role === 'super_admin' || F.website === true;
   const root = `/clients/${id}/exchange`;
   const sec = TABS.some(([k]) => k === section) ? section : '';
@@ -67,7 +68,7 @@ export default function Exchange() {
   else if (sec === 'settings') body = <SettingsPanel tenantId={id} d={d} locked={cfgLocked} canManageSub={can.manageSubscription} features={F} />;
   else if (sec === 'branding') body = <div className="space-y-6"><Guide title="Branding" note="Logo, favicon, brand name, colors and appearance (dark and light mode)." links={[['website', 'Website settings'], ['domain', 'Domain']]} root={root} /><BrandSection tenant={t} readOnly={ro('branding.manage')} /></div>;
   else if (sec === 'website') body = <div className="space-y-6"><Guide title="Website settings" note="Public site content and presentation." links={[['branding', 'Branding'], ['domain', 'Domain']]} root={root} /><WebsiteSection tenant={t} readOnly={ro('branding.manage')} /></div>;
-  else if (sec === 'staff') body = <div className="space-y-6"><PermissionMap /><StaffAccessSection tenantId={id} canEdit={can.manageStaffGrants && !suspended && !unassigned} />
+  else if (sec === 'staff') body = <div className="space-y-6"><PermissionMap /><StaffPanel tenantId={id} canEdit={can.manageStaffGrants && !base} />
     <ResourcesSection tenantId={id} allowed={{ staff: Number(sub?.limits.max_staff ?? 0) > 0, api_keys: false, webhooks: false, payment_methods: false }} readOnly={ro('resources.manage')} staffReadOnly={!can.manageStaffGrants || base} /></div>;
   else if (sec === 'api-keys') body = F.api_keys === true
     ? <ResourcesSection tenantId={id} allowed={{ staff: false, api_keys: true, webhooks: false, payment_methods: false }} readOnly={ro('resources.manage')} />

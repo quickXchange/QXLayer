@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { pool, withDatabase } from "@workspace/db";
-import type { ExchangeSettings } from "@workspace/api-zod";
+import { SaveExchangeConfigurationBody, type ExchangeSettings } from "@workspace/api-zod";
 import { resolvePrincipal, contextFor } from "../modules/authentication/service";
 import { createTenant, saveAssets } from "../modules/tenants/service";
 import { savePlan } from "../modules/entitlements/catalog";
@@ -10,6 +10,7 @@ import { exchangeAudit, exchangeConfiguration, exchangeCustomers, sandboxQuote, 
 import { calculateQuote } from "../products/exchange/calculation";
 import { getSubscription } from "../modules/entitlements/resolver";
 import { setTenantOverrides } from "../modules/entitlements/subscriptions";
+import { listResources, setStaffPermissions } from "../modules/entitlements/resources";
 
 if (process.env.NODE_ENV === "production") throw new Error("Development-only verification refused in production.");
 const suffix = randomUUID().replaceAll("-", "");
@@ -51,6 +52,33 @@ try {
   assert.equal((await exchangeConfiguration(client, a.id)).effectiveEnabled, false);
   // Activation is fixture setup, not an alternative production activation API.
   await pool.query("UPDATE tenants SET status='active' WHERE id=ANY($1::uuid[])", [tenants]);
+  const reserved = structuredClone(configuration);
+  reserved.paymentMethods[0].reserve = "1234.500000000000000001";
+  const savedReserve = await exchangeConfiguration(client, a.id, reserved);
+  assert.equal(savedReserve.configuration.paymentMethods[0].reserve, "1234.500000000000000001");
+  assert.equal((await exchangeConfiguration(client, a.id)).configuration.paymentMethods[0].reserve, "1234.500000000000000001");
+  assert.equal("reserve" in (await publicExchange(a.slug)).paymentMethods[0], false);
+  for (const reserve of ["-1", "", "1e3", "0.1234567890123456789", "1234567890123456789", "NaN"]) {
+    assert.equal(SaveExchangeConfigurationBody.safeParse({ ...configuration, paymentMethods: [{ ...configuration.paymentMethods[0], reserve }] }).success, false);
+  }
+  assert.equal(SaveExchangeConfigurationBody.safeParse({ ...configuration, paymentMethods: [{ ...configuration.paymentMethods[0], reserve: "0" }] }).success, true);
+  for (const action of ["buy", "sell"] as const) {
+    const input = { action, source: action === "buy" ? "fiat:USD" : src, destination: action === "sell" ? "fiat:USD" : dest, amount: "1", paymentMethodId: methodId };
+    assert.deepEqual(calculateQuote(reserved, catalog, input), calculateQuote(configuration, catalog, input));
+  }
+  await exchangeConfiguration(client, a.id, configuration);
+  const staffBefore = await listResources(client, a.id, "staff");
+  assert.ok(staffBefore.some((s) => s.id === staffId));
+  assert.ok(staffBefore.every((s) => s.id !== clientId && s.id !== adminId));
+  await setStaffPermissions(client, a.id, staffId, ["configuration.manage"]);
+  assert.deepEqual((await listResources(client, a.id, "staff")).find((s) => s.id === staffId)?.permissions, ["configuration.manage"]);
+  await denied(() => setStaffPermissions(client, a.id, clientId, []), 404);
+  await denied(() => setStaffPermissions(client, a.id, adminId, []), 404);
+  await denied(() => setStaffPermissions(client, b.id, staffId, []), 403);
+  await denied(() => setStaffPermissions(staff, a.id, staffId, ["configuration.manage"]), 403);
+  await denied(() => setStaffPermissions(client, a.id, staffId, ["super_admin"]), 400);
+  await setStaffPermissions(client, a.id, staffId, []);
+  assert.equal((await resolvePrincipal(adminId)).role, "super_admin");
   assert.equal((await publicExchange(a.slug)).actions.length, 4);
   const input = { action: "swap" as const, source: src, destination: dest, amount: "1" };
   const calculated = calculateQuote({ ...configuration, routes: configuration.routes.map(r => ({ ...r, feeBps: 100, spreadBps: 100 })) }, catalog, input);
@@ -105,7 +133,10 @@ try {
   await denied(() => tenantOrder(staff, a.id, created.order.id, { status: "processing", note: "" }), 403);
   await denied(() => tenantOrder(client, a.id, created.order.id, { status: "completed", note: "" }), 409);
   await tenantOrder(client, a.id, created.order.id, { status: "processing", note: "Simulated processing" });
-  await tenantOrder(client, a.id, created.order.id, { status: "completed", note: "Simulated completion" });
+  await denied(() => tenantOrder(client, a.id, created.order.id, { status: "cancelled", expectedStatus: "pending", note: "Stale review must not apply" }), 409);
+  assert.equal((await tenantOrder(client, a.id, created.order.id)).status, "processing");
+  assert.equal((await tenantOrder(client, a.id, created.order.id)).history.length, 2);
+  await tenantOrder(client, a.id, created.order.id, { status: "completed", expectedStatus: "processing", note: "Simulated completion" });
   await denied(() => tenantOrder(client, a.id, created.order.id, { status: "processing", note: "" }), 409);
   assert.equal((await trackOrder(a.slug, created.order.id, created.trackingToken)).history.length, 3);
   for (const action of ["convert", "buy", "sell"] as const) {
@@ -143,7 +174,7 @@ try {
   await denied(() => sandboxQuote(a.slug, input), 409);
   await setTenantOverrides(admin, a.id, [{ key: "swap", value: false, reason: "Verification entitlement denial" }]);
   await denied(() => sandboxQuote(a.slug, input), 403);
-  console.log("PASS: four actions, integer pricing/rounding, fiat payment fees/limits, configuration-only provider catalog/assignments, credential rejection, customer privacy/date filters, route/payment validation, signed/expired/config-changed quotes, tenant isolation, read-only staff, status history and terminal guards, audited bulk configuration, dashboard, idempotency and concurrent monthly-quota admission.");
+  console.log("PASS: four actions, integer pricing/rounding, fiat payment fees/limits, reserve persistence/validation/privacy and quote invariance, protected Owner/Admin and tenant-scoped staff grants, configuration-only provider catalog/assignments, credential rejection, customer privacy/date filters, route/payment validation, signed/expired/config-changed quotes, tenant isolation, read-only staff, reviewed-status conflicts and terminal guards, audited bulk configuration, dashboard, idempotency and concurrent monthly-quota admission.");
 } finally {
   for (const table of ["exchange_orders", "pricing_rules", "audit_events", "tenant_usage_counters", "tenant_payment_methods", "tenant_product_configuration", "tenant_entitlement_overrides", "tenant_subscriptions", "tenant_memberships", "tenant_asset_networks", "tenant_configuration", "tenant_branding", "tenant_domains"]) {
     await pool.query(`DELETE FROM ${table} WHERE tenant_id=ANY($1::uuid[])`, [tenants]);

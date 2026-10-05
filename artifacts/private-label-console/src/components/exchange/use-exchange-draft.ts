@@ -43,6 +43,7 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
     if (p.maximum != null && (!isDec(p.maximum) || (isDec(p.minimum ?? '0') && gtDec(p.minimum ?? '0', p.maximum)))) e.push(`${p.label || 'Payment method'}: maximum must be a decimal not below the minimum`);
     if (p.feeBps !== undefined && !isInt(p.feeBps, 5000)) e.push(`${p.label || 'Payment method'}: fee is integer basis points 0 to 5000`);
     if (p.fixedFee !== undefined && !isDec(p.fixedFee)) e.push(`${p.label || 'Payment method'}: fixed fee must be a decimal string`);
+    if (p.reserve !== undefined && !isDec(p.reserve)) e.push(`${p.label || 'Payment method'}: sandbox reserve must be a non-negative decimal string`);
     if (p.currency !== s.fiatCurrency) e.push(`${p.label || 'Payment method'}: currency must match ${s.fiatCurrency}`);
     if (p.enabled && !p.buy && !p.sell) e.push(`${p.label || 'Payment method'}: enable Buy or Sell`);
   });
@@ -108,7 +109,7 @@ export function useExchangeDraft(tenantId: string): ExchangeDraft {
   const errors = useMemo(() => (draft ? validate(draft, catalog) : []), [draft, catalog]);
   const dirty = draft !== null && JSON.stringify(draft) !== saved;
   const save = () => {
-    if (!draft) return;
+    if (!draft || m.isPending || errors.length > 0 || !dirty) return;
     setSaveError(null);
     m.mutate({ tenantId, data: draft }, {
       onSuccess: (r) => {

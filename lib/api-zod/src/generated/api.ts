@@ -2020,6 +2020,7 @@ export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeB
 export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax = 5000;
 
 export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationPaymentMethodsItemReserveRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const getExchangeConfigurationResponseConfigurationPaymentMethodsMax = 30;
 
 export const getExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax = 80;
@@ -2091,7 +2092,8 @@ export const GetExchangeConfigurationResponse = zod.object({
   "minimum": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemMinimumRegExp).optional(),
   "maximum": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemMaximumRegExp).nullish(),
   "feeBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMin).max(getExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax).optional(),
-  "fixedFee": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp).optional()
+  "fixedFee": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp).optional(),
+  "reserve": zod.string().regex(getExchangeConfigurationResponseConfigurationPaymentMethodsItemReserveRegExp).optional().describe('Administrator-maintained sandbox reserve metadata in fiat currency. No funds exist and this does not affect quotes or execution.')
 })).max(getExchangeConfigurationResponseConfigurationPaymentMethodsMax),
   "providers": zod.array(zod.object({
   "providerId": zod.string().max(getExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax),
@@ -2186,6 +2188,7 @@ export const saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMin = 0;
 export const saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMax = 5000;
 
 export const saveExchangeConfigurationBodyPaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyPaymentMethodsItemReserveRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const saveExchangeConfigurationBodyPaymentMethodsMax = 30;
 
 export const saveExchangeConfigurationBodyProvidersItemProviderIdMax = 80;
@@ -2256,7 +2259,8 @@ export const SaveExchangeConfigurationBody = zod.object({
   "minimum": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemMinimumRegExp).optional(),
   "maximum": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemMaximumRegExp).nullish(),
   "feeBps": zod.number().int().min(saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMin).max(saveExchangeConfigurationBodyPaymentMethodsItemFeeBpsMax).optional(),
-  "fixedFee": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemFixedFeeRegExp).optional()
+  "fixedFee": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemFixedFeeRegExp).optional(),
+  "reserve": zod.string().regex(saveExchangeConfigurationBodyPaymentMethodsItemReserveRegExp).optional().describe('Administrator-maintained sandbox reserve metadata in fiat currency. No funds exist and this does not affect quotes or execution.')
 })).max(saveExchangeConfigurationBodyPaymentMethodsMax),
   "providers": zod.array(zod.object({
   "providerId": zod.string().max(saveExchangeConfigurationBodyProvidersItemProviderIdMax),
@@ -2326,6 +2330,7 @@ export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFee
 export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax = 5000;
 
 export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationPaymentMethodsItemReserveRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const saveExchangeConfigurationResponseConfigurationPaymentMethodsMax = 30;
 
 export const saveExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax = 80;
@@ -2397,7 +2402,8 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "minimum": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemMinimumRegExp).optional(),
   "maximum": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemMaximumRegExp).nullish(),
   "feeBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMin).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFeeBpsMax).optional(),
-  "fixedFee": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp).optional()
+  "fixedFee": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemFixedFeeRegExp).optional(),
+  "reserve": zod.string().regex(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemReserveRegExp).optional().describe('Administrator-maintained sandbox reserve metadata in fiat currency. No funds exist and this does not affect quotes or execution.')
 })).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsMax),
   "providers": zod.array(zod.object({
   "providerId": zod.string().max(saveExchangeConfigurationResponseConfigurationProvidersItemProviderIdMax),
@@ -2526,7 +2532,8 @@ export const updateExchangeOrderStatusBodyNoteMax = 500;
 
 export const UpdateExchangeOrderStatusBody = zod.object({
   "status": zod.enum(['pending', 'processing', 'completed', 'cancelled', 'failed']),
-  "note": zod.string().max(updateExchangeOrderStatusBodyNoteMax)
+  "note": zod.string().max(updateExchangeOrderStatusBodyNoteMax),
+  "expectedStatus": zod.enum(['pending', 'processing', 'completed', 'cancelled', 'failed']).optional().describe('Status observed when reviewing an update. Reject with conflict if another administrator changed the order.')
 })
 
 export const UpdateExchangeOrderStatusResponse = zod.object({
@@ -2655,6 +2662,7 @@ export const getPublicExchangeResponsePaymentMethodsItemFeeBpsMin = 0;
 export const getPublicExchangeResponsePaymentMethodsItemFeeBpsMax = 5000;
 
 export const getPublicExchangeResponsePaymentMethodsItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getPublicExchangeResponsePaymentMethodsItemReserveRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 
 
 export const GetPublicExchangeResponse = zod.object({
@@ -2699,7 +2707,8 @@ export const GetPublicExchangeResponse = zod.object({
   "minimum": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemMinimumRegExp).optional(),
   "maximum": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemMaximumRegExp).nullish(),
   "feeBps": zod.number().int().min(getPublicExchangeResponsePaymentMethodsItemFeeBpsMin).max(getPublicExchangeResponsePaymentMethodsItemFeeBpsMax).optional(),
-  "fixedFee": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemFixedFeeRegExp).optional()
+  "fixedFee": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemFixedFeeRegExp).optional(),
+  "reserve": zod.string().regex(getPublicExchangeResponsePaymentMethodsItemReserveRegExp).optional().describe('Administrator-maintained sandbox reserve metadata in fiat currency. No funds exist and this does not affect quotes or execution.')
 })),
   "fiatCurrency": zod.string(),
   "publicNote": zod.string()

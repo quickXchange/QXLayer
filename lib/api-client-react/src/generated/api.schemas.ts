@@ -592,6 +592,11 @@ export interface ExchangePaymentMethod {
   feeBps?: number;
   /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
   fixedFee?: string;
+  /**
+     * Administrator-maintained sandbox reserve metadata in fiat currency. No funds exist and this does not affect quotes or execution.
+     * @pattern ^\d{1,18}(\.\d{1,18})?$
+     */
+  reserve?: string;
 }
 
 export type ExchangeProviderStatus = typeof ExchangeProviderStatus[keyof typeof ExchangeProviderStatus];
@@ -737,10 +742,26 @@ export const ExchangeStatusInputStatus = {
   failed: 'failed',
 } as const;
 
+/**
+ * Status observed when reviewing an update. Reject with conflict if another administrator changed the order.
+ */
+export type ExchangeStatusInputExpectedStatus = typeof ExchangeStatusInputExpectedStatus[keyof typeof ExchangeStatusInputExpectedStatus];
+
+
+export const ExchangeStatusInputExpectedStatus = {
+  pending: 'pending',
+  processing: 'processing',
+  completed: 'completed',
+  cancelled: 'cancelled',
+  failed: 'failed',
+} as const;
+
 export interface ExchangeStatusInput {
   status: ExchangeStatusInputStatus;
   /** @maxLength 500 */
   note: string;
+  /** Status observed when reviewing an update. Reject with conflict if another administrator changed the order. */
+  expectedStatus?: ExchangeStatusInputExpectedStatus;
 }
 
 export interface ExchangeOrderEvent {

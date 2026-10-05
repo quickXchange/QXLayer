@@ -1066,6 +1066,10 @@ components:
         maximum: {type: ["string", "null"], pattern: '^\d{1,18}(\.\d{1,18})?$'}
         feeBps: {type: integer, minimum: 0, maximum: 5000}
         fixedFee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        reserve:
+          type: string
+          pattern: '^\d{1,18}(\.\d{1,18})?$'
+          description: Administrator-maintained sandbox reserve metadata in fiat currency. No funds exist and this does not affect quotes or execution.
     ExchangeProvider:
       type: object
       required: [id, name, category, status, functional, credentialSupport, capabilities]
@@ -1168,6 +1172,10 @@ components:
       properties:
         status: {type: string, enum: [pending, processing, completed, cancelled, failed]}
         note: {type: string, maxLength: 500}
+        expectedStatus:
+          type: string
+          enum: [pending, processing, completed, cancelled, failed]
+          description: Status observed when reviewing an update. Reject with conflict if another administrator changed the order.
     ExchangeOrderEvent:
       type: object
       required: [status, at, note]

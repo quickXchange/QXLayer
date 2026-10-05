@@ -17,7 +17,7 @@ import { useInvalidateTenant } from '@/lib/invalidate';
 import { stamp } from '@/lib/format';
 import { Pick, SimNote } from './ui';
 import { NEXT, OrderStatus } from './order-status';
-import { BulkBar, BulkBtn, DataTable, Logo, useSelection } from './bulk';
+import { BulkBar, BulkBtn, DataTable, Logo, useConfirm, useSelection } from './bulk';
 import { isCalendarDate } from './ui-validate';
 
 const ALL = 'all';
@@ -35,7 +35,7 @@ function useRefresh(tenantId: string) {
 }
 
 export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; canEdit: boolean; orderId?: string }) {
-  const [, nav] = useLocation(); const { toast } = useToast(); const refresh = useRefresh(tenantId);
+  const qc = useQueryClient(); const [, nav] = useLocation(); const { toast } = useToast(); const refresh = useRefresh(tenantId);
   const m = useUpdateExchangeOrderStatus();
   const [text, setText] = useState(''); const [search, setSearch] = useState('');
   const [status, setStatus] = useState(ALL); const [action, setAction] = useState(ALL);
@@ -52,20 +52,23 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   const q = useListExchangeOrders(tenantId, params, { query: { queryKey: getListExchangeOrdersQueryKey(tenantId, params), placeholderData: keepPreviousData } });
   const d = q.data;
   const orders = d?.orders ?? [];
-  const sel = useSelection(orders.map((o) => o.id));
+  const stale = q.isFetching;
+  const sel = useSelection(stale ? [] : orders.map((o) => o.id));
+  const [snap, setSnap] = useState<{ id: string; status: string }[]>([]);
   const pages = d ? Math.max(1, Math.ceil(d.total / d.pageSize)) : 1;
-  const chosen = orders.filter((o) => sel.has(o.id));
+  const chosen = stale ? [] : orders.filter((o) => sel.has(o.id));
   const allowed = chosen.length === 0 ? [] : (NEXT[chosen[0].status] ?? []).filter((s) => chosen.every((o) => (NEXT[o.status] ?? []).includes(s)));
+  const snapshotAllowed = snap.length === 0 ? [] : (NEXT[snap[0].status] ?? []).filter((s) => snap.every((o) => (NEXT[o.status] ?? []).includes(s)));
   const reset = () => { setPage(1); sel.clear(); };
   const close = () => { setOpenId(null); if (orderId) nav(`/clients/${tenantId}/exchange/orders`); };
   const run = async () => {
-    if (busy) return; setBusy(true); setFailures([]);
+    if (busy || !canEdit || snap.length === 0 || !snapshotAllowed.includes(target)) return; setBusy(true); setFailures([]);
     const bad: string[] = []; let ok = 0;
-    for (const o of chosen) {
-      try { await m.mutateAsync({ tenantId, orderId: o.id, data: { status: target as 'processing', note: `Bulk: Mark ${target}. ${note.trim()}`.trim().slice(0, 500) } }); ok++; }
-      catch (e) { bad.push(`${o.id.slice(0, 8)}: ${(e as Error)?.message ?? 'rejected'}`); }
+    for (const o of snap) {
+      try { await m.mutateAsync({ tenantId, orderId: o.id, data: { status: target as 'processing', expectedStatus: o.status as 'pending', note: `Bulk: Mark ${target}. ${note.trim()}`.trim().slice(0, 500) } }); ok++; }
+      catch (e) { bad.push(`${o.id}: ${(e as Error)?.message ?? 'rejected'}`); }
     }
-    setBusy(false); setStep(null); setNote(''); setFailures(bad); sel.clear(); refresh();
+    setBusy(false); setStep(null); setNote(''); setFailures(bad); sel.clear(); refresh(); snap.forEach((o) => qc.invalidateQueries({ queryKey: getGetExchangeOrderQueryKey(tenantId, o.id) }));
     toast({ title: bad.length ? `${ok} updated, ${bad.length} failed` : `${ok} order${ok === 1 ? '' : 's'} marked ${target}`, description: bad.length ? 'See the failure list above the table.' : undefined, variant: bad.length ? 'destructive' : undefined });
   };
   return (
@@ -84,16 +87,17 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
          <label className="text-xs text-muted-foreground">From<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-from" value={from} onChange={(e) => { setFrom(e.target.value); setDateError(''); }} /></label>
          <label className="text-xs text-muted-foreground">To<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-to" value={to} onChange={(e) => { setTo(e.target.value); setDateError(''); }} /></label>
         <Button data-testid="button-order-search">Search</Button>
+        <Button type="button" variant="ghost" data-testid="button-order-reset" onClick={() => { setText(''); setSearch(''); setStatus(ALL); setAction(ALL); setCustomer(ALL); setFrom(''); setTo(''); setRange({ from: '', to: '' }); setDateError(''); reset(); }}>Reset</Button>
       </form>
        {dateError && <p role="alert" data-testid="text-order-date-error" className="text-sm text-destructive">{dateError}</p>}
-      {failures.length > 0 && <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-bulk-failures"><p className="font-medium">{failures.length} order{failures.length === 1 ? '' : 's'} failed</p><ul className="font-mono text-xs">{failures.map((f) => <li key={f}>{f}</li>)}</ul></div>}
+      {failures.length > 0 && <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-bulk-failures"><p className="font-medium">{failures.length} order{failures.length === 1 ? '' : 's'} failed (others succeeded and lists were refreshed)</p><ul className="break-all font-mono text-xs">{failures.map((f) => <li key={f}>{f}</li>)}</ul></div>}
       {q.isLoading ? <ListSkeleton /> : q.isError || !d ? <ErrorState what="orders" onRetry={() => q.refetch()} /> : orders.length === 0 ? <EmptyState title="No orders match" body="Adjust the filters, or wait for simulated orders from this tenant's widget." /> : (
         <>
           <BulkBar sel={sel} noun="orders" locked={!canEdit} testid="orders">
-            <BulkBtn sel={sel} locked={!canEdit || allowed.length === 0} testid="button-bulk-status-orders" onClick={() => { setTarget(allowed[0]); setStep('form'); }}>Update status</BulkBtn>
+            <BulkBtn sel={sel} locked={!canEdit || stale || allowed.length === 0} testid="button-bulk-status-orders" onClick={() => { setSnap(chosen.map((o) => ({ id: o.id, status: o.status }))); setTarget(allowed[0]); setStep('form'); }}>Update status</BulkBtn>
           </BulkBar>
           {sel.count > 0 && allowed.length === 0 && <p className="text-xs text-muted-foreground" data-testid="text-no-common-status">The selected orders share no allowed next status (terminal orders cannot be reopened).</p>}
-           <DataTable testid="order" rows={orders} getId={(o) => o.id} sel={sel} locked={!canEdit} onRowClick={(o) => setOpenId(o.id)} cols={[
+           <DataTable testid="order" rows={orders} getId={(o) => o.id} sel={sel} locked={!canEdit} selectionLocked={stale || busy} onRowClick={(o) => setOpenId(o.id)} cols={[
             { h: 'Order', cell: (o) => <button type="button" className="font-mono text-xs text-copper hover:underline" data-testid={`link-order-${o.id}`} onClick={() => setOpenId(o.id)}>{o.id.slice(0, 8)}</button> },
             { h: 'Type', cell: (o) => <span className="capitalize">{o.action}</span> },
             { h: 'Customer', cell: (o) => <span className="text-xs">{o.customerName || 'Anonymous'}</span> },
@@ -103,20 +107,20 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
             { h: 'Created', cell: (o) => <span className="font-mono text-xs text-muted-foreground">{stamp(o.createdAt)}</span> },
             { h: 'Open', cell: (o) => <Button size="sm" variant="outline" data-testid={`button-open-order-${o.id}`} onClick={() => setOpenId(o.id)}>Details</Button> },
           ]} />
-          <div className="flex items-center justify-between text-sm"><span className="font-mono text-xs text-muted-foreground" data-testid="text-order-total">{d.total} orders, page {d.page} of {pages}</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm"><span className="font-mono text-xs text-muted-foreground" data-testid="text-order-total">{d.total} orders, page {d.page} of {pages}</span>
             <div className="flex gap-2"><Button variant="outline" size="sm" data-testid="button-page-prev" disabled={page <= 1} onClick={() => { setPage(page - 1); sel.clear(); }}>Previous</Button><Button variant="outline" size="sm" data-testid="button-page-next" disabled={page >= pages} onClick={() => { setPage(page + 1); sel.clear(); }}>Next</Button></div></div>
         </>)}
       <Dialog open={step !== null} onOpenChange={(v) => { if (!v && !busy) setStep(null); }}>
         <DialogContent data-testid="dialog-bulk-status">
-          <DialogHeader><DialogTitle>Update {chosen.length} order{chosen.length === 1 ? '' : 's'}</DialogTitle><DialogDescription>Simulated workflow only. Only statuses allowed for every selected order are offered. Orders are updated one by one.</DialogDescription></DialogHeader>
+          <DialogHeader><DialogTitle>Update {snap.length} order{snap.length === 1 ? '' : 's'}</DialogTitle><DialogDescription>Simulated workflow only. Only statuses allowed for every selected order are offered. Orders are updated one by one.</DialogDescription></DialogHeader>
           {step === 'form' ? (
-            <div className="space-y-3"><Pick testid="select-bulk-status" value={target} onChange={setTarget} options={allowed.map((s) => [s, `Mark ${s}`] as [string, string])} />
+            <div className="space-y-3"><Pick testid="select-bulk-status" value={target} onChange={setTarget} options={snapshotAllowed.map((s) => [s, `Mark ${s}`] as [string, string])} />
               <Textarea data-testid="input-bulk-note" maxLength={450} placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} /></div>
           ) : (
-            <div className="space-y-1 text-sm" data-testid="text-bulk-preview"><p>Orders: <b>{chosen.length}</b></p><p>New status: <b className="capitalize">{target}</b></p><p>Note: {note.trim() || 'none'}</p></div>)}
+            <div className="space-y-1 text-sm" data-testid="text-bulk-preview"><p>Orders: <b>{snap.length}</b> (selection captured at review; a changed order is rejected, not overwritten)</p><ul className="max-h-32 overflow-y-auto font-mono text-xs">{snap.map((o) => <li key={o.id}>{o.id} ({o.status} to {target})</li>)}</ul>{(target === 'cancelled' || target === 'failed') && <p className="font-medium text-destructive" data-testid="text-bulk-destructive">Destructive: {target} orders can never be reopened.</p>}<p>New status: <b className="capitalize">{target}</b></p><p>Note: {note.trim() || 'none'}</p></div>)}
           <DialogFooter>
             <Button variant="ghost" disabled={busy} onClick={() => (step === 'review' ? setStep('form') : setStep(null))}>{step === 'review' ? 'Back' : 'Cancel'}</Button>
-            {step === 'form' ? <Button data-testid="button-bulk-review" disabled={!target} onClick={() => setStep('review')}>Review</Button> : <Button data-testid="button-bulk-apply" disabled={busy} onClick={run}>{busy ? 'Applying' : `Apply to ${chosen.length}`}</Button>}
+            {step === 'form' ? <Button data-testid="button-bulk-review" disabled={!target || !canEdit} onClick={() => setStep('review')}>Review</Button> : <Button data-testid="button-bulk-apply" variant={target === 'cancelled' || target === 'failed' ? 'destructive' : 'default'} disabled={busy || !canEdit} onClick={run}>{busy ? 'Applying' : `Confirm and apply to ${snap.length}`}</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -132,7 +136,7 @@ function Row({ l, v }: { l: string; v: React.ReactNode }) {
 export function OrderDrawer({ tenantId, orderId, canEdit, onClose }: { tenantId: string; orderId: string | null; canEdit: boolean; onClose: () => void }) {
   return (
     <Sheet open={!!orderId} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-xl" data-testid="drawer-order">
+      <SheetContent className="w-full max-w-none overflow-y-auto sm:max-w-xl" data-testid="drawer-order">
         {orderId && <DrawerBody key={orderId} tenantId={tenantId} orderId={orderId} canEdit={canEdit} />}
       </SheetContent>
     </Sheet>
@@ -144,7 +148,7 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
   const key = getGetExchangeOrderQueryKey(tenantId, orderId);
   const q = useGetExchangeOrder(tenantId, orderId, { query: { queryKey: key } });
   const cfg = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
-  const m = useUpdateExchangeOrderStatus();
+  const m = useUpdateExchangeOrderStatus(); const [ask, confirmNode] = useConfirm(!canEdit);
   const [note, setNote] = useState('');
   const o: ExchangeOrder | undefined = q.data;
   const next = o ? NEXT[o.status] ?? [] : [];
@@ -153,7 +157,7 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
     const c = cfg.data?.catalog.find((x) => x.assetNetworkId === id);
     return { sym, net: c?.networkName ?? 'Unknown network', logo: cfg.data?.configuration.assets.find((a) => a.assetId === c?.assetId)?.logoUrl ?? null };
   };
-  const go = (status: string) => { if (m.isPending) return; m.mutate({ tenantId, orderId, data: { status: status as 'processing', note: note.trim() } }, {
+  const go = (status: string) => { if (m.isPending || !o || !canEdit || q.isFetching) return; const seen = o.status; m.mutate({ tenantId, orderId, data: { status: status as 'processing', expectedStatus: seen as 'pending', note: note.trim() } }, {
     onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); setNote(''); toast({ title: `Order marked ${status}` }); },
     onError: (e) => toast({ title: 'Status change failed', description: (e as Error).message, variant: 'destructive' }),
   }); };
@@ -186,9 +190,10 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
               <section className="space-y-2 rounded-md border bg-card p-4"><h3 className="font-display text-xl">Update status</h3>
                 <p className="text-xs text-muted-foreground">Simulated workflow only. No funds move.</p>
                 <Textarea data-testid="input-status-note" maxLength={500} placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
-                <div className="flex flex-wrap gap-2">{next.map((s) => <Button key={s} data-testid={`button-status-${s}`} variant={s === 'completed' || s === 'processing' ? 'default' : 'outline'} disabled={m.isPending} onClick={() => go(s)}>Mark {s}</Button>)}</div></section>)}
+                <div className="flex flex-wrap gap-2">{next.map((s) => <Button key={s} data-testid={`button-status-${s}`} variant={s === 'completed' || s === 'processing' ? 'default' : 'outline'} disabled={m.isPending || q.isFetching} onClick={() => (s === 'cancelled' || s === 'failed' ? ask({ title: `Mark order ${o?.id.slice(0, 8)} ${s}?`, destructive: true, label: `Mark ${s}`, body: <p>Order {o?.id} moves from {o?.status} to {s}. This cannot be reopened. Sandbox only, no funds move.</p>, run: async () => { await new Promise<void>((res, rej) => { if (!o) return rej(new Error('Order missing')); m.mutate({ tenantId, orderId, data: { status: s as 'processing', expectedStatus: o.status as 'pending', note: note.trim() } }, { onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); setNote(''); res(); }, onError: (e) => rej(e) }); }); return <p>Order marked {s}.</p>; } }) : go(s))}>Mark {s}</Button>)}</div></section>)}
           </>)}
       </div>
+      {confirmNode}
     </>
   );
 }

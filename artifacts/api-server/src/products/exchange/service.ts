@@ -107,7 +107,8 @@ export async function publicExchange(slug: string) {
     const actions = ACTIONS.filter(a => enabled && s.actions[a] && e.features[a]);
     const endpointEnabled = (id: string) => id === `fiat:${s.fiatCurrency}` || catalog.some(c => c.assetNetworkId === id && assets.some(a => a.assetId === c.assetId && a.networkId === c.networkId));
     return { enabled, defaultAction: s.defaultAction, actions, assets, routes: s.routes.filter(r => r.enabled && actions.includes(r.action) && endpointEnabled(r.source) && endpointEnabled(r.destination)),
-      paymentMethods: s.paymentMethods.filter(m => m.enabled), fiatCurrency: s.fiatCurrency, publicNote: s.publicNote };
+      // Keep administrator-only reserve metadata out of the unchanged public view.
+      paymentMethods: s.paymentMethods.filter(m => m.enabled).map(({ reserve: _reserve, ...method }) => method), fiatCurrency: s.fiatCurrency, publicNote: s.publicNote };
   });
 }
 function quoteAdmission(e: EffectiveEntitlements, volume: string) {
@@ -191,6 +192,7 @@ export function tenantOrder(principal: Principal, tenantId: string, id: string, 
     if (input) { await lockTenant(client, tenantId); requireFeature(await resolveEntitlements(client, tenantId), "crypto_exchange"); }
     const row = await orderRow(client, tenantId, id, !!input);
     if (input) {
+      if (input.expectedStatus !== undefined && input.expectedStatus !== row.status) throw new HttpError(409, "This order changed after review. Refresh its details and review again.");
       const next: Record<string, string[]> = { pending: ["processing", "cancelled", "failed"], processing: ["completed", "cancelled", "failed"], completed: [], cancelled: [], failed: [] };
       if (!(next[row.status] ?? []).includes(input.status)) throw new HttpError(409, "This sandbox status transition is not allowed. Terminal orders cannot be reopened.");
       row.request.history.push({ status: input.status, at: new Date().toISOString(), note: input.note || "Status updated by tenant administrator (simulation only)." });

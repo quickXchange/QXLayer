@@ -39,4 +39,9 @@ export interface ExchangePaymentMethod {
   feeBps?: number;
   /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
   fixedFee?: string;
+  /**
+     * Administrator-maintained sandbox reserve metadata in fiat currency. No funds exist and this does not affect quotes or execution.
+     * @pattern ^\d{1,18}(\.\d{1,18})?$
+     */
+  reserve?: string;
 }

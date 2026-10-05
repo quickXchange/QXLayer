@@ -5,10 +5,13 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { ExchangeStatusInputExpectedStatus } from './exchangeStatusInputExpectedStatus';
 import type { ExchangeStatusInputStatus } from './exchangeStatusInputStatus';
 
 export interface ExchangeStatusInput {
   status: ExchangeStatusInputStatus;
   /** @maxLength 500 */
   note: string;
+  /** Status observed when reviewing an update. Reject with conflict if another administrator changed the order. */
+  expectedStatus?: ExchangeStatusInputExpectedStatus;
 }

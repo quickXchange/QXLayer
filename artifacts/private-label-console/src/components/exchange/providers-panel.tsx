@@ -5,16 +5,21 @@ import { Switch } from '@/components/ui/switch';
 import { Section } from '@/components/app/sections';
 import type { ExchangeProvider, ExchangeProviderConfiguration } from '@workspace/api-client-react';
 import { DraftFooter, Field, SimNote } from './ui';
-import { EditDrawer, StatusPill } from './bulk';
+import { EditDrawer, FilterBar, NoMatch, StatusPill } from './bulk';
+import { Pick } from './ui';
 import { useStaged } from './bulk';
 import type { ExchangeDraft } from './use-exchange-draft';
 
-const STATUS: Record<string, string> = { sandbox: 'Functional (sandbox)', configuration_only: 'Configuration only', coming_soon: 'Coming soon' };
+const STATUS: Record<string, string> = { sandbox: 'Sandbox only', configuration_only: 'Configuration only', coming_soon: 'Coming soon' };
 
 export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }) {
   const staged = useStaged();
   const s = d.draft!;
-  const cat = d.providerCatalog;
+  const [q, setQ] = useState(''); const [ty, setTy] = useState('all'); const [stf, setStf] = useState('all');
+  const all = d.providerCatalog;
+  const types = [...new Set(all.map((p) => p.category))];
+  const cat = all.filter((p) => (ty === 'all' || p.category === ty) && (stf === 'all' || p.status === stf) && `${p.name} ${p.capabilities.join(' ')}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const resetF = () => { setQ(''); setTy('all'); setStf('all'); };
   const [edit, setEdit] = useState<{ p: ExchangeProvider; c: ExchangeProviderConfiguration } | null>(null);
   const cfgOf = (id: string): ExchangeProviderConfiguration => (s.providers ?? []).find((x) => x.providerId === id) ?? { providerId: id, enabled: false };
   const upsert = (c: ExchangeProviderConfiguration) => { const cur = s.providers ?? []; d.patch({ providers: cur.some((x) => x.providerId === c.providerId) ? cur.map((x) => (x.providerId === c.providerId ? c : x)) : [...cur, c] }); };
@@ -22,8 +27,12 @@ export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolea
     <Section n="X7" title="Providers / Integrations" note="Provider catalog supplied by the platform. This section stores a label, a public HTTPS endpoint and an enabled flag only." footer={<DraftFooter d={d} locked={locked} />}>
       <SimNote />
       <p className="rounded-md border p-3 text-xs text-muted-foreground" data-testid="text-provider-notice">No API credentials are accepted until a secure real adapter exists. Enabling a provider here is metadata only: it does not connect, quote, or execute anything. Every quote remains manual and sandbox.</p>
-      {cat.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-providers">The provider catalog is not available.</p> : (
-        <div className="overflow-x-auto rounded-md border bg-card"><table className="w-full min-w-[720px] text-left text-sm">
+      <FilterBar noun="providers" search={q} onSearch={setQ} placeholder="Search provider or capability" shown={cat.length} total={all.length} onReset={resetF} active={q !== '' || ty !== 'all' || stf !== 'all'}>
+        <div className="w-44"><Pick testid="select-provider-type" value={ty} onChange={setTy} options={[['all', 'Any type'], ...types.map((t) => [t, t.replace(/_/g, ' ')] as [string, string])]} /></div>
+        <div className="w-48"><Pick testid="select-provider-state" value={stf} onChange={setStf} options={[['all', 'Any state'], ...Object.entries(STATUS)]} /></div>
+      </FilterBar>
+      {all.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-providers">The provider catalog is not available.</p> : cat.length === 0 ? <NoMatch noun="providers" onReset={resetF} /> : (
+        <div className="max-w-full min-w-0 overflow-x-auto rounded-md border bg-card"><table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b font-mono text-[10px] uppercase tracking-wider text-muted-foreground"><tr>{['Provider', 'Type', 'Status', 'Connection', 'Capabilities', 'Enabled', 'Configure'].map((h) => <th key={h} className="px-3 py-2 font-normal">{h}</th>)}</tr></thead>
           <tbody className="divide-y">{cat.map((p) => { const c = cfgOf(p.id); const soon = p.status === 'coming_soon'; return (
             <tr key={p.id} data-testid={`row-provider-${p.id}`}>
