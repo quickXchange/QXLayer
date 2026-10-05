@@ -1,0 +1,701 @@
+{
+  "date": "2026-10-05",
+  "environment": "development-only",
+  "scope": [
+    "braces",
+    "uuid"
+  ],
+  "dispositions": {
+    "braces": "NOT EXPLOITABLE in current untrusted-input paths; unpatched",
+    "uuid": "NOT EXPLOITABLE in current private-file dependency chain; unpatched"
+  },
+  "changes": {
+    "applicationCode": false,
+    "authenticationAuthorization": false,
+    "tenantIsolation": false,
+    "databaseArchitecture": false,
+    "rls": false,
+    "dependencyManifests": false,
+    "lockfile": false,
+    "production": false,
+    "dns": false,
+    "published": false,
+    "addedDevelopmentExposureCheck": true
+  },
+  "registryMetadata": [
+    {
+      "compatible": "3.0.3",
+      "compatibleDependencies": {
+        "fill-range": "^7.1.1"
+      },
+      "latest": "3.0.3",
+      "latestDependencies": {
+        "fill-range": "^7.1.1"
+      },
+      "latestEngines": {
+        "node": ">=8"
+      },
+      "name": "braces",
+      "published": "2024-05-21T08:59:11.390Z"
+    },
+    {
+      "compatible": "4.0.8",
+      "compatibleDependencies": {
+        "braces": "^3.0.3",
+        "picomatch": "^2.3.1"
+      },
+      "latest": "4.0.8",
+      "latestDependencies": {
+        "braces": "^3.0.3",
+        "picomatch": "^2.3.1"
+      },
+      "latestEngines": {
+        "node": ">=8.6"
+      },
+      "name": "micromatch",
+      "published": "2024-08-23T16:31:18.748Z"
+    },
+    {
+      "compatible": "4.2.0",
+      "compatibleDependencies": {
+        "debug": "^4.4.3",
+        "httpxy": "^0.5.4",
+        "is-glob": "^4.0.3",
+        "is-plain-obj": "^4.1.0",
+        "micromatch": "^4.0.8"
+      },
+      "latest": "4.2.0",
+      "latestDependencies": {
+        "debug": "^4.4.3",
+        "httpxy": "^0.5.4",
+        "is-glob": "^4.0.3",
+        "is-plain-obj": "^4.1.0",
+        "micromatch": "^4.0.8"
+      },
+      "latestEngines": {
+        "node": "^22.15.0 || ^24.0.0 || >=26.0.0"
+      },
+      "name": "http-proxy-middleware",
+      "published": "2026-07-04T21:49:09.221Z"
+    },
+    {
+      "compatible": "3.3.3",
+      "compatibleDependencies": {
+        "@nodelib/fs.stat": "^2.0.2",
+        "@nodelib/fs.walk": "^1.2.3",
+        "glob-parent": "^5.1.2",
+        "merge2": "^1.3.0",
+        "micromatch": "^4.0.8"
+      },
+      "latest": "3.3.3",
+      "latestDependencies": {
+        "@nodelib/fs.stat": "^2.0.2",
+        "@nodelib/fs.walk": "^1.2.3",
+        "glob-parent": "^5.1.2",
+        "merge2": "^1.3.0",
+        "micromatch": "^4.0.8"
+      },
+      "latestEngines": {
+        "node": ">=8.6.0"
+      },
+      "name": "fast-glob",
+      "published": "2025-01-05T10:38:42.236Z"
+    },
+    {
+      "compatible": "9.0.1",
+      "latest": "14.0.2",
+      "name": "uuid",
+      "published": "2023-09-12T08:56:35.205Z"
+    },
+    {
+      "compatible": "6.7.1",
+      "compatibleDependencies": {
+        "extend": "^3.0.2",
+        "https-proxy-agent": "^7.0.1",
+        "is-stream": "^2.0.0",
+        "node-fetch": "^2.6.9",
+        "uuid": "^9.0.1"
+      },
+      "latest": "8.1.0",
+      "latestDependencies": {
+        "extend": "^3.0.2",
+        "https-proxy-agent": "^7.0.1",
+        "node-fetch": "^3.3.2"
+      },
+      "latestEngines": {
+        "node": ">=22"
+      },
+      "name": "gaxios",
+      "published": "2024-08-13T21:48:17.716Z"
+    },
+    {
+      "compatible": "9.15.1",
+      "compatibleDependencies": {
+        "base64-js": "^1.3.0",
+        "ecdsa-sig-formatter": "^1.0.11",
+        "gaxios": "^6.1.1",
+        "gcp-metadata": "^6.1.0",
+        "gtoken": "^7.0.0",
+        "jws": "^4.0.0"
+      },
+      "latest": "11.1.0",
+      "latestDependencies": {
+        "base64-js": "^1.3.0",
+        "ecdsa-sig-formatter": "^1.0.11",
+        "gaxios": "^7.1.4",
+        "gcp-metadata": "^9.0.0",
+        "google-logging-utils": "^2.0.0",
+        "jws": "^4.0.0"
+      },
+      "latestEngines": {
+        "node": ">=22"
+      },
+      "name": "google-auth-library",
+      "published": "2025-01-24T16:30:40.365Z"
+    },
+    {
+      "compatible": "8.2.0",
+      "compatibleDependencies": {
+        "@google-cloud/paginator": "^7.0.1",
+        "@google-cloud/projectify": "^6.0.1",
+        "@google-cloud/promisify": "^6.0.1",
+        "abort-controller": "^3.0.0",
+        "async-retry": "^1.3.3",
+        "duplexify": "^4.1.3",
+        "fast-xml-parser": "^5.3.4",
+        "gaxios": "^6.0.2",
+        "google-auth-library": "^9.6.3",
+        "html-entities": "^2.5.2",
+        "mime": "^3.0.0",
+        "p-limit": "^3.0.1",
+        "retry-request": "^9.0.1",
+        "teeny-request": "^11.0.1"
+      },
+      "latest": "8.2.0",
+      "latestDependencies": {
+        "@google-cloud/paginator": "^7.0.1",
+        "@google-cloud/projectify": "^6.0.1",
+        "@google-cloud/promisify": "^6.0.1",
+        "abort-controller": "^3.0.0",
+        "async-retry": "^1.3.3",
+        "duplexify": "^4.1.3",
+        "fast-xml-parser": "^5.3.4",
+        "gaxios": "^6.0.2",
+        "google-auth-library": "^9.6.3",
+        "html-entities": "^2.5.2",
+        "mime": "^3.0.0",
+        "p-limit": "^3.0.1",
+        "retry-request": "^9.0.1",
+        "teeny-request": "^11.0.1"
+      },
+      "latestEngines": {
+        "node": ">=22"
+      },
+      "name": "@google-cloud/storage",
+      "published": "2026-09-17T15:33:39.499Z"
+    }
+  ],
+  "dependencyScan": {
+    "metadata": {
+      "vulnerabilities": {
+        "critical": 0,
+        "high": 2,
+        "info": 0,
+        "low": 0,
+        "moderate": 0
+      }
+    },
+    "vulnerabilities": [
+      {
+        "affectedVersions": {
+          "ranges": [
+            {
+              "introduced": "0",
+              "lastAffected": "3.0.3"
+            }
+          ]
+        },
+        "details": {
+          "aliases": [
+            "CVE-2026-93687"
+          ],
+          "description": "braces through 3.0.3 contains a stack overflow vulnerability in the recursive AST walkers that lack depth guards. Attackers can supply deeply nested brace patterns under the character limit to exhaust the call stack and terminate the Node.js process with an uncaught RangeError.",
+          "references": [
+            {
+              "type": "ADVISORY",
+              "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-93687"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/micromatch/braces/issues/70"
+            },
+            {
+              "type": "PACKAGE",
+              "url": "https://github.com/micromatch/braces"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/micromatch/braces/blob/3.0.3/lib/compile.js#L49-L53"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/micromatch/braces/blob/3.0.3/lib/expand.js#L102-L105"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/micromatch/braces/blob/3.0.3/lib/parse.js#L38-L40"
+            },
+            {
+              "type": "WEB",
+              "url": "https://www.vulncheck.com/advisories/braces-through-3.0.3-stack-overflow-via-deeply-nested-patterns"
+            }
+          ],
+          "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns"
+        },
+        "id": "GHSA-vfj7-8cjw-p6xm@braces-3.0.3",
+        "package": {
+          "ecosystem": "npm",
+          "name": "braces",
+          "purl": "pkg:npm/braces",
+          "version": "3.0.3"
+        },
+        "severity": {
+          "level": "high",
+          "type": "CVSS_V3",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        "source": {
+          "scannedAt": "2026-10-05T16:22:27.957Z",
+          "scanner": "osv-scanner"
+        }
+      },
+      {
+        "affectedVersions": {
+          "ranges": [
+            {
+              "fixed": "11.1.1",
+              "introduced": "0"
+            }
+          ]
+        },
+        "details": {
+          "aliases": [
+            "CVE-2026-41907",
+            "CVE-2026-41988"
+          ],
+          "description": "### Summary\n\nThe `v3()`, `v5()`, and `v6()` [API methods](https://github.com/uuidjs/uuid#api-summary) (not `uuid` release versions) accept external output buffers but do not reject out-of-range writes (small `buf` or large `offset`).  \nBy contrast, `v4()`, `v1()`, and `v7()` API methods explicitly throw `RangeError` on invalid bounds.\n\nThis inconsistency allows **silent partial writes** into caller-provided buffers.\n\n\n### Affected code\n\n- `src/v35.ts` (`v3()`/`v5()` path) writes `buf[offset + i]` without bounds validation.\n- `src/v6.ts` writes `buf[offset + i]` without bounds validation.\n\n### Reproducible PoC\n\n```bash\ncd /home/StrawHat/uuid\nnpm ci\nnpm run build\n\nnode --input-type=module -e \"\nimport {v4,v5,v6} from './dist-node/index.js';\nconst ns='6ba7b810-9dad-11d1-80b4-00c04fd430c8';\nfor (const [name,fn] of [\n  ['v4()',()=>v4({},new Uint8Array(8),4)],\n  ['v5()',()=>v5('x',ns,new Uint8Array(8),4)],\n  ['v6()',()=>v6({},new Uint8Array(8),4)],\n]) {\n  try { fn(); console.log(name,'NO_THROW'); }\n  catch(e){ console.log(name,'THREW',e.name); }\n}\"\n```\n\nObserved:\n\n- `v4() THREW RangeError`\n- `v5() NO_THROW`\n- `v6() NO_THROW`\n\nExample partial overwrite evidence captured during audit:\n\n```text\nsame true buf [\n  170, 170, 170, 170,\n   75, 224, 100,  63\n]\nv6 [\n  187, 187, 187, 187,\n   31,  19, 185,  64\n]\n```\n\n### Security impact\n\n- **Primary**: integrity/robustness issue (silent partial output).\n- If an application assumes full UUID writes into preallocated buffers, this can produce malformed/truncated/partially stale identifiers without error.\n- In systems where caller-controlled offsets/buffer sizes are exposed indirectly, this may become a security-relevant logic flaw.\n\n### Suggested fix\n\nAdd the same guard used by `v4()`/`v1()`/`v7()`:\n\n```ts\nif (offset < 0 || offset + 16 > buf.length) {\n  throw new RangeError(`UUID byte range ${offset}:${offset + 15} is out of buffer bounds`);\n}\n```\n\nApply to:\n\n- `src/v35.ts` (covers `v3()` and `v5()`)\n- `src/v6.ts`",
+          "references": [
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/security/advisories/GHSA-w5hq-g745-h8pq"
+            },
+            {
+              "type": "ADVISORY",
+              "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-41907"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/commit/32389c887c9e75f90442ee4cc95bbab0c4e8346e"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/commit/3d2c5b0342f0fcb52a5ac681c3d47c13e7444b34"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/commit/3d61d6ac1f782cf6b1dd8661c60f11722cd49a0d"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/commit/9d27ddf7046ce496ef39569ff84d948eeff9cb2a"
+            },
+            {
+              "type": "PACKAGE",
+              "url": "https://github.com/uuidjs/uuid"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/releases/tag/v11.1.1"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/releases/tag/v12.0.1"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/releases/tag/v13.0.1"
+            },
+            {
+              "type": "WEB",
+              "url": "https://github.com/uuidjs/uuid/releases/tag/v14.0.0"
+            }
+          ],
+          "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided"
+        },
+        "fix": {
+          "available": true,
+          "requiresMajorUpdate": true,
+          "version": "11.1.1"
+        },
+        "id": "GHSA-w5hq-g745-h8pq@uuid-9.0.1",
+        "package": {
+          "ecosystem": "npm",
+          "name": "uuid",
+          "purl": "pkg:npm/uuid",
+          "version": "9.0.1"
+        },
+        "severity": {
+          "level": "high",
+          "type": "CVSS_V3",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+        },
+        "source": {
+          "scannedAt": "2026-10-05T16:22:27.957Z",
+          "scanner": "osv-scanner"
+        }
+      }
+    ]
+  },
+  "exposureChecks": {
+    "proxyOptionsStatic": true,
+    "untrustedUrlVariants": 4,
+    "braceParserCalls": 0,
+    "previewGlobPatternsConstant": true,
+    "storageGaxiosConsumerPaths": 4,
+    "gaxiosUuidMethods": [
+      "v4"
+    ],
+    "multipartV4Calls": 1,
+    "callerProvidedBufferOrOffset": false,
+    "affectedUuidMethodCalls": 0,
+    "noNetworkAdapter": true
+  },
+  "checks": {
+    "workspaceTypecheck": "PASS",
+    "apiProductionBuild": "PASS",
+    "mainPlatformProductionBuild": "PASS",
+    "tenantWebsiteProductionBuild": "PASS",
+    "suites": {
+      "foundation": "PASS",
+      "landing-catalog": "PASS",
+      "exchange": "PASS",
+      "customer": "PASS",
+      "order-attachments": "PASS",
+      "multi-tenant-security": "PASS"
+    },
+    "comprehensiveAuthorizationChecks": 208,
+    "anonymousAuthentication": {
+      "environment": "development",
+      "checks": [
+        {
+          "method": "POST",
+          "path": "/api/catalog/products",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/customer/admin-panels",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/customer/white-label-catalog",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/customer/white-label-requests/:requestId",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/operator/white-label-requests/:requestId",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/operator/white-label-requests/:requestId/notes",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/customer/white-label-requests",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/customer/white-label-requests",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/operator/white-label-requests",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/operator/white-label-requests/:requestId/review",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/operator/white-label-requests/:requestId/provision",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/exchange",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/exchange",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/exchange/dashboard",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/exchange/audit",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/exchange/orders",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/exchange/orders/:orderId",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/exchange/orders/:orderId",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/landing-products",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/landing-products/:productKey",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/customer/order-attachments",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/customer/order-attachments/:id/content",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/entitlement-definitions",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/plans",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/plans",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/plans/:planId",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/plans/:planId",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/plans/:planId/duplicate",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/plans/:planId/status",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/add-ons",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/add-ons",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/add-ons/:addonId",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/subscription",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/subscription/plan",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/subscription/add-ons",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/subscription/overrides",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/suspension",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/website-settings",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/resources/:resourceType",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/tenants/:tenantId/resources/:resourceType",
+          "status": 401
+        },
+        {
+          "method": "DELETE",
+          "path": "/api/tenants/:tenantId/resources/:resourceType/:resourceId",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/me",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/overview",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/activity",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/administrators",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/tenants/:tenantId/administrators",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/administrators/:userId",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/staff/:userId/permissions",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/domain-verification",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/tenants/:tenantId/domain-verification",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId/products/:moduleKey/configuration",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/products/:moduleKey/configuration",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/tenants",
+          "status": 401
+        },
+        {
+          "method": "GET",
+          "path": "/api/tenants/:tenantId",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/brand",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/domain",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/modules",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/assets-networks",
+          "status": 401
+        },
+        {
+          "method": "PUT",
+          "path": "/api/tenants/:tenantId/configuration",
+          "status": 401
+        },
+        {
+          "method": "POST",
+          "path": "/api/tenants/:tenantId/launch",
+          "status": 401
+        }
+      ]
+    },
+    "signedInBrowserRerun": false,
+    "priorSignedInBrowserEvidence": "artifacts/api-server/.local/security-browser-results.json",
+    "safeToPublish": "NO: unconditional security sign-off withheld while two high advisories remain unpatched"
+  }
+}

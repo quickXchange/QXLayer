@@ -336,3 +336,17 @@ mtime_ms = 1791215084096
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/9e94f2e9-1ba8-4403-a57a-c8f93ab863b7/c04c4d11-fdd7-462e-bcc4-ce121f97ea55"
 storage_version_token = "1791215084645223"
 content_type = "text/html"
+
+[[outputs]]
+id = "hIGPXbA47d8mxLOFBrVR9"
+uri = "file://docs/dependency-advisory-review.html"
+type = "html"
+title = "braces and uuid — dependency security review"
+description = "Exact dependency chains, verified non-reachability, fresh regression/build results, and the remaining scanner findings. No runtime or dependency changes."
+logical_id = "e44d9408-8835-46bf-a6ea-0b7b04793d40"
+content_hash = "sha256:ad0018a9c84b625fd50cc896bda89044fb8dc3dfb1869c4f88ddfc1e25b5f2af"
+size = 11370
+mtime_ms = 1791217527313
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e44d9408-8835-46bf-a6ea-0b7b04793d40/5cad695d-0c52-47c5-8576-1b824adc8178"
+storage_version_token = "1791217555542344"
+content_type = "text/html"

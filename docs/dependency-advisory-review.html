@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QXLayer — braces and uuid security review</title>
+<style>
+body{font:16px/1.55 system-ui,sans-serif;color:#1e293b;max-width:1000px;margin:40px auto;padding:0 24px}
+h1,h2{line-height:1.2}table{width:100%;border-collapse:collapse;margin:20px 0}
+th,td{border:1px solid #cbd5e1;padding:12px;text-align:left;vertical-align:top}
+th{background:#f1f5f9}pre{background:#f1f5f9;padding:16px;overflow:auto;font-size:13px}
+.notice{padding:18px;background:#fff7ed;border:1px solid #fed7aa}code{font-size:14px}
+footer{font-size:13px;color:#475569}
+</style>
+</head>
+<body>
+<h1>braces and uuid dependency security review</h1>
+<p>QXLayer · 5 October 2026 · Development only</p>
+<table>
+<tr><th>Required result</th><th>Verdict</th></tr>
+<tr><td>BRACES</td><td><strong>NOT EXPLOITABLE in the current application.</strong> No untrusted pattern reaches its recursive walkers. No upstream patched release exists.</td></tr>
+<tr><td>UUID</td><td><strong>NOT EXPLOITABLE in the current application.</strong> The private-file dependency chain uses unaffected v4() without caller-provided buffers. A compatible supported update is unavailable.</td></tr>
+<tr><td>SECURITY REGRESSIONS</td><td><strong>PASS</strong> — all six suites, 208 comprehensive authorization checks, real private files, and 61 anonymous HTTP authentication checks.</td></tr>
+<tr><td>PRODUCTION BUILD</td><td><strong>PASS</strong> — workspace typecheck, API Server, main platform and tenant website.</td></tr>
+<tr><td>SAFE TO PUBLISH</td><td><strong>NO — unconditional security sign-off withheld.</strong> Both high-severity package advisories remain unpatched in the dependency scan. Non-reachability is documented, not represented as an upstream fix or clean scanner result.</td></tr>
+</table>
+<div class="notice">
+<strong>No dependency changes were made.</strong>
+<p>Registry checks confirmed that the installed affected packages and their compatible parents are already at their latest releases. Forcing incompatible dependencies or replacing authentication/file-storage machinery would exceed the requested scope. Nothing was suppressed, overridden, published or changed in production.</p>
+</div>
+
+<h2>1. braces</h2>
+<p><strong>Installed:</strong> braces 3.0.3. <strong>Advisory:</strong>
+<a href="https://github.com/advisories/GHSA-vfj7-8cjw-p6xm">GHSA-vfj7-8cjw-p6xm</a> / CVE-2026-93687, high severity.</p>
+<p>Deeply nested brace <em>patterns</em> can overflow recursive AST walkers during compilation/expansion. This is different from a URL or file name containing braces: those strings become vulnerable only if supplied as patterns to the affected functions.</p>
+<h3>Exact dependency paths</h3>
+<pre>@workspace/api-server
+  → http-proxy-middleware 4.2.0
+    → micromatch 4.0.8
+      → braces 3.0.3
+
+@workspace/mockup-sandbox (development dependency)
+  → fast-glob 3.3.3
+    → micromatch 4.0.8
+      → braces 3.0.3</pre>
+<h3>Exposure</h3>
+<ul>
+<li>The Clerk proxy uses a static options object with no pathFilter, router or spread configuration. The installed proxy library defaults pathFilter to the plain string <code>/</code>.</li>
+<li>The plain-string branch uses URL parsing and prefix comparison, not micromatch/braces. A request cannot supply a proxy filter through its URL, query, headers or body.</li>
+<li>Path rewriting removes the fixed <code>/api/__clerk</code> prefix with a developer-defined regular expression; the request is not a glob pattern.</li>
+<li>Preview discovery calls fast-glob with the constant pattern <code>src/components/mockups/**/*.tsx</code> and constant ignore patterns. HTTP requests can trigger a rescan, but do not supply or modify those patterns. Customer uploads go to private object storage, not the source directory.</li>
+</ul>
+<h3>Verification and smallest safe remedy</h3>
+<p>A new development-only check parses the proxy options and verifies the constant preview pattern. It instruments the installed braces module and calls the actual proxy filter with normal, deeply nested, encoded and query-string URL inputs. All four inputs remained on the plain-path branch; there were <strong>zero brace-parser calls</strong>.</p>
+<p>Public npm registry metadata confirms braces 3.0.3, micromatch 4.0.8, http-proxy-middleware 4.2.0 and fast-glob 3.3.3 are their latest releases. There is no patched release to install. No replacement matcher, dependency downgrade, local fork or scanner suppression was introduced.</p>
+<p><strong>Disposition:</strong> NOT EXPLOITABLE from untrusted customer input in the reviewed code. The package defect remains. Reassess if any code starts accepting user-defined glob/brace patterns or dynamic proxy filters.</p>
+
+<h2>2. uuid</h2>
+<p><strong>Installed:</strong> uuid 9.0.1. <strong>Advisory:</strong>
+<a href="https://github.com/uuidjs/uuid/security/advisories/GHSA-w5hq-g745-h8pq">GHSA-w5hq-g745-h8pq</a>
+/ CVE-2026-41907 and CVE-2026-41988, high severity.</p>
+<p>The affected functions are v3(), v5() and v6() when callers provide insufficient output buffers or invalid offsets. The advisory explicitly excludes v4(). Version 9 does not export v6(); its relevant affected functions are v3()/v5().</p>
+<h3>Exact private-file dependency paths</h3>
+<pre>@workspace/api-server → @google-cloud/storage 8.2.0
+  ├─ gaxios 6.7.1 → uuid 9.0.1
+  └─ google-auth-library 9.15.1
+     ├─ gaxios 6.7.1 → uuid 9.0.1
+     ├─ gcp-metadata 6.1.1 → gaxios 6.7.1 → uuid 9.0.1
+     └─ gtoken 7.1.0 → gaxios 6.7.1 → uuid 9.0.1</pre>
+<h3>Exposure</h3>
+<ul>
+<li>All four paths resolve to the same installed gaxios module. Its only uuid call is <code>v4()</code> to generate an internal multipart boundary. It passes no caller-provided buffer, offset or options.</li>
+<li>Private attachment IDs and object keys use Node's <code>crypto.randomUUID()</code>, not the vulnerable npm uuid functions.</li>
+<li>No application call to npm uuid v3()/v5()/v6(), and no upload field mapped to a UUID output buffer or offset, was found.</li>
+<li>The existing storage credentials, upload/download implementation, ownership filters and file-response protections were left unchanged.</li>
+</ul>
+<h3>Verification and smallest safe remedy</h3>
+<p>The new check inspects the actual installed gaxios source and instruments uuid exports. It exercises the real multipart serializer with a no-network adapter. The serializer generated one valid boundary via <code>v4()</code> with zero arguments; there were <strong>zero affected-function calls</strong>.</p>
+<p>The scanner's first fixed release is uuid 11.1.1, outside gaxios 6.7.1's supported <code>^9.0.1</code> range. Registry metadata confirms gaxios 6.7.1 and google-auth-library 9.15.1 are the latest compatible releases, and @google-cloud/storage 8.2.0 is the latest SDK. That SDK still specifies gaxios <code>^6.0.2</code> and google-auth-library <code>^9.6.3</code>.</p>
+<p>Newer gaxios/auth major versions exist, but forcing them under the current Storage SDK would cross its declared compatibility ranges and alter the HTTP/authentication chain. No major override or SDK replacement was applied merely to clear the scanner.</p>
+<p><strong>Disposition:</strong> NOT EXPLOITABLE through the reviewed private-file chain. The library vulnerability remains installed. Reassess if consumers introduce name-based UUIDs or caller-provided UUID buffers/offsets.</p>
+
+<h2>Checks rerun for this request</h2>
+<table>
+<tr><th>Check</th><th>Result</th></tr>
+<tr><td>Dependency security scan</td><td>Completed: 2 high, 0 critical, 0 moderate, 0 low. The same two findings remain; no suppression.</td></tr>
+<tr><td>Dependency exposure check</td><td>PASS — actual plain proxy filter and multipart serializer, plus source/chain guards.</td></tr>
+<tr><td>Workspace typecheck</td><td>PASS.</td></tr>
+<tr><td>API production build</td><td>PASS.</td></tr>
+<tr><td>Main platform production build</td><td>PASS.</td></tr>
+<tr><td>Tenant website production build</td><td>PASS.</td></tr>
+<tr><td>Foundation security suite</td><td>PASS — database-resolved roles/memberships, staff permissions/revocation/escalation, scopes, read-only transactions, constraints, entitlements and assignment rules.</td></tr>
+<tr><td>Landing catalog suite</td><td>PASS — Super-only edits, validation, public projection and immutable readiness.</td></tr>
+<tr><td>Exchange suite</td><td>PASS — tenant/capability isolation, quote signatures/expiry, staff write denial, idempotency and quota concurrency.</td></tr>
+<tr><td>Customer suite</td><td>PASS — customer ownership, operator review/provisioning, draft visibility and Admin Panel delivery/revocation.</td></tr>
+<tr><td>Private attachment suite</td><td>PASS — real private upload and byte-exact download, cross-owner denial, draft Super denial, submitted Super access, unsafe/spoofed file rejection and concurrent idempotency.</td></tr>
+<tr><td>Comprehensive multi-tenant suite</td><td>PASS — 208 checks, including foreign UUID reads/writes/deletes, cross-tenant configuration tampering, resource/staff IDs, downloads, internal notes and tenant-row fingerprints.</td></tr>
+<tr><td>Anonymous HTTP authentication</td><td>PASS — all 61 protected endpoint/method combinations returned 401.</td></tr>
+<tr><td>Visual smoke check</td><td>PASS — existing public platform rendered normally.</td></tr>
+</table>
+<p>Authentication was rechecked through the existing role/principal regressions and live anonymous HTTP requests. A second signed-in browser run was not performed: the earlier real-Clerk multi-context run remains supporting evidence, not a newly rerun result. No runtime dependency or authentication code changed.</p>
+<p>Only non-blocking bundle/chunk-size warnings occurred during these builds. Verification fixtures used fresh development identities/data and real private storage objects, and ran their cleanup paths. Domain-verification assertions used mocked lookups, not DNS changes.</p>
+
+<h2>Changes and reproduction</h2>
+<p>Added only a development verification script and this review/evidence. Dependency manifests, lockfile, application logic, authentication/authorization, tenant isolation, database architecture, RLS, production and DNS were not changed. No publication was attempted.</p>
+<pre># From the workspace root
+NODE_ENV=development node artifacts/api-server/src/verification/dependency-reachability.mjs
+pnpm run typecheck
+NODE_ENV=production pnpm --filter @workspace/api-server run build
+NODE_ENV=production PORT=24073 BASE_PATH=/ pnpm --filter @workspace/private-label-console run build
+NODE_ENV=production PORT=24270 BASE_PATH=/private-label-website/ pnpm --filter @workspace/private-label-website run build
+
+# Sequential, development only
+for suite in foundation landing-catalog exchange customer order-attachments multi-tenant-security; do
+  NODE_ENV=development pnpm --filter @workspace/api-server exec tsx src/verification/$suite.ts
+done
+pnpm why -r braces uuid</pre>
+<footer>Machine-readable evidence: docs/dependency-advisory-review.json. Registry sources: registry.npmjs.org/braces, micromatch, http-proxy-middleware, fast-glob, uuid, gaxios, google-auth-library and @google-cloud/storage. This bounded development review does not certify deployed configuration.</footer>
+</body>
+</html>

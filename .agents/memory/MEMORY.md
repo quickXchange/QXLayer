@@ -12,3 +12,4 @@
 - [GitHub publishing](github-publishing.md) — native Git and GitHub App authentication differ; API history exports must preserve exact commit bytes.
 - [Publishing domain](publishing-domain.md) — quicklychan.xyz is the user's intended custom domain for this project's published app.
 - [Workspace package installer](workspace-package-installer.md) — root refreshes need a temporary pnpm root-check setting; the package callback rejects CLI flags and empty lists.
+- [Dependency security review](dependency-security-review-policy.md) — no unsupported major overrides to clear scanners; distinguish bounded non-exploitability from an upstream fix.
