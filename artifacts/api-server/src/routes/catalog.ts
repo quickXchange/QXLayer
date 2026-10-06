@@ -19,9 +19,9 @@ router.get("/modules", async (_req, res): Promise<void> => {
 router.get("/asset-networks", async (_req, res): Promise<void> => {
   const assets = await withDatabase({ actorId: "public-catalog" }, async (client) => {
     const result = await client.query(
-      "SELECT a.id AS asset_id,a.symbol,a.name, n.id AS network_id,n.name AS network_name,n.testnet FROM asset_network_catalog an JOIN asset_catalog a ON an.asset_id=a.id JOIN network_catalog n ON an.network_id=n.id ORDER BY a.symbol,n.name",
+      "SELECT an.id AS asset_network_id,a.id AS asset_id,a.symbol,a.name, n.id AS network_id,n.name AS network_name,n.testnet FROM asset_network_catalog an JOIN asset_catalog a ON an.asset_id=a.id JOIN network_catalog n ON an.network_id=n.id ORDER BY a.symbol,n.name",
     );
-    return result.rows.map((a) => ({ assetId: a.asset_id, symbol: a.symbol, name: a.name, networkId: a.network_id, networkName: a.network_name, testnet: a.testnet }));
+    return result.rows.map((a) => ({ assetNetworkId: a.asset_network_id, assetId: a.asset_id, symbol: a.symbol, name: a.name, networkId: a.network_id, networkName: a.network_name, testnet: a.testnet }));
   });
   res.json(ListSandboxAssetNetworksResponse.parse({ assets, sandboxOnly: true }));
 });

@@ -140,12 +140,18 @@ export function saveAssets(principal: Principal, tenantId: string, ids: string[]
   return saveStep(principal, tenantId, "assets_networks", async (client) => {
     const effective = await resolveEntitlements(client, tenantId);
     if (ids.length && !(await readRegistry(client)).some((m) => effective.features[m.key] && m.requiresAssetNetworks)) throw new HttpError(403, "No asset-configurable module is enabled for this tenant.");
-    const catalog = await client.query("SELECT id,asset_id,network_id FROM asset_network_catalog WHERE id = ANY($1::text[])", [ids]);
-    if (catalog.rows.length !== new Set(ids).size) throw new HttpError(400, "Only configured sandbox asset/network pairs are supported.");
-    enforceLimit(effective, "max_supported_assets", String(new Set(catalog.rows.map((r) => r.asset_id)).size));
-    enforceLimit(effective, "max_supported_networks", String(new Set(catalog.rows.map((r) => r.network_id)).size));
+    const catalog = await client.query<{ id: string; asset_id: string; network_id: string }>(
+      "SELECT id,asset_id,network_id FROM asset_network_catalog WHERE id = ANY($1::text[]) OR asset_id || ':' || network_id = ANY($1::text[])", [ids]);
+    // Older clients send assetId:networkId; resolve it only against existing catalog pairs.
+    // Persist canonical IDs, preferring an exact ID if it also resembles another pair's alias.
+    const selected = [...new Set(ids)].map(id => catalog.rows.find(r => r.id === id) ??
+      catalog.rows.find(r => `${r.asset_id}:${r.network_id}` === id));
+    if (selected.some(r => !r)) throw new HttpError(400, "Only configured sandbox asset/network pairs are supported.");
+    const pairs = selected.filter((r): r is NonNullable<typeof r> => !!r);
+    enforceLimit(effective, "max_supported_assets", String(new Set(pairs.map((r) => r.asset_id)).size));
+    enforceLimit(effective, "max_supported_networks", String(new Set(pairs.map((r) => r.network_id)).size));
     await client.query("DELETE FROM tenant_asset_networks WHERE tenant_id=$1", [tenantId]);
-    for (const id of [...new Set(ids)]) await client.query("INSERT INTO tenant_asset_networks (tenant_id,asset_network_id) VALUES ($1,$2)", [tenantId, id]);
+    for (const id of new Set(pairs.map(r => r.id))) await client.query("INSERT INTO tenant_asset_networks (tenant_id,asset_network_id) VALUES ($1,$2)", [tenantId, id]);
   });
 }
 

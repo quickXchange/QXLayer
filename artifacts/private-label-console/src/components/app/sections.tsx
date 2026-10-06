@@ -153,14 +153,14 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel, renderAsse
   }, [cat.data]);
   return (
     <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { assetNetworkIds: sel } }, { onSuccess: () => save.ok('Assets and networks'), onError: save.fail }); }}>
-      <Section n="04" title="Assets and networks" note="Sandbox and testnet pairs only, stored as assetId:networkId."
+      <Section n="04" title="Assets and networks" note="Configured sandbox asset/network pairs only."
         footer={<><span className="mr-auto font-mono text-xs text-muted-foreground">{sel.length} selected</span><SaveBtn id="assets" pending={m.isPending} readOnly={readOnly} label={saveLabel} /></>}>
         {cat.isLoading ? <Skeleton className="h-40" /> : cat.isError ? <ErrorState what="asset catalog" onRetry={() => cat.refetch()} /> : (
           <div className="divide-y rounded-md border">
             {groups.map(([id, rows]) => (
               <div key={id} className="flex flex-wrap items-center gap-x-6 gap-y-2 p-3">
                 <div className="w-40">{renderAsset ? renderAsset(rows[0]) : <><span className="font-mono text-sm font-medium">{rows[0].symbol}</span><span className="ml-2 text-xs text-muted-foreground">{rows[0].name}</span></>}</div>
-                {rows.map((r) => { const v = `${r.assetId}:${r.networkId}`; return (
+                {rows.map((r) => { const v = r.assetNetworkId ?? `${r.assetId}:${r.networkId}`; return (
                   <label key={v} className="flex cursor-pointer items-center gap-2 text-sm">
                     <Checkbox data-testid={`checkbox-asset-${v}`} disabled={readOnly} checked={sel.includes(v)} onCheckedChange={() => toggle(v)} />
                     {renderNetwork ? renderNetwork(r) : r.networkName}{r.testnet && <span className="font-mono text-[10px] uppercase text-copper">testnet</span>}
