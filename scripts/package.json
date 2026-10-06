@@ -10,6 +10,8 @@
     "core:upgrade:dev": "tsx ./src/upgrade-core.ts",
     "catalog:upgrade:dev": "tsx ./src/upgrade-landing-catalog.ts",
     "access:assign:dev": "tsx ./src/assign-access.ts",
+    "migration:audit": "node ./src/audit-white-label-migration.mjs",
+    "migration:validate": "node ./src/validate-white-label-migration.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

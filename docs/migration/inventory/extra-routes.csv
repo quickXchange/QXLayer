@@ -1,0 +1,4 @@
+"method","path","file","line","middlewareHint","target"
+"GET","/exchange/visual-assets/:filename","artifacts/api-server/src/routes/exchange.ts","28","[]","/api/white-label/exchange/visual-assets/:filename"
+"POST","/customer/order-attachments","artifacts/api-server/src/routes/order-files.ts","14","[]","/api/white-label/customer/order-attachments"
+"GET","/customer/order-attachments/:id/content","artifacts/api-server/src/routes/order-files.ts","19","[]","/api/white-label/customer/order-attachments/:id/content"

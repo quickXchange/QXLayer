@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-10-06T12:52:20.783Z",
+  "referenceCommit": "b940bd2b44102c5e5606ed64c2178a012c77041e",
+  "project2": {
+    "tables": 36,
+    "apiOperations": 76,
+    "routeDeclarations": 79,
+    "dependencies": 227,
+    "environmentNames": 16
+  },
+  "project1": {
+    "tables": 92,
+    "apiOperations": 293,
+    "routeDeclarations": 294,
+    "dependencies": 251,
+    "environmentNames": 71
+  },
+  "tableCollisions": [
+    "exchange_orders"
+  ],
+  "apiCollisions": [
+    "GET /healthz"
+  ],
+  "schemaNameCollisions": [
+    "ExchangeOrderInput",
+    "HealthStatus"
+  ],
+  "extraRouteCount": 3,
+  "noRuntimeWrites": true,
+  "noDatabaseAccess": true,
+  "noProject1Writes": true,
+  "limitations": [
+    "No private/live Project 1 database, Secrets or service status was inspected.",
+    "Runtime/provider readiness is not proven by source presence.",
+    "Static env scan excludes secret files and may miss dynamically constructed variable names.",
+    "Source declarations do not prove live database schema parity.",
+    "Detailed feature-by-feature treatment and security gates are in ../project2-feature-inventory.md and ../migration-plan.md."
+  ]
+}

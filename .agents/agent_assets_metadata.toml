@@ -462,3 +462,17 @@ mtime_ms = 1791279799178
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/066c4a2d-0b04-4ce2-a87c-064defdd49c7/d0fca473-9526-47c5-ae7f-64d1aaed3c96"
 storage_version_token = "1791279799753898"
 content_type = "text/html"
+
+[[outputs]]
+id = "MDeUhVYe5Z1azik4oNKjv"
+uri = "file://exports/project2-white-label-migration-handoff.html"
+type = "html"
+title = "Project 2 White-label Migration Audit & Map"
+description = "All nine prerequisite outputs, feature traces, database/API/dependency maps, conflicts and staged implementation order. Includes downloadable CSV/JSON inventories. Audit only; QuickXchange and Production remain unchanged."
+logical_id = "0943b06e-1eff-46d3-8ae4-a0f49e93d7be"
+content_hash = "sha256:a045fdf523be31fc308314daab9c6503c2ccad200f8f8c6996a0fd30e6e36fa4"
+size = 1334367
+mtime_ms = 1791291141313
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0943b06e-1eff-46d3-8ae4-a0f49e93d7be/e9074150-0bca-47ce-9eeb-bd2a25888ae5"
+storage_version_token = "1791291287198746"
+content_type = "text/html"
