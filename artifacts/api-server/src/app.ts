@@ -7,6 +7,7 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 import { HttpError } from "./lib/errors";
 import { CLERK_PROXY_PATH, clerkProxyMiddleware, getClerkProxyHost } from "./middlewares/clerkProxyMiddleware";
+import { createAccessGate } from "../../../lib/production-access-gate/index.mjs";
 
 const app: Express = express();
 
@@ -30,6 +31,8 @@ app.use(
   }),
 );
 app.disable("x-powered-by");
+// Before body parsing, Clerk, proxying and application routes.
+app.use(createAccessGate({ basePath: "/api", healthPath: "/api/healthz" }));
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(express.json({ limit: "128kb" }));
 app.use(express.urlencoded({ extended: true, limit: "128kb" }));

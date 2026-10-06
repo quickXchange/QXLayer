@@ -16,12 +16,14 @@ run = "pnpm --filter @workspace/private-label-website run dev"
 
 [services.production]
 build = [ "pnpm", "--filter", "@workspace/private-label-website", "run", "build" ]
-serve = "static"
-publicDir = "artifacts/private-label-website/dist/public"
+[services.production.run]
+args = [ "node", "lib/production-access-gate/serve.mjs", "artifacts/private-label-website/dist/public" ]
 
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
+[services.production.run.env]
+NODE_ENV = "production"
+
+[services.production.health.startup]
+path = "/private-label-website/__qx_access/healthz"
 
 [services.env]
 PORT = "24270"

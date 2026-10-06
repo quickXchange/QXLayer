@@ -20,3 +20,9 @@ Check the available Production write capability before declaring a synchronizati
 **Why:** The readiness discussion proceeded despite the Agent's managed Production SQL channel being read-only. User approval does not lift that platform restriction.
 
 **How to apply:** Distinguish data readiness, identity evidence, execution capability and permission to execute. Do not bypass read-only access with credentials, a bootstrap endpoint, startup imports or publishing. Report blocked Production work separately from verified Development-only fixes.
+
+The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, existing QXLayer design, or prepared Production migration SQL.
+
+**Why:** The user explicitly required a separate Production Domain Access Gate, Development-first testing, and no publishing yet.
+
+**How to apply:** Keep the gate separate from tenant/account permissions. Adding its Production secret or preparing runtime configuration is not permission to publish. Removing the gate for public launch requires an explicit request.
