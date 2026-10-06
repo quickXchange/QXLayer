@@ -21,8 +21,8 @@ Check the available Production write capability before declaring a synchronizati
 
 **How to apply:** Distinguish data readiness, identity evidence, execution capability and permission to execute. Do not bypass read-only access with credentials, a bootstrap endpoint, startup imports or publishing. Report blocked Production work separately from verified Development-only fixes.
 
-The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, existing QXLayer design, or prepared Production migration SQL.
+The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, the landing page, customer sites, or prepared Production migration SQL. The user approved redesigning ONLY the Private Access page to use the existing QXLayer identity and light/dark behavior.
 
-**Why:** The user explicitly required a separate Production Domain Access Gate, Development-first testing, and no publishing yet.
+**Why:** The user explicitly required a separate Production Domain Access Gate and later authorized fixing its Production runtime and redesigning only its Private Access screen, while preserving the other product surfaces and database.
 
-**How to apply:** Keep the gate separate from tenant/account permissions. Adding its Production secret or preparing runtime configuration is not permission to publish. Removing the gate for public launch requires an explicit request.
+**How to apply:** Keep the gate separate from tenant/account permissions. A gate-only Production request does not authorize publishing unrelated Development changes or running the prepared database migration. Verify the active runtime configuration before promising live access. Removing the gate for public launch requires an explicit request.

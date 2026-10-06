@@ -10,6 +10,8 @@ it never signs a user in, creates an account, or grants tenant/admin rights.
   tenant websites, API). Do not prefix it with `VITE_`.
 - The gate is enabled automatically under `NODE_ENV=production`.
 - Missing code fails closed with a private-access-unavailable screen / HTTP 503.
+  The input and Enter button remain interactive; submitting cannot grant access
+  until the Production runtime actually has the secret.
 - No code or code hash is included in browser bundles, HTML, or API responses.
 - The two websites now run a small Node file server rather than ungated static
   hosting. Their existing builds, SPA routes, assets and design are preserved.
@@ -41,6 +43,19 @@ it never signs a user in, creates an account, or grants tenant/admin rights.
   abuse-control system. No database or external storage was added.
 
 ## Development and verification
+
+The gate's standalone screen uses QXLayer's approved light/dark logos, embedded
+Bricolage Grotesque and Spline Sans Mono fonts, and a responsive purple/blue/cyan
+access card. Its theme toggle shares the public platform preference
+`plw:theme:`. Only an exact SHA-256-whitelisted theme script may execute; no
+code or credentials are embedded in it, and native POST/keyboard submission,
+signed CSRF validation, session cookies and rate limits are unchanged.
+
+When Production returns this 503, inspect secret **existence** and the active
+runtime configuration first. Adding a Development/project secret alone does
+not update the deployed runtime: configure the publishing secret and release
+the approved gate-only source. Do not blindly publish unrelated Development
+changes or apply database migrations to fix this configuration error.
 
 Development remains ungated by default. To explicitly test the complete gate in
 the workspace, set the non-secret Development variable
