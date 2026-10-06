@@ -23,7 +23,7 @@ export function OrderSummary({ o }: { o: WlOrder }) {
   const sameApproved = o.approvedPlan && o.requestedPlan && o.approvedPlan.id === o.requestedPlan.id && (o.approvedAddons ?? []).map((a) => a.id).sort().join() === (o.requestedAddons ?? []).map((a) => a.id).sort().join();
   return (
     <div className="space-y-4">
-      <Sec t="Project"><dl className="divide-y"><Row k="Reference" v={orderRef(o)} /><Row k="Project" v={o.projectName} /><Row k="Brand" v={o.brandName} /><Row k="Company" v={o.companyName || '-'} /><Row k="Preferred domain" v={o.preferredDomain || '-'} /><Row k="Features" v={<span className="capitalize">{o.actions.join(', ')}</span>} /><Row k="Submitted" v={stamp(o.createdAt)} /></dl></Sec>
+      <Sec t="Project"><dl className="divide-y"><Row k="Reference" v={orderRef(o)} /><Row k="Project" v={o.projectName} /><Row k="Website" v={o.websiteName || o.brandName} /><Row k="Brand" v={o.brandName} /><Row k="Company" v={o.companyName || '-'} /><Row k="Preferred domain" v={o.preferredDomain || '-'} /><Row k="Features" v={<span className="capitalize">{o.actions.join(', ')}</span>} /><Row k="Submitted" v={stamp(o.createdAt)} /></dl></Sec>
       <Sec t="Design">{d ? <>
         <dl className="divide-y"><Row k="Type" v={d.type === 'custom' ? 'Custom design (paid review)' : 'Standard (Exchange master)'} />
           <Row k="Colors" v={<span className="flex flex-wrap justify-end gap-2">{[d.primaryColor, d.accentColor].map((color, i) => <span key={i} className="inline-flex items-center gap-1.5"><i className="h-4 w-4 shrink-0 rounded border" style={{ background: color }} />{color}</span>)}</span>} /><Row k="Theme" v={<span className="capitalize">{d.themePreference}</span>} />

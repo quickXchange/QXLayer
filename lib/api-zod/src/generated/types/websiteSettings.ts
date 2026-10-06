@@ -10,13 +10,22 @@ import type { WebsiteFaq } from './websiteFaq';
 import type { WebsiteSettingsBorderRadius } from './websiteSettingsBorderRadius';
 import type { WebsiteSettingsFontKey } from './websiteSettingsFontKey';
 import type { WebsiteSettingsNavigationItem } from './websiteSettingsNavigationItem';
+import type { WebsiteSettingsSandboxLabel } from './websiteSettingsSandboxLabel';
 import type { WebsiteSettingsSurfaceStyle } from './websiteSettingsSurfaceStyle';
+import type { WebsiteSettingsTemplateKey } from './websiteSettingsTemplateKey';
 
 export interface WebsiteSettings {
   /** @maxItems 12 */
   navigation?: WebsiteSettingsNavigationItem[];
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
   secondaryColor: string;
+  templateKey?: WebsiteSettingsTemplateKey;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  websiteName?: string;
+  sandboxLabel?: WebsiteSettingsSandboxLabel;
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
   glowColor?: string;
   surfaceStyle?: WebsiteSettingsSurfaceStyle;

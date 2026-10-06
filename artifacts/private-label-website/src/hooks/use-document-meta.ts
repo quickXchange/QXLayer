@@ -9,7 +9,7 @@ export function useDocumentMeta(site: PublicSite, themeColor: string) {
     const added: HTMLElement[] = [];
     const restore: (() => void)[] = [];
     const prevTitle = document.title;
-    document.title = site.brandName;
+    document.title = ws.websiteName || site.brandName;
     const add = (tag: 'link' | 'meta', attrs: Record<string, string>) => { const el = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v)); el.setAttribute('data-tenant-meta', '1'); document.head.appendChild(el); added.push(el); };
     const f = fontLink(ws.fontKey);
     if (f) add('link', { rel: 'stylesheet', href: f });
@@ -22,7 +22,7 @@ export function useDocumentMeta(site: PublicSite, themeColor: string) {
     const text = ws.heroSubtitle || `${site.brandName} customer website`;
     if (desc) { desc.content = text; restore.push(() => { if (prevDesc !== undefined) desc.content = prevDesc; }); } else add('meta', { name: 'description', content: text });
     return () => { document.title = prevTitle; added.forEach((e) => e.remove()); restore.forEach((r) => r()); };
-  }, [site.brandName, ws.fontKey, ws.faviconUrl, ws.heroSubtitle]);
+  }, [site.brandName, ws.websiteName, ws.fontKey, ws.faviconUrl, ws.heroSubtitle]);
   useEffect(() => {
     let m = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
     const created = !m;

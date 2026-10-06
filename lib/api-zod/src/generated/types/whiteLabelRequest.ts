@@ -18,6 +18,7 @@ export interface WhiteLabelRequest {
   id: string;
   customerUserId: string;
   projectName: string;
+  websiteName?: string;
   brandName: string;
   /** @nullable */
   preferredDomain: string | null;

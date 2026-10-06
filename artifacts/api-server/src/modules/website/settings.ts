@@ -5,6 +5,8 @@ import { HttpError } from "../../lib/errors";
 export type WebsiteSettings = z.infer<typeof UpdateTenantWebsiteSettingsBody>;
 export function safeHttps(value: string | null) {
   if (!value) return;
+  // Only the curated, order-linked branding files can be same-origin URLs.
+  if (/^\/api\/public\/sites\/[a-z0-9]+(?:-[a-z0-9]+)*\/branding\/(?:logo|favicon)$/.test(value)) return;
   try {
     const u = new URL(value);
     if (u.protocol !== "https:" || u.username || u.password) throw new Error();
@@ -21,6 +23,7 @@ export function validateSettings(input: WebsiteSettings) {
 }
 export function websiteSettings(brandName: string, raw: Record<string, unknown>): WebsiteSettings {
   return UpdateTenantWebsiteSettingsBody.parse({
+    websiteName: brandName, sandboxLabel: "Sandbox", templateKey: "standard-exchange",
     secondaryColor: "#102C36", faviconUrl: null, fontKey: "system",
     surfaceStyle: "solid", borderRadius: "soft", faq: [], navigation: [],
     heroTitle: `Welcome to ${brandName}`, heroSubtitle: "Explore the capabilities configured for this sandbox website.",

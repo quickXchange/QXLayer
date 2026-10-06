@@ -56,6 +56,7 @@ try {
       paymentMethods: methods.map((id, i) => ({ id, label: i ? "Sandbox card simulation" : "Sandbox bank transfer", currency: "USD", enabled: true, buy: true, sell: true })),
     });
     await saveWebsiteSettings(operator, t.id, websiteSettings("NovaX Exchange", {
+      sandboxLabel: "Sandbox Demo",
       heroTitle: "Your next exchange starts here.",
       heroSubtitle: "Swap, convert, buy and sell in the NovaX sandbox. Explore a fully configured exchange without moving real funds.",
       footerText: "NovaX Exchange · Sandbox Demo. No funds, wallets, blockchain transactions or real payments.",

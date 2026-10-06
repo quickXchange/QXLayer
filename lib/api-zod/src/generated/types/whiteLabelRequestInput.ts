@@ -17,6 +17,11 @@ export interface WhiteLabelRequestInput {
   projectName: string;
   /**
      * @minLength 2
+     * @maxLength 120
+     */
+  websiteName?: string;
+  /**
+     * @minLength 2
      * @maxLength 100
      */
   brandName: string;

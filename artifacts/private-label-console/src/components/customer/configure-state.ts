@@ -1,7 +1,7 @@
 import type { Att } from '@/lib/wl';
 
 export type Cfg = {
-  projectName: string; brandName: string; companyName: string; domain: string;
+  projectName: string; websiteName?: string; brandName: string; companyName: string; domain: string;
   designType: 'standard' | 'custom'; logo: Att | null; favicon: Att | null; primary: string; accent: string; theme: 'light' | 'dark' | 'both';
   styleName: string; description: string; refUrl: string; notes: string; refs: Att[];
   acts: string[]; planId: string; addonIds: string[]; period: 'monthly' | 'yearly'; details: string; reqFiles: Att[];

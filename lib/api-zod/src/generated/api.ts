@@ -287,6 +287,7 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
   "projectName": zod.string(),
+  "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
@@ -535,6 +536,7 @@ export const GetWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
   "projectName": zod.string(),
+  "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
@@ -813,6 +815,7 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
   "projectName": zod.string(),
+  "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
@@ -928,6 +931,9 @@ export const ListMyWhiteLabelRequestsResponse = zod.array(ListMyWhiteLabelReques
 export const submitWhiteLabelRequestBodyProjectNameMin = 2;
 export const submitWhiteLabelRequestBodyProjectNameMax = 100;
 
+export const submitWhiteLabelRequestBodyWebsiteNameMin = 2;
+export const submitWhiteLabelRequestBodyWebsiteNameMax = 120;
+
 export const submitWhiteLabelRequestBodyBrandNameMin = 2;
 export const submitWhiteLabelRequestBodyBrandNameMax = 100;
 
@@ -959,6 +965,7 @@ export const submitWhiteLabelRequestBodyAttachmentIdsMax = 10;
 
 export const SubmitWhiteLabelRequestBody = zod.object({
   "projectName": zod.string().min(submitWhiteLabelRequestBodyProjectNameMin).max(submitWhiteLabelRequestBodyProjectNameMax),
+  "websiteName": zod.string().min(submitWhiteLabelRequestBodyWebsiteNameMin).max(submitWhiteLabelRequestBodyWebsiteNameMax).optional(),
   "brandName": zod.string().min(submitWhiteLabelRequestBodyBrandNameMin).max(submitWhiteLabelRequestBodyBrandNameMax),
   "preferredDomain": zod.string().max(submitWhiteLabelRequestBodyPreferredDomainMax).nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])).min(1).max(submitWhiteLabelRequestBodyActionsMax),
@@ -1106,6 +1113,7 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
   "projectName": zod.string(),
+  "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
@@ -1339,6 +1347,7 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
   "projectName": zod.string(),
+  "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
@@ -1599,6 +1608,7 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
   "projectName": zod.string(),
+  "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
@@ -1840,6 +1850,7 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "customerUserId": zod.string(),
   "projectName": zod.string(),
+  "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
@@ -3472,6 +3483,9 @@ export const resolvePublicDomainResponseWebsiteSettingsNavigationItemLabelMax = 
 export const resolvePublicDomainResponseWebsiteSettingsNavigationMax = 12;
 
 export const resolvePublicDomainResponseWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const resolvePublicDomainResponseWebsiteSettingsWebsiteNameMin = 2;
+export const resolvePublicDomainResponseWebsiteSettingsWebsiteNameMax = 120;
+
 export const resolvePublicDomainResponseWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const resolvePublicDomainResponseWebsiteSettingsFaqItemQuestionMin = 2;
 export const resolvePublicDomainResponseWebsiteSettingsFaqItemQuestionMax = 180;
@@ -3524,6 +3538,9 @@ export const ResolvePublicDomainResponse = zod.object({
   "visible": zod.boolean()
 })).max(resolvePublicDomainResponseWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(resolvePublicDomainResponseWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(resolvePublicDomainResponseWebsiteSettingsWebsiteNameMin).max(resolvePublicDomainResponseWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(resolvePublicDomainResponseWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -3713,6 +3730,9 @@ export const createTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 export const createTenantResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const createTenantResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const createTenantResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const createTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const createTenantResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const createTenantResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -3781,6 +3801,9 @@ export const CreateTenantResponse = zod.object({
   "visible": zod.boolean()
 })).max(createTenantResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(createTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(createTenantResponseTwoWebsiteSettingsWebsiteNameMin).max(createTenantResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(createTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -3822,6 +3845,9 @@ export const getTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 export const getTenantResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getTenantResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const getTenantResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const getTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const getTenantResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const getTenantResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -3890,6 +3916,9 @@ export const GetTenantResponse = zod.object({
   "visible": zod.boolean()
 })).max(getTenantResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(getTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(getTenantResponseTwoWebsiteSettingsWebsiteNameMin).max(getTenantResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(getTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -3956,6 +3985,9 @@ export const updateTenantBrandResponseTwoWebsiteSettingsNavigationItemLabelMax =
 export const updateTenantBrandResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantBrandResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const updateTenantBrandResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const updateTenantBrandResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantBrandResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const updateTenantBrandResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -4024,6 +4056,9 @@ export const UpdateTenantBrandResponse = zod.object({
   "visible": zod.boolean()
 })).max(updateTenantBrandResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantBrandResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(updateTenantBrandResponseTwoWebsiteSettingsWebsiteNameMin).max(updateTenantBrandResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(updateTenantBrandResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -4073,6 +4108,9 @@ export const updateTenantDomainResponseTwoWebsiteSettingsNavigationItemLabelMax 
 export const updateTenantDomainResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantDomainResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const updateTenantDomainResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const updateTenantDomainResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantDomainResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const updateTenantDomainResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -4141,6 +4179,9 @@ export const UpdateTenantDomainResponse = zod.object({
   "visible": zod.boolean()
 })).max(updateTenantDomainResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantDomainResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(updateTenantDomainResponseTwoWebsiteSettingsWebsiteNameMin).max(updateTenantDomainResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(updateTenantDomainResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -4192,6 +4233,9 @@ export const updateTenantModulesResponseTwoWebsiteSettingsNavigationItemLabelMax
 export const updateTenantModulesResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantModulesResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const updateTenantModulesResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const updateTenantModulesResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantModulesResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const updateTenantModulesResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -4260,6 +4304,9 @@ export const UpdateTenantModulesResponse = zod.object({
   "visible": zod.boolean()
 })).max(updateTenantModulesResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantModulesResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(updateTenantModulesResponseTwoWebsiteSettingsWebsiteNameMin).max(updateTenantModulesResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(updateTenantModulesResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -4305,6 +4352,9 @@ export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationItemL
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -4373,6 +4423,9 @@ export const UpdateTenantAssetsNetworksResponse = zod.object({
   "visible": zod.boolean()
 })).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantAssetsNetworksResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(updateTenantAssetsNetworksResponseTwoWebsiteSettingsWebsiteNameMin).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(updateTenantAssetsNetworksResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -4421,6 +4474,9 @@ export const updateTenantConfigurationResponseTwoWebsiteSettingsNavigationItemLa
 export const updateTenantConfigurationResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantConfigurationResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const updateTenantConfigurationResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const updateTenantConfigurationResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const updateTenantConfigurationResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -4489,6 +4545,9 @@ export const UpdateTenantConfigurationResponse = zod.object({
   "visible": zod.boolean()
 })).max(updateTenantConfigurationResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantConfigurationResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(updateTenantConfigurationResponseTwoWebsiteSettingsWebsiteNameMin).max(updateTenantConfigurationResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(updateTenantConfigurationResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -4530,6 +4589,9 @@ export const activateTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60
 export const activateTenantResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const activateTenantResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const activateTenantResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const activateTenantResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const activateTenantResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const activateTenantResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -4598,6 +4660,9 @@ export const ActivateTenantResponse = zod.object({
   "visible": zod.boolean()
 })).max(activateTenantResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(activateTenantResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(activateTenantResponseTwoWebsiteSettingsWebsiteNameMin).max(activateTenantResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(activateTenantResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -5979,6 +6044,9 @@ export const updateTenantWebsiteSettingsBodyNavigationItemLabelMax = 60;
 export const updateTenantWebsiteSettingsBodyNavigationMax = 12;
 
 export const updateTenantWebsiteSettingsBodySecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsBodyWebsiteNameMin = 2;
+export const updateTenantWebsiteSettingsBodyWebsiteNameMax = 120;
+
 export const updateTenantWebsiteSettingsBodyGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantWebsiteSettingsBodyFaqItemQuestionMin = 2;
 export const updateTenantWebsiteSettingsBodyFaqItemQuestionMax = 180;
@@ -6022,6 +6090,9 @@ export const UpdateTenantWebsiteSettingsBody = zod.object({
   "visible": zod.boolean()
 })).max(updateTenantWebsiteSettingsBodyNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsBodySecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(updateTenantWebsiteSettingsBodyWebsiteNameMin).max(updateTenantWebsiteSettingsBodyWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(updateTenantWebsiteSettingsBodyGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -6054,6 +6125,9 @@ export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationItem
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationMax = 12;
 
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsWebsiteNameMin = 2;
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsWebsiteNameMax = 120;
+
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemQuestionMin = 2;
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsFaqItemQuestionMax = 180;
@@ -6122,6 +6196,9 @@ export const UpdateTenantWebsiteSettingsResponse = zod.object({
   "visible": zod.boolean()
 })).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsWebsiteNameMin).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),
@@ -6202,6 +6279,14 @@ export const RemoveTenantResourceResponse = zod.object({
 })
 
 
+export const GetPublicBrandingFileParams = zod.object({
+  "slug": zod.coerce.string(),
+  "kind": zod.enum(['logo', 'favicon'])
+})
+
+export const GetPublicBrandingFileResponse = zod.unknown()
+
+
 export const getPublicSitePathSlugRegExp = new RegExp('^[a-z0-9]+(?:-[a-z0-9]+)*$');
 
 
@@ -6214,6 +6299,9 @@ export const getPublicSiteResponseWebsiteSettingsNavigationItemLabelMax = 60;
 export const getPublicSiteResponseWebsiteSettingsNavigationMax = 12;
 
 export const getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
+export const getPublicSiteResponseWebsiteSettingsWebsiteNameMin = 2;
+export const getPublicSiteResponseWebsiteSettingsWebsiteNameMax = 120;
+
 export const getPublicSiteResponseWebsiteSettingsGlowColorRegExp = new RegExp('^#[0-9A-Fa-f]{6}$');
 export const getPublicSiteResponseWebsiteSettingsFaqItemQuestionMin = 2;
 export const getPublicSiteResponseWebsiteSettingsFaqItemQuestionMax = 180;
@@ -6266,6 +6354,9 @@ export const GetPublicSiteResponse = zod.object({
   "visible": zod.boolean()
 })).max(getPublicSiteResponseWebsiteSettingsNavigationMax).optional(),
   "secondaryColor": zod.string().regex(getPublicSiteResponseWebsiteSettingsSecondaryColorRegExp),
+  "templateKey": zod.enum(['standard-exchange']).optional(),
+  "websiteName": zod.string().min(getPublicSiteResponseWebsiteSettingsWebsiteNameMin).max(getPublicSiteResponseWebsiteSettingsWebsiteNameMax).optional(),
+  "sandboxLabel": zod.enum(['Sandbox', 'Sandbox Demo']).optional(),
   "glowColor": zod.string().regex(getPublicSiteResponseWebsiteSettingsGlowColorRegExp).optional(),
   "surfaceStyle": zod.enum(['solid', 'glass']).optional(),
   "borderRadius": zod.enum(['sharp', 'soft', 'rounded']).optional(),

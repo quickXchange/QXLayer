@@ -16,7 +16,7 @@ const storage = new Storage({
     universe_domain: "googleapis.com",
   },
 });
-function privateFile(key: string) {
+export function privateFile(key: string) {
   const segments = process.env.PRIVATE_OBJECT_DIR?.split("/").filter(Boolean);
   if (!segments?.length || segments.length < 2) throw new HttpError(503, "Private upload storage is not configured.");
   return storage.bucket(segments[0]).file(`${segments.slice(1).join("/")}/${key}`);

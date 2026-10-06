@@ -47,6 +47,7 @@ export function WebsiteSection({ tenant, readOnly, onSaved, saveLabel }: { tenan
       <Section n="06" title="Website" note="Advanced settings for the shared branded site. Custom domains stay unverified and are never served."
         footer={<>{err && !readOnly && <span className="mr-auto text-sm text-destructive">{err}</span>}{readOnly ? <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only</span> : <Button data-testid="button-save-website" disabled={!!err || m.isPending}>{m.isPending ? 'Saving' : saveLabel ?? 'Save website'}</Button>}</>}>
         <fieldset disabled={readOnly} className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-1.5 md:col-span-2"><Label>Website name</Label><Input data-testid="input-websiteName" value={f.websiteName ?? tenant.brandName} onChange={(e) => set('websiteName', e.target.value)} minLength={2} maxLength={120} /></div>
           <div className="space-y-1.5"><Label>Secondary color</Label>
             <div className="flex gap-2"><input type="color" aria-label="Secondary color" value={HEX.test(f.secondaryColor) ? f.secondaryColor : '#000000'} onChange={(e) => set('secondaryColor', e.target.value)} className="h-9 w-11 rounded border bg-transparent p-0.5" />
               <Input data-testid="input-secondaryColor" className="font-mono" value={f.secondaryColor} onChange={(e) => set('secondaryColor', e.target.value)} /></div></div>

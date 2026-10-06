@@ -37,7 +37,7 @@ export async function orderView(c: DatabaseClient, row: Record<string, any>) {
   const files = await c.query(`SELECT ${attachmentColumns} FROM white_label_attachments WHERE request_id=$1 ORDER BY created_at,id`, [row.id]);
   return {
     id: row.id, orderReference: `WL-${String(row.orderNumber).padStart(6, "0")}`, customerUserId: row.customerUserId,
-    projectName: cfg.projectName, brandName: cfg.brandName, preferredDomain: cfg.preferredDomain ?? null, actions: cfg.actions, details: cfg.details,
+    projectName: cfg.projectName, websiteName: cfg.websiteName ?? cfg.brandName, brandName: cfg.brandName, preferredDomain: cfg.preferredDomain ?? null, actions: cfg.actions, details: cfg.details,
     companyName: cfg.companyName ?? null, design: cfg.design ?? null, billingPeriod: cfg.billingPeriod ?? "monthly",
     requestedPlan: cfg.catalogSnapshot?.plan ?? null, requestedAddons: cfg.catalogSnapshot?.addons ?? [],
     approvedPlan: row.approvedConfiguration?.plan ?? null, approvedAddons: row.approvedConfiguration?.addons ?? [],

@@ -11,6 +11,7 @@ import { Ambient } from './ambient';
 
 export function BrandMark({ site, size = 32 }: { site: PublicSite; size?: number }) {
   const [broken, setBroken] = useState(false);
+  useEffect(() => setBroken(false), [site.tenantSlug, site.logoUrl]);
   if (site.logoUrl && !broken) return <img src={site.logoUrl} alt="" width={size} height={size} onError={() => setBroken(true)} style={{ height: size, maxWidth: size * 4 }} className="object-contain" />;
   return <span aria-hidden="true" className="grid place-items-center font-bold" style={{ width: size, height: size, borderRadius: 'var(--s-r1)', background: 'var(--s-primary)', color: 'var(--s-primary-fg)' }}>{site.brandName.slice(0, 1).toUpperCase()}</span>;
 }
@@ -55,13 +56,13 @@ export function SiteShell({ site, children, ambient = false, platform }: { site:
     : <a href={sup.href} className={cls} data-testid="link-support" {...(sup.external ? { target: '_blank', rel: 'noreferrer noopener' } : {})}>{label}</a>;
   const close = () => setOpen(false);
   return (
-    <div className="site min-h-[100dvh]" style={t as CSSProperties} data-qx-theme={platform ? (dark ? 'dark' : 'light') : undefined} data-surface={ws.surfaceStyle ?? 'solid'} data-testid="site-root">
+    <div className="site min-h-[100dvh]" style={t as CSSProperties} data-exchange-template={platform ? undefined : ws.templateKey ?? 'standard-exchange'} data-qx-theme={platform ? (dark ? 'dark' : 'light') : undefined} data-surface={ws.surfaceStyle ?? 'solid'} data-testid="site-root">
       {ambient && <Ambient />}
       <header className="s-header">
         <div className="s-wrap flex h-[68px] items-center gap-3">
           <Link href={base} className="flex min-w-0 items-center gap-2.5" data-testid="link-home">
             <BrandMark site={themedSite} />
-            <span className="truncate text-[1.05rem] font-semibold tracking-tight" data-testid="text-brand">{site.brandName}</span>
+            <span className="truncate text-[1.05rem] font-semibold tracking-tight" data-testid="text-brand">{ws.websiteName || site.brandName}</span>
           </Link>
           <nav className="s-nav ml-6 hidden flex-1 items-center gap-0.5 lg:flex" aria-label="Primary">
             {nav.map((n) => <a key={n.id} href={href(n.id)} onClick={go(n.id)} data-testid={`link-nav-${n.id}`}>{n.label}</a>)}

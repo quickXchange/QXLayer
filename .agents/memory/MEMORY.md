@@ -19,3 +19,4 @@
 - [Exchange visual identity](exchange-visual-catalog-policy.md) — catalog variants are not new records; currency flags are not customer countries; order privacy differs from authorized configuration.
 - [Migration project roles](migration-project-roles.md) — Project 2 is the white-label source; Project 1 is reference-only despite the archive's eventual destination wording.
 - [Preview request security](preview-request-security.md) — sandboxed forms may have opaque origins; Development ingress and direct Production cookie behavior must be distinguished.
+- [Approved Exchange master](master-exchange-template.md) — current NovaX is the approved shared master; preserve its design and use isolated tenant configuration, not frontend copies.

@@ -8,12 +8,15 @@ export function CountUp({ to, ms = 1400 }: { to: number; ms?: number }) {
     const el = ref.current;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (!el || motion.matches || typeof IntersectionObserver === 'undefined') { setV(to); return; }
-    setV(0);
+    // Keep truthful values in offscreen DOM. Reset only when the existing
+    // count-up animation actually starts, not while waiting for visibility.
+    setV(to);
     let raf = 0;
     const duration = window.innerWidth < 768 ? Math.min(ms, 600) : ms;
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
+      setV(0);
       const t0 = performance.now();
       const tick = (t: number) => {
         const p = Math.min(1, (t - t0) / duration);

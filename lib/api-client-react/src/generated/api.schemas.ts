@@ -323,6 +323,7 @@ export interface WhiteLabelRequest {
   id: string;
   customerUserId: string;
   projectName: string;
+  websiteName?: string;
   brandName: string;
   /** @nullable */
   preferredDomain: string | null;
@@ -403,6 +404,11 @@ export interface WhiteLabelRequestInput {
      * @maxLength 100
      */
   projectName: string;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  websiteName?: string;
   /**
      * @minLength 2
      * @maxLength 100
@@ -1438,6 +1444,21 @@ export const WebsiteSettingsNavigationItemKey = {
   faq: 'faq',
 } as const;
 
+export type WebsiteSettingsTemplateKey = typeof WebsiteSettingsTemplateKey[keyof typeof WebsiteSettingsTemplateKey];
+
+
+export const WebsiteSettingsTemplateKey = {
+  'standard-exchange': 'standard-exchange',
+} as const;
+
+export type WebsiteSettingsSandboxLabel = typeof WebsiteSettingsSandboxLabel[keyof typeof WebsiteSettingsSandboxLabel];
+
+
+export const WebsiteSettingsSandboxLabel = {
+  Sandbox: 'Sandbox',
+  Sandbox_Demo: 'Sandbox Demo',
+} as const;
+
 export type WebsiteSettingsSurfaceStyle = typeof WebsiteSettingsSurfaceStyle[keyof typeof WebsiteSettingsSurfaceStyle];
 
 
@@ -1504,6 +1525,13 @@ export interface WebsiteSettings {
   navigation?: WebsiteSettingsNavigationItem[];
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
   secondaryColor: string;
+  templateKey?: WebsiteSettingsTemplateKey;
+  /**
+     * @minLength 2
+     * @maxLength 120
+     */
+  websiteName?: string;
+  sandboxLabel?: WebsiteSettingsSandboxLabel;
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
   glowColor?: string;
   surfaceStyle?: WebsiteSettingsSurfaceStyle;

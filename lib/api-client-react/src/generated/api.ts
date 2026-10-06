@@ -6038,6 +6038,82 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getRemoveTenantResourceMutationOptions(options));
     }
 
+export const getGetPublicBrandingFileUrl = (slug: string,
+    kind: 'logo' | 'favicon',) => {
+
+
+
+
+  return `/api/public/sites/${slug}/branding/${kind}`
+}
+
+export const getPublicBrandingFile = async (slug: string,
+    kind: 'logo' | 'favicon', options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetPublicBrandingFileUrl(slug,kind),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicBrandingFileQueryKey = (slug: string,
+    kind: 'logo' | 'favicon',) => {
+    return [
+    `/api/public/sites/${slug}/branding/${kind}`
+    ] as const;
+    }
+
+
+export const getGetPublicBrandingFileQueryOptions = <TData = Awaited<ReturnType<typeof getPublicBrandingFile>>, TError = ErrorType<void>>(slug: string,
+    kind: 'logo' | 'favicon', options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicBrandingFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicBrandingFileQueryKey(slug,kind);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicBrandingFile>>> = ({ signal }) => getPublicBrandingFile(slug,kind, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined && kind !== null && kind !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicBrandingFile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicBrandingFileQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicBrandingFile>>>
+export type GetPublicBrandingFileQueryError = ErrorType<void>
+
+
+
+export function useGetPublicBrandingFile<TData = Awaited<ReturnType<typeof getPublicBrandingFile>>, TError = ErrorType<void>>(
+ slug: string,
+    kind: 'logo' | 'favicon', options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicBrandingFile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicBrandingFileQueryOptions(slug,kind,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getGetPublicSiteUrl = (slug: string,) => {
 
 
