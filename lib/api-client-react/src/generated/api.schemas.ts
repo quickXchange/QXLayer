@@ -822,6 +822,11 @@ export interface ExchangeOrder {
   spreadBps: number;
   /** @nullable */
   paymentMethod: string | null;
+  /**
+     * Stable configured payment identity. Older orders may have only a historical label.
+     * @nullable
+     */
+  paymentMethodId?: string | null;
   createdAt: string;
   history: ExchangeOrderEvent[];
   updatedAt?: string;

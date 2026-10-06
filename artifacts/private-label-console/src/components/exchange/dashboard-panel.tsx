@@ -2,13 +2,17 @@ import { Link } from 'wouter';
 import { useGetExchangeDashboard, getGetExchangeDashboardQueryKey, useListExchangeAudit, getListExchangeAuditQueryKey } from '@workspace/api-client-react';
 import { ErrorState, ListSkeleton, EmptyState } from '@/components/app/bits';
 import { ago, stamp } from '@/lib/format';
-import { SimNote } from './ui';
+import { SimNote, OrderFlow } from './ui';
+import { useIdentityResolver } from './logo-identity';
+import { useGetExchangeConfiguration, getGetExchangeConfigurationQueryKey } from '@workspace/api-client-react';
 import { OrderStatus } from './order-status';
 import { MetricCard } from '@/components/app/metrics';
 
 export function DashboardPanel({ tenantId }: { tenantId: string }) {
   const q = useGetExchangeDashboard(tenantId, { query: { queryKey: getGetExchangeDashboardQueryKey(tenantId) } });
   const aq = useListExchangeAudit(tenantId, { page: 1 }, { query: { queryKey: getListExchangeAuditQueryKey(tenantId, { page: 1 }) } });
+  const cfg = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
+  const idr = useIdentityResolver(cfg.data?.configuration, cfg.data?.catalog);
   const d = q.data;
   if (q.isLoading) return <ListSkeleton />;
   if (q.isError || !d) return <ErrorState what="the exchange dashboard" onRetry={() => q.refetch()} />;
@@ -31,7 +35,7 @@ export function DashboardPanel({ tenantId }: { tenantId: string }) {
         {d.recentOrders.length === 0 ? <EmptyState title="No orders yet" body="Simulated orders placed on this tenant's widget appear here." /> : (
           <ul className="divide-y rounded-md border bg-card">{d.recentOrders.map((o) => (
             <li key={o.id}><Link href={`${base}/orders/${o.id}`} className="flex flex-wrap items-center gap-3 px-4 py-3 text-sm hover:bg-muted/50" data-testid={`row-recent-${o.id}`}>
-              <span className="font-mono text-[10px] uppercase text-copper">{o.action}</span><span className="font-mono">{o.inputAmount} {o.sourceSymbol} to {o.outputAmount} {o.destinationSymbol}</span>
+              <span className="font-mono text-[10px] uppercase text-copper">{o.action}</span><OrderFlow r={idr} o={o} />
               <span className="ml-auto flex items-center gap-3"><OrderStatus status={o.status} /><span className="font-mono text-xs text-muted-foreground">{ago(o.createdAt)}</span></span></Link></li>))}</ul>)}
       </section>
       <section><div className="mb-2 flex items-baseline justify-between"><h2 className="font-display text-2xl">Recent activity</h2><Link href={`${base}/audit`} className="text-sm text-copper hover:underline" data-testid="link-all-activity">All activity</Link></div>

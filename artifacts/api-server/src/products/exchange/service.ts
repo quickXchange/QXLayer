@@ -137,7 +137,7 @@ export async function sandboxQuote(slug: string, input: ExchangeQuoteInput) {
 }
 type StoredRequest = ReturnType<typeof calculateQuote>["quote"] & {
   product: "crypto_exchange"; quoteHash: string; idempotencyHash: string;
-  paymentMethod: string | null; volume: string; history: { status: string; at: string; note: string }[];
+  paymentMethod: string | null; paymentMethodId?: string | null; volume: string; history: { status: string; at: string; note: string }[];
 };
 interface OrderRow { id: string; status: string; request: StoredRequest; created_at: Date }
 function serializeOrder(row: OrderRow): ExchangeOrder {
@@ -145,7 +145,7 @@ function serializeOrder(row: OrderRow): ExchangeOrder {
   return { id: row.id, status: row.status, action: r.action, source: r.source, destination: r.destination,
     sourceSymbol: r.sourceSymbol, destinationSymbol: r.destinationSymbol, inputAmount: r.inputAmount,
     outputAmount: r.outputAmount, rate: r.rate, fee: r.fee, destinationFee: r.destinationFee ?? "0", spreadBps: r.spreadBps,
-    paymentMethod: r.paymentMethod, createdAt: row.created_at,
+    paymentMethod: r.paymentMethod, paymentMethodId: r.paymentMethodId ?? null, createdAt: row.created_at,
     updatedAt: new Date(r.history.at(-1)?.at ?? row.created_at), customerName: null, customerEmail: null,
     history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true };
 }
@@ -170,7 +170,7 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput) {
     const { quote, volume, paymentMethod } = calculateQuote(s, catalog, request);
     await consumeMonthlyUsage(client, tenantId, "crypto_exchange", volume);
     const id = randomUUID();
-    const stored: StoredRequest = { ...quote, product: "crypto_exchange", paymentMethod, volume,
+    const stored: StoredRequest = { ...quote, product: "crypto_exchange", paymentMethod, paymentMethodId: request.paymentMethodId ?? null, volume,
       quoteHash: hash(input.quoteToken), idempotencyHash: hash(input.idempotencyKey),
       history: [{ status: "pending", at: new Date().toISOString(), note: "Sandbox order created. No funds, wallets, deposit addresses or payments exist." }] };
     const result = await client.query<OrderRow>("INSERT INTO exchange_orders (id,tenant_id,pricing_rule_id,status,request) VALUES ($1,$2,$3,'pending',$4) RETURNING id,status,request,created_at", [id, tenantId, quote.routeId, JSON.stringify(stored)]);

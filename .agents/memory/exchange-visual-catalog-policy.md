@@ -20,3 +20,9 @@ Order presentation must exclude internal configuration reserves and provider det
 **Why:** Reserve editing was explicitly requested for administration, whereas the order-presentation request limits what is shown in View Order.
 
 **How to apply:** Verify privacy against the order drawer specifically; preserve legitimate role-authorized configuration controls.
+
+Exchange logos must retain original brand colors and source files in both themes. Use circular presentation, foreground-aware sizing, adaptive neutral surfaces and local edge contrast treatment—not one recoloring filter for all brands. Flags fill fixed square circular containers without stretching.
+
+**Why:** The user explicitly required full, centered circles and readable dark/light artwork while prohibiting permanent recoloring, destructive cropping and changes to the QXLayer theme.
+
+**How to apply:** Apply the existing shared Exchange logo system to new surfaces. Inspect every supplied original and variant; keep wide wordmarks complete and distinguish source contrast/padding from corrected presentation.

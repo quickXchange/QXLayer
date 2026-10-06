@@ -138,7 +138,7 @@ export function ModulesSection({ tenant, onSaved, saveLabel }: SP) {
   );
 }
 
-export function AssetsSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
+export function AssetsSection({ tenant, readOnly, onSaved, saveLabel, renderAsset, renderNetwork }: SP & { renderAsset?: (row: { assetId: string; symbol: string; name: string }) => ReactNode; renderNetwork?: (row: { assetId: string; networkId: string; networkName: string }) => ReactNode }) {
   const save = useSave(tenant.id, onSaved);
   const cat = useListSandboxAssetNetworks();
   const m = useUpdateTenantAssetsNetworks();
@@ -159,11 +159,11 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
           <div className="divide-y rounded-md border">
             {groups.map(([id, rows]) => (
               <div key={id} className="flex flex-wrap items-center gap-x-6 gap-y-2 p-3">
-                <div className="w-40"><span className="font-mono text-sm font-medium">{rows[0].symbol}</span><span className="ml-2 text-xs text-muted-foreground">{rows[0].name}</span></div>
+                <div className="w-40">{renderAsset ? renderAsset(rows[0]) : <><span className="font-mono text-sm font-medium">{rows[0].symbol}</span><span className="ml-2 text-xs text-muted-foreground">{rows[0].name}</span></>}</div>
                 {rows.map((r) => { const v = `${r.assetId}:${r.networkId}`; return (
                   <label key={v} className="flex cursor-pointer items-center gap-2 text-sm">
                     <Checkbox data-testid={`checkbox-asset-${v}`} disabled={readOnly} checked={sel.includes(v)} onCheckedChange={() => toggle(v)} />
-                    {r.networkName}{r.testnet && <span className="font-mono text-[10px] uppercase text-copper">testnet</span>}
+                    {renderNetwork ? renderNetwork(r) : r.networkName}{r.testnet && <span className="font-mono text-[10px] uppercase text-copper">testnet</span>}
                   </label>); })}
               </div>
             ))}

@@ -5,9 +5,10 @@ import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Section } from '@/components/app/sections';
 import { useToast } from '@/hooks/use-toast';
-import { Dec, DraftFooter, Field, IntInput, Pick, SimNote, isDec, isInt } from './ui';
+import { Dec, DraftFooter, EndpointView, Field, IntInput, LogoText, Pick, SimNote, isDec, isInt } from './ui';
+import { useIdentityResolver } from './logo-identity';
 import { BulkBar, BulkBtn, DataTable, FilterBar, NoMatch, EditDrawer, Logo, StatusPill, providerOptions, useConfirm, useSelection, useStaged } from './bulk';
-import { LogoChooser, useVisualCatalog } from './visual-catalog';
+import { LogoChooser, VisualImg, useVisualCatalog } from './visual-catalog';
 import { fiatId, type ExchangeDraft } from './use-exchange-draft';
 import type { ExchangeRoute, ExchangePaymentMethod } from '@workspace/api-client-react';
 
@@ -15,7 +16,7 @@ const ACTIONS: [string, string][] = [['swap', 'Swap'], ['convert', 'Convert'], [
 
 function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action']; mode: 'routes' | 'pricing' }) {
   const { toast } = useToast(); const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
-  const s = d.draft!; const fiat = fiatId(s);
+  const s = d.draft!; const fiat = fiatId(s); const idr = useIdentityResolver(s, d.catalog);
   const [q, setQ] = useState(''); const [fa, setFa] = useState('all'); const [fs, setFs] = useState('all');
   const label = (id: string) => (id.startsWith('fiat:') ? id.slice(5) : d.catalog.find((c) => c.assetNetworkId === id)?.symbol ?? id);
   const scoped = s.routes.filter((r) => !action || r.action === action);
@@ -25,7 +26,11 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
   const rname = (id: string) => { const r = s.routes.find((x) => x.id === id); return r ? `${r.action}: ${label(r.source)} to ${label(r.destination)} (${id.slice(0, 8)})` : id; };
   const [edit, setEdit] = useState<ExchangeRoute | null>(null);
   const [bulk, setBulk] = useState<'fees' | 'limits' | 'all' | null>(null);
-  const endpoints: [string, string][] = [...d.catalog.map((c) => [c.assetNetworkId, `${c.symbol} on ${c.networkName}`] as [string, string]), [fiat, `${s.fiatCurrency} (fiat)`]];
+  const epOpt = (id: string, sym: string, text: string): [string, React.ReactNode] => [id, <LogoText key={id} id={idr.endpoint(id, sym)} text={text} />];
+  const endpoints: [string, React.ReactNode][] = [...d.catalog.map((c) => epOpt(c.assetNetworkId, c.symbol, `${c.symbol} on ${c.networkName}`)), epOpt(fiat, s.fiatCurrency, `${s.fiatCurrency} (fiat)`)];
+  const sym = (id: string) => label(id);
+  const methodChips = (r: ExchangeRoute) => r.paymentMethodIds.length === 0 ? null : <span className="flex flex-wrap gap-1">{r.paymentMethodIds.map((id) => { const p = s.paymentMethods.find((x) => x.id === id); if (!p) return null; const pi = idr.payment(p); return <span key={id} className="inline-flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px]"><VisualImg url={pi.logoUrl} label={pi.label} kind="payment-method" generic={pi.generic} size={14} />{pi.name}</span>; })}</span>;
+  const pair = (r: ExchangeRoute) => <span className="flex flex-wrap items-center gap-2"><EndpointView r={idr} id={r.source} symbol={sym(r.source)} size={24} /><span className="text-muted-foreground">to</span><EndpointView r={idr} id={r.destination} symbol={sym(r.destination)} size={24} /></span>;
   const setMany = (ids: string[], p: Partial<ExchangeRoute>) => d.patch({ routes: s.routes.map((r) => (ids.includes(r.id) ? { ...r, ...p } : r)) });
   const pms = s.paymentMethods.filter((p) => p.currency === s.fiatCurrency);
   const add = () => {
@@ -75,8 +80,9 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
           </BulkBar>
           {rows.length === 0 ? <NoMatch noun="routes" onReset={resetF} /> : <DataTable testid="route" rows={rows} getId={(r) => r.id} sel={sel} locked={locked} cols={[
             { h: 'Action', cell: (r) => <span className="font-mono text-[10px] uppercase text-copper">{r.action}</span> },
-            { h: 'Source', cell: (r) => <span className="font-mono text-xs">{label(r.source)}</span> },
-            { h: 'Target', cell: (r) => <span className="font-mono text-xs">{label(r.destination)}</span> },
+            { h: 'Source', cell: (r) => <EndpointView r={idr} id={r.source} symbol={label(r.source)} size={24} /> },
+            { h: 'Target', cell: (r) => <EndpointView r={idr} id={r.destination} symbol={label(r.destination)} size={24} /> },
+            { h: 'Methods', cell: (r) => methodChips(r) ?? <span className="text-xs text-muted-foreground">None</span> },
             { h: 'Rate', cell: (r) => <span className="font-mono text-xs">{r.rate || 'not set'}</span> },
             { h: 'Fee', cell: (r) => <span className="font-mono text-xs">{feeText(r)}</span> },
             { h: 'Spread', cell: (r) => <span className="font-mono text-xs">{r.spreadBps} bps</span> },
@@ -91,6 +97,7 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
       <EditDrawer item={edit} itemKey={edit?.id ?? ''} title={edit ? `${label(edit.source)} to ${label(edit.destination)}` : 'Route'} note={mode === 'pricing' ? 'Pricing fields only. Stages into the draft.' : 'Stages into the exchange draft. Press Save exchange settings to persist.'} locked={locked} onClose={() => setEdit(null)}
         onApply={(v) => { setMany([v.id], v); staged(1, 'route'); setEdit(null); }}>
         {(f, set) => { const pay = f.action === 'buy' || f.action === 'sell'; return (<>
+          <div className="rounded-md border bg-muted/30 p-3" data-testid="route-preview">{pair(f)}{methodChips(f) && <div className="mt-2">{methodChips(f)}</div>}</div>
           {mode === 'routes' && <>
             <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled<Switch checked={f.enabled} onCheckedChange={(v) => set({ enabled: v })} /></div>
             <Field label="Action"><Pick disabled={action !== undefined} value={f.action} onChange={(v) => set(changeAction(f, v as ExchangeRoute['action']))} options={ACTIONS} /></Field>
@@ -101,7 +108,7 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
           <Field label="Manual rate (positive)"><Dec positive value={f.rate} onChange={(v) => set({ rate: v })} placeholder="required" testid="input-route-rate" /></Field>
           <div className="grid grid-cols-2 gap-3"><Field label="Minimum"><Dec value={f.minimum} onChange={(v) => set({ minimum: v })} /></Field><Field label="Maximum"><Dec value={f.maximum} onChange={(v) => set({ maximum: v })} placeholder="required" /></Field></div>
           <div className="grid grid-cols-3 gap-3"><Field label="Fee (bps)"><IntInput value={f.feeBps} onChange={(v) => set({ feeBps: v })} /></Field><Field label="Spread (bps)"><IntInput value={f.spreadBps} onChange={(v) => set({ spreadBps: v })} /></Field><Field label="Fixed fee"><Dec value={f.fixedFee} onChange={(v) => set({ fixedFee: v })} /></Field></div>
-          {mode === 'routes' && pay && <Field label={`Payment methods (${f.action})`}>{pms.length === 0 ? <p className="text-xs text-muted-foreground">No {s.fiatCurrency} payment methods exist.</p> : <div className="flex flex-wrap gap-3">{pms.map((p) => <label key={p.id} className="flex items-center gap-2 text-sm"><Checkbox checked={f.paymentMethodIds.includes(p.id)} onCheckedChange={(v) => set({ paymentMethodIds: v === true ? [...f.paymentMethodIds, p.id] : f.paymentMethodIds.filter((x) => x !== p.id) })} />{p.label || 'Unnamed'}</label>)}</div>}</Field>}
+          {mode === 'routes' && pay && <Field label={`Payment methods (${f.action})`}>{pms.length === 0 ? <p className="text-xs text-muted-foreground">No {s.fiatCurrency} payment methods exist.</p> : <div className="flex flex-wrap gap-3">{pms.map((p) => <label key={p.id} className="flex items-center gap-2 text-sm"><Checkbox checked={f.paymentMethodIds.includes(p.id)} onCheckedChange={(v) => set({ paymentMethodIds: v === true ? [...f.paymentMethodIds, p.id] : f.paymentMethodIds.filter((x) => x !== p.id) })} /><LogoText id={idr.payment(p)} text={p.label || 'Unnamed'} size={18} /></label>)}</div>}</Field>}
           {mode === 'routes' && f.action === 'convert' && <><Field label="Convert provider assignment (future)"><Pick testid="select-route-provider" value={f.providerId || 'manual'} onChange={(v) => set({ providerId: v === 'manual' ? undefined : v })} options={providerOptions(d.providerCatalog, 'convert', f.providerId)} /></Field><p className="text-xs text-muted-foreground">Currently {provName(f.providerId)}. Stored for future use; every quote stays manual and sandbox and no provider is called.</p></>}
         </>); }}
       </EditDrawer>
@@ -125,7 +132,7 @@ const TYPES: [string, string][] = [['manual', 'Manual'], ['bank', 'Bank'], ['car
 
 export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }) {
   const { toast } = useToast(); const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
-  const s = d.draft!;
+  const s = d.draft!; const idr = useIdentityResolver(s);
   const [q, setQ] = useState(''); const [ft, setFt] = useState('all'); const [fs, setFs] = useState('all'); const [fd, setFd] = useState('all');
   const rows = s.paymentMethods.filter((p) => (ft === 'all' || (p.methodType ?? 'manual') === ft) && (fs === 'all' || (fs === 'on') === p.enabled) && (fd === 'all' || (fd === 'buy' ? p.buy : p.sell)) && (p.label || 'Unnamed').toLowerCase().includes(q.trim().toLowerCase()));
   const resetF = () => { setQ(''); setFt('all'); setFs('all'); setFd('all'); };
@@ -171,8 +178,8 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
             <BulkBtn destructive sel={sel} locked={locked} testid="button-bulk-delete-methods" onClick={remove}>Delete</BulkBtn>
           </BulkBar>
           {rows.length === 0 ? <NoMatch noun="payment methods" onReset={resetF} /> : <DataTable testid="method" rows={rows} getId={(p) => p.id} sel={sel} locked={locked} cols={[
-            { h: 'Logo', cell: (p) => <Logo url={p.logoUrl} label={p.label || '?'} /> },
-            { h: 'Name', cell: (p) => <span className="font-medium">{p.label || 'Unnamed'}<span className="ml-2 text-xs text-muted-foreground">{[p.buy && 'Buy', p.sell && 'Sell'].filter(Boolean).join(' / ')}</span></span> },
+            { h: 'Logo', cell: (p) => { const pi = idr.payment(p); return <Logo url={pi.logoUrl} label={p.label || '?'} kind="payment-method" generic={pi.generic} />; } },
+            { h: 'Name', cell: (p) => <span className="font-medium">{idr.payment(p).name || p.label || 'Unnamed'}<span className="ml-2 text-xs text-muted-foreground">{[p.buy && 'Buy', p.sell && 'Sell'].filter(Boolean).join(' / ')}</span></span> },
             { h: 'Currency', cell: (p) => <span className="font-mono text-xs">{p.currency}</span> },
             { h: 'Type', cell: (p) => <span className="text-xs capitalize">{p.methodType ?? 'manual'}</span> },
             { h: 'Min', cell: (p) => <span className="font-mono text-xs">{p.minimum ?? '0'}</span> },
@@ -189,6 +196,7 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
       <EditDrawer item={edit} itemKey={edit?.id ?? ''} title={edit?.label || 'New payment method'} note={`Amounts are in ${s.fiatCurrency}. Stages into the draft; Save to persist.`} locked={locked} onClose={() => setEdit(null)}
         onApply={(v) => { setMany([v.id], v); staged(1, 'payment method'); setEdit(null); }}>
         {(f, set) => (<>
+          <div className="rounded-md border bg-muted/30 p-3" data-testid="method-preview"><LogoText id={idr.payment(f)} text={f.label || 'Unnamed'} size={36} /></div>
           <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled<Switch checked={f.enabled} onCheckedChange={(v) => set({ enabled: v })} /></div>
           <Field label="Name"><Input data-testid="input-method-label" value={f.label} onChange={(e) => set({ label: e.target.value })} /></Field>
           <div className="grid grid-cols-2 gap-3"><Field label="Currency"><Pick disabled value={f.currency} onChange={() => undefined} options={[[s.fiatCurrency, s.fiatCurrency]]} /></Field><Field label="Type"><Pick value={f.methodType ?? 'manual'} onChange={(v) => set({ methodType: v as ExchangePaymentMethod['methodType'] })} options={TYPES} /></Field></div>
@@ -230,7 +238,7 @@ function CatalogAdd({ d, onAdded }: { d: ExchangeDraft; onAdded: (m: ExchangePay
         if (s.paymentMethods.some((p) => normalized(p.id) === normalized(a.code) || normalized(p.label) === normalized(a.name) || normalized(p.label) === normalized(a.code))) { toast({ title: `${a.name} already exists`, description: 'Edit the existing method instead.', variant: 'destructive' }); return; }
         const m: ExchangePaymentMethod = { id: crypto.randomUUID(), label: a.name, enabled: false, currency: s.fiatCurrency, buy: true, sell: false, logoUrl: a.logoUrl, methodType: 'manual', minimum: '0', maximum: null, feeBps: 0, fixedFee: '0' };
         d.patch({ paymentMethods: [...s.paymentMethods, m] }); onAdded(m);
-      }} options={[['choose', 'Add from catalog (starts disabled)'], ...items.map((a) => [a.code, a.name] as [string, string])]} />
+      }} options={[['choose', 'Add from catalog (starts disabled)'], ...items.map((a) => [a.code, <span key={a.code} className="inline-flex items-center gap-2"><VisualImg url={a.logoUrl} label={a.name} kind="payment-method" size={18} />{a.name}</span>] as [string, React.ReactNode])]} />
     </div>
   );
 }

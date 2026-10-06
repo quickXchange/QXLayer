@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { Section } from '@/components/app/sections';
 import type { ExchangeProvider, ExchangeProviderConfiguration } from '@workspace/api-client-react';
 import { DraftFooter, Field, SimNote } from './ui';
+import { VisualImg } from './visual-catalog';
 import { EditDrawer, FilterBar, NoMatch, StatusPill } from './bulk';
 import { Pick } from './ui';
 import { useStaged } from './bulk';
@@ -36,7 +37,7 @@ export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolea
           <thead className="border-b font-mono text-[10px] uppercase tracking-wider text-muted-foreground"><tr>{['Provider', 'Type', 'Status', 'Connection', 'Capabilities', 'Enabled', 'Configure'].map((h) => <th key={h} className="px-3 py-2 font-normal">{h}</th>)}</tr></thead>
           <tbody className="divide-y">{cat.map((p) => { const c = cfgOf(p.id); const soon = p.status === 'coming_soon'; return (
             <tr key={p.id} data-testid={`row-provider-${p.id}`}>
-              <td className="px-3 py-2"><span className="font-medium">{c.label || p.name}</span>{c.label && <span className="block text-xs text-muted-foreground">{p.name}</span>}</td>
+              <td className="px-3 py-2"><span className="flex items-center gap-2"><VisualImg label={p.name} kind="provider" size={28} /><span><span className="font-medium">{c.label || p.name}</span>{c.label && <span className="block text-xs text-muted-foreground">{p.name}</span>}</span></span></td>
               <td className="px-3 py-2 text-xs capitalize">{p.category.replace(/_/g, ' ')}</td>
               <td className="px-3 py-2"><StatusPill on={p.functional} onLabel={STATUS[p.status]} offLabel={STATUS[p.status] ?? p.status} /></td>
               <td className="px-3 py-2 text-xs">{p.functional ? 'Sandbox only' : 'Not connected'}</td>

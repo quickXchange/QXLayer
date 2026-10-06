@@ -7,14 +7,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Section, AssetsSection } from '@/components/app/sections';
 import { useToast } from '@/hooks/use-toast';
-import { Dec, DraftFooter, Field, IntInput, Pick, SimNote, isDec, isInt } from './ui';
+import { Dec, DraftFooter, Field, IntInput, LogoText, Pick, SimNote, isDec, isInt } from './ui';
+import { useIdentityResolver } from './logo-identity';
+import { VisualImg } from './visual-catalog';
 import { BulkBar, BulkBtn, DataTable, FilterBar, NoMatch, EditDrawer, Logo, StatusPill, providerOptions, useConfirm, useSelection, useStaged } from './bulk';
 import { LogoChooser, VisualCatalogBrowser } from './visual-catalog';
 import type { ExchangeDraft } from './use-exchange-draft';
 
 export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Tenant; d: ExchangeDraft; locked: boolean; catalogReadOnly: boolean }) {
   const qc = useQueryClient(); const { toast } = useToast(); const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
-  const s = d.draft!;
+  const s = d.draft!; const idr = useIdentityResolver(s, d.catalog);
   const [q, setQ] = useState(''); const [st, setSt] = useState('all');
   const nameOf = (id: string) => d.catalog.find((c) => c.assetId === id)?.name ?? id;
   const rows = s.assets.filter((a) => (st === 'all' || (st === 'on') === a.enabled) && `${a.symbol} ${nameOf(a.assetId)}`.toLowerCase().includes(q.trim().toLowerCase()));
@@ -27,7 +29,7 @@ export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Te
   const nets = (id: string) => d.catalog.filter((c) => c.assetId === id);
   return (
     <div className="space-y-6">
-      <AssetsSection tenant={tenant} readOnly={catalogReadOnly} onSaved={() => qc.invalidateQueries({ queryKey: getGetExchangeConfigurationQueryKey(tenant.id) })} />
+      <AssetsSection tenant={tenant} readOnly={catalogReadOnly} renderAsset={(r) => <LogoText id={idr.asset(r.assetId, r.symbol)} text={<><span className="font-mono text-sm font-medium">{r.symbol}</span><span className="ml-2 text-xs text-muted-foreground">{r.name}</span></>} size={22} />} renderNetwork={(r) => { const n = d.catalog.find((c) => c.assetId === r.assetId && c.networkId === r.networkId); return n ? <LogoText id={idr.network(n.assetNetworkId)} text={r.networkName} /> : r.networkName; }} onSaved={() => qc.invalidateQueries({ queryKey: getGetExchangeConfigurationQueryKey(tenant.id) })} />
       <VisualCatalogBrowser />
       <Section n="X1" title="Asset details" note="Display and sandbox reference data for each tenant-selected asset. Only enabled assets can quote." footer={<DraftFooter d={d} locked={locked} />}>
         <SimNote />
@@ -42,11 +44,11 @@ export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Te
               <BulkBtn sel={sel} locked={locked} testid="button-bulk-edit-assets" onClick={() => setBulk(true)}>Bulk edit</BulkBtn>
             </BulkBar>
             {rows.length === 0 ? <NoMatch noun="assets" onReset={resetF} /> : <DataTable testid="asset" rows={rows} getId={(a) => a.assetId} sel={sel} locked={locked} cols={[
-              { h: 'Logo', cell: (a) => <Logo url={a.logoUrl} label={a.symbol} /> },
+              { h: 'Logo', cell: (a) => <Logo url={a.logoUrl ?? idr.asset(a.assetId, a.symbol).logoUrl} label={a.symbol} kind="crypto" /> },
               { h: 'Name', cell: (a) => <span className="font-medium">{nameOf(a.assetId)}</span> },
               { h: 'Symbol', cell: (a) => <span className="font-mono text-xs">{a.symbol}</span> },
               { h: 'Decimals', cell: (a) => <span className="font-mono text-xs">{a.decimals}</span> },
-              { h: 'Networks', cell: (a) => <span className="text-xs">{nets(a.assetId).map((c) => c.networkName).join(', ') || 'None'}</span> },
+              { h: 'Networks', cell: (a) => <span className="flex flex-wrap gap-x-3 gap-y-1 text-xs">{nets(a.assetId).map((c) => <LogoText key={c.assetNetworkId} id={idr.network(c.assetNetworkId)} text={c.networkName} size={16} />)}{nets(a.assetId).length === 0 && 'None'}</span> },
               { h: 'Status', cell: (a) => <StatusPill on={a.enabled} /> },
               { h: 'Enabled', cell: (a) => <Switch aria-label="Enabled" data-testid={`switch-asset-${a.assetId}`} disabled={locked} checked={a.enabled} onCheckedChange={(v) => setMany([a.assetId], { enabled: v })} /> },
               { h: 'Edit', cell: (a) => <Button size="sm" variant="outline" data-testid={`button-edit-asset-${a.assetId}`} onClick={() => setEdit(a)}>Edit</Button> },
@@ -56,6 +58,7 @@ export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Te
       <EditDrawer item={edit} itemKey={edit?.assetId ?? ''} title={`Edit ${edit?.symbol ?? 'asset'}`} note="Stages into the exchange draft. Press Save exchange settings to persist." locked={locked} onClose={() => setEdit(null)}
         onApply={(v) => { setMany([v.assetId], v); staged(1, 'asset'); setEdit(null); }}>
         {(f, set) => (<>
+          <LogoText id={idr.asset(f.assetId, f.symbol)} text={nameOf(f.assetId)} size={32} />
           <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled<Switch checked={f.enabled} onCheckedChange={(v) => set({ enabled: v })} /></div>
           <Field label="Symbol"><Input data-testid="input-asset-symbol" value={f.symbol} onChange={(e) => set({ symbol: e.target.value })} /></Field>
           <div className="grid grid-cols-2 gap-3"><Field label="Display order"><IntInput value={f.displayOrder} onChange={(v) => set({ displayOrder: v })} /></Field><Field label="Precision"><IntInput value={f.decimals} onChange={(v) => set({ decimals: v })} /></Field></div>
@@ -87,11 +90,10 @@ export function AssetsPanel({ tenant, d, locked, catalogReadOnly }: { tenant: Te
 
 export function NetworksPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }) {
   const { toast } = useToast(); const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
-  const s = d.draft!;
+  const s = d.draft!; const idr = useIdentityResolver(s, d.catalog);
   const [edit, setEdit] = useState<ExchangeNetworkSettings | null>(null);
   const [bulk, setBulk] = useState<'fields' | 'provider' | null>(null);
   const cat = (id: string) => d.catalog.find((x) => x.assetNetworkId === id);
-  const logoOf = (id: string) => s.assets.find((a) => a.assetId === cat(id)?.assetId)?.logoUrl ?? null;
   const provName = (id?: string) => (id ? d.providerCatalog.find((p) => p.id === id)?.name ?? id : 'Manual / sandbox');
   const [q, setQ] = useState(''); const [av, setAv] = useState('all'); const [en, setEn] = useState('all'); const [pv, setPv] = useState('all');
   const rows = s.networks.filter((n) => { const c = cat(n.assetNetworkId); return (av === 'all' || (av === 'on') === n.available) && (en === 'all' || (en === 'on') === n.enabled) && (pv === 'all' || (n.providerId || 'manual') === pv) && `${c?.networkName ?? ''} ${c?.networkId ?? ''} ${c?.symbol ?? ''}`.toLowerCase().includes(q.trim().toLowerCase()); });
@@ -100,7 +102,7 @@ export function NetworksPanel({ d, locked }: { d: ExchangeDraft; locked: boolean
   const bindName = (id: string) => `${cat(id)?.symbol ?? ''} on ${cat(id)?.networkName ?? id}`;
   const setMany = (ids: string[], p: Partial<ExchangeNetworkSettings>) => d.patch({ networks: s.networks.map((n) => (ids.includes(n.assetNetworkId) ? { ...n, ...p } : n)) });
   const bulkSet = (label: string, p: Partial<ExchangeNetworkSettings>) => { const ids = sel.ids; ask({ title: `${label} on ${ids.length} network binding${ids.length === 1 ? '' : 's'}?`, body: <><p>Proposed: {label} (staged only; nothing is saved until you press Save).</p><ul className="font-mono text-xs">{ids.map((i) => <li key={i}>{bindName(i)} ({i})</li>)}</ul></>, label: 'Stage change', run: () => { setMany(ids, p); staged(ids.length, 'network'); sel.clear(); } }); };
-  const provOpts = (cur?: string) => providerOptions(d.providerCatalog, 'swap', cur);
+  const provOpts = (cur?: string): [string, React.ReactNode][] => providerOptions(d.providerCatalog, 'swap', cur).map(([v, l]) => [v, v === 'manual' ? l : <span key={v} className="inline-flex items-center gap-2"><VisualImg label={l} kind="provider" size={18} />{l}</span>]);
   return (
     <Section n="X2" title="Networks" note="Each row is an asset-network binding. Only networks that are enabled and available can quote. Limits and fee are decimal strings in asset units." footer={<DraftFooter d={d} locked={locked} />}>
       {s.networks.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-networks">No asset networks are selected. Use the Assets section to select them.</p> : (
@@ -108,7 +110,7 @@ export function NetworksPanel({ d, locked }: { d: ExchangeDraft; locked: boolean
           <FilterBar noun="networks" search={q} onSearch={setQ} placeholder="Search network, code or symbol" shown={rows.length} total={s.networks.length} onReset={resetF} active={q !== '' || av !== 'all' || en !== 'all' || pv !== 'all'}>
             <div className="w-36"><Pick testid="select-network-enabled" value={en} onChange={setEn} options={[['all', 'Any state'], ['on', 'Enabled'], ['off', 'Disabled']]} /></div>
             <div className="w-40"><Pick testid="select-network-availability" value={av} onChange={setAv} options={[['all', 'Any availability'], ['on', 'Available'], ['off', 'Unavailable']]} /></div>
-            <div className="w-48"><Pick testid="select-network-provider-filter" value={pv} onChange={setPv} options={[['all', 'Any provider'], ['manual', 'Manual / sandbox'], ...d.providerCatalog.filter((p) => s.networks.some((n) => n.providerId === p.id)).map((p) => [p.id, p.name] as [string, string])]} /></div>
+            <div className="w-48"><Pick testid="select-network-provider-filter" value={pv} onChange={setPv} options={[['all', 'Any provider'], ['manual', 'Manual / sandbox'], ...d.providerCatalog.filter((p) => s.networks.some((n) => n.providerId === p.id)).map((p) => [p.id, <span key={p.id} className="inline-flex items-center gap-2"><VisualImg label={p.name} kind="provider" size={18} />{p.name}</span>] as [string, React.ReactNode])]} /></div>
           </FilterBar>
           <BulkBar sel={sel} noun="networks" locked={locked} testid="networks">
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-enable-networks" onClick={() => bulkSet('Enable', { enabled: true })}>Enable</BulkBtn>
@@ -119,11 +121,11 @@ export function NetworksPanel({ d, locked }: { d: ExchangeDraft; locked: boolean
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-provider-networks" onClick={() => setBulk('provider')}>Assign provider</BulkBtn>
           </BulkBar>
           {rows.length === 0 ? <NoMatch noun="networks" onReset={resetF} /> : <DataTable testid="network" rows={rows} getId={(n) => n.assetNetworkId} sel={sel} locked={locked} cols={[
-            { h: 'Logo', cell: (n) => <Logo url={logoOf(n.assetNetworkId)} label={cat(n.assetNetworkId)?.networkName ?? '?'} /> },
+            { h: 'Logo', cell: (n) => <Logo url={idr.network(n.assetNetworkId).logoUrl} label={cat(n.assetNetworkId)?.networkName ?? '?'} kind="network" /> },
             { h: 'Network', cell: (n) => <span className="font-medium">{cat(n.assetNetworkId)?.networkName ?? n.assetNetworkId}{cat(n.assetNetworkId)?.testnet && <span className="ml-2 font-mono text-[10px] uppercase text-copper">testnet</span>}</span> },
             { h: 'Code', cell: (n) => <span className="font-mono text-xs">{cat(n.assetNetworkId)?.networkId ?? n.assetNetworkId}</span> },
             { h: 'Assets', cell: (n) => { const c = cat(n.assetNetworkId); return <span className="font-mono text-xs">{d.catalog.filter((x) => x.networkId === c?.networkId).map((x) => x.symbol).join(', ') || c?.symbol}</span>; } },
-            { h: 'Provider', cell: (n) => <span className="text-xs">{provName(n.providerId)}</span> },
+            { h: 'Provider', cell: (n) => <span className="flex items-center gap-2 text-xs">{n.providerId && <VisualImg label={provName(n.providerId)} kind="provider" size={18} />}{provName(n.providerId)}</span> },
             { h: 'Status', cell: (n) => <span className="flex gap-1"><StatusPill on={n.enabled} /><StatusPill on={n.available} onLabel="Available" offLabel="Unavailable" /></span> },
             { h: 'Enabled', cell: (n) => <Switch aria-label="Enabled" data-testid={`switch-network-enabled-${n.assetNetworkId}`} disabled={locked} checked={n.enabled} onCheckedChange={(v) => setMany([n.assetNetworkId], { enabled: v })} /> },
             { h: 'Edit', cell: (n) => <Button size="sm" variant="outline" data-testid={`button-edit-network-${n.assetNetworkId}`} onClick={() => setEdit(n)}>Edit</Button> },
@@ -132,6 +134,7 @@ export function NetworksPanel({ d, locked }: { d: ExchangeDraft; locked: boolean
       <EditDrawer item={edit} itemKey={edit?.assetNetworkId ?? ''} title={edit ? `${cat(edit.assetNetworkId)?.symbol ?? ''} on ${cat(edit.assetNetworkId)?.networkName ?? edit.assetNetworkId}` : 'Network'} note="Stages into the exchange draft. Press Save exchange settings to persist." locked={locked} onClose={() => setEdit(null)}
         onApply={(v) => { setMany([v.assetNetworkId], v); staged(1, 'network'); setEdit(null); }}>
         {(f, set) => (<>
+          <LogoText id={idr.network(f.assetNetworkId)} text={`${cat(f.assetNetworkId)?.symbol ?? ''} on ${cat(f.assetNetworkId)?.networkName ?? f.assetNetworkId}`} size={32} />
           <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled<Switch checked={f.enabled} onCheckedChange={(v) => set({ enabled: v })} /></div>
           <div className="flex items-center justify-between rounded-md border p-3 text-sm">Available<Switch checked={f.available} onCheckedChange={(v) => set({ available: v })} /></div>
           <div className="grid grid-cols-3 gap-3"><Field label="Minimum"><Dec value={f.minimum} onChange={(v) => set({ minimum: v })} /></Field><Field label="Maximum"><Dec value={f.maximum} onChange={(v) => set({ maximum: v })} /></Field><Field label="Network fee"><Dec value={f.fee} onChange={(v) => set({ fee: v })} /></Field></div>

@@ -7,6 +7,8 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { computeSelection, selectVisible, deselectVisible } from './selection-state';
 import { useToast } from '@/hooks/use-toast';
 import type { ExchangeProvider } from '@workspace/api-client-react';
+import { VisualImg } from './visual-catalog';
+import type { LogoKind } from './logo-identity';
 
 export interface Selection { ids: string[]; count: number; all: boolean; some: boolean; has: (id: string) => boolean; toggle: (id: string) => void; selectAll: () => void; clear: () => void; persist: boolean; hidden: number; deselectVisible: () => void }
 
@@ -87,8 +89,8 @@ export function DataTable<T>({ rows, cols, getId, sel, locked, selectionLocked =
   );
 }
 
-export function Logo({ url, label }: { url?: string | null; label: string }) {
-  return url ? <img src={url} alt="" className="h-7 w-7 rounded-full object-cover" /> : <span className="grid h-7 w-7 place-items-center rounded-full bg-muted font-mono text-[10px]">{label.slice(0, 3).toUpperCase()}</span>;
+export function Logo(props: { url?: string | null; label: string; kind?: LogoKind; size?: number; generic?: 'bank' | 'card' }) {
+  return <VisualImg {...props} />;
 }
 
 type Opts = { title: string; body: ReactNode; label: string; destructive?: boolean; run: () => ReactNode | void | Promise<ReactNode | void>; readOnly?: boolean };

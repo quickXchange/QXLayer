@@ -15,9 +15,10 @@ import { ErrorState, ListSkeleton, EmptyState } from '@/components/app/bits';
 import { useToast } from '@/hooks/use-toast';
 import { useInvalidateTenant } from '@/lib/invalidate';
 import { stamp } from '@/lib/format';
-import { Pick, SimNote } from './ui';
+import { Pick, SimNote, EndpointView, OrderFlow } from './ui';
+import { useIdentityResolver } from './logo-identity';
 import { NEXT, OrderStatus } from './order-status';
-import { BulkBar, BulkBtn, DataTable, Logo, useConfirm, useSelection } from './bulk';
+import { BulkBar, BulkBtn, DataTable, useConfirm, useSelection } from './bulk';
 import { VisualImg, useVisualCatalog } from './visual-catalog';
 import { isCalendarDate } from './ui-validate';
 
@@ -51,6 +52,8 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   const [busy, setBusy] = useState(false); const [failures, setFailures] = useState<string[]>([]);
    const params: ListExchangeOrdersParams = { ...(search ? { search } : {}), ...(status !== ALL ? { status } : {}), ...(action !== ALL ? { action } : {}), ...(customer === 'anonymous' ? { customer: 'anonymous' as const } : {}), ...(range.from ? { from: range.from } : {}), ...(range.to ? { to: range.to } : {}), page };
   const q = useListExchangeOrders(tenantId, params, { query: { queryKey: getListExchangeOrdersQueryKey(tenantId, params), placeholderData: keepPreviousData } });
+  const cfgQ = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
+  const idr = useIdentityResolver(cfgQ.data?.configuration, cfgQ.data?.catalog);
   const d = q.data;
   const orders = d?.orders ?? [];
   const stale = q.isFetching;
@@ -102,8 +105,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
             { h: 'Order', cell: (o) => <button type="button" className="font-mono text-xs text-copper hover:underline" data-testid={`link-order-${o.id}`} onClick={() => setOpenId(o.id)}>{o.id.slice(0, 8)}</button> },
             { h: 'Type', cell: (o) => <span className="capitalize">{o.action}</span> },
             { h: 'Customer', cell: (o) => <span className="text-xs">{o.customerName || 'Anonymous'}</span> },
-            { h: 'Send', cell: (o) => <span className="font-mono text-xs">{o.inputAmount} {o.sourceSymbol}</span> },
-            { h: 'Receive', cell: (o) => <span className="font-mono text-xs">{o.outputAmount} {o.destinationSymbol}</span> },
+            { h: 'Send to Receive', cell: (o) => <OrderFlow r={idr} o={o} /> },
             { h: 'Status', cell: (o) => <OrderStatus status={o.status} /> },
             { h: 'Created', cell: (o) => <span className="font-mono text-xs text-muted-foreground">{stamp(o.createdAt)}</span> },
             { h: 'Open', cell: (o) => <Button size="sm" variant="outline" data-testid={`button-open-order-${o.id}`} onClick={() => setOpenId(o.id)}>Details</Button> },
@@ -156,7 +158,6 @@ function Copy({ value, label }: { value: string; label: string }) {
   }}>Copy</Button>;
 }
 
-const FIAT_NAMES: Record<string, string> = { USD: 'US dollar', EUR: 'Euro', GBP: 'Pound sterling' };
 
 function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId: string; canEdit: boolean }) {
   const { toast } = useToast(); const refresh = useRefresh(tenantId); const qc = useQueryClient();
@@ -168,35 +169,22 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
   const [note, setNote] = useState('');
   const o: ExchangeOrder | undefined = q.data;
   const next = o ? NEXT[o.status] ?? [] : [];
-  const va = vis.data?.assets ?? [];
-  // Only public identity (logo/name) is read from configuration; no internal fields are rendered.
-  const ep = (id: string, sym: string) => {
-    if (id.startsWith('fiat:')) {
-      const code = id.slice(5);
-      const art = va.find((a) => a.kind === 'currency' && a.code === code);
-      const flag = va.find((a) => a.kind === 'flag' && a.currencies.includes(code) && a.logoUrl === art?.logoUrl);
-      return { sym, fiat: true, code, name: FIAT_NAMES[code] ?? code, logo: art?.logoUrl ?? null, flag: flag?.logoUrl ?? null, flagName: flag?.name ?? null, net: 'Fiat', netLogo: null as string | null };
-    }
-    const c = cfg.data?.catalog.find((x) => x.assetNetworkId === id);
-    const crypto = va.find((a) => a.kind === 'crypto' && (c ? a.recordId === c.assetId : a.code.toUpperCase() === sym.toUpperCase()));
-    const net = va.find((a) => a.kind === 'network' && a.recordId === c?.networkId);
-    const logo = cfg.data?.configuration.assets.find((a) => a.assetId === c?.assetId)?.logoUrl ?? crypto?.logoUrl ?? null;
-    return { sym, fiat: false, code: sym, name: c?.name ?? sym, logo, flag: null as string | null, flagName: null as string | null, net: c?.networkName ?? net?.name ?? 'Unknown network', netLogo: net?.logoUrl ?? null };
-  };
-  const pm = o?.paymentMethod ? (cfg.data?.configuration.paymentMethods.find((p) => p.label === o.paymentMethod)?.logoUrl ?? va.find((a) => a.kind === 'payment-method' && a.name === o.paymentMethod)?.logoUrl ?? null) : null;
+  const idr = useIdentityResolver(cfg.data?.configuration, cfg.data?.catalog);
+  const pmKey = o ? (o.paymentMethodId || o.paymentMethod || null) : null;
+  const pmId = pmKey ? idr.payment(pmKey) : null;
   const go = (status: string) => { if (m.isPending || !o || !canEdit || q.isFetching) return; const seen = o.status; m.mutate({ tenantId, orderId, data: { status: status as 'processing', expectedStatus: seen as 'pending', note: note.trim() } }, {
     onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); setNote(''); toast({ title: `Order marked ${status}` }); },
     onError: (e) => toast({ title: 'Status change failed', description: (e as Error).message, variant: 'destructive' }),
   }); };
   const side = (l: string, id: string, sym: string, amt: string) => {
-    const e = ep(id, sym);
+    const e = idr.endpoint(id, sym, null); const fiat = id.startsWith('fiat:');
     return (
       <div className="min-w-0 flex-1 bg-card p-3" data-testid={`order-side-${l.toLowerCase()}`}>
         <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p>
-        <div className="mt-2 flex items-center gap-2"><VisualImg url={e.logo} label={e.code} size={36} />
-          <div className="min-w-0"><p className="break-all font-mono text-base">{amt} {e.sym}</p><p className="truncate text-xs text-muted-foreground">{e.name}</p></div></div>
+        <div className="mt-2 flex items-center gap-2">
+          <div className="min-w-0"><EndpointView r={idr} id={id} symbol={sym} amount={amt} paymentMethod={fiat ? pmKey : null} size={36} /><p className="mt-1 truncate text-xs text-muted-foreground">{e.name}</p></div></div>
         <div className="mt-2 flex items-center gap-2 text-xs">
-          {e.fiat ? (<>{e.flag ? <VisualImg url={e.flag} label={e.code} size={18} /> : null}<span>Fiat currency{e.flagName ? `, ${e.flagName} (currency mapping, not customer country)` : ''}</span></>) : (<><VisualImg url={e.netLogo} label={e.net} size={18} /><span>{e.net}</span></>)}
+          {fiat ? (<>{e.currencyLogoUrl || e.logoUrl ? <VisualImg url={e.currencyLogoUrl ?? e.logoUrl} label={e.label} kind="flag" size={18} /> : null}<span>Fiat currency{e.currencyFlagName ? `, ${e.currencyFlagName} (currency mapping, not customer country)` : ''}</span></>) : (<><VisualImg url={e.networkLogoUrl} label={e.network ?? ''} kind="network" size={18} /><span>{e.network ?? 'Unknown network'}</span></>)}
         </div>
       </div>);
   };
@@ -221,7 +209,7 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
             </Panel>
             <Panel title="Payment">
               <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
-                <Row l="Payment method" v={o.paymentMethod ? <span className="flex items-center gap-2"><VisualImg url={pm} label={o.paymentMethod} size={24} />{o.paymentMethod}</span> : 'None'} />
+                <Row l="Payment method" v={o.paymentMethod ? <span className="flex items-center gap-2"><VisualImg url={pmId?.logoUrl} label={pmId?.label ?? o.paymentMethod} kind="payment-method" generic={pmId?.generic} size={24} />{o.paymentMethod}</span> : 'None'} />
                 <Row l="Payment details" v={<span className="text-muted-foreground" data-testid="text-payment-not-collected">Not collected in this sandbox.</span>} />
               </div>
             </Panel>

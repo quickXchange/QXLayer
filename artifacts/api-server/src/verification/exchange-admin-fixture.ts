@@ -25,6 +25,11 @@ try {
     const settings = structuredClone(source.configuration);
     const methodIds = new Map(settings.paymentMethods.map(p => [p.id, randomUUID()]));
     settings.paymentMethods = settings.paymentMethods.map(p => ({ ...p, id: methodIds.get(p.id)! }));
+    // Only the disposable fixture uses named brands; delivered generic simulations remain untouched.
+    if (process.argv.includes("--logo-audit")) {
+      if (settings.paymentMethods[0]) settings.paymentMethods[0] = { ...settings.paymentMethods[0], label: "SEPA transfer", logoUrl: null };
+      if (settings.paymentMethods[1]) settings.paymentMethods[1] = { ...settings.paymentMethods[1], label: "Visa", logoUrl: null };
+    }
     settings.routes = settings.routes.map(r => ({ ...r, id: randomUUID(), paymentMethodIds: r.paymentMethodIds.map(id => methodIds.get(id)!) }));
     await exchangeConfiguration(admin, tenant.id, settings);
     await pool.query("UPDATE tenants SET status='active',completed_steps=array_append(completed_steps,'exchange_provisioned') WHERE id=$1", [tenant.id]);

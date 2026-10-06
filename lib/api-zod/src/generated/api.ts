@@ -2492,6 +2492,7 @@ export const ListExchangeOrdersResponse = zod.object({
   "destinationFee": zod.string().optional(),
   "spreadBps": zod.number().int(),
   "paymentMethod": zod.string().nullable(),
+  "paymentMethodId": zod.string().nullish().describe('Stable configured payment identity. Older orders may have only a historical label.'),
   "createdAt": zod.coerce.date(),
   "history": zod.array(zod.object({
   "status": zod.string(),
@@ -2529,6 +2530,7 @@ export const GetExchangeOrderResponse = zod.object({
   "destinationFee": zod.string().optional(),
   "spreadBps": zod.number().int(),
   "paymentMethod": zod.string().nullable(),
+  "paymentMethodId": zod.string().nullish().describe('Stable configured payment identity. Older orders may have only a historical label.'),
   "createdAt": zod.coerce.date(),
   "history": zod.array(zod.object({
   "status": zod.string(),
@@ -2572,6 +2574,7 @@ export const UpdateExchangeOrderStatusResponse = zod.object({
   "destinationFee": zod.string().optional(),
   "spreadBps": zod.number().int(),
   "paymentMethod": zod.string().nullable(),
+  "paymentMethodId": zod.string().nullish().describe('Stable configured payment identity. Older orders may have only a historical label.'),
   "createdAt": zod.coerce.date(),
   "history": zod.array(zod.object({
   "status": zod.string(),
@@ -2621,6 +2624,7 @@ export const GetExchangeDashboardResponse = zod.object({
   "destinationFee": zod.string().optional(),
   "spreadBps": zod.number().int(),
   "paymentMethod": zod.string().nullable(),
+  "paymentMethodId": zod.string().nullish().describe('Stable configured payment identity. Older orders may have only a historical label.'),
   "createdAt": zod.coerce.date(),
   "history": zod.array(zod.object({
   "status": zod.string(),
@@ -2806,6 +2810,7 @@ export const CreateSandboxOrderResponse = zod.object({
   "destinationFee": zod.string().optional(),
   "spreadBps": zod.number().int(),
   "paymentMethod": zod.string().nullable(),
+  "paymentMethodId": zod.string().nullish().describe('Stable configured payment identity. Older orders may have only a historical label.'),
   "createdAt": zod.coerce.date(),
   "history": zod.array(zod.object({
   "status": zod.string(),
@@ -2850,6 +2855,7 @@ export const TrackSandboxOrderResponse = zod.object({
   "destinationFee": zod.string().optional(),
   "spreadBps": zod.number().int(),
   "paymentMethod": zod.string().nullable(),
+  "paymentMethodId": zod.string().nullish().describe('Stable configured payment identity. Older orders may have only a historical label.'),
   "createdAt": zod.coerce.date(),
   "history": zod.array(zod.object({
   "status": zod.string(),

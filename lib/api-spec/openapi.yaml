@@ -1244,6 +1244,7 @@ components:
         destinationFee: {type: string}
         spreadBps: {type: integer}
         paymentMethod: {type: ["string", "null"]}
+        paymentMethodId: {type: ["string", "null"], description: "Stable configured payment identity. Older orders may have only a historical label."}
         createdAt: {type: string, format: date-time}
         history: {type: array, items: {$ref: "#/components/schemas/ExchangeOrderEvent"}}
         updatedAt: {type: string, format: date-time}

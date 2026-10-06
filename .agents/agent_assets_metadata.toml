@@ -448,3 +448,17 @@ mtime_ms = 1791243902872
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/9ee614c0-9abf-48b0-82b0-98abef3f8309/63d051a2-801b-4a37-9958-bd31ea019a94"
 storage_version_token = "1791243903500217"
 content_type = "text/html"
+
+[[outputs]]
+id = "uUVVQOioIctFScdM1HeLJ"
+uri = "file://reports/qxlayer-development-logo-system.html"
+type = "html"
+title = "QXLayer Development Logo System Report"
+description = "Mapping, circular flags, theme corrections, full 241-image audit, verification results and remaining missing artwork."
+logical_id = "066c4a2d-0b04-4ce2-a87c-064defdd49c7"
+content_hash = "sha256:c00be3dafb0d79ac45a37a7126aa91d234865f32f21d50b5fc7566897fcb7b78"
+size = 45424
+mtime_ms = 1791279799178
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/066c4a2d-0b04-4ce2-a87c-064defdd49c7/d0fca473-9526-47c5-ae7f-64d1aaed3c96"
+storage_version_token = "1791279799753898"
+content_type = "text/html"
