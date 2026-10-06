@@ -37,6 +37,27 @@ No application import, database connection, secret lookup, provider request, dep
 
 Generated inventories record the reference commit and source SHA-256 fingerprints. Refresh the comparison if QuickXchange changes; do not treat a previous reference snapshot as current implementation truth.
 
+## Source package
+
+The user selected **prepare the package here**, not integration into QuickXchange.
+`exports/project2-white-label-migration.zip` contains the current white-label source,
+shared libraries, migration documentation, original catalog artwork and a standalone
+SHA-256 verifier. Companion manifest/checksum files and a self-contained download
+document are generated alongside it.
+
+Rebuild after refreshing/validating the audit:
+
+```sh
+pnpm --filter @workspace/scripts run migration:package
+```
+
+The exporter reads only compiled-manifest public artwork through the local shared
+proxy. It does not access secrets, databases or private attachments. Source-specific
+routes/schemas are preserved as a snapshot; the planned destination adaptation,
+service registration, data transfer and original-byte storage upload remain separate.
+Do not extract this ZIP over an existing project or execute its Development setup
+helpers against QuickXchange or Production.
+
 ## Critical findings
 
 1. Both projects define **`exchange_orders`**, with incompatible IDs, columns and status contracts.

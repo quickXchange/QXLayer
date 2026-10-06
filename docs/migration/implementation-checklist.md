@@ -11,6 +11,7 @@
 - [x] Identify real table/schema-name/API/package/authorization/provider/storage conflicts.
 - [x] Distinguish implemented workflows, simulated Exchange and deferred/advertised products.
 - [x] Prepare staged order, security/data invariants, assets and standalone destination requirements.
+- [x] Prepare the source migration package here with original artwork, per-file checksums and an offline verifier; no destination merge or private-data transfer.
 
 ## Not performed — requires an authorized Project 1 destination
 

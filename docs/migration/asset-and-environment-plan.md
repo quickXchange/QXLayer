@@ -23,7 +23,7 @@ No runtime environment variables were viewed, changed or requested. No integrati
 - 241 original blob files map to 424 catalog identities. Identity count and blob count intentionally differ.
 - Ten identities explicitly have no downloadable/standalone original art. Preserve text/generic unavailable handling; do not invent substitutes or silently assign another coin/network's art.
 - Source public art route accepts only hash-addressed filenames in the manifest. Adapt both route and matchers when moving under the target API prefix.
-- Source original files are object-storage data, **not included in a Git source checkout or this audit handoff**. Destination implementation must perform an explicit approved original-byte transfer and verify filename/content hashes.
+- Source original files are object-storage data, **not included in a Git source checkout or the initial audit document**. The separately prepared migration ZIP includes hash-verified copies of all 241 blobs. Destination implementation must transfer those bytes to destination-controlled storage; this export does not upload them there.
 - Copying source metadata alone does not create a standalone migration. Object references must point at destination storage, and the destination must work while Project 2 is offline.
 - Do not reimport/create duplicate business asset/network/payment rows just to reproduce visual variants.
 

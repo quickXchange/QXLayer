@@ -476,3 +476,17 @@ mtime_ms = 1791291141313
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0943b06e-1eff-46d3-8ae4-a0f49e93d7be/e9074150-0bca-47ce-9eeb-bd2a25888ae5"
 storage_version_token = "1791291287198746"
 content_type = "text/html"
+
+[[outputs]]
+id = "yYH4O7ijEKMtMEMN3XM3b"
+uri = "file://exports/project2-white-label-migration-download.html"
+type = "html"
+title = "Project 2 White-label Migration Package"
+description = "Open this self-contained document to download the verified ZIP and file manifest: 827 files, three white-label apps, shared libraries, migration maps and 241 original artwork files. No secrets/customer records/private attachments; QuickXchange and Production unchanged."
+logical_id = "dbca1f68-4cc6-49dc-bc6f-08edd6725f87"
+content_hash = "sha256:231e5b436b0940f2d358e0155a0612e403a16249ae1343559d7cc5f7427e1e50"
+size = 6447014
+mtime_ms = 1791292064760
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/dbca1f68-4cc6-49dc-bc6f-08edd6725f87/3ea06022-5be0-4e98-8a92-e61f8fa2684f"
+storage_version_token = "1791292353392167"
+content_type = "text/html"

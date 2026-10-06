@@ -6534,6 +6534,10 @@
       "sha256": "9a865c3de9900891e697e1ee8632dd565ce69bd7cb6b610e48b26bc0ee9e81e9"
     },
     {
+      "file": "scripts/src/package-white-label-migration.mjs",
+      "sha256": "3c013b8876c369fc92c9f7ec715c37a7f709cb21ea2f39e559c487cbd712abe8"
+    },
+    {
       "file": "scripts/src/remove-database-rls.ts",
       "sha256": "62d2e2b8b07c78ffcc23d9deabb8287b0f01f48f9d41627f5be0e1b162675e66"
     },
