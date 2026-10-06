@@ -67,21 +67,25 @@ export async function listTenants(principal: Principal) {
   return tenants.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
 
-export async function createTenant(principal: Principal, input: z.infer<typeof CreateTenantBody>) {
+export async function prepareTenant(client: DatabaseClient, principal: Principal, input: z.infer<typeof CreateTenantBody>, addonIds: string[] = []) {
   requireSuperAdmin(principal);
   if (input.name.trim().length < 2) throw new HttpError(400, "Client name must contain at least two non-whitespace characters.");
-  return withDatabase(contextFor(principal, undefined, true), async (client) => {
-    const plan = await readPlan(client, input.planId);
-    if (plan.status !== "enabled") throw new HttpError(400, "Choose an enabled plan for the new tenant.");
-    const result = await client.query("INSERT INTO tenants (name,slug) VALUES ($1,$2) RETURNING id", [input.name.trim(), input.slug]);
-    const id = result.rows[0].id as string;
-    await client.query("INSERT INTO tenant_branding (tenant_id,brand_name) VALUES ($1,$2)", [id, input.name.trim()]);
-    await client.query("INSERT INTO tenant_configuration (tenant_id) VALUES ($1)", [id]);
-    await client.query("INSERT INTO tenant_subscriptions (tenant_id,plan_id) VALUES ($1,$2)", [id, plan.id]);
-    await client.query("UPDATE tenants SET completed_steps=ARRAY['modules']::text[] WHERE id=$1", [id]);
-    await audit(client, principal, id, "tenant.created", `Created sandbox client ${input.name.trim()}`, { planId: plan.id });
-    return readTenant(client, id);
-  });
+  const plan = await readPlan(client, input.planId);
+  if (plan.status !== "enabled") throw new HttpError(400, "Choose an enabled plan for the new tenant.");
+  const result = await client.query("INSERT INTO tenants (name,slug) VALUES ($1,$2) RETURNING id", [input.name.trim(), input.slug]);
+  const id = result.rows[0].id as string;
+  await client.query("INSERT INTO tenant_branding (tenant_id,brand_name) VALUES ($1,$2)", [id, input.name.trim()]);
+  await client.query("INSERT INTO tenant_configuration (tenant_id) VALUES ($1)", [id]);
+  await client.query("INSERT INTO tenant_subscriptions (tenant_id,plan_id) VALUES ($1,$2)", [id, plan.id]);
+  for (const addonId of new Set(addonIds)) await client.query("INSERT INTO tenant_addons (tenant_id,addon_id) VALUES ($1,$2)", [id, addonId]);
+  await client.query("UPDATE tenants SET completed_steps=ARRAY['modules']::text[] WHERE id=$1", [id]);
+  await audit(client, principal, id, "tenant.created", `Created sandbox client ${input.name.trim()}`, { planId: plan.id });
+  return readTenant(client, id);
+}
+
+export async function createTenant(principal: Principal, input: z.infer<typeof CreateTenantBody>) {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal, undefined, true), client => prepareTenant(client, principal, input));
 }
 
 async function saveStep(principal: Principal, tenantId: string, step: Step, work: (client: DatabaseClient) => Promise<void>) {
@@ -157,6 +161,8 @@ export function saveConfiguration(principal: Principal, tenantId: string, input:
 export function activateTenant(principal: Principal, tenantId: string) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal, tenantId, true), async (client) => {
+    // Lock in request -> tenant order, matching review/manual delivery.
+    const linked = await client.query("SELECT id FROM white_label_requests WHERE tenant_id=$1 FOR UPDATE", [tenantId]);
     await client.query("SELECT id FROM tenants WHERE id = $1 FOR UPDATE", [tenantId]);
     const effective = await resolveEntitlements(client, tenantId);
     assertOperational(effective);
@@ -177,6 +183,10 @@ export function activateTenant(principal: Principal, tenantId: string) {
       completed_steps=CASE WHEN $2 AND NOT 'exchange_provisioned'=ANY(completed_steps)
         THEN array_append(completed_steps,'exchange_provisioned') ELSE completed_steps END WHERE id=$1`, [tenantId, !!exchange.rowCount]);
     await audit(client, principal, tenantId, "tenant.sandbox_activated", "Activated configuration in sandbox only; no domain or financial execution launched");
+    if (linked.rowCount) {
+      const { deliverLinkedRequest } = await import("../customer/service");
+      await deliverLinkedRequest(client, principal, linked.rows[0].id, tenantId);
+    }
     return readTenant(client, tenantId);
   });
 }

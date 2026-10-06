@@ -1,11 +1,11 @@
 {
   "version": 1,
   "kind": "source-migration-handoff",
-  "createdAt": "2026-10-06T13:07:44.004Z",
+  "createdAt": "2026-10-06T13:52:32.268Z",
   "sourceProject": "Project 2 white-label",
   "referenceProject": "Project 1 QuickXchange, read-only",
   "referenceCommit": "b940bd2b44102c5e5606ed64c2178a012c77041e",
-  "sourceGitRevision": "9097e68ec0c076d6c19c72004feca4ff7925705b",
+  "sourceGitRevision": "16db13090e6d810baaccb04d5c4d30a37281b09b",
   "status": {
     "sourcePackagePrepared": true,
     "destinationIntegrated": false,
@@ -1551,8 +1551,8 @@
     },
     {
       "path": "project2-source/artifacts/api-server/src/modules/authentication/service.ts",
-      "bytes": 2509,
-      "sha256": "b1e52e8581c9fbf5be412edbdee2d28921e02b857edf60b25bbf18ccf055766e",
+      "bytes": 2652,
+      "sha256": "dc8cca47d36aafaddefede2f9bdf0d0a70dfb9be567192a28b2160e016c3fe5d",
       "category": "source"
     },
     {
@@ -1587,8 +1587,8 @@
     },
     {
       "path": "project2-source/artifacts/api-server/src/modules/customer/service.ts",
-      "bytes": 15999,
-      "sha256": "4461bdfc65d9ac5d890aed59e9aae07e3e0442659f8a530eefaa3757b52ed1f9",
+      "bytes": 18726,
+      "sha256": "038b4b9b63e1408bb56433c765e8457e0a4160f43d931ec844113eb1ce7e2d42",
       "category": "source"
     },
     {
@@ -1719,8 +1719,8 @@
     },
     {
       "path": "project2-source/artifacts/api-server/src/modules/tenants/service.ts",
-      "bytes": 13378,
-      "sha256": "93aa4f954b8f937f243684640973dca7c03b15eb0688240ac0764f12d2648c5b",
+      "bytes": 14096,
+      "sha256": "06ba0dd25443aefcb21e3c59530cab94ae4910e593af355c49987b1fa45f652d",
       "category": "source"
     },
     {
@@ -1737,8 +1737,8 @@
     },
     {
       "path": "project2-source/artifacts/api-server/src/modules/website/service.ts",
-      "bytes": 2527,
-      "sha256": "43b35c6e4dc4913c94b7234eadb64ce4021d95c573928de315bb44c41c41aabe",
+      "bytes": 2638,
+      "sha256": "0f3fd2dd692bd30d7f982f714c704266bc9b4444ce8852d50eab61bafce5ff9d",
       "category": "source"
     },
     {
@@ -1875,14 +1875,14 @@
     },
     {
       "path": "project2-source/artifacts/api-server/src/verification/customer-fixtures.ts",
-      "bytes": 3530,
-      "sha256": "bb964dc8fbc8c723a037f26e7a80dd26f0f2d41057f9c2ae0b5c2bda03ca9dfb",
+      "bytes": 3739,
+      "sha256": "28de30f4caaefbbd2a3f0a6e5036de70072d4689351a5adc02291984a957e323",
       "category": "source"
     },
     {
       "path": "project2-source/artifacts/api-server/src/verification/customer.ts",
-      "bytes": 7505,
-      "sha256": "ca1caf27bd93a4f1178b33f287b65d6ba9a1e835e7eca198db56e9a2668f2004",
+      "bytes": 9502,
+      "sha256": "f122108fc7172b19be9646329f74d807dff30e77a177c1bec4af0799573a62d1",
       "category": "source"
     },
     {
@@ -2433,14 +2433,14 @@
     },
     {
       "path": "project2-source/artifacts/private-label-console/src/components/operator/notes-delivery.tsx",
-      "bytes": 4107,
-      "sha256": "af56a26bc91daddca9c8d9c4349780f0329e902aed17bfde3734516f04f5096a",
+      "bytes": 4814,
+      "sha256": "f3ee6a3a00542e1c81fdf24ebcde3119bc9dc52e26b6e5b06bd2097128880585",
       "category": "source"
     },
     {
       "path": "project2-source/artifacts/private-label-console/src/components/operator/review-form.tsx",
-      "bytes": 6894,
-      "sha256": "515bd6619dfd13dd23e6cdfd059e880345441bcb1834c34d952b471627bb1892",
+      "bytes": 7081,
+      "sha256": "282bdd743122afa526a0acca14e9cf19413f0cd93763913b91d2476399bfabb8",
       "category": "source"
     },
     {
@@ -2895,8 +2895,8 @@
     },
     {
       "path": "project2-source/artifacts/private-label-console/src/pages/client-detail.tsx",
-      "bytes": 6044,
-      "sha256": "5ec2a5aba00926d9cc3f9483203740a610c5b5325317c48d53f5fcf7a9db8a40",
+      "bytes": 6418,
+      "sha256": "0f820eded45d7de47119a7aef63393b480542b0745e8f52b50f1170df2eaa248",
       "category": "source"
     },
     {
@@ -3687,14 +3687,14 @@
     },
     {
       "path": "project2-source/docs/migration/inventory/project2.json",
-      "bytes": 246311,
-      "sha256": "e233bab4652046a12ada9d13d760740a9e45100db2463beb8ffc83f51819afd4",
+      "bytes": 246309,
+      "sha256": "bb3885a6f098eb0554cd51cd2a32280c37827f139b91d75c27e1bed4956f758d",
       "category": "migration-documentation"
     },
     {
       "path": "project2-source/docs/migration/inventory/summary.json",
       "bytes": 1157,
-      "sha256": "9fcc823acdc8b202981a2d4081f2c0ef83a3c06889b833a244b76cee2d1ad046",
+      "sha256": "d2f64b6107e9b9caccff2971746daf78481af29471ffb5dbc43566e16a529d90",
       "category": "migration-documentation"
     },
     {
@@ -4706,6 +4706,12 @@
       "category": "source"
     },
     {
+      "path": "project2-source/lib/db/migrations/development-automated-delivery.sql",
+      "bytes": 503,
+      "sha256": "ab66199a42c7d705d7a794592f38e70aa00ce234fe906ab07e8a9cb0d5607b42",
+      "category": "source"
+    },
+    {
       "path": "project2-source/lib/db/migrations/development-customer-backfill.sql",
       "bytes": 1377,
       "sha256": "c8a5be0661ff3ae71b210e85ff74d876d6967025dbacebe6150c7d0b2b499d96",
@@ -4719,8 +4725,8 @@
     },
     {
       "path": "project2-source/lib/db/migrations/development-order-upgrade.sql",
-      "bytes": 1882,
-      "sha256": "cfc457e63132730a804c00dff19e3c382d1f4f7bf08b988549691f0c20e128cf",
+      "bytes": 1884,
+      "sha256": "667d8507c343255e91189b05e40ef9cbd740c501fe48e49eacaf7ec951d18a6e",
       "category": "source"
     },
     {
@@ -4815,8 +4821,8 @@
     },
     {
       "path": "project2-source/lib/db/src/schema/white-label-requests.ts",
-      "bytes": 3187,
-      "sha256": "227ce66f90a5e2084f31081cbb07a80b6233cf3a54a326da60baa5867cea14c9",
+      "bytes": 3185,
+      "sha256": "a47522f75eb5f015723f991002f2e8a77d6ecdbe355aece3aadbfd85619efe99",
       "category": "source"
     },
     {
@@ -4977,8 +4983,8 @@
     },
     {
       "path": "reports/migration-audit.html",
-      "bytes": 1335953,
-      "sha256": "990b2abd82a44f775f25d7e281b26747d85de9d9b0c97c69e8c767fed2816d0d",
+      "bytes": 1335949,
+      "sha256": "1d35367a64219c498d722401701b541b1e86ec5647fcc3cafb63832404addd2a",
       "category": "migration-documentation"
     },
     {

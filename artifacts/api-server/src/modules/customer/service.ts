@@ -1,4 +1,4 @@
-import { withDatabase } from "@workspace/db";
+import { withDatabase, type DatabaseClient } from "@workspace/db";
 import { SubmitWhiteLabelRequestBody, ReviewWhiteLabelRequestBody, AddWhiteLabelNoteBody, type WhiteLabelNoteInput, type WhiteLabelRequestInput, type WhiteLabelReviewInput } from "@workspace/api-zod";
 import { createHash } from "node:crypto";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
@@ -7,6 +7,7 @@ import { audit } from "../../lib/audit";
 import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
 import { requestColumns as columns, orderView, event, eventColumns, requestContext, assertTransition, assertFinalPricing } from "./order-model";
 import { catalogSelection } from "./order-catalog";
+import { prepareTenant } from "../tenants/service";
 function stable(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, stable(v)]));
@@ -18,14 +19,16 @@ export function myAdminPanels(p: Principal) {
   return Promise.all(p.memberships.map(m => withDatabase(contextFor(p, m.tenantId), async c => {
     const r = await c.query(`SELECT t.id AS "tenantId",t.name,coalesce(b.brand_name,t.name) AS "brandName",t.slug,t.status
       FROM tenants t LEFT JOIN tenant_branding b ON b.tenant_id=t.id
-      WHERE t.id=$1 AND 'exchange_provisioned'=ANY(t.completed_steps) AND t.status IN ('active','suspended')`, [m.tenantId]);
+      WHERE t.id=$1 AND 'exchange_provisioned'=ANY(t.completed_steps) AND t.status IN ('active','suspended')
+        AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')`, [m.tenantId]);
     return r.rows.map(row => ({ ...row, role: m.role }));
   }))).then(rows => rows.flat());
 }
 export function assertDeliveredExchangeAccess(p: Principal, tenantId: string) {
   if (p.role === "super_admin") return Promise.resolve();
   return withDatabase(contextFor(p, tenantId), async c => {
-    const r = await c.query("SELECT id FROM tenants WHERE id=$1 AND 'exchange_provisioned'=ANY(completed_steps) AND status IN ('active','suspended')", [tenantId]);
+    const r = await c.query(`SELECT id FROM tenants t WHERE id=$1 AND 'exchange_provisioned'=ANY(completed_steps) AND status IN ('active','suspended')
+      AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')`, [tenantId]);
     if (!r.rowCount) throw new HttpError(403, "This Exchange has not been provisioned for your account.");
   });
 }
@@ -97,6 +100,7 @@ export function reviewRequest(p: Principal, id: string, raw: WhiteLabelReviewInp
       await catalogSelection(c, input.approvedPlanId !== undefined ? input.approvedPlanId : (old.approvedConfiguration?.plan?.id ?? old.configuration.catalogSnapshot?.plan?.id ?? null),
         input.approvedAddonIds ?? old.approvedConfiguration?.addons?.map((a: { id: string }) => a.id) ?? old.configuration.requestedAddonIds ?? []);
     if (old.configuration.requestedPlanId && !selection.plan && !["rejected", "cancelled"].includes(input.status)) throw new HttpError(400, "Choose an approved plan for this order.");
+    if (input.status === "approved" && !selection.plan) throw new HttpError(409, "Select a White Label Exchange plan before approving and preparing this order.");
     const next = { ...old, monthlyPrice: input.monthlyPrice, setupPrice: input.setupPrice, currency: input.currency,
       customizationPrice: input.customizationPrice === undefined ? old.customizationPrice : input.customizationPrice,
       customDesignDecision: input.customDesignDecision ?? old.customDesignDecision };
@@ -116,17 +120,39 @@ export function reviewRequest(p: Principal, id: string, raw: WhiteLabelReviewInp
       r.rows[0].operatorNote = input.operatorNote.trim();
     }
     await audit(c, p, null, "white_label.request.reviewed", "Reviewed Exchange White Label request", { requestId: id, status: input.status });
+    if (input.status === "approved" && !old.tenantId && selection.plan) {
+      // The request row lock makes retries idempotent; all preparation and linkage commit together.
+      const tenant = await prepareTenant(c, p, {
+        name: old.configuration.brandName, slug: `wl-${id}`, planId: selection.plan.id,
+      }, selection.addons.map((a: { id: string }) => a.id));
+      const effective = await resolveEntitlements(c, tenant.id);
+      requireFeature(effective, "website"); requireFeature(effective, "crypto_exchange");
+      for (const action of old.configuration.actions as string[]) requireFeature(effective, action);
+      const nextStatus = old.configuration.design?.type === "custom" ? "customization" : "in_setup";
+      const prepared = await c.query(`UPDATE white_label_requests SET tenant_id=$2,status=$3,updated_at=now() WHERE id=$1 RETURNING ${columns}`, [id, tenant.id, nextStatus]);
+      await event(c, p, id, "status", "Admin approved your request and prepared a sandbox Exchange. Setup is in progress; no Admin Panel is available until delivery.", "customer", nextStatus);
+      await audit(c, p, tenant.id, "white_label.request.prepared", "Prepared reviewed Exchange; access not granted", { requestId: id });
+      return orderView(c, prepared.rows[0]);
+    }
+    if (input.status === "ready" && old.tenantId) {
+      const linked = await c.query("SELECT status FROM tenants WHERE id=$1", [old.tenantId]);
+      if (linked.rows[0]?.status === "active") {
+        return (await deliverLinkedRequest(c, p, id, old.tenantId)) ?? orderView(c, r.rows[0]);
+      }
+    }
     return orderView(c, r.rows[0]);
   });
 }
-export function deliverRequest(p: Principal, id: string, tenantId: string) {
-  requireSuperAdmin(p);
-  return withDatabase(contextFor(p, tenantId, true), async c => {
+export async function deliverLinkedRequest(c: DatabaseClient, p: Principal, id: string, tenantId: string) {
+    requireSuperAdmin(p);
     const request = await c.query(`SELECT ${columns} FROM white_label_requests WHERE id=$1 FOR UPDATE`, [id]);
     if (!request.rowCount) throw new HttpError(404, "White Label request not found.");
     const row = request.rows[0];
     if (row.status === "delivered" && row.tenantId === tenantId) return orderView(c, row);
-    if (!["approved", "in_setup", "customization", "ready"].includes(row.status)) throw new HttpError(409, "Approve the request and set final pricing before provisioning.");
+    if (row.tenantId && row.tenantId !== tenantId) throw new HttpError(409, "This request is linked to a different Exchange.");
+    // Custom designs are never generated by the approval step: the operator must mark them ready.
+    if (!["approved", "in_setup", "customization", "ready"].includes(row.status)) return null;
+    if (row.configuration.design?.type === "custom" && row.status !== "ready") return null;
     assertFinalPricing(row);
     const tenant = await c.query("SELECT id,status,completed_steps FROM tenants WHERE id=$1 FOR UPDATE", [tenantId]);
     if (!tenant.rowCount || tenant.rows[0].status !== "active" || !tenant.rows[0].completed_steps.includes("exchange_provisioned")) throw new HttpError(409, "Finish Exchange setup and activate this tenant before handing it to the customer.");
@@ -146,13 +172,21 @@ export function deliverRequest(p: Principal, id: string, tenantId: string) {
     }
     const owner = await c.query("SELECT clerk_user_id FROM tenant_memberships WHERE tenant_id=$1 AND role='client_admin' AND active AND clerk_user_id<>$2", [tenantId, row.customerUserId]);
     if (owner.rowCount) throw new HttpError(409, "This Exchange is already owned by another customer.");
-    const used = await c.query("SELECT id FROM white_label_requests WHERE tenant_id=$1", [tenantId]);
+    const used = await c.query("SELECT id FROM white_label_requests WHERE tenant_id=$1 AND id<>$2", [tenantId, id]);
     if (used.rowCount) throw new HttpError(409, "This Exchange has already been delivered.");
     await c.query("INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role,label,active) VALUES ($1,$2,'client_admin','Customer account owner',true) ON CONFLICT (tenant_id,clerk_user_id) DO UPDATE SET role='client_admin',active=true", [tenantId, row.customerUserId]);
     const r = await c.query(`UPDATE white_label_requests SET status='delivered',tenant_id=$2,updated_at=now() WHERE id=$1 RETURNING ${columns}`, [id, tenantId]);
     await event(c, p, id, "status", "White Label delivered to your existing QXLayer account. Your authorized Admin Panel is available.", "customer", "delivered");
     await audit(c, p, tenantId, "white_label.provisioned", "Delivered Exchange into the existing QXLayer customer account", { requestId: id });
     return orderView(c, r.rows[0]);
+}
+export function deliverRequest(p: Principal, id: string, tenantId: string) {
+  requireSuperAdmin(p);
+  return withDatabase(contextFor(p, tenantId, true), async c => {
+    // Request -> tenant lock order matches review and sandbox activation.
+    const result = await deliverLinkedRequest(c, p, id, tenantId);
+    if (!result) throw new HttpError(409, "Finish approval and setup before delivery. Custom designs must be marked Ready.");
+    return result;
   });
 }
 

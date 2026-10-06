@@ -15,6 +15,12 @@ Only Super Admin reviews/approves requests, sets final pricing, provisions, assi
 
 **How to apply:** Keep customer requests separate from tenant administration and simulated Exchange trading orders. Suspension or a plan change does not undo the fact that an Exchange was delivered; preserve authorized read-only access, while enforcing current operational entitlements on writes.
 
+Admin approval triggers automatic preparation of a linked sandbox Exchange; submission alone never releases it. Release to the customer's existing account happens automatically only after required setup and activation are valid. An approved custom design must be marked Ready by the operator before delivery; approval does not generate the design.
+
+**Why:** The user chose after-admin-approval automation while retaining the required setup safeguards.
+
+**How to apply:** Never expose a pending linked tenant through customer membership or its public site. Keep approval, setup and delivery distinct states even when the handoff runs automatically.
+
 White Label Orders are the existing White Label requests, not a separate ordering system. My Orders contains all lifecycle states; My White Labels contains only provisioned/delivered projects.
 
 **Why:** The user explicitly requires pending, reviewing, rejected and cancelled requests to remain in My Orders, and asked to extend—not rebuild—the existing workflow.

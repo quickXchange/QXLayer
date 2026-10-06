@@ -6,7 +6,8 @@ import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
 export async function publicTenantId(slug: string) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) throw new HttpError(404, "Website not available.");
   const id = await withDatabase({ actorId: "public-site", publicSlug: slug }, async (client) => {
-    const r = await client.query("SELECT id FROM tenants WHERE slug=$1 AND status='active'", [slug]);
+    const r = await client.query(`SELECT id FROM tenants t WHERE slug=$1 AND status='active'
+      AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')`, [slug]);
     return r.rows[0]?.id as string | undefined;
   });
   if (!id) throw new HttpError(404, "Website not available.");

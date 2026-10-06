@@ -17,7 +17,10 @@ export async function resolvePrincipal(userId: string): Promise<Principal> {
   return withDatabase({ actorId: userId }, async (client) => {
     const admins = await client.query("SELECT clerk_user_id FROM platform_admins WHERE clerk_user_id = $1 AND active = true", [userId]);
     const memberships = await client.query<{ tenant_id: string; role: "client_admin" | "staff"; permissions: string[] }>(
-      "SELECT tenant_id, role, permissions FROM tenant_memberships WHERE clerk_user_id = $1 AND active = true ORDER BY created_at", [userId],
+      `SELECT m.tenant_id, m.role, m.permissions FROM tenant_memberships m
+       WHERE m.clerk_user_id=$1 AND m.active=true
+         AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=m.tenant_id AND w.status<>'delivered')
+       ORDER BY m.created_at`, [userId],
     );
     const mapped = memberships.rows.map((m) => ({ tenantId: m.tenant_id, role: m.role, permissions: m.permissions }));
     return {

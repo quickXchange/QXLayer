@@ -22,12 +22,12 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
   const okP = (v: string) => v === '' || price.test(v);
   const formErr = !okP(m) ? 'Recurring price format is 0.00' : !okP(s) ? 'Setup price format is 0.00' : !okP(cust) ? 'Customization price format is 0.00' : !/^[A-Za-z]{3}$/.test(cur) ? 'Currency must be a 3-letter ISO code' : '';
   const planCur = (plans.data ?? []).find((p) => p.id === pid)?.currency;
-  const canApprove = price.test(m) && price.test(s) && (!custom || (price.test(cust) && dec === 'approved'));
+  const canApprove = !!pid && price.test(m) && price.test(s) && (!custom || (price.test(cust) && dec === 'approved'));
   const addonList = (addons.data ?? []).filter((a) => a.enabled || aids.includes(a.id)).filter((a) => { const c = a.currency; return !planCur || !c || c === planCur; });
   const save = (st: string) => {
     setErr(null);
-    const need = st === 'approved' && (!price.test(m) || !price.test(s) || (custom && (!price.test(cust) || dec !== 'approved')));
-    if (need) { setErr(custom ? 'Approval needs recurring, setup and customization prices and an approved custom design decision.' : 'Approval needs recurring and setup prices.'); return; }
+    const need = st === 'approved' && !canApprove;
+    if (need) { setErr('Approval needs an Exchange plan, recurring and setup prices, and—for custom designs—an approved decision and customization price.'); return; }
     review.mutate({ requestId: o.id, data: { status: st as WhiteLabelStatus, monthlyPrice: m === '' ? null : m, setupPrice: s === '' ? null : s, currency: cur.toUpperCase(), operatorNote: '', customizationPrice: cust === '' ? null : cust, approvedPlanId: pid || null, approvedAddonIds: aids, customDesignDecision: dec } }, { onSuccess: onDone, onError: (e) => setErr(errMsg(e)) });
   };
   if (ro) return <p className="text-sm text-muted-foreground">This order is {statusText(o.status)}. Status and prices are read-only; notes can still be added.</p>;
@@ -53,6 +53,7 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
         <Button type="button" variant="secondary" data-testid="button-approve" disabled={!!formErr || !canApprove || review.isPending} onClick={() => { setStatus('approved'); save('approved'); }}>Approve</Button>
         <Button type="button" variant="outline" data-testid="button-reject" disabled={!!formErr || review.isPending} onClick={() => { if (window.confirm('Reject this order?')) { setStatus('rejected'); save('rejected'); } }}>Reject</Button>
       </div>
+      <p className="text-xs text-muted-foreground">Approval creates a linked sandbox draft. Finish its Exchange setup and activate it to deliver automatically. Custom designs also need to be marked Ready; approval alone does not create the design or grant customer access.</p>
     </form>
   );
 }

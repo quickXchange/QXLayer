@@ -12,7 +12,7 @@ UPDATE white_label_requests SET status=CASE status WHEN 'submitted' THEN 'new' W
 WHERE status IN ('submitted','provisioned');
 ALTER TABLE white_label_requests ALTER COLUMN status SET DEFAULT 'new';
 ALTER TABLE white_label_requests ADD CONSTRAINT white_label_request_status CHECK (status IN ('new','reviewing','waiting_for_client','quote_ready','approved','in_setup','customization','ready','delivered','rejected','cancelled'));
-ALTER TABLE white_label_requests ADD CONSTRAINT white_label_request_delivery CHECK ((status='delivered')=(tenant_id IS NOT NULL));
+ALTER TABLE white_label_requests ADD CONSTRAINT white_label_request_delivery CHECK (status <> 'delivered' OR tenant_id IS NOT NULL);
 ALTER TABLE addons ADD COLUMN IF NOT EXISTS monthly_price numeric(22,2) NOT NULL DEFAULT 0;
 ALTER TABLE addons ADD COLUMN IF NOT EXISTS yearly_price numeric(22,2) NOT NULL DEFAULT 0;
 ALTER TABLE addons ADD COLUMN IF NOT EXISTS setup_fee numeric(22,2) NOT NULL DEFAULT 0;

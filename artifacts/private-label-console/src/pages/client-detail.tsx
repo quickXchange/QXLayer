@@ -1,5 +1,6 @@
 import { useParams, Link } from 'wouter';
-import { useGetTenant, getGetTenantQueryKey, useActivateTenant } from '@workspace/api-client-react';
+import { useGetTenant, getGetTenantQueryKey, getListWhiteLabelRequestsQueryKey, useActivateTenant } from '@workspace/api-client-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader, ErrorState, ListSkeleton, StatusBadge, stepLabel } from '@/components/app/bits';
 import { BrandSection, DomainSection, ModulesSection, AssetsSection, ConfigSection } from '@/components/app/sections';
@@ -12,6 +13,7 @@ import { useInvalidateTenant } from '@/lib/invalidate';
 import { useToast } from '@/hooks/use-toast';
 
 export default function ClientDetail() {
+  const qc = useQueryClient();
   const { id = '' } = useParams<{ id: string }>();
   const q = useGetTenant(id, { query: { enabled: !!id, queryKey: getGetTenantQueryKey(id) } });
   const can = useCan(id);
@@ -40,7 +42,7 @@ export default function ClientDetail() {
             <StatusBadge status={t.status} />
             {can.editTenant && t.status === 'draft' && !suspended && (
               <Button data-testid="button-activate" disabled={!t.configurationComplete || act.isPending}
-                onClick={() => act.mutate({ tenantId: t.id }, { onSuccess: () => { inv(t.id); toast({ title: 'Activated in sandbox' }); }, onError: (e) => toast({ title: 'Activation failed', description: (e as Error).message, variant: 'destructive' }) })}>
+                onClick={() => act.mutate({ tenantId: t.id }, { onSuccess: () => { inv(t.id); qc.invalidateQueries({ queryKey: getListWhiteLabelRequestsQueryKey() }); toast({ title: 'Activated in sandbox', description: 'If this was linked to an approved standard order, it was delivered to the customer automatically. Custom designs require the order to be marked Ready.' }); }, onError: (e) => toast({ title: 'Activation or delivery failed', description: (e as Error).message, variant: 'destructive' }) })}>
                 {act.isPending ? 'Activating' : 'Activate sandbox'}
               </Button>)}
           </PageHeader>
