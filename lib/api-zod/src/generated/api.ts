@@ -3773,6 +3773,7 @@ export const CreateTenantResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -3881,6 +3882,7 @@ export const GetTenantResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -4014,6 +4016,7 @@ export const UpdateTenantBrandResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -4130,6 +4133,7 @@ export const UpdateTenantDomainResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -4248,6 +4252,7 @@ export const UpdateTenantModulesResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -4360,6 +4365,7 @@ export const UpdateTenantAssetsNetworksResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -4475,6 +4481,7 @@ export const UpdateTenantConfigurationResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -4583,6 +4590,7 @@ export const ActivateTenantResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
@@ -6106,6 +6114,7 @@ export const UpdateTenantWebsiteSettingsResponse = zod.object({
   "paymentsEnabled": zod.boolean(),
   "allowGuestCheckout": zod.boolean(),
   "configurationComplete": zod.boolean(),
+  "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),

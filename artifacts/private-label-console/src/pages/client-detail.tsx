@@ -52,7 +52,19 @@ export default function ClientDetail() {
               <div key={l} className="bg-card p-4"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="mt-1 text-sm capitalize">{v}</p></div>))}
           </div>
           {showFn && <Link href={`/clients/${t.id}/exchange`} className="mb-6 block rounded-md border bg-card p-4 text-sm hover:bg-muted/50" data-testid="link-exchange-panel">Open exchange panel: orders, assets, routes, pricing and settings for this tenant</Link>}
-          {!t.configurationComplete && <p className="mb-6 text-sm text-muted-foreground">Complete every section below before sandbox activation is available.</p>}
+           {!!t.activationBlockers?.length && <section className="mb-6 space-y-3 rounded-md border border-copper/40 bg-copper/5 p-4" data-testid="panel-activation-blockers">
+             <h2 className="font-display text-lg">Finish Exchange setup before activation</h2>
+             <ul className="list-disc space-y-1 pl-5 text-sm">{t.activationBlockers.map(message => <li key={message}>{message}</li>)}</ul>
+             <div className="flex flex-wrap gap-4 text-sm">
+               <Link href={`/clients/${t.id}/exchange/assets`} className="text-copper hover:underline">Exchange assets</Link>
+               <Link href={`/clients/${t.id}/exchange/networks`} className="text-copper hover:underline">Networks</Link>
+               <Link href={`/clients/${t.id}/exchange/routes`} className="text-copper hover:underline">Routes</Link>
+               <Link href={`/clients/${t.id}/exchange/pricing`} className="text-copper hover:underline">Pricing</Link>
+               <Link href={`/clients/${t.id}/exchange/settings`} className="text-copper hover:underline">Settings</Link>
+             </div>
+             <p className="text-xs text-muted-foreground">Optional API, Webhooks and RPC previews are not required for activation.</p>
+           </section>}
+           {!t.configurationComplete && !t.activationBlockers?.length && <p className="mb-6 text-sm text-muted-foreground">Complete every section below before sandbox activation is available.</p>}
           {unassigned && !suspended && <p className="mb-6 text-sm text-muted-foreground">No plan is assigned, so configuration is read-only.</p>}
           {suspended && <p className="mb-6 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. {isSuper ? 'All configuration is read-only; only subscription controls stay editable. Unsuspend to resume changes.' : 'Configuration is read-only until your operator lifts the suspension.'}</p>}
           {!can.editTenant && <p className="mb-6 text-sm text-muted-foreground">{can.permissions.length ? 'You can edit only the sections granted to you; everything else is read-only.' : 'Your role has read-only access to this client.'}</p>}

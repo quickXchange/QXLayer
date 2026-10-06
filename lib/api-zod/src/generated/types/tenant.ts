@@ -22,5 +22,6 @@ export type Tenant = TenantSummary & ({
   paymentsEnabled: boolean;
   allowGuestCheckout: boolean;
   configurationComplete: boolean;
+  activationBlockers?: string[];
   websiteSettings?: WebsiteSettings;
 });

@@ -13,6 +13,7 @@ import { safeHttps, validateSettings, websiteSettings, type WebsiteSettings } fr
 import { readRegistry } from "../product-registry/service";
 import { newDomainChallenge } from "../domains/service";
 import { exchangeProjection, writeExchangeCompatibility } from "../../products/exchange/compatibility";
+import { exchangeActivationBlockers } from "../../products/exchange/readiness";
 export { audit } from "../../lib/audit";
 
 const steps = ["brand", "domain", "modules", "assets_networks", "configuration"] as const;
@@ -35,19 +36,20 @@ export async function readTenant(client: DatabaseClient, tenantId: string) {
   const enabledModules = effective.enabledModules;
   const assetNetworkIds = assets.rows.map((a) => a.asset_network_id as string);
   const financial = (await readRegistry(client)).some((m) => enabledModules.includes(m.key) && m.requiresAssetNetworks);
-  const complete = steps.every((s) => completed.includes(s)) && enabledModules.length > 0 && (!financial || assetNetworkIds.length > 0);
+  const activationBlockers = await exchangeActivationBlockers(client, tenantId, effective, row.exchange_enabled);
+  const complete = steps.every((s) => completed.includes(s)) && enabledModules.length > 0 && (!financial || assetNetworkIds.length > 0) && activationBlockers.length === 0;
   return {
     id: row.id as string, name: row.name as string, slug: row.slug as string,
     brandName: row.brand_name as string, domain: row.domain ?? null,
     status: row.status as string, environment: "sandbox" as const,
-    enabledModules, provisioningStep: steps.find((s) => !completed.includes(s)) ?? "ready",
+    enabledModules, provisioningStep: steps.find((s) => !completed.includes(s)) ?? (activationBlockers.length ? "configuration" : "ready"),
     createdAt: row.created_at as Date, logoUrl: row.logo_url ?? null,
     primaryColor: row.primary_color as string, accentColor: row.accent_color as string,
     themeMode: row.theme_mode as string, defaultLanguage: row.default_language as string,
     supportedLanguages: row.supported_languages as string[],
      assetNetworkIds, ...exchangeProjection(row, effective),
      paymentsEnabled: Boolean(row.payments_enabled && effective.features.crypto_payments),
-     allowGuestCheckout: Boolean(row.allow_guest_checkout && effective.features.crypto_payments), configurationComplete: complete,
+     allowGuestCheckout: Boolean(row.allow_guest_checkout && effective.features.crypto_payments), configurationComplete: complete, activationBlockers,
      exchangeProvisioned: completed.includes("exchange_provisioned"),
      websiteSettings: websiteSettings(row.brand_name, row.website_settings),
   };
@@ -174,20 +176,12 @@ export function activateTenant(principal: Principal, tenantId: string) {
     assertOperational(effective);
     if (effective.overLimit) throw new HttpError(409, "Resolve over-limit resource usage before sandbox activation.");
     const tenant = await readTenant(client, tenantId);
-    if (!tenant.configurationComplete) throw new HttpError(400, "Complete provisioning, select at least one module, and select sandbox assets for financial modules.");
+    if (!tenant.configurationComplete) throw new HttpError(400, tenant.activationBlockers.join(" ") || "Complete provisioning, select at least one module, and select sandbox assets for financial modules.");
     const exchange = await client.query("SELECT configuration FROM tenant_product_configuration WHERE tenant_id=$1 AND module_key='crypto_exchange'", [tenantId]);
-    if (exchange.rowCount) {
-      requireFeature(effective, "crypto_exchange");
-      const config = exchange.rows[0].configuration;
-      if (!config.routes?.some((r: { enabled: boolean; action: string }) => r.enabled && config.actions?.[r.action]) ||
-          !config.assets?.some((a: { enabled: boolean }) => a.enabled) ||
-          !config.networks?.some((n: { enabled: boolean; available: boolean }) => n.enabled && n.available)) {
-        throw new HttpError(400, "Finish the Exchange assets, available networks, actions and routes before provisioning.");
-      }
-    }
+    const exchangeReady = exchange.rows[0]?.configuration.enabled === true;
     await client.query(`UPDATE tenants SET status='active',updated_at=now(),
       completed_steps=CASE WHEN $2 AND NOT 'exchange_provisioned'=ANY(completed_steps)
-        THEN array_append(completed_steps,'exchange_provisioned') ELSE completed_steps END WHERE id=$1`, [tenantId, !!exchange.rowCount]);
+        THEN array_append(completed_steps,'exchange_provisioned') ELSE completed_steps END WHERE id=$1`, [tenantId, exchangeReady]);
     await audit(client, principal, tenantId, "tenant.sandbox_activated", "Activated configuration in sandbox only; no domain or financial execution launched");
     if (linked.rowCount) {
       const { deliverLinkedRequest } = await import("../customer/service");

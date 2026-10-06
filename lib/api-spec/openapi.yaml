@@ -1669,6 +1669,9 @@ components:
             paymentsEnabled: { type: boolean }
             allowGuestCheckout: { type: boolean }
             configurationComplete: { type: boolean }
+            activationBlockers:
+              type: array
+              items: {type: string}
             websiteSettings: {$ref: "#/components/schemas/WebsiteSettings"}
           required: [logoUrl, primaryColor, accentColor, themeMode, defaultLanguage, supportedLanguages, assetNetworkIds, exchangeEnabled, paymentsEnabled, allowGuestCheckout, configurationComplete]
     EntitlementValue:

@@ -4,7 +4,8 @@ import { pool, withDatabase } from "@workspace/db";
 import { resolvePrincipal } from "../modules/authentication/service";
 import { myAdminPanels, listRequests, submitRequest, reviewRequest, deliverRequest, assertDeliveredExchangeAccess, orderDetail, appendNote } from "../modules/customer/service";
 import { whiteLabelCatalog } from "../modules/customer/order-catalog";
-import { activateTenant, createTenant, getTenant } from "../modules/tenants/service";
+import { activateTenant, createTenant, getTenant, saveBrand, saveDomain, saveAssets, saveConfiguration } from "../modules/tenants/service";
+import { GetTenantResponse } from "@workspace/api-zod";
 import { getPublicSite } from "../modules/website/service";
 import { emptyPreviewSettings, previewIntegrations } from "../products/exchange/preview-integrations";
 import { exchangeConfiguration, publicExchange } from "../products/exchange/service";
@@ -69,6 +70,16 @@ try {
   assert.deepEqual(await myAdminPanels(withDraft), []);
   await denied(() => assertDeliveredExchangeAccess(withDraft, draft.id), 403);
   await denied(() => activateTenant(withDraft, draft.id), 403);
+  await saveBrand(op, draft.id, { brandName: draft.brandName, logoUrl: null, primaryColor: "#102C36", accentColor: "#44D7C4", themeMode: "system", defaultLanguage: "en", supportedLanguages: ["en"] });
+  await saveDomain(op, draft.id, null);
+  await saveAssets(op, draft.id, fixture.base.networks.map(network => network.assetNetworkId));
+  await saveConfiguration(op, draft.id, { environment: "sandbox", exchangeEnabled: false, paymentsEnabled: false, allowGuestCheckout: false });
+  await previewIntegrations(op, draft.id, { settings: emptyPreviewSettings() });
+  const previewOnly = await activateTenant(op, draft.id);
+  assert.equal(previewOnly.status, "active", "Inert optional settings must not block an unrelated visual preview.");
+  assert.equal(previewOnly.exchangeProvisioned, false, "A metadata row must never mark an operational Exchange provisioned.");
+  await denied(() => assertDeliveredExchangeAccess(withDraft, draft.id), 403);
+  assert.deepEqual(await myAdminPanels(withDraft), []);
   await denied(() => deliverRequest(a, submitted.id, first.id), 403);
   await denied(() => deliverRequest(op, submitted.id, first.id), 409);
   await denied(() => reviewRequest(op, submitted.id, price), 409);
@@ -80,9 +91,30 @@ try {
   assert.deepEqual((await previewIntegrations(op, prepared.tenantId!)).settings, emptyPreviewSettings());
   await previewIntegrations(op, prepared.tenantId!, { settings: emptyPreviewSettings() });
   assert.equal((await getTenant(op, prepared.tenantId!)).configurationComplete, false, "Preview settings never count as operational provisioning.");
+  // Reproduce the reported case: every legacy step is complete, but no Exchange was saved.
+  await saveBrand(op, prepared.tenantId!, { brandName: prepared.brandName, logoUrl: null, primaryColor: "#102C36", accentColor: "#44D7C4", themeMode: "system", defaultLanguage: "en", supportedLanguages: ["en"] });
+  await saveDomain(op, prepared.tenantId!, null);
+  await saveAssets(op, prepared.tenantId!, fixture.base.networks.map(network => network.assetNetworkId));
+  await saveConfiguration(op, prepared.tenantId!, { environment: "sandbox", exchangeEnabled: true, paymentsEnabled: false, allowGuestCheckout: false });
+  const blocked = GetTenantResponse.parse(await getTenant(op, prepared.tenantId!));
+  assert.equal(blocked.configurationComplete, false, "Legacy completed steps must not falsely report an Exchange Ready.");
+  assert.equal(blocked.provisioningStep, "configuration");
+  assert.ok(blocked.activationBlockers?.some(message => message.includes("Save the Exchange setup")));
+  await denied(() => activateTenant(op, prepared.tenantId!), 400);
+  assert.equal((await getTenant(op, prepared.tenantId!)).status, "draft");
+  assert.equal((await orderDetail(a, submitted.id)).order.status, "in_setup");
+  assert.deepEqual(await myAdminPanels(a), [], "Blocked activation never delivers the customer panel.");
   await denied(() => deliverRequest(op, submitted.id, draft.id), 409);
   await denied(() => deliverRequest(op, submitted.id, first.id), 409);
   await finishCustomerTenant(op, { id: prepared.tenantId!, name: prepared.brandName }, fixture.base);
+  const readyConfiguration = (await exchangeConfiguration(op, prepared.tenantId!)).configuration;
+  await exchangeConfiguration(op, prepared.tenantId!, { ...readyConfiguration, routes: readyConfiguration.routes.filter(route => route.action !== "sell") });
+  const missingAction = await getTenant(op, prepared.tenantId!);
+  assert.equal(missingAction.configurationComplete, false);
+  assert.ok(missingAction.activationBlockers.some(message => message.includes("requested sell")));
+  await denied(() => activateTenant(op, prepared.tenantId!), 400);
+  await exchangeConfiguration(op, prepared.tenantId!, readyConfiguration);
+  assert.equal((await getTenant(op, prepared.tenantId!)).configurationComplete, true);
   await activateTenant(op, prepared.tenantId!);
   await deliverRequest(op, submitted.id, prepared.tenantId!);
   const owner = await resolvePrincipal(a.userId);
@@ -140,7 +172,7 @@ try {
   assert.deepEqual(await myAdminPanels(await resolvePrincipal(b.userId)), []);
   await pool.query("UPDATE tenant_memberships SET active=false WHERE clerk_user_id=$1", [a.userId]);
   assert.deepEqual(await myAdminPanels(await resolvePrincipal(a.userId)), []);
-  console.log("PASS: automatic preparation/delivery, custom-design hold, optional preview defaults/save/off, private isolated settings, unchanged entitlements and sandbox behavior, operational save preservation, idempotency and revocation.");
+  console.log("PASS: truthful activation readiness, missing-config/action rejection and rollback, metadata-only preview independence, automatic preparation/delivery, custom-design hold, optional settings privacy/save/off, unchanged entitlements and sandbox behavior, idempotency and revocation.");
 } finally {
   if (fixture) await cleanCustomerFixtures([...fixture.tenants.map(t => t.id), ...autoTenantIds, ...(draftId ? [draftId] : [])], fixture.planId, actors);
   else { await pool.query("DELETE FROM white_label_requests WHERE customer_user_id=ANY($1::text[])", [actors]); await pool.query("DELETE FROM platform_admins WHERE clerk_user_id=ANY($1::text[])", [actors]); }

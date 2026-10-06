@@ -21,6 +21,12 @@ Admin approval triggers automatic preparation of a linked sandbox Exchange; subm
 
 **How to apply:** Never expose a pending linked tenant through customer membership or its public site. Keep approval, setup and delivery distinct states even when the handoff runs automatically.
 
+General client setup completion is not proof that an Exchange is ready. Check actual Exchange assets, available networks, requested actions, routes and pricing before advertising readiness or offering activation. A metadata-only configuration row is not a provisioned Exchange.
+
+**Why:** A customer Exchange was shown as Ready after only generic setup, while activation rolled back at delivery because no operational Exchange configuration had been saved.
+
+**How to apply:** Use the same operational readiness checks in the client page and activation path. Show actionable missing setup without weakening delivery safeguards or inventing customer routes/rates. Optional integration previews must remain independent.
+
 White Label Orders are the existing White Label requests, not a separate ordering system. My Orders contains all lifecycle states; My White Labels contains only provisioned/delivered projects.
 
 **Why:** The user explicitly requires pending, reviewing, rejected and cancelled requests to remain in My Orders, and asked to extend—not rebuild—the existing workflow.
