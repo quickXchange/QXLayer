@@ -18,9 +18,16 @@ import { ListTenantAdministratorsParams, ListTenantAdministratorsResponse, Assig
 import { listTenantAdministrators, assignTenantAdministrator, setTenantAdministratorStatus } from "../modules/tenants/administrators";
 import { GetExchangePreviewIntegrationsParams, GetExchangePreviewIntegrationsResponse, SaveExchangePreviewIntegrationsParams, SaveExchangePreviewIntegrationsResponse } from "@workspace/api-zod";
 import { previewIntegrations } from "../products/exchange/preview-integrations";
+import { GetTenantWebsitePreviewResponse } from "@workspace/api-zod";
+import { getTenantWebsitePreview } from "../modules/website/preview-service";
 
 const router = Router();
 router.use("/tenants", requireAuthentication, sameOriginMutation);
+router.get("/tenants/:tenantId/website-preview", async (req, res) => {
+  const { tenantId } = GetTenantParams.parse(req.params);
+  res.set("Cache-Control", "no-store");
+  res.json(GetTenantWebsitePreviewResponse.parse(await getTenantWebsitePreview(principalFrom(res), tenantId)));
+});
 router.get("/tenants/:tenantId/exchange/preview-integrations", async (req, res) => {
   const { tenantId } = GetExchangePreviewIntegrationsParams.parse(req.params);
   res.json(GetExchangePreviewIntegrationsResponse.parse(await previewIntegrations(principalFrom(res), tenantId)));

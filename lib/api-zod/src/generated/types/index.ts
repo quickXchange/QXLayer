@@ -136,6 +136,7 @@ export * from './tenantSummaryEnvironment';
 export * from './tenantThemeMode';
 export * from './usageItem';
 export * from './websiteFaq';
+export * from './websitePreview';
 export * from './websiteSettings';
 export * from './websiteSettingsBorderRadius';
 export * from './websiteSettingsFontKey';

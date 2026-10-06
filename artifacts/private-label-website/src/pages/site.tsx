@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ReactNode } from 'react';
 import { useParams, Link } from 'wouter';
 import { useGetPublicSite, getGetPublicSiteQueryKey, useGetPublicCapability, getGetPublicCapabilityQueryKey, type PublicSite } from '@workspace/api-client-react';
+import { websitePreviewRequest } from '../lib/development-preview';
 import { SiteShell, Unavailable, SiteSkeleton } from '@/components/site-shell';
 import { Hero } from '@/components/hero';
 import { ExchangeWidget } from '@/components/exchange-widget';
@@ -10,7 +11,7 @@ import { humanize } from '@/lib/theme';
 const BelowFold = lazy(() => import('@/components/below-fold'));
 
 export function Gate({ slug, ambient, children }: { slug: string; ambient?: boolean; children: (s: PublicSite) => ReactNode }) {
-  const q = useGetPublicSite(slug, { query: { enabled: !!slug, queryKey: getGetPublicSiteQueryKey(slug), retry: false } });
+  const q = useGetPublicSite(slug, { request: websitePreviewRequest(slug), query: { enabled: !!slug, queryKey: getGetPublicSiteQueryKey(slug), retry: false } });
   if (q.isLoading) return <SiteSkeleton />;
   if (q.isError || !q.data) return <Unavailable onRetry={() => void q.refetch()} />;
   return <SiteShell key={q.data.tenantSlug} site={q.data} ambient={ambient}>{children(q.data)}</SiteShell>;
@@ -32,7 +33,7 @@ function Narrow({ children, testid }: { children: ReactNode; testid?: string }) 
 
 export function FeaturePage() {
   const { slug = '', feature = '' } = useParams<{ slug: string; feature: string }>();
-  const cap = useGetPublicCapability(slug, feature, { query: { enabled: !!slug && !!feature, queryKey: getGetPublicCapabilityQueryKey(slug, feature), retry: false } });
+  const cap = useGetPublicCapability(slug, feature, { request: websitePreviewRequest(slug), query: { enabled: !!slug && !!feature, queryKey: getGetPublicCapabilityQueryKey(slug, feature), retry: false } });
   return <Gate slug={slug}>{(site) => {
     const back = <Link href={`/${site.tenantSlug}`} className="s-btn s-btn-ghost mt-8" data-testid="link-back-home">Back to home</Link>;
     if (cap.isLoading) return <Narrow><div className="s-skel h-5 w-32" /><div className="s-skel mt-4 h-12 w-3/4" /><div className="s-skel mt-6 h-24 w-full" /></Narrow>;

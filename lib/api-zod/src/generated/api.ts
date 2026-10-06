@@ -8,6 +8,19 @@
 import * as zod from 'zod';
 
 
+/**
+ * @summary Get a Development-only read-only customer website preview without activation
+ */
+export const GetTenantWebsitePreviewParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const GetTenantWebsitePreviewResponse = zod.object({
+  "url": zod.string(),
+  "expiresAt": zod.coerce.date()
+})
+
+
 export const GetExchangeVisualCatalogResponse = zod.object({
   "assets": zod.array(zod.object({
   "kind": zod.enum(['crypto', 'network', 'payment-method', 'flag', 'currency']),

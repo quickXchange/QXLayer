@@ -5,6 +5,11 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export interface WebsitePreview {
+  url: string;
+  expiresAt: string;
+}
+
 export type ExchangeVisualAssetKind = typeof ExchangeVisualAssetKind[keyof typeof ExchangeVisualAssetKind];
 
 

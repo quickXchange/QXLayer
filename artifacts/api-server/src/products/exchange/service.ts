@@ -7,6 +7,7 @@ import { contextFor, type Principal } from "../../modules/authentication/service
 import { consumeMonthlyUsage, enforceLimit, lockTenant, requireFeature, resolveEntitlements, type EffectiveEntitlements } from "../../modules/entitlements/resolver";
 import { decimal, decimalString } from "../../modules/entitlements/decimal";
 import { publicTenantId } from "../../modules/website/service";
+import { developmentPreview } from "../../modules/website/development-preview";
 import { ACTIONS, emptySettings, readExchange, validateExchange } from "./settings";
 import { calculateQuote } from "./calculation";
 
@@ -36,8 +37,8 @@ function verify(token: string, tenantId: string, settings: ExchangeSettings, pla
   if (value.settingsHash !== hash(JSON.stringify(settings))) throw new HttpError(409, "Exchange configuration changed. Request a fresh quote.");
   return CreateSandboxQuoteBody.parse(value.input);
 }
-function guard(e: EffectiveEntitlements, action?: string) {
-  if (e.tenantStatus !== "active") throw new HttpError(404, "Exchange website is not active.");
+function guard(e: EffectiveEntitlements, action?: string, readOnlyPreview = false) {
+  if (e.tenantStatus !== "active" && !(readOnlyPreview && e.tenantStatus === "draft")) throw new HttpError(404, "Exchange website is not active.");
   requireFeature(e, "website");
   requireFeature(e, "crypto_exchange");
   if (action) requireFeature(e, action);
@@ -96,10 +97,10 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
     return { ...result, effectiveEnabled: result.configuration.enabled && legacy.rows[0]?.exchange_enabled === true && e.features.crypto_exchange === true && e.features.website === true && e.tenantStatus === "active" && e.status === "active" && !e.overLimit };
   });
 }
-export async function publicExchange(slug: string) {
-  const tenantId = await publicTenantId(slug);
-  return withDatabase({ actorId: "sandbox-visitor", tenantId }, async client => {
-    const e = await resolveEntitlements(client, tenantId); guard(e);
+export async function publicExchange(slug: string, previewToken?: string) {
+  const tenantId = await publicTenantId(slug, previewToken);
+  return withDatabase({ actorId: "sandbox-visitor", tenantId, isSuperAdmin: !!developmentPreview(slug, previewToken) }, async client => {
+    const e = await resolveEntitlements(client, tenantId); guard(e, undefined, !!developmentPreview(slug, previewToken));
     const { configuration: s, catalog } = await readExchange(client, tenantId);
     const legacy = await client.query("SELECT exchange_enabled FROM tenant_configuration WHERE tenant_id=$1", [tenantId]);
     const enabled = s.enabled && legacy.rows[0]?.exchange_enabled === true && !e.overLimit;

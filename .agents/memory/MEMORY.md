@@ -21,3 +21,5 @@
 - [Preview request security](preview-request-security.md) — sandboxed forms may have opaque origins; Development ingress and direct Production cookie behavior must be distinguished.
 - [Approved Exchange master](master-exchange-template.md) — current NovaX is the approved shared master; preserve its design and use isolated tenant configuration, not frontend copies.
 - [Retained review fixture](retained-provisioning-fixture.md) — keep the Asterlane Development test customer/order/uploads and later tenant until explicit removal; user runs the lifecycle.
+- [Setup website previews](setup-website-preview-policy.md) — read-only Development preview uses the shared customer website without activating or delivering the tenant.
+- [Development runtime detection](development-runtime-detection.md) — REPLIT_ENVIRONMENT can say production in the workspace; use the service’s explicit run mode for preview guards.

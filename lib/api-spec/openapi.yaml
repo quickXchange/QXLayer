@@ -17,6 +17,23 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /tenants/{tenantId}/website-preview:
+    get:
+      operationId: getTenantWebsitePreview
+      tags: [Tenants]
+      summary: Get a Development-only read-only customer website preview without activation
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Tenant-scoped preview URL, valid for 24 hours in Development only
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebsitePreview"
   /exchange/visual-catalog:
     get:
       operationId: getExchangeVisualCatalog
@@ -917,6 +934,12 @@ components:
         type: string
         format: uuid
   schemas:
+    WebsitePreview:
+      type: object
+      required: [url, expiresAt]
+      properties:
+        url: { type: string }
+        expiresAt: { type: string, format: date-time }
     ExchangeVisualAsset:
       type: object
       required: [kind, code, name, logoUrl, alternatives, recordId, countries, currencies]

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useCan, type Permission } from '@/lib/principal';
 import { useInvalidateTenant } from '@/lib/invalidate';
 import { useToast } from '@/hooks/use-toast';
+import { WebsitePreviewAction } from '@/components/app/website-preview-action';
 
 export default function ClientDetail() {
   const qc = useQueryClient();
@@ -47,6 +48,14 @@ export default function ClientDetail() {
                 {act.isPending ? 'Activating' : 'Activate sandbox'}
               </Button>)}
           </PageHeader>
+          {isSuper && import.meta.env.DEV && t.environment === "sandbox" && ["draft", "active"].includes(t.status) && (
+            <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border bg-card p-4" data-testid="panel-customer-website">
+              <div><h2 className="font-display text-lg">Customer-facing website</h2>
+                <p className="text-sm text-muted-foreground">View this tenant’s shared Exchange website. No activation or delivery is required; preview links expire after 24 hours.</p>
+              </div>
+              <WebsitePreviewAction tenantId={t.id} />
+            </section>
+          )}
           <div className="mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-md border bg-border md:grid-cols-4">
             {[['Client', t.name], ['Step', stepLabel(t.provisioningStep)], ['Environment', t.environment], ['Configuration', t.configurationComplete ? 'complete' : 'incomplete']].map(([l, v]) => (
               <div key={l} className="bg-card p-4"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="mt-1 text-sm capitalize">{v}</p></div>))}

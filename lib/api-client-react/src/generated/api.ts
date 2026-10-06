@@ -81,6 +81,7 @@ import type {
   TenantInput,
   TenantModulesInput,
   TenantSummary,
+  WebsitePreview,
   WebsiteSettings,
   WhiteLabelCatalog,
   WhiteLabelEvent,
@@ -117,6 +118,83 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetTenantWebsitePreviewUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/website-preview`
+}
+
+/**
+ * @summary Get a Development-only read-only customer website preview without activation
+ */
+export const getTenantWebsitePreview = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<WebsitePreview> => {
+
+  return customFetch<WebsitePreview>(getGetTenantWebsitePreviewUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTenantWebsitePreviewQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/website-preview`
+    ] as const;
+    }
+
+
+export const getGetTenantWebsitePreviewQueryOptions = <TData = Awaited<ReturnType<typeof getTenantWebsitePreview>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantWebsitePreview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantWebsitePreviewQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantWebsitePreview>>> = ({ signal }) => getTenantWebsitePreview(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTenantWebsitePreview>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTenantWebsitePreviewQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantWebsitePreview>>>
+export type GetTenantWebsitePreviewQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get a Development-only read-only customer website preview without activation
+ */
+
+export function useGetTenantWebsitePreview<TData = Awaited<ReturnType<typeof getTenantWebsitePreview>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantWebsitePreview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTenantWebsitePreviewQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetExchangeVisualCatalogUrl = () => {
 

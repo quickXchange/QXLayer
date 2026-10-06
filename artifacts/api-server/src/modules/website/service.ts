@@ -2,22 +2,26 @@ import { withDatabase } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { readTenant } from "../tenants/service";
 import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
+import { developmentPreview, previewBrandingUrl } from "./development-preview";
 
-export async function publicTenantId(slug: string) {
+export async function publicTenantId(slug: string, previewToken?: string) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) throw new HttpError(404, "Website not available.");
-  const id = await withDatabase({ actorId: "public-site", publicSlug: slug }, async (client) => {
-    const r = await client.query(`SELECT id FROM tenants t WHERE slug=$1 AND status='active'
-      AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')`, [slug]);
+  const preview = developmentPreview(slug, previewToken);
+  const id = await withDatabase({ actorId: "public-site", publicSlug: slug, isSuperAdmin: !!preview }, async (client) => {
+    const r = await client.query(`SELECT id FROM tenants t WHERE slug=$1 AND
+      ((status='active' AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered'))
+        OR ($2::uuid=t.id AND t.environment='sandbox' AND t.status IN ('draft','active')))`, [slug, preview?.tenantId ?? null]);
     return r.rows[0]?.id as string | undefined;
   });
   if (!id) throw new HttpError(404, "Website not available.");
   return id;
 }
-export async function getPublicSite(slug: string, feature?: string) {
-  const id = await publicTenantId(slug);
-  return withDatabase({ actorId: "public-site", tenantId: id }, async (client) => {
+export async function getPublicSite(slug: string, feature?: string, previewToken?: string) {
+  const preview = developmentPreview(slug, previewToken);
+  const id = await publicTenantId(slug, previewToken);
+  return withDatabase({ actorId: "public-site", tenantId: id, isSuperAdmin: !!preview }, async (client) => {
     const e = await resolveEntitlements(client, id);
-    if (e.tenantStatus !== "active" || !e.features.website) throw new HttpError(404, "Website not available.");
+    if ((!preview && e.tenantStatus !== "active") || e.status !== "active" || !e.features.website) throw new HttpError(404, "Website not available.");
     if (feature) requireFeature(e, feature);
     const t = await readTenant(client, id);
     if (feature === "crypto_exchange") return { feature, status: "sandbox_ready", message: "White Label Exchange supports manually configured sandbox quotes, simulated orders and private tracking. No funds, wallets, deposit addresses, blockchain transactions or payments are involved." };
@@ -30,9 +34,11 @@ export async function getPublicSite(slug: string, feature?: string) {
     );
     // Never serialize t/e wholesale: their plan, usage, overrides, IDs and staff are private.
     return {
-      tenantSlug: t.slug, brandName: t.brandName, logoUrl: t.logoUrl,
+      tenantSlug: t.slug, brandName: t.brandName, logoUrl: previewBrandingUrl(t.logoUrl, slug, previewToken),
       primaryColor: t.primaryColor, accentColor: t.accentColor, themeMode: t.themeMode,
-      domain: t.domain, sandboxOnly: true, websiteSettings: t.websiteSettings,
+      domain: t.domain, sandboxOnly: true, websiteSettings: {
+        ...t.websiteSettings, faviconUrl: previewBrandingUrl(t.websiteSettings.faviconUrl, slug, previewToken),
+      },
       features: e.features, assets: assets.rows,
     };
   });

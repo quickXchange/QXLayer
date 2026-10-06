@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDownUp, ChevronDown, Info, ShieldCheck } from 'lucide-react';
 import type { AssetNetwork, PublicSite } from '@workspace/api-client-react';
 import { useGetPublicExchange, getGetPublicExchangeQueryKey, createSandboxQuote, createSandboxOrder, trackSandboxOrder, type ExchangeQuote, type ExchangeOrderCreated } from '@workspace/api-client-react';
+import { websitePreviewRequest } from '../lib/development-preview';
 import type { Caps, ExchangeTab } from '../lib/capabilities';
 import { AssetPicker, Coin, NetBadge, assetKey } from './asset-picker';
 
@@ -35,7 +36,7 @@ function Side({ label, asset, onPick, value, onValue, readOnly, fiat, fiatCurren
 }
 
 export function ExchangeWidget({ site, caps, presentation = false }: { site: PublicSite; caps: Caps; presentation?: boolean }) {
-  const exchangeQ = useGetPublicExchange(site.tenantSlug, { query: { queryKey: getGetPublicExchangeQueryKey(site.tenantSlug), enabled: !presentation, refetchInterval: 15000 } });
+  const exchangeQ = useGetPublicExchange(site.tenantSlug, { request: websitePreviewRequest(site.tenantSlug), query: { queryKey: getGetPublicExchangeQueryKey(site.tenantSlug), enabled: !presentation, refetchInterval: 15000 } });
   const config = exchangeQ.data;
   const assets = presentation ? site.assets : config?.assets ?? [];
   const tabs = presentation ? caps.tabs : config?.actions ?? [];
