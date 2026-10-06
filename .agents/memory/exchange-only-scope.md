@@ -20,3 +20,9 @@ Provider catalog and assignment controls are preparation for future integrations
 **Why:** The user requested provider organization while explicitly prohibiting unverified connectivity claims and real execution; selecting a provider must never silently create a real transaction.
 
 **How to apply:** Preserve sandbox behavior regardless of future provider selection. Do not accept provider credentials until a verified integration and secure secret handling are implemented. Do not invent revenue or customer identities to fill administration views.
+
+Customers may fill in optional API, webhook and RPC sandbox preview settings or leave them off. These previews start off and must never block release of a correctly configured Exchange or create errors simply because they are unconfigured.
+
+**Why:** The user explicitly selected optional sandbox settings rather than live integrations, and wants released customer Exchanges to work without unconfigured-module errors.
+
+**How to apply:** Keep preview metadata private, non-secret and independent of operational Exchange settings, quote validity and provisioning readiness. Switches do not grant live entitlements or connect endpoints. Preserve required Exchange validation and actual-error reporting.

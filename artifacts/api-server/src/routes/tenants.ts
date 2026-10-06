@@ -16,9 +16,19 @@ import { getDomainVerification, verifyTenantDomain } from "../modules/domains/se
 import { productConfiguration } from "../modules/product-registry/configuration";
 import { ListTenantAdministratorsParams, ListTenantAdministratorsResponse, AssignTenantAdministratorParams, AssignTenantAdministratorBody, AssignTenantAdministratorResponse, SetTenantAdministratorStatusParams, SetTenantAdministratorStatusBody, SetTenantAdministratorStatusResponse } from "@workspace/api-zod";
 import { listTenantAdministrators, assignTenantAdministrator, setTenantAdministratorStatus } from "../modules/tenants/administrators";
+import { GetExchangePreviewIntegrationsParams, GetExchangePreviewIntegrationsResponse, SaveExchangePreviewIntegrationsParams, SaveExchangePreviewIntegrationsResponse } from "@workspace/api-zod";
+import { previewIntegrations } from "../products/exchange/preview-integrations";
 
 const router = Router();
 router.use("/tenants", requireAuthentication, sameOriginMutation);
+router.get("/tenants/:tenantId/exchange/preview-integrations", async (req, res) => {
+  const { tenantId } = GetExchangePreviewIntegrationsParams.parse(req.params);
+  res.json(GetExchangePreviewIntegrationsResponse.parse(await previewIntegrations(principalFrom(res), tenantId)));
+});
+router.put("/tenants/:tenantId/exchange/preview-integrations", async (req, res) => {
+  const { tenantId } = SaveExchangePreviewIntegrationsParams.parse(req.params);
+  res.json(SaveExchangePreviewIntegrationsResponse.parse(await previewIntegrations(principalFrom(res), tenantId, req.body)));
+});
 router.get("/tenants/:tenantId/administrators", async (req, res) => {
   const { tenantId } = ListTenantAdministratorsParams.parse(req.params);
   res.json(ListTenantAdministratorsResponse.parse(await listTenantAdministrators(principalFrom(res), tenantId)));

@@ -44,6 +44,8 @@ import type {
   ExchangeOrderCreated,
   ExchangeOrderInput,
   ExchangeOrderList,
+  ExchangePreviewInput,
+  ExchangePreviewIntegrations,
   ExchangeQuote,
   ExchangeQuoteInput,
   ExchangeSettings,
@@ -2563,6 +2565,160 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSetTenantAdministratorStatusMutationOptions(options));
+    }
+
+export const getGetExchangePreviewIntegrationsUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/preview-integrations`
+}
+
+export const getExchangePreviewIntegrations = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<ExchangePreviewIntegrations> => {
+
+  return customFetch<ExchangePreviewIntegrations>(getGetExchangePreviewIntegrationsUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExchangePreviewIntegrationsQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange/preview-integrations`
+    ] as const;
+    }
+
+
+export const getGetExchangePreviewIntegrationsQueryOptions = <TData = Awaited<ReturnType<typeof getExchangePreviewIntegrations>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangePreviewIntegrations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExchangePreviewIntegrationsQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExchangePreviewIntegrations>>> = ({ signal }) => getExchangePreviewIntegrations(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExchangePreviewIntegrations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExchangePreviewIntegrationsQueryResult = NonNullable<Awaited<ReturnType<typeof getExchangePreviewIntegrations>>>
+export type GetExchangePreviewIntegrationsQueryError = ErrorType<unknown>
+
+
+
+export function useGetExchangePreviewIntegrations<TData = Awaited<ReturnType<typeof getExchangePreviewIntegrations>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangePreviewIntegrations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExchangePreviewIntegrationsQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveExchangePreviewIntegrationsUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/preview-integrations`
+}
+
+export const saveExchangePreviewIntegrations = async (tenantId: string,
+    exchangePreviewInput: ExchangePreviewInput, options?: Parameters<typeof customFetch>[1]): Promise<ExchangePreviewIntegrations> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ExchangePreviewIntegrations>(getSaveExchangePreviewIntegrationsUrl(tenantId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangePreviewInput)
+  }
+);}
+
+
+
+
+
+export const getSaveExchangePreviewIntegrationsMutationKey = () => ['saveExchangePreviewIntegrations'] as const;
+
+export const getSaveExchangePreviewIntegrationsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveExchangePreviewIntegrations>>, TError,SaveExchangePreviewIntegrationsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveExchangePreviewIntegrations>>, TError,SaveExchangePreviewIntegrationsMutationVariables, TContext> => {
+
+const mutationKey = getSaveExchangePreviewIntegrationsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveExchangePreviewIntegrations>>, SaveExchangePreviewIntegrationsMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  saveExchangePreviewIntegrations(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveExchangePreviewIntegrationsMutationResult = NonNullable<Awaited<ReturnType<typeof saveExchangePreviewIntegrations>>>
+    export type SaveExchangePreviewIntegrationsMutationBody = BodyType<ExchangePreviewInput>
+    export type SaveExchangePreviewIntegrationsMutationError = ErrorType<unknown>
+    export type SaveExchangePreviewIntegrationsMutationVariables = {tenantId: string;data: BodyType<ExchangePreviewInput>}
+
+    export const useSaveExchangePreviewIntegrations = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveExchangePreviewIntegrations>>, TError,SaveExchangePreviewIntegrationsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveExchangePreviewIntegrations>>,
+        TError,
+        SaveExchangePreviewIntegrationsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveExchangePreviewIntegrationsMutationOptions(options));
     }
 
 export const getGetProductConfigurationUrl = (tenantId: string,

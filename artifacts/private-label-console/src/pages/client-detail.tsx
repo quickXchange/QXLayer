@@ -7,6 +7,7 @@ import { BrandSection, DomainSection, ModulesSection, AssetsSection, ConfigSecti
 import { SubscriptionSections, useSubscription } from '@/components/app/subscription';
 import { WebsiteSection, ResourcesSection } from '@/components/app/advanced';
 import { DomainOwnershipSection, StaffAccessSection, ProductSettingsSection, AdministratorsSection } from '@/components/app/management';
+import { PreviewIntegrations } from '@/components/exchange/preview-integrations';
 import { Button } from '@/components/ui/button';
 import { useCan, type Permission } from '@/lib/principal';
 import { useInvalidateTenant } from '@/lib/invalidate';
@@ -63,6 +64,7 @@ export default function ClientDetail() {
             {(isSuper || mods.length > 0) && <ModulesSection tenant={t} readOnly />}
             {showFn && <AssetsSection tenant={t} readOnly={roFor('configuration.manage')} />}
             {showFn && <ConfigSection tenant={t} readOnly={roFor('configuration.manage')} />}
+            <PreviewIntegrations tenantId={t.id} sub={sub} subLoading={subQ.isLoading} suspended={!!suspended} />
             <ProductSettingsSection tenantId={t.id} sub={sub} readOnly={roFor('configuration.manage')} showAll={isSuper} />
             {(isSuper || F.website === true) && <WebsiteSection tenant={t} readOnly={roFor('branding.manage')} />}
             {(isSuper || can.role === 'client_admin') && <AdministratorsSection tenantId={t.id} canManage={isSuper} />}

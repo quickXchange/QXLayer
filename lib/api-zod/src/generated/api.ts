@@ -3068,6 +3068,143 @@ export const SetTenantAdministratorStatusResponse = zod.object({
 })
 
 
+export const GetExchangePreviewIntegrationsParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const getExchangePreviewIntegrationsResponseSettingsApiLabelMax = 120;
+
+export const getExchangePreviewIntegrationsResponseSettingsApiBaseUrlMax = 2048;
+
+export const getExchangePreviewIntegrationsResponseSettingsWebhooksLabelMax = 120;
+
+export const getExchangePreviewIntegrationsResponseSettingsWebhooksEndpointUrlMax = 2048;
+
+export const getExchangePreviewIntegrationsResponseSettingsWebhooksEventsMax = 3;
+
+export const getExchangePreviewIntegrationsResponseSettingsRpcLabelMax = 120;
+
+export const getExchangePreviewIntegrationsResponseSettingsRpcEndpointUrlMax = 2048;
+
+export const getExchangePreviewIntegrationsResponseSettingsRpcNetworkNameMax = 120;
+
+
+
+export const GetExchangePreviewIntegrationsResponse = zod.object({
+  "settings": zod.object({
+  "api": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(getExchangePreviewIntegrationsResponseSettingsApiLabelMax),
+  "baseUrl": zod.string().max(getExchangePreviewIntegrationsResponseSettingsApiBaseUrlMax)
+}),
+  "webhooks": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(getExchangePreviewIntegrationsResponseSettingsWebhooksLabelMax),
+  "endpointUrl": zod.string().max(getExchangePreviewIntegrationsResponseSettingsWebhooksEndpointUrlMax),
+  "events": zod.array(zod.enum(['order.created', 'order.status_changed', 'quote.created'])).max(getExchangePreviewIntegrationsResponseSettingsWebhooksEventsMax)
+}),
+  "rpc": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(getExchangePreviewIntegrationsResponseSettingsRpcLabelMax),
+  "endpointUrl": zod.string().max(getExchangePreviewIntegrationsResponseSettingsRpcEndpointUrlMax),
+  "networkName": zod.string().max(getExchangePreviewIntegrationsResponseSettingsRpcNetworkNameMax)
+})
+}),
+  "sandboxOnly": zod.literal(true),
+  "executionStatus": zod.enum(['configuration_only'])
+})
+
+
+export const SaveExchangePreviewIntegrationsParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const saveExchangePreviewIntegrationsBodySettingsApiLabelMax = 120;
+
+export const saveExchangePreviewIntegrationsBodySettingsApiBaseUrlMax = 2048;
+
+export const saveExchangePreviewIntegrationsBodySettingsWebhooksLabelMax = 120;
+
+export const saveExchangePreviewIntegrationsBodySettingsWebhooksEndpointUrlMax = 2048;
+
+export const saveExchangePreviewIntegrationsBodySettingsWebhooksEventsMax = 3;
+
+export const saveExchangePreviewIntegrationsBodySettingsRpcLabelMax = 120;
+
+export const saveExchangePreviewIntegrationsBodySettingsRpcEndpointUrlMax = 2048;
+
+export const saveExchangePreviewIntegrationsBodySettingsRpcNetworkNameMax = 120;
+
+export const saveExchangePreviewIntegrationsBodyModulesMax = 3;
+
+
+
+export const SaveExchangePreviewIntegrationsBody = zod.object({
+  "settings": zod.object({
+  "api": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangePreviewIntegrationsBodySettingsApiLabelMax),
+  "baseUrl": zod.string().max(saveExchangePreviewIntegrationsBodySettingsApiBaseUrlMax)
+}),
+  "webhooks": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangePreviewIntegrationsBodySettingsWebhooksLabelMax),
+  "endpointUrl": zod.string().max(saveExchangePreviewIntegrationsBodySettingsWebhooksEndpointUrlMax),
+  "events": zod.array(zod.enum(['order.created', 'order.status_changed', 'quote.created'])).max(saveExchangePreviewIntegrationsBodySettingsWebhooksEventsMax)
+}),
+  "rpc": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangePreviewIntegrationsBodySettingsRpcLabelMax),
+  "endpointUrl": zod.string().max(saveExchangePreviewIntegrationsBodySettingsRpcEndpointUrlMax),
+  "networkName": zod.string().max(saveExchangePreviewIntegrationsBodySettingsRpcNetworkNameMax)
+})
+}),
+  "modules": zod.array(zod.enum(['api', 'webhooks', 'rpc'])).min(1).max(saveExchangePreviewIntegrationsBodyModulesMax).optional()
+})
+
+export const saveExchangePreviewIntegrationsResponseSettingsApiLabelMax = 120;
+
+export const saveExchangePreviewIntegrationsResponseSettingsApiBaseUrlMax = 2048;
+
+export const saveExchangePreviewIntegrationsResponseSettingsWebhooksLabelMax = 120;
+
+export const saveExchangePreviewIntegrationsResponseSettingsWebhooksEndpointUrlMax = 2048;
+
+export const saveExchangePreviewIntegrationsResponseSettingsWebhooksEventsMax = 3;
+
+export const saveExchangePreviewIntegrationsResponseSettingsRpcLabelMax = 120;
+
+export const saveExchangePreviewIntegrationsResponseSettingsRpcEndpointUrlMax = 2048;
+
+export const saveExchangePreviewIntegrationsResponseSettingsRpcNetworkNameMax = 120;
+
+
+
+export const SaveExchangePreviewIntegrationsResponse = zod.object({
+  "settings": zod.object({
+  "api": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangePreviewIntegrationsResponseSettingsApiLabelMax),
+  "baseUrl": zod.string().max(saveExchangePreviewIntegrationsResponseSettingsApiBaseUrlMax)
+}),
+  "webhooks": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangePreviewIntegrationsResponseSettingsWebhooksLabelMax),
+  "endpointUrl": zod.string().max(saveExchangePreviewIntegrationsResponseSettingsWebhooksEndpointUrlMax),
+  "events": zod.array(zod.enum(['order.created', 'order.status_changed', 'quote.created'])).max(saveExchangePreviewIntegrationsResponseSettingsWebhooksEventsMax)
+}),
+  "rpc": zod.object({
+  "enabled": zod.boolean(),
+  "label": zod.string().max(saveExchangePreviewIntegrationsResponseSettingsRpcLabelMax),
+  "endpointUrl": zod.string().max(saveExchangePreviewIntegrationsResponseSettingsRpcEndpointUrlMax),
+  "networkName": zod.string().max(saveExchangePreviewIntegrationsResponseSettingsRpcNetworkNameMax)
+})
+}),
+  "sandboxOnly": zod.literal(true),
+  "executionStatus": zod.enum(['configuration_only'])
+})
+
+
 export const getProductConfigurationPathModuleKeyMax = 64;
 
 

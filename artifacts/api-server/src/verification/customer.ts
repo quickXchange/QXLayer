@@ -4,8 +4,11 @@ import { pool, withDatabase } from "@workspace/db";
 import { resolvePrincipal } from "../modules/authentication/service";
 import { myAdminPanels, listRequests, submitRequest, reviewRequest, deliverRequest, assertDeliveredExchangeAccess, orderDetail, appendNote } from "../modules/customer/service";
 import { whiteLabelCatalog } from "../modules/customer/order-catalog";
-import { activateTenant, createTenant } from "../modules/tenants/service";
+import { activateTenant, createTenant, getTenant } from "../modules/tenants/service";
 import { getPublicSite } from "../modules/website/service";
+import { emptyPreviewSettings, previewIntegrations } from "../products/exchange/preview-integrations";
+import { exchangeConfiguration, publicExchange } from "../products/exchange/service";
+import { resolveEntitlements } from "../modules/entitlements/resolver";
 import { prepareCustomerFixtures, finishCustomerTenant, cleanCustomerFixtures } from "./customer-fixtures";
 if (process.env.NODE_ENV === "production") throw new Error("Development verification refused in production.");
 const suffix = randomUUID().slice(0, 8);
@@ -74,6 +77,9 @@ try {
   assert.ok(prepared.tenantId);
   autoTenantIds.push(prepared.tenantId!);
   assert.equal((await myAdminPanels(a)).length, 0);
+  assert.deepEqual((await previewIntegrations(op, prepared.tenantId!)).settings, emptyPreviewSettings());
+  await previewIntegrations(op, prepared.tenantId!, { settings: emptyPreviewSettings() });
+  assert.equal((await getTenant(op, prepared.tenantId!)).configurationComplete, false, "Preview settings never count as operational provisioning.");
   await denied(() => deliverRequest(op, submitted.id, draft.id), 409);
   await denied(() => deliverRequest(op, submitted.id, first.id), 409);
   await finishCustomerTenant(op, { id: prepared.tenantId!, name: prepared.brandName }, fixture.base);
@@ -83,6 +89,34 @@ try {
   assert.equal((await myAdminPanels(owner)).length, 1);
   await assertDeliveredExchangeAccess(owner, prepared.tenantId!);
   await denied(() => assertDeliveredExchangeAccess(b, prepared.tenantId!), 403);
+  assert.deepEqual((await previewIntegrations(owner, prepared.tenantId!)).settings, emptyPreviewSettings(), "Unconfigured optional modules do not prevent automatic delivery.");
+  const privatePreview = {
+    api: { enabled: true, label: "Private API preview", baseUrl: "https://api.preview.example" },
+    webhooks: { enabled: true, label: "Private webhook preview", endpointUrl: "https://hooks.preview.example/events", events: ["order.created", "order.status_changed"] },
+    rpc: { enabled: true, label: "Private RPC preview", endpointUrl: "https://rpc.preview.example", networkName: "Sandbox network" },
+  };
+  const entitlementBefore = await withDatabase({ actorId: op.userId, tenantId: prepared.tenantId!, isSuperAdmin: true }, c => resolveEntitlements(c, prepared.tenantId!));
+  assert.equal(entitlementBefore.features.webhooks, false);
+  assert.deepEqual((await previewIntegrations(owner, prepared.tenantId!, { settings: privatePreview })).settings, privatePreview);
+  const apiOnly = { ...emptyPreviewSettings(), api: { ...privatePreview.api, label: "Updated API preview" } };
+  const merged = await previewIntegrations(owner, prepared.tenantId!, { settings: apiOnly, modules: ["api"] });
+  privatePreview.api.label = "Updated API preview";
+  assert.deepEqual(merged.settings, privatePreview, "Saving one module must not overwrite settings from other tabs or sessions.");
+  await denied(() => previewIntegrations(b, prepared.tenantId!), 403);
+  await denied(() => previewIntegrations(b, prepared.tenantId!, { settings: privatePreview }), 403);
+  await denied(() => previewIntegrations(owner, prepared.tenantId!, { settings: { ...privatePreview, api: { ...privatePreview.api, secret: "DO_NOT_STORE" } } }), 400);
+  await denied(() => previewIntegrations(owner, prepared.tenantId!, { settings: { ...privatePreview, api: { ...privatePreview.api, baseUrl: "https://api.preview.example?token=DO_NOT_STORE" } } }), 400);
+  await denied(() => previewIntegrations(owner, prepared.tenantId!, { settings: { ...privatePreview, rpc: { ...privatePreview.rpc, networkName: "" } } }), 400);
+  const entitlementAfter = await withDatabase({ actorId: op.userId, tenantId: prepared.tenantId!, isSuperAdmin: true }, c => resolveEntitlements(c, prepared.tenantId!));
+  assert.deepEqual(entitlementAfter.features, entitlementBefore.features, "Preview switches never grant live module entitlements.");
+  const publicBefore = await publicExchange(`wl-${submitted.id}`);
+  assert.ok(!JSON.stringify(publicBefore).includes("preview.example"), "Private preview URLs never reach public Exchange responses.");
+  const operational = (await exchangeConfiguration(owner, prepared.tenantId!)).configuration;
+  await exchangeConfiguration(owner, prepared.tenantId!, operational);
+  assert.deepEqual((await previewIntegrations(owner, prepared.tenantId!)).settings, privatePreview, "Operational saves preserve independently edited preview settings.");
+  assert.deepEqual(await publicExchange(`wl-${submitted.id}`), publicBefore, "Optional settings never alter public sandbox behavior.");
+  await previewIntegrations(owner, prepared.tenantId!, { settings: emptyPreviewSettings() });
+  assert.deepEqual((await previewIntegrations(owner, prepared.tenantId!)).settings, emptyPreviewSettings());
   assert.equal((await listRequests(a)).find(r => r.id === submitted.id)?.status, "delivered");
   await finishCustomerTenant(op, { id: preparedCustom.tenantId!, name: preparedCustom.brandName }, fixture.base);
   await pool.query("INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role) VALUES ($1,$2,'client_admin')", [preparedCustom.tenantId, a.userId]);
@@ -106,7 +140,7 @@ try {
   assert.deepEqual(await myAdminPanels(await resolvePrincipal(b.userId)), []);
   await pool.query("UPDATE tenant_memberships SET active=false WHERE clerk_user_id=$1", [a.userId]);
   assert.deepEqual(await myAdminPanels(await resolvePrincipal(a.userId)), []);
-  console.log("PASS: automatic draft preparation on approval and delivery on activation/ready, custom-design hold, existing-session access, isolation, idempotency and revocation.");
+  console.log("PASS: automatic preparation/delivery, custom-design hold, optional preview defaults/save/off, private isolated settings, unchanged entitlements and sandbox behavior, operational save preservation, idempotency and revocation.");
 } finally {
   if (fixture) await cleanCustomerFixtures([...fixture.tenants.map(t => t.id), ...autoTenantIds, ...(draftId ? [draftId] : [])], fixture.planId, actors);
   else { await pool.query("DELETE FROM white_label_requests WHERE customer_user_id=ANY($1::text[])", [actors]); await pool.query("DELETE FROM platform_admins WHERE clerk_user_id=ANY($1::text[])", [actors]); }

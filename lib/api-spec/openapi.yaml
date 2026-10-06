@@ -300,6 +300,32 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/MutationStatus"}
+  /tenants/{tenantId}/exchange/preview-integrations:
+    parameters:
+      - $ref: "#/components/parameters/TenantId"
+    get:
+      operationId: getExchangePreviewIntegrations
+      tags: [exchange]
+      responses:
+        "200":
+          description: Optional private sandbox settings, off by default and never executed
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ExchangePreviewIntegrations"}
+    put:
+      operationId: saveExchangePreviewIntegrations
+      tags: [exchange]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangePreviewInput"}
+      responses:
+        "200":
+          description: Stored preview settings only; no API access, webhook delivery or RPC connection
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ExchangePreviewIntegrations"}
   /tenants/{tenantId}/products/{moduleKey}/configuration:
     parameters:
       - $ref: "#/components/parameters/TenantId"
@@ -1344,6 +1370,60 @@ components:
       type: object
       properties: {active: {type: boolean}}
       required: [active]
+    ExchangePreviewSettings:
+      type: object
+      additionalProperties: false
+      required: [api, webhooks, rpc]
+      properties:
+        api:
+          type: object
+          additionalProperties: false
+          required: [enabled, label, baseUrl]
+          properties:
+            enabled: {type: boolean}
+            label: {type: string, maxLength: 120}
+            baseUrl: {type: string, maxLength: 2048}
+        webhooks:
+          type: object
+          additionalProperties: false
+          required: [enabled, label, endpointUrl, events]
+          properties:
+            enabled: {type: boolean}
+            label: {type: string, maxLength: 120}
+            endpointUrl: {type: string, maxLength: 2048}
+            events:
+              type: array
+              maxItems: 3
+              uniqueItems: true
+              items: {type: string, enum: [order.created, order.status_changed, quote.created]}
+        rpc:
+          type: object
+          additionalProperties: false
+          required: [enabled, label, endpointUrl, networkName]
+          properties:
+            enabled: {type: boolean}
+            label: {type: string, maxLength: 120}
+            endpointUrl: {type: string, maxLength: 2048}
+            networkName: {type: string, maxLength: 120}
+    ExchangePreviewInput:
+      type: object
+      additionalProperties: false
+      required: [settings]
+      properties:
+        settings: {$ref: "#/components/schemas/ExchangePreviewSettings"}
+        modules:
+          type: array
+          minItems: 1
+          maxItems: 3
+          uniqueItems: true
+          items: {type: string, enum: [api, webhooks, rpc]}
+    ExchangePreviewIntegrations:
+      type: object
+      required: [settings, sandboxOnly, executionStatus]
+      properties:
+        settings: {$ref: "#/components/schemas/ExchangePreviewSettings"}
+        sandboxOnly: {type: boolean, enum: [true]}
+        executionStatus: {type: string, enum: [configuration_only]}
     ProductConfiguration:
       type: object
       properties:

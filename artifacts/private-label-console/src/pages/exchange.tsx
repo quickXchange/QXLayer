@@ -19,9 +19,10 @@ import { CustomersPanel } from '@/components/exchange/customers-panel';
 import { StaffPanel } from '@/components/exchange/staff-panel';
 import { AuditPanel } from '@/components/exchange/audit-panel';
 import { ExchangeAdminNavigation } from '@/components/exchange/admin-navigation';
+import { PreviewIntegrations } from '@/components/exchange/preview-integrations';
 import { useConsoleNavigation } from '@/components/app/console-frame';
 
-const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
+const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
 const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'providers', 'settings'];
 
 export default function Exchange() {
@@ -73,6 +74,7 @@ export default function Exchange() {
   else if (sec === 'api-keys') body = F.api_keys === true
     ? <ResourcesSection tenantId={id} allowed={{ staff: false, api_keys: true, webhooks: false, payment_methods: false }} readOnly={ro('resources.manage')} />
     : <div className="space-y-3" data-testid="text-api-keys-unavailable"><h2 className="font-display text-2xl">API Keys</h2><p className="text-sm text-muted-foreground">API Keys are not included in this tenant's effective plan. No keys can be issued from this section.</p></div>;
+  else if (sec === 'api-preview' || sec === 'webhooks-preview' || sec === 'rpc-preview') body = <PreviewIntegrations tenantId={id} sub={sub} subLoading={subQ.isLoading} suspended={!!suspended} module={sec === 'api-preview' ? 'api' : sec === 'rpc-preview' ? 'rpc' : 'webhooks'} />;
   else body = <AuditPanel tenantId={id} />;
 
   return (

@@ -4,6 +4,7 @@ import {
   useListTenantResources, getListTenantResourcesQueryKey, useListProductRegistry, useGetProductConfiguration, getGetProductConfigurationQueryKey,
   useSetProductConfiguration, useListTenantAdministrators, getListTenantAdministratorsQueryKey, useAssignTenantAdministrator, useSetTenantAdministratorStatus, type Tenant, type SubscriptionView, type ProductModule,
 } from '@workspace/api-client-react';
+import { Link } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -149,7 +150,7 @@ export function ProductSettingsSection({ tenantId, sub, readOnly, showAll }: { t
       footer={readOnly ? RO : <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">JSON object, no secrets</span>}>
       {reg.isLoading ? <Skeleton className="h-24" /> : reg.isError ? <ErrorState what="the product registry" onRetry={() => reg.refetch()} /> : mods.length === 0 ? (
         <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-products">No registered product is enabled for this client.</p>
-      ) : <div className="divide-y rounded-md border">{mods.map((m) => <ProductPanel key={m.key} tenantId={tenantId} mod={m} readOnly={readOnly} />)}</div>}
+      ) : <div className="divide-y rounded-md border">{mods.map((m) => m.key === 'crypto_exchange' ? <div key={m.key} className="flex flex-wrap items-center justify-between gap-2 p-4" data-testid="panel-product-crypto_exchange"><p className="font-display text-xl">{m.name}</p><Link href={`/clients/${tenantId}/exchange/settings`} className="text-sm text-copper hover:underline" data-testid="link-exchange-dedicated">Managed in the dedicated Exchange panel</Link></div> : <ProductPanel key={m.key} tenantId={tenantId} mod={m} readOnly={readOnly} />)}</div>}
       {denied.length > 0 && (
         <div className="divide-y rounded-md border" data-testid="list-assignment-needed">
           {denied.map((m) => <div key={m.key} className="flex items-center justify-between gap-3 p-3 text-sm" data-testid={`row-needs-assignment-${m.key}`}><span>{m.name}</span><span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Assignment needed. Grant it through the plan, add-ons or overrides above.</span></div>)}

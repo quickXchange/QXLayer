@@ -1018,6 +1018,80 @@ export interface TenantAdministratorStatusInput {
   active: boolean;
 }
 
+export type ExchangePreviewSettingsApi = {
+  enabled: boolean;
+  /** @maxLength 120 */
+  label: string;
+  /** @maxLength 2048 */
+  baseUrl: string;
+};
+
+export type ExchangePreviewSettingsWebhooksEventsItem = typeof ExchangePreviewSettingsWebhooksEventsItem[keyof typeof ExchangePreviewSettingsWebhooksEventsItem];
+
+
+export const ExchangePreviewSettingsWebhooksEventsItem = {
+  ordercreated: 'order.created',
+  orderstatus_changed: 'order.status_changed',
+  quotecreated: 'quote.created',
+} as const;
+
+export type ExchangePreviewSettingsWebhooks = {
+  enabled: boolean;
+  /** @maxLength 120 */
+  label: string;
+  /** @maxLength 2048 */
+  endpointUrl: string;
+  /** @maxItems 3 */
+  events: ExchangePreviewSettingsWebhooksEventsItem[];
+};
+
+export type ExchangePreviewSettingsRpc = {
+  enabled: boolean;
+  /** @maxLength 120 */
+  label: string;
+  /** @maxLength 2048 */
+  endpointUrl: string;
+  /** @maxLength 120 */
+  networkName: string;
+};
+
+export interface ExchangePreviewSettings {
+  api: ExchangePreviewSettingsApi;
+  webhooks: ExchangePreviewSettingsWebhooks;
+  rpc: ExchangePreviewSettingsRpc;
+}
+
+export type ExchangePreviewInputModulesItem = typeof ExchangePreviewInputModulesItem[keyof typeof ExchangePreviewInputModulesItem];
+
+
+export const ExchangePreviewInputModulesItem = {
+  api: 'api',
+  webhooks: 'webhooks',
+  rpc: 'rpc',
+} as const;
+
+export interface ExchangePreviewInput {
+  settings: ExchangePreviewSettings;
+  /**
+     * @minItems 1
+     * @maxItems 3
+     */
+  modules?: ExchangePreviewInputModulesItem[];
+}
+
+export type ExchangePreviewIntegrationsExecutionStatus = typeof ExchangePreviewIntegrationsExecutionStatus[keyof typeof ExchangePreviewIntegrationsExecutionStatus];
+
+
+export const ExchangePreviewIntegrationsExecutionStatus = {
+  configuration_only: 'configuration_only',
+} as const;
+
+export interface ExchangePreviewIntegrations {
+  settings: ExchangePreviewSettings;
+  sandboxOnly: true;
+  executionStatus: ExchangePreviewIntegrationsExecutionStatus;
+}
+
 export type ProductConfigurationConfiguration = {[key: string]: unknown};
 
 export interface ProductConfiguration {

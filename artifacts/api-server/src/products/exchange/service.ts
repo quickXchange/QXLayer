@@ -69,7 +69,11 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
           [r.id, tenantId, `Sandbox ${r.action}: ${r.source} → ${r.destination}`, r.feeBps.toString()]);
         if (!saved.rowCount) throw new HttpError(400, "Route identifier belongs to another tenant.");
       }
-      await client.query("INSERT INTO tenant_product_configuration (tenant_id,module_key,configuration) VALUES ($1,'crypto_exchange',$2) ON CONFLICT (tenant_id,module_key) DO UPDATE SET configuration=EXCLUDED.configuration,updated_at=now()", [tenantId, JSON.stringify({ ...s, referenceCurrency: e.plan?.currency })]);
+      await client.query(`INSERT INTO tenant_product_configuration (tenant_id,module_key,configuration) VALUES ($1,'crypto_exchange',$2)
+        ON CONFLICT (tenant_id,module_key) DO UPDATE SET configuration=EXCLUDED.configuration ||
+          CASE WHEN tenant_product_configuration.configuration ? 'optionalIntegrations'
+            THEN jsonb_build_object('optionalIntegrations',tenant_product_configuration.configuration->'optionalIntegrations')
+            ELSE '{}'::jsonb END,updated_at=now()`, [tenantId, JSON.stringify({ ...s, referenceCurrency: e.plan?.currency })]);
       await client.query("UPDATE tenant_configuration SET exchange_enabled=$2 WHERE tenant_id=$1", [tenantId, s.enabled]);
       await client.query("UPDATE tenants SET completed_steps=CASE WHEN 'configuration'=ANY(completed_steps) THEN completed_steps ELSE array_append(completed_steps,'configuration') END,updated_at=now() WHERE id=$1", [tenantId]);
       await audit(client, principal, tenantId, "exchange.configuration.saved", "Updated White Label Exchange sandbox settings", { routes: s.routes.length, enabled: s.enabled });
