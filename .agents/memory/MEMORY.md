@@ -20,3 +20,4 @@
 - [Migration project roles](migration-project-roles.md) — Project 2 is the white-label source; Project 1 is reference-only despite the archive's eventual destination wording.
 - [Preview request security](preview-request-security.md) — sandboxed forms may have opaque origins; Development ingress and direct Production cookie behavior must be distinguished.
 - [Approved Exchange master](master-exchange-template.md) — current NovaX is the approved shared master; preserve its design and use isolated tenant configuration, not frontend copies.
+- [Retained review fixture](retained-provisioning-fixture.md) — keep the Asterlane Development test customer/order/uploads and later tenant until explicit removal; user runs the lifecycle.
