@@ -518,3 +518,17 @@ mtime_ms = 1791406888216
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/43dbd03d-9e79-4045-a851-3f35ab0f2df6/f3879021-faf5-4f1f-8171-3774df046dff"
 storage_version_token = "1791406888916040"
 content_type = "text/html"
+
+[[outputs]]
+id = "jn-zVkez7X8PW0eRFvd6f"
+uri = "file://reports/final-recovery-package.html"
+type = "html"
+title = "FINAL Production Recovery Package — Prepared Only"
+description = "Exact guarded schema change and rollback, 15-product catalog preflight/compiler, diagnostics, execution order and GO/NO-GO. No Production execution."
+logical_id = "e58b0679-f8de-4d14-9afa-9c49c6adeb5a"
+content_hash = "sha256:d5be655d0782a271a65d1cbfa1c76c84d9a84c02c19137571a4e93a62039514f"
+size = 29533
+mtime_ms = 1791408080625
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e58b0679-f8de-4d14-9afa-9c49c6adeb5a/c33c532c-ee23-492b-871a-fd27925e50c1"
+storage_version_token = "1791408081118971"
+content_type = "text/html"

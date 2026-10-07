@@ -1,0 +1,375 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QXLayer Final Recovery Package</title><style>body{margin:0;background:#f1f4f8;color:#172338;font:16px/1.6 system-ui,sans-serif}main{max-width:1050px;padding:32px 22px;margin:auto;background:white}h1,h2,h3{line-height:1.3}h2{margin-top:36px;padding-top:16px;border-top:1px solid #dee4ed}table{width:100%;border-collapse:collapse;margin:16px 0}td{border:1px solid #dce2eb;padding:10px;vertical-align:top}pre{font:13px/1.6 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6fa;padding:18px}code{font-size:13px}summary{cursor:pointer;font-weight:650;padding:10px}aside{padding:16px;background:#fff0d2;border-left:4px solid #ae7113}</style><main><aside>Prepared only. No Production SQL or recovery actions executed. Full Production lifecycle remains blocked by the pre-delivery Preview guard.</aside><h1>FINAL recovery package — prepared, not executed</h1>
+<p>No Production connection or SQL execution was performed while preparing this package. No Production data, owner access, DNS or Admin Demo was changed. All SQL files are future operator drafts, not migrations or startup hooks.</p>
+<h2>1. Delivery constraint: the only proposed schema change</h2>
+<table><tr><td>Item</td><td>Exact value</td></tr><tr><td>Table</td><td><code>public.white_label_requests</code></td></tr><tr><td>Constraint</td><td><code>white_label_request_delivery</code></td></tr><tr><td>Captured Production definition</td><td><code>CHECK (((status = 'delivered'::text) = (tenant_id IS NOT NULL)))</code></td></tr><tr><td>Current Development definition</td><td><code>CHECK (((status &lt;&gt; 'delivered'::text) OR (tenant_id IS NOT NULL)))</code></td></tr></table>
+<p>Production equates delivery with the existence of a tenant link. Development requires a tenant link when delivered, but permits that link earlier. This is a difference in business invariants, not missing columns or indexes. The capture does not establish who introduced the old invariant or when.</p>
+<p>The current service prepares the tenant and sets <code>tenant_id</code> while status becomes <code>in_setup</code> or <code>customization</code>. Production evaluates <code>false = true</code> and rejects that update. It would also reject a linked project in <code>ready</code>.</p>
+<p>Smallest replacement:</p>
+<pre>ALTER TABLE public.white_label_requests
+  DROP CONSTRAINT white_label_request_delivery,
+  ADD CONSTRAINT white_label_request_delivery
+    CHECK (status &lt;&gt; 'delivered' OR tenant_id IS NOT NULL);</pre>
+<p>Use the guarded complete script, not this abbreviated statement. No table is recreated. No data, foreign key, other CHECK, index or permission is changed. The link does not deliver the order or grant customer Admin Panel access: existing application delivery/authorization checks remain in force.</p>
+<h3>Existing-data validity: proof and execution gate</h3>
+<p>Every row accepted by the old validated constraint is accepted by the new one:</p>
+<table><tr><td>Status</td><td>Tenant link</td><td>Old</td><td>New</td></tr><tr><td>Not delivered</td><td>Absent</td><td>Accept</td><td>Accept</td></tr><tr><td>Not delivered</td><td>Present</td><td>Reject</td><td>Accept</td></tr><tr><td>Delivered</td><td>Absent</td><td>Reject</td><td>Reject</td></tr><tr><td>Delivered</td><td>Present</td><td>Accept</td><td>Accept</td></tr></table>
+<p>Therefore no formerly valid row needs rewriting. An exhaustive offline test covered all 11 allowed statuses and both link states.</p>
+<p>The previous schema snapshot did <strong>not</strong> capture <code>convalidated</code>. Actual current validation status and schema drift remain unverified because Production reads are forbidden in this turn. The future preflight checks validation/nullability. The forward script refuses a missing/unvalidated/unexpected constraint or active DDL event triggers, takes an exclusive lock, replaces only this CHECK, and lets PostgreSQL validate all existing rows again before commit.</p>
+<p><code>lock_timeout=5s</code> and <code>statement_timeout=30s</code> bound lock waits and execution. Schedule a short quiet window: ALTER/validation may block access to this table. On any timeout/error issue <code>ROLLBACK</code> in the <strong>same SQL session</strong>. Do not run statements independently or continue through errors. The database must not be left in an open/aborted transaction.</p>
+<h3>Forward and rollback files</h3>
+<ul><li><code>01-delivery-preflight.sql</code>: metadata only; no order/customer records.</li><li><code>02-delivery-forward.sql</code>: atomic guarded replacement; compatible retries no-op.</li><li><code>03-delivery-rollback.sql</code>: guarded restoration of the exact old predicate.</li></ul>
+<p>Before COMMIT, transaction rollback retains the old schema without data changes. After COMMIT, the reverse script is safe only while every row still satisfies the old predicate. Once setup creates a pre-delivery link, reversal must stop. The script checks that condition without exporting order records and aborts if it is false. Never delete/unlink a tenant or change order status to force rollback. Restoring the old predicate would intentionally restore the lifecycle blocker. If reversal is blocked, keep the safe new constraint and separately review a forward correction/code rollback; do not assume code rollback also requires reinstating the old CHECK.</p>
+<h2>2. Exactly 15 platform-global catalog products</h2>
+<p><code>approved-catalog.json</code> contains the reviewed manifest; its fingerprint is in <code>package-readiness.json</code>. It has no Kolo. New values are exactly the approved copy, visible=true, NULL prices, USD, on_request, Learn More, orders 10–150, Exchange available/sandbox-only and the other 14 coming_soon.</p>
+<p>Production catalog state remains <strong>not inspected</strong>, not "empty". No actual Production classification or write script has been fabricated.</p>
+<p>Future authorized sequence:</p>
+<p>1. Run <code>04-catalog-preflight.sql</code> against Production <strong>read-only</strong>, after explicit    read approval. It projects only the approved landing rows and their module keys.    The managed read-only SQL channel can supply this snapshot; no manual customer    database export, credentials or log upload is required. 2. Save its JSON result as the internal <code>snapshot.json</code> preparation input. 3. Run the offline classifier:</p>
+<p>   ``<code>    pnpm --filter @workspace/scripts exec tsx src/recovery/prepare-catalog-apply.ts snapshot.json    </code>``</p>
+<p>4. Review all 15 keys. Classifications:</p>
+<p>   - <code>INSERT</code>: absent approved key with an existing module dependency.    - <code>UNCHANGED</code>: existing visible row exactly matches the approved definition.    - <code>RESTORE VISIBILITY</code>: existing copy/configuration matches; only visibility is false.    - <code>CONFLICT / REVIEW REQUIRED</code>: any existing copy, icon, price, currency,      billing, status, CTA or ordering differs, or a module dependency is absent.</p>
+<p>   Intentional Production edits are not assumed wrong. Hidden edited rows are    conflicts, not automatic visibility restorations.</p>
+<p>5. Approve INSERT/RESTORE keys individually. Conflicts require explicit    <code>PRESERVE</code> acknowledgement; the compiler cannot overwrite them. Missing module    dependencies block the entire apply, even if acknowledged. Do not seed modules    as part of this package. An edited hidden record preserved by review remains    hidden; do not claim that all 15 public cards have been restored in that case. 6. Fill <code>approvals-template.json</code>. Generate, inspect and approve the frozen SQL:</p>
+<p>   ``<code>    pnpm --filter @workspace/scripts exec tsx src/recovery/prepare-catalog-apply.ts snapshot.json approvals.json --emit-sql    </code>``</p>
+<p>   This tool only reads local files and emits draft SQL. It imports no database,    opens no connection and cannot execute SQL.</p>
+<p>7. An explicitly authorized Production writer may run the reviewed output in one    SQL session. The Agent's managed Production SQL channel cannot perform writes.    Replit documents an operator SQL runner in Database → My Data; confirm the    Production target and operator permissions there. This is a future approved    operator action, not permission granted by this package.</p>
+<h3>Apply guards</h3>
+<p>The generated transaction expires its preflight after 15 minutes, locks only the two platform-global catalog tables, rechecks module dependencies, rejects unexpected RLS/user triggers, and compares every projected existing field with the reviewed baseline before any write. Drift aborts the whole transaction. Existing copy is hex-encoded JSON, not interpolated executable SQL.</p>
+<p>Only approved missing rows are inserted and explicitly approved matching hidden rows get <code>visible=true</code>. There is no conflict-update upsert, copy/price overwrite, deletion, truncation, customer/tenant/order query or write, audit/customer-data import, module activation, financial execution or startup/publish hook. The exact expected post-state is checked before commit.</p>
+<p>On error use same-session ROLLBACK. After commit, preserve the preflight/approval/ result as marketing-only evidence. Do not DELETE newly inserted records as a rollback. Any later visibility reversal requires separate key-level approval and a fresh drift check; hiding a new row is non-destructive mitigation, not a return to the former absent-row state.</p>
+<h2>3. NovaX diagnostics: ready, with no data dependency</h2>
+<p>Publishing the implemented shared website/API diagnostics requires no NovaX branding, tenant, configuration, order, membership or provider changes. No diagnostic schema table is needed: evidence is emitted to server logs.</p>
+<p>Public error UI and diagnostic payload contain only:</p>
+<ul><li>safe random QXS error ID;</li><li>allowlisted category;</li><li>source build fingerprint.</li></ul>
+<p>Server evidence adds the timestamp and fixed event/component identifiers, plus separate request acceptance status/timing. Raw exception messages, stacks, responses, tenant/customer identifiers and secrets remain excluded server-side. This is correlation evidence, <strong>not a secretly retained full stack trace</strong>. The endpoint can reject/limit a report; absence of a log is not proof of no crash. Capture the UI reference/build and correlate it with an accepted server event. No source change attempts to guess or repair the real NovaX exception.</p>
+<p>Publish the API and website together through the normal project release: the website calls the separately routed <code>/api/diagnostics/website-errors</code>. Keep the Production access gate and Production runtime modes unchanged.</p>
+<h2>4. Safest order, based on the actual architecture</h2>
+<p>All steps below are future, separately authorized actions.</p>
+<p>0. <strong>Preconditions:</strong> verify the selected Production target, authorized schema/    catalog writer, restore capability, captured schema definition and reviewed    catalog snapshot. Check existing owner access read-only before changing    anything; no owner creation/role adjustment. Review the publishing schema diff    for unrelated/destructive changes. No data synchronization/import. A. <strong>Schema:</strong> run metadata preflight, review it, apply only the guarded CHECK    replacement, and verify exact new definition plus convalidated=true. B. <strong>Catalog:</strong> inspect/classify/review all 15 keys; emit a fresh approved SQL plan;    apply only scoped INSERT/visibility actions and verify exact post-state. C. <strong>Code publication:</strong> separately approve Republish of current code including    API/shared-website diagnostics. Confirm build success and no unwanted schema    or data changes. Publishing alone must not be relied on to seed the catalog    or silently repair legacy CHECK constraints. D. <strong>Landing:</strong> test through the existing gate. Verify public catalog content,    ordering, approved prices/visibility, product status and sandbox/planned labels;    confirm the presentation-only homepage widget stays presentation-only. E. <strong>NovaX capture:</strong> visit the actual protected Production NovaX site. If it fails,    collect the safe reference/category/build and corresponding server event.    If it does not fail, record that fact; do not fabricate a root cause. F. <strong>Proven fix only:</strong> reproduce using the captured build/evidence and authorized    investigation. Implement/test a narrowly approved Development correction,    then separately approve publishing it. Repeat Landing/owner checks after it. G. <strong>Owner verification:</strong> repeat existing Production sign-in, /api/me super_admin    and /admin before any privileged lifecycle test. Stop on failure; do not edit    identity/permissions to make the test pass. H. <strong>Lifecycle:</strong> verify order → approval → provision/link during setup →    configure → preview → ready → delivered, then customer access only after    delivery. Use only separately authorized legitimate Production activity;    do not manufacture disposable customers or import Development fixtures.</p>
+<h3>Additional code/environment blocker: pre-delivery Preview</h3>
+<p>Current <code>/api/tenants/:tenantId/website-preview</code> uses preview-service.ts, which returns 404 unless developmentPreviewEnabled() is true. That requires explicit Development mode and rejects published deployments. Production is configured with NODE_ENV=production. Therefore this package's schema fix does <strong>not</strong> make the full current tenant-specific pre-delivery Preview flow work in Production.</p>
+<p>No preview guard was changed. An authenticated, read-only Production operator preview needs a separately approved implementation/security scope; it must not enable Development tokens, activate tenants early, alter owner privileges or activate the Production Admin Demo. Until resolved, H cannot honestly pass the full specified lifecycle. This does not require guessing/fixing NovaX first and does not prevent a separately approved diagnostic-only publication.</p>
+<h2>5. Final GO / NO-GO at this preparation checkpoint</h2>
+<table><tr><td>Required field</td><td>Answer</td></tr><tr><td>SCHEMA CHANGE READY</td><td>YES — guarded draft and compatibility proof prepared</td></tr><tr><td>CATALOG RECOVERY READY</td><td>YES — manifest, preflight, classification and guarded offline compiler prepared</td></tr><tr><td>DIAGNOSTICS READY</td><td>YES — verified existing implementation; no NovaX data changes</td></tr><tr><td>SAFE TO EXECUTE RECOVERY</td><td>NO — no execution approval, fresh Production preflight or verified writer</td></tr><tr><td>SAFE TO REPUBLISH AFTER RECOVERY</td><td>NO — recovery not performed/verified; publish approval/diff review outstanding; full lifecycle Preview remains unsupported</td></tr></table>
+<p>"Ready" above means package-ready, not proof of current live prerequisites. After successful A/B and a clean reviewed release plan, a <strong>diagnostic publication</strong> can be a conditional GO without first fixing an unproven NovaX problem. A <strong>full-lifecycle release</strong> remains NO-GO until the Production Preview gap is separately resolved and the applicable checks pass.</p>
+<p>Verification performed only during preparation: offline fixture tests, TypeScript checks, and PostgreSQL PL/pgSQL compilation in a Development READ ONLY transaction with all recovery bodies inside IF FALSE. No recovery statement/body was executed, and that transaction was rolled back. </p><h2>Complete future operator scripts</h2><details><summary>Guarded forward delivery-constraint change</summary><pre>-- PREPARED ONLY. No automatic startup/publishing hook. Authorized operator only.
+-- One named constraint replacement; no data changes.
+BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '30s';
+LOCK TABLE public.white_label_requests IN ACCESS EXCLUSIVE MODE;
+DO $qx_recovery$
+DECLARE
+  actual_definition text;
+  is_validated boolean;
+  old_definition constant text := 'CHECK (((status = ''delivered''::text) = (tenant_id IS NOT NULL)))';
+  new_definition constant text := 'CHECK (((status &lt;&gt; ''delivered''::text) OR (tenant_id IS NOT NULL)))';
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_event_trigger WHERE evtenabled&lt;&gt;'D') THEN
+    RAISE EXCEPTION 'Active DDL event triggers require separate review.';
+  END IF;
+  SELECT pg_get_constraintdef(c.oid),c.convalidated
+    INTO actual_definition,is_validated
+  FROM pg_constraint c
+  WHERE c.conrelid='public.white_label_requests'::regclass
+    AND c.conname='white_label_request_delivery' AND c.contype='c';
+  IF actual_definition IS NULL OR NOT is_validated THEN
+    RAISE EXCEPTION 'Missing or unvalidated delivery constraint; stop for review.';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_attribute
+    WHERE attrelid='public.white_label_requests'::regclass
+      AND attname='status' AND attnotnull AND NOT attisdropped) THEN
+    RAISE EXCEPTION 'Unexpected status nullability; stop for review.';
+  END IF;
+  IF actual_definition = new_definition THEN
+    RAISE NOTICE 'Current Development delivery constraint already installed; no change.';
+  ELSIF actual_definition = old_definition THEN
+    -- Every row accepted by the validated old predicate satisfies the new one.
+    -- PostgreSQL validates existing rows again when adding this CHECK.
+    ALTER TABLE public.white_label_requests
+      DROP CONSTRAINT white_label_request_delivery,
+      ADD CONSTRAINT white_label_request_delivery
+        CHECK (status &lt;&gt; 'delivered' OR tenant_id IS NOT NULL);
+  ELSE
+    RAISE EXCEPTION 'Delivery definition differs from reviewed snapshot; stop for review.';
+  END IF;
+END;
+$qx_recovery$;
+SELECT conname,convalidated,pg_get_constraintdef(oid) AS definition
+FROM pg_constraint
+WHERE conrelid='public.white_label_requests'::regclass
+  AND conname='white_label_request_delivery';
+COMMIT;
+-- Any failure: issue ROLLBACK in the same SQL session; do not continue/retry blindly.
+</pre></details><details><summary>Guarded rollback: may refuse after setup links exist</summary><pre>-- PREPARED ONLY. Separate approval required. Old behavior blocks CURRENT lifecycle.
+-- Never rewrite/unlink orders to force rollback to pass.
+BEGIN;
+SET LOCAL lock_timeout = '5s';
+SET LOCAL statement_timeout = '30s';
+LOCK TABLE public.white_label_requests IN ACCESS EXCLUSIVE MODE;
+DO $qx_rollback$
+DECLARE
+  actual_definition text;
+  is_validated boolean;
+  old_definition constant text := 'CHECK (((status = ''delivered''::text) = (tenant_id IS NOT NULL)))';
+  new_definition constant text := 'CHECK (((status &lt;&gt; ''delivered''::text) OR (tenant_id IS NOT NULL)))';
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_event_trigger WHERE evtenabled&lt;&gt;'D') THEN
+    RAISE EXCEPTION 'Active DDL event triggers require separate review.';
+  END IF;
+  SELECT pg_get_constraintdef(c.oid),c.convalidated
+    INTO actual_definition,is_validated
+  FROM pg_constraint c
+  WHERE c.conrelid='public.white_label_requests'::regclass
+    AND c.conname='white_label_request_delivery' AND c.contype='c';
+  IF actual_definition IS NULL OR NOT is_validated THEN
+    RAISE EXCEPTION 'Missing or unvalidated delivery constraint; stop for review.';
+  END IF;
+  IF actual_definition = old_definition THEN
+    RAISE NOTICE 'Original validated definition already installed; no change.';
+  ELSIF actual_definition = new_definition THEN
+    IF EXISTS (
+      SELECT 1 FROM public.white_label_requests
+      WHERE ((status = 'delivered') = (tenant_id IS NOT NULL)) IS FALSE
+    ) THEN
+      RAISE EXCEPTION 'Rollback blocked: existing rows use pre-delivery tenant links. Leave rows unchanged.';
+    END IF;
+    ALTER TABLE public.white_label_requests
+      DROP CONSTRAINT white_label_request_delivery,
+      ADD CONSTRAINT white_label_request_delivery
+        CHECK ((status = 'delivered') = (tenant_id IS NOT NULL));
+  ELSE
+    RAISE EXCEPTION 'Delivery definition differs from reviewed definitions; stop for review.';
+  END IF;
+END;
+$qx_rollback$;
+SELECT conname,convalidated,pg_get_constraintdef(oid) AS definition
+FROM pg_constraint
+WHERE conrelid='public.white_label_requests'::regclass
+  AND conname='white_label_request_delivery';
+COMMIT;
+-- Any failure: issue ROLLBACK in the same SQL session. Never delete or alter data.
+</pre></details><details><summary>Read-only catalog preflight</summary><pre>-- PREPARED ONLY. Separate Production-read approval required.
+-- Exactly 15 platform-global marketing rows/module keys; no other application data.
+BEGIN READ ONLY;
+SELECT jsonb_build_object(
+  'capturedAt',clock_timestamp(),
+  'catalogRows',(SELECT coalesce(jsonb_agg(to_jsonb(r) ORDER BY key),'[]'::jsonb)
+    FROM (SELECT key,visible,name,description,icon,starting_price::text AS starting_price,setup_fee::text AS setup_fee,currency,billing_period,status,cta_label,display_order FROM public.landing_products WHERE key IN ('crypto_exchange','crypto_payments','crypto_engine','ios_app','android_app','crypto_card','staking','earn','dex','articles','telegram_bot','telegram_mini_app','whatsapp_bot','rpc_nodes','cloud_mining')) r),
+  'moduleKeys',(SELECT coalesce(jsonb_agg(key ORDER BY key),'[]'::jsonb)
+    FROM public.module_catalog WHERE key IN ('crypto_exchange','crypto_payments','crypto_engine','ios_app','android_app','crypto_card','staking','earn','dex','articles','telegram_bot','telegram_mini_app','whatsapp_bot','rpc_nodes','cloud_mining'))
+) AS recovery_snapshot;
+COMMIT;</pre></details><details><summary>Exact approved 15-product manifest</summary><pre>{
+  "fingerprint": "6e8f081b5703e88d9daad32ecd676accdad21c1d0657dbf15481f495974fb682",
+  "products": [
+    {
+      "key": "crypto_exchange",
+      "visible": true,
+      "name": "White Label Exchange — Swap / Convert / Buy &amp; Sell",
+      "description": "Your brand at the center of the exchange experience. Configure swap, convert, buy and sell journeys on the shared White Label Core. Currently a non-executing sandbox.",
+      "icon": "exchange",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "available",
+      "cta_label": "Learn More",
+      "display_order": 10
+    },
+    {
+      "key": "crypto_payments",
+      "visible": true,
+      "name": "Crypto Payment Gateway",
+      "description": "Bring branded crypto payment experiences into your ecosystem. Merchant checkout and payment infrastructure are planned; payment processing is not implemented.",
+      "icon": "payments",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 20
+    },
+    {
+      "key": "crypto_engine",
+      "visible": true,
+      "name": "Crypto Engine",
+      "description": "A planned orchestration layer connecting your crypto products through one modular platform. Financial execution and provider integrations are not implemented.",
+      "icon": "engine",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 30
+    },
+    {
+      "key": "ios_app",
+      "visible": true,
+      "name": "iOS App",
+      "description": "Extend your brand to a native iOS experience connected to the same White Label platform. Mobile application development is planned, not available today.",
+      "icon": "ios",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 40
+    },
+    {
+      "key": "android_app",
+      "visible": true,
+      "name": "Android App",
+      "description": "Bring your ecosystem to Android with a branded mobile experience and shared platform configuration. Mobile application development is planned.",
+      "icon": "android",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 50
+    },
+    {
+      "key": "crypto_card",
+      "visible": true,
+      "name": "Crypto Card",
+      "description": "A planned branded card offering within your wider crypto ecosystem. Card issuance, spending and provider integrations are not implemented.",
+      "icon": "card",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 60
+    },
+    {
+      "key": "staking",
+      "visible": true,
+      "name": "Staking API",
+      "description": "A planned staking interface for future integration into your branded products. No staking engine, rewards or blockchain execution is connected.",
+      "icon": "staking",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 70
+    },
+    {
+      "key": "earn",
+      "visible": true,
+      "name": "Earn API",
+      "description": "A planned API layer for future earning products in your ecosystem. Yield generation, balances and financial execution are not implemented.",
+      "icon": "earn",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 80
+    },
+    {
+      "key": "dex",
+      "visible": true,
+      "name": "DEX",
+      "description": "A planned decentralized exchange experience under your brand. Smart contracts, liquidity routing and trade execution are not implemented.",
+      "icon": "dex",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 90
+    },
+    {
+      "key": "articles",
+      "visible": true,
+      "name": "Articles / Content",
+      "description": "A planned publishing product for branded articles, education and ecosystem updates. The editorial CMS is not implemented yet.",
+      "icon": "content",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 100
+    },
+    {
+      "key": "telegram_bot",
+      "visible": true,
+      "name": "Telegram Bot",
+      "description": "A planned conversational entry point for your branded ecosystem on Telegram. Bot delivery and financial actions are not implemented.",
+      "icon": "telegram",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 110
+    },
+    {
+      "key": "telegram_mini_app",
+      "visible": true,
+      "name": "Telegram Mini App",
+      "description": "A planned compact branded experience inside Telegram, connected to the shared platform. Mini App development and integration are deferred.",
+      "icon": "miniapp",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 120
+    },
+    {
+      "key": "whatsapp_bot",
+      "visible": true,
+      "name": "WhatsApp Bot",
+      "description": "A planned messaging channel for your branded customer experience. WhatsApp delivery and provider integrations are not implemented.",
+      "icon": "whatsapp",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 130
+    },
+    {
+      "key": "rpc_nodes",
+      "visible": true,
+      "name": "RPC / Nodes",
+      "description": "A planned infrastructure offering for blockchain connectivity. No node hosting, RPC endpoints or live blockchain services are provided today.",
+      "icon": "nodes",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 140
+    },
+    {
+      "key": "cloud_mining",
+      "visible": true,
+      "name": "Cloud Mining",
+      "description": "A planned mining product in the modular ecosystem. Mining execution, contracts and returns are not implemented or offered.",
+      "icon": "mining",
+      "starting_price": null,
+      "setup_fee": null,
+      "currency": "USD",
+      "billing_period": "on_request",
+      "status": "coming_soon",
+      "cta_label": "Learn More",
+      "display_order": 150
+    }
+  ]
+}</pre></details><p>Workspace package: reports/final-recovery/. Offline classifier/compiler: scripts/src/recovery/. No Production apply file is emitted until actual preflight and per-key approval are supplied.</p></main></html>
