@@ -35,3 +35,16 @@ the foundation phase.
 return or audit secret values; tenant views must not expose global schemas or
 other tenants' configuration. Future webhooks require verified signatures,
 verified account-to-tenant binding and atomic idempotent domain processing.
+
+A missing vault key must block credential operations, not authentication,
+administration, customer websites or the existing sandbox Exchange. Provider
+credentials are not a prerequisite for a code-only republish with no connected
+provider.
+
+**Why:** The user intentionally dismissed the Development key request and
+explicitly requires republishing without provider credentials or weakened vault
+security.
+
+**How to apply:** Keep vault availability lazy and isolated from application
+startup. Do not resume vault implementation or key requests during pre-publish
+verification; review provider connectivity separately.
