@@ -574,3 +574,17 @@ mtime_ms = 1791415657078
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/58da5217-5b87-4a62-8370-f28ea1dcfaf7/5efb859f-faf3-4447-8d5e-e2f453345d6b"
 storage_version_token = "1791415661366876"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "sMDmO4QlcAb4c41Ba_q1p"
+uri = "file://reports/final-recovery/downloads/08-FINAL-PRODUCTION-RECOVERY-60min-20261007T233736Z.zip"
+type = "unspecified"
+title = "Recovery SQL — refreshed 60-minute window"
+description = "Contains 08-FINAL-PRODUCTION-RECOVERY.sql for manual execution through an external PostgreSQL client. Production preflight matched. Deadline: 8 October 2026 at 01:37:36.680905 Algeria time / 00:37:36.680905 UTC. Recovery SQL not executed."
+logical_id = "c350a7d2-a0fe-4cb0-8dbd-983d92978186"
+content_hash = "sha256:6a0f9eb6f0a73cb179fd0ac9fa17a8bd40bc5c15c0298528df482097a7c65ccb"
+size = 9803
+mtime_ms = 1791416290757
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/c350a7d2-a0fe-4cb0-8dbd-983d92978186/af9688f8-167d-48fb-b729-f40e1b1b97ff"
+storage_version_token = "1791416297535512"
+content_type = "application/octet-stream"
