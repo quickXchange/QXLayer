@@ -3,7 +3,7 @@
 -- No owner mapping, commercial plan, customers, tenants, orders, memberships,
 -- QA/demo records, credentials, provider connections or Development import.
 -- Global metadata includes the approved sandbox-network reference catalog.
--- Snapshot: 2026-10-07T23:05:03.714205+00:00; expires 15 minutes after capture.
+-- Snapshot: 2026-10-07T23:27:04.705609+00:00; expires 15 minutes after capture.
 -- Paste and RUN THE ENTIRE FILE ONCE in the Production SQL Console.
 -- Any failure: ROLLBACK in the same SQL session. Never run selected fragments.
 
@@ -20,7 +20,7 @@ LOCK TABLE public.landing_products IN SHARE ROW EXCLUSIVE MODE;
 
 -- Preconditions: freshness, exact-scope drift, RLS and active trigger checks.
 DO $qx_global$
-DECLARE captured_at timestamptz := (convert_from(decode('22323032362d31302d30375432333a30353a30332e3731343230352b30303a303022','hex'),'UTF8')::jsonb#>>'{}')::timestamptz;
+DECLARE captured_at timestamptz := (convert_from(decode('22323032362d31302d30375432333a32373a30342e3730353630392b30303a303022','hex'),'UTF8')::jsonb#>>'{}')::timestamptz;
 BEGIN
 IF captured_at < clock_timestamp()-interval '15 minutes'
  OR captured_at > clock_timestamp()+interval '1 minute' THEN RAISE EXCEPTION 'Preflight expired; refreeze after review.'; END IF;

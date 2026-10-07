@@ -560,3 +560,17 @@ mtime_ms = 1791415214310
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/2ad5cbe4-8eb5-4042-895b-d34cdc74a38f/e7e9db2b-ff93-4683-b791-cc7b994a36a6"
 storage_version_token = "1791415218847350"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "cT2H3tcb_cGZ8nUOheIXd"
+uri = "file://reports/final-recovery/downloads/08-FINAL-PRODUCTION-RECOVERY-20261007T232704Z.zip"
+type = "unspecified"
+title = "Refreshed recovery SQL — new snapshot"
+description = "Exact refreshed SQL. Deadline: 8 October 2026 at 00:42:04.705609 Algeria time (7 October 2026 at 23:42:04.705609 UTC). Only the snapshot timestamp changed; recovery SQL was not executed."
+logical_id = "58da5217-5b87-4a62-8370-f28ea1dcfaf7"
+content_hash = "sha256:78acf055a0ea8d152aefcd4387a06a5bf729059d72c7d45c9aec4c09449a8390"
+size = 9802
+mtime_ms = 1791415657078
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/58da5217-5b87-4a62-8370-f28ea1dcfaf7/5efb859f-faf3-4447-8d5e-e2f453345d6b"
+storage_version_token = "1791415661366876"
+content_type = "application/octet-stream"
