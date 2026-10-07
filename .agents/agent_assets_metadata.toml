@@ -490,3 +490,17 @@ mtime_ms = 1791294753054
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/dbca1f68-4cc6-49dc-bc6f-08edd6725f87/b7221b21-c990-49d4-949f-60933277ea8a"
 storage_version_token = "1791295166636899"
 content_type = "text/html"
+
+[[outputs]]
+id = "sWMW9sKMxcWuoLXWEpI3m"
+uri = "file://reports/qxlayer-approved-landing-catalog.csv"
+type = "table"
+title = "Approved QXLayer Landing Catalog — 15 Records"
+description = "Exact proposed platform-global marketing records and fields. Empty price cells mean NULL (pricing on request). Kolo is excluded. This is a review manifest, not an executed Production import."
+logical_id = "75bb5de2-317d-4870-9622-edebbbcdc760"
+content_hash = "sha256:5254f0aec754f19411200803db611754a35ea1f687b4697d78418f6db5dc3b40"
+size = 3517
+mtime_ms = 1791405608741
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/75bb5de2-317d-4870-9622-edebbbcdc760/7e28f314-b329-409e-bfda-89992bbf91bb"
+storage_version_token = "1791405666974662"
+content_type = "text/csv"
