@@ -31,3 +31,9 @@ Judge responsive drawer overflow only after its opening animation settles.
 **Why:** Immediate tester screenshots showed right-edge clipping during slide-in, while settled drawers and their contents fit the phone viewport correctly.
 
 **How to apply:** Compare settled drawer bounds and document scroll width with the viewport before changing layout. A transitional screenshot alone is not evidence of persistent clipping.
+
+For transactional end-to-end Exchange verification, use disposable customers and the native request, approval, configuration, activation and delivery flow—not response overlays or SQL-seeded delivery/entitlements.
+
+**Why:** The user requires actual Admin → widget → quote → order → status verification and explicitly rejects fixture-backed false passes.
+
+**How to apply:** Keep real test mutations restricted to disposable Development tenants. Temporary owner authorization must be scoped to the exact new QA identity, never conditioned on there being no permanent owner. Remove newly created test business data and temporary access after verification; preserve retained fixtures and permanent ownership.

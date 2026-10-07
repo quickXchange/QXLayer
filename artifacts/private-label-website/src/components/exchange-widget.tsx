@@ -207,9 +207,9 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
       )}
       {(
         <dl className="s-ratebox mt-4 divide-y rounded-[var(--s-r2)] border px-4 py-2.5" style={{ borderColor: 'var(--s-line)' }} data-testid="panel-rate">
-          {rate('rate', 'Rate')}{rate('min', 'Minimum')}{rate('max', 'Maximum')}{rate('fee', 'Network and service fee')}
-          {!presentation && quote?.destinationFee && <div className="flex justify-between gap-3 py-1.5 text-xs"><dt>Destination network fee</dt><dd className="s-muted">{quote.destinationFee} {quote.destinationSymbol}</dd></div>}
-          <p className="s-muted pt-2 text-xs">{presentation ? `${NOQ} Nothing here is an estimate.` : 'Sandbox rates only. Output includes destination network fees. No real funds or execution.'}</p>
+          {rate('rate', 'Rate')}{rate('min', 'Minimum')}{rate('max', 'Maximum')}{rate('fee', 'Source fees')}
+          {!presentation && quote?.destinationFee && <div className="flex justify-between gap-3 py-1.5 text-xs"><dt>Destination fees</dt><dd className="s-muted">{quote.destinationFee} {quote.destinationSymbol}</dd></div>}
+          <p className="s-muted pt-2 text-xs">{presentation ? `${NOQ} Nothing here is an estimate.` : 'Sandbox rates only. Fees include applicable service, network and payment-method charges. Destination fees are included in the output. No real funds or execution.'}</p>
           {!presentation && !inactive && amount && !quote && !quoting && <button type="button" className="s-link mt-2 text-xs" onClick={() => setRefreshQuote(n => n + 1)} data-testid="button-refresh-quote">Request fresh sandbox quote</button>}
         </dl>
       )}
