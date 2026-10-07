@@ -39,5 +39,13 @@
   "demoReadOnlyMetadataEndpointsVerified": true,
   "disposableVerificationFixturesCleaned": true,
   "retainedAsterlaneFixturePreserved": true,
-  "customerBrowserAttachmentDownloadVerified": false
+  "customerBrowserAttachmentDownloadVerified": false,
+  "approvedGlobalRecoveryFingerprint": "2fef7fe832d7eb84be45b84c6365ed39bc019455cad42d05ba86e825ef2f5be4",
+  "globalRecoveryScopeAuthorizedByCurrentUserInstruction": true,
+  "minimalDeliveryCorrectionAuthorizedByCurrentUserInstruction": true,
+  "productionWriteCapabilityAvailableToAgent": false,
+  "productionCommercialConfigurationPrepared": true,
+  "commercialConfigurationFile": "production-commercial-exchange-config.json",
+  "commercialPricingDecisionOutstanding": true,
+  "productionCommercialPlanCreated": false
 }

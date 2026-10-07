@@ -26,3 +26,4 @@
 - [Provider foundation safety](provider-foundation-safety.md) — catalog/configuration is not connectivity; real adapters, vaults, webhooks and idempotent execution require separate approval.
 - [Production readback evidence](production-readback-evidence.md) — empty schema diffs do not prove CHECK parity; SQL success envelopes must contain the expected results.
 - [QA cleanup durability](qa-cleanup-durability.md) — persist exact disposable fixture scope through workspace restarts; /tmp can vanish before database cleanup.
+- [Commercial pricing safety](commercial-pricing-safety.md) — undecided prices are not zero; separate real commercial configuration from technical recovery.

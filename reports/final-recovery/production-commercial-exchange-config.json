@@ -1,0 +1,99 @@
+{
+  "purpose": "Real White Label Exchange commercial configuration; not a Development, QA or demo plan",
+  "databaseCreated": false,
+  "pricingDecisionRequired": [
+    "monthlyPrice",
+    "yearlyPrice",
+    "setupFee"
+  ],
+  "pricingPolicy": "No invented prices or zero-price placeholders. Contact / Requires Review is a billing label; current PlanInput still requires all three numeric prices. Pricing is separate from constraint, owner and global recovery.",
+  "includedCapabilities": [
+    "Swap",
+    "Convert",
+    "Buy",
+    "Sell",
+    "Customer Website",
+    "Exchange Admin",
+    "Assets",
+    "Networks",
+    "Payment Methods",
+    "Routes",
+    "Pricing",
+    "Orders",
+    "Tracking"
+  ],
+  "planConfiguration": {
+    "name": "White Label Exchange",
+    "description": "Shared customer website and Exchange Admin with Swap, Convert, Buy and Sell; configuration, sandbox quotes, orders and tracking. Providers disconnected; no financial execution.",
+    "currency": "USD",
+    "billingLabel": "Contact / Requires Review",
+    "displayOrder": 0,
+    "status": "enabled",
+    "entitlements": [
+      {
+        "key": "website",
+        "value": true
+      },
+      {
+        "key": "crypto_exchange",
+        "value": true
+      },
+      {
+        "key": "swap",
+        "value": true
+      },
+      {
+        "key": "convert",
+        "value": true
+      },
+      {
+        "key": "buy",
+        "value": true
+      },
+      {
+        "key": "sell",
+        "value": true
+      },
+      {
+        "key": "max_supported_assets",
+        "value": "10"
+      },
+      {
+        "key": "max_supported_networks",
+        "value": "20"
+      },
+      {
+        "key": "max_payment_methods",
+        "value": "5"
+      },
+      {
+        "key": "max_staff",
+        "value": "2"
+      },
+      {
+        "key": "max_api_keys",
+        "value": "0"
+      },
+      {
+        "key": "max_webhooks",
+        "value": "0"
+      },
+      {
+        "key": "max_monthly_transactions",
+        "value": "1000"
+      },
+      {
+        "key": "max_monthly_volume",
+        "value": "100000"
+      }
+    ]
+  },
+  "safety": {
+    "environment": "sandbox",
+    "providerConnectivity": false,
+    "financialExecution": false,
+    "merchantApi": false,
+    "customerAdminAccess": "Delivered assignment only; private during setup",
+    "provisioning": "Existing approved shared Master and normal tenant lifecycle"
+  }
+}
