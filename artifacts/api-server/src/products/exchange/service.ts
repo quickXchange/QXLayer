@@ -7,7 +7,7 @@ import { contextFor, type Principal } from "../../modules/authentication/service
 import { consumeMonthlyUsage, enforceLimit, lockTenant, requireFeature, resolveEntitlements, type EffectiveEntitlements } from "../../modules/entitlements/resolver";
 import { decimal, decimalString } from "../../modules/entitlements/decimal";
 import { publicTenantId } from "../../modules/website/service";
-import { developmentPreview } from "../../modules/website/development-preview";
+import type { WebsitePreview } from "../../modules/website/operator-preview";
 import { ACTIONS, emptySettings, readExchange, validateExchange } from "./settings";
 import { calculateQuote } from "./calculation";
 import { publicExchangeConfiguration } from "./public-configuration";
@@ -99,10 +99,10 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
     return { ...result, effectiveEnabled: result.configuration.enabled && legacy.rows[0]?.exchange_enabled === true && e.features.crypto_exchange === true && e.features.website === true && e.tenantStatus === "active" && e.status === "active" && !e.overLimit };
   });
 }
-export async function publicExchange(slug: string, previewToken?: string) {
-  const tenantId = await publicTenantId(slug, previewToken);
-  return withDatabase({ actorId: "sandbox-visitor", tenantId, isSuperAdmin: !!developmentPreview(slug, previewToken) }, async client => {
-    const e = await resolveEntitlements(client, tenantId); guard(e, undefined, !!developmentPreview(slug, previewToken));
+export async function publicExchange(slug: string, preview?: WebsitePreview) {
+  const tenantId = await publicTenantId(slug, preview);
+  return withDatabase({ actorId: "sandbox-visitor", tenantId, isSuperAdmin: !!preview }, async client => {
+    const e = await resolveEntitlements(client, tenantId); guard(e, undefined, !!preview);
     return publicExchangeConfiguration(client, tenantId, e);
   });
 }

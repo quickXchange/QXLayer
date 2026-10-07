@@ -1,7 +1,25 @@
 ---
 name: Setup website preview policy
-description: Customer-facing Development previews must not require or trigger tenant activation/delivery.
+description: Operator-only previews of the shared website must never activate or deliver a tenant; Production authority stays authenticated.
 ---
+
+# Production preview authority
+
+Production readiness now includes an authenticated, read-only, pre-delivery
+preview using the same shared customer renderer. Preview intent alone must
+never authorize access: require a short-lived tenant-scoped grant, the matching
+live authenticated operator and a freshly resolved Super Admin permission.
+Keep ordinary anonymous draft access blocked and preview mutations disabled.
+Never reactivate the older Development-only proof as a Production fallback.
+
+**Why:** The user expanded readiness to the complete Production lifecycle,
+including previews before delivery, while forbidding weakened authentication.
+
+**How to apply:** Treat the earlier Development-specific policy below as
+historical. A schema compatibility change is not enough; verify real browser
+authentication, tenant isolation, uploaded branding and immediate revocation.
+
+## Earlier Development policy (historical)
 
 Preview the actual shared customer-facing Master Exchange while a Development
 tenant is still Sandbox/Setup. Issuing a preview must never activate, deliver,

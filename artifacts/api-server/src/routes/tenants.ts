@@ -19,10 +19,20 @@ import { listTenantAdministrators, assignTenantAdministrator, setTenantAdministr
 import { GetExchangePreviewIntegrationsParams, GetExchangePreviewIntegrationsResponse, SaveExchangePreviewIntegrationsParams, SaveExchangePreviewIntegrationsResponse } from "@workspace/api-zod";
 import { previewIntegrations } from "../products/exchange/preview-integrations";
 import { GetTenantWebsitePreviewResponse } from "@workspace/api-zod";
-import { getTenantWebsitePreview } from "../modules/website/preview-service";
+import { getTenantWebsitePreview, openTenantWebsitePreview } from "../modules/website/preview-service";
+import { PREVIEW_COOKIE, PREVIEW_TTL } from "../modules/website/operator-preview";
 
 const router = Router();
 router.use("/tenants", requireAuthentication, sameOriginMutation);
+router.get("/tenants/:tenantId/website-preview/open", async (req, res) => {
+  const { tenantId } = GetTenantParams.parse(req.params);
+  const preview = await openTenantWebsitePreview(principalFrom(res), tenantId);
+  res.set({ "Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer" });
+  res.cookie(PREVIEW_COOKIE, preview.token, { httpOnly: true, sameSite: "strict",
+    secure: process.env.NODE_ENV === "production" || req.secure, maxAge: PREVIEW_TTL,
+    path: `/api/public/sites/${preview.slug}` });
+  res.redirect(303, `/private-label-website/${preview.slug}?preview=1`);
+});
 router.get("/tenants/:tenantId/website-preview", async (req, res) => {
   const { tenantId } = GetTenantParams.parse(req.params);
   res.set("Cache-Control", "no-store");

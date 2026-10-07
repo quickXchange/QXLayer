@@ -161,7 +161,7 @@ paths:
     get:
       operationId: getTenantWebsitePreview
       tags: [Tenants]
-      summary: Get a Development-only read-only customer website preview without activation
+      summary: Get an authenticated operator-only read-only website preview without activation
       parameters:
         - name: tenantId
           in: path
@@ -169,7 +169,7 @@ paths:
           schema: { type: string, format: uuid }
       responses:
         "200":
-          description: Tenant-scoped preview URL, valid for 24 hours in Development only
+          description: Authenticated launcher; issues a 15-minute tenant-scoped cookie and requires fresh Super Admin authorization on every preview request.
           content:
             application/json:
               schema:
@@ -188,18 +188,18 @@ paths:
     get:
       operationId: getDemoSession
       responses:
-        "200": {description: Current development sandbox demo session, content: {application/json: {schema: {$ref: "#/components/schemas/DemoSession"}}}}
+        "200": {description: Current isolated read-only demo session; explicit per-tab intent required, content: {application/json: {schema: {$ref: "#/components/schemas/DemoSession"}}}}
     post:
       operationId: startDemoSession
       requestBody:
         required: true
         content:
           application/json:
-            schema: {$ref: "#/components/schemas/DemoLoginInput"}
+            schema: {$ref: "#/components/schemas/DemoLaunchInput"}
       responses:
         "200": {description: Restricted read-only demo session, content: {application/json: {schema: {$ref: "#/components/schemas/DemoSession"}}}}
-        "401": {description: Incorrect demo credentials}
-        "503": {description: Development demo not provisioned}
+        "400": {description: Demo entry takes no credentials or authority fields}
+        "503": {description: Secure session signing unavailable}
     delete:
       operationId: endDemoSession
       responses:
@@ -1901,13 +1901,10 @@ components:
               permissions: {type: array, items: {type: string}}
             required: [tenantId, role, permissions]
       required: [userId, email, role, tenantId, sandboxOnly]
-    DemoLoginInput:
+    DemoLaunchInput:
       type: object
       additionalProperties: false
-      properties:
-        username: {type: string, maxLength: 100}
-        password: {type: string, maxLength: 100}
-      required: [username, password]
+      properties: {}
     DemoSession:
       type: object
       properties:

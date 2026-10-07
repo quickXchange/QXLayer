@@ -72,7 +72,7 @@ function ClientDetailInner() {
           {isSuper && import.meta.env.DEV && t.environment === "sandbox" && ["draft", "active"].includes(t.status) && (
             <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md border bg-card p-4" data-testid="panel-customer-website">
               <div><h2 className="font-display text-lg">Customer-facing website</h2>
-                <p className="text-sm text-muted-foreground">View this tenant’s shared Exchange website. No activation or delivery is required; preview links expire after 24 hours.</p>
+                <p className="text-sm text-muted-foreground">View this tenant’s shared Exchange website privately. No activation or delivery is required. Your authenticated operator session is required; preview access expires after 15 minutes.</p>
               </div>
               <WebsitePreviewAction tenantId={t.id} />
             </section>

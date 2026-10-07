@@ -336,6 +336,16 @@ export async function customFetch<T = unknown>(
   }
 
   const headers = mergeHeaders(isRequest(input) ? input.headers : undefined, headersInit);
+  // A demo is an explicit per-tab context, never a replacement for the Owner's
+  // real Clerk session in other tabs. The server still verifies its signed cookie.
+  if (typeof window !== "undefined") {
+    try {
+      if (window.sessionStorage.getItem("qx-isolated-demo") === "read-only" && resolveUrl(input).startsWith("/api/") &&
+        !/^\/api\/(?:public\/|landing\/|diagnostics\/)/.test(resolveUrl(input))) {
+        headers.set("X-QX-Demo", "read-only");
+      }
+    } catch { /* Storage unavailable: demo entry will report session unavailable. */ }
+  }
 
   if (
     typeof init.body === "string" &&

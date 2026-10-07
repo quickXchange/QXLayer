@@ -21,7 +21,7 @@ export * from './currentPrincipalMembershipsItemRole';
 export * from './customerAdminPanel';
 export * from './customerAdminPanelRole';
 export * from './customerAdminPanelStatus';
-export * from './demoLoginInput';
+export * from './demoLaunchInput';
 export * from './demoSession';
 export * from './domainInput';
 export * from './domainVerification';

@@ -16,6 +16,7 @@ export function CustomerShell({ children }: { children: ReactNode }) {
   const exit = async () => {
     if (!p.demo) { await signOut({ redirectUrl: '/' }); return; }
     await endDemoSession();
+    sessionStorage.removeItem('qx-isolated-demo');
     qc.clear();
     window.location.assign(import.meta.env.BASE_URL);
   };

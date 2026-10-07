@@ -663,7 +663,7 @@ export const GetPlatformManagementResponse = zod.object({
 
 
 /**
- * @summary Get a Development-only read-only customer website preview without activation
+ * @summary Get an authenticated operator-only read-only website preview without activation
  */
 export const GetTenantWebsitePreviewParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
@@ -703,15 +703,8 @@ export const GetDemoSessionResponse = zod.object({
 })
 
 
-export const startDemoSessionBodyUsernameMax = 100;
-
-export const startDemoSessionBodyPasswordMax = 100;
-
-
-
 export const StartDemoSessionBody = zod.object({
-  "username": zod.string().max(startDemoSessionBodyUsernameMax),
-  "password": zod.string().max(startDemoSessionBodyPasswordMax)
+
 })
 
 export const StartDemoSessionResponse = zod.object({

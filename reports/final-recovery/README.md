@@ -1,3 +1,17 @@
+# Historical preparation report — superseded
+
+This earlier checkpoint report is retained for its minimal CHECK compatibility
+proof and reviewed SQL references. Its runtime-preview, demo and Production
+inspection statements are obsolete. The complete release-readiness report is
+`FINAL-READINESS.md` / `FINAL-READINESS.html`.
+
+Do not run the historical scripts as agent-managed Production migrations.
+No build/startup DDL or automatic republishing was added. Publishing is the
+managed schema path; the exact CHECK must also be inspected because the
+read-only publishing diff returned no change while the old CHECK remained.
+Any exceptional manual repair requires the user's explicit approval and an
+authorized human Production database writer.
+
 # FINAL recovery package — prepared, not executed
 
 No Production connection or SQL execution was performed while preparing this

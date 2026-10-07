@@ -46,7 +46,11 @@ const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
     res.status(400).json({ error: "Invalid safe diagnostic." }); return;
   }
   if (error?.type === "entity.too.large") { res.status(413).json({ error: "The upload or request exceeds its allowed size limit." }); return; }
-  if (error instanceof ZodError) { res.status(400).json({ error: "Invalid input.", details: error.issues.map((i) => ({ path: i.path, message: i.message })) }); return; }
+  // The generated API validators and application validators can resolve distinct
+  // Zod packages. Keep valid client mistakes at 400 rather than logging a 500.
+  if (error instanceof ZodError || (error?.name === "ZodError" && Array.isArray(error.issues))) {
+    res.status(400).json({ error: "Invalid input.", details: error.issues.map((i: { path: unknown; message: string }) => ({ path: i.path, message: i.message })) }); return;
+  }
   if (error instanceof HttpError) { res.status(error.status).json({ error: error.message }); return; }
   const code = (error as { code?: string }).code;
   if (code === "23505") { res.status(409).json({ error: "This slug, domain, or unique configuration is already in use." }); return; }

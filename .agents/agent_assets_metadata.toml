@@ -532,3 +532,17 @@ mtime_ms = 1791408080625
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e58b0679-f8de-4d14-9afa-9c49c6adeb5a/c33c532c-ee23-492b-871a-fd27925e50c1"
 storage_version_token = "1791408081118971"
 content_type = "text/html"
+
+[[outputs]]
+id = "oe0VfPYQwbeFrmW3nJ8z5"
+uri = "file://reports/final-recovery/FINAL-READINESS.html"
+type = "html"
+title = "QXLayer — Final Production Readiness Report"
+description = "Complete readiness matrix, verification evidence, exact recovery scope and required approvals. Production remains unchanged."
+logical_id = "27053836-7769-4fbb-921b-e68cf1977d35"
+content_hash = "sha256:9395f1c0b0538cbb8bb6488dbce20d4818e38daee0ac2b110532ce1553318459"
+size = 19412
+mtime_ms = 1791412853999
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/27053836-7769-4fbb-921b-e68cf1977d35/0550c60d-c414-47bc-a007-3ed85de4eaec"
+storage_version_token = "1791412854648277"
+content_type = "text/html"

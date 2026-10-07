@@ -17,7 +17,9 @@ import { assertDeliveredExchangeAccess } from "../modules/customer/service";
 import { GetTenantParams } from "@workspace/api-zod";
 
 const router: IRouter = Router();
+import demoIsolationRouter from "./demo-isolation";
 
+router.use(demoIsolationRouter);
 router.use(healthRouter);
 router.use(demoRouter);
 router.use(landingCatalogRouter);

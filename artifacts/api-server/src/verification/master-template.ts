@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { randomBytes, randomUUID, createHash } from "node:crypto";
 import { deflateSync } from "node:zlib";
-import { readFile, writeFile, unlink } from "node:fs/promises";
+import { mkdir, readFile, writeFile, unlink } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
 import { pool } from "@workspace/db";
 import { resolvePrincipal } from "../modules/authentication/service";
 import { savePlan } from "../modules/entitlements/catalog";
@@ -18,7 +20,8 @@ import { masterExchangeDefaults } from "../products/exchange/master-template";
 import { sealIntegrationCredentials, openIntegrationCredentials, integrationSummary } from "../products/exchange/integration-contract";
 
 if (process.env.NODE_ENV !== "development") throw new Error("Master verification requires explicit Development mode.");
-const file = "/tmp/qx-master-fixtures.json";
+// Keep cleanup scope across workspace restarts during long browser passes.
+const file = fileURLToPath(new URL("../../../../.local/qa/master-fixtures.json", import.meta.url));
 type Fixture = { actors: string[]; planId: string; tenants: { id: string; slug: string; name: string; ownerId: string; orderId: string }[] };
 async function cleanup(f: Fixture) {
   const linked = await pool.query("SELECT tenant_id FROM white_label_requests WHERE customer_user_id=ANY($1::text[]) AND tenant_id IS NOT NULL", [f.actors]);
@@ -134,6 +137,7 @@ if (process.argv.includes("--cleanup")) {
     await assert.rejects(() => provisionDevelopmentOrder(operator, a.orderId), (e: any) => e.status === 403);
     process.env.NODE_ENV = savedMode;
     if (process.argv.includes("--keep")) {
+      await mkdir(dirname(file), { recursive: true });
       await writeFile(file, JSON.stringify(f), { mode: 0o600 });
       keep = true;
       process.stdout.write(`PASS: master, order branding, uploaded logo/favicon, idempotent provisioning, owner Admin, isolation, defaults and encrypted credential scope. Browser fixtures: ${file}\n`);

@@ -29,7 +29,7 @@ import type {
   CapabilityStatus,
   CurrentPrincipal,
   CustomerAdminPanel,
-  DemoLoginInput,
+  DemoLaunchInput,
   DemoSession,
   DomainInput,
   DomainVerification,
@@ -913,7 +913,7 @@ export const getGetTenantWebsitePreviewUrl = (tenantId: string,) => {
 }
 
 /**
- * @summary Get a Development-only read-only customer website preview without activation
+ * @summary Get an authenticated operator-only read-only website preview without activation
  */
 export const getTenantWebsitePreview = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<WebsitePreview> => {
 
@@ -960,7 +960,7 @@ export type GetTenantWebsitePreviewQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get a Development-only read-only customer website preview without activation
+ * @summary Get an authenticated operator-only read-only website preview without activation
  */
 
 export function useGetTenantWebsitePreview<TData = Awaited<ReturnType<typeof getTenantWebsitePreview>>, TError = ErrorType<unknown>>(
@@ -1131,7 +1131,7 @@ export const getStartDemoSessionUrl = () => {
   return `/api/demo/session`
 }
 
-export const startDemoSession = async (demoLoginInput: DemoLoginInput, options?: Parameters<typeof customFetch>[1]): Promise<DemoSession> => {
+export const startDemoSession = async (demoLaunchInput: DemoLaunchInput, options?: Parameters<typeof customFetch>[1]): Promise<DemoSession> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1152,7 +1152,7 @@ return customFetch<DemoSession>(getStartDemoSessionUrl(),
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(demoLoginInput)
+    body: JSON.stringify(demoLaunchInput)
   }
 );}
 
@@ -1190,9 +1190,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type StartDemoSessionMutationResult = NonNullable<Awaited<ReturnType<typeof startDemoSession>>>
-    export type StartDemoSessionMutationBody = BodyType<DemoLoginInput>
+    export type StartDemoSessionMutationBody = BodyType<DemoLaunchInput>
     export type StartDemoSessionMutationError = ErrorType<void>
-    export type StartDemoSessionMutationVariables = {data: BodyType<DemoLoginInput>}
+    export type StartDemoSessionMutationVariables = {data: BodyType<DemoLaunchInput>}
 
     export const useStartDemoSession = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startDemoSession>>, TError,StartDemoSessionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}

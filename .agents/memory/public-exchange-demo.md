@@ -3,11 +3,21 @@ name: Public Exchange demo boundaries
 description: Why public demo credentials use restricted sessions and why delivered customers must not be repurposed as demos.
 ---
 
-Publicly advertised demo credentials must not authenticate a shared editable Clerk account. Use a restricted, expiring demo session with no identity-management capabilities, no persistent admin writes, and exactly one read-only tenant membership. Keep the creator's existing Clerk identity and ownership unchanged.
+Public demos must not authenticate a shared editable Clerk account. Use a credential-free restricted session with no identity-management capabilities, no persistent admin writes, and only isolated fictional configuration. Keep the creator's existing Clerk identity and ownership unchanged.
 
 **Why:** Anyone holding public credentials could otherwise change a shared account's email/password or damage shared configuration. The user requested a real Admin Panel experience without account/security changes or cross-tenant access.
 
-**How to apply:** Reuse the normal provisioned Exchange and staff/read-only UI. Enforce the demo boundary on the server and deny privileged/global/customer-account paths. If editable demo controls are introduced later, use visitor-isolated disposable state rather than writes to the shared tenant.
+Exclude demo customer queries centrally and consider launch intent as well as
+the resolved principal.
+
+**Why:** A shared navigation shell fetched customer panels after the page gate
+was fixed. A first-render stale principal also allowed a transient request.
+
+**How to apply:** Shared query callers must inherit the no-customer-data
+boundary during launch and navigation. Intent is only a denial boundary, never
+authentication. Every demo exit/error path must preserve the real Clerk session.
+
+**How to apply:** Reuse the normal shared Exchange renderer and staff/read-only UI, but never depend on a Development tenant being copied to Production. Fictional configurations must be authored deliberately, not exported from tenant records. Enforce a terminal server isolation boundary and deny privileged/global/customer-account paths. A demo must not replace the real owner's session in another tab; use explicit per-tab intent and separate caches. Customer delivery guards must not fetch real customer account panels for the demo. If editable demo controls are introduced later, use visitor-isolated disposable state rather than writes to a shared tenant.
 
 A requested demo brand or slug may already belong to a delivered tenant, including a demonstration retained for inspection. Check its delivery purpose and membership history before reuse; preserve existing Development assignments and choose a separate dedicated demo slug when there is a collision. Delivered status alone does not make a fixture legitimate for Production synchronization.
 

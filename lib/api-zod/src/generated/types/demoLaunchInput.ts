@@ -6,9 +6,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface DemoLoginInput {
-  /** @maxLength 100 */
-  username: string;
-  /** @maxLength 100 */
-  password: string;
-}
+export interface DemoLaunchInput { [key: string]: unknown }

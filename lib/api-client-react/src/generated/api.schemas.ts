@@ -1618,12 +1618,7 @@ export interface CurrentPrincipal {
   memberships?: CurrentPrincipalMembershipsItem[];
 }
 
-export interface DemoLoginInput {
-  /** @maxLength 100 */
-  username: string;
-  /** @maxLength 100 */
-  password: string;
-}
+export interface DemoLaunchInput { [key: string]: unknown }
 
 export interface DemoSession {
   active: boolean;

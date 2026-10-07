@@ -1,10 +1,10 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useRef, type ComponentType, type ReactNode } from 'react';
 import { ClerkProvider, SignIn, SignUp, Show, useClerk } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
-import { useGetCurrentPrincipal, getGetCurrentPrincipalQueryKey, useGetDemoSession, getGetDemoSessionQueryKey } from '@workspace/api-client-react';
+import { useGetCurrentPrincipal, getGetCurrentPrincipalQueryKey, useGetDemoSession, getGetDemoSessionQueryKey, endDemoSession } from '@workspace/api-client-react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -15,30 +15,36 @@ import { AdminShell } from '@/components/app/shell';
 import { PrincipalContext, usePrincipal } from '@/lib/principal';
 import NotFound from '@/pages/not-found';
 import Home from '@/pages/home';
-import DemoAdmin from '@/pages/demo-admin';
+const DemoAdmin = lazy(() => import('@/pages/demo-admin'));
 import { CustomerShell } from '@/components/app/customer-shell';
 import { useAdminPanels } from '@/lib/customer';
-import { AccountDashboard, AccountOrders, AccountWhiteLabels, AdminPanels, ConfigureExchange, AccountProfile, NotProvisioned } from '@/pages/account';
-import WhiteLabelRequests from '@/pages/white-label-requests';
-import WhiteLabelOrder from '@/pages/white-label-order';
-import AccountOrderDetail from '@/pages/account-order';
+const AccountDashboard = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountDashboard })));
+const AccountOrders = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountOrders })));
+const AccountWhiteLabels = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountWhiteLabels })));
+const AdminPanels = lazy(() => import('@/pages/account').then(m => ({ default: m.AdminPanels })));
+const ConfigureExchange = lazy(() => import('@/pages/account').then(m => ({ default: m.ConfigureExchange })));
+const AccountProfile = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountProfile })));
+const NotProvisioned = lazy(() => import('@/pages/account').then(m => ({ default: m.NotProvisioned })));
+const WhiteLabelRequests = lazy(() => import('@/pages/white-label-requests'));
+const WhiteLabelOrder = lazy(() => import('@/pages/white-label-order'));
+const AccountOrderDetail = lazy(() => import('@/pages/account-order'));
 import { useParams } from 'wouter';
-import Admin from '@/pages/admin';
-import Clients from '@/pages/clients';
-import ClientNew from '@/pages/client-new';
-import ClientDetail from '@/pages/client-detail';
-import Exchange from '@/pages/exchange';
-import Modules from '@/pages/modules';
-import Activity from '@/pages/activity';
-import WhiteLabels from '@/pages/white-labels';
-import Provisioning from '@/pages/provisioning';
-import Providers from '@/pages/providers';
-import CustomerDetail from '@/pages/customer-detail';
-import Plans from '@/pages/plans';
-import PlanDetail from '@/pages/plan-detail';
-import Addons from '@/pages/addons';
-import LandingProducts from '@/pages/landing-products';
-import CatalogPreview from '@/pages/catalog-preview';
+const Admin = lazy(() => import('@/pages/admin'));
+const Clients = lazy(() => import('@/pages/clients'));
+const ClientNew = lazy(() => import('@/pages/client-new'));
+const ClientDetail = lazy(() => import('@/pages/client-detail'));
+const Exchange = lazy(() => import('@/pages/exchange'));
+const Modules = lazy(() => import('@/pages/modules'));
+const Activity = lazy(() => import('@/pages/activity'));
+const WhiteLabels = lazy(() => import('@/pages/white-labels'));
+const Provisioning = lazy(() => import('@/pages/provisioning'));
+const Providers = lazy(() => import('@/pages/providers'));
+const CustomerDetail = lazy(() => import('@/pages/customer-detail'));
+const Plans = lazy(() => import('@/pages/plans'));
+const PlanDetail = lazy(() => import('@/pages/plan-detail'));
+const Addons = lazy(() => import('@/pages/addons'));
+const LandingProducts = lazy(() => import('@/pages/landing-products'));
+const CatalogPreview = lazy(() => import('@/pages/catalog-preview'));
 import { QXLAYER_LIGHT_LOGO_URL } from '@/lib/brand';
 import { BrandLogo } from '@/components/brand-logo';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
@@ -115,21 +121,35 @@ function HomeRedirect() {
 }
 
 function PrincipalGate({ children }: { children: ReactNode }) {
+  const [location] = useLocation();
   const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: 10000 } });
   const { signOut } = useClerk();
+  const qc = useQueryClient();
+  let demoTab = false;
+  try { demoTab = sessionStorage.getItem('qx-isolated-demo') === 'read-only'; } catch { /* no demo intent */ }
+  const leave = async () => {
+    if (!demoTab) { await signOut({ redirectUrl: '/' }); return; }
+    try { await endDemoSession(); } finally {
+      sessionStorage.removeItem('qx-isolated-demo'); qc.clear();
+      window.location.assign(import.meta.env.BASE_URL);
+    }
+  };
   if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div></ConsoleThemeScope>;
+  if (demoTab && q.data && !q.data.demo) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   if (q.isError || !q.data) {
     return (
       <ConsoleThemeScope><div className="grid min-h-[100dvh] place-items-center px-5 text-center">
         <div className="space-y-3"><BrandLogo size={48} className="mx-auto" /><p className="font-display text-3xl">Could not verify your access</p>
           <div className="flex justify-center gap-2"><Button data-testid="button-retry" onClick={() => q.refetch()}>Retry</Button>
-            <Button variant="ghost" onClick={() => signOut({ redirectUrl: '/' })}>Sign out</Button></div></div>
+            <Button variant="ghost" onClick={() => void leave()}>{demoTab ? 'Exit demo' : 'Sign out'}</Button></div></div>
       </div></ConsoleThemeScope>
     );
   }
-  if (q.data.demo && window.location.pathname !== `${basePath}/clients/${q.data.tenantId}/exchange`
-    && !window.location.pathname.startsWith(`${basePath}/clients/${q.data.tenantId}/exchange/`)) {
-    return <Redirect to={`/clients/${q.data.tenantId}/exchange`} />;
+  if (q.data.demo) {
+    const tenantId = q.data.memberships?.[0]?.tenantId;
+    if (!tenantId) return <Redirect to="/demo/admin" />;
+    const allowed = `/clients/${tenantId}/exchange`;
+    if (location !== allowed && !location.startsWith(`${allowed}/`)) return <Redirect to={allowed} />;
   }
   return (
     <PrincipalContext.Provider value={q.data}>
@@ -140,7 +160,10 @@ function PrincipalGate({ children }: { children: ReactNode }) {
 
 function Protected({ children }: { children: ReactNode }) {
   const demo = useGetDemoSession({ query: { queryKey: getGetDemoSessionQueryKey(), retry: false, staleTime: 0, refetchInterval: 60000 } });
-  if (demo.data?.active) return <PrincipalGate>{children}</PrincipalGate>;
+  let demoTab = false;
+  try { demoTab = sessionStorage.getItem("qx-isolated-demo") === "read-only"; } catch { /* no demo context */ }
+  if (demoTab && demo.error) return <Redirect to="/demo/admin" />;
+  if (demoTab && demo.data?.active) return <PrincipalGate>{children}</PrincipalGate>;
   if (demo.isLoading) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   return (
     <>
@@ -155,21 +178,24 @@ function SuperOnly({ children }: { children: ReactNode }) {
 }
 function DeliveredOnly({ children }: { children: ReactNode }) {
   const p = usePrincipal(); const { id = '' } = useParams<{ id: string }>();
-  const a = useAdminPanels();
+  const a = useAdminPanels(!p.demo && p.role !== 'super_admin');
+  // Isolated demo access is not a delivered customer assignment. Its server
+  // fixture boundary is authoritative and it must not read account endpoints.
+  if (p.demo) return p.memberships?.some(m => m.tenantId === id) ? <>{children}</> : <NotProvisioned />;
   if (p.role === 'super_admin') return <>{children}</>;
   if (a.isLoading) return <Skeleton className="h-64 w-full" />;
   if (a.isError) return <ErrorState what="your admin panels" onRetry={() => a.refetch()} />;
   return a.data?.some((x) => x.tenantId === id) ? <>{children}</> : <NotProvisioned />;
 }
-const guard = (C: () => ReactNode) => () => <Protected><SuperOnly><C /></SuperOnly></Protected>;
-const open = (C: () => ReactNode) => () => <Protected><C /></Protected>;
+const guard = (C: ComponentType) => () => <Protected><SuperOnly><C /></SuperOnly></Protected>;
+const open = (C: ComponentType) => () => <Protected><C /></Protected>;
 const rDelivered = () => <Protected><DeliveredOnly><Exchange /></DeliveredOnly></Protected>;
 const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rProv = guard(Provisioning), rProviders = guard(Providers), rCust = guard(CustomerDetail);
 const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile), rOrdD = open(AccountOrderDetail);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  return <ErrorBoundary resetKey={location}>{children}</ErrorBoundary>;
+  return <ErrorBoundary resetKey={location}><Suspense fallback={<div className="p-6"><Skeleton className="h-64 w-full" /></div>}>{children}</Suspense></ErrorBoundary>;
 }
 
 function ClerkProviderWithRoutes() {

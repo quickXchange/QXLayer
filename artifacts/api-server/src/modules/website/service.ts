@@ -2,13 +2,15 @@ import { withDatabase } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { readTenant } from "../tenants/service";
 import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
-import { developmentPreview, previewBrandingUrl } from "./development-preview";
+import { previewBrandingUrl, type WebsitePreview } from "./operator-preview";
 import { publicExchangeConfiguration } from "../../products/exchange/public-configuration";
 import { ACTIONS } from "../../products/exchange/settings";
+import { DEMO_SLUG } from "../demo/identity";
 
-export async function publicTenantId(slug: string, previewToken?: string) {
+export async function publicTenantId(slug: string, preview?: WebsitePreview) {
+  if (slug === DEMO_SLUG) throw new HttpError(403, "This reserved demo uses isolated fictional configuration only.");
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) throw new HttpError(404, "Website not available.");
-  const preview = developmentPreview(slug, previewToken);
+  if (preview && (preview.slug !== slug || preview.expiresAt <= Date.now())) throw new HttpError(403, "Private preview expired.");
   const id = await withDatabase({ actorId: "public-site", publicSlug: slug, isSuperAdmin: !!preview }, async (client) => {
     const r = await client.query(`SELECT id FROM tenants t WHERE slug=$1 AND
       ((status='active' AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered'))
@@ -18,9 +20,8 @@ export async function publicTenantId(slug: string, previewToken?: string) {
   if (!id) throw new HttpError(404, "Website not available.");
   return id;
 }
-export async function getPublicSite(slug: string, feature?: string, previewToken?: string) {
-  const preview = developmentPreview(slug, previewToken);
-  const id = await publicTenantId(slug, previewToken);
+export async function getPublicSite(slug: string, feature?: string, preview?: WebsitePreview) {
+  const id = await publicTenantId(slug, preview);
   return withDatabase({ actorId: "public-site", tenantId: id, isSuperAdmin: !!preview }, async (client) => {
     const e = await resolveEntitlements(client, id);
     if ((!preview && e.tenantStatus !== "active") || e.status !== "active" || !e.features.website) throw new HttpError(404, "Website not available.");
@@ -41,10 +42,10 @@ export async function getPublicSite(slug: string, feature?: string, previewToken
     );
     // Never serialize t/e wholesale: their plan, usage, overrides, IDs and staff are private.
     return {
-      tenantSlug: t.slug, brandName: t.brandName, logoUrl: previewBrandingUrl(t.logoUrl, slug, previewToken),
+      tenantSlug: t.slug, brandName: t.brandName, logoUrl: previewBrandingUrl(t.logoUrl, slug, preview),
       primaryColor: t.primaryColor, accentColor: t.accentColor, themeMode: t.themeMode,
       domain: t.domain, sandboxOnly: true, websiteSettings: {
-        ...t.websiteSettings, faviconUrl: previewBrandingUrl(t.websiteSettings.faviconUrl, slug, previewToken),
+        ...t.websiteSettings, faviconUrl: previewBrandingUrl(t.websiteSettings.faviconUrl, slug, preview),
       },
       features: publicFeatures, assets: assets.rows,
     };

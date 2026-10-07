@@ -19,6 +19,7 @@ import { exchangeAudit, exchangeConfiguration, exchangeCustomers, exchangeDashbo
 import { containsCredential } from "../products/exchange/providers";
 import { HttpError } from "../lib/errors";
 import { visualCatalog, visualFile } from "../products/exchange/visual-assets";
+import { authorizedWebsitePreview } from "../modules/website/operator-preview";
 
 const router = Router();
 router.get("/exchange/visual-catalog", (_req, res) => {
@@ -56,8 +57,8 @@ router.use("/public/sites/:slug/exchange", sameOriginMutation, (req, res, next) 
   next();
 });
 router.get("/public/sites/:slug/exchange", async (req, res) => {
-  const token = req.headers["x-qx-website-preview"] ?? req.query.preview;
-  res.json(GetPublicExchangeResponse.parse(await publicExchange(GetPublicExchangeParams.parse(req.params).slug, typeof token === "string" ? token : undefined)));
+  const { slug } = GetPublicExchangeParams.parse(req.params);
+  res.json(GetPublicExchangeResponse.parse(await publicExchange(slug, await authorizedWebsitePreview(req, slug))));
 });
 router.post("/public/sites/:slug/exchange/quotes", guardPublicDemo, async (req, res) => res.json(CreateSandboxQuoteResponse.parse(await sandboxQuote(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxQuoteBody.parse(req.body)))));
 router.post("/public/sites/:slug/exchange/orders", guardPublicDemo, async (req, res) => res.status(201).json(CreateSandboxOrderResponse.parse(await sandboxOrder(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxOrderBody.parse(req.body)))));
