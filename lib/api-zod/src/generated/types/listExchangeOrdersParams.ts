@@ -6,12 +6,17 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ListExchangeOrdersCustomer } from './listExchangeOrdersCustomer';
+import type { ListExchangeOrdersView } from './listExchangeOrdersView';
 
 export type ListExchangeOrdersParams = {
 /**
  * @maxLength 100
  */
 search?: string;
+/**
+ * Status group applied before pagination and counting.
+ */
+view?: ListExchangeOrdersView;
 status?: string;
 action?: string;
 /**

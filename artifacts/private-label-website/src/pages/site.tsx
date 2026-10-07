@@ -11,7 +11,7 @@ import { humanize } from '@/lib/theme';
 const BelowFold = lazy(() => import('@/components/below-fold'));
 
 export function Gate({ slug, ambient, children }: { slug: string; ambient?: boolean; children: (s: PublicSite) => ReactNode }) {
-  const q = useGetPublicSite(slug, { request: websitePreviewRequest(slug), query: { enabled: !!slug, queryKey: getGetPublicSiteQueryKey(slug), retry: false } });
+  const q = useGetPublicSite(slug, { request: websitePreviewRequest(slug), query: { enabled: !!slug, queryKey: getGetPublicSiteQueryKey(slug), retry: false, staleTime: 0, refetchOnMount: "always", refetchOnWindowFocus: true, refetchInterval: 15000, refetchIntervalInBackground: true } });
   if (q.isLoading) return <SiteSkeleton />;
   if (q.isError || !q.data) return <Unavailable onRetry={() => void q.refetch()} />;
   return <SiteShell key={q.data.tenantSlug} site={q.data} ambient={ambient}>{children(q.data)}</SiteShell>;

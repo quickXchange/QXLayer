@@ -10,6 +10,8 @@ import { publicTenantId } from "../../modules/website/service";
 import { developmentPreview } from "../../modules/website/development-preview";
 import { ACTIONS, emptySettings, readExchange, validateExchange } from "./settings";
 import { calculateQuote } from "./calculation";
+import { publicExchangeConfiguration } from "./public-configuration";
+import { statusesForOrderView } from "./order-views";
 
 const hash = (v: string) => createHash("sha256").update(v).digest("hex");
 function sign(v: string) {
@@ -101,19 +103,7 @@ export async function publicExchange(slug: string, previewToken?: string) {
   const tenantId = await publicTenantId(slug, previewToken);
   return withDatabase({ actorId: "sandbox-visitor", tenantId, isSuperAdmin: !!developmentPreview(slug, previewToken) }, async client => {
     const e = await resolveEntitlements(client, tenantId); guard(e, undefined, !!developmentPreview(slug, previewToken));
-    const { configuration: s, catalog } = await readExchange(client, tenantId);
-    const legacy = await client.query("SELECT exchange_enabled FROM tenant_configuration WHERE tenant_id=$1", [tenantId]);
-    const enabled = s.enabled && legacy.rows[0]?.exchange_enabled === true && !e.overLimit;
-    const assets = catalog.flatMap(c => {
-      const a = s.assets.find(a => a.assetId === c.assetId && a.enabled);
-      const n = s.networks.find(n => n.assetNetworkId === c.assetNetworkId && n.enabled && n.available);
-      return a && n ? [{ assetNetworkId: c.assetNetworkId, assetId: c.assetId, symbol: a.symbol, name: c.name, networkId: c.networkId, networkName: c.networkName, testnet: c.testnet, logoUrl: a.logoUrl, decimals: a.decimals }] : [];
-    }).sort((a, b) => (s.assets.find(x => x.assetId === a.assetId)?.displayOrder ?? 0) - (s.assets.find(x => x.assetId === b.assetId)?.displayOrder ?? 0));
-    const actions = ACTIONS.filter(a => enabled && s.actions[a] && e.features[a]);
-    const endpointEnabled = (id: string) => id === `fiat:${s.fiatCurrency}` || catalog.some(c => c.assetNetworkId === id && assets.some(a => a.assetId === c.assetId && a.networkId === c.networkId));
-    return { enabled, defaultAction: s.defaultAction, actions, assets, routes: s.routes.filter(r => r.enabled && actions.includes(r.action) && endpointEnabled(r.source) && endpointEnabled(r.destination)),
-      // Keep administrator-only reserve metadata out of the unchanged public view.
-      paymentMethods: s.paymentMethods.filter(m => m.enabled).map(({ reserve: _reserve, ...method }) => method), fiatCurrency: s.fiatCurrency, publicNote: s.publicNote };
+    return publicExchangeConfiguration(client, tenantId, e);
   });
 }
 function quoteAdmission(e: EffectiveEntitlements, volume: string) {
@@ -209,16 +199,16 @@ export function tenantOrder(principal: Principal, tenantId: string, id: string, 
     return serializeOrder(row);
   });
 }
-export function tenantOrders(principal: Principal, tenantId: string, query: { search?: string; status?: string; action?: string; page?: number; from?: string; to?: string; customer?: string }) {
+export function tenantOrders(principal: Principal, tenantId: string, query: { search?: string; status?: string; action?: string; view?: "active" | "archived"; page?: number; from?: string; to?: string; customer?: string }) {
   return withDatabase(contextFor(principal, tenantId), async client => {
     for (const date of [query.from, query.to]) if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date)) throw new HttpError(400, "Use valid calendar dates in YYYY-MM-DD format.");
     if (query.from && query.to && query.from > query.to) throw new HttpError(400, "Start date must not be after end date.");
     if (query.customer && query.customer !== "anonymous") throw new HttpError(400, "Sandbox orders do not collect customer identity.");
     const page = query.page ?? 1, pageSize = 25;
-    const filter = "tenant_id=$1 AND request->>'product'='crypto_exchange' AND ($2='' OR status=$2) AND ($3='' OR request->>'action'=$3) AND ($4='' OR id::text ILIKE '%'||$4||'%' OR request->>'sourceSymbol' ILIKE '%'||$4||'%' OR request->>'destinationSymbol' ILIKE '%'||$4||'%') AND ($5::timestamptz IS NULL OR created_at >= $5::timestamptz) AND ($6::timestamptz IS NULL OR created_at < $6::timestamptz + interval '1 day')";
-    const args = [tenantId, query.status ?? "", query.action ?? "", query.search ?? "", query.from ? `${query.from}T00:00:00Z` : null, query.to ? `${query.to}T00:00:00Z` : null];
+    const filter = "tenant_id=$1 AND request->>'product'='crypto_exchange' AND ($2='' OR status=$2) AND ($3='' OR request->>'action'=$3) AND ($4='' OR id::text ILIKE '%'||$4||'%' OR request->>'sourceSymbol' ILIKE '%'||$4||'%' OR request->>'destinationSymbol' ILIKE '%'||$4||'%') AND ($5::timestamptz IS NULL OR created_at >= $5::timestamptz) AND ($6::timestamptz IS NULL OR created_at < $6::timestamptz + interval '1 day') AND ($7::text[] IS NULL OR status=ANY($7::text[]))";
+    const args = [tenantId, query.status ?? "", query.action ?? "", query.search ?? "", query.from ? `${query.from}T00:00:00Z` : null, query.to ? `${query.to}T00:00:00Z` : null, statusesForOrderView(query.view)];
     const count = await client.query(`SELECT count(*)::int AS total FROM exchange_orders WHERE ${filter}`, args);
-    const rows = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE ${filter} ORDER BY created_at DESC,id DESC LIMIT $7 OFFSET $8`, [...args, pageSize, (page - 1) * pageSize]);
+    const rows = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE ${filter} ORDER BY created_at DESC,id DESC LIMIT $8 OFFSET $9`, [...args, pageSize, (page - 1) * pageSize]);
     return { orders: rows.rows.map(serializeOrder), total: count.rows[0].total as number, page, pageSize };
   });
 }

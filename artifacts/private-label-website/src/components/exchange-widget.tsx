@@ -39,7 +39,11 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
   const exchangeQ = useGetPublicExchange(site.tenantSlug, { request: websitePreviewRequest(site.tenantSlug), query: { queryKey: getGetPublicExchangeQueryKey(site.tenantSlug), enabled: !presentation, refetchInterval: 15000 } });
   const config = exchangeQ.data;
   const assets = presentation ? site.assets : config?.assets ?? [];
-  const tabs = presentation ? caps.tabs : config?.actions ?? [];
+  const tabs = presentation || !config ? caps.tabs : config.actions;
+  const previewProof = useMemo(() => !presentation && !!websitePreviewRequest(site.tenantSlug).headers, [presentation, site.tenantSlug]);
+  const loadingCfg = !presentation && exchangeQ.isLoading;
+  const errorCfg = !presentation && !loadingCfg && exchangeQ.isError;
+  const inactive = !presentation && (loadingCfg || errorCfg || !config?.enabled || !config.actions.length || previewProof);
   const [tab, setTab] = useState<ExchangeTab>(caps.tabs[0] ?? 'swap');
   const [fromKey, setFromKey] = useState<string | null>(assets[0] ? assetKey(assets[0]) : null);
   const [toKey, setToKey] = useState<string | null>(() => { const f = assets[0]; const o = assets.find((a) => !f || a.assetId !== f.assetId); return o ? assetKey(o) : null; });
@@ -86,7 +90,7 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
   useEffect(() => {
     if (presentation) return;
     setQuote(null); setStatus(null); setQuoting(false);
-    if (!source || !destination || !amount || Number(amount) <= 0 || !tabs.includes(tab) || (!twoSided && !paymentMethodId)) return;
+    if (inactive || !source || !destination || !amount || Number(amount) <= 0 || !tabs.includes(tab) || (!twoSided && !paymentMethodId)) return;
     const controller = new AbortController();
     const current = ++revision.current;
     const timer = setTimeout(() => {
@@ -97,7 +101,7 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
         .finally(() => { if (!controller.signal.aborted && current === revision.current) setQuoting(false); });
     }, 400);
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [source, destination, tab, amount, paymentMethodId, config, presentation, site.tenantSlug, refreshQuote]);
+  }, [source, destination, tab, amount, paymentMethodId, config, presentation, inactive, site.tenantSlug, refreshQuote]);
   useEffect(() => {
     if (presentation) return;
     try {
@@ -131,10 +135,7 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
   const shell = (inner: React.ReactNode) => (
     <div ref={frame} className="s-glowframe" data-testid="widget-exchange"><div className="s-glowinner p-3.5 sm:p-7"><div className="s-clip" aria-hidden="true"><span className="s-spec" /><span className="s-sheen" /></div>{inner}</div></div>
   );
-  if (!presentation && exchangeQ.isLoading) return shell(<p className="s-muted py-8 text-center">Loading exchange configuration…</p>);
-  if (!presentation && exchangeQ.isError) return shell(<div className="py-8 text-center"><p role="alert">Exchange configuration could not be loaded.</p><button type="button" className="s-btn mt-4" onClick={() => exchangeQ.refetch()}>Try again</button></div>);
-  if (!presentation && !config?.enabled) return shell(<div className="py-8 text-center"><span className="s-badge">Sandbox</span><h3 className="mt-4 text-xl font-semibold">Exchange is paused</h3><p className="s-muted mt-2">This client has not enabled sandbox trading yet.</p></div>);
-  if (caps.exchange === 'empty' || (!presentation && !tabs.length)) return shell(
+  if (presentation && caps.exchange === 'empty') return shell(
     <div className="py-6 text-center" data-testid="state-exchange-empty">
       <span className="s-badge">Exchange enabled</span>
       <h3 className="mt-4 text-xl font-semibold">No exchange actions are enabled yet</h3>
@@ -152,6 +153,7 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setTouched(true);
     const a = twoSided ? from && to : tab === 'buy' ? to : from;
+    if (inactive) return;
     if (!a) { setStatus('Choose an asset first.'); return; }
     if (amount === '' || Number(amount) <= 0) { setStatus(null); return; }
     if (presentation) { setStatus('Sandbox preview only. No order was created and nothing was sent.'); return; }
@@ -175,26 +177,26 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
   const values: Record<string, string | undefined> = { rate: quote ? `1 ${quote.sourceSymbol} = ${quote.rate} ${quote.destinationSymbol}` : undefined, min: quote?.minimum ?? route?.minimum, max: quote?.maximum ?? route?.maximum, fee: quote ? `${quote.fee} ${quote.sourceSymbol}` : undefined };
   const rate = (k: string, label: string) => <div className="flex items-center justify-between gap-3 py-1.5" key={k}><dt>{label}</dt><dd className="s-muted" title={presentation ? NOQ : 'Configured sandbox pricing only'} data-testid={`text-${k}`}>{values[k] ?? 'Unavailable'}</dd></div>;
 
+  const notice = presentation ? null
+    : loadingCfg ? 'Loading exchange configuration…'
+    : errorCfg ? 'Exchange configuration could not be loaded.'
+    : !config?.enabled ? 'Exchange is paused. This client has not enabled sandbox trading yet.'
+    : !tabs.length ? 'No exchange actions are enabled yet.'
+    : previewProof ? 'Read-only preview. Quotes and orders are disabled.'
+    : noAssets ? 'No assets configured yet, so there is nothing to exchange.'
+    : insufficient ? `A ${LABEL[tab].toLowerCase()} needs two different asset/network selections.`
+    : null;
+
   return shell(
     <form onSubmit={submit} noValidate aria-label="Exchange (sandbox)" className={presentation ? undefined : 's-exchange-functional'}>
       <div className="flex items-center justify-between gap-3">
         <div role="tablist" aria-label="Exchange action" className="s-tabs overflow-x-auto">
+          {!presentation && !tabs.length && <span className="s-tab" aria-disabled="true" data-testid="state-actions-unconfigured">Actions not configured</span>}
           {tabs.map((t) => <button key={t} type="button" role="tab" id={`tab-${t}`} aria-selected={tab === t} className="s-tab" onClick={() => { setTab(t); setTouched(false); setPaymentMethodId(''); reset(); }} data-testid={`tab-${t}`}>{LABEL[t]}</button>)}
         </div>
         <span className="s-badge shrink-0" data-testid="badge-sandbox">{site.websiteSettings.sandboxLabel ?? 'Sandbox'}</span>
       </div>
-      {noAssets && !presentation ? (
-        <div className="py-10 text-center" data-testid="state-widget-no-assets"><h3 className="text-lg font-semibold">No assets configured</h3><p className="s-muted mx-auto mt-2 max-w-xs text-sm">This tenant has not enabled any assets or networks yet, so there is nothing to exchange.</p></div>
-      ) : insufficient && !presentation ? (
-        <div className="s-insuff mt-5" data-testid="state-widget-insufficient">
-          <div className="s-pairviz" aria-hidden="true">{assets[0] && <Coin asset={assets[0]} size={64} />}<span className="s-pairviz-line" /><span className="s-ghostcoin">2</span></div>
-          <div className="flex items-start gap-3"><Info size={18} className="mt-0.5 shrink-0" style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" />
-            <div><h3 className="font-semibold">A {LABEL[tab].toLowerCase()} needs two different asset/network selections</h3>
-              <p className="s-muted mt-1.5 text-sm leading-relaxed">{site.brandName} currently has one configured asset, so no valid pair exists. A pair is not simulated with a duplicate. Currently configured:</p>
-              <ul className="mt-3 space-y-2">{assets.map((a) => <li key={assetKey(a)} className="flex items-center gap-2.5 text-sm"><Coin asset={a} size={26} /><span className="font-semibold">{a.symbol}</span><NetBadge a={a} /></li>)}</ul>
-            </div></div>
-        </div>
-      ) : (
+      {(
         <div className="mt-4 sm:mt-5">
           <Side id="top" label={tab === 'buy' ? 'You pay' : tab === 'convert' ? 'You convert' : 'You send'} asset={tab === 'buy' ? null : from} fiat={tab === 'buy'} fiatCurrency={config?.fiatCurrency} onPick={() => setPicker('from')} value={amount} onValue={(v) => { setAmount(v); reset(); }} error={amountError} assetsAvailable={assets.length > 0} />
           {twoSided ? <button type="button" className="s-swapbtn" onClick={flip} aria-label="Switch direction" disabled={!from || !to} data-testid="button-switch-direction"><ArrowDownUp size={17} /></button> : <div className="h-3" />}
@@ -203,17 +205,18 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
           <p className="s-muted mt-2 text-xs" aria-live="polite" data-testid="text-receive-note">{quoting ? 'Calculating sandbox quote…' : quote ? `Receive ${quote.outputAmount} ${quote.destinationSymbol} · sandbox estimate · markup ${quote.spreadBps / 100}% · valid until ${new Date(quote.expiresAt).toLocaleTimeString()}` : 'Receive amount appears once a quote is available.'}</p>
         </div>
       )}
-      {(!noAssets || presentation) && (
+      {(
         <dl className="s-ratebox mt-4 divide-y rounded-[var(--s-r2)] border px-4 py-2.5" style={{ borderColor: 'var(--s-line)' }} data-testid="panel-rate">
           {rate('rate', 'Rate')}{rate('min', 'Minimum')}{rate('max', 'Maximum')}{rate('fee', 'Network and service fee')}
           {!presentation && quote?.destinationFee && <div className="flex justify-between gap-3 py-1.5 text-xs"><dt>Destination network fee</dt><dd className="s-muted">{quote.destinationFee} {quote.destinationSymbol}</dd></div>}
           <p className="s-muted pt-2 text-xs">{presentation ? `${NOQ} Nothing here is an estimate.` : 'Sandbox rates only. Output includes destination network fees. No real funds or execution.'}</p>
-          {!presentation && amount && !quote && !quoting && <button type="button" className="s-link mt-2 text-xs" onClick={() => setRefreshQuote(n => n + 1)} data-testid="button-refresh-quote">Request fresh sandbox quote</button>}
+          {!presentation && !inactive && amount && !quote && !quoting && <button type="button" className="s-link mt-2 text-xs" onClick={() => setRefreshQuote(n => n + 1)} data-testid="button-refresh-quote">Request fresh sandbox quote</button>}
         </dl>
       )}
-      <button type="submit" className="s-btn s-btn-primary s-cta-xl mt-5 w-full" disabled={noAssets || insufficient || submitting || (!presentation && (!quote || quoting))} data-testid="button-exchange-cta">{submitting ? 'Creating sandbox order…' : presentation ? 'Preview order (sandbox)' : 'Create order (sandbox)'}</button>
+      <button type="submit" className="s-btn s-btn-primary s-cta-xl mt-5 w-full" disabled={inactive || noAssets || insufficient || submitting || (!presentation && (!quote || quoting))} data-testid="button-exchange-cta">{submitting ? 'Creating sandbox order…' : presentation ? 'Preview order (sandbox)' : 'Create order (sandbox)'}</button>
       {!presentation && config?.publicNote && <p className="s-muted mt-3 text-xs">{config.publicNote}</p>}
       <div role="status" aria-live="polite" className="mt-3 min-h-[1.25rem]">
+        {!status && notice && <p className="s-muted flex items-start gap-2 text-xs leading-relaxed" data-testid="status-exchange-inline"><Info size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" />{notice}{errorCfg && <button type="button" className="s-link ml-2" onClick={() => exchangeQ.refetch()}>Try again</button>}</p>}
         {status && <p className="flex items-start gap-2 text-xs leading-relaxed" data-testid="status-sandbox"><ShieldCheck size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--s-accent-ink)' }} aria-hidden="true" />{status}</p>}
       </div>
       {created && <div className="s-ratebox mt-4 rounded-[var(--s-r2)] border p-4 text-xs" style={{ borderColor: 'var(--s-line)' }} data-testid="panel-sandbox-order">

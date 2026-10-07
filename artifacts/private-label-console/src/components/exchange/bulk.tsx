@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type MouseEvent as _M, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -73,18 +73,31 @@ export function BulkBtn({ sel, locked, onClick, children, testid, destructive }:
 
 export interface Col<T> { h: string; cell: (r: T) => ReactNode; className?: string }
 
-export function DataTable<T>({ rows, cols, getId, sel, locked, selectionLocked = false, testid, onRowClick }: { rows: T[]; cols: Col<T>[]; getId: (r: T) => string; sel: Selection; locked?: boolean; selectionLocked?: boolean; testid: string; onRowClick?: (r: T) => void }) {
+export function DataTable<T>({ rows, cols, getId, sel, locked, selectionLocked = false, testid, onRowClick, readOnlyRows = false }: { rows: T[]; cols: Col<T>[]; getId: (r: T) => string; sel: Selection; locked?: boolean; selectionLocked?: boolean; testid: string; onRowClick?: (r: T) => void; readOnlyRows?: boolean }) {
+  const click = (e: _M, r: T) => { if (!(e.target as HTMLElement).closest('button, input, a, [role="checkbox"], [role="switch"]')) onRowClick?.(r); };
+  const selectionLabel = sel.persist ? 'Select all filtered results' : 'Select visible';
+  const headCheck = <Checkbox disabled={selectionLocked} aria-label={selectionLabel} checked={sel.all ? true : sel.some ? 'indeterminate' : false} onCheckedChange={() => (sel.all ? (sel.persist ? sel.deselectVisible() : sel.clear()) : sel.selectAll())} />;
   return (
-    <div className="max-w-full min-w-0 overflow-x-auto rounded-md border bg-card" data-testid={`table-${testid}`}>
-      <table className="w-full min-w-[720px] text-left text-sm">
-        <thead className="border-b font-mono text-[10px] uppercase tracking-wider text-muted-foreground"><tr>
-          <th className="w-10 px-3 py-2"><Checkbox disabled={selectionLocked} aria-label="Select all shown" checked={sel.all ? true : sel.some ? 'indeterminate' : false} onCheckedChange={() => (sel.all ? (sel.persist ? sel.deselectVisible() : sel.clear()) : sel.selectAll())} /></th>
-          {cols.map((c) => <th key={c.h} className="whitespace-nowrap px-3 py-2 font-normal">{c.h}</th>)}</tr></thead>
-        <tbody className="divide-y">{rows.map((r) => { const id = getId(r); return (
-          <tr key={id} className={`${sel.has(id) ? 'bg-muted/50' : 'hover:bg-muted/30'} ${onRowClick ? 'cursor-pointer' : ''}`} data-testid={`row-${testid}-${id}`} onClick={(e) => { if (!(e.target as HTMLElement).closest('button, input, a, [role="checkbox"], [role="switch"]')) onRowClick?.(r); }}>
-            <td className="px-3 py-2"><Checkbox disabled={selectionLocked} data-testid={`checkbox-${testid}-${id}`} aria-label="Select row" checked={sel.has(id)} onCheckedChange={() => sel.toggle(id)} /></td>
-            {cols.map((c) => <td key={c.h} className={`px-3 py-2 ${c.className ?? ''}`}>{c.cell(r)}</td>)}</tr>); })}</tbody>
-      </table>
+    <div className="max-w-full min-w-0" data-testid={`table-${testid}`}>
+      <div className="hidden max-w-full min-w-0 overflow-x-auto rounded-md border bg-card md:block">
+        <table className="w-full min-w-[720px] text-left text-sm">
+          <thead className="border-b font-mono text-[10px] uppercase tracking-wider text-muted-foreground"><tr>
+            {!readOnlyRows && <th className="w-10 px-3 py-2">{headCheck}</th>}
+            {cols.map((c) => <th key={c.h} className="whitespace-nowrap px-3 py-2 font-normal">{c.h}</th>)}</tr></thead>
+          <tbody className="divide-y">{rows.map((r) => { const id = getId(r); return (
+            <tr key={id} className={`${sel.has(id) ? 'bg-muted/50' : 'hover:bg-muted/30'} ${onRowClick ? 'cursor-pointer' : ''}`} data-testid={`row-${testid}-${id}`} onClick={(e) => click(e, r)}>
+              {!readOnlyRows && <td className="px-3 py-2"><Checkbox disabled={selectionLocked} data-testid={`checkbox-${testid}-${id}`} aria-label="Select row" checked={sel.has(id)} onCheckedChange={() => sel.toggle(id)} /></td>}
+              {cols.map((c) => <td key={c.h} className={`px-3 py-2 ${c.className ?? ''}`}>{c.cell(r)}</td>)}</tr>); })}</tbody>
+        </table>
+      </div>
+      <ul className="space-y-2 md:hidden" data-testid={`cards-${testid}`}>
+        <li className="flex items-center gap-2 px-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{!readOnlyRows && headCheck}{readOnlyRows ? 'Records' : selectionLabel}</li>
+        {rows.map((r) => { const id = getId(r); const [first, ...rest] = cols; return (
+          <li key={id} className={`min-w-0 space-y-2 rounded-md border bg-card p-3 ${sel.has(id) ? 'bg-muted/50' : ''} ${onRowClick ? 'cursor-pointer' : ''}`} data-testid={`card-${testid}-${id}`} onClick={(e) => click(e, r)}>
+            <div className="flex min-w-0 items-center gap-3">{!readOnlyRows && <Checkbox disabled={selectionLocked} aria-label="Select row" checked={sel.has(id)} onCheckedChange={() => sel.toggle(id)} />}<div className="min-w-0 flex-1 break-words">{first.cell(r)}</div></div>
+            <dl className="grid grid-cols-2 gap-x-3 gap-y-2">{rest.map((c) => <div key={c.h} className={`min-w-0 break-words ${c.h === 'Actions' || c.h === 'Edit' ? 'col-span-2' : ''}`}><dt className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{c.h}</dt><dd className="mt-0.5 text-sm">{c.cell(r)}</dd></div>)}</dl>
+          </li>); })}
+      </ul>
     </div>
   );
 }

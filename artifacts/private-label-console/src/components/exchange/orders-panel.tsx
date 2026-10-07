@@ -45,12 +45,13 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   const [from, setFrom] = useState(''); const [to, setTo] = useState('');
    const [range, setRange] = useState({ from: '', to: '' });
    const [dateError, setDateError] = useState('');
+  const [bucket, setBucket] = useState<'' | 'active' | 'archived'>('');
   const [page, setPage] = useState(1);
   const [openId, setOpenId] = useState<string | null>(orderId ?? null);
   const [step, setStep] = useState<null | 'form' | 'review'>(null);
   const [target, setTarget] = useState(''); const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false); const [failures, setFailures] = useState<string[]>([]);
-   const params: ListExchangeOrdersParams = { ...(search ? { search } : {}), ...(status !== ALL ? { status } : {}), ...(action !== ALL ? { action } : {}), ...(customer === 'anonymous' ? { customer: 'anonymous' as const } : {}), ...(range.from ? { from: range.from } : {}), ...(range.to ? { to: range.to } : {}), page };
+   const params: ListExchangeOrdersParams = { ...(search ? { search } : {}), ...(status !== ALL ? { status } : {}), ...(action !== ALL ? { action } : {}), ...(bucket ? { view: bucket } : {}), ...(customer === 'anonymous' ? { customer: 'anonymous' as const } : {}), ...(range.from ? { from: range.from } : {}), ...(range.to ? { to: range.to } : {}), page };
   const q = useListExchangeOrders(tenantId, params, { query: { queryKey: getListExchangeOrdersQueryKey(tenantId, params), placeholderData: keepPreviousData } });
   const cfgQ = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
   const idr = useIdentityResolver(cfgQ.data?.configuration, cfgQ.data?.catalog);
@@ -63,6 +64,8 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   const chosen = stale ? [] : orders.filter((o) => sel.has(o.id));
   const allowed = chosen.length === 0 ? [] : (NEXT[chosen[0].status] ?? []).filter((s) => chosen.every((o) => (NEXT[o.status] ?? []).includes(s)));
   const snapshotAllowed = snap.length === 0 ? [] : (NEXT[snap[0].status] ?? []).filter((s) => snap.every((o) => (NEXT[o.status] ?? []).includes(s)));
+  const shortcut = (v: string) => { setBucket(v === 'active' || v === 'archived' ? v : ''); setStatus(ALL); setAction(['swap', 'convert', 'buy', 'sell'].includes(v) ? v : ALL); setPage(1); sel.clear(); };
+  const cur = bucket || (action !== ALL ? action : status === ALL ? 'all' : '');
   const reset = () => { setPage(1); sel.clear(); };
   const close = () => { setOpenId(null); if (orderId) nav(`/clients/${tenantId}/exchange/orders`); };
   const run = async () => {
@@ -78,6 +81,8 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   return (
     <div className="space-y-4">
       <SimNote />
+      <div className="flex flex-wrap gap-1" role="tablist" aria-label="Order shortcuts" data-testid="order-shortcuts">{[['all', 'All'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['active', 'Active'], ['archived', 'Archived']].map(([k, l]) => <Button key={k} type="button" size="sm" role="tab" aria-selected={cur === k} variant={cur === k ? 'default' : 'outline'} data-testid={`button-shortcut-${k}`} onClick={() => shortcut(k)}>{l}</Button>)}</div>
+      {bucket && <p className="text-xs text-muted-foreground" data-testid="text-bucket-note">{bucket === 'active' ? 'Active: pending and processing orders' : 'Archived: completed, cancelled and failed orders'}, across all pages.</p>}
        <form className="flex flex-wrap items-end gap-2" onSubmit={(e) => {
          e.preventDefault();
          if ([from, to].some((v) => v && !isCalendarDate(v))) { setDateError('Enter complete, valid dates before searching.'); return; }
@@ -85,13 +90,13 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
          setDateError(''); setRange({ from, to }); setSearch(text.trim()); reset();
        }}>
         <Input data-testid="input-order-search" className="w-full sm:w-64" placeholder="Search order id, symbol" value={text} onChange={(e) => setText(e.target.value)} />
-        <div className="w-36"><Pick testid="select-order-status" value={status} onChange={(v) => { setStatus(v); reset(); }} options={[[ALL, 'Any status'], ['pending', 'Pending'], ['processing', 'Processing'], ['completed', 'Completed'], ['cancelled', 'Cancelled'], ['failed', 'Failed']]} /></div>
+        <div className="w-36"><Pick testid="select-order-status" value={status} onChange={(v) => { setStatus(v); setBucket(''); reset(); }} options={[[ALL, 'Any status'], ['pending', 'Pending'], ['processing', 'Processing'], ['completed', 'Completed'], ['cancelled', 'Cancelled'], ['failed', 'Failed']]} /></div>
         <div className="w-36"><Pick testid="select-order-action" value={action} onChange={(v) => { setAction(v); reset(); }} options={[[ALL, 'Any type'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell']]} /></div>
         <div className="w-44"><Pick testid="select-order-customer" value={customer} onChange={(v) => { setCustomer(v); reset(); }} options={[[ALL, 'Any customer'], ['anonymous', 'Anonymous visitors']]} /></div>
          <label className="text-xs text-muted-foreground">From<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-from" value={from} onChange={(e) => { setFrom(e.target.value); setDateError(''); }} /></label>
          <label className="text-xs text-muted-foreground">To<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-to" value={to} onChange={(e) => { setTo(e.target.value); setDateError(''); }} /></label>
         <Button data-testid="button-order-search">Search</Button>
-        <Button type="button" variant="ghost" data-testid="button-order-reset" onClick={() => { setText(''); setSearch(''); setStatus(ALL); setAction(ALL); setCustomer(ALL); setFrom(''); setTo(''); setRange({ from: '', to: '' }); setDateError(''); reset(); }}>Reset</Button>
+        <Button type="button" variant="ghost" data-testid="button-order-reset" onClick={() => { setBucket(''); setText(''); setSearch(''); setStatus(ALL); setAction(ALL); setCustomer(ALL); setFrom(''); setTo(''); setRange({ from: '', to: '' }); setDateError(''); reset(); }}>Reset</Button>
       </form>
        {dateError && <p role="alert" data-testid="text-order-date-error" className="text-sm text-destructive">{dateError}</p>}
       {failures.length > 0 && <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-bulk-failures"><p className="font-medium">{failures.length} order{failures.length === 1 ? '' : 's'} failed (others succeeded and lists were refreshed)</p><ul className="break-all font-mono text-xs">{failures.map((f) => <li key={f}>{f}</li>)}</ul></div>}
@@ -133,13 +138,13 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
 }
 
 function Row({ l, v }: { l: string; v: React.ReactNode }) {
-  return <div className="min-w-0 bg-card p-3"><p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p><div className="mt-1 break-all text-sm">{v}</div></div>;
+  return <div className="min-w-0 bg-card p-3"><p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p><div className="mt-1 break-words [overflow-wrap:anywhere] text-sm">{v}</div></div>;
 }
 
 export function OrderDrawer({ tenantId, orderId, canEdit, onClose }: { tenantId: string; orderId: string | null; canEdit: boolean; onClose: () => void }) {
   return (
     <Sheet open={!!orderId} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <SheetContent className="w-full max-w-none overflow-y-auto sm:max-w-xl" data-testid="drawer-order">
+      <SheetContent className="w-full max-w-none overflow-y-auto sm:max-w-md" data-testid="drawer-order">
         {orderId && <DrawerBody key={orderId} tenantId={tenantId} orderId={orderId} canEdit={canEdit} />}
       </SheetContent>
     </Sheet>
@@ -210,6 +215,7 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
             <Panel title="Payment">
               <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
                 <Row l="Payment method" v={o.paymentMethod ? <span className="flex items-center gap-2"><VisualImg url={pmId?.logoUrl} label={pmId?.label ?? o.paymentMethod} kind="payment-method" generic={pmId?.generic} size={24} />{o.paymentMethod}</span> : 'None'} />
+                <Row l="Account or card details" v={<span className="text-muted-foreground">Not collected</span>} />
                 <Row l="Payment details" v={<span className="text-muted-foreground" data-testid="text-payment-not-collected">Not collected in this sandbox.</span>} />
               </div>
             </Panel>
@@ -218,6 +224,7 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
                 <Row l="Order ID" v={<span className="flex flex-wrap items-center gap-1"><span className="font-mono text-xs">{o.id}</span><Copy value={o.id} label="Order ID" /></span>} />
                 <Row l="Type" v={<span className="capitalize">{o.action}</span>} />
                 <Row l="Customer" v={o.customerName || 'Anonymous'} />
+                <Row l="Country" v={<span className="text-muted-foreground" data-testid="text-country-not-collected">Not collected</span>} />
                 <Row l="Email" v={o.customerEmail ? <span className="flex flex-wrap items-center gap-1">{o.customerEmail}<Copy value={o.customerEmail} label="Email" /></span> : 'Not collected'} />
                 <Row l="Created" v={stamp(o.createdAt)} />
                 <Row l="Updated" v={o.updatedAt ? stamp(o.updatedAt) : 'Not updated'} />

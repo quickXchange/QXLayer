@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
-import type { ExchangeOrder } from '@workspace/api-client-react';
+import type { ExchangeOrder, ExchangeSettings } from '@workspace/api-client-react';
 import { VisualImg } from './visual-catalog';
 import type { useIdentityResolver } from './logo-identity';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useConfirm } from './bulk';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { ExchangeDraft } from './use-exchange-draft';
 import { isDec, isPos } from './ui-validate';
@@ -71,13 +72,22 @@ export function Pick({ value, onChange, options, disabled, testid, bounded = fal
   );
 }
 
+const COLS: [keyof ExchangeSettings, string][] = [['assets', 'assets'], ['networks', 'networks'], ['routes', 'routes'], ['paymentMethods', 'payment methods'], ['providers', 'providers']];
+function SaveSummary({ d }: { d: ExchangeDraft }) {
+  const b = d.baseline as unknown as Record<string, unknown> | null; const c = d.draft as unknown as Record<string, unknown> | null;
+  const lines = COLS.map(([k, n]) => { const x = (b?.[k] as { id?: string }[] | undefined) ?? []; const y = (c?.[k] as { id?: string }[] | undefined) ?? []; const changed = y.filter((r, i) => JSON.stringify(r) !== JSON.stringify(x[i])).length + Math.max(0, x.length - y.length); return changed ? `${changed} ${n} changed (${x.length} before, ${y.length} after)` : ''; }).filter(Boolean);
+  return <><p>These staged changes will be saved to the tenant exchange configuration:</p><ul className="text-xs" data-testid="review-save">{lines.length ? lines.map((l) => <li key={l}>{l}</li>) : <li>General settings changed</li>}</ul></>;
+}
+
 export function DraftFooter({ d, locked }: { d: ExchangeDraft; locked: boolean }) {
+  const [ask, node] = useConfirm(locked);
   if (locked) return <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only: permission, plan feature or subscription state</span>;
   return (
     <>
       <span className="mr-auto text-sm text-destructive" data-testid="text-draft-errors">{d.errors[0] ?? d.saveError ?? ''}{d.errors.length > 1 ? ` (+${d.errors.length - 1} more)` : ''}</span>
       {d.dirty && <Button type="button" variant="ghost" data-testid="button-discard-exchange" onClick={d.discard}>Discard changes</Button>}
-      <Button type="button" data-testid="button-save-exchange" disabled={!d.dirty || d.errors.length > 0 || d.saving} onClick={d.save}>{d.saving ? 'Saving' : d.dirty ? 'Save exchange settings' : 'Saved'}</Button>
+      <Button type="button" data-testid="button-save-exchange" disabled={!d.dirty || d.errors.length > 0 || d.saving} onClick={() => ask({ title: 'Save exchange settings?', label: 'Save settings', body: <SaveSummary d={d} />, run: () => { d.save(); return <p>Save submitted. A notification confirms the result.</p>; } })}>{d.saving ? 'Saving' : d.dirty ? 'Save exchange settings' : 'Saved'}</Button>
+      {node}
     </>
   );
 }

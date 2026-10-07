@@ -9,13 +9,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useInvalidateTenant } from '@/lib/invalidate';
 import { isAllowedLogo } from './visual-catalog';
 import { gtDec, isDec, isInt, isPos } from './ui-validate';
+import { reconcileExchangeScope } from './draft-scope';
 
 export interface ExchangeDraft {
   loading: boolean; error: boolean; refetch: () => void;
   draft: ExchangeSettings | null; catalog: ExchangeCatalogAsset[]; providerCatalog: ExchangeProvider[]; effectiveEnabled: boolean;
   patch: (p: Partial<ExchangeSettings>) => void;
   dirty: boolean; errors: string[]; saveError: string | null; saving: boolean;
-  save: () => void; discard: () => void;
+  save: () => void; discard: () => void; baseline: ExchangeSettings | null;
 }
 
 export function fiatId(s: ExchangeSettings) { return `fiat:${s.fiatCurrency}`; }
@@ -91,24 +92,22 @@ export function useExchangeDraft(tenantId: string): ExchangeDraft {
   useEffect(() => {
     if (q.data && initFor.current !== tenantId) { initFor.current = tenantId; setDraft(q.data.configuration); setSaved(JSON.stringify(q.data.configuration)); serverRef.current = q.data.configuration; }
   }, [q.data, tenantId]);
+  const dirtyRef = useRef(false);
+  useEffect(() => {
+    if (!q.data || initFor.current !== tenantId || dirtyRef.current) return;
+    const j = JSON.stringify(q.data.configuration);
+    if (j !== saved) { setDraft(q.data.configuration); setSaved(j); serverRef.current = q.data.configuration; }
+  }, [q.data]); // eslint-disable-line react-hooks/exhaustive-deps
   const catKey = catalog.map((c) => c.assetNetworkId).join(',');
   const ready = draft !== null;
   useEffect(() => {
     if (!ready) return;
-    setDraft((d) => {
-      if (!d) return d;
-      const assetIds = new Set(catalog.map((c) => c.assetId)); const netIds = new Set(catalog.map((c) => c.assetNetworkId));
-      const assets = d.assets.filter((a) => assetIds.has(a.assetId));
-      catalog.forEach((c) => { if (!assets.some((a) => a.assetId === c.assetId)) assets.push({ assetId: c.assetId, enabled: false, displayOrder: assets.length, symbol: c.symbol, decimals: 8, logoUrl: null, sandboxPlanRate: '0' }); });
-      const networks = d.networks.filter((n) => netIds.has(n.assetNetworkId));
-      catalog.forEach((c) => { if (!networks.some((n) => n.assetNetworkId === c.assetNetworkId)) networks.push({ assetNetworkId: c.assetNetworkId, enabled: false, available: false, minimum: '0', maximum: '0', fee: '0', information: '' }); });
-      if (assets.length === d.assets.length && networks.length === d.networks.length && assets.every((a, i) => a === d.assets[i]) && networks.every((n, i) => n === d.networks[i])) return d;
-      return { ...d, assets, networks, routes: d.routes.filter(r => (r.source.startsWith('fiat:') || netIds.has(r.source)) && (r.destination.startsWith('fiat:') || netIds.has(r.destination))) };
-    });
+    setDraft(d => d ? reconcileExchangeScope(d, catalog) : d);
   }, [catKey, ready]); // eslint-disable-line react-hooks/exhaustive-deps
   const patch = useCallback((p: Partial<ExchangeSettings>) => { setSaveError(null); setDraft((d) => (d ? { ...d, ...p } : d)); }, []);
   const errors = useMemo(() => (draft ? validate(draft, catalog) : []), [draft, catalog]);
   const dirty = draft !== null && JSON.stringify(draft) !== saved;
+  dirtyRef.current = dirty;
   const save = () => {
     if (!draft || m.isPending || errors.length > 0 || !dirty) return;
     setSaveError(null);
@@ -123,6 +122,6 @@ export function useExchangeDraft(tenantId: string): ExchangeDraft {
       onError: (e) => { const msg = (e as Error)?.message ?? 'Request rejected'; setSaveError(msg); toast({ title: 'Save failed', description: msg, variant: 'destructive' }); },
     });
   };
-  const discard = () => { if (serverRef.current) { setDraft(serverRef.current); setSaveError(null); } };
-  return { loading: q.isLoading, error: q.isError, refetch: () => { q.refetch(); }, draft, catalog, providerCatalog: q.data?.providerCatalog ?? [], effectiveEnabled: q.data?.effectiveEnabled ?? false, patch, dirty, errors, saveError, saving: m.isPending, save, discard };
+  const discard = () => { if (serverRef.current) { setDraft(reconcileExchangeScope(serverRef.current, catalog)); setSaveError(null); } };
+  return { loading: q.isLoading, error: q.isError, refetch: () => { q.refetch(); }, draft, catalog, providerCatalog: q.data?.providerCatalog ?? [], effectiveEnabled: q.data?.effectiveEnabled ?? false, patch, baseline: serverRef.current, dirty, errors, saveError, saving: m.isPending, save, discard };
 }

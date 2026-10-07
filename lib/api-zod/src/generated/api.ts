@@ -2492,6 +2492,7 @@ export const listExchangeOrdersQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}
 
 export const ListExchangeOrdersQueryParams = zod.object({
   "search": zod.coerce.string().max(listExchangeOrdersQuerySearchMax).optional(),
+  "view": zod.enum(['active', 'archived']).optional().describe('Status group applied before pagination and counting.'),
   "status": zod.coerce.string().optional(),
   "action": zod.coerce.string().optional(),
   "from": zod.coerce.string().regex(listExchangeOrdersQueryFromRegExp).optional(),

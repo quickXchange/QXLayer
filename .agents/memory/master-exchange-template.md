@@ -7,8 +7,16 @@ TEMPLATE for future White Label Exchange customers. Preserve its approved
 layout, widget/actions, sections, responsive behavior, animations, themes and
 spacing without redesign or per-customer frontend copies.
 
+The complete Master structure must remain visible for Sandbox/Setup, paused,
+loading and empty configurations too. Do not replace the exchange form with a
+small status-only panel or remove Supported Assets/statistics because counts
+are zero. Use honest disabled controls and empty states inside the same layout;
+never fill them by copying NovaX demo assets, rates or customer data.
+
 **Why:** The user explicitly approved this design and requested tenant
 configuration and provisioning reuse, not another design or app.
+The user repeated this requirement after the newly provisioned Asterlane preview
+looked like a simplified template because its initial configuration was empty.
 
 **How to apply:** Extend tenant identity, content and isolated operational
 configuration around the existing shared renderer and Admin Panel. Do not copy

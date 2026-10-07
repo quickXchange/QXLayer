@@ -58,8 +58,8 @@ export default function Exchange() {
   else if (sec === 'orders') body = <OrdersPanel key={orderId ?? 'list'} tenantId={id} orderId={orderId} canEdit={!cfgLocked} />;
   else if (sec === 'customers') body = <CustomersPanel tenantId={id} />;
   else if (sec === 'providers') body = <ProvidersPanel d={d} locked={cfgLocked} />;
-  else if (sec === 'assets') body = <AssetsPanel tenant={t} d={d} locked={cfgLocked} catalogReadOnly={cfgLocked} />;
-  else if (sec === 'networks') body = <NetworksPanel d={d} locked={cfgLocked} />;
+  else if (sec === 'assets') body = <AssetsPanel tenant={t} d={d} locked={cfgLocked} />;
+  else if (sec === 'networks') body = <NetworksPanel tenant={t} d={d} locked={cfgLocked} />;
   else if (sec === 'routes') body = <RoutesPanel d={d} locked={cfgLocked} />;
   else if (sec === 'swap' || sec === 'convert' || sec === 'buy' || sec === 'sell') body = <RoutesPanel d={d} locked={cfgLocked} action={sec} />;
   else if (sec === 'fees') body = <PricingPanel d={d} locked={cfgLocked} />;
@@ -82,7 +82,7 @@ export default function Exchange() {
       {!principal.demo && <Link href={can.role === 'super_admin' ? `/clients/${id}` : '/account/white-labels'} className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground" data-testid="link-back"><ArrowLeft className="h-4 w-4" /> {can.role === 'super_admin' ? 'Client detail' : 'My White Labels'}</Link>}
       {q.isLoading ? <ListSkeleton /> : q.isError || !t ? <ErrorState what="this client" onRetry={() => q.refetch()} /> : (
         <>
-          <PageHeader eyebrow={`${t.slug} · exchange sandbox`} title={`${t.brandName} exchange`}>
+          <PageHeader eyebrow={`${t.slug} · exchange sandbox`} title={/\bexchange$/i.test(t.brandName.trim()) ? t.brandName : `${t.brandName} exchange`}>
             {can.role === 'super_admin' && <Link href={`/clients/${id}`} className="text-sm text-copper hover:underline" data-testid="link-client-detail">Client detail</Link>}
           </PageHeader>
           {suspended && <p className="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. Everything is read-only.</p>}

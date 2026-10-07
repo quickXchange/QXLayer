@@ -87,6 +87,7 @@ export * from './landingProductReadiness';
 export * from './listExchangeAuditParams';
 export * from './listExchangeOrdersCustomer';
 export * from './listExchangeOrdersParams';
+export * from './listExchangeOrdersView';
 export * from './moduleDefinition';
 export * from './moduleKey';
 export * from './mutationStatus';

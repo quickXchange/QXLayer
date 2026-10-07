@@ -9,7 +9,8 @@ import { Coin, NetBadge, assetKey } from '../asset-picker';
 export function Assets({ site, caps }: { site: PublicSite; caps: Caps }) {
   const [net, setNet] = useState<string | null>(null);
   const nets = useMemo(() => Array.from(new Map(site.assets.map((a) => [a.networkId, a.networkName]))), [site.assets]);
-  if (!site.assets.length) return null;
+  const real = !!site.tenantSlug && site.tenantSlug !== 'qxlayer-platform' && caps.exchange !== 'off';
+  if (!site.assets.length && !real) return null;
   const list = net ? site.assets.filter((a) => a.networkId === net) : site.assets;
   return (
     <Section id="assets">
@@ -24,6 +25,7 @@ export function Assets({ site, caps }: { site: PublicSite; caps: Caps }) {
             {[0, 1].map((r) => <div key={r} className="flex gap-10">{site.assets.map((a) => <div key={assetKey(a)} className="s-marquee-item"><Coin asset={a} size={52} />{a.symbol}</div>)}</div>)}
           </div>
         </div>)}
+      {!site.assets.length && <div className="s-lit s-tile mt-8 p-4" data-testid="state-assets-empty"><p className="font-semibold">No assets configured</p><p className="s-muted text-sm">Assets and networks will be listed here once they are enabled for this site.</p></div>}
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((a, i) => (
           <Reveal key={assetKey(a)} delay={Math.min(i, 6) * 60}>
@@ -34,7 +36,7 @@ export function Assets({ site, caps }: { site: PublicSite; caps: Caps }) {
             </div>
           </Reveal>))}
       </div>
-      <Stats caps={caps} />
+      <Stats caps={caps} stableStructure={real} />
     </Section>
   );
 }

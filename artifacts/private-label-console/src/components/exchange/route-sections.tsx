@@ -3,11 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Section } from '@/components/app/sections';
+import { ExSection as Section } from './manage';
 import { useToast } from '@/hooks/use-toast';
 import { Dec, DraftFooter, EndpointView, Field, IntInput, LogoText, Pick, SimNote, isDec, isInt } from './ui';
 import { useIdentityResolver } from './logo-identity';
 import { BulkBar, BulkBtn, DataTable, FilterBar, NoMatch, EditDrawer, Logo, StatusPill, providerOptions, useConfirm, useSelection, useStaged } from './bulk';
+import { DiffList, NameList, PageBar, usePaged } from './manage';
 import { LogoChooser, VisualImg, useVisualCatalog } from './visual-catalog';
 import { fiatId, type ExchangeDraft } from './use-exchange-draft';
 import type { ExchangeRoute, ExchangePaymentMethod } from '@workspace/api-client-react';
@@ -17,11 +18,14 @@ const ACTIONS: [string, string][] = [['swap', 'Swap'], ['convert', 'Convert'], [
 function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action']; mode: 'routes' | 'pricing' }) {
   const { toast } = useToast(); const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
   const s = d.draft!; const fiat = fiatId(s); const idr = useIdentityResolver(s, d.catalog);
-  const [q, setQ] = useState(''); const [fa, setFa] = useState('all'); const [fs, setFs] = useState('all');
+  const [q, setQ] = useState(''); const [fa, setFa] = useState('all'); const [fs, setFs] = useState('all'); const [nf, setNf] = useState('all');
+  const netOf = (id: string) => d.catalog.find((c) => c.assetNetworkId === id)?.networkId;
+  const netName = (id: string) => d.catalog.find((c) => c.assetNetworkId === id)?.networkName ?? (id.startsWith('fiat:') ? 'Fiat' : id);
   const label = (id: string) => (id.startsWith('fiat:') ? id.slice(5) : d.catalog.find((c) => c.assetNetworkId === id)?.symbol ?? id);
   const scoped = s.routes.filter((r) => !action || r.action === action);
-  const rows = scoped.filter((r) => (fa === 'all' || r.action === fa) && (fs === 'all' || (fs === 'on') === r.enabled) && `${label(r.source)} ${label(r.destination)} ${r.action}`.toLowerCase().includes(q.trim().toLowerCase()));
-  const resetF = () => { setQ(''); setFa('all'); setFs('all'); };
+  const filtered = scoped.filter((r) => (nf === 'all' || [r.source, r.destination].some((e) => netOf(e) === nf)) && (fa === 'all' || r.action === fa) && (fs === 'all' || (fs === 'on') === r.enabled) && `${label(r.source)} ${label(r.destination)} ${r.action}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const resetF = () => { setQ(''); setFa('all'); setFs('all'); setNf('all'); };
+  const pg = usePaged(filtered, `${q}|${fa}|${fs}|${nf}`); const rows = pg.pageRows;
   const sel = useSelection(rows.map((r) => r.id));
   const rname = (id: string) => { const r = s.routes.find((x) => x.id === id); return r ? `${r.action}: ${label(r.source)} to ${label(r.destination)} (${id.slice(0, 8)})` : id; };
   const [edit, setEdit] = useState<ExchangeRoute | null>(null);
@@ -45,8 +49,8 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
     if (a === 'sell') return { action: a, destination: fiat, source: has(r.source) ? r.source : c0 };
     return { action: a, source: r.source === fiat ? c0 : r.source, destination: r.destination === fiat ? c1 : r.destination, paymentMethodIds: [] };
   };
-  const toggle = (on: boolean) => { const ids = sel.ids; ask({ title: `${on ? 'Enable' : 'Disable'} ${ids.length} route${ids.length === 1 ? '' : 's'}?`, body: <><p>Proposed: {on ? 'enable' : 'disable'} these routes (staged, not saved). Enabling still needs a valid rate, limits and (Buy/Sell) a payment method; validation blocks Save otherwise.</p><ul className="font-mono text-xs">{ids.map((i) => <li key={i}>{rname(i)}</li>)}</ul></>, label: `Stage ${on ? 'enable' : 'disable'}`, run: () => { setMany(ids, { enabled: on }); staged(ids.length, 'route'); sel.clear(); } }); };
-  const remove = () => { const ids = sel.ids; ask({ title: `Delete ${ids.length} route${ids.length === 1 ? '' : 's'}?`, destructive: true, body: <><p>Removed from the draft. Customers lose these pairs only after you save. Discard changes restores them.</p><ul className="font-mono text-xs">{ids.map((i) => <li key={i}>{rname(i)}</li>)}</ul></>, label: 'Stage delete', run: () => { d.patch({ routes: s.routes.filter((r) => !ids.includes(r.id)) }); staged(ids.length, 'route deletion'); sel.clear(); } }); };
+  const toggle = (on: boolean) => { const ids = sel.ids; ask({ title: `${on ? 'Enable' : 'Disable'} ${ids.length} route${ids.length === 1 ? '' : 's'}?`, body: <><p>Proposed: {on ? 'enable' : 'disable'} these routes (staged, not saved). Enabling still needs a valid rate, limits and (Buy/Sell) a payment method; validation blocks Save otherwise.</p><NameList names={ids.map(rname)} /></>, label: `Stage ${on ? 'enable' : 'disable'}`, run: () => { setMany(ids, { enabled: on }); staged(ids.length, 'route'); sel.clear(); } }); };
+  const remove = (only?: string[]) => { const ids = only ?? sel.ids; ask({ title: `Delete ${ids.length} route${ids.length === 1 ? '' : 's'}?`, destructive: true, body: <><p>Removed from the draft. Customers lose these pairs only after you save. Discard changes restores them.</p><NameList names={ids.map(rname)} /></>, label: 'Stage delete', run: () => { d.patch({ routes: s.routes.filter((r) => !ids.includes(r.id)) }); staged(ids.length, 'route deletion'); sel.clear(); } }); };
   const feeText = (r: ExchangeRoute) => `${r.feeBps} bps${r.fixedFee !== '0' ? ` + ${r.fixedFee}` : ''}`;
   const provName = (id?: string) => (id ? d.providerCatalog.find((p) => p.id === id)?.name ?? id : 'Manual / sandbox');
   const applyBulk = (v: Record<string, string>) => {
@@ -56,7 +60,7 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
     if (v.rate !== '' && v.rate !== undefined) { if (!isDec(v.rate) || !/[1-9]/.test(v.rate)) { toast({ title: 'Rate must be a positive decimal', variant: 'destructive' }); return; } p.rate = v.rate; }
     if (Object.keys(p).length === 0) { toast({ title: 'Nothing to change', description: 'Fill at least one field.', variant: 'destructive' }); return; }
     const ids = sel.ids; setBulk(null);
-    ask({ title: `Apply to ${ids.length} route${ids.length === 1 ? '' : 's'}?`, body: <><ul className="font-mono text-xs">{Object.entries(p).map(([k, x]) => <li key={k}>{k}: {String(x)}</li>)}</ul><p>Applies to:</p><ul className="font-mono text-xs">{ids.map((i) => <li key={i}>{rname(i)}</li>)}</ul><p>Staged only. Press Save to persist.</p></>, label: 'Stage edit', run: () => { setMany(ids, p); staged(ids.length, 'route'); sel.clear(); } });
+    ask({ title: `Apply to ${ids.length} route${ids.length === 1 ? '' : 's'}?`, body: <><ul className="font-mono text-xs">{Object.entries(p).map(([k, x]) => <li key={k}>{k}: {String(x)}</li>)}</ul><p>Applies to:</p><NameList names={ids.map(rname)} /><p>Staged only. Press Save to persist.</p></>, label: 'Stage edit', run: () => { setMany(ids, p); staged(ids.length, 'route'); sel.clear(); } });
   };
   const bf = (f: Record<string, string>, set: (p: Record<string, string>) => void, k: string, l: string, int?: boolean) => <Field label={l}>{int ? <Input inputMode="numeric" data-testid={`input-bulk-${k}`} value={f[k]} onChange={(e) => set({ [k]: e.target.value.trim() })} /> : <Dec testid={`input-bulk-${k}`} value={f[k]} onChange={(v) => set({ [k]: v })} />}</Field>;
   const empty = { feeBps: '', spreadBps: '', fixedFee: '', minimum: '', maximum: '', rate: '' };
@@ -65,9 +69,10 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
     <Section n={mode === 'pricing' ? 'X5' : 'X3'} title={title} note={mode === 'pricing' ? 'Reference rates, service fee, spread, fixed fee and limits per route. Basis points are integers: 100 bps is 1%.' : 'Each route is one directed pair with an explicit manual rate. Nothing is derived or fetched.'} footer={<DraftFooter d={d} locked={locked} />}>
       <SimNote />
       {mode === 'pricing' && <fieldset disabled={locked} className="grid gap-3 md:grid-cols-4"><Field label={`Fiat plan rate (${s.fiatCurrency})`}><Dec positive value={s.fiatPlanRate} onChange={(v) => d.patch({ fiatPlanRate: v })} testid="input-fiat-plan-rate" /></Field></fieldset>}
-      {scoped.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-routes">{s.routes.length === 0 ? `No routes yet. ${d.catalog.length === 0 ? 'Select tenant assets first.' : 'Add a route and enter its manual rate.'}` : 'No routes for this action.'}</p> : (
+      {scoped.length === 0 && <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-routes">{s.routes.length === 0 ? `No routes yet. ${d.catalog.length === 0 ? 'Select tenant assets first.' : 'Add a route and enter its manual rate.'}` : 'No routes for this action.'}</p>}{(
         <>
-          <FilterBar noun="routes" search={q} onSearch={setQ} placeholder="Search symbol or action" shown={rows.length} total={scoped.length} onReset={resetF} active={q !== '' || fa !== 'all' || fs !== 'all'}>
+          <FilterBar noun="routes" search={q} onSearch={setQ} placeholder="Search symbol or action" shown={filtered.length} total={scoped.length} onReset={resetF} active={q !== '' || fa !== 'all' || fs !== 'all' || nf !== 'all'}>
+            <div className="w-44"><Pick testid="select-route-network-filter" bounded value={nf} onChange={setNf} options={[['all', 'Any network'], ...[...new Map(d.catalog.map((c) => [c.networkId, c.networkName])).entries()]]} /></div>
             {!action && <div className="w-36"><Pick testid="select-route-action-filter" value={fa} onChange={setFa} options={[['all', 'Any action'], ...ACTIONS]} /></div>}
             <div className="w-36"><Pick testid="select-route-status-filter" value={fs} onChange={setFs} options={[['all', 'Any status'], ['on', 'Enabled'], ['off', 'Disabled']]} /></div>
           </FilterBar>
@@ -76,26 +81,23 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-fees-routes" onClick={() => setBulk('fees')}>Fee / spread</BulkBtn>
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-limits-routes" onClick={() => setBulk('limits')}>Limits</BulkBtn>
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-edit-routes" onClick={() => setBulk('all')}>Bulk edit</BulkBtn>
-            {mode === 'routes' && <BulkBtn destructive sel={sel} locked={locked} testid="button-bulk-delete-routes" onClick={remove}>Delete</BulkBtn>}
+            {mode === 'routes' && <BulkBtn destructive sel={sel} locked={locked} testid="button-bulk-delete-routes" onClick={() => remove()}>Delete</BulkBtn>}
           </BulkBar>
-          {rows.length === 0 ? <NoMatch noun="routes" onReset={resetF} /> : <DataTable testid="route" rows={rows} getId={(r) => r.id} sel={sel} locked={locked} cols={[
-            { h: 'Action', cell: (r) => <span className="font-mono text-[10px] uppercase text-copper">{r.action}</span> },
-            { h: 'Source', cell: (r) => <EndpointView r={idr} id={r.source} symbol={label(r.source)} size={24} /> },
+          {filtered.length === 0 ? (scoped.length > 0 ? <NoMatch noun="routes" onReset={resetF} /> : null) : <><DataTable testid="route" onRowClick={(x) => setEdit(x)} rows={rows} getId={(r) => r.id} sel={sel} locked={locked} cols={[
+            { h: 'Source', cell: (r) => <span className="flex flex-col gap-1"><span className="font-mono text-[10px] uppercase text-copper">{r.action}</span><EndpointView r={idr} id={r.source} symbol={label(r.source)} size={24} /></span> },
             { h: 'Target', cell: (r) => <EndpointView r={idr} id={r.destination} symbol={label(r.destination)} size={24} /> },
-            { h: 'Methods', cell: (r) => methodChips(r) ?? <span className="text-xs text-muted-foreground">None</span> },
-            { h: 'Rate', cell: (r) => <span className="font-mono text-xs">{r.rate || 'not set'}</span> },
-            { h: 'Fee', cell: (r) => <span className="font-mono text-xs">{feeText(r)}</span> },
-            { h: 'Spread', cell: (r) => <span className="font-mono text-xs">{r.spreadBps} bps</span> },
-            { h: 'Min', cell: (r) => <span className="font-mono text-xs">{r.minimum}</span> },
-            { h: 'Max', cell: (r) => <span className="font-mono text-xs">{r.maximum || 'not set'}</span> },
+            { h: 'Network', cell: (r) => <span className="text-xs">{netName(r.source)} to {netName(r.destination)}</span> },
+            { h: 'Payment method', cell: (r) => methodChips(r) ?? <span className="text-xs text-muted-foreground">None</span> },
+            { h: 'Pricing', cell: (r) => <span className="font-mono text-xs">{r.rate || 'rate not set'}<span className="block text-muted-foreground">spread {r.spreadBps} bps</span></span> },
+            { h: 'Limits', cell: (r) => <span className="font-mono text-xs">{r.minimum} to {r.maximum || 'not set'}</span> },
+            { h: 'Fees', cell: (r) => <span className="font-mono text-xs">{feeText(r)}</span> },
             { h: 'Status', cell: (r) => <StatusPill on={r.enabled} /> },
-            ...(mode === 'routes' ? [{ h: 'Enabled', cell: (r: ExchangeRoute) => <Switch aria-label="Enabled" disabled={locked} checked={r.enabled} onCheckedChange={(v) => setMany([r.id], { enabled: v })} data-testid={`switch-route-${r.id}`} /> }] : []),
-            { h: 'Edit', cell: (r) => <Button size="sm" variant="outline" data-testid={`button-edit-route-${r.id}`} onClick={() => setEdit(r)}>Edit</Button> },
-          ]} />}
+            { h: 'Actions', cell: (r: ExchangeRoute) => <span className="flex items-center gap-2">{mode === 'routes' && <Switch aria-label="Enabled" disabled={locked} checked={r.enabled} onCheckedChange={(v) => setMany([r.id], { enabled: v })} data-testid={`switch-route-${r.id}`} />}<Button size="sm" variant="outline" data-testid={`button-edit-route-${r.id}`} onClick={() => setEdit(r)}>Edit</Button>{mode === 'routes' && <Button size="sm" variant="outline" className="text-destructive" disabled={locked} data-testid={`button-delete-route-${r.id}`} onClick={() => remove([r.id])}>Delete</Button>}</span> },
+          ]} /><PageBar p={pg} noun="routes" testid="routes" /></>}
         </>)}
       {mode === 'routes' && !locked && <Button type="button" variant="outline" data-testid="button-add-route" disabled={d.catalog.length === 0} onClick={add}>Add route</Button>}
       <EditDrawer item={edit} itemKey={edit?.id ?? ''} title={edit ? `${label(edit.source)} to ${label(edit.destination)}` : 'Route'} note={mode === 'pricing' ? 'Pricing fields only. Stages into the draft.' : 'Stages into the exchange draft. Press Save exchange settings to persist.'} locked={locked} onClose={() => setEdit(null)}
-        onApply={(v) => { setMany([v.id], v); staged(1, 'route'); setEdit(null); }}>
+        applyLabel="Review changes" onApply={(v) => { const orig = s.routes.find((x) => x.id === v.id); setEdit(null); ask({ title: 'Apply route changes?', label: 'Stage changes', body: <><p>Staged only; not saved until you press Save.</p>{orig && <DiffList before={orig} after={v} />}</>, run: () => { setMany([v.id], v); staged(1, 'route'); } }); }}>
         {(f, set) => { const pay = f.action === 'buy' || f.action === 'sell'; return (<>
           <div className="rounded-md border bg-muted/30 p-3" data-testid="route-preview">{pair(f)}{methodChips(f) && <div className="mt-2">{methodChips(f)}</div>}</div>
           {mode === 'routes' && <>
@@ -136,13 +138,15 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
   const [q, setQ] = useState(''); const [ft, setFt] = useState('all'); const [fs, setFs] = useState('all'); const [fd, setFd] = useState('all');
   const rows = s.paymentMethods.filter((p) => (ft === 'all' || (p.methodType ?? 'manual') === ft) && (fs === 'all' || (fs === 'on') === p.enabled) && (fd === 'all' || (fd === 'buy' ? p.buy : p.sell)) && (p.label || 'Unnamed').toLowerCase().includes(q.trim().toLowerCase()));
   const resetF = () => { setQ(''); setFt('all'); setFs('all'); setFd('all'); };
+  const pg = usePaged(rows, `${q}|${ft}|${fs}|${fd}`);
+  const flagOf = (p: PM) => idr.endpoint(`fiat:${p.currency}`, p.currency, null);
   const sel = useSelection(rows.map((p) => p.id), { persist: true, universe: s.paymentMethods.map((p) => p.id) });
   const mname = (id: string) => s.paymentMethods.find((p) => p.id === id)?.label || 'Unnamed';
   const [edit, setEdit] = useState<PM | null>(null);
   const [bulk, setBulk] = useState<'fees' | 'limits' | 'reserve' | 'all' | null>(null);
   const setMany = (ids: string[], p: Partial<PM>) => d.patch({ paymentMethods: s.paymentMethods.map((x) => (ids.includes(x.id) ? { ...x, ...p } : x)) });
-  const toggle = (on: boolean) => { const ids = sel.ids; ask({ title: `${on ? 'Enable' : 'Disable'} ${ids.length} payment method${ids.length === 1 ? '' : 's'}?`, body: <><p>Proposed: {on ? 'enable' : 'disable'} (staged, not saved). Disabling removes a method from customer checkout after you save.</p><ul className="text-xs">{ids.map((i) => <li key={i}>{mname(i)} ({i.slice(0, 8)})</li>)}</ul></>, label: `Stage ${on ? 'enable' : 'disable'}`, run: () => { setMany(ids, { enabled: on }); staged(ids.length, 'payment method'); sel.clear(); } }); };
-  const remove = () => { const ids = sel.ids; ask({ title: `Delete ${ids.length} payment method${ids.length === 1 ? '' : 's'}?`, destructive: true, body: <><p>{ids.map((i) => mname(i)).join(', ')} will be removed from the draft and from any route that uses it.</p><p>Existing orders keep their recorded payment method name. Discard changes restores the draft.</p></>, label: 'Stage delete', run: () => { d.patch({ paymentMethods: s.paymentMethods.filter((p) => !ids.includes(p.id)), routes: s.routes.map((r) => ({ ...r, paymentMethodIds: r.paymentMethodIds.filter((x) => !ids.includes(x)) })) }); staged(ids.length, 'payment method deletion'); sel.clear(); } }); };
+  const toggle = (on: boolean) => { const ids = sel.ids; ask({ title: `${on ? 'Enable' : 'Disable'} ${ids.length} payment method${ids.length === 1 ? '' : 's'}?`, body: <><p>Proposed: {on ? 'enable' : 'disable'} (staged, not saved). Disabling removes a method from customer checkout after you save.</p><NameList names={ids.map((i) => `${mname(i)} (${i.slice(0, 8)})`)} /></>, label: `Stage ${on ? 'enable' : 'disable'}`, run: () => { setMany(ids, { enabled: on }); staged(ids.length, 'payment method'); sel.clear(); } }); };
+  const remove = (only?: string[]) => { const ids = only ?? sel.ids; ask({ title: `Delete ${ids.length} payment method${ids.length === 1 ? '' : 's'}?`, destructive: true, body: <><p>{ids.map((i) => mname(i)).join(', ')} will be removed from the draft and from any route that uses it.</p><p>Existing orders keep their recorded payment method name. Discard changes restores the draft.</p></>, label: 'Stage delete', run: () => { d.patch({ paymentMethods: s.paymentMethods.filter((p) => !ids.includes(p.id)), routes: s.routes.map((r) => ({ ...r, paymentMethodIds: r.paymentMethodIds.filter((x) => !ids.includes(x)) })) }); staged(ids.length, 'payment method deletion'); sel.clear(); } }); };
   const applyBulk = (v: Record<string, string>) => {
     const p: Partial<PM> = {};
     if (v.reserve !== '' && v.reserve !== undefined) { if (!isDec(v.reserve)) { toast({ title: 'Reserve must be a decimal >= 0 with up to 18 decimal places', variant: 'destructive' }); return; } p.reserve = v.reserve; }
@@ -155,13 +159,13 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
     if (v.sell !== undefined && v.sell !== 'keep') p.sell = v.sell === 'true';
     if (Object.keys(p).length === 0) { toast({ title: 'Nothing to change', variant: 'destructive' }); return; }
     const ids = sel.ids; setBulk(null);
-    ask({ title: `Apply to ${ids.length} payment method${ids.length === 1 ? '' : 's'}?`, body: <><ul className="font-mono text-xs">{Object.entries(p).map(([k, x]) => <li key={k}>{k}: {x === null ? 'unlimited' : String(x)}</li>)}</ul>{p.reserve !== undefined && <p className="text-copper">Reserve is sandbox metadata only. It does not represent real funds.</p>}<p>Applies to:</p><ul className="text-xs">{ids.map((i) => <li key={i}>{mname(i)} ({i.slice(0, 8)})</li>)}</ul><p>Amounts are in {s.fiatCurrency}. Staged only, saved on Save.</p></>, label: 'Stage edit', run: () => { setMany(ids, p); staged(ids.length, 'payment method'); sel.clear(); } });
+    ask({ title: `Apply to ${ids.length} payment method${ids.length === 1 ? '' : 's'}?`, body: <><ul className="font-mono text-xs">{Object.entries(p).map(([k, x]) => <li key={k}>{k}: {x === null ? 'unlimited' : String(x)}</li>)}</ul>{p.reserve !== undefined && <p className="text-copper">Reserve is sandbox metadata only. It does not represent real funds.</p>}<p>Applies to:</p><NameList names={ids.map((i) => `${mname(i)} (${i.slice(0, 8)})`)} /><p>Amounts are in {s.fiatCurrency}. Staged only, saved on Save.</p></>, label: 'Stage edit', run: () => { setMany(ids, p); staged(ids.length, 'payment method'); sel.clear(); } });
   };
   const emptyB = { feeBps: '', fixedFee: '', minimum: '', maximum: '', methodType: 'keep', reserve: '', buy: 'keep', sell: 'keep' };
   return (
     <Section n="X4" title="Payment methods" note={`Fees and limits are applied in ${s.fiatCurrency}. Sell limits are measured on fiat proceeds before the payment fee.`} footer={<DraftFooter d={d} locked={locked} />}>
       <SimNote />
-      {s.paymentMethods.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-methods">No payment methods yet. Buy and Sell routes need at least one enabled method.</p> : (
+      {s.paymentMethods.length === 0 && <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-methods">No payment methods yet. Buy and Sell routes need at least one enabled method.</p>}{(
         <>
           <FilterBar noun="payment methods" search={q} onSearch={setQ} placeholder="Search name" shown={rows.length} total={s.paymentMethods.length} onReset={resetF} active={q !== '' || ft !== 'all' || fs !== 'all' || fd !== 'all'}>
             <div className="w-32"><Pick testid="select-method-type" value={ft} onChange={setFt} options={[['all', 'Any type'], ...TYPES]} /></div>
@@ -175,26 +179,23 @@ export function PaymentMethodsPanel({ d, locked }: { d: ExchangeDraft; locked: b
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-limits-methods" onClick={() => setBulk('limits')}>Bulk limits</BulkBtn>
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-reserve-methods" onClick={() => setBulk('reserve')}>Set reserve</BulkBtn>
             <BulkBtn sel={sel} locked={locked} testid="button-bulk-edit-methods" onClick={() => setBulk('all')}>Edit</BulkBtn>
-            <BulkBtn destructive sel={sel} locked={locked} testid="button-bulk-delete-methods" onClick={remove}>Delete</BulkBtn>
+            <BulkBtn destructive sel={sel} locked={locked} testid="button-bulk-delete-methods" onClick={() => remove()}>Delete</BulkBtn>
           </BulkBar>
-          {rows.length === 0 ? <NoMatch noun="payment methods" onReset={resetF} /> : <DataTable testid="method" rows={rows} getId={(p) => p.id} sel={sel} locked={locked} cols={[
+          {rows.length === 0 ? (s.paymentMethods.length > 0 ? <NoMatch noun="payment methods" onReset={resetF} /> : null) : <><DataTable testid="method" onRowClick={(x) => setEdit(x)} rows={pg.pageRows} getId={(p) => p.id} sel={sel} locked={locked} cols={[
             { h: 'Logo', cell: (p) => { const pi = idr.payment(p); return <Logo url={pi.logoUrl} label={p.label || '?'} kind="payment-method" generic={pi.generic} />; } },
             { h: 'Name', cell: (p) => <span className="font-medium">{idr.payment(p).name || p.label || 'Unnamed'}<span className="ml-2 text-xs text-muted-foreground">{[p.buy && 'Buy', p.sell && 'Sell'].filter(Boolean).join(' / ')}</span></span> },
-            { h: 'Currency', cell: (p) => <span className="font-mono text-xs">{p.currency}</span> },
+            { h: 'Country', cell: (p) => { const f = flagOf(p); return <span className="flex items-center gap-2 text-xs" data-testid={`text-country-${p.id}`}>{(f.currencyLogoUrl || f.logoUrl) && <VisualImg url={f.currencyLogoUrl ?? f.logoUrl} label={p.currency} kind="flag" size={18} />}<span><span className="block">Country not configured</span><span className="block text-[10px] text-muted-foreground">{p.currency} currency artwork, not a country</span></span></span>; } },
             { h: 'Type', cell: (p) => <span className="text-xs capitalize">{p.methodType ?? 'manual'}</span> },
-            { h: 'Min', cell: (p) => <span className="font-mono text-xs">{p.minimum ?? '0'}</span> },
-            { h: 'Max', cell: (p) => <span className="font-mono text-xs">{p.maximum ?? 'Unlimited'}</span> },
-            { h: 'Fee', cell: (p) => <span className="font-mono text-xs">{p.feeBps ?? 0} bps + {p.fixedFee ?? '0'}</span> },
+            { h: 'Currency', cell: (p) => <span className="font-mono text-xs">{p.currency}</span> },
             { h: 'Reserve (sandbox)', cell: (p) => <span className="font-mono text-xs">{(p as PM).reserve ?? 'not set'}</span> },
             { h: 'Status', cell: (p) => <StatusPill on={p.enabled} /> },
-            { h: 'Enabled', cell: (p) => <Switch aria-label="Enabled" disabled={locked} checked={p.enabled} onCheckedChange={(v) => setMany([p.id], { enabled: v })} data-testid={`switch-method-${p.id}`} /> },
-            { h: 'Edit', cell: (p) => <Button size="sm" variant="outline" data-testid={`button-edit-method-${p.id}`} onClick={() => setEdit(p)}>Edit</Button> },
-          ]} />}
+            { h: 'Actions', cell: (p) => <span className="flex items-center gap-2"><Switch aria-label="Enabled" disabled={locked} checked={p.enabled} onCheckedChange={(v) => setMany([p.id], { enabled: v })} data-testid={`switch-method-${p.id}`} /><Button size="sm" variant="outline" data-testid={`button-edit-method-${p.id}`} onClick={() => setEdit(p)}>Edit</Button><Button size="sm" variant="outline" className="text-destructive" disabled={locked} data-testid={`button-delete-method-${p.id}`} onClick={() => remove([p.id])}>Delete</Button></span> },
+          ]} /><PageBar p={pg} noun="payment methods" testid="methods" /></>}
         </>)}
       {!locked && <CatalogAdd d={d} onAdded={setEdit} />}
       {!locked && <Button type="button" variant="outline" data-testid="button-add-method" onClick={() => { const m: ExchangePaymentMethod = { id: crypto.randomUUID(), label: '', enabled: false, currency: s.fiatCurrency, buy: true, sell: false, logoUrl: null, methodType: 'manual', minimum: '0', maximum: null, feeBps: 0, fixedFee: '0' }; d.patch({ paymentMethods: [...s.paymentMethods, m] }); setEdit(m); }}>Add payment method</Button>}
       <EditDrawer item={edit} itemKey={edit?.id ?? ''} title={edit?.label || 'New payment method'} note={`Amounts are in ${s.fiatCurrency}. Stages into the draft; Save to persist.`} locked={locked} onClose={() => setEdit(null)}
-        onApply={(v) => { setMany([v.id], v); staged(1, 'payment method'); setEdit(null); }}>
+        applyLabel="Review changes" onApply={(v) => { const orig = s.paymentMethods.find((x) => x.id === v.id); setEdit(null); ask({ title: `Apply changes to ${v.label || 'payment method'}?`, label: 'Stage changes', body: <><p>Staged only; not saved until you press Save.</p>{orig ? <DiffList before={orig} after={v} /> : null}</>, run: () => { setMany([v.id], v); staged(1, 'payment method'); } }); }}>
         {(f, set) => (<>
           <div className="rounded-md border bg-muted/30 p-3" data-testid="method-preview"><LogoText id={idr.payment(f)} text={f.label || 'Unnamed'} size={36} /></div>
           <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled<Switch checked={f.enabled} onCheckedChange={(v) => set({ enabled: v })} /></div>

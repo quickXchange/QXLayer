@@ -158,6 +158,7 @@ paths:
       parameters:
         - {$ref: "#/components/parameters/TenantId"}
         - {name: search, in: query, schema: {type: string, maxLength: 100}}
+        - {name: view, in: query, description: Status group applied before pagination and counting., schema: {type: string, enum: [active, archived]}}
         - {name: status, in: query, schema: {type: string}}
         - {name: action, in: query, schema: {type: string}}
         - {name: from, in: query, schema: {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}}

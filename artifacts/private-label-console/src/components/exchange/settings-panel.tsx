@@ -1,6 +1,6 @@
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { Section } from '@/components/app/sections';
+import { ExSection as Section } from './manage';
 import { SubscriptionSections } from '@/components/app/subscription';
 import type { ExchangeSettings } from '@workspace/api-client-react';
 import { DraftFooter, Field, Pick, SimNote } from './ui';
@@ -11,7 +11,10 @@ export function SettingsPanel({ tenantId, d, locked, canManageSub, features }: {
   const acts = ['swap', 'convert', 'buy', 'sell'] as const;
   return (
     <div className="space-y-6">
-      <SubscriptionSections tenantId={tenantId} canManage={canManageSub} />
+      <details className="min-w-0 rounded-md border bg-card" data-testid="details-exchange-plan">
+        <summary className="cursor-pointer px-5 py-4 font-display text-lg">Subscription, features &amp; limits</summary>
+        <div className="min-w-0 space-y-4 border-t p-4"><SubscriptionSections tenantId={tenantId} canManage={canManageSub} /></div>
+      </details>
       <Section n="X6" title="Exchange settings" note="Pause or enable this tenant's exchange sandbox and choose which actions it offers." footer={<DraftFooter d={d} locked={locked} />}>
         <SimNote />
         <fieldset disabled={locked} className="space-y-4">

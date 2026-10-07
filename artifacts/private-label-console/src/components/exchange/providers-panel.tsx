@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Section } from '@/components/app/sections';
+import { ExSection as Section } from './manage';
 import type { ExchangeProvider, ExchangeProviderConfiguration } from '@workspace/api-client-react';
 import { DraftFooter, Field, SimNote } from './ui';
 import { VisualImg } from './visual-catalog';
-import { EditDrawer, FilterBar, NoMatch, StatusPill } from './bulk';
+import { BulkBar, BulkBtn, DataTable, EditDrawer, FilterBar, NoMatch, StatusPill, useConfirm, useSelection } from './bulk';
+import { DiffList, NameList, PageBar, usePaged } from './manage';
 import { Pick } from './ui';
 import { useStaged } from './bulk';
 import type { ExchangeDraft } from './use-exchange-draft';
@@ -14,12 +15,15 @@ import type { ExchangeDraft } from './use-exchange-draft';
 const STATUS: Record<string, string> = { sandbox: 'Sandbox only', configuration_only: 'Configuration only', coming_soon: 'Coming soon' };
 
 export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }) {
-  const staged = useStaged();
+  const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
   const s = d.draft!;
   const [q, setQ] = useState(''); const [ty, setTy] = useState('all'); const [stf, setStf] = useState('all');
   const all = d.providerCatalog;
   const types = [...new Set(all.map((p) => p.category))];
   const cat = all.filter((p) => (ty === 'all' || p.category === ty) && (stf === 'all' || p.status === stf) && `${p.name} ${p.capabilities.join(' ')}`.toLowerCase().includes(q.trim().toLowerCase()));
+  const pg = usePaged(cat, `${q}|${ty}|${stf}`);
+  const sel = useSelection(pg.pageRows.map((x) => x.id));
+  const bulkEnable = (on: boolean) => { const ids = sel.ids.filter((i) => all.find((x) => x.id === i)?.status !== 'coming_soon'); ask({ title: `${on ? 'Enable' : 'Disable'} ${ids.length} provider${ids.length === 1 ? '' : 's'}?`, label: `Stage ${on ? 'enable' : 'disable'}`, body: <><p>Metadata flag only. Nothing connects, quotes or executes. Coming soon providers are skipped.</p><NameList names={ids.map((i) => all.find((x) => x.id === i)?.name ?? i)} /></>, run: () => { const cur = s.providers ?? []; const next = [...cur.filter((c) => !ids.includes(c.providerId)), ...ids.map((i) => ({ ...cfgOf(i), enabled: on }))]; d.patch({ providers: next }); staged(ids.length, 'provider'); sel.clear(); } }); };
   const resetF = () => { setQ(''); setTy('all'); setStf('all'); };
   const [edit, setEdit] = useState<{ p: ExchangeProvider; c: ExchangeProviderConfiguration } | null>(null);
   const cfgOf = (id: string): ExchangeProviderConfiguration => (s.providers ?? []).find((x) => x.providerId === id) ?? { providerId: id, enabled: false };
@@ -32,20 +36,24 @@ export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolea
         <div className="w-44"><Pick testid="select-provider-type" value={ty} onChange={setTy} options={[['all', 'Any type'], ...types.map((t) => [t, t.replace(/_/g, ' ')] as [string, string])]} /></div>
         <div className="w-48"><Pick testid="select-provider-state" value={stf} onChange={setStf} options={[['all', 'Any state'], ...Object.entries(STATUS)]} /></div>
       </FilterBar>
+      <BulkBar sel={sel} noun="providers" locked={locked} testid="providers">
+        <BulkBtn sel={sel} locked={locked} testid="button-bulk-enable-providers" onClick={() => bulkEnable(true)}>Enable (metadata)</BulkBtn>
+        <BulkBtn sel={sel} locked={locked} testid="button-bulk-disable-providers" onClick={() => bulkEnable(false)}>Disable</BulkBtn>
+      </BulkBar>
       {all.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-providers">The provider catalog is not available.</p> : cat.length === 0 ? <NoMatch noun="providers" onReset={resetF} /> : (
-        <div className="max-w-full min-w-0 overflow-x-auto rounded-md border bg-card"><table className="w-full min-w-[720px] text-left text-sm">
-          <thead className="border-b font-mono text-[10px] uppercase tracking-wider text-muted-foreground"><tr>{['Provider', 'Type', 'Status', 'Connection', 'Capabilities', 'Enabled', 'Configure'].map((h) => <th key={h} className="px-3 py-2 font-normal">{h}</th>)}</tr></thead>
-          <tbody className="divide-y">{cat.map((p) => { const c = cfgOf(p.id); const soon = p.status === 'coming_soon'; return (
-            <tr key={p.id} data-testid={`row-provider-${p.id}`}>
-              <td className="px-3 py-2"><span className="flex items-center gap-2"><VisualImg label={p.name} kind="provider" size={28} /><span><span className="font-medium">{c.label || p.name}</span>{c.label && <span className="block text-xs text-muted-foreground">{p.name}</span>}</span></span></td>
-              <td className="px-3 py-2 text-xs capitalize">{p.category.replace(/_/g, ' ')}</td>
-              <td className="px-3 py-2"><StatusPill on={p.functional} onLabel={STATUS[p.status]} offLabel={STATUS[p.status] ?? p.status} /></td>
-              <td className="px-3 py-2 text-xs">{p.functional ? 'Sandbox only' : 'Not connected'}</td>
-              <td className="px-3 py-2 text-xs">{p.capabilities.join(', ') || 'None'}</td>
-              <td className="px-3 py-2"><Switch aria-label="Enabled" data-testid={`switch-provider-${p.id}`} disabled={locked || soon} checked={c.enabled && !soon} onCheckedChange={(v) => { upsert({ ...c, enabled: v }); staged(1, 'provider'); }} /></td>
-              <td className="px-3 py-2"><Button size="sm" variant="outline" data-testid={`button-edit-provider-${p.id}`} onClick={() => setEdit({ p, c })}>{soon ? 'View' : 'Configure'}</Button></td></tr>); })}</tbody></table></div>)}
+        <>
+          <DataTable testid="provider" rows={pg.pageRows} getId={(x) => x.id} sel={sel} locked={locked} onRowClick={(x) => setEdit({ p: x, c: cfgOf(x.id) })} cols={[
+            { h: 'Logo', cell: (x) => <VisualImg label={x.name} kind="provider" size={28} /> },
+            { h: 'Name', cell: (x) => { const c = cfgOf(x.id); return <span><span className="font-medium">{c.label || x.name}</span>{c.label && <span className="block text-xs text-muted-foreground">{x.name}</span>}</span>; } },
+            { h: 'Type', cell: (x) => <span className="text-xs capitalize">{x.category.replace(/_/g, ' ')}</span> },
+            { h: 'Connection', cell: (x) => <span className="flex flex-col gap-1 text-xs"><StatusPill on={false} offLabel="Not connected" /><span className="text-muted-foreground">{STATUS[x.status] ?? x.status}{cfgOf(x.id).enabled && x.status !== 'coming_soon' ? ', metadata flag on' : ''}</span></span> },
+            { h: 'Services', cell: (x) => <span className="text-xs">{x.capabilities.join(', ') || 'None'}</span> },
+            { h: 'Actions', cell: (x) => { const c = cfgOf(x.id); const soon = x.status === 'coming_soon'; return <span className="flex items-center gap-2"><Switch aria-label="Metadata flag" data-testid={`switch-provider-${x.id}`} disabled={locked || soon} checked={c.enabled && !soon} onCheckedChange={(v) => { upsert({ ...c, enabled: v }); staged(1, 'provider'); }} /><Button size="sm" variant="outline" data-testid={`button-edit-provider-${x.id}`} onClick={() => setEdit({ p: x, c })}>{soon ? 'View' : 'Configure'}</Button></span>; } },
+          ]} />
+          <PageBar p={pg} noun="providers" testid="providers" />
+        </>)}
       <EditDrawer item={edit} itemKey={edit?.p.id ?? ''} title={edit?.p.name ?? 'Provider'} note={edit ? `${STATUS[edit.p.status] ?? edit.p.status}. ${edit.p.functional ? '' : 'Not connected.'}` : ''} locked={locked || edit?.p.status === 'coming_soon'} onClose={() => setEdit(null)}
-        onApply={(v) => { const c = { ...v.c, label: v.c.label?.trim() || undefined, endpoint: v.c.endpoint?.trim() || null }; upsert(c); staged(1, 'provider'); setEdit(null); }}>
+        applyLabel="Review changes" onApply={(v) => { const c = { ...v.c, label: v.c.label?.trim() || undefined, endpoint: v.c.endpoint?.trim() || null }; const orig = cfgOf(v.p.id); setEdit(null); ask({ title: `Apply changes to ${v.p.name}?`, label: 'Stage changes', body: <><p>Metadata only; no connection is made. Not saved until you press Save.</p><DiffList before={orig} after={c} /></>, run: () => { upsert(c); staged(1, 'provider'); } }); }}>
         {(f, set) => (<>
           <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled (metadata only)<Switch checked={f.c.enabled} onCheckedChange={(v) => set({ c: { ...f.c, enabled: v } })} /></div>
           <Field label="Label"><Input maxLength={100} data-testid="input-provider-label" value={f.c.label ?? ''} onChange={(e) => set({ c: { ...f.c, label: e.target.value } })} /></Field>
@@ -55,6 +63,7 @@ export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolea
           <p className="text-xs text-muted-foreground">No credentials accepted until a secure real adapter exists. There is no connection test because no real integration is implemented for this provider.</p>
         </>)}
       </EditDrawer>
+      {confirmNode}
     </Section>
   );
 }

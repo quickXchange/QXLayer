@@ -1753,6 +1753,10 @@ export type ListExchangeOrdersParams = {
  * @maxLength 100
  */
 search?: string;
+/**
+ * Status group applied before pagination and counting.
+ */
+view?: ListExchangeOrdersView;
 status?: string;
 action?: string;
 /**
@@ -1769,6 +1773,14 @@ customer?: ListExchangeOrdersCustomer;
  */
 page?: number;
 };
+
+export type ListExchangeOrdersView = typeof ListExchangeOrdersView[keyof typeof ListExchangeOrdersView];
+
+
+export const ListExchangeOrdersView = {
+  active: 'active',
+  archived: 'archived',
+} as const;
 
 export type ListExchangeOrdersCustomer = typeof ListExchangeOrdersCustomer[keyof typeof ListExchangeOrdersCustomer];
 

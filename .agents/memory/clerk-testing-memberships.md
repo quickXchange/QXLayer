@@ -19,3 +19,9 @@ Construct testing URLs from the runtime development domain and fixture metadata 
 **Why:** Repeated transposed identifiers produced false missing-fixture and unavailable-preview reports while the actual app and fixture were healthy.
 
 **How to apply:** Before diagnosing a browser setup failure as an app issue, compare its exact target against authoritative runtime values and a direct HTTP request. Keep the same authenticated identity and tenant when resuming verification.
+
+For data-preserving Exchange Admin UI verification, use browser-only GET response overlays for large catalogues and selection examples, and block tenant mutation requests. Compare the retained Development fixture before and after.
+
+**Why:** The user requires Admin organization work without changing tenant data merely to populate or exercise the UI.
+
+**How to apply:** Stage and discard local edits; cancel persisted assignment, configuration and order actions. A disposable QA authorization grant is separate from tenant configuration and must be removed exactly. Expired test sign-in tickets require fresh programmatic test authentication, not real-user credentials or elevation of an unrelated customer session.

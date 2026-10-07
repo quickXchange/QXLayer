@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useCan, usePrincipal } from '@/lib/principal';
 import { ErrorState } from '@/components/app/bits';
-import { Section } from '@/components/app/sections';
+import { ExSection as Section } from './manage';
 
 type Mod = 'api' | 'webhooks' | 'rpc';
 type EventKey = 'order.created' | 'order.status_changed' | 'quote.created';
