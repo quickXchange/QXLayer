@@ -585,6 +585,21 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/PublicSite"}
+  /diagnostics/website-errors:
+    post:
+      operationId: recordWebsiteError
+      tags: [website]
+      summary: Record a privacy-safe shared website error identifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/WebsiteErrorDiagnostic"}
+      responses:
+        "204": {description: Safe diagnostic accepted}
+        "400": {description: Invalid diagnostic}
+        "403": {description: Origin or access gate rejected}
+        "429": {description: Rate limited}
   /healthz:
     get:
       operationId: healthCheck
@@ -1075,6 +1090,14 @@ components:
         type: string
         format: uuid
   schemas:
+    WebsiteErrorDiagnostic:
+      type: object
+      additionalProperties: false
+      required: [errorId, category, buildId]
+      properties:
+        errorId: {type: string, pattern: "^QXS-[a-f0-9]{32}$"}
+        category: {type: string, enum: [render_type, missing_reference, script_syntax, asset_load, unknown]}
+        buildId: {type: string, pattern: "^site-[a-f0-9]{16}$"}
     ProviderSchemaField:
       type: object
       additionalProperties: false

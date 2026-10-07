@@ -1,4 +1,6 @@
 import path from 'path';
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
@@ -28,8 +30,23 @@ if (!basePath) {
   );
 }
 
+// Deterministic source fingerprint, with no environment variables or secret material.
+const buildHash = createHash('sha256');
+function hashSource(directory: string) {
+  for (const entry of readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) hashSource(file);
+    else { buildHash.update(path.relative(import.meta.dirname, file)); buildHash.update(readFileSync(file)); }
+  }
+}
+hashSource(path.resolve(import.meta.dirname, 'src'));
+hashSource(path.resolve(import.meta.dirname, '../../lib/api-client-react/src'));
+buildHash.update(readFileSync(new URL(import.meta.url)));
+const websiteBuildId = `site-${buildHash.digest('hex').slice(0, 16)}`;
+
 export default defineConfig({
   base: basePath,
+  define: { __QX_SITE_BUILD_ID__: JSON.stringify(websiteBuildId) },
   plugins: [
     accessGateVitePlugin(),
     react(),

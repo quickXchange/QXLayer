@@ -4,10 +4,12 @@ import {
   type ErrorInfo,
   type ReactNode,
 } from 'react';
+import { createDiagnostic, reportDiagnostic, type SafeDiagnostic } from '@/lib/error-diagnostics';
 
 export interface ErrorFallbackProps {
   error: Error;
   resetError: () => void;
+  diagnostic: SafeDiagnostic;
 }
 
 interface ErrorBoundaryProps {
@@ -18,24 +20,10 @@ interface ErrorBoundaryProps {
 }
 
 interface ErrorBoundaryState {
-  error: Error | null;
+  diagnostic: SafeDiagnostic | null;
 }
 
-function toError(value: unknown): Error {
-  if (value instanceof Error) {
-    return value;
-  }
-  if (typeof value === 'string') {
-    return new Error(value);
-  }
-  try {
-    return new Error(JSON.stringify(value));
-  } catch {
-    return new Error(String(value));
-  }
-}
-
-function DefaultFallback({ error, resetError }: ErrorFallbackProps) {
+function DefaultFallback({ diagnostic, resetError }: ErrorFallbackProps) {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-6">
       <div className="max-w-lg w-full text-center">
@@ -46,12 +34,11 @@ function DefaultFallback({ error, resetError }: ErrorFallbackProps) {
           This part of the app hit an error. The rest of the app is still
           running.
         </p>
-        {/* Dev only: messages can carry API responses and other internals. */}
-        {import.meta.env.DEV ? (
-          <pre className="mt-4 overflow-x-auto rounded bg-gray-100 p-3 text-left text-xs text-gray-800">
-            {error.message || String(error)}
-          </pre>
-        ) : null}
+        <p className="mt-4 break-all text-xs text-gray-500" data-testid="safe-error-diagnostic">
+          Reference: {diagnostic.errorId}<br />
+          Category: {diagnostic.category}<br />
+          Build: {diagnostic.buildId}
+        </p>
         <button
           type="button"
           onClick={resetError}
@@ -68,23 +55,19 @@ export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  state: ErrorBoundaryState = { error: null };
+  state: ErrorBoundaryState = { diagnostic: null };
 
   static getDerivedStateFromError(error: unknown): ErrorBoundaryState {
-    return { error: toError(error) };
+    return { diagnostic: createDiagnostic(error) };
   }
 
-  componentDidCatch(error: unknown, info: ErrorInfo): void {
-    console.error(
-      'ErrorBoundary caught an error:',
-      toError(error),
-      info.componentStack,
-    );
+  componentDidCatch(_error: unknown, _info: ErrorInfo): void {
+    if (this.state.diagnostic) reportDiagnostic(this.state.diagnostic);
   }
 
   componentDidUpdate(prevProps: ErrorBoundaryProps): void {
     if (
-      this.state.error !== null &&
+      this.state.diagnostic !== null &&
       prevProps.resetKey !== this.props.resetKey
     ) {
       this.resetError();
@@ -92,15 +75,21 @@ export class ErrorBoundary extends Component<
   }
 
   resetError = (): void => {
-    this.setState({ error: null });
+    this.setState({ diagnostic: null });
+  };
+
+  retry = (): void => {
+    // A fresh document clears cached malformed query data that can immediately
+    // crash again before a remounted query has a chance to refetch.
+    window.location.reload();
   };
 
   render(): ReactNode {
-    const { error } = this.state;
-    if (error === null) {
+    const { diagnostic } = this.state;
+    if (diagnostic === null) {
       return this.props.children;
     }
     const Fallback = this.props.FallbackComponent ?? DefaultFallback;
-    return <Fallback error={error} resetError={this.resetError} />;
+    return <Fallback error={new Error("The website could not render.")} diagnostic={diagnostic} resetError={this.retry} />;
   }
 }

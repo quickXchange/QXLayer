@@ -6,6 +6,7 @@ import platformRouter from "./platform";
 import tenantsRouter from "./tenants";
 import plansRouter from "./plans";
 import websiteRouter from "./website";
+import websiteDiagnosticsRouter from "./website-diagnostics";
 import landingCatalogRouter from "./landing-catalog";
 import exchangeRouter from "./exchange";
 import providerFoundationRouter from "./provider-foundation";
@@ -21,6 +22,7 @@ router.use(healthRouter);
 router.use(demoRouter);
 router.use(landingCatalogRouter);
 router.use(websiteRouter);
+router.use(websiteDiagnosticsRouter);
 router.use(customerRouter);
 router.use(orderFilesRouter);
 router.use("/tenants/:tenantId", requireAuthentication, async (req, res, next) => {

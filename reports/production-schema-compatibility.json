@@ -1,0 +1,31 @@
+{
+  "inspection": "Schema metadata only; no Production application records queried",
+  "counts": {
+    "tables": 39,
+    "columns": 232,
+    "indexes": 51,
+    "constraints": 133
+  },
+  "missingTables": [],
+  "missingColumns": [],
+  "missingIndexes": [],
+  "providerTables": "All three present with columns, indexes and relationships matching Development",
+  "materialDifferences": [
+    {
+      "table": "white_label_requests",
+      "constraint": "white_label_request_delivery",
+      "production": "(status = 'delivered') = (tenant_id IS NOT NULL)",
+      "expected": "status <> 'delivered' OR tenant_id IS NOT NULL",
+      "impact": "Current code assigns tenant_id during in_setup/customization; Production rejects that state. No schema changes executed."
+    }
+  ],
+  "equivalentRepresentationDifferences": [
+    "addons.monthly_price/setup_fee/yearly_price: 0 versus quoted numeric zero default",
+    "tenant_branding.supported_languages: ARRAY[en] versus PostgreSQL array literal default",
+    "landing_products_copy: equivalent parenthesis/grouping of AND predicates"
+  ],
+  "rlsPolicies": [],
+  "fullLifecycleSchemaCompatible": false,
+  "readSurfaceAndProviderSchemaCompatible": true,
+  "sourceColumnTypesAndNullability": "All compatible; Drizzle serial maps to integer plus a sequence-backed nextval default"
+}

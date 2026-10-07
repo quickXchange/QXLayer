@@ -1,0 +1,106 @@
+{
+  "tables": {
+    "missingInProduction": [],
+    "productionOnly": []
+  },
+  "columns": {
+    "missingInProduction": [
+      {
+        "name": "monthly_price",
+        "type": "numeric(22,2)",
+        "not_null": true,
+        "table_name": "addons",
+        "default_expression": "0"
+      },
+      {
+        "name": "setup_fee",
+        "type": "numeric(22,2)",
+        "not_null": true,
+        "table_name": "addons",
+        "default_expression": "0"
+      },
+      {
+        "name": "yearly_price",
+        "type": "numeric(22,2)",
+        "not_null": true,
+        "table_name": "addons",
+        "default_expression": "0"
+      },
+      {
+        "name": "supported_languages",
+        "type": "text[]",
+        "not_null": true,
+        "table_name": "tenant_branding",
+        "default_expression": "ARRAY['en'::text]"
+      }
+    ],
+    "productionOnly": [
+      {
+        "name": "monthly_price",
+        "type": "numeric(22,2)",
+        "not_null": true,
+        "table_name": "addons",
+        "default_expression": "'0'::numeric"
+      },
+      {
+        "name": "setup_fee",
+        "type": "numeric(22,2)",
+        "not_null": true,
+        "table_name": "addons",
+        "default_expression": "'0'::numeric"
+      },
+      {
+        "name": "yearly_price",
+        "type": "numeric(22,2)",
+        "not_null": true,
+        "table_name": "addons",
+        "default_expression": "'0'::numeric"
+      },
+      {
+        "name": "supported_languages",
+        "type": "text[]",
+        "not_null": true,
+        "table_name": "tenant_branding",
+        "default_expression": "'{en}'::text[]"
+      }
+    ]
+  },
+  "constraints": {
+    "missingInProduction": [
+      {
+        "name": "landing_products_copy",
+        "type": "c",
+        "definition": "CHECK ((((length(btrim(name)) >= 2) AND (length(btrim(name)) <= 100)) AND ((length(btrim(description)) >= 10) AND (length(btrim(description)) <= 500)) AND ((length(btrim(cta_label)) >= 2) AND (length(btrim(cta_label)) <= 40))))",
+        "table_name": "landing_products"
+      },
+      {
+        "name": "white_label_request_delivery",
+        "type": "c",
+        "definition": "CHECK (((status <> 'delivered'::text) OR (tenant_id IS NOT NULL)))",
+        "table_name": "white_label_requests"
+      }
+    ],
+    "productionOnly": [
+      {
+        "name": "landing_products_copy",
+        "type": "c",
+        "definition": "CHECK (((length(btrim(name)) >= 2) AND (length(btrim(name)) <= 100) AND ((length(btrim(description)) >= 10) AND (length(btrim(description)) <= 500)) AND ((length(btrim(cta_label)) >= 2) AND (length(btrim(cta_label)) <= 40))))",
+        "table_name": "landing_products"
+      },
+      {
+        "name": "white_label_request_delivery",
+        "type": "c",
+        "definition": "CHECK (((status = 'delivered'::text) = (tenant_id IS NOT NULL)))",
+        "table_name": "white_label_requests"
+      }
+    ]
+  },
+  "indexes": {
+    "missingInProduction": [],
+    "productionOnly": []
+  },
+  "policies": {
+    "missingInProduction": [],
+    "productionOnly": []
+  }
+}

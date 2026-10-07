@@ -4247,6 +4247,22 @@ export const ResolvePublicDomainResponse = zod.object({
 
 
 /**
+ * @summary Record a privacy-safe shared website error identifier
+ */
+export const recordWebsiteErrorBodyErrorIdRegExp = new RegExp('^QXS-[a-f0-9]{32}$');
+export const recordWebsiteErrorBodyBuildIdRegExp = new RegExp('^site-[a-f0-9]{16}$');
+
+
+export const RecordWebsiteErrorBody = zod.object({
+  "errorId": zod.string().regex(recordWebsiteErrorBodyErrorIdRegExp),
+  "category": zod.enum(['render_type', 'missing_reference', 'script_syntax', 'asset_load', 'unknown']),
+  "buildId": zod.string().regex(recordWebsiteErrorBodyBuildIdRegExp)
+})
+
+export const RecordWebsiteErrorResponse = zod.void()
+
+
+/**
  * Returns server health status
  * @summary Health check
  */

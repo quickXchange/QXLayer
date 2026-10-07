@@ -90,6 +90,7 @@ import type {
   TenantInput,
   TenantModulesInput,
   TenantSummary,
+  WebsiteErrorDiagnostic,
   WebsitePreview,
   WebsiteSettings,
   WhiteLabelCatalog,
@@ -4191,6 +4192,94 @@ export function useResolvePublicDomain<TData = Awaited<ReturnType<typeof resolve
 
 
 
+
+export const getRecordWebsiteErrorUrl = () => {
+
+
+
+
+  return `/api/diagnostics/website-errors`
+}
+
+/**
+ * @summary Record a privacy-safe shared website error identifier
+ */
+export const recordWebsiteError = async (websiteErrorDiagnostic: WebsiteErrorDiagnostic, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<void>(getRecordWebsiteErrorUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(websiteErrorDiagnostic)
+  }
+);}
+
+
+
+
+
+export const getRecordWebsiteErrorMutationKey = () => ['recordWebsiteError'] as const;
+
+export const getRecordWebsiteErrorMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordWebsiteError>>, TError,RecordWebsiteErrorMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof recordWebsiteError>>, TError,RecordWebsiteErrorMutationVariables, TContext> => {
+
+const mutationKey = getRecordWebsiteErrorMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordWebsiteError>>, RecordWebsiteErrorMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  recordWebsiteError(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordWebsiteErrorMutationResult = NonNullable<Awaited<ReturnType<typeof recordWebsiteError>>>
+    export type RecordWebsiteErrorMutationBody = BodyType<WebsiteErrorDiagnostic>
+    export type RecordWebsiteErrorMutationError = ErrorType<void>
+    export type RecordWebsiteErrorMutationVariables = {data: BodyType<WebsiteErrorDiagnostic>}
+
+    /**
+ * @summary Record a privacy-safe shared website error identifier
+ */
+export const useRecordWebsiteError = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordWebsiteError>>, TError,RecordWebsiteErrorMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof recordWebsiteError>>,
+        TError,
+        RecordWebsiteErrorMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRecordWebsiteErrorMutationOptions(options));
+    }
 
 export const getHealthCheckUrl = () => {
 

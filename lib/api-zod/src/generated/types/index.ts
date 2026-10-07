@@ -165,6 +165,8 @@ export * from './tenantSummary';
 export * from './tenantSummaryEnvironment';
 export * from './tenantThemeMode';
 export * from './usageItem';
+export * from './websiteErrorDiagnostic';
+export * from './websiteErrorDiagnosticCategory';
 export * from './websiteFaq';
 export * from './websitePreview';
 export * from './websiteSettings';

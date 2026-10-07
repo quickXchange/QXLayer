@@ -5,6 +5,25 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export type WebsiteErrorDiagnosticCategory = typeof WebsiteErrorDiagnosticCategory[keyof typeof WebsiteErrorDiagnosticCategory];
+
+
+export const WebsiteErrorDiagnosticCategory = {
+  render_type: 'render_type',
+  missing_reference: 'missing_reference',
+  script_syntax: 'script_syntax',
+  asset_load: 'asset_load',
+  unknown: 'unknown',
+} as const;
+
+export interface WebsiteErrorDiagnostic {
+  /** @pattern ^QXS-[a-f0-9]{32}$ */
+  errorId: string;
+  category: WebsiteErrorDiagnosticCategory;
+  /** @pattern ^site-[a-f0-9]{16}$ */
+  buildId: string;
+}
+
 export type ProviderSchemaFieldType = typeof ProviderSchemaFieldType[keyof typeof ProviderSchemaFieldType];
 
 

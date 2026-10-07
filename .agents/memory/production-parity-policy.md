@@ -41,3 +41,14 @@ The Production access-code gate is temporary pre-launch hiding only, not a repla
 **Why:** The user explicitly required a separate Production Domain Access Gate and later authorized fixing its Production runtime and redesigning only its Private Access screen, while preserving the other product surfaces and database.
 
 **How to apply:** Keep the gate separate from tenant/account permissions. A gate-only Production request does not authorize publishing unrelated Development changes or running the prepared database migration. Verify the active runtime configuration before promising live access. Removing the gate for public launch requires an explicit request.
+
+Do not equate matching table/column inventories with lifecycle compatibility.
+Compare CHECK-constraint semantics separately from equivalent default-expression
+or parenthesis differences. Do not assume publication replaces legacy constraints.
+
+**Why:** A stricter Production predicate could reject valid pre-delivery tenant
+preparation even though the table, column, index and relationship inventories matched.
+
+**How to apply:** Evaluate current intermediate workflow states against the actual
+Production predicates before declaring schema parity. Report material differences
+separately and obtain approval for any repair instead of changing constraints during inspection.

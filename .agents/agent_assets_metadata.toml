@@ -504,3 +504,17 @@ mtime_ms = 1791405608741
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/75bb5de2-317d-4870-9622-edebbbcdc760/7e28f314-b329-409e-bfda-89992bbf91bb"
 storage_version_token = "1791405666974662"
 content_type = "text/csv"
+
+[[outputs]]
+id = "6r4PRCZDwbrgVEpua6JAj"
+uri = "file://reports/production-preparation-report.html"
+type = "html"
+title = "Development preparation & Production schema review"
+description = "Catalog readiness, privacy/recovery tests, exact schema differences and approval-gated next steps. No Production changes."
+logical_id = "43dbd03d-9e79-4045-a851-3f35ab0f2df6"
+content_hash = "sha256:692992d30a955f7baf3ea8e52498a6b44f13ceee6046e00570b7ca7374d5b026"
+size = 92658
+mtime_ms = 1791406888216
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/43dbd03d-9e79-4045-a851-3f35ab0f2df6/f3879021-faf5-4f1f-8171-3774df046dff"
+storage_version_token = "1791406888916040"
+content_type = "text/html"

@@ -42,6 +42,9 @@ app.use(clerkMiddleware((req) => ({
 
 app.use("/api", router);
 const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
+  if (req.path === "/api/diagnostics/website-errors" && error?.type === "entity.parse.failed") {
+    res.status(400).json({ error: "Invalid safe diagnostic." }); return;
+  }
   if (error?.type === "entity.too.large") { res.status(413).json({ error: "The upload or request exceeds its allowed size limit." }); return; }
   if (error instanceof ZodError) { res.status(400).json({ error: "Invalid input.", details: error.issues.map((i) => ({ path: i.path, message: i.message })) }); return; }
   if (error instanceof HttpError) { res.status(error.status).json({ error: error.message }); return; }
