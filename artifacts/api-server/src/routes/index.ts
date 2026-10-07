@@ -8,6 +8,7 @@ import plansRouter from "./plans";
 import websiteRouter from "./website";
 import landingCatalogRouter from "./landing-catalog";
 import exchangeRouter from "./exchange";
+import providerFoundationRouter from "./provider-foundation";
 import customerRouter from "./customer";
 import orderFilesRouter from "./order-files";
 import { requireAuthentication, principalFrom } from "../middlewares/authentication";
@@ -27,6 +28,7 @@ router.use("/tenants/:tenantId", requireAuthentication, async (req, res, next) =
   next();
 });
 router.use(exchangeRouter);
+router.use(providerFoundationRouter);
 router.use(catalogRouter);
 router.use(tenantsRouter);
 router.use(platformRouter);

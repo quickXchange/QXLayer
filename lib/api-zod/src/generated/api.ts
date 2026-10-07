@@ -8,6 +8,614 @@
 import * as zod from 'zod';
 
 
+export const getProviderFoundationResponseProvidersItemOneNameMax = 120;
+
+export const getProviderFoundationResponseProvidersItemOneLogoUrlMax = 500;
+
+export const getProviderFoundationResponseProvidersItemOneDescriptionMax = 2000;
+
+export const getProviderFoundationResponseProvidersItemOneCategoriesItemMax = 80;
+
+export const getProviderFoundationResponseProvidersItemOneCategoriesMax = 20;
+
+export const getProviderFoundationResponseProvidersItemOneServicesItemMax = 80;
+
+export const getProviderFoundationResponseProvidersItemOneServicesMax = 30;
+
+export const getProviderFoundationResponseProvidersItemOneCapabilitiesItemRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const getProviderFoundationResponseProvidersItemOneCapabilitiesMax = 30;
+
+export const getProviderFoundationResponseProvidersItemOneEnvironmentsMax = 3;
+
+export const getProviderFoundationResponseProvidersItemOneCredentialSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const getProviderFoundationResponseProvidersItemOneCredentialSchemaItemLabelMax = 100;
+
+export const getProviderFoundationResponseProvidersItemOneCredentialSchemaMax = 30;
+
+export const getProviderFoundationResponseProvidersItemOneConfigurationSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const getProviderFoundationResponseProvidersItemOneConfigurationSchemaItemLabelMax = 100;
+
+export const getProviderFoundationResponseProvidersItemOneConfigurationSchemaMax = 30;
+
+export const getProviderFoundationResponseProvidersItemOneEntitlementKeyMax = 100;
+
+export const getProviderFoundationResponseAssignmentsItemOneCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const getProviderFoundationResponsePoliciesItemOneResourceIdMax = 100;
+
+export const getProviderFoundationResponsePoliciesItemOneCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+
+
+export const GetProviderFoundationResponse = zod.object({
+  "providers": zod.array(zod.object({
+  "name": zod.string().min(1).max(getProviderFoundationResponseProvidersItemOneNameMax),
+  "logoUrl": zod.string().max(getProviderFoundationResponseProvidersItemOneLogoUrlMax).nullable(),
+  "description": zod.string().max(getProviderFoundationResponseProvidersItemOneDescriptionMax),
+  "categories": zod.array(zod.string().min(1).max(getProviderFoundationResponseProvidersItemOneCategoriesItemMax)).min(1).max(getProviderFoundationResponseProvidersItemOneCategoriesMax),
+  "services": zod.array(zod.string().min(1).max(getProviderFoundationResponseProvidersItemOneServicesItemMax)).max(getProviderFoundationResponseProvidersItemOneServicesMax),
+  "capabilities": zod.array(zod.string().regex(getProviderFoundationResponseProvidersItemOneCapabilitiesItemRegExp)).min(1).max(getProviderFoundationResponseProvidersItemOneCapabilitiesMax),
+  "status": zod.enum(['coming_soon', 'configuration_only', 'available', 'disabled']),
+  "environments": zod.array(zod.enum(['sandbox', 'test', 'live'])).min(1).max(getProviderFoundationResponseProvidersItemOneEnvironmentsMax),
+  "credentialSchema": zod.array(zod.object({
+  "key": zod.string().regex(getProviderFoundationResponseProvidersItemOneCredentialSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(getProviderFoundationResponseProvidersItemOneCredentialSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(getProviderFoundationResponseProvidersItemOneCredentialSchemaMax),
+  "configurationSchema": zod.array(zod.object({
+  "key": zod.string().regex(getProviderFoundationResponseProvidersItemOneConfigurationSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(getProviderFoundationResponseProvidersItemOneConfigurationSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(getProviderFoundationResponseProvidersItemOneConfigurationSchemaMax),
+  "access": zod.enum(['platform_wide', 'entitlement', 'assigned']),
+  "entitlementKey": zod.string().max(getProviderFoundationResponseProvidersItemOneEntitlementKeyMax).nullable(),
+  "tenantConfigurable": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "implementationStatus": zod.enum(['not_implemented']),
+  "connectionStatus": zod.enum(['not_configured']),
+  "assignedTenants": zod.number().int(),
+  "credentialStorageAvailable": zod.boolean()
+}))),
+  "assignments": zod.array(zod.object({
+  "providerId": zod.string().uuid(),
+  "capability": zod.string().regex(getProviderFoundationResponseAssignmentsItemOneCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live'])
+}).and(zod.object({
+  "configuration": zod.record(zod.string(), zod.union([zod.string(),zod.number(),zod.boolean()]))
+})).and(zod.object({
+  "id": zod.string().uuid(),
+  "tenantId": zod.string().uuid(),
+  "connectionStatus": zod.enum(['not_configured', 'configured']),
+  "credentialState": zod.enum(['not_configured']),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))),
+  "policies": zod.array(zod.object({
+  "scope": zod.enum(['route', 'network']),
+  "resourceId": zod.string().min(1).max(getProviderFoundationResponsePoliciesItemOneResourceIdMax),
+  "capability": zod.string().regex(getProviderFoundationResponsePoliciesItemOneCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live']),
+  "executionMode": zod.enum(['sandbox_manual', 'provider']),
+  "providerId": zod.string().uuid().nullable(),
+  "fallback": zod.enum(['none', 'manual', 'secondary_provider']),
+  "secondaryProviderId": zod.string().uuid().nullable()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "tenantId": zod.string().uuid(),
+  "executionEnabled": zod.boolean(),
+  "updatedAt": zod.string()
+}))),
+  "activity": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().nullable(),
+  "action": zod.string(),
+  "summary": zod.string(),
+  "createdAt": zod.string()
+})),
+  "categories": zod.array(zod.string()),
+  "capabilities": zod.array(zod.string()),
+  "credentialStorageAvailable": zod.boolean(),
+  "executionEnabled": zod.boolean()
+})
+
+
+export const createProviderDefinitionBodyNameMax = 120;
+
+export const createProviderDefinitionBodyLogoUrlMax = 500;
+
+export const createProviderDefinitionBodyDescriptionMax = 2000;
+
+export const createProviderDefinitionBodyCategoriesItemMax = 80;
+
+export const createProviderDefinitionBodyCategoriesMax = 20;
+
+export const createProviderDefinitionBodyServicesItemMax = 80;
+
+export const createProviderDefinitionBodyServicesMax = 30;
+
+export const createProviderDefinitionBodyCapabilitiesItemRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const createProviderDefinitionBodyCapabilitiesMax = 30;
+
+export const createProviderDefinitionBodyEnvironmentsMax = 3;
+
+export const createProviderDefinitionBodyCredentialSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const createProviderDefinitionBodyCredentialSchemaItemLabelMax = 100;
+
+export const createProviderDefinitionBodyCredentialSchemaMax = 30;
+
+export const createProviderDefinitionBodyConfigurationSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const createProviderDefinitionBodyConfigurationSchemaItemLabelMax = 100;
+
+export const createProviderDefinitionBodyConfigurationSchemaMax = 30;
+
+export const createProviderDefinitionBodyEntitlementKeyMax = 100;
+
+
+
+export const CreateProviderDefinitionBody = zod.object({
+  "name": zod.string().min(1).max(createProviderDefinitionBodyNameMax),
+  "logoUrl": zod.string().max(createProviderDefinitionBodyLogoUrlMax).nullable(),
+  "description": zod.string().max(createProviderDefinitionBodyDescriptionMax),
+  "categories": zod.array(zod.string().min(1).max(createProviderDefinitionBodyCategoriesItemMax)).min(1).max(createProviderDefinitionBodyCategoriesMax),
+  "services": zod.array(zod.string().min(1).max(createProviderDefinitionBodyServicesItemMax)).max(createProviderDefinitionBodyServicesMax),
+  "capabilities": zod.array(zod.string().regex(createProviderDefinitionBodyCapabilitiesItemRegExp)).min(1).max(createProviderDefinitionBodyCapabilitiesMax),
+  "status": zod.enum(['coming_soon', 'configuration_only', 'available', 'disabled']),
+  "environments": zod.array(zod.enum(['sandbox', 'test', 'live'])).min(1).max(createProviderDefinitionBodyEnvironmentsMax),
+  "credentialSchema": zod.array(zod.object({
+  "key": zod.string().regex(createProviderDefinitionBodyCredentialSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(createProviderDefinitionBodyCredentialSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(createProviderDefinitionBodyCredentialSchemaMax),
+  "configurationSchema": zod.array(zod.object({
+  "key": zod.string().regex(createProviderDefinitionBodyConfigurationSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(createProviderDefinitionBodyConfigurationSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(createProviderDefinitionBodyConfigurationSchemaMax),
+  "access": zod.enum(['platform_wide', 'entitlement', 'assigned']),
+  "entitlementKey": zod.string().max(createProviderDefinitionBodyEntitlementKeyMax).nullable(),
+  "tenantConfigurable": zod.boolean()
+})
+
+export const createProviderDefinitionResponseOneNameMax = 120;
+
+export const createProviderDefinitionResponseOneLogoUrlMax = 500;
+
+export const createProviderDefinitionResponseOneDescriptionMax = 2000;
+
+export const createProviderDefinitionResponseOneCategoriesItemMax = 80;
+
+export const createProviderDefinitionResponseOneCategoriesMax = 20;
+
+export const createProviderDefinitionResponseOneServicesItemMax = 80;
+
+export const createProviderDefinitionResponseOneServicesMax = 30;
+
+export const createProviderDefinitionResponseOneCapabilitiesItemRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const createProviderDefinitionResponseOneCapabilitiesMax = 30;
+
+export const createProviderDefinitionResponseOneEnvironmentsMax = 3;
+
+export const createProviderDefinitionResponseOneCredentialSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const createProviderDefinitionResponseOneCredentialSchemaItemLabelMax = 100;
+
+export const createProviderDefinitionResponseOneCredentialSchemaMax = 30;
+
+export const createProviderDefinitionResponseOneConfigurationSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const createProviderDefinitionResponseOneConfigurationSchemaItemLabelMax = 100;
+
+export const createProviderDefinitionResponseOneConfigurationSchemaMax = 30;
+
+export const createProviderDefinitionResponseOneEntitlementKeyMax = 100;
+
+
+
+export const CreateProviderDefinitionResponse = zod.object({
+  "name": zod.string().min(1).max(createProviderDefinitionResponseOneNameMax),
+  "logoUrl": zod.string().max(createProviderDefinitionResponseOneLogoUrlMax).nullable(),
+  "description": zod.string().max(createProviderDefinitionResponseOneDescriptionMax),
+  "categories": zod.array(zod.string().min(1).max(createProviderDefinitionResponseOneCategoriesItemMax)).min(1).max(createProviderDefinitionResponseOneCategoriesMax),
+  "services": zod.array(zod.string().min(1).max(createProviderDefinitionResponseOneServicesItemMax)).max(createProviderDefinitionResponseOneServicesMax),
+  "capabilities": zod.array(zod.string().regex(createProviderDefinitionResponseOneCapabilitiesItemRegExp)).min(1).max(createProviderDefinitionResponseOneCapabilitiesMax),
+  "status": zod.enum(['coming_soon', 'configuration_only', 'available', 'disabled']),
+  "environments": zod.array(zod.enum(['sandbox', 'test', 'live'])).min(1).max(createProviderDefinitionResponseOneEnvironmentsMax),
+  "credentialSchema": zod.array(zod.object({
+  "key": zod.string().regex(createProviderDefinitionResponseOneCredentialSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(createProviderDefinitionResponseOneCredentialSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(createProviderDefinitionResponseOneCredentialSchemaMax),
+  "configurationSchema": zod.array(zod.object({
+  "key": zod.string().regex(createProviderDefinitionResponseOneConfigurationSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(createProviderDefinitionResponseOneConfigurationSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(createProviderDefinitionResponseOneConfigurationSchemaMax),
+  "access": zod.enum(['platform_wide', 'entitlement', 'assigned']),
+  "entitlementKey": zod.string().max(createProviderDefinitionResponseOneEntitlementKeyMax).nullable(),
+  "tenantConfigurable": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "implementationStatus": zod.enum(['not_implemented']),
+  "connectionStatus": zod.enum(['not_configured']),
+  "assignedTenants": zod.number().int(),
+  "credentialStorageAvailable": zod.boolean()
+}))
+
+
+export const UpdateProviderDefinitionParams = zod.object({
+  "providerId": zod.coerce.string().uuid()
+})
+
+export const updateProviderDefinitionBodyNameMax = 120;
+
+export const updateProviderDefinitionBodyLogoUrlMax = 500;
+
+export const updateProviderDefinitionBodyDescriptionMax = 2000;
+
+export const updateProviderDefinitionBodyCategoriesItemMax = 80;
+
+export const updateProviderDefinitionBodyCategoriesMax = 20;
+
+export const updateProviderDefinitionBodyServicesItemMax = 80;
+
+export const updateProviderDefinitionBodyServicesMax = 30;
+
+export const updateProviderDefinitionBodyCapabilitiesItemRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const updateProviderDefinitionBodyCapabilitiesMax = 30;
+
+export const updateProviderDefinitionBodyEnvironmentsMax = 3;
+
+export const updateProviderDefinitionBodyCredentialSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const updateProviderDefinitionBodyCredentialSchemaItemLabelMax = 100;
+
+export const updateProviderDefinitionBodyCredentialSchemaMax = 30;
+
+export const updateProviderDefinitionBodyConfigurationSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const updateProviderDefinitionBodyConfigurationSchemaItemLabelMax = 100;
+
+export const updateProviderDefinitionBodyConfigurationSchemaMax = 30;
+
+export const updateProviderDefinitionBodyEntitlementKeyMax = 100;
+
+
+
+export const UpdateProviderDefinitionBody = zod.object({
+  "name": zod.string().min(1).max(updateProviderDefinitionBodyNameMax),
+  "logoUrl": zod.string().max(updateProviderDefinitionBodyLogoUrlMax).nullable(),
+  "description": zod.string().max(updateProviderDefinitionBodyDescriptionMax),
+  "categories": zod.array(zod.string().min(1).max(updateProviderDefinitionBodyCategoriesItemMax)).min(1).max(updateProviderDefinitionBodyCategoriesMax),
+  "services": zod.array(zod.string().min(1).max(updateProviderDefinitionBodyServicesItemMax)).max(updateProviderDefinitionBodyServicesMax),
+  "capabilities": zod.array(zod.string().regex(updateProviderDefinitionBodyCapabilitiesItemRegExp)).min(1).max(updateProviderDefinitionBodyCapabilitiesMax),
+  "status": zod.enum(['coming_soon', 'configuration_only', 'available', 'disabled']),
+  "environments": zod.array(zod.enum(['sandbox', 'test', 'live'])).min(1).max(updateProviderDefinitionBodyEnvironmentsMax),
+  "credentialSchema": zod.array(zod.object({
+  "key": zod.string().regex(updateProviderDefinitionBodyCredentialSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(updateProviderDefinitionBodyCredentialSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(updateProviderDefinitionBodyCredentialSchemaMax),
+  "configurationSchema": zod.array(zod.object({
+  "key": zod.string().regex(updateProviderDefinitionBodyConfigurationSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(updateProviderDefinitionBodyConfigurationSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(updateProviderDefinitionBodyConfigurationSchemaMax),
+  "access": zod.enum(['platform_wide', 'entitlement', 'assigned']),
+  "entitlementKey": zod.string().max(updateProviderDefinitionBodyEntitlementKeyMax).nullable(),
+  "tenantConfigurable": zod.boolean()
+})
+
+export const updateProviderDefinitionResponseOneNameMax = 120;
+
+export const updateProviderDefinitionResponseOneLogoUrlMax = 500;
+
+export const updateProviderDefinitionResponseOneDescriptionMax = 2000;
+
+export const updateProviderDefinitionResponseOneCategoriesItemMax = 80;
+
+export const updateProviderDefinitionResponseOneCategoriesMax = 20;
+
+export const updateProviderDefinitionResponseOneServicesItemMax = 80;
+
+export const updateProviderDefinitionResponseOneServicesMax = 30;
+
+export const updateProviderDefinitionResponseOneCapabilitiesItemRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const updateProviderDefinitionResponseOneCapabilitiesMax = 30;
+
+export const updateProviderDefinitionResponseOneEnvironmentsMax = 3;
+
+export const updateProviderDefinitionResponseOneCredentialSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const updateProviderDefinitionResponseOneCredentialSchemaItemLabelMax = 100;
+
+export const updateProviderDefinitionResponseOneCredentialSchemaMax = 30;
+
+export const updateProviderDefinitionResponseOneConfigurationSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const updateProviderDefinitionResponseOneConfigurationSchemaItemLabelMax = 100;
+
+export const updateProviderDefinitionResponseOneConfigurationSchemaMax = 30;
+
+export const updateProviderDefinitionResponseOneEntitlementKeyMax = 100;
+
+
+
+export const UpdateProviderDefinitionResponse = zod.object({
+  "name": zod.string().min(1).max(updateProviderDefinitionResponseOneNameMax),
+  "logoUrl": zod.string().max(updateProviderDefinitionResponseOneLogoUrlMax).nullable(),
+  "description": zod.string().max(updateProviderDefinitionResponseOneDescriptionMax),
+  "categories": zod.array(zod.string().min(1).max(updateProviderDefinitionResponseOneCategoriesItemMax)).min(1).max(updateProviderDefinitionResponseOneCategoriesMax),
+  "services": zod.array(zod.string().min(1).max(updateProviderDefinitionResponseOneServicesItemMax)).max(updateProviderDefinitionResponseOneServicesMax),
+  "capabilities": zod.array(zod.string().regex(updateProviderDefinitionResponseOneCapabilitiesItemRegExp)).min(1).max(updateProviderDefinitionResponseOneCapabilitiesMax),
+  "status": zod.enum(['coming_soon', 'configuration_only', 'available', 'disabled']),
+  "environments": zod.array(zod.enum(['sandbox', 'test', 'live'])).min(1).max(updateProviderDefinitionResponseOneEnvironmentsMax),
+  "credentialSchema": zod.array(zod.object({
+  "key": zod.string().regex(updateProviderDefinitionResponseOneCredentialSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(updateProviderDefinitionResponseOneCredentialSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(updateProviderDefinitionResponseOneCredentialSchemaMax),
+  "configurationSchema": zod.array(zod.object({
+  "key": zod.string().regex(updateProviderDefinitionResponseOneConfigurationSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(updateProviderDefinitionResponseOneConfigurationSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(updateProviderDefinitionResponseOneConfigurationSchemaMax),
+  "access": zod.enum(['platform_wide', 'entitlement', 'assigned']),
+  "entitlementKey": zod.string().max(updateProviderDefinitionResponseOneEntitlementKeyMax).nullable(),
+  "tenantConfigurable": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "implementationStatus": zod.enum(['not_implemented']),
+  "connectionStatus": zod.enum(['not_configured']),
+  "assignedTenants": zod.number().int(),
+  "credentialStorageAvailable": zod.boolean()
+}))
+
+
+export const GetTenantProviderFoundationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const getTenantProviderFoundationResponseProvidersItemOneNameMax = 120;
+
+export const getTenantProviderFoundationResponseProvidersItemOneLogoUrlMax = 500;
+
+export const getTenantProviderFoundationResponseProvidersItemOneDescriptionMax = 2000;
+
+export const getTenantProviderFoundationResponseProvidersItemOneCategoriesItemMax = 80;
+
+export const getTenantProviderFoundationResponseProvidersItemOneCategoriesMax = 20;
+
+export const getTenantProviderFoundationResponseProvidersItemOneServicesItemMax = 80;
+
+export const getTenantProviderFoundationResponseProvidersItemOneServicesMax = 30;
+
+export const getTenantProviderFoundationResponseProvidersItemOneCapabilitiesItemRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const getTenantProviderFoundationResponseProvidersItemOneCapabilitiesMax = 30;
+
+export const getTenantProviderFoundationResponseProvidersItemOneEnvironmentsMax = 3;
+
+export const getTenantProviderFoundationResponseProvidersItemOneCredentialSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const getTenantProviderFoundationResponseProvidersItemOneCredentialSchemaItemLabelMax = 100;
+
+export const getTenantProviderFoundationResponseProvidersItemOneCredentialSchemaMax = 30;
+
+export const getTenantProviderFoundationResponseProvidersItemOneConfigurationSchemaItemKeyRegExp = new RegExp('^[a-zA-Z][a-zA-Z0-9_]{0,63}$');
+export const getTenantProviderFoundationResponseProvidersItemOneConfigurationSchemaItemLabelMax = 100;
+
+export const getTenantProviderFoundationResponseProvidersItemOneConfigurationSchemaMax = 30;
+
+export const getTenantProviderFoundationResponseProvidersItemOneEntitlementKeyMax = 100;
+
+export const getTenantProviderFoundationResponseAssignmentsItemOneCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+export const getTenantProviderFoundationResponsePoliciesItemOneResourceIdMax = 100;
+
+export const getTenantProviderFoundationResponsePoliciesItemOneCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+
+
+export const GetTenantProviderFoundationResponse = zod.object({
+  "providers": zod.array(zod.object({
+  "name": zod.string().min(1).max(getTenantProviderFoundationResponseProvidersItemOneNameMax),
+  "logoUrl": zod.string().max(getTenantProviderFoundationResponseProvidersItemOneLogoUrlMax).nullable(),
+  "description": zod.string().max(getTenantProviderFoundationResponseProvidersItemOneDescriptionMax),
+  "categories": zod.array(zod.string().min(1).max(getTenantProviderFoundationResponseProvidersItemOneCategoriesItemMax)).min(1).max(getTenantProviderFoundationResponseProvidersItemOneCategoriesMax),
+  "services": zod.array(zod.string().min(1).max(getTenantProviderFoundationResponseProvidersItemOneServicesItemMax)).max(getTenantProviderFoundationResponseProvidersItemOneServicesMax),
+  "capabilities": zod.array(zod.string().regex(getTenantProviderFoundationResponseProvidersItemOneCapabilitiesItemRegExp)).min(1).max(getTenantProviderFoundationResponseProvidersItemOneCapabilitiesMax),
+  "status": zod.enum(['coming_soon', 'configuration_only', 'available', 'disabled']),
+  "environments": zod.array(zod.enum(['sandbox', 'test', 'live'])).min(1).max(getTenantProviderFoundationResponseProvidersItemOneEnvironmentsMax),
+  "credentialSchema": zod.array(zod.object({
+  "key": zod.string().regex(getTenantProviderFoundationResponseProvidersItemOneCredentialSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(getTenantProviderFoundationResponseProvidersItemOneCredentialSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(getTenantProviderFoundationResponseProvidersItemOneCredentialSchemaMax),
+  "configurationSchema": zod.array(zod.object({
+  "key": zod.string().regex(getTenantProviderFoundationResponseProvidersItemOneConfigurationSchemaItemKeyRegExp),
+  "label": zod.string().min(1).max(getTenantProviderFoundationResponseProvidersItemOneConfigurationSchemaItemLabelMax),
+  "type": zod.enum(['text', 'number', 'boolean', 'url', 'secret']),
+  "required": zod.boolean()
+})).max(getTenantProviderFoundationResponseProvidersItemOneConfigurationSchemaMax),
+  "access": zod.enum(['platform_wide', 'entitlement', 'assigned']),
+  "entitlementKey": zod.string().max(getTenantProviderFoundationResponseProvidersItemOneEntitlementKeyMax).nullable(),
+  "tenantConfigurable": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "implementationStatus": zod.enum(['not_implemented']),
+  "connectionStatus": zod.enum(['not_configured']),
+  "assignedTenants": zod.number().int(),
+  "credentialStorageAvailable": zod.boolean()
+}))),
+  "assignments": zod.array(zod.object({
+  "providerId": zod.string().uuid(),
+  "capability": zod.string().regex(getTenantProviderFoundationResponseAssignmentsItemOneCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live'])
+}).and(zod.object({
+  "configuration": zod.record(zod.string(), zod.union([zod.string(),zod.number(),zod.boolean()]))
+})).and(zod.object({
+  "id": zod.string().uuid(),
+  "tenantId": zod.string().uuid(),
+  "connectionStatus": zod.enum(['not_configured', 'configured']),
+  "credentialState": zod.enum(['not_configured']),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))),
+  "policies": zod.array(zod.object({
+  "scope": zod.enum(['route', 'network']),
+  "resourceId": zod.string().min(1).max(getTenantProviderFoundationResponsePoliciesItemOneResourceIdMax),
+  "capability": zod.string().regex(getTenantProviderFoundationResponsePoliciesItemOneCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live']),
+  "executionMode": zod.enum(['sandbox_manual', 'provider']),
+  "providerId": zod.string().uuid().nullable(),
+  "fallback": zod.enum(['none', 'manual', 'secondary_provider']),
+  "secondaryProviderId": zod.string().uuid().nullable()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "tenantId": zod.string().uuid(),
+  "executionEnabled": zod.boolean(),
+  "updatedAt": zod.string()
+}))),
+  "activity": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().nullable(),
+  "action": zod.string(),
+  "summary": zod.string(),
+  "createdAt": zod.string()
+})),
+  "categories": zod.array(zod.string()),
+  "capabilities": zod.array(zod.string()),
+  "credentialStorageAvailable": zod.boolean(),
+  "executionEnabled": zod.boolean()
+})
+
+
+export const CreateProviderAssignmentParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const createProviderAssignmentBodyCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+
+
+export const CreateProviderAssignmentBody = zod.object({
+  "providerId": zod.string().uuid(),
+  "capability": zod.string().regex(createProviderAssignmentBodyCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live'])
+})
+
+export const createProviderAssignmentResponseOneCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+
+
+export const CreateProviderAssignmentResponse = zod.object({
+  "providerId": zod.string().uuid(),
+  "capability": zod.string().regex(createProviderAssignmentResponseOneCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live'])
+}).and(zod.object({
+  "configuration": zod.record(zod.string(), zod.union([zod.string(),zod.number(),zod.boolean()]))
+})).and(zod.object({
+  "id": zod.string().uuid(),
+  "tenantId": zod.string().uuid(),
+  "connectionStatus": zod.enum(['not_configured', 'configured']),
+  "credentialState": zod.enum(['not_configured']),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+
+
+export const UpdateProviderAssignmentParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "assignmentId": zod.coerce.string().uuid()
+})
+
+export const UpdateProviderAssignmentBody = zod.object({
+  "configuration": zod.record(zod.string(), zod.union([zod.string(),zod.number(),zod.boolean()]))
+})
+
+export const updateProviderAssignmentResponseOneCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+
+
+export const UpdateProviderAssignmentResponse = zod.object({
+  "providerId": zod.string().uuid(),
+  "capability": zod.string().regex(updateProviderAssignmentResponseOneCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live'])
+}).and(zod.object({
+  "configuration": zod.record(zod.string(), zod.union([zod.string(),zod.number(),zod.boolean()]))
+})).and(zod.object({
+  "id": zod.string().uuid(),
+  "tenantId": zod.string().uuid(),
+  "connectionStatus": zod.enum(['not_configured', 'configured']),
+  "credentialState": zod.enum(['not_configured']),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+
+
+export const RemoveProviderAssignmentParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "assignmentId": zod.coerce.string().uuid()
+})
+
+export const RemoveProviderAssignmentResponse = zod.void()
+
+
+export const SaveProviderPolicyParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const saveProviderPolicyBodyResourceIdMax = 100;
+
+export const saveProviderPolicyBodyCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+
+
+export const SaveProviderPolicyBody = zod.object({
+  "scope": zod.enum(['route', 'network']),
+  "resourceId": zod.string().min(1).max(saveProviderPolicyBodyResourceIdMax),
+  "capability": zod.string().regex(saveProviderPolicyBodyCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live']),
+  "executionMode": zod.enum(['sandbox_manual', 'provider']),
+  "providerId": zod.string().uuid().nullable(),
+  "fallback": zod.enum(['none', 'manual', 'secondary_provider']),
+  "secondaryProviderId": zod.string().uuid().nullable()
+})
+
+export const saveProviderPolicyResponseOneResourceIdMax = 100;
+
+export const saveProviderPolicyResponseOneCapabilityRegExp = new RegExp('^[a-z][a-z0-9_]{0,63}$');
+
+
+export const SaveProviderPolicyResponse = zod.object({
+  "scope": zod.enum(['route', 'network']),
+  "resourceId": zod.string().min(1).max(saveProviderPolicyResponseOneResourceIdMax),
+  "capability": zod.string().regex(saveProviderPolicyResponseOneCapabilityRegExp),
+  "environment": zod.enum(['sandbox', 'test', 'live']),
+  "executionMode": zod.enum(['sandbox_manual', 'provider']),
+  "providerId": zod.string().uuid().nullable(),
+  "fallback": zod.enum(['none', 'manual', 'secondary_provider']),
+  "secondaryProviderId": zod.string().uuid().nullable()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "tenantId": zod.string().uuid(),
+  "executionEnabled": zod.boolean(),
+  "updatedAt": zod.string()
+}))
+
+
+export const RemoveProviderPolicyParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "policyId": zod.coerce.string().uuid()
+})
+
+export const RemoveProviderPolicyResponse = zod.void()
+
+
 /**
  * @summary Read-only platform owner account, project, usage and audit directory
  */

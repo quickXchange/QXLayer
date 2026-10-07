@@ -23,3 +23,4 @@
 - [Retained review fixture](retained-provisioning-fixture.md) — keep the Asterlane Development test customer/order/uploads and later tenant until explicit removal; user runs the lifecycle.
 - [Setup website previews](setup-website-preview-policy.md) — read-only Development preview uses the shared customer website without activating or delivering the tenant.
 - [Development runtime detection](development-runtime-detection.md) — REPLIT_ENVIRONMENT can say production in the workspace; use the service’s explicit run mode for preview guards.
+- [Provider foundation safety](provider-foundation-safety.md) — catalog/configuration is not connectivity; real adapters, vaults, webhooks and idempotent execution require separate approval.

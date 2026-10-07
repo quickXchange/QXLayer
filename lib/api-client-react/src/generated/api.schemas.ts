@@ -5,6 +5,257 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export type ProviderSchemaFieldType = typeof ProviderSchemaFieldType[keyof typeof ProviderSchemaFieldType];
+
+
+export const ProviderSchemaFieldType = {
+  text: 'text',
+  number: 'number',
+  boolean: 'boolean',
+  url: 'url',
+  secret: 'secret',
+} as const;
+
+export interface ProviderSchemaField {
+  /** @pattern ^[a-zA-Z][a-zA-Z0-9_]{0,63}$ */
+  key: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  label: string;
+  type: ProviderSchemaFieldType;
+  required: boolean;
+}
+
+export type ProviderDefinitionInputStatus = typeof ProviderDefinitionInputStatus[keyof typeof ProviderDefinitionInputStatus];
+
+
+export const ProviderDefinitionInputStatus = {
+  coming_soon: 'coming_soon',
+  configuration_only: 'configuration_only',
+  available: 'available',
+  disabled: 'disabled',
+} as const;
+
+export type ProviderDefinitionInputEnvironmentsItem = typeof ProviderDefinitionInputEnvironmentsItem[keyof typeof ProviderDefinitionInputEnvironmentsItem];
+
+
+export const ProviderDefinitionInputEnvironmentsItem = {
+  sandbox: 'sandbox',
+  test: 'test',
+  live: 'live',
+} as const;
+
+export type ProviderDefinitionInputAccess = typeof ProviderDefinitionInputAccess[keyof typeof ProviderDefinitionInputAccess];
+
+
+export const ProviderDefinitionInputAccess = {
+  platform_wide: 'platform_wide',
+  entitlement: 'entitlement',
+  assigned: 'assigned',
+} as const;
+
+export interface ProviderDefinitionInput {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  name: string;
+  /**
+     * @maxLength 500
+     * @nullable
+     */
+  logoUrl: string | null;
+  /** @maxLength 2000 */
+  description: string;
+  /**
+     * @minItems 1
+     * @maxItems 20
+     * @items.minLength 1
+     * @items.maxLength 80
+     */
+  categories: string[];
+  /**
+     * @maxItems 30
+     * @items.minLength 1
+     * @items.maxLength 80
+     */
+  services: string[];
+  /**
+     * @minItems 1
+     * @maxItems 30
+     * @items.pattern ^[a-z][a-z0-9_]{0,63}$
+     */
+  capabilities: string[];
+  status: ProviderDefinitionInputStatus;
+  /**
+     * @minItems 1
+     * @maxItems 3
+     */
+  environments: ProviderDefinitionInputEnvironmentsItem[];
+  /** @maxItems 30 */
+  credentialSchema: ProviderSchemaField[];
+  /** @maxItems 30 */
+  configurationSchema: ProviderSchemaField[];
+  access: ProviderDefinitionInputAccess;
+  /**
+     * @maxLength 100
+     * @nullable
+     */
+  entitlementKey: string | null;
+  tenantConfigurable: boolean;
+}
+
+export type ProviderDefinitionImplementationStatus = typeof ProviderDefinitionImplementationStatus[keyof typeof ProviderDefinitionImplementationStatus];
+
+
+export const ProviderDefinitionImplementationStatus = {
+  not_implemented: 'not_implemented',
+} as const;
+
+export type ProviderDefinitionConnectionStatus = typeof ProviderDefinitionConnectionStatus[keyof typeof ProviderDefinitionConnectionStatus];
+
+
+export const ProviderDefinitionConnectionStatus = {
+  not_configured: 'not_configured',
+} as const;
+
+export type ProviderDefinition = ProviderDefinitionInput & {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  implementationStatus: ProviderDefinitionImplementationStatus;
+  connectionStatus: ProviderDefinitionConnectionStatus;
+  assignedTenants: number;
+  credentialStorageAvailable: boolean;
+};
+
+export type ProviderAssignmentInputEnvironment = typeof ProviderAssignmentInputEnvironment[keyof typeof ProviderAssignmentInputEnvironment];
+
+
+export const ProviderAssignmentInputEnvironment = {
+  sandbox: 'sandbox',
+  test: 'test',
+  live: 'live',
+} as const;
+
+export interface ProviderAssignmentInput {
+  providerId: string;
+  /** @pattern ^[a-z][a-z0-9_]{0,63}$ */
+  capability: string;
+  environment: ProviderAssignmentInputEnvironment;
+}
+
+export type ProviderConfigurationInputConfiguration = {[key: string]: string | number | boolean};
+
+export interface ProviderConfigurationInput {
+  configuration: ProviderConfigurationInputConfiguration;
+}
+
+export type ProviderAssignmentConnectionStatus = typeof ProviderAssignmentConnectionStatus[keyof typeof ProviderAssignmentConnectionStatus];
+
+
+export const ProviderAssignmentConnectionStatus = {
+  not_configured: 'not_configured',
+  configured: 'configured',
+} as const;
+
+export type ProviderAssignmentCredentialState = typeof ProviderAssignmentCredentialState[keyof typeof ProviderAssignmentCredentialState];
+
+
+export const ProviderAssignmentCredentialState = {
+  not_configured: 'not_configured',
+} as const;
+
+export type ProviderAssignment = ProviderAssignmentInput & ProviderConfigurationInput & {
+  id: string;
+  tenantId: string;
+  connectionStatus: ProviderAssignmentConnectionStatus;
+  credentialState: ProviderAssignmentCredentialState;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ProviderPolicyInputScope = typeof ProviderPolicyInputScope[keyof typeof ProviderPolicyInputScope];
+
+
+export const ProviderPolicyInputScope = {
+  route: 'route',
+  network: 'network',
+} as const;
+
+export type ProviderPolicyInputEnvironment = typeof ProviderPolicyInputEnvironment[keyof typeof ProviderPolicyInputEnvironment];
+
+
+export const ProviderPolicyInputEnvironment = {
+  sandbox: 'sandbox',
+  test: 'test',
+  live: 'live',
+} as const;
+
+export type ProviderPolicyInputExecutionMode = typeof ProviderPolicyInputExecutionMode[keyof typeof ProviderPolicyInputExecutionMode];
+
+
+export const ProviderPolicyInputExecutionMode = {
+  sandbox_manual: 'sandbox_manual',
+  provider: 'provider',
+} as const;
+
+export type ProviderPolicyInputFallback = typeof ProviderPolicyInputFallback[keyof typeof ProviderPolicyInputFallback];
+
+
+export const ProviderPolicyInputFallback = {
+  none: 'none',
+  manual: 'manual',
+  secondary_provider: 'secondary_provider',
+} as const;
+
+export interface ProviderPolicyInput {
+  scope: ProviderPolicyInputScope;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  resourceId: string;
+  /** @pattern ^[a-z][a-z0-9_]{0,63}$ */
+  capability: string;
+  environment: ProviderPolicyInputEnvironment;
+  executionMode: ProviderPolicyInputExecutionMode;
+  /** @nullable */
+  providerId: string | null;
+  fallback: ProviderPolicyInputFallback;
+  /** @nullable */
+  secondaryProviderId: string | null;
+}
+
+export type ProviderPolicy = ProviderPolicyInput & {
+  id: string;
+  tenantId: string;
+  executionEnabled: boolean;
+  updatedAt: string;
+};
+
+export interface ProviderActivity {
+  id: string;
+  /** @nullable */
+  tenantId: string | null;
+  action: string;
+  summary: string;
+  createdAt: string;
+}
+
+export interface ProviderFoundation {
+  providers: ProviderDefinition[];
+  assignments: ProviderAssignment[];
+  policies: ProviderPolicy[];
+  activity: ProviderActivity[];
+  categories: string[];
+  capabilities: string[];
+  credentialStorageAvailable: boolean;
+  executionEnabled: boolean;
+}
+
 export interface PlatformCustomer {
   id: string;
   name: string;

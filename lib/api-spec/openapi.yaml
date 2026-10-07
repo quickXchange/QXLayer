@@ -17,6 +17,130 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /providers/foundation:
+    get:
+      operationId: getProviderFoundation
+      tags: [platform]
+      responses:
+        "200":
+          description: Super Admin provider catalog and scoped configuration, no secrets
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProviderFoundation"}
+  /providers/catalog:
+    post:
+      operationId: createProviderDefinition
+      tags: [platform]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProviderDefinitionInput"}
+      responses:
+        "201":
+          description: Created metadata only
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProviderDefinition"}
+  /providers/catalog/{providerId}:
+    put:
+      operationId: updateProviderDefinition
+      tags: [platform]
+      parameters:
+        - {name: providerId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProviderDefinitionInput"}
+      responses:
+        "200":
+          description: Updated metadata only
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProviderDefinition"}
+  /tenants/{tenantId}/provider-foundation:
+    get:
+      operationId: getTenantProviderFoundation
+      tags: [tenants]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        "200":
+          description: Only this tenant's allowed providers and assignments
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProviderFoundation"}
+  /tenants/{tenantId}/provider-assignments:
+    post:
+      operationId: createProviderAssignment
+      tags: [tenants]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProviderAssignmentInput"}
+      responses:
+        "201":
+          description: Super Admin assignment
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProviderAssignment"}
+  /tenants/{tenantId}/provider-assignments/{assignmentId}:
+    put:
+      operationId: updateProviderAssignment
+      tags: [tenants]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: assignmentId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProviderConfigurationInput"}
+      responses:
+        "200":
+          description: Validated non-secret configuration
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProviderAssignment"}
+    delete:
+      operationId: removeProviderAssignment
+      tags: [tenants]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: assignmentId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        "204":
+          description: Super Admin removal; policies referencing the assignment must be cleared first
+  /tenants/{tenantId}/provider-policies:
+    put:
+      operationId: saveProviderPolicy
+      tags: [tenants]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProviderPolicyInput"}
+      responses:
+        "200":
+          description: Future policy only, sandbox execution unchanged
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ProviderPolicy"}
+  /tenants/{tenantId}/provider-policies/{policyId}:
+    delete:
+      operationId: removeProviderPolicy
+      tags: [tenants]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: policyId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        "204": {description: Future policy removed}
   /platform-management:
     get:
       operationId: getPlatformManagement
@@ -951,6 +1075,117 @@ components:
         type: string
         format: uuid
   schemas:
+    ProviderSchemaField:
+      type: object
+      additionalProperties: false
+      required: [key, label, type, required]
+      properties:
+        key: {type: string, pattern: "^[a-zA-Z][a-zA-Z0-9_]{0,63}$"}
+        label: {type: string, minLength: 1, maxLength: 100}
+        type: {type: string, enum: [text, number, boolean, url, secret]}
+        required: {type: boolean}
+    ProviderDefinitionInput:
+      type: object
+      additionalProperties: false
+      required: [name, logoUrl, description, categories, services, capabilities, status, environments, credentialSchema, configurationSchema, access, entitlementKey, tenantConfigurable]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 120}
+        logoUrl: {type: [string, "null"], maxLength: 500}
+        description: {type: string, maxLength: 2000}
+        categories: {type: array, minItems: 1, maxItems: 20, items: {type: string, minLength: 1, maxLength: 80}}
+        services: {type: array, maxItems: 30, items: {type: string, minLength: 1, maxLength: 80}}
+        capabilities: {type: array, minItems: 1, maxItems: 30, items: {type: string, pattern: "^[a-z][a-z0-9_]{0,63}$"}}
+        status: {type: string, enum: [coming_soon, configuration_only, available, disabled]}
+        environments: {type: array, minItems: 1, maxItems: 3, items: {type: string, enum: [sandbox, test, live]}}
+        credentialSchema: {type: array, maxItems: 30, items: {$ref: "#/components/schemas/ProviderSchemaField"}}
+        configurationSchema: {type: array, maxItems: 30, items: {$ref: "#/components/schemas/ProviderSchemaField"}}
+        access: {type: string, enum: [platform_wide, entitlement, assigned]}
+        entitlementKey: {type: [string, "null"], maxLength: 100}
+        tenantConfigurable: {type: boolean}
+    ProviderDefinition:
+      allOf:
+        - {$ref: "#/components/schemas/ProviderDefinitionInput"}
+        - type: object
+          required: [id, createdAt, updatedAt, implementationStatus, connectionStatus, assignedTenants, credentialStorageAvailable]
+          properties:
+            id: {type: string, format: uuid}
+            createdAt: {type: string}
+            updatedAt: {type: string}
+            implementationStatus: {type: string, enum: [not_implemented]}
+            connectionStatus: {type: string, enum: [not_configured]}
+            assignedTenants: {type: integer}
+            credentialStorageAvailable: {type: boolean}
+    ProviderAssignmentInput:
+      type: object
+      additionalProperties: false
+      required: [providerId, capability, environment]
+      properties:
+        providerId: {type: string, format: uuid}
+        capability: {type: string, pattern: "^[a-z][a-z0-9_]{0,63}$"}
+        environment: {type: string, enum: [sandbox, test, live]}
+    ProviderConfigurationInput:
+      type: object
+      additionalProperties: false
+      required: [configuration]
+      properties:
+        configuration: {type: object, additionalProperties: {type: [string, number, boolean]}}
+    ProviderAssignment:
+      allOf:
+        - {$ref: "#/components/schemas/ProviderAssignmentInput"}
+        - {$ref: "#/components/schemas/ProviderConfigurationInput"}
+        - type: object
+          required: [id, tenantId, connectionStatus, credentialState, createdAt, updatedAt]
+          properties:
+            id: {type: string, format: uuid}
+            tenantId: {type: string, format: uuid}
+            connectionStatus: {type: string, enum: [not_configured, configured]}
+            credentialState: {type: string, enum: [not_configured]}
+            createdAt: {type: string}
+            updatedAt: {type: string}
+    ProviderPolicyInput:
+      type: object
+      additionalProperties: false
+      required: [scope, resourceId, capability, environment, executionMode, providerId, fallback, secondaryProviderId]
+      properties:
+        scope: {type: string, enum: [route, network]}
+        resourceId: {type: string, minLength: 1, maxLength: 100}
+        capability: {type: string, pattern: "^[a-z][a-z0-9_]{0,63}$"}
+        environment: {type: string, enum: [sandbox, test, live]}
+        executionMode: {type: string, enum: [sandbox_manual, provider]}
+        providerId: {type: [string, "null"], format: uuid}
+        fallback: {type: string, enum: [none, manual, secondary_provider]}
+        secondaryProviderId: {type: [string, "null"], format: uuid}
+    ProviderPolicy:
+      allOf:
+        - {$ref: "#/components/schemas/ProviderPolicyInput"}
+        - type: object
+          required: [id, tenantId, executionEnabled, updatedAt]
+          properties:
+            id: {type: string, format: uuid}
+            tenantId: {type: string, format: uuid}
+            executionEnabled: {type: boolean}
+            updatedAt: {type: string}
+    ProviderActivity:
+      type: object
+      required: [id, tenantId, action, summary, createdAt]
+      properties:
+        id: {type: string}
+        tenantId: {type: [string, "null"]}
+        action: {type: string}
+        summary: {type: string}
+        createdAt: {type: string}
+    ProviderFoundation:
+      type: object
+      required: [providers, assignments, policies, activity, categories, capabilities, credentialStorageAvailable, executionEnabled]
+      properties:
+        providers: {type: array, items: {$ref: "#/components/schemas/ProviderDefinition"}}
+        assignments: {type: array, items: {$ref: "#/components/schemas/ProviderAssignment"}}
+        policies: {type: array, items: {$ref: "#/components/schemas/ProviderPolicy"}}
+        activity: {type: array, items: {$ref: "#/components/schemas/ProviderActivity"}}
+        categories: {type: array, items: {type: string}}
+        capabilities: {type: array, items: {type: string}}
+        credentialStorageAvailable: {type: boolean}
+        executionEnabled: {type: boolean}
     PlatformCustomer:
       type: object
       required: [id, name, email, status, createdAt, tenantIds]

@@ -65,6 +65,14 @@ import type {
   PlatformOverview,
   ProductConfiguration,
   ProductModule,
+  ProviderAssignment,
+  ProviderAssignmentInput,
+  ProviderConfigurationInput,
+  ProviderDefinition,
+  ProviderDefinitionInput,
+  ProviderFoundation,
+  ProviderPolicy,
+  ProviderPolicyInput,
   PublicExchange,
   PublicSite,
   ResourceCreated,
@@ -119,6 +127,704 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetProviderFoundationUrl = () => {
+
+
+
+
+  return `/api/providers/foundation`
+}
+
+export const getProviderFoundation = async ( options?: Parameters<typeof customFetch>[1]): Promise<ProviderFoundation> => {
+
+  return customFetch<ProviderFoundation>(getGetProviderFoundationUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProviderFoundationQueryKey = () => {
+    return [
+    `/api/providers/foundation`
+    ] as const;
+    }
+
+
+export const getGetProviderFoundationQueryOptions = <TData = Awaited<ReturnType<typeof getProviderFoundation>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProviderFoundation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProviderFoundationQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProviderFoundation>>> = ({ signal }) => getProviderFoundation({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProviderFoundation>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetProviderFoundationQueryResult = NonNullable<Awaited<ReturnType<typeof getProviderFoundation>>>
+export type GetProviderFoundationQueryError = ErrorType<unknown>
+
+
+
+export function useGetProviderFoundation<TData = Awaited<ReturnType<typeof getProviderFoundation>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getProviderFoundation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetProviderFoundationQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateProviderDefinitionUrl = () => {
+
+
+
+
+  return `/api/providers/catalog`
+}
+
+export const createProviderDefinition = async (providerDefinitionInput: ProviderDefinitionInput, options?: Parameters<typeof customFetch>[1]): Promise<ProviderDefinition> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProviderDefinition>(getCreateProviderDefinitionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(providerDefinitionInput)
+  }
+);}
+
+
+
+
+
+export const getCreateProviderDefinitionMutationKey = () => ['createProviderDefinition'] as const;
+
+export const getCreateProviderDefinitionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProviderDefinition>>, TError,CreateProviderDefinitionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProviderDefinition>>, TError,CreateProviderDefinitionMutationVariables, TContext> => {
+
+const mutationKey = getCreateProviderDefinitionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProviderDefinition>>, CreateProviderDefinitionMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createProviderDefinition(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateProviderDefinitionMutationResult = NonNullable<Awaited<ReturnType<typeof createProviderDefinition>>>
+    export type CreateProviderDefinitionMutationBody = BodyType<ProviderDefinitionInput>
+    export type CreateProviderDefinitionMutationError = ErrorType<unknown>
+    export type CreateProviderDefinitionMutationVariables = {data: BodyType<ProviderDefinitionInput>}
+
+    export const useCreateProviderDefinition = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProviderDefinition>>, TError,CreateProviderDefinitionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createProviderDefinition>>,
+        TError,
+        CreateProviderDefinitionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateProviderDefinitionMutationOptions(options));
+    }
+
+export const getUpdateProviderDefinitionUrl = (providerId: string,) => {
+
+
+
+
+  return `/api/providers/catalog/${providerId}`
+}
+
+export const updateProviderDefinition = async (providerId: string,
+    providerDefinitionInput: ProviderDefinitionInput, options?: Parameters<typeof customFetch>[1]): Promise<ProviderDefinition> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProviderDefinition>(getUpdateProviderDefinitionUrl(providerId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(providerDefinitionInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateProviderDefinitionMutationKey = () => ['updateProviderDefinition'] as const;
+
+export const getUpdateProviderDefinitionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProviderDefinition>>, TError,UpdateProviderDefinitionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateProviderDefinition>>, TError,UpdateProviderDefinitionMutationVariables, TContext> => {
+
+const mutationKey = getUpdateProviderDefinitionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateProviderDefinition>>, UpdateProviderDefinitionMutationVariables> = (props) => {
+          const {providerId,data} = props ?? {};
+
+          return  updateProviderDefinition(providerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateProviderDefinitionMutationResult = NonNullable<Awaited<ReturnType<typeof updateProviderDefinition>>>
+    export type UpdateProviderDefinitionMutationBody = BodyType<ProviderDefinitionInput>
+    export type UpdateProviderDefinitionMutationError = ErrorType<unknown>
+    export type UpdateProviderDefinitionMutationVariables = {providerId: string;data: BodyType<ProviderDefinitionInput>}
+
+    export const useUpdateProviderDefinition = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProviderDefinition>>, TError,UpdateProviderDefinitionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateProviderDefinition>>,
+        TError,
+        UpdateProviderDefinitionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateProviderDefinitionMutationOptions(options));
+    }
+
+export const getGetTenantProviderFoundationUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/provider-foundation`
+}
+
+export const getTenantProviderFoundation = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<ProviderFoundation> => {
+
+  return customFetch<ProviderFoundation>(getGetTenantProviderFoundationUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTenantProviderFoundationQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/provider-foundation`
+    ] as const;
+    }
+
+
+export const getGetTenantProviderFoundationQueryOptions = <TData = Awaited<ReturnType<typeof getTenantProviderFoundation>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantProviderFoundation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantProviderFoundationQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantProviderFoundation>>> = ({ signal }) => getTenantProviderFoundation(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTenantProviderFoundation>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTenantProviderFoundationQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantProviderFoundation>>>
+export type GetTenantProviderFoundationQueryError = ErrorType<unknown>
+
+
+
+export function useGetTenantProviderFoundation<TData = Awaited<ReturnType<typeof getTenantProviderFoundation>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantProviderFoundation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTenantProviderFoundationQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateProviderAssignmentUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/provider-assignments`
+}
+
+export const createProviderAssignment = async (tenantId: string,
+    providerAssignmentInput: ProviderAssignmentInput, options?: Parameters<typeof customFetch>[1]): Promise<ProviderAssignment> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProviderAssignment>(getCreateProviderAssignmentUrl(tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(providerAssignmentInput)
+  }
+);}
+
+
+
+
+
+export const getCreateProviderAssignmentMutationKey = () => ['createProviderAssignment'] as const;
+
+export const getCreateProviderAssignmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProviderAssignment>>, TError,CreateProviderAssignmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProviderAssignment>>, TError,CreateProviderAssignmentMutationVariables, TContext> => {
+
+const mutationKey = getCreateProviderAssignmentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProviderAssignment>>, CreateProviderAssignmentMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  createProviderAssignment(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateProviderAssignmentMutationResult = NonNullable<Awaited<ReturnType<typeof createProviderAssignment>>>
+    export type CreateProviderAssignmentMutationBody = BodyType<ProviderAssignmentInput>
+    export type CreateProviderAssignmentMutationError = ErrorType<unknown>
+    export type CreateProviderAssignmentMutationVariables = {tenantId: string;data: BodyType<ProviderAssignmentInput>}
+
+    export const useCreateProviderAssignment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProviderAssignment>>, TError,CreateProviderAssignmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createProviderAssignment>>,
+        TError,
+        CreateProviderAssignmentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreateProviderAssignmentMutationOptions(options));
+    }
+
+export const getUpdateProviderAssignmentUrl = (tenantId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/provider-assignments/${assignmentId}`
+}
+
+export const updateProviderAssignment = async (tenantId: string,
+    assignmentId: string,
+    providerConfigurationInput: ProviderConfigurationInput, options?: Parameters<typeof customFetch>[1]): Promise<ProviderAssignment> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProviderAssignment>(getUpdateProviderAssignmentUrl(tenantId,assignmentId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(providerConfigurationInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateProviderAssignmentMutationKey = () => ['updateProviderAssignment'] as const;
+
+export const getUpdateProviderAssignmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProviderAssignment>>, TError,UpdateProviderAssignmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateProviderAssignment>>, TError,UpdateProviderAssignmentMutationVariables, TContext> => {
+
+const mutationKey = getUpdateProviderAssignmentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateProviderAssignment>>, UpdateProviderAssignmentMutationVariables> = (props) => {
+          const {tenantId,assignmentId,data} = props ?? {};
+
+          return  updateProviderAssignment(tenantId,assignmentId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateProviderAssignmentMutationResult = NonNullable<Awaited<ReturnType<typeof updateProviderAssignment>>>
+    export type UpdateProviderAssignmentMutationBody = BodyType<ProviderConfigurationInput>
+    export type UpdateProviderAssignmentMutationError = ErrorType<unknown>
+    export type UpdateProviderAssignmentMutationVariables = {tenantId: string;assignmentId: string;data: BodyType<ProviderConfigurationInput>}
+
+    export const useUpdateProviderAssignment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProviderAssignment>>, TError,UpdateProviderAssignmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateProviderAssignment>>,
+        TError,
+        UpdateProviderAssignmentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateProviderAssignmentMutationOptions(options));
+    }
+
+export const getRemoveProviderAssignmentUrl = (tenantId: string,
+    assignmentId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/provider-assignments/${assignmentId}`
+}
+
+export const removeProviderAssignment = async (tenantId: string,
+    assignmentId: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getRemoveProviderAssignmentUrl(tenantId,assignmentId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getRemoveProviderAssignmentMutationKey = () => ['removeProviderAssignment'] as const;
+
+export const getRemoveProviderAssignmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeProviderAssignment>>, TError,RemoveProviderAssignmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeProviderAssignment>>, TError,RemoveProviderAssignmentMutationVariables, TContext> => {
+
+const mutationKey = getRemoveProviderAssignmentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeProviderAssignment>>, RemoveProviderAssignmentMutationVariables> = (props) => {
+          const {tenantId,assignmentId} = props ?? {};
+
+          return  removeProviderAssignment(tenantId,assignmentId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveProviderAssignmentMutationResult = NonNullable<Awaited<ReturnType<typeof removeProviderAssignment>>>
+
+    export type RemoveProviderAssignmentMutationError = ErrorType<unknown>
+    export type RemoveProviderAssignmentMutationVariables = {tenantId: string;assignmentId: string}
+
+    export const useRemoveProviderAssignment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeProviderAssignment>>, TError,RemoveProviderAssignmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof removeProviderAssignment>>,
+        TError,
+        RemoveProviderAssignmentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRemoveProviderAssignmentMutationOptions(options));
+    }
+
+export const getSaveProviderPolicyUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/provider-policies`
+}
+
+export const saveProviderPolicy = async (tenantId: string,
+    providerPolicyInput: ProviderPolicyInput, options?: Parameters<typeof customFetch>[1]): Promise<ProviderPolicy> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ProviderPolicy>(getSaveProviderPolicyUrl(tenantId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(providerPolicyInput)
+  }
+);}
+
+
+
+
+
+export const getSaveProviderPolicyMutationKey = () => ['saveProviderPolicy'] as const;
+
+export const getSaveProviderPolicyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveProviderPolicy>>, TError,SaveProviderPolicyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveProviderPolicy>>, TError,SaveProviderPolicyMutationVariables, TContext> => {
+
+const mutationKey = getSaveProviderPolicyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveProviderPolicy>>, SaveProviderPolicyMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  saveProviderPolicy(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveProviderPolicyMutationResult = NonNullable<Awaited<ReturnType<typeof saveProviderPolicy>>>
+    export type SaveProviderPolicyMutationBody = BodyType<ProviderPolicyInput>
+    export type SaveProviderPolicyMutationError = ErrorType<unknown>
+    export type SaveProviderPolicyMutationVariables = {tenantId: string;data: BodyType<ProviderPolicyInput>}
+
+    export const useSaveProviderPolicy = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveProviderPolicy>>, TError,SaveProviderPolicyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveProviderPolicy>>,
+        TError,
+        SaveProviderPolicyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveProviderPolicyMutationOptions(options));
+    }
+
+export const getRemoveProviderPolicyUrl = (tenantId: string,
+    policyId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/provider-policies/${policyId}`
+}
+
+export const removeProviderPolicy = async (tenantId: string,
+    policyId: string, options?: Parameters<typeof customFetch>[1]): Promise<void> => {
+
+  return customFetch<void>(getRemoveProviderPolicyUrl(tenantId,policyId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getRemoveProviderPolicyMutationKey = () => ['removeProviderPolicy'] as const;
+
+export const getRemoveProviderPolicyMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeProviderPolicy>>, TError,RemoveProviderPolicyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeProviderPolicy>>, TError,RemoveProviderPolicyMutationVariables, TContext> => {
+
+const mutationKey = getRemoveProviderPolicyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeProviderPolicy>>, RemoveProviderPolicyMutationVariables> = (props) => {
+          const {tenantId,policyId} = props ?? {};
+
+          return  removeProviderPolicy(tenantId,policyId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveProviderPolicyMutationResult = NonNullable<Awaited<ReturnType<typeof removeProviderPolicy>>>
+
+    export type RemoveProviderPolicyMutationError = ErrorType<unknown>
+    export type RemoveProviderPolicyMutationVariables = {tenantId: string;policyId: string}
+
+    export const useRemoveProviderPolicy = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeProviderPolicy>>, TError,RemoveProviderPolicyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof removeProviderPolicy>>,
+        TError,
+        RemoveProviderPolicyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRemoveProviderPolicyMutationOptions(options));
+    }
 
 export const getGetPlatformManagementUrl = () => {
 

@@ -14,7 +14,7 @@ import { OrdersPanel } from '@/components/exchange/orders-panel';
 import { AssetsPanel, NetworksPanel } from '@/components/exchange/catalog-sections';
 import { RoutesPanel, PaymentMethodsPanel, PricingPanel } from '@/components/exchange/route-sections';
 import { SettingsPanel } from '@/components/exchange/settings-panel';
-import { ProvidersPanel } from '@/components/exchange/providers-panel';
+import { TenantProviderPanel } from '@/components/providers/tenant-panel';
 import { CustomersPanel } from '@/components/exchange/customers-panel';
 import { StaffPanel } from '@/components/exchange/staff-panel';
 import { AuditPanel } from '@/components/exchange/audit-panel';
@@ -23,7 +23,7 @@ import { PreviewIntegrations } from '@/components/exchange/preview-integrations'
 import { useConsoleNavigation } from '@/components/app/console-frame';
 
 const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
-const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'providers', 'settings'];
+const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'settings'];
 
 export default function Exchange() {
   const setNavigation = useConsoleNavigation();
@@ -57,7 +57,7 @@ export default function Exchange() {
   else if (sec === '') body = <DashboardPanel tenantId={id} />;
   else if (sec === 'orders') body = <OrdersPanel key={orderId ?? 'list'} tenantId={id} orderId={orderId} canEdit={!cfgLocked} />;
   else if (sec === 'customers') body = <CustomersPanel tenantId={id} />;
-  else if (sec === 'providers') body = <ProvidersPanel d={d} locked={cfgLocked} />;
+  else if (sec === 'providers') body = <TenantProviderPanel tenantId={id} locked={cfgLocked} />;
   else if (sec === 'assets') body = <AssetsPanel tenant={t} d={d} locked={cfgLocked} />;
   else if (sec === 'networks') body = <NetworksPanel tenant={t} d={d} locked={cfgLocked} />;
   else if (sec === 'routes') body = <RoutesPanel d={d} locked={cfgLocked} />;
