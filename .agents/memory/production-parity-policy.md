@@ -9,6 +9,21 @@ Use CURRENT Development as the source of truth when comparing or synchronizing t
 
 **How to apply:** Report confirmed differences and the exact synchronization scope before making changes. Preserve the current Development design and tenant/authentication boundaries. Do not treat a historical seed or checkpoint as the authoritative configuration.
 
+Build/startup success is not proof of functional Production equivalence or
+release readiness. Verify the live configuration dependencies, existing owner
+authorization and intentionally environment-restricted features separately.
+If access or inspection restrictions prevent verification, mark it unverified,
+not passed.
+
+**Why:** A build/startup-based pre-publish verdict was followed by a live empty
+catalog and nonfunctional demos; code publication alone did not establish
+Production functionality.
+
+**How to apply:** Separate source/build readiness from live functional readiness
+in release reports. Identify required global configuration and demo behavior
+before recommending publication, without automatically importing Development
+data or weakening authentication.
+
 Production synchronization requires explicit approval of a row-level inclusion/exclusion plan. Exclude disposable users, temporary tenants, simulated orders, test history, sessions, fixtures and credentials. Do not enable Production Live Demo authentication or connect the homepage's presentation-only widget as part of synchronization.
 
 **Why:** The user explicitly separated legitimate configuration transfer from demonstration data and deferred both Live Demo and homepage-widget behavior.
