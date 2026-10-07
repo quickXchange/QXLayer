@@ -1,4 +1,8 @@
+import { useState } from 'react';
+import { OwnerReviewProvider, useReviewGate } from '@/components/super-admin/review-gate';
 import { useParams, Link } from 'wouter';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TenantActivity } from '@/components/super-admin/audit-list';
 import { useGetTenant, getGetTenantQueryKey, getListWhiteLabelRequestsQueryKey, useActivateTenant } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
@@ -14,7 +18,23 @@ import { useInvalidateTenant } from '@/lib/invalidate';
 import { useToast } from '@/hooks/use-toast';
 import { WebsitePreviewAction } from '@/components/app/website-preview-action';
 
-export default function ClientDetail() {
+function Group({ title, note, open, children }: { title: string; note: string; open?: boolean; children: React.ReactNode }) {
+  return (
+    <details open={open} className="group rounded-md border bg-card/50" data-testid={`group-${title.toLowerCase().replace(/[^a-z]+/g, '-')}`}>
+      <summary className="flex cursor-pointer list-none items-baseline justify-between gap-3 px-5 py-4 marker:hidden [&::-webkit-details-marker]:hidden">
+        <span><span className="font-display text-xl">{title}</span><span className="block text-xs text-muted-foreground">{note}</span></span>
+        <span className="font-mono text-[11px] uppercase tracking-wider text-copper group-open:hidden">Expand</span>
+        <span className="hidden font-mono text-[11px] uppercase tracking-wider text-muted-foreground group-open:inline">Collapse</span>
+      </summary>
+      <div className="space-y-6 border-t p-4">{children}</div>
+    </details>
+  );
+}
+
+export default function ClientDetail() { return <OwnerReviewProvider><ClientDetailInner /></OwnerReviewProvider>; }
+
+function ClientDetailInner() {
+  const gate = useReviewGate();
   const qc = useQueryClient();
   const { id = '' } = useParams<{ id: string }>();
   const q = useGetTenant(id, { query: { enabled: !!id, queryKey: getGetTenantQueryKey(id) } });
@@ -23,6 +43,7 @@ export default function ClientDetail() {
   const { toast } = useToast();
   const act = useActivateTenant();
   const t = q.data;
+  const [tab, setTab] = useState(() => { const v = new URLSearchParams(window.location.search).get('tab'); return ['account', 'config', 'plans', 'entitlements', 'activity'].includes(v ?? '') ? v! : 'account'; });
   const subQ = useSubscription(id);
   const sub = subQ.data;
   const isSuper = can.role === 'super_admin';
@@ -44,7 +65,7 @@ export default function ClientDetail() {
             <StatusBadge status={t.status} />
             {can.editTenant && t.status === 'draft' && !suspended && (
               <Button data-testid="button-activate" disabled={!t.configurationComplete || act.isPending}
-                onClick={() => act.mutate({ tenantId: t.id }, { onSuccess: () => { inv(t.id); qc.invalidateQueries({ queryKey: getListWhiteLabelRequestsQueryKey() }); toast({ title: 'Activated in sandbox', description: 'If this was linked to an approved standard order, it was delivered to the customer automatically. Custom designs require the order to be marked Ready.' }); }, onError: (e) => toast({ title: 'Activation or delivery failed', description: (e as Error).message, variant: 'destructive' }) })}>
+                onClick={() => gate('Activate sandbox', () => act.mutate({ tenantId: t.id }, { onSuccess: () => { inv(t.id); qc.invalidateQueries({ queryKey: getListWhiteLabelRequestsQueryKey() }); toast({ title: 'Activated in sandbox', description: 'If this was linked to an approved standard order, it was delivered to the customer automatically. Custom designs require the order to be marked Ready.' }); }, onError: (e) => toast({ title: 'Activation or delivery failed', description: (e as Error).message, variant: 'destructive' }) }), [['Project', t.brandName], ['Configuration', 'complete'], ['Effect', 'Sandbox activation; a linked approved standard order is delivered automatically']])}>
                 {act.isPending ? 'Activating' : 'Activate sandbox'}
               </Button>)}
           </PageHeader>
@@ -77,21 +98,32 @@ export default function ClientDetail() {
           {unassigned && !suspended && <p className="mb-6 text-sm text-muted-foreground">No plan is assigned, so configuration is read-only.</p>}
           {suspended && <p className="mb-6 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. {isSuper ? 'All configuration is read-only; only subscription controls stay editable. Unsuspend to resume changes.' : 'Configuration is read-only until your operator lifts the suspension.'}</p>}
           {!can.editTenant && <p className="mb-6 text-sm text-muted-foreground">{can.permissions.length ? 'You can edit only the sections granted to you; everything else is read-only.' : 'Your role has read-only access to this client.'}</p>}
-          <div className="space-y-6">
-            <SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} />
-            <BrandSection tenant={t} readOnly={roFor('branding.manage')} />
-            <DomainSection tenant={t} readOnly={roFor('domains.manage')} />
-            <DomainOwnershipSection tenant={t} readOnly={roFor('domains.manage')} />
-            {(isSuper || mods.length > 0) && <ModulesSection tenant={t} readOnly />}
-            {showFn && <AssetsSection tenant={t} readOnly={roFor('configuration.manage')} />}
-            {showFn && <ConfigSection tenant={t} readOnly={roFor('configuration.manage')} />}
-            <PreviewIntegrations tenantId={t.id} sub={sub} subLoading={subQ.isLoading} suspended={!!suspended} />
-            <ProductSettingsSection tenantId={t.id} sub={sub} readOnly={roFor('configuration.manage')} showAll={isSuper} />
-            {(isSuper || F.website === true) && <WebsiteSection tenant={t} readOnly={roFor('branding.manage')} />}
-            {(isSuper || can.role === 'client_admin') && <AdministratorsSection tenantId={t.id} canManage={isSuper} />}
-            <StaffAccessSection tenantId={t.id} canEdit={can.manageStaffGrants && !suspended} />
-            <ResourcesSection tenantId={t.id} allowed={allowed} readOnly={roFor('resources.manage')} staffReadOnly={!can.manageStaffGrants} showAll={isSuper} />
-          </div>
+          <Tabs value={tab} onValueChange={setTab}>
+            <div className="mb-5 overflow-x-auto"><TabsList className="w-max">
+              {[['account', 'Account'], ['config', 'White Label config'], ['plans', 'Plans & Add-ons'], ['entitlements', 'Entitlements & Overrides'], ['activity', 'Activity']].map(([v, l]) => <TabsTrigger key={v} value={v} data-testid={`tab-client-${v}`}>{l}</TabsTrigger>)}
+            </TabsList></div>
+            <TabsContent value="account" className="space-y-6">
+              {(isSuper || can.role === 'client_admin') && <AdministratorsSection tenantId={t.id} canManage={isSuper} />}
+              <StaffAccessSection tenantId={t.id} canEdit={can.manageStaffGrants && !suspended} />
+              <SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} show={['suspension']} />
+            </TabsContent>
+            <TabsContent value="config" className="space-y-3">
+              <Group open title="Branding" note="Name, logo, colors, language"><BrandSection tenant={t} readOnly={roFor('branding.manage')} /></Group>
+              <Group title="Domain" note="Hostname and ownership verification"><DomainSection tenant={t} readOnly={roFor('domains.manage')} /><DomainOwnershipSection tenant={t} readOnly={roFor('domains.manage')} /></Group>
+              <Group title="Module and asset setup" note="Modules, assets, networks, product settings">
+                {(isSuper || mods.length > 0) && <ModulesSection tenant={t} readOnly />}
+                {showFn && <AssetsSection tenant={t} readOnly={roFor('configuration.manage')} />}
+                {showFn && <ConfigSection tenant={t} readOnly={roFor('configuration.manage')} />}
+                <ProductSettingsSection tenantId={t.id} sub={sub} readOnly={roFor('configuration.manage')} showAll={isSuper} />
+              </Group>
+              <Group title="Advanced previews" note="Optional API, webhook and RPC previews"><PreviewIntegrations tenantId={t.id} sub={sub} subLoading={subQ.isLoading} suspended={!!suspended} reviewSave={(apply, settings) => gate('Save optional preview settings (no live connections)', apply, [['Project', t.brandName], ['Proposed settings', <pre className="max-h-48 overflow-auto whitespace-pre-wrap text-left text-xs">{JSON.stringify(settings, null, 2)}</pre>]])} /></Group>
+              {(isSuper || F.website === true) && <Group title="Website" note="Customer-facing website settings"><WebsiteSection tenant={t} readOnly={roFor('branding.manage')} /></Group>}
+              <Group title="Resources" note="Staff, API keys, webhooks, payment methods"><ResourcesSection tenantId={t.id} allowed={allowed} readOnly={roFor('resources.manage')} staffReadOnly={!can.manageStaffGrants} showAll={isSuper} /></Group>
+            </TabsContent>
+            <TabsContent value="plans"><SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} show={['plan', 'addons']} /></TabsContent>
+            <TabsContent value="entitlements"><SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} show={['capabilities', 'overrides']} /></TabsContent>
+            <TabsContent value="activity"><TenantActivity tenantId={t.id} /></TabsContent>
+          </Tabs>
         </>)}
     </>
   );

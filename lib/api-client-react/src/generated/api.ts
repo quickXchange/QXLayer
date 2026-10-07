@@ -61,6 +61,7 @@ import type {
   Plan,
   PlanInput,
   PlanStatusInput,
+  PlatformManagement,
   PlatformOverview,
   ProductConfiguration,
   ProductModule,
@@ -118,6 +119,83 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetPlatformManagementUrl = () => {
+
+
+
+
+  return `/api/platform-management`
+}
+
+/**
+ * @summary Read-only platform owner account, project, usage and audit directory
+ */
+export const getPlatformManagement = async ( options?: Parameters<typeof customFetch>[1]): Promise<PlatformManagement> => {
+
+  return customFetch<PlatformManagement>(getGetPlatformManagementUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlatformManagementQueryKey = () => {
+    return [
+    `/api/platform-management`
+    ] as const;
+    }
+
+
+export const getGetPlatformManagementQueryOptions = <TData = Awaited<ReturnType<typeof getPlatformManagement>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlatformManagement>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlatformManagementQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlatformManagement>>> = ({ signal }) => getPlatformManagement({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlatformManagement>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPlatformManagementQueryResult = NonNullable<Awaited<ReturnType<typeof getPlatformManagement>>>
+export type GetPlatformManagementQueryError = ErrorType<void>
+
+
+/**
+ * @summary Read-only platform owner account, project, usage and audit directory
+ */
+
+export function useGetPlatformManagement<TData = Awaited<ReturnType<typeof getPlatformManagement>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlatformManagement>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPlatformManagementQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getGetTenantWebsitePreviewUrl = (tenantId: string,) => {
 

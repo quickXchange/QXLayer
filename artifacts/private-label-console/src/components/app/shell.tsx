@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useClerk } from '@clerk/react';
-import { LayoutGrid, Users, Boxes, ScrollText, LogOut } from 'lucide-react';
+import { LayoutGrid, Users, Boxes, ScrollText, LogOut, Globe2, Puzzle, Plug, Workflow, Eye } from 'lucide-react';
 import { useHealthCheck } from '@workspace/api-client-react';
 import { usePrincipal } from '@/lib/principal';
 import { roleLabel } from '@/lib/format';
@@ -11,14 +11,17 @@ import { ConsoleFrame, type ConsoleNavItem } from '@/components/app/console-fram
 
 const nav = [
   { href: '/admin', label: 'Overview', icon: LayoutGrid },
-  { href: '/clients', label: 'Clients', icon: Users },
-  { href: '/white-label-requests', label: 'White Label Orders', icon: ScrollText, op: true },
-  { href: '/plans', label: 'Plans', icon: Boxes, op: true },
-  { href: '/add-ons', label: 'Add-ons', icon: Boxes, op: true },
-  { href: '/landing-products', label: 'Landing', icon: LayoutGrid, op: true },
-  { href: '/catalog-preview', label: 'Preview', icon: LayoutGrid },
-  { href: '/modules', label: 'Modules', icon: Boxes },
-  { href: '/activity', label: 'Activity', icon: ScrollText },
+  { href: '/white-label-requests', label: 'White Label Orders', icon: ScrollText, op: true, group: 'White Labels' },
+  { href: '/white-labels', label: 'White Labels', icon: Globe2, op: true, group: 'White Labels' },
+  { href: '/clients', label: 'Clients', icon: Users, group: 'White Labels' },
+  { href: '/plans', label: 'Plans', icon: Boxes, op: true, group: 'Commercial' },
+  { href: '/add-ons', label: 'Add-ons', icon: Puzzle, op: true, group: 'Commercial' },
+  { href: '/modules', label: 'Modules', icon: Boxes, group: 'Platform' },
+  { href: '/providers', label: 'Providers', icon: Plug, op: true, group: 'Platform' },
+  { href: '/provisioning', label: 'Provisioning', icon: Workflow, op: true, group: 'System' },
+  { href: '/activity', label: 'Activity', icon: ScrollText, group: 'System' },
+  { href: '/landing-products', label: 'Landing', icon: LayoutGrid, op: true, group: 'Additional' },
+  { href: '/catalog-preview', label: 'Preview', icon: Eye, group: 'Additional' },
 ];
 
 export function Logo({ light }: { light?: boolean }) {
@@ -46,9 +49,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const p = usePrincipal();
   const { signOut } = useClerk();
-  const active = (h: string) => (h === '/admin' ? loc === h : loc.startsWith(h));
+  const active = (h: string) => (h === '/admin' ? loc === h : h === '/clients' ? loc.startsWith('/clients') || loc.startsWith('/customers') : loc.startsWith(h));
   const items: ConsoleNavItem[] = nav.filter((n) => !n.op || p.role === 'super_admin').map((n) => ({
-    key: n.href, href: n.href, label: n.label, icon: n.icon, testId: `link-nav-${n.label.toLowerCase().replace(/ /g, '')}`, current: active(n.href),
+    key: n.href, href: n.href, label: n.label, icon: n.icon, testId: `link-nav-${n.label.toLowerCase().replace(/ /g, '')}`, current: active(n.href), group: n.group,
   }));
   return (
     <ConsoleFrame homeHref="/admin" navLabel="Administration navigation" items={items} maxWidth="max-w-6xl"

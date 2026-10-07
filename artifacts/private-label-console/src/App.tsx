@@ -30,6 +30,10 @@ import ClientDetail from '@/pages/client-detail';
 import Exchange from '@/pages/exchange';
 import Modules from '@/pages/modules';
 import Activity from '@/pages/activity';
+import WhiteLabels from '@/pages/white-labels';
+import Provisioning from '@/pages/provisioning';
+import Providers from '@/pages/providers';
+import CustomerDetail from '@/pages/customer-detail';
 import Plans from '@/pages/plans';
 import PlanDetail from '@/pages/plan-detail';
 import Addons from '@/pages/addons';
@@ -160,7 +164,7 @@ function DeliveredOnly({ children }: { children: ReactNode }) {
 const guard = (C: () => ReactNode) => () => <Protected><SuperOnly><C /></SuperOnly></Protected>;
 const open = (C: () => ReactNode) => () => <Protected><C /></Protected>;
 const rDelivered = () => <Protected><DeliveredOnly><Exchange /></DeliveredOnly></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rProv = guard(Provisioning), rProviders = guard(Providers), rCust = guard(CustomerDetail);
 const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile), rOrdD = open(AccountOrderDetail);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -199,6 +203,10 @@ function ClerkProviderWithRoutes() {
               <Route path="/account/profile/*?" component={rProf} />
               <Route path="/white-label-requests" component={rWL} />
               <Route path="/white-label-requests/:orderId" component={rWLO} />
+              <Route path="/white-labels" component={rWLs} />
+              <Route path="/provisioning" component={rProv} />
+              <Route path="/providers" component={rProviders} />
+              <Route path="/customers/:customerId" component={rCust} />
               <Route path="/admin" component={rAdmin} />
               <Route path="/clients" component={rClients} />
               <Route path="/clients/new" component={rNew} />

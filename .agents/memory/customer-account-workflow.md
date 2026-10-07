@@ -44,3 +44,9 @@ The platform creator's existing account has permanent Platform Owner/Super Admin
 **Why:** The user explicitly requested permanent ownership on their existing account, with no replacement account, password change, role mocks or temporary permissions.
 
 **How to apply:** Never remove the owner's grant during test cleanup. Cleanup may remove only disposable grants introduced by that test. Confirm the exact existing identity before ownership changes; do not guess from recently created accounts or use a generated test identity as the owner.
+
+The owner-facing Clients section is customer-account management, not a tenant/project directory. White Labels is the separate project-management section.
+
+**Why:** The user requires actual customer-focused Clients and truthful customer metrics; tenant count must not be presented as customer count.
+
+**How to apply:** Keep account and project concepts separate when extending owner management. An account can exist without an order or project, and historical linked identifiers are not proof of a current registered account.

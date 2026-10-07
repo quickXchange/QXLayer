@@ -17,6 +17,22 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /platform-management:
+    get:
+      operationId: getPlatformManagement
+      tags: [platform]
+      summary: Read-only platform owner account, project, usage and audit directory
+      responses:
+        "200":
+          description: Management data; unavailable identity directory is explicit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformManagement"
+        "401":
+          description: Sign-in required
+        "403":
+          description: Super administrator required
   /tenants/{tenantId}/website-preview:
     get:
       operationId: getTenantWebsitePreview
@@ -935,6 +951,77 @@ components:
         type: string
         format: uuid
   schemas:
+    PlatformCustomer:
+      type: object
+      required: [id, name, email, status, createdAt, tenantIds]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: [string, "null"] }
+        status: { type: string }
+        createdAt: { type: [string, "null"] }
+        tenantIds:
+          type: array
+          items: { type: string }
+    PlatformProject:
+      type: object
+      required: [tenantId, customerIds, planId, planName, addonIds, logoUrl, updatedAt]
+      properties:
+        tenantId: { type: string }
+        customerIds:
+          type: array
+          items: { type: string }
+        planId: { type: [string, "null"] }
+        planName: { type: [string, "null"] }
+        addonIds:
+          type: array
+          items: { type: string }
+        logoUrl: { type: [string, "null"] }
+        updatedAt: { type: string }
+    PlatformAudit:
+      type: object
+      required: [id, tenantId, actorId, eventType, description, resource, result, createdAt]
+      properties:
+        id: { type: string }
+        tenantId: { type: [string, "null"] }
+        actorId: { type: string }
+        eventType: { type: string }
+        description: { type: string }
+        resource: { type: [string, "null"] }
+        result: { type: [string, "null"] }
+        createdAt: { type: string }
+    PlatformProvider:
+      type: object
+      required: [id, name, category, capabilities, status, logoUrl, implemented]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        category: { type: string }
+        capabilities:
+          type: array
+          items: { type: string }
+        status: { type: string }
+        logoUrl: { type: [string, "null"] }
+        implemented: { type: boolean }
+    PlatformManagement:
+      type: object
+      required: [customers, customerTotal, projects, audit, providers, directoryAvailable, directoryError]
+      properties:
+        customerTotal: { type: [integer, "null"] }
+        customers:
+          type: array
+          items: { $ref: "#/components/schemas/PlatformCustomer" }
+        projects:
+          type: array
+          items: { $ref: "#/components/schemas/PlatformProject" }
+        audit:
+          type: array
+          items: { $ref: "#/components/schemas/PlatformAudit" }
+        providers:
+          type: array
+          items: { $ref: "#/components/schemas/PlatformProvider" }
+        directoryAvailable: { type: boolean }
+        directoryError: { type: [string, "null"] }
     WebsitePreview:
       type: object
       required: [url, expiresAt]

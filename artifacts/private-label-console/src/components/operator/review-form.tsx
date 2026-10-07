@@ -4,19 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ErrorState, ListSkeleton } from '@/components/app/bits';
-import { TERMINAL, errMsg, statusText, type WlOrder } from '@/lib/wl';
+import { TERMINAL, errMsg, statusText, cash, type WlOrder } from '@/lib/wl';
+import { ReviewDialog } from '@/components/super-admin/kit';
+import { validTargets } from '@/components/super-admin/lifecycle';
+import { useToast } from '@/hooks/use-toast';
 
-const MANUAL = ['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready'];
 const price = /^\d{1,12}(\.\d{1,2})?$/;
 const sel = 'h-10 w-full rounded-md border bg-background px-2 text-sm';
 
 export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
   const review = useReviewWhiteLabelRequest(); const plans = useListPlans(); const addons = useListAddons();
+  const { toast } = useToast();
   const [status, setStatus] = useState<string>(o.status);
   const [m, setM] = useState(o.monthlyPrice ?? ''); const [s, setS] = useState(o.setupPrice ?? ''); const [cur, setCur] = useState(o.currency ?? 'USD');
   const [cust, setCust] = useState(o.customizationPrice ?? ''); const [dec, setDec] = useState<'pending' | 'approved' | 'rejected'>(o.customDesignDecision ?? 'pending');
   const [pid, setPid] = useState(o.approvedPlan?.id ?? o.requestedPlan?.id ?? ''); const [aids, setAids] = useState<string[]>((o.approvedAddons ?? o.requestedAddons ?? []).map((a) => a.id));
   const [err, setErr] = useState<string | null>(null);
+  const [pendingSt, setPendingSt] = useState<string | null>(null);
   const ro = TERMINAL.includes(o.status); const custom = o.design?.type === 'custom';
   const curRef = useRef(cur); curRef.current = cur;
   const okP = (v: string) => v === '' || price.test(v);
@@ -28,7 +32,10 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
     setErr(null);
     const need = st === 'approved' && !canApprove;
     if (need) { setErr('Approval needs an Exchange plan, recurring and setup prices, and—for custom designs—an approved decision and customization price.'); return; }
-    review.mutate({ requestId: o.id, data: { status: st as WhiteLabelStatus, monthlyPrice: m === '' ? null : m, setupPrice: s === '' ? null : s, currency: cur.toUpperCase(), operatorNote: '', customizationPrice: cust === '' ? null : cust, approvedPlanId: pid || null, approvedAddonIds: aids, customDesignDecision: dec } }, { onSuccess: onDone, onError: (e) => setErr(errMsg(e)) });
+    setPendingSt(st);
+  };
+  const apply = (st: string) => {
+    review.mutate({ requestId: o.id, data: { status: st as WhiteLabelStatus, monthlyPrice: m === '' ? null : m, setupPrice: s === '' ? null : s, currency: cur.toUpperCase(), operatorNote: '', customizationPrice: cust === '' ? null : cust, approvedPlanId: pid || null, approvedAddonIds: aids, customDesignDecision: dec } }, { onSuccess: () => { setPendingSt(null); toast({ title: 'Order review saved' }); onDone(); }, onError: (e) => { setErr(errMsg(e)); toast({ title: 'Review failed', description: errMsg(e), variant: 'destructive' }); } });
   };
   if (ro) return <p className="text-sm text-muted-foreground">This order is {statusText(o.status)}. Status and prices are read-only; notes can still be added.</p>;
   if (plans.isLoading || addons.isLoading) return <div role="status" aria-label="Loading review options"><ListSkeleton rows={3} /></div>;
@@ -36,7 +43,7 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
   return (
     <form onSubmit={(e) => { e.preventDefault(); save(status); }} className="space-y-4">
       <div className="grid gap-x-5 gap-y-4 sm:grid-cols-2 [&>label]:block [&>label]:min-w-0 [&>label]:space-y-1.5 [&_select]:w-full">
-        <label className="text-sm md:col-span-2">Status<select data-testid="select-status" className={sel} value={status} onChange={(e) => setStatus(e.target.value)}>{MANUAL.map((x) => <option key={x} value={x}>{statusText(x)}</option>)}</select></label>
+        <label className="text-sm md:col-span-2">Status<select data-testid="select-status" className={sel} value={status} onChange={(e) => setStatus(e.target.value)}>{[o.status, ...validTargets(o.status)].map((x) => <option key={x} value={x}>{statusText(x)}</option>)}</select></label>
         <label className="text-sm">Currency<Input data-testid="input-currency" value={cur} maxLength={3} onChange={(e) => setCur(e.target.value.toUpperCase())} /></label>
          <label className="text-sm">Recurring / {o.billingPeriod === 'yearly' ? 'year' : 'month'}<Input data-testid="input-monthly" inputMode="decimal" value={m} onChange={(e) => setM(e.target.value)} placeholder="0.00" /></label>
          <label className="text-sm">Setup fee<Input data-testid="input-setup" inputMode="decimal" value={s} onChange={(e) => setS(e.target.value)} placeholder="0.00" /></label>
@@ -50,10 +57,13 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
       {(err || formErr) && <p role="alert" data-testid="text-error" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">{err ?? formErr}</p>}
       <div className="flex flex-wrap gap-2">
         <Button type="submit" data-testid="button-save-review" disabled={!!formErr || review.isPending || (status === 'approved' && !canApprove)}>Save review, pricing and status</Button>
-        <Button type="button" variant="secondary" data-testid="button-approve" disabled={!!formErr || !canApprove || review.isPending} onClick={() => { setStatus('approved'); save('approved'); }}>Approve</Button>
-        <Button type="button" variant="outline" data-testid="button-reject" disabled={!!formErr || review.isPending} onClick={() => { if (window.confirm('Reject this order?')) { setStatus('rejected'); save('rejected'); } }}>Reject</Button>
+        {validTargets(o.status).includes('approved') && <Button type="button" variant="secondary" data-testid="button-approve" disabled={!!formErr || !canApprove || review.isPending} onClick={() => { setStatus('approved'); save('approved'); }}>Approve</Button>}
+        {validTargets(o.status).includes('rejected') && <Button type="button" variant="outline" data-testid="button-reject" disabled={!!formErr || review.isPending} onClick={() => { setStatus('rejected'); save('rejected'); }}>Reject</Button>}
       </div>
       <p className="text-xs text-muted-foreground">Approval creates a linked sandbox draft. Finish its Exchange setup and activate it to deliver automatically. Custom designs also need to be marked Ready; approval alone does not create the design or grant customer access.</p>
+      <ReviewDialog open={!!pendingSt} onClose={() => setPendingSt(null)} title="order review" pending={review.isPending} error={err} destructive={pendingSt === 'rejected'}
+        applyLabel="Confirm and apply" onApply={() => pendingSt && apply(pendingSt)}
+        rows={[['Status', `${statusText(o.status)} to ${statusText(pendingSt ?? status)}`], ['Plan', (plans.data ?? []).find((p) => p.id === pid)?.name ?? 'None'], ['Add-ons', aids.length ? String(aids.length) : 'None'], ['Recurring', cash(m, cur)], ['Setup fee', cash(s, cur)], ['Customization', cash(cust, cur)]]} />
     </form>
   );
 }

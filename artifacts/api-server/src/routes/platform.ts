@@ -4,9 +4,15 @@ import { GetCurrentPrincipalResponse, GetPlatformOverviewResponse, ListPlatformA
 import { requireAuthentication, principalFrom } from "../middlewares/authentication";
 import { contextFor, type Principal } from "../modules/authentication/service";
 import { listTenants } from "../modules/tenants/service";
+import { GetPlatformManagementResponse } from "@workspace/api-zod";
+import { platformManagement } from "../modules/platform/management";
 
 const router = Router();
 router.use(requireAuthentication);
+router.get("/platform-management", async (_req, res): Promise<void> => {
+  res.setHeader("Cache-Control", "private, no-store");
+  res.json(GetPlatformManagementResponse.parse(await platformManagement(principalFrom(res))));
+});
 
 export async function activity(principal: Principal) {
   const query = async (tenantId?: string) => withDatabase(contextFor(principal, tenantId), async (client) => {

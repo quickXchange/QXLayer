@@ -1,25 +1,40 @@
-import { Link } from 'wouter';
+import { useMemo, useState } from 'react';
 import { useListWhiteLabelRequests, getListWhiteLabelRequestsQueryKey } from '@workspace/api-client-react';
-import { PageHeader, ErrorState, EmptyState, ListSkeleton } from '@/components/app/bits';
+import { PageHeader, ErrorState, ListSkeleton } from '@/components/app/bits';
 import { OrderStatus } from '@/components/customer/order-view';
-import { orderRef } from '@/lib/wl';
+import { Chips, DataList, Pager, SearchBox, usePaged, type Col } from '@/components/super-admin/kit';
+import { ALL_STATUSES } from '@/components/super-admin/lifecycle';
+import { orderRef, statusText, cash, type WlOrder } from '@/lib/wl';
+import { ago } from '@/lib/format';
 
 export default function WhiteLabelRequests() {
   const q = useListWhiteLabelRequests({ query: { queryKey: getListWhiteLabelRequestsQueryKey(), refetchInterval: 10000, refetchOnWindowFocus: true } });
-  const rows = q.data ?? [];
+  const [s, setS] = useState(''); const [f, setF] = useState('all');
+  const all = q.data ?? [];
+  const list = useMemo(() => {
+    const k = s.trim().toLowerCase();
+    return all.filter((o) => (f === 'all' || o.status === f) && (!k || [orderRef(o), o.projectName, o.brandName, o.companyName, o.customerUserId, o.preferredDomain, o.websiteName].some((v) => (v ?? '').toLowerCase().includes(k))));
+  }, [all, s, f]);
+  const pg = usePaged(list, `${s}|${f}`);
+  const cols: Col<WlOrder>[] = [
+    { key: 'p', header: 'Project', primary: true, cell: (o) => <span><span className="block font-display text-xl">{o.projectName}</span><span className="block text-xs text-muted-foreground">{o.brandName}{o.companyName ? ` / ${o.companyName}` : ''}</span></span> },
+    { key: 'r', header: 'Reference', cell: (o) => <span className="font-mono text-xs text-copper">{orderRef(o)}</span> },
+    { key: 'c', header: 'Customer', cell: (o) => <span className="font-mono text-xs">{o.customerUserId}</span> },
+    { key: 'pl', header: 'Plan', cell: (o) => (o.approvedPlan ?? o.requestedPlan)?.name ?? 'None' },
+    { key: 'pr', header: 'Quote', cell: (o) => cash(o.monthlyPrice, o.currency) },
+    { key: 's', header: 'Status', cell: (o) => <OrderStatus status={o.status} /> },
+    { key: 'u', header: 'Updated', cell: (o) => <span className="text-xs text-muted-foreground">{ago(o.updatedAt)}</span> },
+  ];
   return (
     <>
-      <PageHeader eyebrow="Operator" title="White Label Orders" />
-      {q.isLoading ? <ListSkeleton /> : q.isError ? <ErrorState what="the order queue" onRetry={() => q.refetch()} /> : rows.length === 0 ? <EmptyState title="Queue is empty" body="Customer Exchange orders appear here." /> : (
-        <div className="divide-y rounded-md border bg-card">{rows.map((x) => (
-          <Link key={x.id} href={`/white-label-requests/${x.id}`} data-testid={`row-request-${x.id}`} className="grid gap-2 p-4 transition-colors hover:bg-muted/40 md:grid-cols-[120px_1.5fr_1fr_110px_130px_110px] md:items-center">
-            <span className="font-mono text-xs text-copper">{orderRef(x)}</span>
-            <span className="min-w-0"><span className="font-display block truncate text-xl">{x.projectName}</span><span className="block truncate text-xs text-muted-foreground">{x.brandName}{x.companyName ? ` · ${x.companyName}` : ''}</span></span>
-            <span className="min-w-0 truncate text-xs text-muted-foreground" title={x.preferredDomain ?? undefined}>{x.preferredDomain || 'No preferred domain'}</span>
-            <span className="text-xs capitalize">{x.design?.type ?? 'standard'}</span>
-            <OrderStatus status={x.status} />
-            <span className="text-xs text-muted-foreground">{new Date(x.createdAt).toLocaleDateString()}</span>
-          </Link>))}</div>)}
+      <PageHeader eyebrow="White Labels" title="White Label Orders" />
+      {q.isLoading ? <ListSkeleton /> : q.isError ? <ErrorState what="the order queue" onRetry={() => q.refetch()} /> : (
+        <div className="space-y-4">
+          <SearchBox id="orders" value={s} onChange={setS} placeholder="Search reference, project, brand, customer, domain" />
+          <Chips id="orders" value={f} onChange={setF} options={[['all', `All (${all.length})`], ...ALL_STATUSES.map((x): [string, string] => [x, `${statusText(x)} (${all.filter((o) => o.status === x).length})`])]} />
+          <DataList id="request" rows={pg.rows} cols={cols} rowKey={(o) => o.id} href={(o) => `/white-label-requests/${o.id}`} emptyTitle={all.length ? 'No matching orders' : 'Queue is empty'} emptyBody={all.length ? 'Adjust the search or status filter.' : 'Customer Exchange orders appear here.'} />
+          {list.length > 0 && <Pager id="orders" p={pg} />}
+        </div>)}
     </>
   );
 }

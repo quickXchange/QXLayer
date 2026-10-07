@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { useListProductRegistry, useRegisterProductModule, getListProductRegistryQueryKey, type ProductModule } from '@workspace/api-client-react';
+import { useMemo, useState } from 'react';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Chips, DataList, Pager, Pill, ReviewDialog, SearchBox, usePaged, type Col } from '@/components/super-admin/kit';
+import { useListProductRegistry, useListEntitlementDefinitions, useRegisterProductModule, getListProductRegistryQueryKey, type ProductModule } from '@workspace/api-client-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { PageHeader, ErrorState, ListSkeleton, SandboxNote } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
@@ -34,6 +36,7 @@ function RegisterForm({ taken, onDone }: { taken: string[]; onDone: () => void }
     : feats.some((f) => !KEY.test(f.key) || f.label.trim().length < 2) || new Set(fk).size !== fk.length ? 'Each feature needs a unique key and a label'
     : feats.some((f) => f.dependsOn.split(',').map((s) => s.trim()).filter(Boolean).some((d) => !KEY.test(d) || d === f.key)) ? 'Dependencies must be valid keys (this manifest or existing entitlements); the server rejects unknown ones'
     : lims.some((l) => !KEY.test(l.key) || l.label.trim().length < 2) || new Set(lims.map((l) => l.key)).size !== lims.length ? 'Each limit needs a unique key and a label' : '';
+  const [rev, setRev] = useState(false);
   const submit = () => {
     const data: ProductModule = {
       key, name: name.trim(), description: description.trim(), category: category.trim().toLowerCase().replace(/\s+/g, '_'),
@@ -42,12 +45,12 @@ function RegisterForm({ taken, onDone }: { taken: string[]; onDone: () => void }
       limits: lims.map((l) => ({ key: l.key, label: l.label.trim(), valueType: l.valueType })),
     };
     m.mutate({ data }, {
-      onSuccess: () => { qc.invalidateQueries({ queryKey: getListProductRegistryQueryKey() }); toast({ title: 'Manifest registered as deferred' }); onDone(); },
-      onError: (e) => toast({ title: 'Registration failed', description: (e as Error).message, variant: 'destructive' }),
+      onSuccess: () => { setRev(false); qc.invalidateQueries({ queryKey: getListProductRegistryQueryKey() }); toast({ title: 'Manifest registered as deferred' }); onDone(); },
+      onError: (e) => { setRev(false); toast({ title: 'Registration failed', description: (e as Error).message, variant: 'destructive' }); },
     });
   };
   return (
-    <form data-testid="form-register-product" className="mb-8 space-y-4 rounded-md border bg-card p-5" onSubmit={(e) => { e.preventDefault(); if (!err) submit(); }}>
+    <form data-testid="form-register-product" className="mb-8 space-y-4 rounded-md border bg-card p-5" onSubmit={(e) => { e.preventDefault(); if (!err) setRev(true); }}>
       <div><h2 className="font-display text-2xl">Register a product manifest</h2>
         <p className="text-sm text-muted-foreground">Registration records a manifest only. It does not implement a service: lifecycle is fixed to deferred and sandbox availability to off.</p></div>
       <div className="grid gap-4 md:grid-cols-2">
@@ -81,18 +84,32 @@ function RegisterForm({ taken, onDone }: { taken: string[]; onDone: () => void }
         <Button type="button" variant="ghost" onClick={onDone} data-testid="button-cancel-register">Cancel</Button>
         <Button data-testid="button-register-product" disabled={!!err || m.isPending}>{m.isPending ? 'Registering' : 'Register manifest'}</Button>
       </div>
+      <ReviewDialog open={rev} onClose={() => setRev(false)} title="register manifest" pending={m.isPending} onApply={submit}
+        rows={[['Key', key], ['Name', name.trim()], ['Lifecycle', 'Deferred, not in sandbox'], ['Features / limits', `${feats.length} / ${lims.length}`]]} />
     </form>
   );
 }
 
 export default function Modules() {
   const q = useListProductRegistry();
+  const defsQ = useListEntitlementDefinitions();
+  const defKeys = new Set((defsQ.data ?? []).map((d) => d.key));
   const can = useCan();
   const [open, setOpen] = useState(false);
-  const [filter, setFilter] = useState('all');
-  const [exp, setExp] = useState<string | null>(null);
+  const [filter, setFilter] = useState('all'); const [s, setS] = useState('');
+  const [sel, setSel] = useState<ProductModule | null>(null);
   const all = q.data ?? [];
-  const list = all.filter((m) => filter === 'all' || m.lifecycle === filter);
+  const list = useMemo(() => { const k = s.trim().toLowerCase(); return all.filter((m) => (filter === 'all' || m.lifecycle === filter) && (!k || [m.key, m.name, m.category, m.description].some((v) => v.toLowerCase().includes(k)))); }, [all, filter, s]);
+  const pg = usePaged(list, `${s}|${filter}`);
+  const avail = (m: ProductModule) => (m.sandboxAvailable ? 'Available in sandbox' : m.lifecycle === 'deferred' ? 'Planned, no service' : 'Not in sandbox');
+  const cols: Col<ProductModule>[] = [
+    { key: 'n', header: 'Product', primary: true, cell: (m) => <span><span className="block font-display text-xl">{m.name}</span><span className="font-mono text-xs text-muted-foreground">{m.key}</span></span> },
+    { key: 'c', header: 'Category', cell: (m) => label(m.category) },
+    { key: 'l', header: 'Lifecycle', cell: (m) => LIFECYCLE[m.lifecycle]?.name ?? m.lifecycle },
+    { key: 'a', header: 'Availability', cell: (m) => <Pill tone={m.sandboxAvailable ? 'ok' : 'warn'}>{avail(m)}</Pill> },
+    { key: 'f', header: 'Features / limits', cell: (m) => `${m.features.length} / ${m.limits.length}` },
+  ];
+  const Row = ({ k, v }: { k: string; v: string }) => <div className="flex justify-between gap-4 py-2 text-sm"><dt className="text-muted-foreground">{k}</dt><dd className="max-w-[60%] text-right">{v}</dd></div>;
   return (
     <>
       <PageHeader eyebrow="Registry" title="Products">
@@ -100,33 +117,34 @@ export default function Modules() {
       </PageHeader>
       <p className="mb-6 max-w-2xl text-sm text-muted-foreground">Every product the platform knows about, read from the registry. A manifest describes features and limits a client can be granted. It never implies a running service; the lifecycle shows what actually exists.</p>
       {open && can.editModules && <RegisterForm taken={all.map((m) => m.key)} onDone={() => setOpen(false)} />}
-      <div className="mb-4 flex flex-wrap gap-2 font-mono text-[11px] uppercase tracking-wider">
-        {['all', 'core_ready', 'sandbox_only', 'deferred'].map((f) => (
-          <button key={f} data-testid={`filter-${f}`} onClick={() => setFilter(f)} className={`rounded-full border px-3 py-1 ${filter === f ? 'border-copper text-copper' : 'text-muted-foreground hover:text-foreground'}`}>
-            {f === 'all' ? `All (${all.length})` : `${LIFECYCLE[f].name} (${all.filter((m) => m.lifecycle === f).length})`}</button>))}
-      </div>
-      {q.isLoading ? <ListSkeleton rows={6} /> : q.isError ? <ErrorState what="the product registry" onRetry={() => q.refetch()} /> : list.length === 0 ? (
-        <p className="rounded-md border border-dashed p-6 text-sm text-muted-foreground" data-testid="text-registry-empty">No products match this filter.</p>
-      ) : (
-        <div className="grid gap-px overflow-hidden rounded-md border bg-border md:grid-cols-2">
-          {list.map((m, i) => (
-            <div key={m.key} data-testid={`card-module-${m.key}`} className="bg-card p-5">
-              <div className="flex items-baseline justify-between"><span className="font-mono text-xs text-copper">{String(i + 1).padStart(2, '0')}</span><span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{label(m.category)}</span></div>
-              <h3 className="font-display mt-3 text-2xl">{m.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{m.description}</p>
-              <p className="mt-4 font-mono text-[11px] text-muted-foreground" data-testid={`text-lifecycle-${m.key}`}>{m.key} · {LIFECYCLE[m.lifecycle]?.name ?? m.lifecycle} · {m.sandboxAvailable ? 'sandbox available' : 'not in sandbox'}{m.requiresAssetNetworks ? ' · needs assets' : ''}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{LIFECYCLE[m.lifecycle]?.note}</p>
-              <button className="mt-3 text-xs text-copper underline" data-testid={`button-toggle-${m.key}`} onClick={() => setExp(exp === m.key ? null : m.key)}>{exp === m.key ? 'Hide manifest' : `Manifest: ${m.features.length} features, ${m.limits.length} limits`}</button>
-              {exp === m.key && (
-                <div className="mt-3 space-y-3 text-sm" data-testid={`detail-module-${m.key}`}>
-                  <div><p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Features</p>
-                    {m.features.length === 0 ? <p className="text-xs text-muted-foreground">None declared.</p> : m.features.map((f) => <p key={f.key} className="text-xs"><span className="font-mono">{f.key}</span> · {f.label}{f.dependsOn.length > 0 && <span className="text-muted-foreground"> · needs {f.dependsOn.join(', ')}</span>}</p>)}</div>
-                  <div><p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Limits</p>
-                    {m.limits.length === 0 ? <p className="text-xs text-muted-foreground">None declared.</p> : m.limits.map((l) => <p key={l.key} className="text-xs"><span className="font-mono">{l.key}</span> · {l.label} · {l.valueType}</p>)}</div>
-                </div>)}
-            </div>
-          ))}
+      {q.isLoading ? <ListSkeleton rows={6} /> : q.isError ? <ErrorState what="the product registry" onRetry={() => q.refetch()} /> : (
+        <div className="space-y-4">
+          <SearchBox id="modules" value={s} onChange={setS} placeholder="Search product, key, category" />
+          <Chips id="modules" value={filter} onChange={setFilter} options={[['all', `All (${all.length})`], ...['core_ready', 'sandbox_only', 'deferred'].map((f): [string, string] => [f, `${LIFECYCLE[f].name} (${all.filter((m) => m.lifecycle === f).length})`])]} />
+          <DataList id="module" rows={pg.rows} cols={cols} rowKey={(m) => m.key} onOpen={(m: ProductModule) => setSel(m)} emptyTitle="No products" emptyBody="No product matches this search or filter." />
+          {list.length > 0 && <Pager id="modules" p={pg} />}
         </div>)}
+      <Sheet open={!!sel} onOpenChange={(v) => { if (!v) setSel(null); }}>
+        <SheetContent className="w-full overflow-y-auto sm:max-w-xl" data-testid="drawer-module">
+          {sel && <>
+            <SheetHeader><SheetTitle className="font-display text-2xl">{sel.name}</SheetTitle><SheetDescription>{sel.description}</SheetDescription></SheetHeader>
+            <dl className="mt-4 divide-y" data-testid={`facts-module-${sel.key}`}>
+              <Row k="Lifecycle" v={`${LIFECYCLE[sel.lifecycle]?.name ?? sel.lifecycle}. ${LIFECYCLE[sel.lifecycle]?.note ?? ''}`} />
+              <Row k="Availability" v={`${avail(sel)}. Comes from the lifecycle, not from grants.`} />
+              <Row k="Entitlement grants" v={defsQ.isLoading ? 'Loading' : defsQ.isError ? 'Unavailable' : `${[...sel.features, ...sel.limits].filter((x) => defKeys.has(x.key)).length} of ${sel.features.length + sel.limits.length} defined. A disabled grant on a project does not change availability.`} />
+              <Row k="Customer" v="Can request catalog-featured products. No self-activation." />
+              <Row k="Owner only" v="Manifest authoring and entitlement assignment (plans, add-ons, overrides)." />
+              <Row k="Needs assets" v={sel.requiresAssetNetworks ? 'Yes' : 'No'} />
+            </dl>
+            <div className="mt-5 space-y-3 text-sm" data-testid={`detail-module-${sel.key}`}>
+              <div><p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Features</p>
+                {sel.features.length === 0 ? <p className="text-xs text-muted-foreground">None declared.</p> : sel.features.map((f) => <p key={f.key} className="text-xs"><span className="font-mono">{f.key}</span> · {f.label}{f.dependsOn.length > 0 && <span className="text-muted-foreground"> · needs {f.dependsOn.join(', ')}</span>}</p>)}</div>
+              <div><p className="mb-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Limits</p>
+                {sel.limits.length === 0 ? <p className="text-xs text-muted-foreground">None declared.</p> : sel.limits.map((l) => <p key={l.key} className="text-xs"><span className="font-mono">{l.key}</span> · {l.label} · {l.valueType}</p>)}</div>
+            </div>
+          </>}
+        </SheetContent>
+      </Sheet>
       <div className="mt-6"><SandboxNote /></div>
     </>
   );

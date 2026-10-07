@@ -25,3 +25,9 @@ For data-preserving Exchange Admin UI verification, use browser-only GET respons
 **Why:** The user requires Admin organization work without changing tenant data merely to populate or exercise the UI.
 
 **How to apply:** Stage and discard local edits; cancel persisted assignment, configuration and order actions. A disposable QA authorization grant is separate from tenant configuration and must be removed exactly. Expired test sign-in tickets require fresh programmatic test authentication, not real-user credentials or elevation of an unrelated customer session.
+
+Judge responsive drawer overflow only after its opening animation settles.
+
+**Why:** Immediate tester screenshots showed right-edge clipping during slide-in, while settled drawers and their contents fit the phone viewport correctly.
+
+**How to apply:** Compare settled drawer bounds and document scroll width with the viewport before changing layout. A transitional screenshot alone is not evidence of persistent clipping.

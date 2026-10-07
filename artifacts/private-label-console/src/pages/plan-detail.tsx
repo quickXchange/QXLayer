@@ -4,7 +4,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useGetPlan, getGetPlanQueryKey, useCreatePlan, useUpdatePlan, useListEntitlementDefinitions, type PlanInput } from '@workspace/api-client-react';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader, ErrorState, ListSkeleton } from '@/components/app/bits';
-import { EntitlementEditor, entriesFrom, entError, toMap, type EntMap } from '@/components/app/entitlement-editor';
+import { GroupedEntitlementEditor } from '@/components/super-admin/grouped-entitlements';
+import { ReviewDialog } from '@/components/super-admin/kit';
+import { entriesFrom, entError, toMap, type EntMap } from '@/components/app/entitlement-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,6 +33,7 @@ export default function PlanDetail() {
   const update = useUpdatePlan();
   const [f, setF] = useState(blank);
   const [ent, setEnt] = useState<EntMap>({});
+  const [rev, setRev] = useState(false);
   const init = useRef('');
   useEffect(() => {
     if (plan.data && init.current !== plan.data.id) {
@@ -45,12 +48,12 @@ export default function PlanDetail() {
   const order = Number(f.displayOrder);
   const err = f.name.trim().length < 2 ? 'Name needs 2+ characters' : ![f.monthlyPrice, f.yearlyPrice, f.setupFee].every((x) => MONEY.test(x)) ? 'Prices are decimal strings with up to 2 places'
     : !/^[A-Z]{3}$/.test(f.currency) ? 'Currency is a 3-letter uppercase code' : !Number.isInteger(order) || order < 0 || order > 100000 ? 'Display order 0 - 100000' : entError(d, ent);
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = (e: React.FormEvent) => { e.preventDefault(); if (!err) setRev(true); };
+  const doSave = () => {
     const data: PlanInput = { name: f.name.trim(), description: f.description, monthlyPrice: f.monthlyPrice, yearlyPrice: f.yearlyPrice, setupFee: f.setupFee, currency: f.currency, billingLabel: f.billingLabel, displayOrder: order, status: f.status, entitlements: entriesFrom(d, ent, true) };
-    const fail = (er: unknown) => toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' });
-    if (id) update.mutate({ planId: id, data }, { onSuccess: (p) => { qc.setQueryData(getGetPlanQueryKey(id), p); inv(); toast({ title: 'Plan saved' }); }, onError: fail });
-    else create.mutate({ data }, { onSuccess: (p) => { inv(); toast({ title: 'Plan created' }); nav(`/plans/${p.id}`); }, onError: fail });
+    const fail = (er: unknown) => { setRev(false); toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }); };
+    if (id) update.mutate({ planId: id, data }, { onSuccess: (p) => { setRev(false); qc.setQueryData(getGetPlanQueryKey(id), p); inv(); toast({ title: 'Plan saved' }); }, onError: fail });
+    else create.mutate({ data }, { onSuccess: (p) => { setRev(false); inv(); toast({ title: 'Plan created' }); nav(`/plans/${p.id}`); }, onError: fail });
   };
   const loading = defs.isLoading || (!!id && plan.isLoading);
   return (
@@ -76,13 +79,15 @@ export default function PlanDetail() {
           </section>
           <section className="space-y-3 rounded-md border bg-card p-5">
             <h2 className="font-display text-2xl">Entitlements</h2>
-            <EntitlementEditor defs={d} value={ent} onChange={setEnt} />
+            <GroupedEntitlementEditor defs={d} value={ent} onChange={setEnt} />
           </section>
           <div className="flex items-center justify-end gap-3">
             {err && <span className="mr-auto text-sm text-destructive">{err}</span>}
             <Button type="submit" data-testid="button-save-plan" disabled={!!err || create.isPending || update.isPending}>{create.isPending || update.isPending ? 'Saving' : id ? 'Save plan' : 'Create plan'}</Button>
           </div>
         </form>)}
+      <ReviewDialog open={rev} onClose={() => setRev(false)} title={id ? 'save plan' : 'create plan'} pending={create.isPending || update.isPending} onApply={doSave}
+        rows={[['Name', f.name.trim()], ['Status', f.status], ['Prices', `${f.monthlyPrice} / mo, ${f.yearlyPrice} / yr, ${f.setupFee} setup ${f.currency}`], ['Entitlements set', String(entriesFrom(d, ent, true).length)]]} />
     </>
   );
 }

@@ -40,7 +40,7 @@ function errorsFor(s: Settings, m: Mod): Record<string, string> {
   return e;
 }
 
-export function PreviewIntegrations({ tenantId, sub, subLoading, suspended, module }: { tenantId: string; sub?: { status?: string; features?: Record<string, boolean | undefined> }; subLoading?: boolean; suspended?: boolean; module?: Mod }) {
+export function PreviewIntegrations({ tenantId, sub, subLoading, suspended, module, reviewSave }: { tenantId: string; sub?: { status?: string; features?: Record<string, boolean | undefined> }; subLoading?: boolean; suspended?: boolean; module?: Mod; reviewSave?: (apply: () => void, settings: Settings) => void }) {
   const can = useCan(tenantId);
   const principal = usePrincipal();
   const qc = useQueryClient();
@@ -82,7 +82,7 @@ export function PreviewIntegrations({ tenantId, sub, subLoading, suspended, modu
   const upd = <M extends Mod>(m: M, p: Partial<Settings[M]>) => setF((s) => ({ ...s, [m]: { ...s[m], ...p } }));
   const submit = () => {
     const data = module ? { ...(JSON.parse(key) as Settings), [module]: f[module] } : f;
-    save.mutate({ tenantId, data: { settings: data, modules: changed } }, {
+    const apply = () => save.mutate({ tenantId, data: { settings: data, modules: changed } }, {
       onSuccess: (res) => {
         const before = lastServer.current?.settings;
         setF(draft => before ? {
@@ -96,6 +96,7 @@ export function PreviewIntegrations({ tenantId, sub, subLoading, suspended, modu
       },
       onError: (e) => toast({ title: 'Save failed', description: (e as Error).message, variant: 'destructive' }),
     });
+    if (reviewSave) reviewSave(apply, data); else apply();
   };
   const field = (id: string, label: string, value: string, onChange: (v: string) => void, ph: string, err?: string) => (
     <div className="space-y-1.5"><Label htmlFor={id}>{label}</Label>

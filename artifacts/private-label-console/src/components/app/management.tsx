@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useGatedMutate } from '@/components/super-admin/review-gate';
 import {
   useGetDomainVerification, getGetDomainVerificationQueryKey, useVerifyTenantDomain, useSetStaffPermissions,
   useListTenantResources, getListTenantResourcesQueryKey, useListProductRegistry, useGetProductConfiguration, getGetProductConfigurationQueryKey,
@@ -21,6 +22,7 @@ const RO = <span className="font-mono text-[11px] uppercase tracking-wider text-
 export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; readOnly?: boolean }) {
   const q = useGetDomainVerification(tenant.id);
   const m = useVerifyTenantDomain();
+  const verify = useGatedMutate(m.mutate, 'Check and record domain ownership (DNS records will not be changed)');
   const qc = useQueryClient();
   const inv = useInvalidateTenant();
   const { toast } = useToast();
@@ -33,7 +35,7 @@ export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; r
   return (
     <Section n="02b" title="Domain ownership" note="A TXT record proves control of the hostname. Hosting is not connected, so nothing is served on it."
       footer={readOnly ? RO : <Button data-testid="button-verify-domain" disabled={!d || d.status === 'unconfigured' || m.isPending}
-        onClick={() => m.mutate({ tenantId: tenant.id }, {
+        onClick={() => verify({ tenantId: tenant.id }, {
           onSuccess: (r) => { qc.setQueryData(getGetDomainVerificationQueryKey(tenant.id), r); qc.invalidateQueries({ queryKey: getGetDomainVerificationQueryKey(tenant.id) }); inv(tenant.id); toast({ title: r.status === 'verified' ? 'Domain verified' : 'TXT record not found yet', description: r.status === 'verified' ? undefined : 'DNS changes can take time to propagate.' }); },
           onError: (e) => toast({ title: 'Verification failed', description: (e as Error).message, variant: 'destructive' }),
         })}>{m.isPending ? 'Checking DNS' : 'Check DNS record'}</Button>}>
@@ -60,6 +62,7 @@ const PERMS = [['branding.manage', 'Brand and website'], ['domains.manage', 'Dom
 
 function StaffRow({ tenantId, id, label, reference, perms, canEdit }: { tenantId: string; id: string; label: string; reference: string | null; perms: string[]; canEdit: boolean }) {
   const m = useSetStaffPermissions();
+  const gM = useGatedMutate(m.mutate, 'Save staff permissions');
   const qc = useQueryClient();
   const { toast } = useToast();
   const [sel, setSel] = useState(perms);
@@ -72,7 +75,7 @@ function StaffRow({ tenantId, id, label, reference, perms, canEdit }: { tenantId
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
         {PERMS.map(([p, l]) => (
           <label key={p} className="flex items-center gap-2 text-sm"><Checkbox data-testid={`checkbox-grant-${id}-${p}`} disabled={!canEdit} checked={sel.includes(p)} onCheckedChange={() => setSel((s) => (s.includes(p) ? s.filter((x) => x !== p) : [...s, p]))} />{l}</label>))}
-        {canEdit && <Button size="sm" data-testid={`button-save-grant-${id}`} disabled={!dirty || m.isPending} onClick={() => m.mutate({ tenantId, userId: id, data: { permissions: sel as never } }, {
+        {canEdit && <Button size="sm" data-testid={`button-save-grant-${id}`} disabled={!dirty || m.isPending} onClick={() => gM({ tenantId, userId: id, data: { permissions: sel as never } }, {
           onSuccess: () => { qc.invalidateQueries({ queryKey: getListTenantResourcesQueryKey(tenantId, 'staff') }); toast({ title: 'Permissions saved' }); },
           onError: (e) => toast({ title: 'Could not save permissions', description: (e as Error).message, variant: 'destructive' }),
         })}>{m.isPending ? 'Saving' : 'Save access'}</Button>}
@@ -112,6 +115,7 @@ function exchangeError(p: Record<string, unknown>) {
 function ProductPanel({ tenantId, mod, readOnly }: { tenantId: string; mod: ProductModule; readOnly?: boolean }) {
   const q = useGetProductConfiguration(tenantId, mod.key);
   const m = useSetProductConfiguration();
+  const gM = useGatedMutate(m.mutate, 'Save product settings');
   const qc = useQueryClient();
   const { toast } = useToast();
   const server = JSON.stringify(q.data?.configuration ?? {}, null, 2);
@@ -129,7 +133,7 @@ function ProductPanel({ tenantId, mod, readOnly }: { tenantId: string; mod: Prod
           {isEx && <p className="text-xs text-muted-foreground" data-testid={`text-help-${mod.key}`}>Schema: {'{ "defaultAction": "swap" | "convert" | "buy" | "sell", "publicNote": "text" }'}, both optional. The default action must be one the client is entitled to. Nothing is executed.</p>}
           <Textarea data-testid={`input-config-${mod.key}`} disabled={readOnly} className="min-h-28 font-mono text-xs" value={txt} onChange={(e) => setTxt(e.target.value)} />
           <div className="flex items-center gap-3">
-            {readOnly ? RO : <Button size="sm" data-testid={`button-save-config-${mod.key}`} disabled={!!err || !parsed || m.isPending || txt === server} onClick={() => parsed && m.mutate({ tenantId, moduleKey: mod.key, data: { configuration: parsed } }, {
+            {readOnly ? RO : <Button size="sm" data-testid={`button-save-config-${mod.key}`} disabled={!!err || !parsed || m.isPending || txt === server} onClick={() => parsed && gM({ tenantId, moduleKey: mod.key, data: { configuration: parsed } }, {
               onSuccess: () => { qc.invalidateQueries({ queryKey: getGetProductConfigurationQueryKey(tenantId, mod.key) }); toast({ title: `${mod.name} settings saved` }); },
               onError: (e) => toast({ title: 'Save failed', description: (e as Error).message, variant: 'destructive' }),
             })}>{m.isPending ? 'Saving' : 'Save settings'}</Button>}
@@ -162,6 +166,7 @@ export function ProductSettingsSection({ tenantId, sub, readOnly, showAll }: { t
 export function AdministratorsSection({ tenantId, canManage }: { tenantId: string; canManage: boolean }) {
   const q = useListTenantAdministrators(tenantId);
   const assign = useAssignTenantAdministrator();
+  const gAssign = useGatedMutate(assign.mutate, 'Assign administrator');
   const status = useSetTenantAdministratorStatus();
   const qc = useQueryClient();
   const inv = useInvalidateTenant();
@@ -198,7 +203,7 @@ export function AdministratorsSection({ tenantId, canManage }: { tenantId: strin
           </div>
         </div>)}
       {canManage && (
-        <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); assign.mutate({ tenantId, data: { userId: userId.trim(), label: label.trim() } }, { onSuccess: () => { setUserId(''); setLabel(''); refresh(); toast({ title: 'Administrator assigned' }); }, onError: fail('Assignment failed') }); }}>
+        <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); gAssign({ tenantId, data: { userId: userId.trim(), label: label.trim() } }, { onSuccess: () => { setUserId(''); setLabel(''); refresh(); toast({ title: 'Administrator assigned' }); }, onError: fail('Assignment failed') }); }}>
           <Input data-testid="input-admin-userid" className="w-72 font-mono" placeholder="Clerk user ID (user_...)" value={userId} onChange={(e) => setUserId(e.target.value)} />
           <Input data-testid="input-admin-label" className="w-52" placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
           <Button data-testid="button-assign-admin" disabled={userId.trim().length < 2 || label.trim().length < 2 || assign.isPending}>{assign.isPending ? 'Assigning' : 'Assign administrator'}</Button>

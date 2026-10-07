@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useGatedMutate } from '@/components/super-admin/review-gate';
 import {
   useListModuleCatalog, useListSandboxAssetNetworks, useUpdateTenantBrand, useUpdateTenantDomain,
   useUpdateTenantAssetsNetworks, useUpdateTenantConfiguration,
@@ -50,6 +51,7 @@ function SaveBtn({ pending, disabled, readOnly, label, id }: { pending: boolean;
 export function BrandSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   const save = useSave(tenant.id, onSaved);
   const m = useUpdateTenantBrand();
+  const gM = useGatedMutate(m.mutate, 'Save brand');
   const init = useMemo(() => ({
     brandName: tenant.brandName, logoUrl: tenant.logoUrl ?? '', primaryColor: tenant.primaryColor, accentColor: tenant.accentColor,
     themeMode: tenant.themeMode, defaultLanguage: tenant.defaultLanguage, langs: tenant.supportedLanguages.join(', '),
@@ -65,7 +67,7 @@ export function BrandSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const data: BrandInput = { brandName: f.brandName.trim(), logoUrl: f.logoUrl.trim() || null, primaryColor: f.primaryColor, accentColor: f.accentColor, themeMode: f.themeMode as BrandInput['themeMode'], defaultLanguage: f.defaultLanguage.trim(), supportedLanguages: langs };
-    m.mutate({ tenantId: tenant.id, data }, { onSuccess: () => save.ok('Brand'), onError: save.fail });
+    gM({ tenantId: tenant.id, data }, { onSuccess: () => save.ok('Brand'), onError: save.fail });
   };
   const color = (k: 'primaryColor' | 'accentColor', l: string) => (
     <div className="space-y-1.5"><Label>{l}</Label>
@@ -103,12 +105,13 @@ export function BrandSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
 export function DomainSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   const save = useSave(tenant.id, onSaved);
   const m = useUpdateTenantDomain();
+  const gM = useGatedMutate(m.mutate, 'Save domain');
   const [d, setD] = useState(tenant.domain ?? '');
   useEffect(() => setD(tenant.domain ?? ''), [tenant.domain]);
   const v = d.trim().toLowerCase();
   const bad = v !== '' && !/^(?!-)[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(v);
   return (
-    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { domain: v || null } }, { onSuccess: () => save.ok('Domain'), onError: save.fail }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { domain: v || null } }, { onSuccess: () => save.ok('Domain'), onError: save.fail }); }}>
       <Section n="02" title="Domain" note="Saved as unverified configuration. DNS is not checked and nothing is served."
         footer={<>{bad && <span className="mr-auto text-sm text-destructive">Enter a hostname like app.example.com</span>}<SaveBtn id="domain" pending={m.isPending} disabled={bad} readOnly={readOnly} label={saveLabel ?? (v ? 'Save domain' : 'Save without domain')} /></>}>
         <div className="space-y-1.5"><Label>Custom domain (optional)</Label>
@@ -142,6 +145,7 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel, renderAsse
   const save = useSave(tenant.id, onSaved);
   const cat = useListSandboxAssetNetworks();
   const m = useUpdateTenantAssetsNetworks();
+  const gM = useGatedMutate(m.mutate, 'Save assets and networks');
   const [sel, setSel] = useState<string[]>(tenant.assetNetworkIds);
   const key = tenant.assetNetworkIds.join(',');
   useEffect(() => setSel(tenant.assetNetworkIds), [key]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -152,7 +156,7 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel, renderAsse
     return [...g.entries()];
   }, [cat.data]);
   return (
-    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { assetNetworkIds: sel } }, { onSuccess: () => save.ok('Assets and networks'), onError: save.fail }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { assetNetworkIds: sel } }, { onSuccess: () => save.ok('Assets and networks'), onError: save.fail }); }}>
       <Section n="04" title="Assets and networks" note="Configured sandbox asset/network pairs only."
         footer={<><span className="mr-auto font-mono text-xs text-muted-foreground">{sel.length} selected</span><SaveBtn id="assets" pending={m.isPending} readOnly={readOnly} label={saveLabel} /></>}>
         {cat.isLoading ? <Skeleton className="h-40" /> : cat.isError ? <ErrorState what="asset catalog" onRetry={() => cat.refetch()} /> : (
@@ -177,6 +181,7 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel, renderAsse
 export function ConfigSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   const save = useSave(tenant.id, onSaved);
   const m = useUpdateTenantConfiguration();
+  const gM = useGatedMutate(m.mutate, 'Save configuration');
   const sub = useSubscription(tenant.id);
   const p = usePrincipal();
   const feats = sub.data?.features ?? {};
@@ -190,7 +195,7 @@ export function ConfigSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   ];
   const shown = rows.filter(([k]) => p.role !== 'client_admin' || avail[k]);
   return (
-    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { environment: 'sandbox', exchangeEnabled: avail.x && f.x, paymentsEnabled: avail.p && f.p, allowGuestCheckout: avail.g && f.g } }, { onSuccess: () => save.ok('Configuration'), onError: save.fail }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { environment: 'sandbox', exchangeEnabled: avail.x && f.x, paymentsEnabled: avail.p && f.p, allowGuestCheckout: avail.g && f.g } }, { onSuccess: () => save.ok('Configuration'), onError: save.fail }); }}>
       <Section n="05" title="Configuration" note="Environment is fixed to sandbox. Flags the subscription does not grant are saved as off."
         footer={<SaveBtn id="config" pending={m.isPending} disabled={sub.isLoading} readOnly={readOnly} label={saveLabel} />}>
         <div className="flex items-center justify-between rounded-md border bg-muted/40 p-3"><span className="text-sm">Environment</span><span className="font-mono text-xs uppercase tracking-wider text-copper">sandbox</span></div>

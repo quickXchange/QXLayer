@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useGatedMutate } from '@/components/super-admin/review-gate';
 import {
   useGetTenantSubscription, getGetTenantSubscriptionQueryKey, useListPlans, useListAddons, useListEntitlementDefinitions,
   useChangeTenantPlan, useSetTenantAddons, useSetTenantOverrides, useSetTenantSuspension, type SubscriptionView,
@@ -62,6 +63,7 @@ function Capabilities({ sub }: { sub: SubscriptionView }) {
 function PlanPanel({ sub }: { sub: SubscriptionView }) {
   const plans = useListPlans();
   const m = useChangeTenantPlan();
+  const gM = useGatedMutate(m.mutate, 'Change plan');
   const d = useDone(sub.tenantId);
   const [sel, setSel] = useState(sub.plan?.id ?? '');
   useEffect(() => setSel(sub.plan?.id ?? ''), [sub.plan?.id]);
@@ -72,7 +74,7 @@ function PlanPanel({ sub }: { sub: SubscriptionView }) {
         {plans.isLoading ? <Skeleton className="h-9" /> : plans.isError ? <button className="text-sm text-destructive underline" onClick={() => plans.refetch()}>Retry loading plans</button> : (
           <Select value={sel} onValueChange={setSel}><SelectTrigger data-testid="select-tenant-plan"><SelectValue placeholder="Select a plan" /></SelectTrigger>
             <SelectContent>{opts.map((p) => <SelectItem key={p.id} value={p.id}>{p.name}{p.status !== 'enabled' ? ` (${p.status}, current)` : ''}</SelectItem>)}</SelectContent></Select>)}</div>
-      <Button data-testid="button-change-plan" disabled={!sel || sel === sub.plan?.id || m.isPending} onClick={() => m.mutate({ tenantId: sub.tenantId, data: { planId: sel } }, { onSuccess: () => d.ok('Plan changed'), onError: d.fail })}>{m.isPending ? 'Changing' : 'Change plan'}</Button>
+      <Button data-testid="button-change-plan" disabled={!sel || sel === sub.plan?.id || m.isPending} onClick={() => gM({ tenantId: sub.tenantId, data: { planId: sel } }, { onSuccess: () => d.ok('Plan changed'), onError: d.fail })}>{m.isPending ? 'Changing' : 'Change plan'}</Button>
     </div>
   );
 }
@@ -80,6 +82,7 @@ function PlanPanel({ sub }: { sub: SubscriptionView }) {
 function AddonsPanel({ sub }: { sub: SubscriptionView }) {
   const addons = useListAddons();
   const m = useSetTenantAddons();
+  const gM = useGatedMutate(m.mutate, 'Save add-ons');
   const d = useDone(sub.tenantId);
   const cur = sub.addons.map((a) => a.id);
   const [sel, setSel] = useState<string[]>(cur);
@@ -98,7 +101,7 @@ function AddonsPanel({ sub }: { sub: SubscriptionView }) {
             <span><span className="block text-sm font-medium">{a.name}</span><span className="block text-xs text-muted-foreground">{a.description}</span></span>
           </label>))}
       </div>
-      <Button data-testid="button-save-addons" disabled={m.isPending} onClick={() => m.mutate({ tenantId: sub.tenantId, data: { addonIds: sel } }, { onSuccess: () => d.ok('Add-ons saved'), onError: d.fail })}>{m.isPending ? 'Saving' : 'Save add-ons'}</Button>
+      <Button data-testid="button-save-addons" disabled={m.isPending} onClick={() => gM({ tenantId: sub.tenantId, data: { addonIds: sel } }, { onSuccess: () => d.ok('Add-ons saved'), onError: d.fail })}>{m.isPending ? 'Saving' : 'Save add-ons'}</Button>
     </div>
   );
 }
@@ -106,6 +109,7 @@ function AddonsPanel({ sub }: { sub: SubscriptionView }) {
 function OverridesPanel({ sub }: { sub: SubscriptionView }) {
   const defs = useListEntitlementDefinitions();
   const m = useSetTenantOverrides();
+  const gM = useGatedMutate(m.mutate, 'Save overrides');
   const d = useDone(sub.tenantId);
   const [rows, setRows] = useState(sub.overrides);
   useEffect(() => setRows(sub.overrides), [sub.overrides]);
@@ -118,7 +122,7 @@ function OverridesPanel({ sub }: { sub: SubscriptionView }) {
       <p className="text-sm text-muted-foreground">Overrides apply to this tenant only. A numeric override replaces the combined plan and add-on value.</p>
       <OverridesEditor defs={defList} rows={rows} onChange={setRows} />
       <div className="flex items-center gap-3">
-        <Button data-testid="button-save-overrides" disabled={!!err || m.isPending} onClick={() => m.mutate({ tenantId: sub.tenantId, data: { overrides: rows } }, { onSuccess: () => d.ok('Overrides saved'), onError: d.fail })}>{m.isPending ? 'Saving' : 'Save overrides'}</Button>
+        <Button data-testid="button-save-overrides" disabled={!!err || m.isPending} onClick={() => gM({ tenantId: sub.tenantId, data: { overrides: rows } }, { onSuccess: () => d.ok('Overrides saved'), onError: d.fail })}>{m.isPending ? 'Saving' : 'Save overrides'}</Button>
         {err && <span className="text-sm text-destructive">{err}</span>}
       </div>
     </div>
@@ -127,6 +131,7 @@ function OverridesPanel({ sub }: { sub: SubscriptionView }) {
 
 function SuspensionPanel({ sub }: { sub: SubscriptionView }) {
   const m = useSetTenantSuspension();
+  const gM = useGatedMutate(m.mutate, 'Change suspension');
   const d = useDone(sub.tenantId);
   const [reason, setReason] = useState('');
   const suspended = sub.status === 'suspended' || sub.tenantStatus === 'suspended';
@@ -136,27 +141,28 @@ function SuspensionPanel({ sub }: { sub: SubscriptionView }) {
       <div className="flex flex-wrap gap-2">
         <Input data-testid="input-suspend-reason" className="max-w-md" placeholder="Reason (required)" value={reason} onChange={(e) => setReason(e.target.value)} />
         <Button data-testid="button-suspend" variant={suspended ? 'outline' : 'destructive'} disabled={reason.trim().length < 2 || m.isPending}
-          onClick={() => m.mutate({ tenantId: sub.tenantId, data: { suspended: !suspended, reason: reason.trim() } }, { onSuccess: () => { setReason(''); d.ok(suspended ? 'Tenant unsuspended' : 'Tenant suspended'); }, onError: d.fail })}>
+          onClick={() => gM({ tenantId: sub.tenantId, data: { suspended: !suspended, reason: reason.trim() } }, { onSuccess: () => { setReason(''); d.ok(suspended ? 'Tenant unsuspended' : 'Tenant suspended'); }, onError: d.fail })}>
           {m.isPending ? 'Working' : suspended ? 'Unsuspend' : 'Suspend tenant'}</Button>
       </div>
     </div>
   );
 }
 
-export function SubscriptionSections({ tenantId, canManage }: { tenantId: string; canManage: boolean }) {
+export function SubscriptionSections({ tenantId, canManage, show }: { tenantId: string; canManage: boolean; show?: ('capabilities' | 'plan' | 'addons' | 'overrides' | 'suspension')[] }) {
+  const on = (k: NonNullable<typeof show>[number]) => !show || show.includes(k);
   const q = useSubscription(tenantId);
   const sub = q.data;
   return (
     <div className="space-y-6">
-      <Section n="S1" title={canManage ? 'Subscription' : 'Your capabilities'} note="Effective rights resolved from plan, add-ons and tenant overrides." footer={<span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{canManage ? 'Operator controls below' : 'Managed by your platform operator'}</span>}>
+      {on('capabilities') && <Section n="S1" title={canManage ? 'Subscription' : 'Your capabilities'} note="Effective rights resolved from plan, add-ons and tenant overrides." footer={<span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{canManage ? 'Operator controls below' : 'Managed by your platform operator'}</span>}>
         {q.isLoading ? <Skeleton className="h-48" /> : q.isError || !sub ? <ErrorState what="subscription" onRetry={() => q.refetch()} /> : <Capabilities sub={sub} />}
-      </Section>
+      </Section>}
       {canManage && sub && (
         <>
-          <Section n="S2" title="Plan" note="Disabled or archived plans cannot be newly assigned." footer={<span />}><PlanPanel sub={sub} /></Section>
-          <Section n="S3" title="Add-ons" note="Feature grants combine with the plan; numeric increments add to it." footer={<span />}><AddonsPanel sub={sub} /></Section>
-          <Section n="S4" title="Overrides" note="Tenant-only feature and limit replacements, each with a reason." footer={<span />}><OverridesPanel sub={sub} /></Section>
-          <Section n="S5" title="Suspension" note="Reason is recorded in activity." footer={<span />}><SuspensionPanel sub={sub} /></Section>
+          {on('plan') && <Section n="S2" title="Plan" note="Disabled or archived plans cannot be newly assigned." footer={<span />}><PlanPanel sub={sub} /></Section>}
+          {on('addons') && <Section n="S3" title="Add-ons" note="Feature grants combine with the plan; numeric increments add to it." footer={<span />}><AddonsPanel sub={sub} /></Section>}
+          {on('overrides') && <Section n="S4" title="Overrides" note="Tenant-only feature and limit replacements, each with a reason." footer={<span />}><OverridesPanel sub={sub} /></Section>}
+          {on('suspension') && <Section n="S5" title="Suspension" note="Reason is recorded in activity." footer={<span />}><SuspensionPanel sub={sub} /></Section>}
         </>)}
     </div>
   );

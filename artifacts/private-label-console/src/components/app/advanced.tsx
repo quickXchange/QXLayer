@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useGatedMutate } from '@/components/super-admin/review-gate';
 import {
   useUpdateTenantWebsiteSettings, useListTenantResources, getListTenantResourcesQueryKey, useCreateTenantResource, useRemoveTenantResource,
   type Tenant, type WebsiteSettings, type SiteLink, type ResourceItem,
@@ -26,6 +27,7 @@ const fullNav = (n?: NavItem[]) => { const have = n ?? []; return [...have, ...N
 
 export function WebsiteSection({ tenant, readOnly, onSaved, saveLabel }: { tenant: Tenant; readOnly?: boolean; onSaved?: () => void; saveLabel?: string }) {
   const m = useUpdateTenantWebsiteSettings();
+  const gM = useGatedMutate(m.mutate, 'Save website settings');
   const inv = useInvalidateTenant();
   const { toast } = useToast();
   const base = tenant.websiteSettings ?? { ...DEFAULT, heroTitle: tenant.brandName };
@@ -43,7 +45,7 @@ export function WebsiteSection({ tenant, readOnly, onSaved, saveLabel }: { tenan
   const links = f.socialLinks;
   const setLink = (i: number, p: Partial<SiteLink>) => set('socialLinks', links.map((l, j) => (j === i ? { ...l, ...p } : l)));
   return (
-    <form onSubmit={(e) => { e.preventDefault(); m.mutate({ tenantId: tenant.id, data: { ...f, heroTitle: f.heroTitle.trim(), ...(navTouched ? { navigation: nav.map((x) => ({ ...x, label: x.label.trim() })) } : {}) } }, { onSuccess: () => { inv(tenant.id); toast({ title: 'Website settings saved' }); onSaved?.(); }, onError: (er) => toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }) }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { ...f, heroTitle: f.heroTitle.trim(), ...(navTouched ? { navigation: nav.map((x) => ({ ...x, label: x.label.trim() })) } : {}) } }, { onSuccess: () => { inv(tenant.id); toast({ title: 'Website settings saved' }); onSaved?.(); }, onError: (er) => toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }) }); }}>
       <Section n="06" title="Website" note="Advanced settings for the shared branded site. Custom domains stay unverified and are never served."
         footer={<>{err && !readOnly && <span className="mr-auto text-sm text-destructive">{err}</span>}{readOnly ? <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only</span> : <Button data-testid="button-save-website" disabled={!!err || m.isPending}>{m.isPending ? 'Saving' : saveLabel ?? 'Save website'}</Button>}</>}>
         <fieldset disabled={readOnly} className="grid gap-4 md:grid-cols-2">
@@ -96,7 +98,9 @@ function ResourcePanel({ tenantId, type, readOnly, canCreate }: { tenantId: stri
   const meta = META[type];
   const q = useListTenantResources(tenantId, type);
   const create = useCreateTenantResource();
+  const gCreate = useGatedMutate(create.mutate, 'Create resource');
   const remove = useRemoveTenantResource();
+  const gRemove = useGatedMutate(remove.mutate, 'Remove resource');
   const qc = useQueryClient();
   const inv = useInvalidateTenant();
   const { toast } = useToast();
@@ -126,12 +130,12 @@ function ResourcePanel({ tenantId, type, readOnly, canCreate }: { tenantId: stri
             <div key={it.id} className="flex items-center gap-3 p-3" data-testid={`row-${type}-${it.id}`}>
               <div className="min-w-0 flex-1"><p className="text-sm">{it.label}</p>{it.reference && <p className="truncate font-mono text-[11px] text-muted-foreground">{it.reference}</p>}</div>
               <span className="font-mono text-[10px] uppercase text-muted-foreground">{it.status}</span>
-              {!readOnly && <Button size="sm" variant="ghost" disabled={remove.isPending} onClick={() => remove.mutate({ tenantId, resourceType: type, resourceId: it.id }, { onSuccess: () => { refresh(); toast({ title: 'Removed' }); }, onError: fail })}>Remove</Button>}
+              {!readOnly && <Button size="sm" variant="ghost" disabled={remove.isPending} onClick={() => gRemove({ tenantId, resourceType: type, resourceId: it.id }, { onSuccess: () => { refresh(); toast({ title: 'Removed' }); }, onError: fail })}>Remove</Button>}
             </div>))}
         </div>)}
       {!readOnly && !canCreate && <p className="text-sm text-muted-foreground" data-testid={`text-locked-${type}`}>Not permitted by effective rights or limit reached. Existing items can still be removed.</p>}
       {!readOnly && canCreate && (
-        <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); create.mutate({ tenantId, resourceType: type, data: { label: label.trim(), reference: meta.ref ? r || null : null } }, { onSuccess: (res) => { setLabel(''); setRef(''); if (res.issuedKey) setIssued(res.issuedKey); refresh(); toast({ title: 'Added' }); }, onError: fail }); }}>
+        <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); gCreate({ tenantId, resourceType: type, data: { label: label.trim(), reference: meta.ref ? r || null : null } }, { onSuccess: (res) => { setLabel(''); setRef(''); if (res.issuedKey) setIssued(res.issuedKey); refresh(); toast({ title: 'Added' }); }, onError: fail }); }}>
           <Input data-testid={`input-${type}-label`} className="w-52" placeholder="Label" value={label} onChange={(e) => setLabel(e.target.value)} />
           {meta.ref && <Input data-testid={`input-${type}-ref`} className="w-72 font-mono" placeholder={`${meta.ref} (${meta.refHint})`} value={ref} onChange={(e) => setRef(e.target.value)} />}
           <Button data-testid={`button-add-${type}`} disabled={bad || create.isPending}>{create.isPending ? 'Adding' : type === 'api_keys' ? 'Issue key' : 'Add'}</Button>

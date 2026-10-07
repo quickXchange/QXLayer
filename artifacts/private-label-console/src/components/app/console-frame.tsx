@@ -5,7 +5,7 @@ import { Ambient } from '@site/components/ambient';
 import { BrandLogo } from '@/components/brand-logo';
 import { useConsoleTheme } from '@/lib/console-theme';
 
-export interface ConsoleNavItem { key: string; href: string; label: string; icon: ElementType; testId?: string; current: boolean }
+export interface ConsoleNavItem { key: string; href: string; label: string; icon: ElementType; testId?: string; current: boolean; group?: string }
 
 /** Applies the shared QXLayer theme and renders children inside the themed root. */
 const ThemeCtx = createContext<{ dark: boolean; toggle: () => void } | null>(null);
@@ -85,17 +85,18 @@ function Inner({ homeHref, navLabel, items, footer, mobileAction, maxWidth, chil
       {dark ? <Sun size={18} /> : <Moon size={18} />}
     </button>
   );
-  const links = (mobile: boolean) => items.map((n) => (
+  const links = (mobile: boolean) => items.flatMap((n, i) => [
+    ...(n.group && n.group !== items[i - 1]?.group ? [<p key={`g-${n.group}`} className="px-3 pb-1 pt-4 font-mono text-[10px] uppercase tracking-[0.16em] opacity-60">{n.group}</p>] : []),
     <Link key={n.key} href={n.href} data-testid={n.testId} aria-current={n.current ? 'page' : undefined}
       className={`qx-navlink ${mobile ? 'qx-navlink-m' : ''}`}>
       <n.icon className="h-4 w-4 shrink-0" /><span className="truncate">{n.label}</span>
-    </Link>
-  ));
+    </Link>,
+  ]);
   return (
     <NavigationCtx.Provider value={setNavigation}><div className="qx-frame min-h-[100dvh] md:flex">
       {desktop ? (
         <aside className="qx-side md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:justify-between">
-          <div>
+          <div className="min-h-0 overflow-y-auto">
             <div className="flex items-center justify-between gap-2">{<Brand href={homeHref} />}{themeBtn}</div>
             <nav aria-label={navigation?.label ?? navLabel} className="qx-nav mt-8 flex flex-col gap-1">{navigation?.content ?? links(false)}</nav>
           </div>
@@ -113,7 +114,7 @@ function Inner({ homeHref, navLabel, items, footer, mobileAction, maxWidth, chil
             </div>
           </div>
           {open && (
-            <div id="qx-mobile-menu" ref={panel} className="s-mobile-menu qx-drawer border-t"
+            <div id="qx-mobile-menu" ref={panel} className="s-mobile-menu qx-drawer max-h-[calc(100dvh-68px)] overflow-y-auto border-t"
               style={navigation ? { position: 'absolute', top: 68, left: 0, right: 0 } : undefined}>
               <nav aria-label={navigation?.label ?? navLabel} className="grid gap-1 p-3"
                 onClick={navigation ? (event) => {

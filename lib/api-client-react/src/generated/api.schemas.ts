@@ -5,6 +5,67 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export interface PlatformCustomer {
+  id: string;
+  name: string;
+  /** @nullable */
+  email: string | null;
+  status: string;
+  /** @nullable */
+  createdAt: string | null;
+  tenantIds: string[];
+}
+
+export interface PlatformProject {
+  tenantId: string;
+  customerIds: string[];
+  /** @nullable */
+  planId: string | null;
+  /** @nullable */
+  planName: string | null;
+  addonIds: string[];
+  /** @nullable */
+  logoUrl: string | null;
+  updatedAt: string;
+}
+
+export interface PlatformAudit {
+  id: string;
+  /** @nullable */
+  tenantId: string | null;
+  actorId: string;
+  eventType: string;
+  description: string;
+  /** @nullable */
+  resource: string | null;
+  /** @nullable */
+  result: string | null;
+  createdAt: string;
+}
+
+export interface PlatformProvider {
+  id: string;
+  name: string;
+  category: string;
+  capabilities: string[];
+  status: string;
+  /** @nullable */
+  logoUrl: string | null;
+  implemented: boolean;
+}
+
+export interface PlatformManagement {
+  /** @nullable */
+  customerTotal: number | null;
+  customers: PlatformCustomer[];
+  projects: PlatformProject[];
+  audit: PlatformAudit[];
+  providers: PlatformProvider[];
+  directoryAvailable: boolean;
+  /** @nullable */
+  directoryError: string | null;
+}
+
 export interface WebsitePreview {
   url: string;
   expiresAt: string;

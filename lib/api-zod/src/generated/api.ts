@@ -9,6 +9,52 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Read-only platform owner account, project, usage and audit directory
+ */
+export const GetPlatformManagementResponse = zod.object({
+  "customerTotal": zod.number().int().nullable(),
+  "customers": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string().nullable(),
+  "status": zod.string(),
+  "createdAt": zod.string().nullable(),
+  "tenantIds": zod.array(zod.string())
+})),
+  "projects": zod.array(zod.object({
+  "tenantId": zod.string(),
+  "customerIds": zod.array(zod.string()),
+  "planId": zod.string().nullable(),
+  "planName": zod.string().nullable(),
+  "addonIds": zod.array(zod.string()),
+  "logoUrl": zod.string().nullable(),
+  "updatedAt": zod.string()
+})),
+  "audit": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string().nullable(),
+  "actorId": zod.string(),
+  "eventType": zod.string(),
+  "description": zod.string(),
+  "resource": zod.string().nullable(),
+  "result": zod.string().nullable(),
+  "createdAt": zod.string()
+})),
+  "providers": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "capabilities": zod.array(zod.string()),
+  "status": zod.string(),
+  "logoUrl": zod.string().nullable(),
+  "implemented": zod.boolean()
+})),
+  "directoryAvailable": zod.boolean(),
+  "directoryError": zod.string().nullable()
+})
+
+
+/**
  * @summary Get a Development-only read-only customer website preview without activation
  */
 export const GetTenantWebsitePreviewParams = zod.object({
