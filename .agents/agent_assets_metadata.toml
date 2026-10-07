@@ -546,3 +546,17 @@ mtime_ms = 1791412853999
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/27053836-7769-4fbb-921b-e68cf1977d35/0550c60d-c414-47bc-a007-3ed85de4eaec"
 storage_version_token = "1791412854648277"
 content_type = "text/html"
+
+[[outputs]]
+id = "ESOPva9RwQeXO72QFZ-fO"
+uri = "file://reports/final-recovery/downloads/08-FINAL-PRODUCTION-RECOVERY.zip"
+type = "unspecified"
+title = "Download the exact recovery SQL"
+description = "ZIP containing the existing 08-FINAL-PRODUCTION-RECOVERY.sql, verified byte-for-byte identical. The SQL was not modified, regenerated, or executed."
+logical_id = "2ad5cbe4-8eb5-4042-895b-d34cdc74a38f"
+content_hash = "sha256:b7a7d762ed08d8f12944c4caad5b29b4f52112c26d0d465db0424ec48346b19d"
+size = 9797
+mtime_ms = 1791415214310
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/2ad5cbe4-8eb5-4042-895b-d34cdc74a38f/e7e9db2b-ff93-4683-b791-cc7b994a36a6"
+storage_version_token = "1791415218847350"
+content_type = "application/octet-stream"
