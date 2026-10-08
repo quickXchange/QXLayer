@@ -1,5 +1,5 @@
 {
-  "status": "REVIEW_ONLY_EXECUTION_BLOCKED",
+  "status": "APPROVED_SCOPE_EXECUTION_BLOCKED",
   "source": "Current Development read-only snapshot",
   "target": "Existing Production database",
   "snapshotCapturedAt": "2026-10-08T21:00:10.706Z",
@@ -578,5 +578,13 @@
     "activeRecords": 1,
     "integrityFingerprint": "df326f2c50d3925f12de6b1ae5b76683",
     "fingerprintMethod": "Read-only md5 of owner rows serialized in clerk_user_id order; compare unchanged before commit and after execution."
+  },
+  "approval": {
+    "approvedByUser": true,
+    "approvedAt": "2026-10-08T21:45:20.944Z",
+    "scope": "32 inserts only: 16 required module_catalog rows and 16 landing_products rows from this reviewed snapshot; no updates or deletes.",
+    "approvedPayloadSha256": "110ee5ac12820106c5b8ea437416f48add578994c2087728511b43353257b85e",
+    "executionPerformed": false,
+    "executionBlocker": "Agent Production database access is read-only. No supported authorized write path is currently available to Agent."
   }
 }
