@@ -1,0 +1,582 @@
+{
+  "status": "REVIEW_ONLY_EXECUTION_BLOCKED",
+  "source": "Current Development read-only snapshot",
+  "target": "Existing Production database",
+  "snapshotCapturedAt": "2026-10-08T21:00:10.706Z",
+  "sha256": "110ee5ac12820106c5b8ea437416f48add578994c2087728511b43353257b85e",
+  "counts": {
+    "module_catalog_inserts": 16,
+    "landing_products_inserts": 16,
+    "updates": 0,
+    "deletes": 0,
+    "admin_products_after": 16,
+    "public_visible_products_after": 15
+  },
+  "guardrails": {
+    "approvalRequired": true,
+    "agentProductionWriteAccess": false,
+    "productionTablesAllowed": [
+      "module_catalog",
+      "landing_products"
+    ],
+    "conflictPolicy": "Skip exact existing matches; abort the entire migration on any differing existing key. Never overwrite.",
+    "sourceDriftPolicy": "Recheck source and destination against the approved snapshot before writing; stop on unexpected drift.",
+    "atomicity": "One transaction: dependencies first, product rows second, validation before commit; rollback all scoped writes on failure.",
+    "excluded": "platform_admins, tenants, memberships, plans, entitlements, providers, assets, networks, requests, orders, sessions and all other tables; no schema, code, design, service execution or credentials changes."
+  },
+  "imageHandling": "No image URL/blob columns exist in landing_products. Preserve icon keys and product keys, which select the existing bundled artwork; do not copy media or change frontend assets.",
+  "runtimeReadiness": "crypto_exchange remains sandbox_only; all other products remain planned. Preserve original module definition/lifecycle and legacy sandbox_available values exactly, without granting any tenant entitlement or implementing connectivity.",
+  "changes": {
+    "module_catalog": [
+      {
+        "key": "android_app",
+        "name": "Android App",
+        "category": "Channels",
+        "definition": {
+          "key": "android_app",
+          "name": "Android App",
+          "limits": [],
+          "category": "Channels",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "articles",
+        "name": "Articles / Content",
+        "category": "Content",
+        "definition": {
+          "key": "articles",
+          "name": "Articles / Content",
+          "limits": [],
+          "category": "Content",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "cloud_mining",
+        "name": "Cloud Mining",
+        "category": "Infrastructure",
+        "definition": {
+          "key": "cloud_mining",
+          "name": "Cloud Mining",
+          "limits": [],
+          "category": "Infrastructure",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "crypto_card",
+        "name": "Crypto Card",
+        "category": "Financial",
+        "definition": {
+          "key": "crypto_card",
+          "name": "Crypto Card",
+          "limits": [],
+          "category": "Financial",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "crypto_engine",
+        "name": "Crypto Engine",
+        "category": "Infrastructure",
+        "definition": {
+          "key": "crypto_engine",
+          "name": "Crypto Engine",
+          "limits": [],
+          "category": "Infrastructure",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "crypto_exchange",
+        "name": "Crypto Exchange",
+        "category": "Financial",
+        "definition": {
+          "key": "crypto_exchange",
+          "name": "Exchange",
+          "limits": [],
+          "category": "Financial",
+          "features": [
+            {
+              "key": "swap",
+              "label": "swap",
+              "dependsOn": [
+                "crypto_exchange"
+              ]
+            },
+            {
+              "key": "convert",
+              "label": "convert",
+              "dependsOn": [
+                "crypto_exchange"
+              ]
+            },
+            {
+              "key": "buy",
+              "label": "Buy (Buy/Sell)",
+              "dependsOn": [
+                "crypto_exchange"
+              ]
+            },
+            {
+              "key": "sell",
+              "label": "Sell (Buy/Sell)",
+              "dependsOn": [
+                "crypto_exchange"
+              ]
+            }
+          ],
+          "lifecycle": "sandbox_only",
+          "description": "Shared platform configuration; financial execution remains disabled.",
+          "sandboxAvailable": true,
+          "requiresAssetNetworks": true
+        },
+        "description": "Exchange, swap, and convert product entitlement. Engine implementation is deferred.",
+        "sandbox_available": true
+      },
+      {
+        "key": "crypto_payments",
+        "name": "Crypto Payments",
+        "category": "Financial",
+        "definition": {
+          "key": "crypto_payments",
+          "name": "Crypto Payments",
+          "limits": [],
+          "category": "Financial",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": true
+        },
+        "description": "Crypto payment gateway entitlement. Invoice execution is deferred.",
+        "sandbox_available": true
+      },
+      {
+        "key": "dex",
+        "name": "DEX",
+        "category": "Financial",
+        "definition": {
+          "key": "dex",
+          "name": "DEX",
+          "limits": [],
+          "category": "Financial",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "earn",
+        "name": "Earn",
+        "category": "Financial",
+        "definition": {
+          "key": "earn",
+          "name": "Earn",
+          "limits": [],
+          "category": "Financial",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "ios_app",
+        "name": "iOS App",
+        "category": "Channels",
+        "definition": {
+          "key": "ios_app",
+          "name": "iOS App",
+          "limits": [],
+          "category": "Channels",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "kolo",
+        "name": "Kolo",
+        "category": "Products",
+        "definition": {
+          "key": "kolo",
+          "name": "Kolo",
+          "limits": [],
+          "category": "Products",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "rpc_nodes",
+        "name": "RPC / Nodes",
+        "category": "Infrastructure",
+        "definition": {
+          "key": "rpc_nodes",
+          "name": "RPC / Nodes",
+          "limits": [],
+          "category": "Infrastructure",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "staking",
+        "name": "Staking",
+        "category": "Financial",
+        "definition": {
+          "key": "staking",
+          "name": "Staking",
+          "limits": [],
+          "category": "Financial",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      },
+      {
+        "key": "telegram_bot",
+        "name": "Telegram Bot",
+        "category": "Channels",
+        "definition": {
+          "key": "telegram_bot",
+          "name": "Telegram Bot",
+          "limits": [],
+          "category": "Channels",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Branded bot entitlement using the shared backend. Bot connection is deferred.",
+        "sandbox_available": true
+      },
+      {
+        "key": "telegram_mini_app",
+        "name": "Telegram Mini App",
+        "category": "Channels",
+        "definition": {
+          "key": "telegram_mini_app",
+          "name": "Telegram Mini App",
+          "limits": [],
+          "category": "Channels",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Telegram web app entitlement using the same tenant configuration.",
+        "sandbox_available": true
+      },
+      {
+        "key": "whatsapp_bot",
+        "name": "WhatsApp Bot",
+        "category": "Channels",
+        "definition": {
+          "key": "whatsapp_bot",
+          "name": "WhatsApp Bot",
+          "limits": [],
+          "category": "Channels",
+          "features": [],
+          "lifecycle": "deferred",
+          "description": "Registered for future independent implementation. No execution is implemented.",
+          "sandboxAvailable": false,
+          "requiresAssetNetworks": false
+        },
+        "description": "Registered for future independent implementation. No execution is implemented.",
+        "sandbox_available": false
+      }
+    ],
+    "landing_products": [
+      {
+        "key": "crypto_exchange",
+        "icon": "exchange",
+        "name": "White Label Exchange — Swap / Convert / Buy & Sell",
+        "status": "available",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "Your brand at the center of the exchange experience. Configure swap, convert, buy and sell journeys on the shared White Label Core. Currently a non-executing sandbox.",
+        "display_order": 10,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "crypto_payments",
+        "icon": "payments",
+        "name": "Crypto Payment Gateway",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "Bring branded crypto payment experiences into your ecosystem. Merchant checkout and payment infrastructure are planned; payment processing is not implemented.",
+        "display_order": 20,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "crypto_engine",
+        "icon": "engine",
+        "name": "Crypto Engine",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned orchestration layer connecting your crypto products through one modular platform. Financial execution and provider integrations are not implemented.",
+        "display_order": 30,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "ios_app",
+        "icon": "ios",
+        "name": "iOS App",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "Extend your brand to a native iOS experience connected to the same White Label platform. Mobile application development is planned, not available today.",
+        "display_order": 40,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "android_app",
+        "icon": "android",
+        "name": "Android App",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "Bring your ecosystem to Android with a branded mobile experience and shared platform configuration. Mobile application development is planned.",
+        "display_order": 50,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "crypto_card",
+        "icon": "card",
+        "name": "Crypto Card",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned branded card offering within your wider crypto ecosystem. Card issuance, spending and provider integrations are not implemented.",
+        "display_order": 60,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "staking",
+        "icon": "staking",
+        "name": "Staking API",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned staking interface for future integration into your branded products. No staking engine, rewards or blockchain execution is connected.",
+        "display_order": 70,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "earn",
+        "icon": "earn",
+        "name": "Earn API",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned API layer for future earning products in your ecosystem. Yield generation, balances and financial execution are not implemented.",
+        "display_order": 80,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "dex",
+        "icon": "dex",
+        "name": "DEX",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned decentralized exchange experience under your brand. Smart contracts, liquidity routing and trade execution are not implemented.",
+        "display_order": 90,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "articles",
+        "icon": "content",
+        "name": "Articles / Content",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned publishing product for branded articles, education and ecosystem updates. The editorial CMS is not implemented yet.",
+        "display_order": 100,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "telegram_bot",
+        "icon": "telegram",
+        "name": "Telegram Bot",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned conversational entry point for your branded ecosystem on Telegram. Bot delivery and financial actions are not implemented.",
+        "display_order": 110,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "telegram_mini_app",
+        "icon": "miniapp",
+        "name": "Telegram Mini App",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned compact branded experience inside Telegram, connected to the shared platform. Mini App development and integration are deferred.",
+        "display_order": 120,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "whatsapp_bot",
+        "icon": "whatsapp",
+        "name": "WhatsApp Bot",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned messaging channel for your branded customer experience. WhatsApp delivery and provider integrations are not implemented.",
+        "display_order": 130,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "rpc_nodes",
+        "icon": "nodes",
+        "name": "RPC / Nodes",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned infrastructure offering for blockchain connectivity. No node hosting, RPC endpoints or live blockchain services are provided today.",
+        "display_order": 140,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "cloud_mining",
+        "icon": "mining",
+        "name": "Cloud Mining",
+        "status": "coming_soon",
+        "visible": true,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A planned mining product in the modular ecosystem. Mining execution, contracts and returns are not implemented or offered.",
+        "display_order": 150,
+        "billing_period": "on_request",
+        "starting_price": null
+      },
+      {
+        "key": "kolo",
+        "icon": "kolo",
+        "name": "Kolo",
+        "status": "coming_soon",
+        "visible": false,
+        "currency": "USD",
+        "cta_label": "Learn More",
+        "setup_fee": null,
+        "description": "A reserved future product within the modular White Label ecosystem. Product functionality and integrations are not implemented.",
+        "display_order": 160,
+        "billing_period": "on_request",
+        "starting_price": null
+      }
+    ]
+  },
+  "ownerBaseline": {
+    "records": 1,
+    "activeRecords": 1,
+    "integrityFingerprint": "df326f2c50d3925f12de6b1ae5b76683",
+    "fingerprintMethod": "Read-only md5 of owner rows serialized in clerk_user_id order; compare unchanged before commit and after execution."
+  }
+}

@@ -588,3 +588,17 @@ mtime_ms = 1791416290757
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/c350a7d2-a0fe-4cb0-8dbd-983d92978186/af9688f8-167d-48fb-b729-f40e1b1b97ff"
 storage_version_token = "1791416297535512"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "VTmjs2yQPXXtpnmxWm6Xj"
+uri = "file://reports/landing-products-migration/review.html"
+type = "html"
+title = "Exact Landing Products migration review — 32 inserts, no overwrites"
+description = "Every field for the 16 current Development products and their 16 missing parent module definitions. Review-only: Production execution remains blocked by read-only Agent access."
+logical_id = "f11f8070-59e3-4fc7-8e00-78a5a52d5434"
+content_hash = "sha256:effe0a2f8bc59ab9880cbf4a93abed241ea949c7d0d9ab7208aa3567b5bd3052"
+size = 78390
+mtime_ms = 1791493211048
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/f11f8070-59e3-4fc7-8e00-78a5a52d5434/6342aa5a-a994-4aa7-bcfd-b34cbbf8c41a"
+storage_version_token = "1791493211741675"
+content_type = "text/html"
