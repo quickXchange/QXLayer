@@ -5,6 +5,17 @@ description: User constraints for diagnosing and synchronizing published content
 
 Use CURRENT Development as the source of truth when comparing or synchronizing this project's published state. Do not restore old deleted data or old configuration. Diagnose source/build, current data, environment settings and media separately, read-only first; do not blindly republish, redesign, delete or recreate data.
 
+Distinguish code-only Republish readiness from database-recovery readiness.
+Missing Production configuration may limit live functionality without blocking
+deployment of the latest code and visual updates.
+
+**Why:** The user explicitly requested a publishing assessment without mixing
+code deployment with database recovery.
+
+**How to apply:** Check builds, publishing configuration and schema-change risk
+for code-only requests. State remaining data-dependent limitations separately;
+do not claim Republish populates missing records or proves full live parity.
+
 **Why:** The user explicitly required this approach after reporting that a republished live site did not match current Development.
 
 **How to apply:** Report confirmed differences and the exact synchronization scope before making changes. Preserve the current Development design and tenant/authentication boundaries. Do not treat a historical seed or checkpoint as the authoritative configuration.
