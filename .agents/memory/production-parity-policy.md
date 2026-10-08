@@ -66,6 +66,14 @@ Check the available Production write capability before declaring a synchronizati
 
 **How to apply:** Distinguish data readiness, identity evidence, execution capability and permission to execute. Do not bypass read-only access with credentials, a bootstrap endpoint, startup imports or publishing. Report blocked Production work separately from verified Development-only fixes.
 
+## Republish and catalog initialization
+
+The user wants one-click Republish for the latest approved website changes and approved Landing Products with their required modules, using only officially supported publishing and database initialization options. Preserve the existing Production database, Super Admin access and all existing records. No destructive operations, temporary endpoints or startup migration scripts. If Republish cannot safely transfer the records, explain the exact limitation before the user clicks it.
+
+**Why:** The user explicitly made preservation of existing Production data and access a condition of the requested Republish workflow.
+
+**How to apply:** Recheck official documentation before configuring initialization. Ordinary publication transfers code and schema changes, not selective row inserts. A whole-database Development-data initialization is not an append-only catalog merge and cannot satisfy this preservation requirement. Keep code-only publication separate from any authorized catalog-only Production data operation; do not present the combined workflow as ready when only code publication is configured.
+
 The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, the landing page, customer sites, or prepared Production migration SQL. The user approved redesigning ONLY the Private Access page to use the existing QXLayer identity and light/dark behavior.
 
 **Why:** The user explicitly required a separate Production Domain Access Gate and later authorized fixing its Production runtime and redesigning only its Private Access screen, while preserving the other product surfaces and database.
