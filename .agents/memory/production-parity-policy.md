@@ -66,19 +66,19 @@ Check the available Production write capability before declaring a synchronizati
 
 **How to apply:** Distinguish data readiness, identity evidence, execution capability and permission to execute. Do not bypass read-only access with credentials, a bootstrap endpoint, startup imports or publishing. Report blocked Production work separately from verified Development-only fixes.
 
-## Republish and manual catalog transfer
+## Supported Republish and protected configuration
 
-The user stopped investigating Republish for database transfer. For the approved Landing Products and required modules, prepare one complete insert-only SQL script for the user to execute using Replit's Production SQL Console. A successful run must insert exactly the approved records, prevent duplicates, use a transaction and validate before committing. Preserve existing Super Admin access and all Production data. No updates, deletes, authentication/schema/design changes, automatic execution or publishing.
+The user stopped the manual recovery process. They want Production to match Development's latest code/design and application configuration, including products, plans, add-ons, modules and settings, using Replit's supported publishing and database initialization mechanisms. Do not ask them to use Shell or manually run SQL.
 
-**Why:** After the official Republish limitations were explained, the user explicitly chose a manually executed Production SQL Console operation instead.
+**Why:** The user explicitly changed the chosen workflow back to Republish and rejected further manual Shell/SQL recovery.
 
-**How to apply:** Preparing user-requested catalog DML is not permission for Agent Production execution or schema migration. Use the exact approved snapshot; abort on existing approved keys rather than silently skip them when an exact insert count is required. Do not reintroduce a Republish initialization workaround, startup script or temporary endpoint. Keep subsequent code-only publication separate from this manual data operation.
+**How to apply:** Preserve existing Super Admin access, customer accounts, orders and all existing Production data. Never delete/reset the database or select wholesale Development-data overwrite. Prepare a separate safe configuration operation for approval if data synchronization is needed; do not request additional permission for already-requested code/workflow work. Keep native code/schema publishing separate from configuration rows, and do not claim Republish merges records. Do not invent build/startup seeds or bootstrap endpoints to bypass read-only access. Report a missing supported selective execution path honestly instead of asking the user to approve an operation that cannot run.
 
-Before presenting this catalog transfer as finally verified, the user requires a rollback-only test against the actual Production schema, with no test data committed.
+Read-only inspection or an isolated test using reproduced Production definitions is not proof that an actual Production write or rollback rehearsal ran.
 
-**Why:** The user explicitly requested this additional verification before executing the Production SQL script.
+**Why:** The previous recovery discussion repeatedly encountered the Agent's read-only Production replica.
 
-**How to apply:** Distinguish read-only Production schema inspection, isolated tests using reproduced Production definitions, and an actual Production rollback-only write rehearsal. A clone test does not prove the live rehearsal ran. Agent's Production replica remains read-only even when the planned transaction ends in rollback; leave the actual rehearsal to the user's authorized Production SQL Console and do not claim it passed without evidence.
+**How to apply:** Distinguish prepared data, user approval, execution capability and verified Production results. Old manual recovery approvals do not authorize a new operation under the changed workflow.
 
 The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, the landing page, customer sites, or prepared Production migration SQL. The user approved redesigning ONLY the Private Access page to use the existing QXLayer identity and light/dark behavior.
 
