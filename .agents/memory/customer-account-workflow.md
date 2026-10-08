@@ -61,6 +61,19 @@ other Production data unchanged. Do not promise Agent can press Publish or
 operate the editor, and do not add a recovery endpoint or startup grant to
 bypass the limitation.
 
+Do not make opening the raw Live identity API the only way to find the owner's
+Production Clerk ID.
+
+**Why:** The user reported a signed-in Live account, but opening the raw identity
+endpoint on their phone returned "Sign-in required." That observation does not
+prove the account is missing; the browser request's authenticated context was
+not established.
+
+**How to apply:** Use Production Auth user details as the no-code fallback.
+Distinguish a verified account record from proof of the current Live session.
+Do not respond to raw-link failure by adding browser bearer-token handling,
+weakening authentication or repeating the same unsuccessful instructions.
+
 The owner-facing Clients section is customer-account management, not a tenant/project directory. White Labels is the separate project-management section.
 
 **Why:** The user requires actual customer-focused Clients and truthful customer metrics; tenant count must not be presented as customer count.
