@@ -45,6 +45,22 @@ The platform creator's existing account has permanent Platform Owner/Super Admin
 
 **How to apply:** Never remove the owner's grant during test cleanup. Cleanup may remove only disposable grants introduced by that test. Confirm the exact existing identity before ownership changes; do not guess from recently created accounts or use a generated test identity as the owner.
 
+Owner recovery must not require the user to use Shell or execute SQL manually.
+The supported visual Production database editor is an alternative for an
+authorized project owner, after matching their successfully authenticated Live
+account to the correct Production Clerk user record. A copied user ID alone
+does not prove account control.
+
+**Why:** The user explicitly required verified identity before any privilege
+grant and a no-Shell/no-manual-SQL recovery process. Agent Production queries
+remain read-only; publishing approval does not authorize owner-record writes.
+
+**How to apply:** Separate identity verification, approval of the single
+persisted owner mapping, and the authorized visual editor action. Keep all
+other Production data unchanged. Do not promise Agent can press Publish or
+operate the editor, and do not add a recovery endpoint or startup grant to
+bypass the limitation.
+
 The owner-facing Clients section is customer-account management, not a tenant/project directory. White Labels is the separate project-management section.
 
 **Why:** The user requires actual customer-focused Clients and truthful customer metrics; tenant count must not be presented as customer count.
