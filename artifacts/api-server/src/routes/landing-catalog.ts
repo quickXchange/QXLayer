@@ -1,12 +1,14 @@
 import { Router } from "express";
 import * as v from "@workspace/api-zod";
 import { principalFrom, requireAuthentication, sameOriginMutation } from "../middlewares/authentication";
-import { publicProducts, listProducts, saveProduct } from "../modules/landing-catalog/service";
+import { publicProductCatalog, listProducts, saveProduct } from "../modules/landing-catalog/service";
 
 const router = Router();
 router.get("/public/product-catalog", async (_req, res): Promise<void> => {
   res.set("Cache-Control", "no-store");
-  res.json(v.GetPublicProductCatalogResponse.parse(await publicProducts()));
+  const catalog = await publicProductCatalog();
+  res.set("X-QX-Catalog-Source", catalog.source);
+  res.json(v.GetPublicProductCatalogResponse.parse(catalog.products));
 });
 router.get("/landing-products", requireAuthentication, async (_req, res): Promise<void> => {
   res.set("Cache-Control", "no-store");

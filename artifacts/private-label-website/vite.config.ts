@@ -76,8 +76,11 @@ export default defineConfig({
         'attached_assets',
       ),
     },
-    dedupe: ['react', 'react-dom'],
+    // Workspace hooks and this app must share the same QueryClient context,
+    // even when pnpm resolves separate React peer dependency variants.
+    dedupe: ['react', 'react-dom', '@tanstack/react-query'],
   },
+  optimizeDeps: { force: true },
   root: path.resolve(import.meta.dirname),
   build: {
     outDir: path.resolve(import.meta.dirname, 'dist/public'),

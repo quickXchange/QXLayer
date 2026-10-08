@@ -4,6 +4,8 @@ import type { z } from "zod";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { audit } from "../../lib/audit";
 import { HttpError } from "../../lib/errors";
+import { logger } from "../../lib/logger";
+import { selectPublicCatalog } from "./published-marketing";
 
 export type LandingProductInput = z.infer<typeof UpdateLandingProductBody>;
 const projection = `key,visible,name,description,icon,starting_price AS "startingPrice",
@@ -12,9 +14,23 @@ const projection = `key,visible,name,description,icon,starting_price AS "startin
   CASE WHEN key='crypto_exchange' THEN 'sandbox_only' ELSE 'planned' END AS readiness`;
 
 // Explicit public projection; execution readiness is server-owned, never marketing-editable.
-export function publicProducts() {
-  return withDatabase({ actorId: "public:product-catalog" }, async (client) =>
-    (await client.query(`SELECT ${projection} FROM landing_products WHERE visible=true ORDER BY display_order,key`)).rows);
+let reportedPublishedMarketing = false;
+export function publicProductCatalog() {
+  return withDatabase({ actorId: "public:product-catalog" }, async (client) => {
+    const products = (await client.query(`SELECT ${projection} FROM landing_products WHERE visible=true ORDER BY display_order,key`)).rows;
+    const hasStoredProducts = products.length > 0 || (await client.query<{ configured: boolean }>(
+      "SELECT EXISTS(SELECT 1 FROM landing_products) AS configured")).rows[0]?.configured === true;
+    const catalog = selectPublicCatalog(products, hasStoredProducts, process.env.NODE_ENV === "production");
+    if (catalog.source === "published-marketing" && !reportedPublishedMarketing) {
+      logger.warn({ event: "published_marketing_catalog", source: catalog.source },
+        "Production catalog has no records; serving published public marketing content without database writes.");
+      reportedPublishedMarketing = true;
+    }
+    return catalog;
+  });
+}
+export async function publicProducts() {
+  return (await publicProductCatalog()).products;
 }
 export function listProducts(principal: Principal) {
   requireSuperAdmin(principal);
