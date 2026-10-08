@@ -66,13 +66,13 @@ Check the available Production write capability before declaring a synchronizati
 
 **How to apply:** Distinguish data readiness, identity evidence, execution capability and permission to execute. Do not bypass read-only access with credentials, a bootstrap endpoint, startup imports or publishing. Report blocked Production work separately from verified Development-only fixes.
 
-## Republish and catalog initialization
+## Republish and manual catalog transfer
 
-The user wants one-click Republish for the latest approved website changes and approved Landing Products with their required modules, using only officially supported publishing and database initialization options. Preserve the existing Production database, Super Admin access and all existing records. No destructive operations, temporary endpoints or startup migration scripts. If Republish cannot safely transfer the records, explain the exact limitation before the user clicks it.
+The user stopped investigating Republish for database transfer. For the approved Landing Products and required modules, prepare one complete insert-only SQL script for the user to execute using Replit's Production SQL Console. A successful run must insert exactly the approved records, prevent duplicates, use a transaction and validate before committing. Preserve existing Super Admin access and all Production data. No updates, deletes, authentication/schema/design changes, automatic execution or publishing.
 
-**Why:** The user explicitly made preservation of existing Production data and access a condition of the requested Republish workflow.
+**Why:** After the official Republish limitations were explained, the user explicitly chose a manually executed Production SQL Console operation instead.
 
-**How to apply:** Recheck official documentation before configuring initialization. Ordinary publication transfers code and schema changes, not selective row inserts. A whole-database Development-data initialization is not an append-only catalog merge and cannot satisfy this preservation requirement. Keep code-only publication separate from any authorized catalog-only Production data operation; do not present the combined workflow as ready when only code publication is configured.
+**How to apply:** Preparing user-requested catalog DML is not permission for Agent Production execution or schema migration. Use the exact approved snapshot; abort on existing approved keys rather than silently skip them when an exact insert count is required. Do not reintroduce a Republish initialization workaround, startup script or temporary endpoint. Keep subsequent code-only publication separate from this manual data operation.
 
 The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, the landing page, customer sites, or prepared Production migration SQL. The user approved redesigning ONLY the Private Access page to use the existing QXLayer identity and light/dark behavior.
 
