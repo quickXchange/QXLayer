@@ -1,6 +1,8 @@
--- MANUAL EXECUTION ONLY: Replit Production SQL Console, whole script in one run.
--- CANDIDATE: isolated rollback tests passed, but an actual Production rollback
--- rehearsal must pass before this COMMIT version is treated as Production-verified.
+-- ROLLBACK-ONLY PRODUCTION REHEARSAL. No COMMIT is present.
+-- Run the entire file once in the Production SQL Console.
+-- Compare the first and last baseline result rows: they must be identical.
+SELECT (SELECT count(*) FROM public.module_catalog) AS modules_total, (SELECT count(*) FROM public.landing_products) AS products_total, (SELECT count(*) FROM public.platform_admins WHERE active=true) AS active_admins, (SELECT md5(COALESCE(string_agg(row_to_json(a)::text,chr(10) ORDER BY clerk_user_id),'')) FROM public.platform_admins a) AS owner_fingerprint;
+-- MANUAL ROLLBACK-ONLY TEST: whole script in one run.
 -- No application, authentication, schema, startup or publishing changes.
 -- Exactly 16 + 16 new rows on success; any existing approved key aborts the run.
 -- Approved snapshot SHA-256: 110ee5ac12820106c5b8ea437416f48add578994c2087728511b43353257b85e
@@ -253,9 +255,8 @@ BEGIN
 END;
 $qx_insert$ LANGUAGE plpgsql;
 
-COMMIT;
 
--- Post-commit readback. Only treat the run as successful if there were NO errors.
+-- Counts inside the validated transaction: expect 16,16,15,true.
 WITH approved_keys AS (
   SELECT unnest(ARRAY['android_app','articles','cloud_mining','crypto_card','crypto_engine','crypto_exchange','crypto_payments','dex','earn','ios_app','kolo','rpc_nodes','staking','telegram_bot','telegram_mini_app','whatsapp_bot']::text[]) AS key
 )
@@ -265,3 +266,8 @@ SELECT
   (SELECT count(*) FROM public.landing_products p JOIN approved_keys k USING (key) WHERE p.visible) AS approved_visible_products,
   EXISTS (SELECT 1 FROM public.landing_products WHERE key = 'kolo' AND visible = false AND display_order = 160) AS kolo_hidden,
   (SELECT count(*) FROM public.platform_admins WHERE active = true) AS active_platform_admins;
+
+ROLLBACK;
+
+-- After rollback: original totals and owner fingerprint must be unchanged.
+SELECT (SELECT count(*) FROM public.module_catalog) AS modules_total, (SELECT count(*) FROM public.landing_products) AS products_total, (SELECT count(*) FROM public.platform_admins WHERE active=true) AS active_admins, (SELECT md5(COALESCE(string_agg(row_to_json(a)::text,chr(10) ORDER BY clerk_user_id),'')) FROM public.platform_admins a) AS owner_fingerprint;
