@@ -1,0 +1,15 @@
+{
+  "status": "PASSED_SYNTHETIC_REHEARSAL_ONLY",
+  "target": "Isolated PostgreSQL 16 cluster, private /tmp socket",
+  "productionExecuted": false,
+  "productionVerified": false,
+  "developmentModified": false,
+  "tests": [
+    "Unapproved original file rejects without inserting any data.",
+    "Wrong owner/target fingerprint rejects before any insert.",
+    "Full 277-row import passes actual reproduced Production column/CHECK/FK definitions; 15 visible, Kolo hidden; rerun is unchanged.",
+    "An existing matching configuration record is retained, not duplicated or overwritten.",
+    "A conflicting existing record aborts all changes and keeps its original value.",
+    "Injected failure after all inserts rolls the entire single statement back; synthetic owner survives."
+  ]
+}

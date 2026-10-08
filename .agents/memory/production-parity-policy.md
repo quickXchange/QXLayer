@@ -66,9 +66,9 @@ Check the available Production write capability before declaring a synchronizati
 
 **How to apply:** Distinguish data readiness, identity evidence, execution capability and permission to execute. Do not bypass read-only access with credentials, a bootstrap endpoint, startup imports or publishing. Report blocked Production work separately from verified Development-only fixes.
 
-## Supported Republish and protected configuration
+## Earlier Republish-based request (superseded for data execution)
 
-The user stopped the manual recovery process. They want Production to match Development's latest code/design and application configuration, including products, plans, add-ons, modules and settings, using Replit's supported publishing and database initialization mechanisms. Do not ask them to use Shell or manually run SQL.
+The user previously stopped the manual recovery process and requested native Republish/database initialization for code/design and configuration, without Shell or manual SQL. The complete approved-configuration request below now permits one clear authorized execution step if Agent cannot execute; it does not permit a return to the earlier complicated recovery process.
 
 **Why:** The user explicitly changed the chosen workflow back to Republish and rejected further manual Shell/SQL recovery.
 
@@ -80,13 +80,21 @@ Read-only inspection or an isolated test using reproduced Production definitions
 
 **How to apply:** Distinguish prepared data, user approval, execution capability and verified Production results. Old manual recovery approvals do not authorize a new operation under the changed workflow.
 
-## Landing-only Live restoration
+## Earlier landing-only request (superseded)
 
-The current restoration request is limited to the existing 16 Development Landing Products and their required modules. Show all 15 visible products and keep Kolo hidden. Preserve the original design, Super Admin access, customer accounts and all existing Production data. Do not delete or reset anything, and do not Republish unless necessary.
+The earlier restoration request was limited to the existing 16 Development Landing Products and their required modules. Its visibility requirement remains: show all 15 visible products and keep Kolo hidden. Preserve the original design, Super Admin access, customer accounts and all existing Production data. Do not delete or reset anything, and do not Republish unless necessary.
 
 **Why:** The user narrowed the earlier full-configuration parity request to fixing the empty Live landing page.
 
-**How to apply:** Require approval before any Production change through an authorized write method. Do not include plans, add-ons or unrelated configuration in this operation. Verify the actual Live website after execution, not Development Preview. A read-only Production comparison or a screenshot of the Private Access gate is not post-fix landing-page verification.
+**How to apply:** Retain the visibility and preservation requirements, but use the broader scope below. A read-only Production comparison or a screenshot of the Private Access gate is not post-fix landing-page verification.
+
+## Complete approved platform configuration
+
+The user broadened the request to landing products, modules, plans, add-ons and all required platform configuration records and dependencies. Do not restrict it to landing products. Preserve existing Super Admin, users, orders and all existing Production records without deleting, resetting or overwriting anything.
+
+**Why:** The user explicitly superseded the narrow landing-only restoration with a complete approved-configuration migration.
+
+**How to apply:** Check all configuration tables and their dependencies. Demo/test offerings are not automatically approved commercial configuration; obtain the exact scope decision before importing them. If Agent cannot execute, the user now requests one clear, simple execution step through an authorized Production connection. A single native Production SQL-runner action is allowed for this request; do not resume a multi-step Shell/credential recovery process or bypass Agent's read-only channel. Verify actual Production records and the actual Live website after execution, then prepare Republish only if needed. Do not claim completion before Live verification.
 
 The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, the landing page, customer sites, or prepared Production migration SQL. The user approved redesigning ONLY the Private Access page to use the existing QXLayer identity and light/dark behavior.
 
