@@ -1,0 +1,125 @@
+{
+  "status": "APPROVED_FOR_NATIVE_OPERATOR_EXECUTION_NOT_EXECUTED",
+  "sourceSha256": "0f04a2dd448ce5138f228a1cfc1e1130eca2acb473fd4811ae31ef4a92ad0e36",
+  "sqlSha256": "78fb99b117c8a3c50dd84aef105721443e8b417f0e883167016689d346cfa3f5",
+  "bytes": 74526,
+  "operatorExecution": "Native Production SQL runner; entire file is ONE DO statement.",
+  "agentExecution": "Unavailable: managed Agent Production SQL is read-only.",
+  "included": [
+    {
+      "table": "module_catalog",
+      "count": 18,
+      "primaryKey": [
+        "key"
+      ]
+    },
+    {
+      "table": "entitlement_definitions",
+      "count": 32,
+      "primaryKey": [
+        "key"
+      ]
+    },
+    {
+      "table": "asset_catalog",
+      "count": 33,
+      "primaryKey": [
+        "id"
+      ]
+    },
+    {
+      "table": "network_catalog",
+      "count": 19,
+      "primaryKey": [
+        "id"
+      ]
+    },
+    {
+      "table": "provider_catalog",
+      "count": 0,
+      "primaryKey": [
+        "id"
+      ]
+    },
+    {
+      "table": "plans",
+      "count": 5,
+      "primaryKey": [
+        "id"
+      ]
+    },
+    {
+      "table": "addons",
+      "count": 1,
+      "primaryKey": [
+        "id"
+      ]
+    },
+    {
+      "table": "landing_products",
+      "count": 16,
+      "primaryKey": [
+        "key"
+      ]
+    },
+    {
+      "table": "asset_network_catalog",
+      "count": 37,
+      "primaryKey": [
+        "id"
+      ]
+    },
+    {
+      "table": "plan_entitlements",
+      "count": 112,
+      "primaryKey": [
+        "plan_id",
+        "key"
+      ]
+    },
+    {
+      "table": "addon_entitlements",
+      "count": 4,
+      "primaryKey": [
+        "addon_id",
+        "key"
+      ]
+    }
+  ],
+  "excluded": [
+    "api_keys",
+    "audit_events",
+    "blockchain_provider_configs",
+    "exchange_orders",
+    "notification_events",
+    "payment_invoices",
+    "platform_admins",
+    "pricing_rules",
+    "provider_assignments",
+    "provider_policies",
+    "tenant_addons",
+    "tenant_asset_networks",
+    "tenant_branding",
+    "tenant_configuration",
+    "tenant_domains",
+    "tenant_entitlement_overrides",
+    "tenant_memberships",
+    "tenant_modules",
+    "tenant_payment_methods",
+    "tenant_product_configuration",
+    "tenant_subscriptions",
+    "tenant_usage_counters",
+    "tenants",
+    "wallet_configurations",
+    "webhook_endpoints",
+    "white_label_attachments",
+    "white_label_events",
+    "white_label_requests"
+  ],
+  "preservedProductionAdminCount": 1,
+  "totalRows": 277,
+  "approvalRequired": false,
+  "approvedAt": "2026-10-08T23:46:24.117Z",
+  "approval": "All 277 records unchanged; exact frozen source approved.",
+  "liveVerified": false
+}

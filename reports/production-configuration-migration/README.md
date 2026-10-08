@@ -1,6 +1,10 @@
 # Complete Production configuration migration
 
-**Status: prepared and synthetically tested; NOT APPROVED, NOT EXECUTED. Live is NOT verified.**
+**Status: all 277 records APPROVED unchanged and synthetically tested; NOT EXECUTED. Live is NOT verified.**
+
+Approval is recorded in `approval.json`. The executable approved copy is
+`migration-APPROVED.sql`, with its checksum in `manifest-APPROVED.json`.
+The prepared files remain unchanged as the original review evidence.
 
 This is the current full-platform data proposal. It supersedes the earlier
 landing-only proposal and historical recovery packages. Do not run those old files.
@@ -32,7 +36,7 @@ stays within these 11 tables, and every source reference was checked. Module
 feature/limit declarations were checked against entitlement definitions.
 All 16 landing products are retained: 15 visible, Kolo hidden.
 
-## Approval issue: these are demo/test offerings
+## Approved scope: these remain demo/test offerings
 
 Development contains no clearly identified real commercial plan. All five
 plans are currently enabled:
@@ -48,8 +52,9 @@ USD 300 monthly / USD 3,000 yearly / USD 200 setup.
 
 The proposed full migration retains their exact names, IDs, prices, enabled
 states and entitlement values. It does not relabel them as real commercial
-offerings. These 122 plan/add-on/entitlement rows require an explicit scope
-decision before execution. Public landing marketing prices remain NULL.
+offerings. The user explicitly approved these 122 plan/add-on/entitlement rows
+along with the other 155 global configuration rows, unchanged and without
+exclusions. Public landing marketing prices remain NULL.
 
 ## Preservation
 
@@ -75,15 +80,17 @@ Short-lived table locks prevent concurrent changes; ordinary SELECTs stay availa
 Protected table fingerprints are checked before and after; every original global
 row and every imported source row is verified inside the transaction.
 
-## Authorized execution — one step, after approval
+## Authorized execution — one step
 
 **In Replit's Database tool, select Production → My Data → SQL runner, paste the
-entire approved migration file supplied after scope approval, and click Run once.**
+entire `reports/production-configuration-migration/migration-APPROVED.sql` file,
+and click Run once.**
 
-The prepared file is `migration-PREPARED.sql`. Its approval guard is deliberately
-false; running it now aborts without changes. After approval, the approved copy
-will have that guard enabled and an updated checksum. Do not independently
-remove guards or edit source values.
+The prepared file is `migration-PREPARED.sql`. Its approval guard remains
+deliberately false; running that old prepared copy aborts without changes.
+The approved copy has only its approval guard and explanatory approval header
+changed. Frozen source data and all preservation checks are identical.
+Do not independently remove guards or edit source values.
 
 The entire file is one PostgreSQL DO statement. This makes all inserts atomic
 even if the editor uses pooled connections: any error rolls back the whole

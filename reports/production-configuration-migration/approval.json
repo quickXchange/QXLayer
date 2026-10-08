@@ -1,0 +1,13 @@
+{
+  "status": "USER_APPROVED_SCOPE_NOT_EXECUTED",
+  "approvedAt": "2026-10-08T23:46:24.117Z",
+  "userDecision": "Approve all 277 records unchanged",
+  "exclusionsOrCorrections": null,
+  "totalRows": 277,
+  "sourceSha256": "0f04a2dd448ce5138f228a1cfc1e1130eca2acb473fd4811ae31ef4a92ad0e36",
+  "approvedSqlSha256": "78fb99b117c8a3c50dd84aef105721443e8b417f0e883167016689d346cfa3f5",
+  "execution": "Authorized user runs the single statement in native Production SQL runner; Agent remains read-only.",
+  "productionExecutionPerformed": false,
+  "liveVerified": false,
+  "includesEnabledDemoTestPlansAndSampleAddonUnchanged": true
+}
