@@ -3,6 +3,24 @@ name: Development-to-production parity policy
 description: User constraints for diagnosing and synchronizing published content and configuration.
 ---
 
+## Current test-project scope
+
+QXLayer is currently a test project. The user states there are no real
+customers, orders, or important Production data to preserve. They want the
+latest Development version to work correctly on Live, including required
+configuration and test data, without changing its design or functionality.
+
+**Why:** The user explicitly clarified the project is a test environment,
+superseding the earlier assumption that Production contains important customer
+data for this initialization request.
+
+**How to apply:** Development test data may be considered for a reviewed
+initialization plan; earlier blanket exclusions on Development/test imports do
+not prohibit that plan. Preparation is permitted, but explain the plan before
+destructive database operations or publishing. This does not grant Agent
+Production write access or justify bypassing managed database restrictions.
+Verify Production identity compatibility separately from database copying.
+
 Use CURRENT Development as the source of truth when comparing or synchronizing this project's published state. Do not restore old deleted data or old configuration. Diagnose source/build, current data, environment settings and media separately, read-only first; do not blindly republish, redesign, delete or recreate data.
 
 Distinguish code-only Republish readiness from database-recovery readiness.
