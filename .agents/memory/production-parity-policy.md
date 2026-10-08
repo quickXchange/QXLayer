@@ -80,6 +80,14 @@ Read-only inspection or an isolated test using reproduced Production definitions
 
 **How to apply:** Distinguish prepared data, user approval, execution capability and verified Production results. Old manual recovery approvals do not authorize a new operation under the changed workflow.
 
+## Landing-only Live restoration
+
+The current restoration request is limited to the existing 16 Development Landing Products and their required modules. Show all 15 visible products and keep Kolo hidden. Preserve the original design, Super Admin access, customer accounts and all existing Production data. Do not delete or reset anything, and do not Republish unless necessary.
+
+**Why:** The user narrowed the earlier full-configuration parity request to fixing the empty Live landing page.
+
+**How to apply:** Require approval before any Production change through an authorized write method. Do not include plans, add-ons or unrelated configuration in this operation. Verify the actual Live website after execution, not Development Preview. A read-only Production comparison or a screenshot of the Private Access gate is not post-fix landing-page verification.
+
 The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, the landing page, customer sites, or prepared Production migration SQL. The user approved redesigning ONLY the Private Access page to use the existing QXLayer identity and light/dark behavior.
 
 **Why:** The user explicitly required a separate Production Domain Access Gate and later authorized fixing its Production runtime and redesigning only its Private Access screen, while preserving the other product surfaces and database.
