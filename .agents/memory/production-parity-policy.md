@@ -14,12 +14,13 @@ configuration and test data, without changing its design or functionality.
 superseding the earlier assumption that Production contains important customer
 data for this initialization request.
 
-**How to apply:** Development test data may be considered for a reviewed
-initialization plan; earlier blanket exclusions on Development/test imports do
-not prohibit that plan. Preparation is permitted, but explain the plan before
-destructive database operations or publishing. This does not grant Agent
-Production write access or justify bypassing managed database restrictions.
-Verify Production identity compatibility separately from database copying.
+**How to apply:** The test-project clarification does not authorize deleting,
+overwriting or initializing either database. For code-only Republish requests,
+preserve the existing Production database and limit scope to the latest code
+and design. Any future data initialization requires separate explicit approval
+after explaining the plan. This does not grant Agent Production write access
+or justify bypassing managed database restrictions. Verify Production identity
+compatibility separately from database copying.
 
 Use CURRENT Development as the source of truth when comparing or synchronizing this project's published state. Do not restore old deleted data or old configuration. Diagnose source/build, current data, environment settings and media separately, read-only first; do not blindly republish, redesign, delete or recreate data.
 
