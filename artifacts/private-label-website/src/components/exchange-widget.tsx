@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowDownUp, ChevronDown, Info, ShieldCheck } from 'lucide-react';
 import type { AssetNetwork, PublicSite } from '@workspace/api-client-react';
 import { useGetPublicExchange, getGetPublicExchangeQueryKey, createSandboxQuote, createSandboxOrder, trackSandboxOrder, type ExchangeQuote, type ExchangeOrderCreated } from '@workspace/api-client-react';
@@ -9,8 +9,9 @@ import { AssetPicker, Coin, NetBadge, assetKey } from './asset-picker';
 const LABEL: Record<ExchangeTab, string> = { swap: 'Swap', convert: 'Convert', buy: 'Buy', sell: 'Sell' };
 const AMOUNT = /^\d{0,12}(\.\d{0,18})?$/;
 const NOQ = 'No pricing source is connected in this sandbox.';
+const EMPTY_ASSETS: AssetNetwork[] = [];
 
-function Side({ label, asset, onPick, value, onValue, readOnly, fiat, fiatCurrency = 'Fiat', error, id, assetsAvailable }: { label: string; asset: AssetNetwork | null; onPick?: () => void; value: string; onValue?: (v: string) => void; readOnly?: boolean; fiat?: boolean; fiatCurrency?: string; error?: string | null; id: string; assetsAvailable: boolean }) {
+const Side = memo(function Side({ label, asset, onPick, value, onValue, readOnly, fiat, fiatCurrency = 'Fiat', error, id, assetsAvailable }: { label: string; asset: AssetNetwork | null; onPick?: () => void; value: string; onValue?: (v: string) => void; readOnly?: boolean; fiat?: boolean; fiatCurrency?: string; error?: string | null; id: string; assetsAvailable: boolean }) {
   return (
     <div>
       <div className={`s-side${id === 'bottom' ? ' s-side-out' : ''}`} style={error ? { borderColor: '#d9485f' } : undefined}>
@@ -33,7 +34,7 @@ function Side({ label, asset, onPick, value, onValue, readOnly, fiat, fiatCurren
       {error && <p id={`err-${id}`} role="alert" className="mt-1.5 text-xs font-medium" style={{ color: '#e5556b' }}>{error}</p>}
     </div>
   );
-}
+});
 
 export interface RateInfo { mode: 'swap' | 'convert' | null; sourceAsset: string | null; targetAsset: string | null; rate: string | null; loading: boolean; error: boolean }
 
@@ -41,7 +42,7 @@ export interface RateInfo { mode: 'swap' | 'convert' | null; sourceAsset: string
 export function ExchangeWidget({ site, caps, presentation = false, allowedActions, initialAction, onRateInfo }: { site: PublicSite; caps: Caps; presentation?: boolean; allowedActions?: ExchangeTab[]; initialAction?: ExchangeTab; onRateInfo?: (info: RateInfo) => void }) {
   const exchangeQ = useGetPublicExchange(site.tenantSlug, { request: websitePreviewRequest(site.tenantSlug), query: { queryKey: getGetPublicExchangeQueryKey(site.tenantSlug), enabled: !presentation, refetchInterval: 15000 } });
   const config = exchangeQ.data;
-  const assets = presentation ? site.assets : config?.assets ?? [];
+  const assets = presentation ? site.assets : config?.assets ?? EMPTY_ASSETS;
   const allTabs = presentation || !config ? caps.tabs : config.actions;
   const tabs = allowedActions ? allTabs.filter((t) => allowedActions.includes(t)) : allTabs;
   const previewProof = useMemo(() => !presentation && !!websitePreviewRequest(site.tenantSlug).headers, [presentation, site.tenantSlug]);
@@ -68,7 +69,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
   const byKey = useMemo(() => new Map(assets.map((a) => [assetKey(a), a])), [assets]);
   const from = fromKey ? byKey.get(fromKey) ?? null : null;
   const to = toKey ? byKey.get(toKey) ?? null : null;
-  const distinct = new Set(assets.map((a) => presentation ? a.assetId : assetKey(a))).size;
+  const distinct = useMemo(() => new Set(assets.map((a) => presentation ? a.assetId : assetKey(a))).size, [assets, presentation]);
   const twoSided = tab === 'swap' || tab === 'convert';
   const insufficient = twoSided && distinct < 2;
   const noAssets = assets.length === 0;
@@ -149,6 +150,8 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
     return () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave); if (raf) cancelAnimationFrame(raf); };
   }, []);
 
+  const cryptoSide = tab === 'sell' ? 'from' : 'to';
+  const pickBottom = useCallback(() => setPicker(cryptoSide === 'to' ? 'to' : 'from'), [cryptoSide]);
   const shell = (inner: React.ReactNode) => (
     <div ref={frame} className="s-glowframe" data-testid="widget-exchange"><div className="s-glowinner p-3.5 sm:p-7"><div className="s-clip" aria-hidden="true"><span className="s-spec" /><span className="s-sheen" /></div>{inner}</div></div>
   );
@@ -159,7 +162,6 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
       <p className="s-muted mx-auto mt-2 max-w-sm text-sm leading-relaxed">{site.brandName} has the exchange service turned on, but none of Swap, Convert, Buy or Sell have been enabled. They will appear here once configured.</p>
     </div>);
 
-  const cryptoSide = tab === 'sell' ? 'from' : 'to';
   const onSelect = (a: AssetNetwork) => {
     const k = assetKey(a);
     if (picker === 'from') { setFromKey(k); if (twoSided && to && (presentation ? to.assetId === a.assetId : assetKey(to) === k)) setToKey(null); }
@@ -217,7 +219,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
         <div className="mt-4 sm:mt-5">
           <Side id="top" label={tab === 'buy' ? 'You pay' : tab === 'convert' ? 'You convert' : 'You send'} asset={tab === 'buy' ? null : from} fiat={tab === 'buy'} fiatCurrency={config?.fiatCurrency} onPick={() => setPicker('from')} value={amount} onValue={(v) => { setAmount(v); reset(); }} error={amountError} assetsAvailable={assets.length > 0} />
           {twoSided ? <button type="button" className="s-swapbtn" onClick={flip} aria-label="Switch direction" disabled={!from || !to} data-testid="button-switch-direction"><ArrowDownUp size={17} /></button> : <div className="h-3" />}
-          <Side id="bottom" label="You receive" asset={tab === 'sell' ? null : to} fiat={tab === 'sell'} fiatCurrency={config?.fiatCurrency} onPick={() => setPicker(cryptoSide === 'to' ? 'to' : 'from')} value={quote?.outputAmount ?? ''} readOnly assetsAvailable={assets.length > 0} />
+          <Side id="bottom" label="You receive" asset={tab === 'sell' ? null : to} fiat={tab === 'sell'} fiatCurrency={config?.fiatCurrency} onPick={pickBottom} value={quote?.outputAmount ?? ''} readOnly assetsAvailable={assets.length > 0} />
           {!presentation && !twoSided && <label className="s-muted mt-3 block text-xs">Sandbox payment method<select className="s-field mt-1 w-full rounded-lg border bg-transparent p-2" value={paymentMethodId} onChange={e => { setPaymentMethodId(e.target.value); reset(); }} data-testid="select-exchange-payment-method"><option value="">Select a method</option>{methods.map(m => <option key={m.id} value={m.id}>{m.label} ({m.currency})</option>)}</select></label>}
           <p className="s-muted mt-2 text-xs" aria-live="polite" data-testid="text-receive-note">{quoting ? 'Calculating sandbox quote…' : quote ? `Receive ${quote.outputAmount} ${quote.destinationSymbol} · sandbox estimate · markup ${quote.spreadBps / 100}% · valid until ${new Date(quote.expiresAt).toLocaleTimeString()}` : 'Receive amount appears once a quote is available.'}</p>
         </div>

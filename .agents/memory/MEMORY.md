@@ -31,3 +31,4 @@
 - [Hostname normalization](hostname-normalization.md) — IDN conversion can discard URL syntax; validate customer input before canonicalizing it.
 - [Integration verification boundaries](integration-verification-boundaries.md) — privileged-role RLS queries are not isolation proof; source-schema references need a bounded allowlist.
 - [External preparation](external-migration-authorization.md) — GitHub/Vercel/Render/Supabase preparation authorized; no Production transfer, DNS change or cutover.
+- [Performance comparisons](performance-comparisons.md) — normalize build/auth settings; distinguish bootstrap, complete-route bytes, lab clicks and field/cloud results.

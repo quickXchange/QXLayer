@@ -28,20 +28,21 @@ export async function withDatabase<T>(
 ): Promise<T> {
   const client = await pool.connect();
   try {
-    await client.query(context.canWrite === true ? "BEGIN" : "BEGIN READ ONLY");
     const role = runtimeRole();
     if (role === "qxlayer_runtime") {
+      await client.query(context.canWrite === true ? "BEGIN" : "BEGIN READ ONLY");
       const login = await client.query(`SELECT session_user='qxlayer_app' AND NOT r.rolsuper
         AND NOT r.rolbypassrls AND NOT r.rolinherit AND NOT r.rolcreaterole AND NOT r.rolcreatedb
         AND NOT EXISTS (SELECT 1 FROM pg_roles p WHERE p.rolname NOT IN ('qxlayer_app','qxlayer_runtime')
           AND pg_has_role(r.oid,p.oid,'MEMBER')) AS safe
         FROM pg_roles r WHERE r.rolname=session_user`);
       if (!login.rows[0]?.safe) throw new Error("External database login is not restricted.");
-      await client.query("SET LOCAL ROLE qxlayer_runtime");
+      await client.query("SET LOCAL ROLE qxlayer_runtime; SET LOCAL search_path=pg_catalog,public; SET LOCAL row_security=on");
     } else {
-      await client.query("SET LOCAL ROLE pg_database_owner");
+      // Static commands only: batch transport, not authorization or guard results.
+      // Every transaction still performs the full schema/policy/grant readback.
+      await client.query(`${context.canWrite === true ? "BEGIN" : "BEGIN READ ONLY"}; SET LOCAL ROLE pg_database_owner; SET LOCAL search_path=pg_catalog,public; SET LOCAL row_security=on`);
     }
-    await client.query("SET LOCAL search_path=pg_catalog,public");
     const security = await client.query<{ safe: boolean }>(`
       SELECT NOT r.rolsuper AND NOT r.rolbypassrls AND
         NOT EXISTS (SELECT 1 FROM unnest($1::text[]) names(name)
@@ -59,7 +60,6 @@ export async function withDatabase<T>(
                 AND position('app.can_write' in pg_get_expr(p.polwithcheck,p.polrelid))>0)))<>2)
         AS safe FROM pg_roles r WHERE r.rolname=current_user`, [applicationTableNames()]);
     if (!security.rows[0]?.safe) throw new Error("Database isolation is not ready: review the approved schema, policies and role grants before serving requests.");
-    await client.query("SET LOCAL row_security=on");
     await client.query(
       `SELECT set_config('app.actor_id', $1, true),
               set_config('app.tenant_id', $2, true),

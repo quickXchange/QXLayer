@@ -714,3 +714,17 @@ mtime_ms = 1791578468606
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/deb70892-ee0e-4436-8628-b025f04e839b/5b66c733-044b-41d7-963b-73166f4f8f0e"
 storage_version_token = "1791578469222965"
 content_type = "text/html"
+
+[[outputs]]
+id = "BIpa6pRdk-ZcSdlDTlhef"
+uri = "file://generated-artifacts/performance/report.html"
+type = "html"
+title = "QXLayer performance report"
+description = "Measured before/after results, completed checks, design/security safeguards and explicit lab/cloud limitations."
+logical_id = "20885ba2-b11e-4ed7-a392-a460d40464f7"
+content_hash = "sha256:d4f6ec8a8dd379cd0170a4c734527de83d645d22e12f50bbc37068ad3f830ba1"
+size = 7794
+mtime_ms = 1791588389642
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/20885ba2-b11e-4ed7-a392-a460d40464f7/df8ff2c4-ff0a-4c0f-90bd-2c253edb514a"
+storage_version_token = "1791588512140396"
+content_type = "text/html"

@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { cp, mkdir, rm, writeFile, readdir, stat } from "node:fs/promises";
+import { cp, mkdir, rm, writeFile, readdir, stat, readFile } from "node:fs/promises";
+import { brotliCompressSync, gzipSync, constants } from "node:zlib";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../../", import.meta.url));
@@ -38,6 +39,20 @@ async function validateSizes(dir) {
   }
 }
 await validateSizes(path.join(fn, "static"));
+// Compress at build time, not per visitor. Gate still runs before every response;
+// these files remain inside the function, never on a public bypass route.
+async function compressAssets(dir) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const file = path.join(dir, entry.name);
+    if (entry.isDirectory()) await compressAssets(file);
+    else if (/\.(js|css|html|svg)$/.test(file)) {
+      const bytes = await readFile(file);
+      await writeFile(`${file}.gz`, gzipSync(bytes, { level: 9 }));
+      await writeFile(`${file}.br`, brotliCompressSync(bytes, { params: { [constants.BROTLI_PARAM_QUALITY]: 9 } }));
+    }
+  }
+}
+await compressAssets(path.join(fn, "static"));
 await writeFile(path.join(fn, ".vc-config.json"), JSON.stringify({
   runtime: "nodejs24.x", handler: "handler.mjs", launcherType: "Nodejs",
   shouldAddHelpers: false, maxDuration: 15,
