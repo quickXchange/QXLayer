@@ -48,3 +48,16 @@ security.
 **How to apply:** Keep vault availability lazy and isolated from application
 startup. Do not resume vault implementation or key requests during pre-publish
 verification; review provider connectivity separately.
+
+The user has now approved reuse and adaptation of QuickXchange's 1Forge, WhiteBIT,
+RPC/monitoring, provider selection, integration settings, connection tests, health
+and Manual fallback into QXLayer. This supersedes the earlier metadata-only scope
+for those components, not the prohibitions on fake connectivity or unsafe secrets.
+
+**Why:** The user selected these existing integrations explicitly and requires
+independent projects with protected credentials and data.
+
+**How to apply:** Use the current working Replit source, not its outdated GitHub
+copy. Keep copied code tenant-scoped and credentials independently configured.
+Do not infer authorization for deposits, trades, withdrawals, automatic financial
+execution or Heleket from approval of provider configuration and monitoring.
