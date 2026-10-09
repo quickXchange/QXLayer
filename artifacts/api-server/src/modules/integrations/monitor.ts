@@ -5,6 +5,7 @@ const system = { userId: "qxlayer-provider-health", role: "super_admin" as const
 /** Opt-in, read-only health checks. Never poll suspended tenants or execute financial operations. */
 export function startIntegrationHealthMonitor() {
   let busy = false;
+  const drained: (() => void)[] = [];
   const timer = setInterval(async () => {
     if (busy || !vaultAvailable()) return;
     busy = true;
@@ -19,8 +20,11 @@ export function startIntegrationHealthMonitor() {
     } catch {
       // No raw provider errors, endpoints or secrets in logs. Normal request/startup remains independent.
       console.warn("Opt-in provider health cycle could not complete.");
-    } finally { busy = false; }
+    } finally { busy = false; for (const done of drained.splice(0)) done(); }
   }, 5 * 60 * 1000);
   timer.unref();
-  return () => clearInterval(timer);
+  return () => {
+    clearInterval(timer);
+    return busy ? new Promise<void>(resolve => drained.push(resolve)) : Promise.resolve();
+  };
 }

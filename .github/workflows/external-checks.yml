@@ -1,0 +1,49 @@
+name: External preparation checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  preparation:
+    runs-on: ubuntu-latest
+    services:
+      # Disposable CI fixture only: never Production or copied customer data.
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: qxlayer_ci_disposable_only
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:qxlayer_ci_disposable_only@127.0.0.1:5432/postgres
+      MIGRATION_DATABASE_URL: postgresql://postgres:qxlayer_ci_disposable_only@127.0.0.1:5432/postgres
+      QXLAYER_MIGRATION_TEST: "true"
+      QXLAYER_EXTERNAL_MIGRATIONS_APPROVED: "true"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm run external:test
+      - run: pnpm run release:test
+      - run: pnpm run external:test:database
+      - run: pnpm --filter @workspace/api-server run build
+      - name: Build isolated frontend package (no hosted account or real key)
+        run: pnpm run external:build:frontend
+        env:
+          QXLAYER_API_ORIGIN: https://qxlayer-ci-placeholder.onrender.com
+          VITE_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS5pbnZhbGlkJA
+          VITE_CLERK_PROXY_URL: https://qxlayer-ci.example.invalid/api/__clerk

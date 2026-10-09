@@ -1,0 +1,3220 @@
+{
+  "columns": [
+    {
+      "table_name": "addon_entitlements",
+      "name": "addon_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "addon_entitlements",
+      "name": "key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "addon_entitlements",
+      "name": "value",
+      "type": "jsonb",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "addons",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "addons",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "addons",
+      "name": "description",
+      "type": "text",
+      "required": true,
+      "default_value": "''::text"
+    },
+    {
+      "table_name": "addons",
+      "name": "enabled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "addons",
+      "name": "monthly_price",
+      "type": "numeric(22,2)",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "addons",
+      "name": "yearly_price",
+      "type": "numeric(22,2)",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "addons",
+      "name": "setup_fee",
+      "type": "numeric(22,2)",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "addons",
+      "name": "currency",
+      "type": "text",
+      "required": true,
+      "default_value": "'USD'::text"
+    },
+    {
+      "table_name": "addons",
+      "name": "pricing_configured",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "addons",
+      "name": "discount_percent",
+      "type": "numeric(5,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "addons",
+      "name": "pricing_confirmed",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "api_keys",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "api_keys",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "api_keys",
+      "name": "label",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "api_keys",
+      "name": "key_hash",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "api_keys",
+      "name": "scopes",
+      "type": "text[]",
+      "required": true,
+      "default_value": "'{}'::text[]"
+    },
+    {
+      "table_name": "api_keys",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "api_keys",
+      "name": "revoked_at",
+      "type": "timestamp with time zone",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "asset_catalog",
+      "name": "id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "asset_catalog",
+      "name": "symbol",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "asset_catalog",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "asset_network_catalog",
+      "name": "id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "asset_network_catalog",
+      "name": "asset_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "asset_network_catalog",
+      "name": "network_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "audit_events",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "audit_events",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "audit_events",
+      "name": "actor_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "audit_events",
+      "name": "event_type",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "audit_events",
+      "name": "description",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "audit_events",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "audit_events",
+      "name": "metadata",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "network_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "adapter",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "priority",
+      "type": "text",
+      "required": true,
+      "default_value": "'primary'::text"
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "customer_notification_reads",
+      "name": "customer_user_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "customer_notification_reads",
+      "name": "event_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "customer_notification_reads",
+      "name": "read_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "entitlement_definitions",
+      "name": "key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "entitlement_definitions",
+      "name": "label",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "entitlement_definitions",
+      "name": "kind",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "entitlement_definitions",
+      "name": "value_type",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "pricing_rule_id",
+      "type": "uuid",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'draft'::text"
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "request",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "landing_products",
+      "name": "key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "visible",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "landing_products",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "description",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "icon",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "starting_price",
+      "type": "numeric(12,2)",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "setup_fee",
+      "type": "numeric(12,2)",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "currency",
+      "type": "text",
+      "required": true,
+      "default_value": "'USD'::text"
+    },
+    {
+      "table_name": "landing_products",
+      "name": "billing_period",
+      "type": "text",
+      "required": true,
+      "default_value": "'on_request'::text"
+    },
+    {
+      "table_name": "landing_products",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'coming_soon'::text"
+    },
+    {
+      "table_name": "landing_products",
+      "name": "cta_label",
+      "type": "text",
+      "required": true,
+      "default_value": "'Learn More'::text"
+    },
+    {
+      "table_name": "landing_products",
+      "name": "display_order",
+      "type": "integer",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "description",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "category",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "sandbox_available",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "definition",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "network_catalog",
+      "name": "id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "network_catalog",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "network_catalog",
+      "name": "testnet",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "notification_events",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "notification_events",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "notification_events",
+      "name": "channel",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "notification_events",
+      "name": "payload",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "notification_events",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox_queued'::text"
+    },
+    {
+      "table_name": "notification_events",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "amount",
+      "type": "numeric(36,18)",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "currency",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'pending'::text"
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "plan_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "value",
+      "type": "jsonb",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "plans",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "plans",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "plans",
+      "name": "description",
+      "type": "text",
+      "required": true,
+      "default_value": "''::text"
+    },
+    {
+      "table_name": "plans",
+      "name": "monthly_price",
+      "type": "numeric(22,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "plans",
+      "name": "yearly_price",
+      "type": "numeric(22,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "plans",
+      "name": "setup_fee",
+      "type": "numeric(22,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "plans",
+      "name": "currency",
+      "type": "text",
+      "required": true,
+      "default_value": "'USD'::text"
+    },
+    {
+      "table_name": "plans",
+      "name": "billing_label",
+      "type": "text",
+      "required": true,
+      "default_value": "''::text"
+    },
+    {
+      "table_name": "plans",
+      "name": "display_order",
+      "type": "integer",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "plans",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'disabled'::text"
+    },
+    {
+      "table_name": "plans",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "plans",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "plans",
+      "name": "pricing_configured",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "plans",
+      "name": "discount_percent",
+      "type": "numeric(5,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "platform_admins",
+      "name": "clerk_user_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "platform_admins",
+      "name": "active",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "platform_admins",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "fee_bps",
+      "type": "numeric(10,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "provider_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "capability",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "configuration",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "provider_catalog",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "provider_catalog",
+      "name": "definition",
+      "type": "jsonb",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_catalog",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "provider_catalog",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "scope",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "resource_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "capability",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "definition",
+      "type": "jsonb",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_addons",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_addons",
+      "name": "addon_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_asset_networks",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_asset_networks",
+      "name": "asset_network_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "brand_name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "logo_url",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "primary_color",
+      "type": "text",
+      "required": true,
+      "default_value": "'#0F766E'::text"
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "accent_color",
+      "type": "text",
+      "required": true,
+      "default_value": "'#14B8A6'::text"
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "theme_mode",
+      "type": "text",
+      "required": true,
+      "default_value": "'system'::text"
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "default_language",
+      "type": "text",
+      "required": true,
+      "default_value": "'en'::text"
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "supported_languages",
+      "type": "text[]",
+      "required": true,
+      "default_value": "ARRAY['en'::text]"
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "website_settings",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "exchange_enabled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "payments_enabled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "allow_guest_checkout",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "domain",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'unverified'::text"
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "verification_token",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "verified_at",
+      "type": "timestamp with time zone",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "value",
+      "type": "jsonb",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "reason",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "provider_key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "credential_management",
+      "type": "text",
+      "required": true,
+      "default_value": "'super_admin'::text"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "enabled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "settings",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "encrypted_credentials",
+      "type": "jsonb",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "credential_identity",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "revision",
+      "type": "bigint",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "last_nonce",
+      "type": "bigint",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "health",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{\"state\": \"not_configured\"}'::jsonb"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "clerk_user_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "role",
+      "type": "text",
+      "required": true,
+      "default_value": "'client_admin'::text"
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "active",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "label",
+      "type": "text",
+      "required": true,
+      "default_value": "''::text"
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "permissions",
+      "type": "text[]",
+      "required": true,
+      "default_value": "'{}'::text[]"
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "module_key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "enabled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "label",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "module_key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "configuration",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "plan_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'active'::text"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "resume_status",
+      "type": "text",
+      "required": true,
+      "default_value": "'draft'::text"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "billing_period",
+      "type": "text",
+      "required": true,
+      "default_value": "'monthly'::text"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "discount_percent",
+      "type": "numeric(5,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "cancelled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "operator_note",
+      "type": "text",
+      "required": true,
+      "default_value": "''::text"
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "integration_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "update_id",
+      "type": "bigint",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "payload_hash",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "state",
+      "type": "text",
+      "required": true,
+      "default_value": "'claimed'::text"
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "completed_at",
+      "type": "timestamp with time zone",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "period",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "used",
+      "type": "numeric(36,18)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "tenants",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "tenants",
+      "name": "name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenants",
+      "name": "slug",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenants",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'draft'::text"
+    },
+    {
+      "table_name": "tenants",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "tenants",
+      "name": "completed_steps",
+      "type": "text[]",
+      "required": true,
+      "default_value": "'{}'::text[]"
+    },
+    {
+      "table_name": "tenants",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "tenants",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "asset_network_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "strategy",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "url",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "enabled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "label",
+      "type": "text",
+      "required": true,
+      "default_value": "'Webhook'::text"
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "owner_user_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "request_id",
+      "type": "uuid",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "object_key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "file_name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "content_type",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "size",
+      "type": "integer",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "category",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "request_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "kind",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "author_user_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "visibility",
+      "type": "text",
+      "required": true,
+      "default_value": "'customer'::text"
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "message",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "status",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "customer_user_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "idempotency_key",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "configuration",
+      "type": "jsonb",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'new'::text"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "monthly_price",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "setup_price",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "currency",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "operator_note",
+      "type": "text",
+      "required": true,
+      "default_value": "''::text"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "order_number",
+      "type": "integer",
+      "required": true,
+      "default_value": "nextval('white_label_requests_order_number_seq'::regclass)"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "customization_price",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "custom_design_decision",
+      "type": "text",
+      "required": true,
+      "default_value": "'pending'::text"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "approved_configuration",
+      "type": "jsonb",
+      "required": false,
+      "default_value": null
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "addon_entitlements",
+      "name": "addon_entitlements_addon_id_addons_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (addon_id) REFERENCES addons(id)",
+      "validated": true
+    },
+    {
+      "table_name": "addon_entitlements",
+      "name": "addon_entitlements_addon_id_key_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (addon_id, key)",
+      "validated": true
+    },
+    {
+      "table_name": "addon_entitlements",
+      "name": "addon_entitlements_key_entitlement_definitions_key_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (key) REFERENCES entitlement_definitions(key)",
+      "validated": true
+    },
+    {
+      "table_name": "addons",
+      "name": "addons_discount",
+      "type": "c",
+      "definition": "CHECK (discount_percent >= 0::numeric AND discount_percent <= 100::numeric)",
+      "validated": true
+    },
+    {
+      "table_name": "addons",
+      "name": "addons_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "api_keys",
+      "name": "api_keys_key_hash_unique",
+      "type": "u",
+      "definition": "UNIQUE (key_hash)",
+      "validated": true
+    },
+    {
+      "table_name": "api_keys",
+      "name": "api_keys_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "api_keys",
+      "name": "api_keys_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "api_keys",
+      "name": "api_keys_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "asset_catalog",
+      "name": "asset_catalog_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "asset_network_catalog",
+      "name": "asset_network_catalog_asset_id_asset_catalog_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (asset_id) REFERENCES asset_catalog(id)",
+      "validated": true
+    },
+    {
+      "table_name": "asset_network_catalog",
+      "name": "asset_network_catalog_network_id_network_catalog_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (network_id) REFERENCES network_catalog(id)",
+      "validated": true
+    },
+    {
+      "table_name": "asset_network_catalog",
+      "name": "asset_network_catalog_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "audit_events",
+      "name": "audit_events_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "audit_events",
+      "name": "audit_events_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "blockchain_provider_configs_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "blockchain_provider_configs_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "providers_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text AND adapter = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "providers_valid_priority",
+      "type": "c",
+      "definition": "CHECK (priority = ANY (ARRAY['primary'::text, 'secondary'::text, 'manual'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "customer_notification_reads",
+      "name": "customer_notification_reads_customer_user_id_event_id_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (customer_user_id, event_id)",
+      "validated": true
+    },
+    {
+      "table_name": "customer_notification_reads",
+      "name": "customer_notification_reads_event_id_white_label_events_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (event_id) REFERENCES white_label_events(id)",
+      "validated": true
+    },
+    {
+      "table_name": "entitlement_definitions",
+      "name": "entitlement_definition_kind_type",
+      "type": "c",
+      "definition": "CHECK (kind = 'feature'::text AND value_type = 'boolean'::text OR kind = 'limit'::text AND (value_type = ANY (ARRAY['integer'::text, 'decimal'::text])))",
+      "validated": true
+    },
+    {
+      "table_name": "entitlement_definitions",
+      "name": "entitlement_definitions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (key)",
+      "validated": true
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "exchange_orders_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "exchange_orders_pricing_rule_id_tenant_id_pricing_rules_id_tena",
+      "type": "f",
+      "definition": "FOREIGN KEY (pricing_rule_id, tenant_id) REFERENCES pricing_rules(id, tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "exchange_orders_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "orders_id_tenant_unique",
+      "type": "u",
+      "definition": "UNIQUE (id, tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "orders_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_amounts",
+      "type": "c",
+      "definition": "CHECK ((starting_price IS NULL OR starting_price >= 0::numeric) AND (setup_fee IS NULL OR setup_fee >= 0::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_billing",
+      "type": "c",
+      "definition": "CHECK (billing_period = ANY (ARRAY['monthly'::text, 'yearly'::text, 'one_time'::text, 'on_request'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_copy",
+      "type": "c",
+      "definition": "CHECK (length(btrim(name)) >= 2 AND length(btrim(name)) <= 100 AND length(btrim(description)) >= 10 AND length(btrim(description)) <= 500 AND length(btrim(cta_label)) >= 2 AND length(btrim(cta_label)) <= 40)",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_currency",
+      "type": "c",
+      "definition": "CHECK (currency ~ '^[A-Z]{3}$'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_icon",
+      "type": "c",
+      "definition": "CHECK (icon = ANY (ARRAY['exchange'::text, 'card'::text, 'payments'::text, 'staking'::text, 'earn'::text, 'dex'::text, 'content'::text, 'telegram'::text, 'miniapp'::text, 'whatsapp'::text, 'ios'::text, 'android'::text, 'engine'::text, 'nodes'::text, 'mining'::text, 'kolo'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_key_module_catalog_key_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (key) REFERENCES module_catalog(key)",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_order",
+      "type": "c",
+      "definition": "CHECK (display_order >= 0 AND display_order <= 10000)",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (key)",
+      "validated": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_status",
+      "type": "c",
+      "definition": "CHECK (status = ANY (ARRAY['available'::text, 'coming_soon'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "module_catalog_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (key)",
+      "validated": true
+    },
+    {
+      "table_name": "network_catalog",
+      "name": "network_catalog_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "notification_events",
+      "name": "notification_events_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "notification_events",
+      "name": "notification_events_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "notification_events",
+      "name": "notifications_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payment_invoices_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payment_invoices_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payments_id_tenant_unique",
+      "type": "u",
+      "definition": "UNIQUE (id, tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payments_positive_amount",
+      "type": "c",
+      "definition": "CHECK (amount > 0::numeric)",
+      "validated": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payments_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payments_valid_status",
+      "type": "c",
+      "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'waiting_for_payment'::text, 'payment_detected'::text, 'confirming'::text, 'paid'::text, 'expired'::text, 'underpaid'::text, 'overpaid'::text, 'failed'::text, 'refunded'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "plan_entitlements_key_entitlement_definitions_key_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (key) REFERENCES entitlement_definitions(key)",
+      "validated": true
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "plan_entitlements_plan_id_key_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (plan_id, key)",
+      "validated": true
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "plan_entitlements_plan_id_plans_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (plan_id) REFERENCES plans(id)",
+      "validated": true
+    },
+    {
+      "table_name": "plans",
+      "name": "plans_currency",
+      "type": "c",
+      "definition": "CHECK (currency ~ '^[A-Z]{3}$'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "plans",
+      "name": "plans_discount",
+      "type": "c",
+      "definition": "CHECK (discount_percent >= 0::numeric AND discount_percent <= 100::numeric)",
+      "validated": true
+    },
+    {
+      "table_name": "plans",
+      "name": "plans_nonnegative_metadata",
+      "type": "c",
+      "definition": "CHECK (monthly_price >= 0::numeric AND yearly_price >= 0::numeric AND setup_fee >= 0::numeric AND display_order >= 0)",
+      "validated": true
+    },
+    {
+      "table_name": "plans",
+      "name": "plans_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "plans",
+      "name": "plans_status",
+      "type": "c",
+      "definition": "CHECK (status = ANY (ARRAY['enabled'::text, 'disabled'::text, 'archived'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "platform_admins",
+      "name": "platform_admins_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (clerk_user_id)",
+      "validated": true
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "pricing_id_tenant_unique",
+      "type": "u",
+      "definition": "UNIQUE (id, tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "pricing_nonnegative_fee",
+      "type": "c",
+      "definition": "CHECK (fee_bps >= 0::numeric)",
+      "validated": true
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "pricing_rules_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "pricing_rules_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "pricing_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "provider_assignment_environment",
+      "type": "c",
+      "definition": "CHECK (environment = ANY (ARRAY['sandbox'::text, 'test'::text, 'live'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "provider_assignments_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "provider_assignments_provider_id_provider_catalog_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (provider_id) REFERENCES provider_catalog(id)",
+      "validated": true
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "provider_assignments_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "provider_catalog",
+      "name": "provider_catalog_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "provider_policies_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "provider_policies_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "provider_policy_resource",
+      "type": "c",
+      "definition": "CHECK (scope = ANY (ARRAY['route'::text, 'network'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_addons",
+      "name": "tenant_addons_addon_id_addons_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (addon_id) REFERENCES addons(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_addons",
+      "name": "tenant_addons_tenant_id_addon_id_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id, addon_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_addons",
+      "name": "tenant_addons_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_asset_networks",
+      "name": "tenant_asset_networks_asset_network_id_asset_network_catalog_id",
+      "type": "f",
+      "definition": "FOREIGN KEY (asset_network_id) REFERENCES asset_network_catalog(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_asset_networks",
+      "name": "tenant_asset_networks_tenant_id_asset_network_id_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id, asset_network_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_asset_networks",
+      "name": "tenant_asset_networks_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "branding_valid_mode",
+      "type": "c",
+      "definition": "CHECK (theme_mode = ANY (ARRAY['light'::text, 'dark'::text, 'system'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "tenant_branding_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "tenant_branding_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "configuration_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "tenant_configuration_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "tenant_configuration_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "domains_valid_status",
+      "type": "c",
+      "definition": "CHECK (status = ANY (ARRAY['unverified'::text, 'verified'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "tenant_domains_domain_unique",
+      "type": "u",
+      "definition": "UNIQUE (domain)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "tenant_domains_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "tenant_domains_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "tenant_entitlement_overrides_key_entitlement_definitions_key_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (key) REFERENCES entitlement_definitions(key)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "tenant_entitlement_overrides_tenant_id_key_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id, key)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "tenant_entitlement_overrides_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_integration_management",
+      "type": "c",
+      "definition": "CHECK (credential_management = ANY (ARRAY['super_admin'::text, 'customer'::text, 'both'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_integration_sandbox",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_integrations_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_integrations_tenant_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "memberships_valid_role",
+      "type": "c",
+      "definition": "CHECK (role = ANY (ARRAY['client_admin'::text, 'staff'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "tenant_memberships_tenant_id_clerk_user_id_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id, clerk_user_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "tenant_memberships_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "tenant_modules_module_key_module_catalog_key_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (module_key) REFERENCES module_catalog(key)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "tenant_modules_tenant_id_module_key_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id, module_key)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "tenant_modules_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "payment_methods_sandbox",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "tenant_payment_methods_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "tenant_payment_methods_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "product_configuration_object",
+      "type": "c",
+      "definition": "CHECK (jsonb_typeof(configuration) = 'object'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "tenant_product_configuration_module_key_module_catalog_key_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (module_key) REFERENCES module_catalog(key)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "tenant_product_configuration_tenant_id_module_key_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id, module_key)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "tenant_product_configuration_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "subscription_billing_period",
+      "type": "c",
+      "definition": "CHECK (billing_period = ANY (ARRAY['monthly'::text, 'yearly'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "subscription_discount",
+      "type": "c",
+      "definition": "CHECK (discount_percent >= 0::numeric AND discount_percent <= 100::numeric)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "subscription_resume_status",
+      "type": "c",
+      "definition": "CHECK (resume_status = ANY (ARRAY['draft'::text, 'active'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "subscription_status",
+      "type": "c",
+      "definition": "CHECK (status = ANY (ARRAY['active'::text, 'suspended'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "tenant_subscriptions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "tenant_subscriptions_plan_id_plans_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (plan_id) REFERENCES plans(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "tenant_subscriptions_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "tenant_telegram_receipts_integration_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (integration_id) REFERENCES tenant_integrations(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "tenant_telegram_receipts_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "tenant_telegram_receipts_tenant_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "tenant_usage_counters_key_entitlement_definitions_key_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (key) REFERENCES entitlement_definitions(key)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "tenant_usage_counters_tenant_id_key_period_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (tenant_id, key, period)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "tenant_usage_counters_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "usage_month_format",
+      "type": "c",
+      "definition": "CHECK (period ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "usage_nonnegative",
+      "type": "c",
+      "definition": "CHECK (used >= 0::numeric)",
+      "validated": true
+    },
+    {
+      "table_name": "tenants",
+      "name": "tenants_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "tenants",
+      "name": "tenants_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "tenants",
+      "name": "tenants_slug_unique",
+      "type": "u",
+      "definition": "UNIQUE (slug)",
+      "validated": true
+    },
+    {
+      "table_name": "tenants",
+      "name": "tenants_valid_status",
+      "type": "c",
+      "definition": "CHECK (status = ANY (ARRAY['draft'::text, 'active'::text, 'suspended'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "wallet_configurations_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "wallet_configurations_tenant_id_asset_network_id_tenant_asset_n",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id, asset_network_id) REFERENCES tenant_asset_networks(tenant_id, asset_network_id)",
+      "validated": true
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "wallet_configurations_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "wallets_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text AND strategy = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "webhook_endpoints_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "webhook_endpoints_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "webhooks_sandbox_only",
+      "type": "c",
+      "definition": "CHECK (environment = 'sandbox'::text)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "white_label_attachment_size",
+      "type": "c",
+      "definition": "CHECK (size > 0 AND size <= 8388608)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "white_label_attachments_object_key_unique",
+      "type": "u",
+      "definition": "UNIQUE (object_key)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "white_label_attachments_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "white_label_attachments_request_id_white_label_requests_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (request_id) REFERENCES white_label_requests(id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "white_label_event_kind",
+      "type": "c",
+      "definition": "CHECK (kind = ANY (ARRAY['status'::text, 'note'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "white_label_event_visibility",
+      "type": "c",
+      "definition": "CHECK (visibility = ANY (ARRAY['customer'::text, 'internal'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "white_label_events_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "white_label_events_request_id_white_label_requests_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (request_id) REFERENCES white_label_requests(id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_request_delivery_requires_tenant",
+      "type": "c",
+      "definition": "CHECK (status <> 'delivered'::text OR tenant_id IS NOT NULL)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_request_status",
+      "type": "c",
+      "definition": "CHECK (status = ANY (ARRAY['new'::text, 'reviewing'::text, 'waiting_for_client'::text, 'quote_ready'::text, 'approved'::text, 'in_setup'::text, 'customization'::text, 'ready'::text, 'delivered'::text, 'rejected'::text, 'cancelled'::text]))",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_requests_order_number_unique",
+      "type": "u",
+      "definition": "UNIQUE (order_number)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_requests_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (id)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_requests_tenant_id_tenants_id_fk",
+      "type": "f",
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)",
+      "validated": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_requests_tenant_id_unique",
+      "type": "u",
+      "definition": "UNIQUE (tenant_id)",
+      "validated": true
+    }
+  ],
+  "indexes": [
+    {
+      "table_name": "addon_entitlements",
+      "name": "addon_entitlements_addon_id_key_pk",
+      "definition": "CREATE UNIQUE INDEX addon_entitlements_addon_id_key_pk ON public.addon_entitlements USING btree (addon_id, key)",
+      "valid": true
+    },
+    {
+      "table_name": "addons",
+      "name": "addons_pkey",
+      "definition": "CREATE UNIQUE INDEX addons_pkey ON public.addons USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "api_keys",
+      "name": "api_keys_key_hash_unique",
+      "definition": "CREATE UNIQUE INDEX api_keys_key_hash_unique ON public.api_keys USING btree (key_hash)",
+      "valid": true
+    },
+    {
+      "table_name": "api_keys",
+      "name": "api_keys_pkey",
+      "definition": "CREATE UNIQUE INDEX api_keys_pkey ON public.api_keys USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "asset_catalog",
+      "name": "asset_catalog_pkey",
+      "definition": "CREATE UNIQUE INDEX asset_catalog_pkey ON public.asset_catalog USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "asset_network_catalog",
+      "name": "asset_network_catalog_pkey",
+      "definition": "CREATE UNIQUE INDEX asset_network_catalog_pkey ON public.asset_network_catalog USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "audit_events",
+      "name": "audit_events_pkey",
+      "definition": "CREATE UNIQUE INDEX audit_events_pkey ON public.audit_events USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "blockchain_provider_configs_pkey",
+      "definition": "CREATE UNIQUE INDEX blockchain_provider_configs_pkey ON public.blockchain_provider_configs USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "customer_notification_reads",
+      "name": "customer_notification_reads_customer_user_id_event_id_pk",
+      "definition": "CREATE UNIQUE INDEX customer_notification_reads_customer_user_id_event_id_pk ON public.customer_notification_reads USING btree (customer_user_id, event_id)",
+      "valid": true
+    },
+    {
+      "table_name": "entitlement_definitions",
+      "name": "entitlement_definitions_pkey",
+      "definition": "CREATE UNIQUE INDEX entitlement_definitions_pkey ON public.entitlement_definitions USING btree (key)",
+      "valid": true
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "exchange_orders_pkey",
+      "definition": "CREATE UNIQUE INDEX exchange_orders_pkey ON public.exchange_orders USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "orders_id_tenant_unique",
+      "definition": "CREATE UNIQUE INDEX orders_id_tenant_unique ON public.exchange_orders USING btree (id, tenant_id)",
+      "valid": true
+    },
+    {
+      "table_name": "landing_products",
+      "name": "landing_products_pkey",
+      "definition": "CREATE UNIQUE INDEX landing_products_pkey ON public.landing_products USING btree (key)",
+      "valid": true
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "module_catalog_pkey",
+      "definition": "CREATE UNIQUE INDEX module_catalog_pkey ON public.module_catalog USING btree (key)",
+      "valid": true
+    },
+    {
+      "table_name": "network_catalog",
+      "name": "network_catalog_pkey",
+      "definition": "CREATE UNIQUE INDEX network_catalog_pkey ON public.network_catalog USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "notification_events",
+      "name": "notification_events_pkey",
+      "definition": "CREATE UNIQUE INDEX notification_events_pkey ON public.notification_events USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payment_invoices_pkey",
+      "definition": "CREATE UNIQUE INDEX payment_invoices_pkey ON public.payment_invoices USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "payments_id_tenant_unique",
+      "definition": "CREATE UNIQUE INDEX payments_id_tenant_unique ON public.payment_invoices USING btree (id, tenant_id)",
+      "valid": true
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "plan_entitlements_plan_id_key_pk",
+      "definition": "CREATE UNIQUE INDEX plan_entitlements_plan_id_key_pk ON public.plan_entitlements USING btree (plan_id, key)",
+      "valid": true
+    },
+    {
+      "table_name": "plans",
+      "name": "plans_pkey",
+      "definition": "CREATE UNIQUE INDEX plans_pkey ON public.plans USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "platform_admins",
+      "name": "platform_admins_pkey",
+      "definition": "CREATE UNIQUE INDEX platform_admins_pkey ON public.platform_admins USING btree (clerk_user_id)",
+      "valid": true
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "pricing_id_tenant_unique",
+      "definition": "CREATE UNIQUE INDEX pricing_id_tenant_unique ON public.pricing_rules USING btree (id, tenant_id)",
+      "valid": true
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "pricing_rules_pkey",
+      "definition": "CREATE UNIQUE INDEX pricing_rules_pkey ON public.pricing_rules USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "provider_assignment_scope",
+      "definition": "CREATE UNIQUE INDEX provider_assignment_scope ON public.provider_assignments USING btree (tenant_id, provider_id, capability, environment)",
+      "valid": true
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "provider_assignments_pkey",
+      "definition": "CREATE UNIQUE INDEX provider_assignments_pkey ON public.provider_assignments USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "provider_catalog",
+      "name": "provider_catalog_pkey",
+      "definition": "CREATE UNIQUE INDEX provider_catalog_pkey ON public.provider_catalog USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "provider_policies_pkey",
+      "definition": "CREATE UNIQUE INDEX provider_policies_pkey ON public.provider_policies USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "provider_policy_scope",
+      "definition": "CREATE UNIQUE INDEX provider_policy_scope ON public.provider_policies USING btree (tenant_id, scope, resource_id, capability)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_addons",
+      "name": "tenant_addons_tenant_id_addon_id_pk",
+      "definition": "CREATE UNIQUE INDEX tenant_addons_tenant_id_addon_id_pk ON public.tenant_addons USING btree (tenant_id, addon_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_asset_networks",
+      "name": "tenant_asset_networks_tenant_id_asset_network_id_pk",
+      "definition": "CREATE UNIQUE INDEX tenant_asset_networks_tenant_id_asset_network_id_pk ON public.tenant_asset_networks USING btree (tenant_id, asset_network_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "tenant_branding_pkey",
+      "definition": "CREATE UNIQUE INDEX tenant_branding_pkey ON public.tenant_branding USING btree (tenant_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_configuration",
+      "name": "tenant_configuration_pkey",
+      "definition": "CREATE UNIQUE INDEX tenant_configuration_pkey ON public.tenant_configuration USING btree (tenant_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "tenant_domains_domain_unique",
+      "definition": "CREATE UNIQUE INDEX tenant_domains_domain_unique ON public.tenant_domains USING btree (domain)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_domains",
+      "name": "tenant_domains_pkey",
+      "definition": "CREATE UNIQUE INDEX tenant_domains_pkey ON public.tenant_domains USING btree (tenant_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "tenant_entitlement_overrides_tenant_id_key_pk",
+      "definition": "CREATE UNIQUE INDEX tenant_entitlement_overrides_tenant_id_key_pk ON public.tenant_entitlement_overrides USING btree (tenant_id, key)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_integration_independent_credentials",
+      "definition": "CREATE UNIQUE INDEX tenant_integration_independent_credentials ON public.tenant_integrations USING btree (provider_key, credential_identity)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_integration_scope",
+      "definition": "CREATE UNIQUE INDEX tenant_integration_scope ON public.tenant_integrations USING btree (tenant_id, provider_key, environment)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_integrations_pkey",
+      "definition": "CREATE UNIQUE INDEX tenant_integrations_pkey ON public.tenant_integrations USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "tenant_memberships_tenant_id_clerk_user_id_pk",
+      "definition": "CREATE UNIQUE INDEX tenant_memberships_tenant_id_clerk_user_id_pk ON public.tenant_memberships USING btree (tenant_id, clerk_user_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "tenant_modules_tenant_id_module_key_pk",
+      "definition": "CREATE UNIQUE INDEX tenant_modules_tenant_id_module_key_pk ON public.tenant_modules USING btree (tenant_id, module_key)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_payment_methods",
+      "name": "tenant_payment_methods_pkey",
+      "definition": "CREATE UNIQUE INDEX tenant_payment_methods_pkey ON public.tenant_payment_methods USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "tenant_product_configuration_tenant_id_module_key_pk",
+      "definition": "CREATE UNIQUE INDEX tenant_product_configuration_tenant_id_module_key_pk ON public.tenant_product_configuration USING btree (tenant_id, module_key)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "tenant_subscriptions_pkey",
+      "definition": "CREATE UNIQUE INDEX tenant_subscriptions_pkey ON public.tenant_subscriptions USING btree (tenant_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "tenant_telegram_receipts_pkey",
+      "definition": "CREATE UNIQUE INDEX tenant_telegram_receipts_pkey ON public.tenant_telegram_receipts USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "tenant_telegram_update_identity",
+      "definition": "CREATE UNIQUE INDEX tenant_telegram_update_identity ON public.tenant_telegram_receipts USING btree (integration_id, update_id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "tenant_usage_counters_tenant_id_key_period_pk",
+      "definition": "CREATE UNIQUE INDEX tenant_usage_counters_tenant_id_key_period_pk ON public.tenant_usage_counters USING btree (tenant_id, key, period)",
+      "valid": true
+    },
+    {
+      "table_name": "tenants",
+      "name": "tenants_pkey",
+      "definition": "CREATE UNIQUE INDEX tenants_pkey ON public.tenants USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "tenants",
+      "name": "tenants_slug_unique",
+      "definition": "CREATE UNIQUE INDEX tenants_slug_unique ON public.tenants USING btree (slug)",
+      "valid": true
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "wallet_configurations_pkey",
+      "definition": "CREATE UNIQUE INDEX wallet_configurations_pkey ON public.wallet_configurations USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "webhook_endpoints_pkey",
+      "definition": "CREATE UNIQUE INDEX webhook_endpoints_pkey ON public.webhook_endpoints USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "white_label_attachments_object_key_unique",
+      "definition": "CREATE UNIQUE INDEX white_label_attachments_object_key_unique ON public.white_label_attachments USING btree (object_key)",
+      "valid": true
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "white_label_attachments_pkey",
+      "definition": "CREATE UNIQUE INDEX white_label_attachments_pkey ON public.white_label_attachments USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "white_label_events_pkey",
+      "definition": "CREATE UNIQUE INDEX white_label_events_pkey ON public.white_label_events USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_request_idempotency",
+      "definition": "CREATE UNIQUE INDEX white_label_request_idempotency ON public.white_label_requests USING btree (customer_user_id, idempotency_key)",
+      "valid": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_requests_order_number_unique",
+      "definition": "CREATE UNIQUE INDEX white_label_requests_order_number_unique ON public.white_label_requests USING btree (order_number)",
+      "valid": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_requests_pkey",
+      "definition": "CREATE UNIQUE INDEX white_label_requests_pkey ON public.white_label_requests USING btree (id)",
+      "valid": true
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "white_label_requests_tenant_id_unique",
+      "definition": "CREATE UNIQUE INDEX white_label_requests_tenant_id_unique ON public.white_label_requests USING btree (tenant_id)",
+      "valid": true
+    }
+  ]
+}

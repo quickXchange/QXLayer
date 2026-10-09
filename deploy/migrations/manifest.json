@@ -1,0 +1,10 @@
+[
+  {
+    "file": "0001_application_schema.sql",
+    "sha256": "a98288bddf07dd765aee55c3be4911c943294bee8903bb9cd1516a6abe155e43"
+  },
+  {
+    "file": "0002_runtime_security.sql",
+    "sha256": "a264bf8bf3951addd48b94a1b137b9706b06a26c5504fa1e77fe7b3904a4139d"
+  }
+]

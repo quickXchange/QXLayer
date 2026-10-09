@@ -1,17 +1,22 @@
 ---
-name: Replit-first delivery direction
-description: External migration cancelled; finish QXLayer on Replit without weakening security or losing Production data.
+name: External preparation authorization
+description: GitHub/Vercel/Render/Supabase preparation is authorized; Production transfer and cutover are not.
 ---
 
-The user cancelled Supabase, Vercel and Render migration plans for now and said:
-"Do not spend more time preparing external hosting migrations. I want to finish
-QXLayer on Replit first."
+The user subsequently authorized preparing permanent GitHub-based deployment:
+Replit Development, Vercel frontend if compatible, Render API/workers, and
+Supabase Production PostgreSQL with complete RLS. This supersedes the previous
+cancellation of external preparation.
 
-**Why:** The user explicitly reversed the earlier external migration approval.
+**Why:** The user explicitly reinstated external preparation, but said:
+"Do not migrate Production data, expose secrets, switch DNS, or shut down the
+existing website yet."
 
 **How to apply:** The current delivery requirements are recorded in replit.md.
-Do not revive the external plan without a new explicit request. Historical
-external SQL/report artifacts are not approved execution instructions. Keep
+Preparation is authorized; target provisioning, Production transfer and cutover
+still require separate approval. Historical SQL/reports are not current execution
+instructions. Preserve accounts, Super Admin, design and isolation; do not touch
+QuickXchange. Keep
 managed Production schema changes in Replit's native Publish flow; a security
 blocker does not authorize a custom Production migration hook or silent removal
 of database-enforced isolation.
@@ -34,6 +39,7 @@ For the QXLayer Production release, the user instructed:
 
 **Why:** The user repeated these release constraints.
 
-**How to apply:** Respect these constraints throughout release work. Do not
+**How to apply:** The hosting-preparation prohibition above was superseded, but
+the no-cutover and no-security-weakening constraints remain. Do not
 substitute another report or support referral for a completed migration, and
 state clearly when a requested action cannot be performed.

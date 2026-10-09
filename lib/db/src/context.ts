@@ -1,6 +1,7 @@
 import type { PoolClient } from "pg";
 import { pool } from "./index";
 import { applicationTableNames } from "./schema-table-names";
+import { runtimeRole } from "./connection-options";
 
 export type DatabaseClient = PoolClient;
 export interface DatabaseContext {
@@ -14,9 +15,10 @@ export interface DatabaseContext {
 }
 
 /**
- * Drop the privileged login to PostgreSQL's built-in, non-bypassing database-owner
- * group inside every request transaction. Server checks remain authoritative for
- * capabilities; RLS independently filters tenant rows. No custom roles or DDL.
+ * Replit drops to the non-bypassing built-in owner group; external Supabase
+ * uses its separately provisioned restricted transaction role. Server checks
+ * remain authoritative for capabilities; RLS independently filters tenant rows.
+ * No role/schema DDL runs here.
  * Read-only requests cannot execute database mutations.
  * ROLLBACK/COMMIT clear the context before the connection returns to the pool.
  */
@@ -27,7 +29,18 @@ export async function withDatabase<T>(
   const client = await pool.connect();
   try {
     await client.query(context.canWrite === true ? "BEGIN" : "BEGIN READ ONLY");
-    await client.query("SET LOCAL ROLE pg_database_owner");
+    const role = runtimeRole();
+    if (role === "qxlayer_runtime") {
+      const login = await client.query(`SELECT session_user='qxlayer_app' AND NOT r.rolsuper
+        AND NOT r.rolbypassrls AND NOT r.rolinherit AND NOT r.rolcreaterole AND NOT r.rolcreatedb
+        AND NOT EXISTS (SELECT 1 FROM pg_roles p WHERE p.rolname NOT IN ('qxlayer_app','qxlayer_runtime')
+          AND pg_has_role(r.oid,p.oid,'MEMBER')) AS safe
+        FROM pg_roles r WHERE r.rolname=session_user`);
+      if (!login.rows[0]?.safe) throw new Error("External database login is not restricted.");
+      await client.query("SET LOCAL ROLE qxlayer_runtime");
+    } else {
+      await client.query("SET LOCAL ROLE pg_database_owner");
+    }
     await client.query("SET LOCAL search_path=pg_catalog,public");
     const security = await client.query<{ safe: boolean }>(`
       SELECT NOT r.rolsuper AND NOT r.rolbypassrls AND
@@ -45,7 +58,7 @@ export async function withDatabase<T>(
                 AND position('app.can_write' in pg_get_expr(p.polqual,p.polrelid))>0
                 AND position('app.can_write' in pg_get_expr(p.polwithcheck,p.polrelid))>0)))<>2)
         AS safe FROM pg_roles r WHERE r.rolname=current_user`, [applicationTableNames()]);
-    if (!security.rows[0]?.safe) throw new Error("Database isolation is not ready: review the native security migration and built-in role grants before serving requests.");
+    if (!security.rows[0]?.safe) throw new Error("Database isolation is not ready: review the approved schema, policies and role grants before serving requests.");
     await client.query("SET LOCAL row_security=on");
     await client.query(
       `SELECT set_config('app.actor_id', $1, true),

@@ -30,4 +30,4 @@
 - [Public marketing baseline](public-marketing-baseline.md) — presentation-only recovery can ship with code; it is not Production database or owner-access restoration.
 - [Hostname normalization](hostname-normalization.md) — IDN conversion can discard URL syntax; validate customer input before canonicalizing it.
 - [Integration verification boundaries](integration-verification-boundaries.md) — privileged-role RLS queries are not isolation proof; source-schema references need a bounded allowlist.
-- [Replit-first delivery](external-migration-authorization.md) — external plans cancelled; finish on Replit, preserve Production and obtain consent before changing isolation.
+- [External preparation](external-migration-authorization.md) — GitHub/Vercel/Render/Supabase preparation authorized; no Production transfer, DNS change or cutover.
