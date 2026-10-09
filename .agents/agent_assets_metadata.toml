@@ -602,3 +602,17 @@ mtime_ms = 1791493211048
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/f11f8070-59e3-4fc7-8e00-78a5a52d5434/6342aa5a-a994-4aa7-bcfd-b34cbbf8c41a"
 storage_version_token = "1791493211741675"
 content_type = "text/html"
+
+[[outputs]]
+id = "6kPwnzWFjiE12AlHoouwH"
+uri = "file://reports/production-configuration-migration/migration-ipad-access.html"
+type = "html"
+title = "Approved SQL — iPad view and download"
+description = "Full verified migration text with Download .sql, Copy full SQL and Select all controls. Display/download only; no SQL execution or database access."
+logical_id = "e114eea5-dc55-43a1-9d60-58fb3f85a524"
+content_hash = "sha256:fc6fd5f47fb98c5329b09f774140f9f391dc2b77ba3456ddd305f8ef13f85905"
+size = 177632
+mtime_ms = 1791506117894
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e114eea5-dc55-43a1-9d60-58fb3f85a524/338824d6-d794-4309-b26c-6f848317554e"
+storage_version_token = "1791506118914489"
+content_type = "text/html"
