@@ -28,3 +28,12 @@ Investigate documented supported capabilities, but do not equate an SQL-runner
 interface or generated documentation summary with a verified atomic schema/
 policy/grant rollout. Preserve the strict release hold until actual policy,
 permission and access readbacks establish readiness.
+
+For the QXLayer Production release, the user instructed:
+"Do not contact support, migrate hosting, weaken security, or repeat previous reports."
+
+**Why:** The user repeated these release constraints.
+
+**How to apply:** Respect these constraints throughout release work. Do not
+substitute another report or support referral for a completed migration, and
+state clearly when a requested action cannot be performed.
