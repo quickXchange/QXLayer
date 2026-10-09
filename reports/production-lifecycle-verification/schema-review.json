@@ -1,0 +1,24 @@
+{
+  "migration": "APPLIED_AND_VALIDATED",
+  "nativeDiff": {
+    "columnsToRemove": [],
+    "hasDiff": false,
+    "hasStructuralDataLoss": false,
+    "matViewsToRemove": [],
+    "maybeNonBackwardsCompatible": false,
+    "schemasToRemove": [],
+    "statementsToExecute": [],
+    "success": true,
+    "tablesToRemove": [],
+    "tablesToTruncate": [],
+    "warnings": []
+  },
+  "deliveryChecks": [
+    {
+      "name": "white_label_request_delivery_requires_tenant",
+      "validated": true,
+      "definition": "CHECK (((status <> 'delivered'::text) OR (tenant_id IS NOT NULL)))"
+    }
+  ],
+  "legacyConstraintAbsent": true
+}

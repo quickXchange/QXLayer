@@ -8,6 +8,22 @@ For Clerk UI checks, use a normal generated test identity and assign its actual 
 
 **How to apply:** Use only an isolated development tenant; remove temporary memberships after verification. Do not change app authentication to force synthetic claims. Check a protected route and the authenticated principal response rather than judging sign-in from the public marketing header. Follow the [customer delivery requirements](customer-account-workflow.md) when preparing a tenant-admin fixture; membership alone is intentionally insufficient.
 
+Production verification requires genuine Live customer and operator sessions.
+Do not treat a Development helper identity, a demo session, or the user's own
+accessible browser as authority in a separate test browser.
+
+**Why:** A Production browser check stopped at the private access gate despite
+the owner having working Live access. The available browser tools had no
+secret-aware form input, and the owner's authenticated session was not shared.
+
+**How to apply:** Confirm the test browser's actual environment and access
+capabilities first. Use normal supported access only; never expose secrets,
+forge gate cookies, grant Production test privileges or weaken authentication.
+Read-only database/log checks can establish migration and connection health,
+but not an authenticated lifecycle or cross-tenant isolation. If access remains
+unavailable, ask the user to submit a labelled Live QA order through their normal
+customer session and share only its non-secret reference for staged verification.
+
 Programmatic test sign-in can also yield a principal without an email, even when an email was supplied to the helper.
 
 **Why:** Visual review found null principal emails despite the supplied test identity, exposing raw account IDs in fallback labels.

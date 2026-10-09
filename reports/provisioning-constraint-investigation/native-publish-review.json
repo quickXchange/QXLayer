@@ -1,18 +1,15 @@
 {
-  "reviewedAt": "2026-10-09T08:57:20.734Z",
-  "scope": "Native CHECK replacement only; review snapshot, no SQL execution",
+  "reviewedAt": "2026-10-09T09:53:54.838Z",
+  "scope": "Fresh read-only Development/Production constraint review after native publishing; correction already applied. No Production writes.",
   "schemaSha256": "a18af635171c50d578d655780716ec9e26206379f98005f805a3109b01a8801f",
   "diff": {
     "columnsToRemove": [],
-    "hasDiff": true,
+    "hasDiff": false,
     "hasStructuralDataLoss": false,
     "matViewsToRemove": [],
-    "maybeNonBackwardsCompatible": true,
+    "maybeNonBackwardsCompatible": false,
     "schemasToRemove": [],
-    "statementsToExecute": [
-      "ALTER TABLE \"white_label_requests\" DROP CONSTRAINT \"white_label_request_delivery\";",
-      "ALTER TABLE \"white_label_requests\" ADD CONSTRAINT \"white_label_request_delivery_requires_tenant\" CHECK ((status <> 'delivered'::text) OR (tenant_id IS NOT NULL));"
-    ],
+    "statementsToExecute": [],
     "success": true,
     "tablesToRemove": [],
     "tablesToTruncate": [],
@@ -52,9 +49,9 @@
   ],
   "production": [
     {
-      "name": "white_label_request_delivery",
+      "name": "white_label_request_delivery_requires_tenant",
       "validated": true,
-      "definition": "CHECK (((status = 'delivered'::text) = (tenant_id IS NOT NULL)))"
+      "definition": "CHECK (((status <> 'delivered'::text) OR (tenant_id IS NOT NULL)))"
     },
     {
       "name": "white_label_request_status",

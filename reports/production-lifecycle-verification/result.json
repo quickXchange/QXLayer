@@ -1,0 +1,27 @@
+{
+  "status": "MIGRATION_AND_CONNECTIVITY_VERIFIED_LIVE_LIFECYCLE_BLOCKED_BY_BROWSER_ACCESS",
+  "productionUrl": "https://www.quicklychan.xyz",
+  "orders": 0,
+  "tenants": 0,
+  "memberships": 0,
+  "activePlatformAdministrators": 1,
+  "historicalProductionOrdersAlsoZero": true,
+  "migrationAppliedAndValidated": true,
+  "legacyConstraintAbsent": true,
+  "nativeSchemaDiffEmpty": true,
+  "foreignKeyAndOrderTenantUniquenessValidated": true,
+  "liveOwnerListApi200Observed": true,
+  "catalogPresent": {
+    "plans": 5,
+    "planEntitlements": 112,
+    "assetNetworkPairs": 37
+  },
+  "all39TableFingerprintsUnchanged": true,
+  "productionWrites": 0,
+  "qaCreated": false,
+  "websiteSourceChanges": false,
+  "authenticatedProductionJourneyVerified": false,
+  "crossTenantProductionJourneyVerified": false,
+  "requiredUserAction": "Submit one clearly labelled Live QA White Label order using a normal authenticated Production customer account, and share only its WL reference. The existing owner must perform review/setup/activation via their authenticated Live Super Admin session. Do not send access codes, passwords or cookies.",
+  "previousDevelopmentChecksNotSubstitutedForLive": true
+}

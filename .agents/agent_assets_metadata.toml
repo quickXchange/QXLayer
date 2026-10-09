@@ -630,3 +630,17 @@ mtime_ms = 1791538515857
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e5d96b27-6d7f-4115-a42e-f6969af2cd4a/829c8c67-e0c1-45f3-ac98-ec906788f2f9"
 storage_version_token = "1791538516505661"
 content_type = "text/html"
+
+[[outputs]]
+id = "Wp3YSYkxkbDcHeR5LUcY5"
+uri = "file://reports/production-lifecycle-verification/report.html"
+type = "html"
+title = "QXLayer — Production verification results"
+description = "Installed migration, healthy APIs, genuine zero records, unchanged data/design, and the authenticated Live steps requiring your access."
+logical_id = "be8d48f3-63f9-429e-b95f-87dfc263f79e"
+content_hash = "sha256:3ab610f4151a5ab820c181a1b3b3068eec2e6a9dce33bc33be13f09e75962dba"
+size = 5730
+mtime_ms = 1791539635272
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/be8d48f3-63f9-429e-b95f-87dfc263f79e/d02a216a-56bd-42c6-80ac-877a173e21fa"
+storage_version_token = "1791539635775306"
+content_type = "text/html"
