@@ -6,6 +6,7 @@
   "scripts": {
     "hello": "tsx ./src/hello.ts",
     "db:access:dev": "tsx ./src/remove-database-rls.ts",
+    "db:security:dev": "NODE_ENV=development tsx ../../lib/db/src/setup-row-security.ts --development-only",
     "db:seed:dev": "tsx ./src/seed-catalog.ts",
     "core:upgrade:dev": "tsx ./src/upgrade-core.ts",
     "catalog:upgrade:dev": "tsx ./src/upgrade-landing-catalog.ts",

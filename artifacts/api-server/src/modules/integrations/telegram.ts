@@ -87,6 +87,8 @@ export async function registerWebhook(p: Principal, tenantId: string, raw: unkno
   return { registered: true, sandboxOnly: true };
 }
 export async function receiveTelegramUpdate(slug: string, suppliedSecret: string, body: unknown) {
+  if (typeof suppliedSecret !== "string" || !/^[a-f0-9]{64}$/.test(suppliedSecret))
+    throw new HttpError(403, "Telegram webhook authentication required.");
   const tenantId = await publicTenantId(slug);
   const row = await withDatabase({ actorId: "telegram-webhook", tenantId }, async c =>
     (await c.query("SELECT * FROM tenant_integrations WHERE tenant_id=$1 AND provider_key='telegram_bot'", [tenantId])).rows[0]);

@@ -9,6 +9,12 @@ import { publicBrandingFile } from "../modules/website/branding-files";
 import { authorizedWebsitePreview } from "../modules/website/operator-preview";
 
 const router = Router();
+router.get("/public/site-delivery/:slug", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const { deliveredPublicSite } = await import("../modules/website/service");
+  if (!await deliveredPublicSite(req.params.slug)) { res.status(404).json({ error: "Website not available." }); return; }
+  res.json({ tenantSlug: req.params.slug, delivered: true });
+});
 router.get("/public/domains/:hostname/hosting-proof/:nonce", async (req, res) => {
   res.set("Cache-Control", "no-store");
   res.json(GetDomainHostingProofResponse.parse(await publicHostingProof(req.params.hostname, req.params.nonce)));

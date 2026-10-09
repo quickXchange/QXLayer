@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { check, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { check, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { createInsertSchema } from "drizzle-zod";
 
 export const tenantsTable = pgTable("tenants", {

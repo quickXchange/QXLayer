@@ -4,12 +4,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { pool, withDatabase } from "@workspace/db";
 import { resolvePrincipal } from "../modules/authentication/service";
 import { integrationBundle, saveIntegration } from "../modules/integrations/service";
-import { publicMiniConfig, miniLanguages } from "../modules/integrations/telegram";
-import { vaultAvailable } from "../modules/integrations/vault";
+import { publicMiniConfig, miniLanguages, receiveTelegramUpdate } from "../modules/integrations/telegram";
+import { vaultAvailable, webhookProof } from "../modules/integrations/vault";
 import { submitRequest, reviewRequest, myAdminPanels, assertDeliveredExchangeAccess } from "../modules/customer/service";
 import { prepareCustomerFixtures, cleanCustomerFixtures } from "./customer-fixtures";
 import { exchangeConfiguration, sandboxQuote, sandboxOrder, tenantOrder, trackOrder } from "../products/exchange/service";
-import { getPublicSite } from "../modules/website/service";
+import { getPublicSite, deliveredPublicSite } from "../modules/website/service";
 if (process.env.NODE_ENV === "production") throw new Error("Development-only verification.");
 const path = "../../.local/qa/integration-runtime-fixtures.json";
 const denied = (work: () => Promise<unknown>, status: number) =>
@@ -58,11 +58,52 @@ if (process.argv.includes("--cleanup")) {
     assert.deepEqual(bundle.definitions[0].secretFields, []);
     assert.ok(!JSON.stringify(bundle).includes("encrypted_credentials"));
     const rls = await withDatabase({ actorId: b.userId, tenantId: tb.id }, c => c.query("SELECT id FROM tenant_integrations WHERE tenant_id=$1", [ta.id]));
-    const role = (await pool.query("SELECT rolsuper OR rolbypassrls AS bypass FROM pg_roles WHERE rolname=current_user")).rows[0];
-    if (!role.bypass) assert.equal(rls.rowCount, 0);
+    const role = await withDatabase({ actorId: b.userId, tenantId: tb.id }, async c =>
+      (await c.query("SELECT current_user AS role,rolsuper OR rolbypassrls AS bypass FROM pg_roles WHERE rolname=current_user")).rows[0]);
+    assert.equal(role.role, "pg_database_owner"); assert.equal(role.bypass, false);
+    assert.equal(rls.rowCount, 0);
+    await withDatabase({ actorId: b.userId, tenantId: tb.id, canWrite: true }, async c => {
+      assert.equal((await c.query("UPDATE tenant_integrations SET enabled=false WHERE tenant_id=$1 RETURNING id", [ta.id])).rowCount, 0);
+      assert.equal((await c.query("DELETE FROM tenant_integrations WHERE tenant_id=$1 RETURNING id", [ta.id])).rowCount, 0);
+      const tables = await c.query("SELECT table_name FROM information_schema.columns WHERE table_schema='public' AND column_name='tenant_id'");
+      for (const { table_name } of tables.rows) {
+        assert.match(table_name, /^[a-z_]+$/);
+        assert.equal((await c.query(`SELECT count(*)::int AS n FROM "${table_name}" WHERE tenant_id IS DISTINCT FROM $1::uuid`, [tb.id])).rows[0].n, 0, table_name);
+      }
+    });
+    await assert.rejects(withDatabase({ actorId: b.userId, tenantId: tb.id, canWrite: true }, c =>
+      c.query("INSERT INTO tenant_integrations(tenant_id,provider_key) VALUES($1,'quickex')", [ta.id])),
+      (e: any) => e.code === "42501");
     const policy = (await pool.query("SELECT relrowsecurity,relforcerowsecurity FROM pg_class WHERE oid='tenant_integrations'::regclass")).rows[0];
     assert.equal(policy.relrowsecurity, true); assert.equal(policy.relforcerowsecurity, true);
-    checked("application tenant isolation, masked responses, permission modes, missing vault; policies present (Development privileged-role bypass disclosed)");
+    checked("actual non-bypassing API transaction role; all tenant-owned table cross-tenant reads hidden, wrong-tenant insert denied and update/delete ineffective; application permissions and masked responses preserved");
+    assert.equal(await deliveredPublicSite(ta.slug), false); // Legacy fixture is not a delivered customer order.
+    assert.equal(await deliveredPublicSite("unavailable-fixture-site"), false);
+    await denied(() => receiveTelegramUpdate(ta.slug, "", { update_id: 1 }), 403);
+    const vaultBefore = process.env.PROVIDER_VAULT_KEY_V1;
+    const fetchBefore = globalThis.fetch;
+    try {
+      // Fictional in-process key/token only. Block all external network calls.
+      process.env.PROVIDER_VAULT_KEY_V1 = "19".repeat(32);
+      globalThis.fetch = async () => { throw new Error("External calls forbidden in synthetic webhook checks"); };
+      const secrets = { botToken: "123456789:fictional_token_not_a_real_account_123456" };
+      await saveIntegration(op, ta.id, "telegram_bot", { enabled: true, credentialManagement: "super_admin",
+        settings: { botUsername: "fictional_fixture_bot", webhookUrl: `https://example.com/api/public/sites/${ta.slug}/telegram/webhook`,
+          miniAppUrl: `https://example.com/private-label-website/${ta.slug}/telegram` }, secrets, reason: "Disposable synthetic webhook security verification" });
+      const proof = webhookProof({ tenantId: ta.id, providerKey: "telegram_bot", environment: "sandbox" }, secrets);
+      await denied(() => receiveTelegramUpdate(ta.slug, "0".repeat(64), { update_id: 101 }), 403);
+      await denied(() => receiveTelegramUpdate(tb.slug, proof, { update_id: 101 }), 404);
+      assert.equal((await receiveTelegramUpdate(ta.slug, proof, { update_id: 101 })).duplicate, false);
+      assert.equal((await receiveTelegramUpdate(ta.slug, proof, { update_id: 101 })).duplicate, true);
+      await withDatabase({ actorId: op.userId, isSuperAdmin: true, canWrite: true }, async c => {
+        await c.query("DELETE FROM tenant_telegram_receipts WHERE tenant_id=$1", [ta.id]);
+        await c.query("DELETE FROM tenant_integrations WHERE tenant_id=$1 AND provider_key='telegram_bot'", [ta.id]);
+      });
+    } finally {
+      globalThis.fetch = fetchBefore;
+      if (vaultBefore === undefined) delete process.env.PROVIDER_VAULT_KEY_V1; else process.env.PROVIDER_VAULT_KEY_V1 = vaultBefore;
+    }
+    checked("delivered-only channel authority, synthetic tenant-bound webhook proof, missing/wrong proof rejection, cross-tenant denial and duplicate update handling; no external requests");
     const mini = { enabled: true, credentialManagement: "super_admin" as const, settings: { menu: ["swap", "tracking"], primaryColor: "#1188aa", backgroundColor: "#0d1018" }, reason: body.reason };
     await saveIntegration(op, ta.id, "telegram_mini_app", mini);
     assert.equal((await publicMiniConfig(ta.slug)).brandName, ta.name);
@@ -110,6 +151,15 @@ if (process.argv.includes("--cleanup")) {
     const empty = await exchangeConfiguration(op, approved.tenantId!);
     assert.equal(empty.configuration.routes.length, 0);
     const deliveredTenant = (await pool.query("SELECT slug,completed_steps FROM tenants WHERE id=$1", [approved.tenantId])).rows[0];
+    manifest.deliveredSite = { tenantId: approved.tenantId, slug: deliveredTenant.slug };
+    await writeFile(path, JSON.stringify(manifest));
+    assert.equal(await deliveredPublicSite(deliveredTenant.slug), true);
+    await withDatabase({ actorId: op.userId, isSuperAdmin: true, canWrite: true }, c =>
+      c.query("UPDATE tenants SET status='suspended' WHERE id=$1", [approved.tenantId]));
+    assert.equal(await deliveredPublicSite(deliveredTenant.slug), false);
+    await withDatabase({ actorId: op.userId, isSuperAdmin: true, canWrite: true }, c =>
+      c.query("UPDATE tenants SET status='active' WHERE id=$1", [approved.tenantId]));
+    assert.equal(await deliveredPublicSite(deliveredTenant.slug), true);
     assert.ok(!deliveredTenant.completed_steps.includes("exchange_provisioned"));
     assert.equal((await getPublicSite(deliveredTenant.slug) as any).brandName, `Runtime approval ${suffix}`);
     checked("approval automatically provisions isolated master and same-account Admin, without demo routes");

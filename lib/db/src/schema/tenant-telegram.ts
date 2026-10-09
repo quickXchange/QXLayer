@@ -1,4 +1,5 @@
-import { pgTable, uuid, bigint, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { uuid, bigint, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { tenantsTable } from "./tenants";
 import { tenantIntegrationsTable } from "./tenant-integrations";
 export const tenantTelegramReceiptsTable = pgTable("tenant_telegram_receipts", {

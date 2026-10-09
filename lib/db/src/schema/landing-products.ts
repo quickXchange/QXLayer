@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, integer, numeric, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, check, integer, numeric, text } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { modulesTable } from "./catalog";
 
 // Marketing metadata only. This table cannot grant rights or load product code.

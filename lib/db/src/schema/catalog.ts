@@ -1,4 +1,5 @@
-import { boolean, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { boolean, jsonb, text } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { createInsertSchema } from "drizzle-zod";
 
 export const modulesTable = pgTable("module_catalog", {

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { check, integer, jsonb, pgTable, serial, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { check, integer, jsonb, serial, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { tenantsTable } from "./tenants";
 import { createInsertSchema } from "drizzle-zod";
 export const whiteLabelRequestsTable = pgTable("white_label_requests", {

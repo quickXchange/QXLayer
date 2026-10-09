@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, integer, jsonb, numeric, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, check, integer, jsonb, numeric, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { tenantsTable } from "./tenants";
 
 // A new feature/limit is a catalog row, not a column or a tier in application code.

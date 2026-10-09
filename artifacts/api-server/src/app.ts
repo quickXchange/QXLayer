@@ -32,7 +32,8 @@ app.use(
 );
 app.disable("x-powered-by");
 // Before body parsing, Clerk, proxying and application routes.
-app.use(createAccessGate({ basePath: "/api", healthPath: "/api/healthz" }));
+app.use(createAccessGate({ basePath: "/api", healthPath: "/api/healthz",
+  deliveredSite: async slug => (await import("./modules/website/service")).deliveredPublicSite(slug) }));
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(express.json({ limit: "128kb" }));
 app.use(express.urlencoded({ extended: true, limit: "128kb" }));

@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { pool, applicationTableNames } from "@workspace/db";
 
+throw new Error("Legacy RLS removal is disabled after the approved isolation rollout. Use db:security:dev; never remove policies to bypass a publishing issue.");
+
 // Explicit development maintenance only. No deployment/build/startup invocation.
 if (process.env.NODE_ENV === "production") throw new Error("Development access migration refused in production.");
 const identifier = (name: string) => {

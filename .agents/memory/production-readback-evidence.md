@@ -24,6 +24,18 @@ Restoring a stricter historical CHECK after a correction may be incompatible
 with newly valid records. Guard reversals and refuse them when they would
 require deleting records, clearing links or changing lifecycle statuses.
 
+Policy names and RLS enablement do not prove predicate parity. Require actual
+USING/WITH CHECK clauses and the restricted role's privileges in the native
+publishing plan, and fail closed when runtime metadata is incomplete.
+
+**Why:** Native diff inspection has emitted policy-creation statements without
+their security conditions and omitted Development role grants. Missing conditions
+can default to permissive access, even though the Development policies passed.
+
+**How to apply:** Compare policy semantics and grants before publishing. Hold
+the release if the supported plan loses them; do not add Production DDL or startup
+repair, and do not label a passing Development isolation check as Live acceptance.
+
 **Why:** Isolated lifecycle verification showed that legitimate pre-delivery
 tenant links must survive; transaction rollback is safe before commit, but an
 unconditional post-commit schema reversal can reject valid new state.

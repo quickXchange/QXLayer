@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { check, jsonb, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { check, jsonb, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { tenantsTable } from "./tenants";
 import { modulesTable } from "./catalog";
 

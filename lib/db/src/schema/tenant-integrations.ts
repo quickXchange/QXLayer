@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
-import { check, pgTable, uuid, text, boolean, jsonb, timestamp, uniqueIndex, bigint } from "drizzle-orm/pg-core";
+import { check, uuid, text, boolean, jsonb, timestamp, uniqueIndex, bigint } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { createInsertSchema } from "drizzle-zod";
 import { tenantsTable } from "./tenants";
 

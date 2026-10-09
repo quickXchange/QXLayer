@@ -9,7 +9,7 @@ An independent multi-tenant administration and provisioning foundation, not a li
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `pnpm --filter @workspace/scripts run db:access:dev` — one-time development cleanup of legacy RLS/custom-role metadata; verifies all table data is unchanged
+- `pnpm --filter @workspace/scripts run db:security:dev` — explicit Development-only policy/grant setup; preserves table counts. Legacy RLS removal is disabled.
 - `pnpm --filter @workspace/scripts run db:seed:dev` — seed only sandbox catalogs
 - `pnpm --filter @workspace/api-server run verify:foundation` — development-only provisioning and tenant-isolation checks
 - `pnpm --filter @workspace/api-server run samples:plans:dev` — explicit development-only Aster/Nexa demonstrations; never an automatic startup seed
@@ -41,7 +41,7 @@ An independent multi-tenant administration and provisioning foundation, not a li
 
 - Use one modular monolith and one shared backend; channels must reuse tenant branding, assets, entitlements, pricing, orders, payments, and provider boundaries.
 - Administrator privileges are explicitly assigned by an operator, never inferred from sign-up order or browser-provided roles.
-- PostgreSQL uses the configured connection login, including the existing owner login. There is no RLS or custom runtime-role dependency. Server-side role checks, membership checks, customer ownership checks and explicitly tenant-scoped SQL enforce access. Never rely on transaction settings to filter rows. Read-only request transactions reject writes.
+- Owner-approved database isolation: every request transaction uses PostgreSQL's built-in `pg_database_owner` role (not superuser/BYPASSRLS), verifies policies/permissions, and applies transaction-local RLS context. Retain server-side role, membership, ownership and explicitly tenant-scoped SQL checks. Runtime table access must use `withDatabase`, never raw `pool`/`db`. Read-only transactions reject writes. The pool login remains privileged for explicit Development maintenance only; this is not protection against compromised server/database credentials.
 - Client administrators can edit their tenant configuration and manage staff grants; only super administrators assign Client Admins or manage plans, add-ons, subscriptions, overrides, suspension and registry registration. Staff default to read-only and may receive four narrowly scoped configuration grants; staff never manage memberships.
 - Effective rights come from database plans → additive add-ons → replacing tenant overrides. Missing features deny and missing limits are zero. Direct legacy module writes cannot bypass this resolver.
 - Disabling or archiving a plan/add-on blocks new assignments, but retains existing assignments. Tenant suspension denies capability access and configuration mutations.
@@ -68,10 +68,10 @@ responsive behavior, sandbox boundaries and measured verification results.
 
 ## Gotchas
 
-- Schema pushes require no custom role, grants or RLS policy setup. Never reintroduce database RLS or custom-role switching as a startup/deployment hook.
+- Schema declarations include RLS policies. Review the native Publish plan for policy enablement and built-in-role table/schema/sequence privileges; no custom roles are required. Never put schema/policy/grant DDL in build, startup or deployment hooks. Missing isolation metadata fails request transactions closed.
 - No public first-signup administrator endpoint exists. New accounts can use the customer workspace and submit Exchange requests immediately; tenant administrator access requires explicit Super Admin provisioning/ownership assignment.
 - Use the Zod namespace matching a generated schema for inferred types and caught validation errors; see `.agents/memory/validation-compatibility.md`.
-- Keep database credentials server-side. Use the configured PostgreSQL login without custom-role provisioning. No production migration/build/startup DDL is provided here.
+- Keep database credentials server-side. Do not provision custom runtime roles. No Production migration/build/startup DDL is provided here; the user triggers native Publish and must keep Development-data overwrite disabled.
 
 ## Pointers
 

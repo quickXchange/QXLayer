@@ -1,4 +1,5 @@
-import { pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable } from "../row-security";
 import { whiteLabelEventsTable } from "./white-label-requests";
 
 // Notifications are real customer-visible order events, not an outbound-send claim.

@@ -20,6 +20,17 @@ export async function publicTenantId(slug: string, preview?: WebsitePreview) {
   if (!id) throw new HttpError(404, "Website not available.");
   return id;
 }
+
+/** Minimal, uncached delivery authority for the public access gate; never drafts. */
+export async function deliveredPublicSite(slug: string): Promise<boolean> {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) return false;
+  return withDatabase({ actorId: "public-delivery", publicSlug: slug }, async c => {
+    const result = await c.query(`SELECT 1 FROM tenants t WHERE slug=$1 AND status='active'
+      AND EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status='delivered')
+      AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')`, [slug]);
+    return !!result.rowCount;
+  });
+}
 export async function getPublicSite(slug: string, feature?: string, preview?: WebsitePreview) {
   const id = await publicTenantId(slug, preview);
   return withDatabase({ actorId: "public-site", tenantId: id, isSuperAdmin: !!preview }, async (client) => {

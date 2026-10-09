@@ -5,6 +5,7 @@ export function createAccessGate(options?: {
   basePath?: string;
   healthPath?: string;
   now?: () => number;
+  deliveredSite?: (slug: string) => Promise<boolean>;
 }): (req: IncomingMessage, res: ServerResponse, next: () => void) => Promise<void>;
 export function accessGateVitePlugin(): {
   name: string;
