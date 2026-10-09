@@ -1,0 +1,16 @@
+{
+  "capturedAt": "2026-10-09T12:47:56.545Z",
+  "deployment": {
+    "additionalUrls": [
+      "https://private-label-crypto-platform.replit.app"
+    ],
+    "deploymentType": "autoscale",
+    "hasSuccessfulBuild": true,
+    "isDeployed": true,
+    "primaryUrl": "https://www.quicklychan.xyz",
+    "success": true,
+    "visibility": "public"
+  },
+  "tableCount": 39,
+  "fingerprints": "table_name,rows,fingerprint\naddon_entitlements,4,72a0bc85e4be20f38db7974b70f75052\naddons,1,e1f5ad1531949cf1fe39acb9696ceb6f\napi_keys,0,d41d8cd98f00b204e9800998ecf8427e\nasset_catalog,33,942e554744eb214f7c9629070c5e9799\nasset_network_catalog,37,d3f78c4df7a53d1f22612c94de1b694d\naudit_events,0,d41d8cd98f00b204e9800998ecf8427e\nblockchain_provider_configs,0,d41d8cd98f00b204e9800998ecf8427e\nentitlement_definitions,32,19fa466a70f233360c5c195ffa1649e2\nexchange_orders,0,d41d8cd98f00b204e9800998ecf8427e\nlanding_products,16,13bbeefbebb951426a77438ac4fbbdb9\nmodule_catalog,18,34361526e8399aeff8fdd2686ce7b6a2\nnetwork_catalog,19,b0abbc75db25e680e28ad63f249728e7\nnotification_events,0,d41d8cd98f00b204e9800998ecf8427e\npayment_invoices,0,d41d8cd98f00b204e9800998ecf8427e\nplan_entitlements,112,9966e8476d7213ab9342af176afce394\nplans,5,ea2dc5408017a2d297221c83254fa6b7\nplatform_admins,1,cbdcad674b2f79144714b58f28e2a07a\npricing_rules,0,d41d8cd98f00b204e9800998ecf8427e\nprovider_assignments,0,d41d8cd98f00b204e9800998ecf8427e\nprovider_catalog,0,d41d8cd98f00b204e9800998ecf8427e\nprovider_policies,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_addons,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_asset_networks,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_branding,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_configuration,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_domains,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_entitlement_overrides,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_memberships,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_modules,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_payment_methods,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_product_configuration,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_subscriptions,0,d41d8cd98f00b204e9800998ecf8427e\ntenant_usage_counters,0,d41d8cd98f00b204e9800998ecf8427e\ntenants,0,d41d8cd98f00b204e9800998ecf8427e\nwallet_configurations,0,d41d8cd98f00b204e9800998ecf8427e\nwebhook_endpoints,0,d41d8cd98f00b204e9800998ecf8427e\nwhite_label_attachments,0,d41d8cd98f00b204e9800998ecf8427e\nwhite_label_events,0,d41d8cd98f00b204e9800998ecf8427e\nwhite_label_requests,0,d41d8cd98f00b204e9800998ecf8427e\n"
+}

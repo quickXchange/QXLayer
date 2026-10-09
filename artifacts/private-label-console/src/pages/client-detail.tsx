@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { OwnerReviewProvider, useReviewGate } from '@/components/super-admin/review-gate';
 import { useParams, Link } from 'wouter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -44,6 +44,21 @@ function ClientDetailInner() {
   const act = useActivateTenant();
   const t = q.data;
   const [tab, setTab] = useState(() => { const v = new URLSearchParams(window.location.search).get('tab'); return ['account', 'config', 'plans', 'entitlements', 'activity'].includes(v ?? '') ? v! : 'account'; });
+  const tabsScroll = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const container = tabsScroll.current;
+    if (!container) return;
+    const revealSelected = () => {
+      const active = container.querySelector<HTMLElement>('[data-state="active"]');
+      if (!active) return;
+      const a = active.getBoundingClientRect(), c = container.getBoundingClientRect();
+      container.scrollLeft += Math.max(0, a.right - c.right) + Math.min(0, a.left - c.left);
+    };
+    revealSelected();
+    const observer = new ResizeObserver(revealSelected);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [tab, t?.id]);
   const subQ = useSubscription(id);
   const sub = subQ.data;
   const isSuper = can.role === 'super_admin';
@@ -99,7 +114,7 @@ function ClientDetailInner() {
           {suspended && <p className="mb-6 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-suspended">This client is suspended. {isSuper ? 'All configuration is read-only; only subscription controls stay editable. Unsuspend to resume changes.' : 'Configuration is read-only until your operator lifts the suspension.'}</p>}
           {!can.editTenant && <p className="mb-6 text-sm text-muted-foreground">{can.permissions.length ? 'You can edit only the sections granted to you; everything else is read-only.' : 'Your role has read-only access to this client.'}</p>}
           <Tabs value={tab} onValueChange={setTab}>
-            <div className="mb-5 overflow-x-auto"><TabsList className="w-max">
+            <div ref={tabsScroll} className="mb-5 overflow-x-auto"><TabsList className="w-max">
               {[['account', 'Account'], ['config', 'White Label config'], ['plans', 'Plans & Add-ons'], ['entitlements', 'Entitlements & Overrides'], ['activity', 'Activity']].map(([v, l]) => <TabsTrigger key={v} value={v} data-testid={`tab-client-${v}`}>{l}</TabsTrigger>)}
             </TabsList></div>
             <TabsContent value="account" className="space-y-6">
@@ -120,7 +135,7 @@ function ClientDetailInner() {
               {(isSuper || F.website === true) && <Group title="Website" note="Customer-facing website settings"><WebsiteSection tenant={t} readOnly={roFor('branding.manage')} /></Group>}
               <Group title="Resources" note="Staff, API keys, webhooks, payment methods"><ResourcesSection tenantId={t.id} allowed={allowed} readOnly={roFor('resources.manage')} staffReadOnly={!can.manageStaffGrants} showAll={isSuper} /></Group>
             </TabsContent>
-            <TabsContent value="plans"><SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} show={['plan', 'addons']} /></TabsContent>
+            <TabsContent value="plans"><SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} show={['plan', 'addons', 'commercial', 'summary']} /></TabsContent>
             <TabsContent value="entitlements"><SubscriptionSections tenantId={t.id} canManage={can.manageSubscription} show={['capabilities', 'overrides']} /></TabsContent>
             <TabsContent value="activity"><TenantActivity tenantId={t.id} /></TabsContent>
           </Tabs>

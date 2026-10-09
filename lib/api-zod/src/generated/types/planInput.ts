@@ -18,19 +18,27 @@ export interface PlanInput {
   description: string;
   /**
      * @maxLength 18
+     * @nullable
      * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
      */
-  monthlyPrice: string;
+  monthlyPrice: string | null;
   /**
      * @maxLength 18
+     * @nullable
      * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
      */
-  yearlyPrice: string;
+  yearlyPrice: string | null;
   /**
      * @maxLength 18
+     * @nullable
      * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
      */
-  setupFee: string;
+  setupFee: string | null;
+  /**
+     * @maxLength 6
+     * @pattern ^\d{1,3}(\.\d{1,2})?$
+     */
+  discountPercent?: string;
   /** @pattern ^[A-Z]{3}$ */
   currency: string;
   /** @maxLength 160 */

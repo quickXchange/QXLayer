@@ -29,7 +29,7 @@ export function Section({ n, title, note, children, footer }: { n: string; title
         <div><h2 className="font-display text-2xl leading-none">{title}</h2><p className="mt-1 text-sm text-muted-foreground">{note}</p></div>
       </header>
       <div className="space-y-4 p-5">{children}</div>
-      <footer className="flex items-center justify-end gap-3 border-t bg-muted/40 px-5 py-3">{footer}</footer>
+      <footer className="flex flex-wrap items-center justify-end gap-3 border-t bg-muted/40 px-5 py-3">{footer}</footer>
     </section>
   );
 }
@@ -79,7 +79,7 @@ export function BrandSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   return (
     <form onSubmit={submit}>
       <Section n="01" title="Brand" note="Identity applied to every module this client enables."
-        footer={<>{err && !readOnly && <span className="mr-auto text-sm text-destructive">{err}</span>}<SaveBtn id="brand" pending={m.isPending} disabled={!!err} readOnly={readOnly} label={saveLabel} /></>}>
+        footer={<>{err && !readOnly && <span role="alert" className="mr-auto text-sm text-destructive">{err}</span>}<SaveBtn id="brand" pending={m.isPending} disabled={!!err} readOnly={readOnly} label={saveLabel} /></>}>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1.5"><Label>Brand name</Label><Input data-testid="input-brandName" disabled={readOnly} value={f.brandName} onChange={(e) => set('brandName', e.target.value)} /></div>
           <div className="space-y-1.5"><Label>Logo URL</Label><Input data-testid="input-logoUrl" disabled={readOnly} placeholder="https://" value={f.logoUrl} onChange={(e) => set('logoUrl', e.target.value)} /></div>
@@ -113,7 +113,7 @@ export function DomainSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   return (
     <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { domain: v || null } }, { onSuccess: () => save.ok('Domain'), onError: save.fail }); }}>
       <Section n="02" title="Domain" note="Saved as unverified configuration. DNS is not checked and nothing is served."
-        footer={<>{bad && <span className="mr-auto text-sm text-destructive">Enter a hostname like app.example.com</span>}<SaveBtn id="domain" pending={m.isPending} disabled={bad} readOnly={readOnly} label={saveLabel ?? (v ? 'Save domain' : 'Save without domain')} /></>}>
+        footer={<>{bad && <span role="alert" className="mr-auto text-sm text-destructive">Enter a hostname like app.example.com</span>}<SaveBtn id="domain" pending={m.isPending} disabled={bad} readOnly={readOnly} label={saveLabel ?? (v ? 'Save domain' : 'Save without domain')} /></>}>
         <div className="space-y-1.5"><Label>Custom domain (optional)</Label>
           <Input data-testid="input-domain" disabled={readOnly} className="font-mono" placeholder="app.example.com" value={d} onChange={(e) => setD(e.target.value)} /></div>
         <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Status: unverified · leave empty to clear</p>

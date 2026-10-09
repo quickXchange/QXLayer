@@ -19,6 +19,8 @@ export const plansTable = pgTable("plans", {
   monthlyPrice: numeric("monthly_price", { precision: 22, scale: 2 }).notNull().default("0"),
   yearlyPrice: numeric("yearly_price", { precision: 22, scale: 2 }).notNull().default("0"),
   setupFee: numeric("setup_fee", { precision: 22, scale: 2 }).notNull().default("0"),
+  pricingConfigured: boolean("pricing_configured").notNull().default(false),
+  discountPercent: numeric("discount_percent", { precision: 5, scale: 2 }).notNull().default("0"),
   currency: text("currency").notNull().default("USD"),
   billingLabel: text("billing_label").notNull().default(""),
   displayOrder: integer("display_order").notNull().default(0),
@@ -29,6 +31,7 @@ export const plansTable = pgTable("plans", {
   check("plans_status", sql`status IN ('enabled','disabled','archived')`),
   check("plans_nonnegative_metadata", sql`monthly_price >= 0 AND yearly_price >= 0 AND setup_fee >= 0 AND display_order >= 0`),
   check("plans_currency", sql`currency ~ '^[A-Z]{3}$'`),
+  check("plans_discount", sql`discount_percent >= 0 AND discount_percent <= 100`),
 ]);
 
 export const planEntitlementsTable = pgTable("plan_entitlements", {
@@ -49,7 +52,10 @@ export const addonsTable = pgTable("addons", {
   setupFee: numeric("setup_fee", { precision: 22, scale: 2 }).notNull().default("0"),
   currency: text("currency").notNull().default("USD"),
   pricingConfigured: boolean("pricing_configured").notNull().default(false),
-});
+  // Existing configured sample amounts are not approved commercial pricing.
+  pricingConfirmed: boolean("pricing_confirmed").notNull().default(false),
+  discountPercent: numeric("discount_percent", { precision: 5, scale: 2 }).notNull().default("0"),
+}, () => [check("addons_discount", sql`discount_percent >= 0 AND discount_percent <= 100`)]);
 
 export const addonEntitlementsTable = pgTable("addon_entitlements", {
   addonId: uuid("addon_id").notNull().references(() => addonsTable.id),
@@ -64,10 +70,16 @@ export const tenantSubscriptionsTable = pgTable("tenant_subscriptions", {
   planId: uuid("plan_id").notNull().references(() => plansTable.id),
   status: text("status").notNull().default("active"),
   resumeStatus: text("resume_status").notNull().default("draft"),
+  billingPeriod: text("billing_period").notNull().default("monthly"),
+  discountPercent: numeric("discount_percent", { precision: 5, scale: 2 }).notNull().default("0"),
+  cancelled: boolean("cancelled").notNull().default(false),
+  operatorNote: text("operator_note").notNull().default(""),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, () => [
   check("subscription_status", sql`status IN ('active','suspended')`),
   check("subscription_resume_status", sql`resume_status IN ('draft','active')`),
+  check("subscription_billing_period", sql`billing_period IN ('monthly','yearly')`),
+  check("subscription_discount", sql`discount_percent >= 0 AND discount_percent <= 100`),
 ]);
 
 export const tenantAddonsTable = pgTable("tenant_addons", {

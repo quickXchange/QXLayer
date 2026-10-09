@@ -6,6 +6,7 @@ import { ConfigureExchange } from '@/components/customer/configure';
 import { OrderStatus } from '@/components/customer/order-view';
 import { cash, orderRef, type WlOrder } from '@/lib/wl';
 import { useAdminPanels, useMyRequests } from '@/lib/customer';
+import { NotificationsPanel } from '@/components/customer/notifications';
 import { MetricCard } from '@/components/app/metrics';
 
 export function AccountDashboard() {
@@ -15,12 +16,13 @@ export function AccountDashboard() {
     <>
       <PageHeader eyebrow="Customer account" title="Dashboard"><Button asChild data-testid="button-configure"><Link href="/account/configure">Configure Exchange</Link></Button></PageHeader>
       {r.isLoading ? <ListSkeleton rows={2} /> : r.isError ? <ErrorState what="your requests" onRetry={() => r.refetch()} /> : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <MetricCard id="stat-requests" label="Requests" value={reqs.length} />
           <MetricCard id="stat-pending" label="Awaiting review" value={reqs.filter((x) => OPEN.includes(x.status)).length} />
           <MetricCard id="stat-approved" label="Approved" value={reqs.filter((x) => ['approved', 'in_setup', 'customization', 'ready'].includes(x.status)).length} />
           <MetricCard id="stat-panels" label="Delivered panels" value={panels.length} />
         </div>)}
+      <NotificationsPanel />
       {!r.isLoading && reqs.length === 0 && <div className="mt-8"><EmptyState title="No Exchange project yet" body="Configure a white-label Exchange and an operator will review it." action={<Button asChild><Link href="/account/configure">Configure Exchange</Link></Button>} /></div>}
     </>
   );
@@ -68,7 +70,7 @@ export function AccountWhiteLabels() {
         {delivered.map((x) => (
           <div key={x.id} className="rounded-md border bg-card p-5" data-testid={`card-wl-${x.id}`}>
             <div className="flex flex-wrap items-center justify-between gap-2"><p className="font-mono text-[11px] uppercase text-copper">{orderRef(x)}</p><OrderStatus status={x.status} /></div><p className="font-display mt-1 text-2xl [overflow-wrap:anywhere]">{x.projectName}</p><p className="text-sm text-muted-foreground">{x.brandName}</p>
-            <div className="mt-4 flex flex-wrap gap-2">{x.tenantId && ids.includes(x.tenantId) && <Button asChild size="sm"><Link href={`/clients/${x.tenantId}/exchange`}>Open Admin</Link></Button>}<Button asChild size="sm" variant="outline"><Link href={`/account/orders/${x.id}`}>Order details</Link></Button></div>
+            <div className="mt-4 flex flex-wrap gap-2">{x.websiteUrl && <Button asChild size="sm" variant="outline"><a href={x.websiteUrl} target="_blank" rel="noopener noreferrer" data-testid={`link-wl-website-${x.id}`}>Open website</a></Button>}{x.tenantId && ids.includes(x.tenantId) && <Button asChild size="sm"><Link href={`/clients/${x.tenantId}/exchange`}>Open Admin</Link></Button>}<Button asChild size="sm" variant="outline"><Link href={`/account/orders/${x.id}`}>Order details</Link></Button></div>
           </div>))}
         {orphan.map((p) => (
           <div key={p.tenantId} className="rounded-md border bg-card p-5" data-testid={`card-wl-panel-${p.tenantId}`}>

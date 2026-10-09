@@ -486,19 +486,27 @@ export interface PlanInput {
   description: string;
   /**
      * @maxLength 18
+     * @nullable
      * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
      */
-  monthlyPrice: string;
+  monthlyPrice: string | null;
   /**
      * @maxLength 18
+     * @nullable
      * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
      */
-  yearlyPrice: string;
+  yearlyPrice: string | null;
   /**
      * @maxLength 18
+     * @nullable
      * @pattern ^[0-9]+(?:\.[0-9]{1,2})?$
      */
-  setupFee: string;
+  setupFee: string | null;
+  /**
+     * @maxLength 6
+     * @pattern ^\d{1,3}(\.\d{1,2})?$
+     */
+  discountPercent?: string;
   /** @pattern ^[A-Z]{3}$ */
   currency: string;
   /** @maxLength 160 */
@@ -517,6 +525,7 @@ export type Plan = PlanInput & {
   id: string;
   createdAt: string;
   updatedAt: string;
+  pricingConfigured?: boolean;
 };
 
 export interface AddonInput {
@@ -537,6 +546,11 @@ export interface AddonInput {
   setupFee?: string | null;
   /** @pattern ^[A-Z]{3}$ */
   currency?: string;
+  /**
+     * @maxLength 6
+     * @pattern ^\d{1,3}(\.\d{1,2})?$
+     */
+  discountPercent?: string;
   /**
      * @minLength 2
      * @maxLength 120
@@ -2015,7 +2029,16 @@ export type SubscriptionViewStatus = typeof SubscriptionViewStatus[keyof typeof 
 export const SubscriptionViewStatus = {
   active: 'active',
   suspended: 'suspended',
+  cancelled: 'cancelled',
   unassigned: 'unassigned',
+} as const;
+
+export type SubscriptionViewBillingPeriod = typeof SubscriptionViewBillingPeriod[keyof typeof SubscriptionViewBillingPeriod];
+
+
+export const SubscriptionViewBillingPeriod = {
+  monthly: 'monthly',
+  yearly: 'yearly',
 } as const;
 
 export type SubscriptionViewFeatures = {[key: string]: boolean};
@@ -2028,6 +2051,14 @@ export interface SubscriptionView {
   tenantId: string;
   tenantStatus: string;
   status: SubscriptionViewStatus;
+  billingPeriod?: SubscriptionViewBillingPeriod;
+  discountPercent?: string;
+  operatorNote?: string;
+  /** @nullable */
+  recurringEstimate?: string | null;
+  /** @nullable */
+  currency?: string | null;
+  billingConnected?: boolean;
   plan: Plan | null;
   addons: Addon[];
   overrides: EntitlementOverride[];
@@ -2037,6 +2068,64 @@ export interface SubscriptionView {
   usage: UsageItem[];
   enabledModules: string[];
   overLimit: boolean;
+}
+
+export type SubscriptionCommercialInputBillingPeriod = typeof SubscriptionCommercialInputBillingPeriod[keyof typeof SubscriptionCommercialInputBillingPeriod];
+
+
+export const SubscriptionCommercialInputBillingPeriod = {
+  monthly: 'monthly',
+  yearly: 'yearly',
+} as const;
+
+export type SubscriptionCommercialInputAction = typeof SubscriptionCommercialInputAction[keyof typeof SubscriptionCommercialInputAction];
+
+
+export const SubscriptionCommercialInputAction = {
+  save: 'save',
+  cancel: 'cancel',
+  restore: 'restore',
+} as const;
+
+export interface SubscriptionCommercialInput {
+  billingPeriod: SubscriptionCommercialInputBillingPeriod;
+  /**
+     * @maxLength 6
+     * @pattern ^\d{1,3}(\.\d{1,2})?$
+     */
+  discountPercent: string;
+  /** @maxLength 2000 */
+  operatorNote: string;
+  action: SubscriptionCommercialInputAction;
+  /**
+     * @minLength 2
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export interface NotificationReadInput {
+  /** @maxItems 100 */
+  ids: string[];
+}
+
+export interface CustomerNotification {
+  id: string;
+  requestId: string;
+  orderReference: string;
+  message: string;
+  /** @nullable */
+  status: string | null;
+  createdAt: string;
+  /** @nullable */
+  readAt: string | null;
+}
+
+export interface CustomerNotifications {
+  items: CustomerNotification[];
+  /** @minimum 0 */
+  unreadCount: number;
+  outboundConnected: boolean;
 }
 
 export interface SuspensionInput {

@@ -8,6 +8,7 @@
 import type { Addon } from './addon';
 import type { EntitlementOverride } from './entitlementOverride';
 import type { Plan } from './plan';
+import type { SubscriptionViewBillingPeriod } from './subscriptionViewBillingPeriod';
 import type { SubscriptionViewFeatures } from './subscriptionViewFeatures';
 import type { SubscriptionViewLimits } from './subscriptionViewLimits';
 import type { SubscriptionViewSources } from './subscriptionViewSources';
@@ -18,6 +19,14 @@ export interface SubscriptionView {
   tenantId: string;
   tenantStatus: string;
   status: SubscriptionViewStatus;
+  billingPeriod?: SubscriptionViewBillingPeriod;
+  discountPercent?: string;
+  operatorNote?: string;
+  /** @nullable */
+  recurringEstimate?: string | null;
+  /** @nullable */
+  currency?: string | null;
+  billingConnected?: boolean;
   plan: Plan | null;
   addons: Addon[];
   overrides: EntitlementOverride[];

@@ -20,6 +20,10 @@ router.put("/plans/:planId", async (req, res) => {
   const { planId } = v.UpdatePlanParams.parse(req.params);
   res.json(v.UpdatePlanResponse.parse(await catalog.savePlan(principalFrom(res), v.UpdatePlanBody.parse(req.body), planId)));
 });
+router.delete("/plans/:planId", async (req, res) => {
+  const { planId } = v.DeletePlanParams.parse(req.params);
+  res.json(v.DeletePlanResponse.parse(await catalog.deleteCatalogRecord(principalFrom(res), planId, "plan")));
+});
 router.post("/plans/:planId/duplicate", async (req, res) => {
   const { planId } = v.DuplicatePlanParams.parse(req.params);
   res.status(201).json(v.DuplicatePlanResponse.parse(await catalog.duplicatePlan(principalFrom(res), planId)));
@@ -33,6 +37,14 @@ router.post("/add-ons", async (req, res) => res.status(201).json(v.CreateAddonRe
 router.put("/add-ons/:addonId", async (req, res) => {
   const { addonId } = v.UpdateAddonParams.parse(req.params);
   res.json(v.UpdateAddonResponse.parse(await catalog.saveAddon(principalFrom(res), v.UpdateAddonBody.parse(req.body), addonId)));
+});
+router.delete("/add-ons/:addonId", async (req, res) => {
+  const { addonId } = v.DeleteAddonParams.parse(req.params);
+  res.json(v.DeleteAddonResponse.parse(await catalog.deleteCatalogRecord(principalFrom(res), addonId, "addon")));
+});
+router.put("/tenants/:tenantId/subscription/commercial", async (req, res) => {
+  const { tenantId } = v.UpdateSubscriptionCommercialParams.parse(req.params);
+  res.json(v.UpdateSubscriptionCommercialResponse.parse(await sub.updateSubscriptionCommercial(principalFrom(res), tenantId, v.UpdateSubscriptionCommercialBody.parse(req.body))));
 });
 router.get("/tenants/:tenantId/subscription", async (req, res) => {
   const { tenantId } = v.GetTenantSubscriptionParams.parse(req.params);

@@ -29,6 +29,7 @@ import type {
   CapabilityStatus,
   CurrentPrincipal,
   CustomerAdminPanel,
+  CustomerNotifications,
   DemoLaunchInput,
   DemoSession,
   DomainInput,
@@ -59,6 +60,7 @@ import type {
   ListExchangeOrdersParams,
   ModuleDefinition,
   MutationStatus,
+  NotificationReadInput,
   Plan,
   PlanInput,
   PlanStatusInput,
@@ -81,6 +83,7 @@ import type {
   ResourceItem,
   StaffPermissions,
   SubscriptionAddonInput,
+  SubscriptionCommercialInput,
   SubscriptionPlanInput,
   SubscriptionView,
   SuspensionInput,
@@ -6014,6 +6017,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getCreatePlanMutationOptions(options));
     }
 
+export const getDeletePlanUrl = (planId: string,) => {
+
+
+
+
+  return `/api/plans/${planId}`
+}
+
+export const deletePlan = async (planId: string, options?: Parameters<typeof customFetch>[1]): Promise<MutationStatus> => {
+
+  return customFetch<MutationStatus>(getDeletePlanUrl(planId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeletePlanMutationKey = () => ['deletePlan'] as const;
+
+export const getDeletePlanMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlan>>, TError,DeletePlanMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePlan>>, TError,DeletePlanMutationVariables, TContext> => {
+
+const mutationKey = getDeletePlanMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlan>>, DeletePlanMutationVariables> = (props) => {
+          const {planId} = props ?? {};
+
+          return  deletePlan(planId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePlanMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlan>>>
+
+    export type DeletePlanMutationError = ErrorType<void>
+    export type DeletePlanMutationVariables = {planId: string}
+
+    export const useDeletePlan = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlan>>, TError,DeletePlanMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deletePlan>>,
+        TError,
+        DeletePlanMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeletePlanMutationOptions(options));
+    }
+
 export const getGetPlanUrl = (planId: string,) => {
 
 
@@ -6472,6 +6543,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getCreateAddonMutationOptions(options));
     }
 
+export const getDeleteAddonUrl = (addonId: string,) => {
+
+
+
+
+  return `/api/add-ons/${addonId}`
+}
+
+export const deleteAddon = async (addonId: string, options?: Parameters<typeof customFetch>[1]): Promise<MutationStatus> => {
+
+  return customFetch<MutationStatus>(getDeleteAddonUrl(addonId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteAddonMutationKey = () => ['deleteAddon'] as const;
+
+export const getDeleteAddonMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAddon>>, TError,DeleteAddonMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteAddon>>, TError,DeleteAddonMutationVariables, TContext> => {
+
+const mutationKey = getDeleteAddonMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAddon>>, DeleteAddonMutationVariables> = (props) => {
+          const {addonId} = props ?? {};
+
+          return  deleteAddon(addonId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteAddonMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAddon>>>
+
+    export type DeleteAddonMutationError = ErrorType<void>
+    export type DeleteAddonMutationVariables = {addonId: string}
+
+    export const useDeleteAddon = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteAddon>>, TError,DeleteAddonMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteAddon>>,
+        TError,
+        DeleteAddonMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteAddonMutationOptions(options));
+    }
+
 export const getUpdateAddonUrl = (addonId: string,) => {
 
 
@@ -6707,6 +6846,242 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getChangeTenantPlanMutationOptions(options));
+    }
+
+export const getUpdateSubscriptionCommercialUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/subscription/commercial`
+}
+
+export const updateSubscriptionCommercial = async (tenantId: string,
+    subscriptionCommercialInput: SubscriptionCommercialInput, options?: Parameters<typeof customFetch>[1]): Promise<SubscriptionView> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SubscriptionView>(getUpdateSubscriptionCommercialUrl(tenantId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(subscriptionCommercialInput)
+  }
+);}
+
+
+
+
+
+export const getUpdateSubscriptionCommercialMutationKey = () => ['updateSubscriptionCommercial'] as const;
+
+export const getUpdateSubscriptionCommercialMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriptionCommercial>>, TError,UpdateSubscriptionCommercialMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubscriptionCommercial>>, TError,UpdateSubscriptionCommercialMutationVariables, TContext> => {
+
+const mutationKey = getUpdateSubscriptionCommercialMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubscriptionCommercial>>, UpdateSubscriptionCommercialMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  updateSubscriptionCommercial(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubscriptionCommercialMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubscriptionCommercial>>>
+    export type UpdateSubscriptionCommercialMutationBody = BodyType<SubscriptionCommercialInput>
+    export type UpdateSubscriptionCommercialMutationError = ErrorType<unknown>
+    export type UpdateSubscriptionCommercialMutationVariables = {tenantId: string;data: BodyType<SubscriptionCommercialInput>}
+
+    export const useUpdateSubscriptionCommercial = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubscriptionCommercial>>, TError,UpdateSubscriptionCommercialMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubscriptionCommercial>>,
+        TError,
+        UpdateSubscriptionCommercialMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateSubscriptionCommercialMutationOptions(options));
+    }
+
+export const getGetCustomerNotificationsUrl = () => {
+
+
+
+
+  return `/api/customer/notifications`
+}
+
+export const getCustomerNotifications = async ( options?: Parameters<typeof customFetch>[1]): Promise<CustomerNotifications> => {
+
+  return customFetch<CustomerNotifications>(getGetCustomerNotificationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCustomerNotificationsQueryKey = () => {
+    return [
+    `/api/customer/notifications`
+    ] as const;
+    }
+
+
+export const getGetCustomerNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getCustomerNotifications>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCustomerNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCustomerNotificationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCustomerNotifications>>> = ({ signal }) => getCustomerNotifications({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCustomerNotifications>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCustomerNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof getCustomerNotifications>>>
+export type GetCustomerNotificationsQueryError = ErrorType<unknown>
+
+
+
+export function useGetCustomerNotifications<TData = Awaited<ReturnType<typeof getCustomerNotifications>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCustomerNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCustomerNotificationsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getMarkCustomerNotificationsReadUrl = () => {
+
+
+
+
+  return `/api/customer/notifications/read`
+}
+
+export const markCustomerNotificationsRead = async (notificationReadInput: NotificationReadInput, options?: Parameters<typeof customFetch>[1]): Promise<MutationStatus> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MutationStatus>(getMarkCustomerNotificationsReadUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(notificationReadInput)
+  }
+);}
+
+
+
+
+
+export const getMarkCustomerNotificationsReadMutationKey = () => ['markCustomerNotificationsRead'] as const;
+
+export const getMarkCustomerNotificationsReadMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markCustomerNotificationsRead>>, TError,MarkCustomerNotificationsReadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof markCustomerNotificationsRead>>, TError,MarkCustomerNotificationsReadMutationVariables, TContext> => {
+
+const mutationKey = getMarkCustomerNotificationsReadMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof markCustomerNotificationsRead>>, MarkCustomerNotificationsReadMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  markCustomerNotificationsRead(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type MarkCustomerNotificationsReadMutationResult = NonNullable<Awaited<ReturnType<typeof markCustomerNotificationsRead>>>
+    export type MarkCustomerNotificationsReadMutationBody = BodyType<NotificationReadInput>
+    export type MarkCustomerNotificationsReadMutationError = ErrorType<unknown>
+    export type MarkCustomerNotificationsReadMutationVariables = {data: BodyType<NotificationReadInput>}
+
+    export const useMarkCustomerNotificationsRead = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof markCustomerNotificationsRead>>, TError,MarkCustomerNotificationsReadMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof markCustomerNotificationsRead>>,
+        TError,
+        MarkCustomerNotificationsReadMutationVariables,
+        TContext
+      > => {
+      return useMutation(getMarkCustomerNotificationsReadMutationOptions(options));
     }
 
 export const getSetTenantAddonsUrl = (tenantId: string,) => {

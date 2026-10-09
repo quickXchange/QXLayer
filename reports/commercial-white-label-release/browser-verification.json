@@ -1,0 +1,324 @@
+{
+  "run": "consolidated-development-commercial-white-label-browser-verification",
+  "environment": "Development",
+  "baseUrl": "https://372d2684-97ec-4ce5-b16a-77fb322db72a-00-3vzuovktccar2.reed.replit.dev/",
+  "status": "development-verified-with-disclosed-delivered-summary-gap",
+  "authDiagnosis": {
+    "clerkLoaded": true,
+    "signInClerkUserResults": {
+      "type": "string",
+      "isString": true,
+      "twoFreshUniqueIdentities": true
+    },
+    "publicRootAutoRedirect": false,
+    "plainApiMe": {
+      "httpStatus": 401,
+      "reason": "Sign-in required; plain fetch omitted SDK bearer token"
+    },
+    "bearerApiMe": [
+      {
+        "httpStatus": 200,
+        "userId": "user_3KSSh2X7m5jW3CWjVLote3dbHXg",
+        "role": "unassigned",
+        "tenantId": null,
+        "memberships": [],
+        "sandboxOnly": true
+      },
+      {
+        "httpStatus": 200,
+        "userId": "user_3KSSf8DWdM7Kd4JcKx2sLh1o4Zz",
+        "role": "unassigned",
+        "tenantId": null,
+        "memberships": [],
+        "sandboxOnly": true
+      }
+    ],
+    "tokenHandling": "Clerk SDK getToken() was used only in-memory in the browser and immediately attached to Bearer API calls. Token contents, cookies, and authorization headers were not logged or persisted.",
+    "result": "Authenticated principal is available. Root remains public; explicit /plans/new rendered after load. /dashboard was tried explicitly and returned 404 (not the commercial route).",
+    "appInitiatedApiMeCaptured": false,
+    "appInitiatedApiMeNote": "The app UI made authenticated plan GET/PUT calls successfully (GET 200, PUT 200), but the app-initiated /api/me request headers were not separately captured; the in-browser manual Bearer /api/me check was captured and succeeded."
+  },
+  "manifest": {
+    "path": ".local/commercial-white-label-browser-qa.json",
+    "createdBeforeAnyGrantOrBusinessWrite": true,
+    "operatorGrantRecorded": true,
+    "customerTenantGrant": true
+  },
+  "actorIdsForCleanup": {
+    "operator": "user_3KSSh2X7m5jW3CWjVLote3dbHXg",
+    "customer": "user_3KSSf8DWdM7Kd4JcKx2sLh1o4Zz"
+  },
+  "checks": [
+    {
+      "name": "Clerk SDK authentication diagnosis and actual /api/me identities",
+      "status": "passed",
+      "evidence": "Both fresh sessions had loaded Clerk user/session state; in-browser Bearer /api/me returned HTTP 200 and matching actual IDs. The earlier plain fetch 401 was due to missing SDK bearer token, not absent Clerk sessions."
+    },
+    {
+      "name": "Pre-grant scope check",
+      "status": "passed",
+      "evidence": "Targeted read-only query found no existing platform_admins or tenant_memberships rows for either exact actor ID."
+    },
+    {
+      "name": "Temporary Development operator grant",
+      "status": "passed",
+      "evidence": "Exactly one platform_admins row for operator user_3KSSh2X7m5jW3CWjVLote3dbHXg; manifest records it. A separate customer tenant_memberships row was later added only for the single disposable QA tenant."
+    },
+    {
+      "name": "New enabled plan, pricing OFF, website and crypto_exchange, numeric limit",
+      "status": "passed",
+      "evidence": "UI review/confirm; POST /api/plans returned HTTP 201 and exact UUID 57d585d5-63a6-42c3-bc31-1784819f1fca. Response monthlyPrice/yearlyPrice/setupFee were null. Private-label website and Crypto Exchange were enabled, max_api_keys=5, status was visibly enabled before creation. Exact UUID was written to manifest in the response handler before another UI action."
+    },
+    {
+      "name": "Plan pricing edit and review flow",
+      "status": "passed",
+      "evidence": "UI review plus final confirmation; PUT /api/plans/57d585d5-63a6-42c3-bc31-1784819f1fca returned HTTP 200 with monthly 100.00, yearly 1000.00, setup 50.00, discount 10.00, USD, status enabled. UI displayed 90.00/month and 900.00/year and explicitly stated prices are reference only/no billing performed."
+    },
+    {
+      "name": "Refresh persistence of plan pricing/features/limit",
+      "status": "passed",
+      "evidence": "After reload the form read monthly/yearly/setup/discount=100.00/1000.00/50.00/10.00, website and crypto_exchange aria-checked=true, max_api_keys=5. Authenticated GET /api/plans/57d585d5-63a6-42c3-bc31-1784819f1fca returned HTTP 200 and status=enabled."
+    },
+    {
+      "name": "Plan status control display after refresh",
+      "status": "passed",
+      "expected": "Status trigger displays enabled after reload.",
+      "observed": "Enabled displays visibly after reload; authenticated API state is also enabled.",
+      "evidence": "After the status-select correction, the QA plan editor showed Enabled on reload and the API retained status=enabled."
+    },
+    {
+      "name": "Duplicate/delete unused plan and referenced-delete 409",
+      "status": "passed",
+      "evidence": "Duplicate via UI returned 201 (15029839-2228-4cf7-bd86-e897b77fd99c); the unused duplicate was deleted via UI with HTTP 200. DELETE of referenced QA plan 57d585d5-63a6-42c3-bc31-1784819f1fca returned HTTP 409 with `This plan is referenced by a subscription or order. Disable or archive it instead; customer records must be preserved.` The plan remained enabled and intact."
+    },
+    {
+      "name": "Add-on create/edit/disable/clear/delete",
+      "status": "passed",
+      "evidence": "The first QA add-on lifecycle passed: create, configure, disable/re-enable, clear/restore prices, and delete unused add-on via UI (HTTP 200). Separate QA tenant add-on 3c0399ee-9fef-47d3-8d9e-ba303a549dc8 was configured at 20/200/0/0 and attached to the QA tenant. Its referenced DELETE returned HTTP 409 with `This add-on is referenced by a subscription or order. Disable it instead; customer records must be preserved.` It remains enabled and assigned; the retained Sample fixture was untouched."
+    },
+    {
+      "name": "Disposable tenant subscription, cancellation/suspension/restore, private note exclusion, admin summary",
+      "status": "passed-with-delivered-summary-gap",
+      "evidence": "QA tenant 5761557d-ec7e-4965-bf8f-cc87db05d9ec and its single customer membership were created in scope; QA add-on assignment returned HTTP 200. The corrected commercial save with Yearly/10%, a private operator note, and a non-empty reason returned HTTP 200; reload confirmed the same settings and USD 990.00/year estimate. Cancel showed `Subscription cancelled` and suspended/read-only access; Restore returned HTTP 200 to Draft with subscription active. Tenant remains unactivated. The customer subscription GET returned HTTP 403 and the private operator note did not appear in customer views."
+    },
+    {
+      "name": "Customer order, customer-visible note, own-order notifications/read isolation, and role permissions",
+      "status": "passed",
+      "evidence": "Customer POST created WL-000129 (UUID 0d0714dc-ac1c-4dad-954e-2d134a6e102d) and it remains New/pending review with no payment, delivery, activation, or provisioning. The operator added one truthful customer-visible pending-review note (POST HTTP 201, UUID 6077dec2-cd16-4e32-aa54-1ce80c3f9f6e). The customer My Orders list contained only WL-000129; Dashboard showed only its two notifications. Marking the note notification read left the original submission notification unread, and this state persisted after reload. Customer subscription GET returned 403; direct navigation to the operator client route redirected to `/account`. No tenant private note appeared in customer views; My White Labels remains empty because no project was delivered."
+    },
+    {
+      "name": "Responsive plan/add-on/account/tenant-tab overflow at 1440x900, 768x1024, 390x844",
+      "status": "passed-with-nonblocking-layout-observations",
+      "evidence": "Plans, Add-ons, Account, and the QA tenant Plans & Add-ons tab were checked at 1440x900, 768x1024, and 390x844; document-level horizontal overflow was absent on all sampled routes/sizes. Plans/Add-ons become stacked cards on mobile. The tenant tab row uses an inner horizontal scroller at 768/390; at 390 the selected Plans & Add-ons tab was initially partly clipped at scrollLeft=0 but became fully visible after scrolling it into view. At 768 the customer Dashboard's four metric-card labels wrap awkwardly inside words (e.g. REQUEST/S and AWAITIN/G REVIEW); content remains accessible and the page does not overflow horizontally."
+    }
+  ],
+  "mutationsAndCleanupScope": {
+    "developmentPlatformAdminGrant": "platform_admins.clerk_user_id = user_3KSSh2X7m5jW3CWjVLote3dbHXg (temporary; main agent must remove)",
+    "createdPlanUuid": "57d585d5-63a6-42c3-bc31-1784819f1fca",
+    "customerMemberships": [
+      {
+        "tenantId": "5761557d-ec7e-4965-bf8f-cc87db05d9ec",
+        "userId": "user_3KSSf8DWdM7Kd4JcKx2sLh1o4Zz",
+        "label": "QA-CWL-SMt7LcK Customer Admin",
+        "assignmentHttpStatus": 201
+      }
+    ],
+    "addOns": [
+      {
+        "uuid": "94684cbe-eee1-48c7-968b-49a17123b98c",
+        "state": "deleted-via-UI"
+      },
+      {
+        "uuid": "3c0399ee-9fef-47d3-8d9e-ba303a549dc8",
+        "state": "enabled-attached-to-QA-tenant"
+      }
+    ],
+    "tenants": [
+      {
+        "uuid": "5761557d-ec7e-4965-bf8f-cc87db05d9ec",
+        "name": "QA-CWL-SMt7LcK Tenant",
+        "slug": "qa-cwl-smt7lck-tenant",
+        "state": "draft",
+        "planUuid": "57d585d5-63a6-42c3-bc31-1784819f1fca"
+      }
+    ],
+    "orders": [
+      "0d0714dc-ac1c-4dad-954e-2d134a6e102d"
+    ],
+    "notifications": [
+      "d01f8ad6-84f5-4d7e-baa1-efea8904ca03",
+      "6077dec2-cd16-4e32-aa54-1ce80c3f9f6e"
+    ],
+    "cleanedByTester": false,
+    "existingRetainedDataTouched": false,
+    "productionAccessed": false
+  },
+  "uuidEvidence": [
+    {
+      "recordType": "plan",
+      "exactUuid": "57d585d5-63a6-42c3-bc31-1784819f1fca",
+      "source": "POST /api/plans HTTP 201 response field id",
+      "recordedInManifestBeforeNextUIAction": true,
+      "createdPriceFields": {
+        "monthlyPrice": null,
+        "yearlyPrice": null,
+        "setupFee": null
+      }
+    },
+    {
+      "recordType": "tenant",
+      "exactUuid": "5761557d-ec7e-4965-bf8f-cc87db05d9ec",
+      "source": "Authenticated POST request sent; response parse threw; exact-slug read-only DB recovery then UI list/drawer confirmed",
+      "recordedInManifest": true
+    },
+    {
+      "recordType": "tenant-addon",
+      "exactUuid": "3c0399ee-9fef-47d3-8d9e-ba303a549dc8",
+      "source": "POST /api/add-ons HTTP 201 response",
+      "recordedInManifestBeforeNextUIAction": true
+    },
+    {
+      "recordType": "customer-order",
+      "exactUuid": "0d0714dc-ac1c-4dad-954e-2d134a6e102d",
+      "source": "POST /api/customer/white-label-requests HTTP 201 response for WL-000129",
+      "recordedInManifestBeforeNextAppAction": true
+    },
+    {
+      "recordType": "customer-order-notification",
+      "exactUuid": "d01f8ad6-84f5-4d7e-baa1-efea8904ca03",
+      "source": "Customer Dashboard unread notification row for WL-000129",
+      "recordedInManifestBeforeNextAppAction": true
+    },
+    {
+      "recordType": "customer-visible-note-notification",
+      "exactUuid": "6077dec2-cd16-4e32-aa54-1ce80c3f9f6e",
+      "source": "POST /api/operator/white-label-requests/0d0714dc-ac1c-4dad-954e-2d134a6e102d/notes HTTP 201; Dashboard row later individually marked read",
+      "recordedInManifestBeforeNextAppAction": true
+    }
+  ],
+  "screenshots": [
+    {
+      "id": "22vnhn",
+      "description": "Create-plan review dialog: enabled plan, prices shown as Unconfigured (Requires review); nothing saved yet."
+    },
+    {
+      "id": "af7z1j",
+      "description": "Plan creation form staged with max_api_keys=5 and website enabled."
+    },
+    {
+      "id": "6kye8g",
+      "description": "Crypto Exchange entitlement enabled in the plan editor."
+    },
+    {
+      "id": "qzp2dg",
+      "description": "Pricing edit review dialog with 100/1000/50 and 10% discount; reference-only/no-billing statement in underlying form."
+    },
+    {
+      "id": "yu50oq",
+      "description": "After reload, plan pricing persisted but Status combobox is visibly blank despite API status=enabled."
+    },
+    {
+      "id": "dtq3p8",
+      "description": "Final commercial settings confirmation for QA tenant, staged yearly/10%/private note; reason empty."
+    },
+    {
+      "id": "cp8vur",
+      "description": "Commercial save failed with HTTP 400 Invalid input; estimate remained USD 100/year despite 900 discounted-plan text."
+    },
+    {
+      "id": "2dvhvd",
+      "description": "First unused QA add-on deletion succeeded; retained Sample add-on remained the only row."
+    },
+    {
+      "id": "r49gzx",
+      "description": "Referenced QA plan delete produced HTTP 409 preservation error; plan remained enabled."
+    },
+    {
+      "id": "63y1aq",
+      "description": "Referenced QA add-on delete produced HTTP 409 preservation error; add-on remained enabled and assigned."
+    },
+    {
+      "id": "pwa8yd",
+      "description": "Customer Dashboard after reload: customer-note notification remains Read and the original WL-000129 submission notification remains Unread."
+    },
+    {
+      "id": "tx8sxo",
+      "description": "Customer direct navigation to operator-only client Plans & Add-ons route redirected to /account."
+    },
+    {
+      "id": "lezxwz",
+      "description": "Plans page at 1440x900 with no document-level horizontal overflow."
+    },
+    {
+      "id": "btp6t5",
+      "description": "Plans page at 768x1024 with stacked cards and no document-level horizontal overflow."
+    },
+    {
+      "id": "ht3po5",
+      "description": "Plans page at 390x844 with stacked cards and no document-level horizontal overflow."
+    },
+    {
+      "id": "6st602",
+      "description": "Add-ons page at 1440x900 with no document-level horizontal overflow."
+    },
+    {
+      "id": "vcjc7i",
+      "description": "Add-ons page at 768x1024 with cards and no document-level horizontal overflow."
+    },
+    {
+      "id": "juyal1",
+      "description": "Add-ons page at 390x844 with responsive cards and no document-level horizontal overflow."
+    },
+    {
+      "id": "k3p6oo",
+      "description": "Customer Dashboard at 1440x900 with notification panel and no document-level horizontal overflow."
+    },
+    {
+      "id": "74uuxo",
+      "description": "Customer Dashboard at 768x1024; metric labels wrap inside words despite no document-level overflow."
+    },
+    {
+      "id": "p9epqm",
+      "description": "Customer Dashboard at 390x844 with 2x2 metric cards and no document-level horizontal overflow."
+    },
+    {
+      "id": "v8ltki",
+      "description": "Tenant Plans & Add-ons at 1440x900 with no document-level horizontal overflow."
+    },
+    {
+      "id": "l6qp44",
+      "description": "Tenant Plans & Add-ons at 768x1024; inner tab scroller requires horizontal scrolling."
+    },
+    {
+      "id": "am0m3o",
+      "description": "Tenant Plans & Add-ons at 390x844; active tab is partly clipped at initial horizontal scroll position."
+    },
+    {
+      "id": "pjyv3n",
+      "description": "Tenant Plans & Add-ons at 390x844 after scrolling selected tab into view; page-level overflow absent."
+    },
+    {
+      "id": "uui8vo",
+      "description": "Tenant commercial settings at 390x844; fields and USD 990/year estimate fit within the mobile column."
+    }
+  ],
+  "limitations": [
+    "No White Label project was delivered or activated, by design; customer My White Labels remains empty, so a delivered-project summary could not be inspected without violating the no-delivery scope.",
+    "At 768x1024, customer Dashboard metric labels wrap awkwardly inside words. Tenant tabs use an inner horizontal scroller; at 390x844 the selected Plans & Add-ons tab is initially partly clipped until scrolled into view. No document-level horizontal overflow was found.",
+    "The two minor responsive observations were corrected after the browser pass; corrections were checked by typecheck and production build, not another browser pass."
+  ],
+  "mainAgentCleanup": {
+    "status": "complete",
+    "originalDevelopmentTablesPreserved": 40,
+    "comparison": "Original columns; separately verified new addons.pricing_confirmed=false default",
+    "temporaryAccessRemoved": true,
+    "clerkAccounts": "Retained unassigned per manifest scope"
+  },
+  "mainAgentCorrections": {
+    "statusSelect": "Browser verified",
+    "commercialSaveReason": "Browser verified",
+    "savedEstimatePeriodLabel": "Browser verified",
+    "tabletMetricLayout": "Four-column layout now starts at lg; verified by typecheck/production build, no further browser pass",
+    "selectedTenantTab": "Auto-revealed on selection and container resize; verified by typecheck/production build, no further browser pass"
+  }
+}

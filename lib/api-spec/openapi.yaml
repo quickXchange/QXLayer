@@ -964,6 +964,12 @@ paths:
         "201": {description: Plan created, content: {application/json: {schema: {$ref: "#/components/schemas/Plan"}}}}
   /plans/{planId}:
     parameters: [{$ref: "#/components/parameters/PlanId"}]
+    delete:
+      operationId: deletePlan
+      tags: [platform]
+      responses:
+        "200": {description: Unreferenced plan deleted, content: {application/json: {schema: {$ref: "#/components/schemas/MutationStatus"}}}}
+        "409": {description: Referenced plans must be disabled or archived instead}
     get:
       operationId: getPlan
       tags: [platform]
@@ -1003,6 +1009,13 @@ paths:
       responses:
         "201": {description: Add-on created, content: {application/json: {schema: {$ref: "#/components/schemas/Addon"}}}}
   /add-ons/{addonId}:
+    delete:
+      operationId: deleteAddon
+      tags: [platform]
+      parameters: [{name: addonId, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses:
+        "200": {description: Unreferenced add-on deleted, content: {application/json: {schema: {$ref: "#/components/schemas/MutationStatus"}}}}
+        "409": {description: Referenced add-ons must be disabled instead}
     put:
       operationId: updateAddon
       tags: [platform]
@@ -1025,6 +1038,27 @@ paths:
       requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionPlanInput"}}}}
       responses:
         "200": {description: Plan changed without billing, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionView"}}}}
+  /tenants/{tenantId}/subscription/commercial:
+    put:
+      operationId: updateSubscriptionCommercial
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionCommercialInput"}}}}
+      responses:
+        "200": {description: Operator-managed commercial settings; no payment collection, content: {application/json: {schema: {$ref: "#/components/schemas/SubscriptionView"}}}}
+  /customer/notifications:
+    get:
+      operationId: getCustomerNotifications
+      tags: [customer]
+      responses:
+        "200": {description: Customer-owned order updates, content: {application/json: {schema: {$ref: "#/components/schemas/CustomerNotifications"}}}}
+  /customer/notifications/read:
+    put:
+      operationId: markCustomerNotificationsRead
+      tags: [customer]
+      requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/NotificationReadInput"}}}}
+      responses:
+        "200": {description: Owned notifications acknowledged, content: {application/json: {schema: {$ref: "#/components/schemas/MutationStatus"}}}}
   /tenants/{tenantId}/subscription/add-ons:
     put:
       operationId: setTenantAddons
@@ -2133,9 +2167,10 @@ components:
       properties:
         name: {type: string, minLength: 2, maxLength: 120}
         description: {type: string, maxLength: 3000}
-        monthlyPrice: {type: string, pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
-        yearlyPrice: {type: string, pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
-        setupFee: {type: string, pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
+        monthlyPrice: {type: ["string", "null"], pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
+        yearlyPrice: {type: ["string", "null"], pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
+        setupFee: {type: ["string", "null"], pattern: "^[0-9]+(?:\\.[0-9]{1,2})?$", maxLength: 18}
+        discountPercent: {type: string, pattern: '^\d{1,3}(\.\d{1,2})?$', maxLength: 6}
         currency: {type: string, pattern: "^[A-Z]{3}$"}
         billingLabel: {type: string, maxLength: 160}
         displayOrder: {type: integer, minimum: 0, maximum: 100000}
@@ -2150,6 +2185,7 @@ components:
             id: {type: string, format: uuid}
             createdAt: {type: string, format: date-time}
             updatedAt: {type: string, format: date-time}
+            pricingConfigured: {type: boolean}
           required: [id, createdAt, updatedAt]
     PlanStatusInput:
       type: object
@@ -2162,6 +2198,7 @@ components:
         yearlyPrice: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
         setupFee: {type: ["string", "null"], pattern: '^\d{1,12}(\.\d{1,2})?$'}
         currency: {type: string, pattern: '^[A-Z]{3}$'}
+        discountPercent: {type: string, pattern: '^\d{1,3}(\.\d{1,2})?$', maxLength: 6}
         name: {type: string, minLength: 2, maxLength: 120}
         description: {type: string, maxLength: 3000}
         enabled: {type: boolean}
@@ -2205,7 +2242,13 @@ components:
       properties:
         tenantId: {type: string, format: uuid}
         tenantStatus: {type: string}
-        status: {type: string, enum: [active, suspended, unassigned]}
+        status: {type: string, enum: [active, suspended, cancelled, unassigned]}
+        billingPeriod: {type: string, enum: [monthly, yearly]}
+        discountPercent: {type: string}
+        operatorNote: {type: string}
+        recurringEstimate: {type: ["string", "null"]}
+        currency: {type: ["string", "null"]}
+        billingConnected: {type: boolean}
         plan:
           oneOf: [{$ref: "#/components/schemas/Plan"}, {type: "null"}]
         addons: {type: array, items: {$ref: "#/components/schemas/Addon"}}
@@ -2217,6 +2260,38 @@ components:
         enabledModules: {type: array, items: {type: string}}
         overLimit: {type: boolean}
       required: [tenantId, tenantStatus, status, plan, addons, overrides, features, limits, sources, usage, enabledModules, overLimit]
+    SubscriptionCommercialInput:
+      type: object
+      properties:
+        billingPeriod: {type: string, enum: [monthly, yearly]}
+        discountPercent: {type: string, pattern: '^\d{1,3}(\.\d{1,2})?$', maxLength: 6}
+        operatorNote: {type: string, maxLength: 2000}
+        action: {type: string, enum: [save, cancel, restore]}
+        reason: {type: string, minLength: 2, maxLength: 500}
+      required: [billingPeriod, discountPercent, operatorNote, action, reason]
+    NotificationReadInput:
+      type: object
+      properties:
+        ids: {type: array, maxItems: 100, uniqueItems: true, items: {type: string, format: uuid}}
+      required: [ids]
+    CustomerNotification:
+      type: object
+      properties:
+        id: {type: string, format: uuid}
+        requestId: {type: string, format: uuid}
+        orderReference: {type: string}
+        message: {type: string}
+        status: {type: ["string", "null"]}
+        createdAt: {type: string, format: date-time}
+        readAt: {type: ["string", "null"], format: date-time}
+      required: [id, requestId, orderReference, message, status, createdAt, readAt]
+    CustomerNotifications:
+      type: object
+      properties:
+        items: {type: array, items: {$ref: "#/components/schemas/CustomerNotification"}}
+        unreadCount: {type: integer, minimum: 0}
+        outboundConnected: {type: boolean}
+      required: [items, unreadCount, outboundConnected]
     SuspensionInput:
       type: object
       properties: {suspended: {type: boolean}, reason: {type: string, minLength: 2, maxLength: 500}}

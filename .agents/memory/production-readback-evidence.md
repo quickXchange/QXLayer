@@ -40,3 +40,15 @@ envelope containing only transaction wrapper output, without result rows.
 
 **How to apply:** Treat missing result sets as unverified, correct the query, and
 never interpret missing output as zero records.
+
+Preservation snapshots must record the exact fingerprint algorithm and original
+column set. Compare original columns across additive schema changes, and verify
+the new columns' intended defaults separately.
+
+**Why:** Changing JSON serialization or aggregation separators produced different
+hashes for unchanged records. A new false-default pricing guard also changed the
+full-row hash although every pre-existing column remained identical.
+
+**How to apply:** Never weaken a preservation guard or rewrite business data to
+force a match. Reproduce the original serialization, digest ordering and separator;
+prove original-column equality and the expected additive defaults independently.

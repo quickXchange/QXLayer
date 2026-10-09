@@ -26,6 +26,11 @@ export interface AddonInput {
   /** @pattern ^[A-Z]{3}$ */
   currency?: string;
   /**
+     * @maxLength 6
+     * @pattern ^\d{1,3}(\.\d{1,2})?$
+     */
+  discountPercent?: string;
+  /**
      * @minLength 2
      * @maxLength 120
      */

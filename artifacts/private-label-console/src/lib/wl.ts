@@ -20,7 +20,12 @@ export const toCents = (v: string | null | undefined): bigint => { if (v == null
 export const fromCents = (c: bigint) => `${c / 100n}.${String(c % 100n).padStart(2, '0')}`;
 export const cash = (v: string | null | undefined, c?: string | null) => (v == null || v === '' ? 'Requires review' : !DEC.test(v) ? '-' : `${c ?? ''} ${fromCents(toCents(v))}`.trim());
 export const fmtSize = (n: number) => (n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
-export const periodPrice = (x: { monthlyPrice?: string | null; yearlyPrice?: string | null } | null | undefined, p: string) => (x ? (p === 'yearly' ? x.yearlyPrice : x.monthlyPrice) : undefined);
+export const pctBp = (pct: string | null | undefined): bigint => { const b = toCents(pct); return b > 10000n ? 10000n : b; };
+/** Percentage discount on a recurring price only (never setup). BigInt cents, half-up rounding; null stays null. */
+export const discounted = (v: string | null | undefined, pct?: string | null): string | null | undefined => (v == null || v === '' || !DEC.test(v) ? v : fromCents((toCents(v) * (10000n - pctBp(pct)) + 5000n) / 10000n));
+export const hasDiscount = (pct?: string | null) => pctBp(pct) > 0n;
+export const periodPrice = (x: { monthlyPrice?: string | null; yearlyPrice?: string | null; discountPercent?: string } | null | undefined, p: string) => (x ? discounted(p === 'yearly' ? x.yearlyPrice : x.monthlyPrice, x.discountPercent) : undefined);
+export const listPrice = (x: { monthlyPrice?: string | null; yearlyPrice?: string | null } | null | undefined, p: string) => (x ? (p === 'yearly' ? x.yearlyPrice : x.monthlyPrice) : undefined);
 export const unknownCount = (xs: (string | null | undefined)[]) => xs.filter((v) => v == null || v === '').length;
 export const sumNum = (xs: (string | null | undefined)[]) => fromCents(xs.reduce((a, v) => a + toCents(v), 0n));
 export const limitText = (v: boolean | string) => (v === true ? 'Included' : v === false ? 'Not included' : String(v));

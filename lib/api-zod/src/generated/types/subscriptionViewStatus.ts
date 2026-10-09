@@ -12,5 +12,6 @@ export type SubscriptionViewStatus = typeof SubscriptionViewStatus[keyof typeof 
 export const SubscriptionViewStatus = {
   active: 'active',
   suspended: 'suspended',
+  cancelled: 'cancelled',
   unassigned: 'unassigned',
 } as const;

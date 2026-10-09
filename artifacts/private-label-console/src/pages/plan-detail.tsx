@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
-import { useGetPlan, getGetPlanQueryKey, useCreatePlan, useUpdatePlan, useListEntitlementDefinitions, type PlanInput } from '@workspace/api-client-react';
+import { useGetPlan, getGetPlanQueryKey, useCreatePlan, useUpdatePlan, useDeletePlan, getListPlansQueryKey, useListEntitlementDefinitions, type PlanInput } from '@workspace/api-client-react';
 import { ArrowLeft } from 'lucide-react';
 import { PageHeader, ErrorState, ListSkeleton } from '@/components/app/bits';
 import { GroupedEntitlementEditor } from '@/components/super-admin/grouped-entitlements';
@@ -10,6 +10,8 @@ import { entriesFrom, entError, toMap, type EntMap } from '@/components/app/enti
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { discounted } from '@/lib/wl';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCan } from '@/lib/principal';
@@ -17,7 +19,7 @@ import { useInvalidateCatalog } from '@/lib/invalidate';
 import { useToast } from '@/hooks/use-toast';
 
 const MONEY = /^[0-9]+(?:\.[0-9]{1,2})?$/;
-const blank = { name: '', description: '', monthlyPrice: '0', yearlyPrice: '0', setupFee: '0', currency: 'USD', billingLabel: '', displayOrder: '0', status: 'disabled' as PlanInput['status'] };
+const blank = { name: '', description: '', monthlyPrice: '', yearlyPrice: '', setupFee: '', discountPercent: '0', currency: 'USD', billingLabel: '', displayOrder: '0', status: 'disabled' as PlanInput['status'] };
 
 export default function PlanDetail() {
   const params = useParams<{ id?: string }>();
@@ -31,6 +33,10 @@ export default function PlanDetail() {
   const plan = useGetPlan(id, { query: { enabled: !!id, queryKey: getGetPlanQueryKey(id) } });
   const create = useCreatePlan();
   const update = useUpdatePlan();
+  const del = useDeletePlan();
+  const [configured, setConfigured] = useState(false);
+  const [delOpen, setDelOpen] = useState(false);
+  const [delErr, setDelErr] = useState<string | null>(null);
   const [f, setF] = useState(blank);
   const [ent, setEnt] = useState<EntMap>({});
   const [rev, setRev] = useState(false);
@@ -38,7 +44,8 @@ export default function PlanDetail() {
   useEffect(() => {
     if (plan.data && init.current !== plan.data.id) {
       init.current = plan.data.id; const p = plan.data;
-      setF({ name: p.name, description: p.description, monthlyPrice: p.monthlyPrice, yearlyPrice: p.yearlyPrice, setupFee: p.setupFee, currency: p.currency, billingLabel: p.billingLabel, displayOrder: String(p.displayOrder), status: p.status });
+      setF({ name: p.name, description: p.description, monthlyPrice: p.monthlyPrice ?? '', yearlyPrice: p.yearlyPrice ?? '', setupFee: p.setupFee ?? '', discountPercent: p.discountPercent ?? '0', currency: p.currency, billingLabel: p.billingLabel, displayOrder: String(p.displayOrder), status: p.status });
+      setConfigured(p.pricingConfigured ?? (p.monthlyPrice != null && p.yearlyPrice != null && p.setupFee != null));
       setEnt(toMap(p.entitlements));
     }
   }, [plan.data]);
@@ -46,11 +53,12 @@ export default function PlanDetail() {
   const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
   const d = defs.data ?? [];
   const order = Number(f.displayOrder);
-  const err = f.name.trim().length < 2 ? 'Name needs 2+ characters' : ![f.monthlyPrice, f.yearlyPrice, f.setupFee].every((x) => MONEY.test(x)) ? 'Prices are decimal strings with up to 2 places'
+  const err = f.name.trim().length < 2 ? 'Name needs 2+ characters' : configured && ![f.monthlyPrice, f.yearlyPrice, f.setupFee].every((x) => MONEY.test(x)) ? 'Configured pricing needs monthly, yearly and setup as decimals with up to 2 places'
+    : !/^\d{1,3}(\.\d{1,2})?$/.test(f.discountPercent) || Number(f.discountPercent) > 100 ? 'Discount is a percentage from 0 to 100'
     : !/^[A-Z]{3}$/.test(f.currency) ? 'Currency is a 3-letter uppercase code' : !Number.isInteger(order) || order < 0 || order > 100000 ? 'Display order 0 - 100000' : entError(d, ent);
   const submit = (e: React.FormEvent) => { e.preventDefault(); if (!err) setRev(true); };
   const doSave = () => {
-    const data: PlanInput = { name: f.name.trim(), description: f.description, monthlyPrice: f.monthlyPrice, yearlyPrice: f.yearlyPrice, setupFee: f.setupFee, currency: f.currency, billingLabel: f.billingLabel, displayOrder: order, status: f.status, entitlements: entriesFrom(d, ent, true) };
+    const data: PlanInput = { name: f.name.trim(), description: f.description, monthlyPrice: configured ? f.monthlyPrice : null, yearlyPrice: configured ? f.yearlyPrice : null, setupFee: configured ? f.setupFee : null, discountPercent: f.discountPercent, currency: f.currency, billingLabel: f.billingLabel, displayOrder: order, status: f.status, entitlements: entriesFrom(d, ent, true) };
     const fail = (er: unknown) => { setRev(false); toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }); };
     if (id) update.mutate({ planId: id, data }, { onSuccess: (p) => { setRev(false); qc.setQueryData(getGetPlanQueryKey(id), p); inv(); toast({ title: 'Plan saved' }); }, onError: fail });
     else create.mutate({ data }, { onSuccess: (p) => { setRev(false); inv(); toast({ title: 'Plan created' }); nav(`/plans/${p.id}`); }, onError: fail });
@@ -67,27 +75,33 @@ export default function PlanDetail() {
               <div className="space-y-1.5"><Label>Name</Label><Input data-testid="input-plan-name" value={f.name} onChange={(e) => set('name', e.target.value)} /></div>
               <div className="space-y-1.5"><Label>Billing label</Label><Input data-testid="input-plan-billing" value={f.billingLabel} onChange={(e) => set('billingLabel', e.target.value)} /></div>
               <div className="space-y-1.5 md:col-span-2"><Label>Description</Label><Textarea data-testid="input-plan-description" value={f.description} onChange={(e) => set('description', e.target.value)} /></div>
+              <div className="flex items-center gap-3 md:col-span-2"><Switch id="plan-configured" data-testid="switch-plan-configured" checked={configured} onCheckedChange={setConfigured} /><Label htmlFor="plan-configured">Pricing configured</Label><span className="text-xs text-muted-foreground">{configured ? 'Monthly, yearly and setup are all required.' : 'Off: all three prices are saved as unconfigured and customers see Requires review.'}</span></div>
               {([['monthlyPrice', 'Monthly price'], ['yearlyPrice', 'Yearly price'], ['setupFee', 'Setup fee']] as const).map(([k, l]) => (
-                <div key={k} className="space-y-1.5"><Label>{l}</Label><Input data-testid={`input-plan-${k}`} className="font-mono" value={f[k]} onChange={(e) => set(k, e.target.value)} /></div>))}
+                <div key={k} className="space-y-1.5"><Label htmlFor={`plan-${k}`}>{l}</Label><Input id={`plan-${k}`} data-testid={`input-plan-${k}`} className="font-mono" disabled={!configured} placeholder={configured ? '0.00' : 'Not configured'} aria-invalid={configured && !MONEY.test(f[k])} value={f[k]} onChange={(e) => set(k, e.target.value)} /></div>))}
+              <div className="space-y-1.5"><Label htmlFor="plan-discount">Discount percent (recurring only)</Label><Input id="plan-discount" data-testid="input-plan-discount" className="font-mono" inputMode="decimal" value={f.discountPercent} onChange={(e) => set('discountPercent', e.target.value)} /></div>
               <div className="space-y-1.5"><Label>Currency</Label><Input data-testid="input-plan-currency" className="font-mono" value={f.currency} onChange={(e) => set('currency', e.target.value.toUpperCase())} /></div>
               <div className="space-y-1.5"><Label>Display order</Label><Input data-testid="input-plan-order" className="font-mono" value={f.displayOrder} onChange={(e) => set('displayOrder', e.target.value)} /></div>
               <div className="space-y-1.5"><Label>Status</Label>
-                <Select value={f.status} onValueChange={(v) => set('status', v)}><SelectTrigger data-testid="select-plan-status"><SelectValue /></SelectTrigger>
+                <Select value={f.status} onValueChange={(v) => { if (['enabled', 'disabled', 'archived'].includes(v)) set('status', v); }}><SelectTrigger data-testid="select-plan-status"><SelectValue>{f.status.charAt(0).toUpperCase() + f.status.slice(1)}</SelectValue></SelectTrigger>
                   <SelectContent>{['enabled', 'disabled', 'archived'].map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent></Select></div>
             </div>
-            <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Prices are stored for reference only. No billing is performed.</p>
+            <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Prices are stored for reference only. No billing is performed. Discounts apply to monthly and yearly prices, never to the setup fee.{configured && MONEY.test(f.monthlyPrice) && MONEY.test(f.yearlyPrice) && !err.startsWith('Discount') ? ` After discount: ${discounted(f.monthlyPrice, f.discountPercent)} / mo, ${discounted(f.yearlyPrice, f.discountPercent)} / yr ${f.currency}.` : ''}</p>
           </section>
           <section className="space-y-3 rounded-md border bg-card p-5">
             <h2 className="font-display text-2xl">Entitlements</h2>
             <GroupedEntitlementEditor defs={d} value={ent} onChange={setEnt} />
           </section>
-          <div className="flex items-center justify-end gap-3">
-            {err && <span className="mr-auto text-sm text-destructive">{err}</span>}
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            {err && <span role="alert" className="mr-auto text-sm text-destructive">{err}</span>}
+            {id && <Button type="button" variant="outline" className="text-destructive" data-testid="button-delete-plan" onClick={() => { setDelErr(null); setDelOpen(true); }}>Delete plan</Button>}
             <Button type="submit" data-testid="button-save-plan" disabled={!!err || create.isPending || update.isPending}>{create.isPending || update.isPending ? 'Saving' : id ? 'Save plan' : 'Create plan'}</Button>
           </div>
         </form>)}
+      <ReviewDialog open={delOpen} onClose={() => setDelOpen(false)} title="delete plan" destructive applyLabel="Delete plan" pending={del.isPending} error={delErr}
+        onApply={() => del.mutate({ planId: id }, { onSuccess: () => { setDelOpen(false); qc.removeQueries({ queryKey: getGetPlanQueryKey(id) }); qc.invalidateQueries({ queryKey: getListPlansQueryKey() }); inv(); toast({ title: 'Plan deleted' }); nav('/plans'); }, onError: (e) => setDelErr(`${(e as Error).message}. A plan assigned to a project or referenced by an order cannot be deleted; disable or archive it to stop new offers.`) })}
+        rows={[['Plan', f.name], ['Rule', 'Refused if assigned to any project or referenced by any order'], ['Alternative', 'Disable or archive to stop offering it']]} />
       <ReviewDialog open={rev} onClose={() => setRev(false)} title={id ? 'save plan' : 'create plan'} pending={create.isPending || update.isPending} onApply={doSave}
-        rows={[['Name', f.name.trim()], ['Status', f.status], ['Prices', `${f.monthlyPrice} / mo, ${f.yearlyPrice} / yr, ${f.setupFee} setup ${f.currency}`], ['Entitlements set', String(entriesFrom(d, ent, true).length)]]} />
+        rows={[['Name', f.name.trim()], ['Status', f.status], ['Prices', configured ? `${f.monthlyPrice} / mo, ${f.yearlyPrice} / yr, ${f.setupFee} setup ${f.currency}` : 'Unconfigured (Requires review)'], ['Discount (recurring only)', `${f.discountPercent}%`], ['Current subscribers', 'Entitlement edits update their rights now'], ['Entitlements set', String(entriesFrom(d, ent, true).length)]]} />
     </>
   );
 }

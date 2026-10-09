@@ -11,8 +11,17 @@ import { myAdminPanels, listRequests, submitRequest, reviewRequest, deliverReque
 import { whiteLabelCatalog } from "../modules/customer/order-catalog";
 import { getProvisioning, retryProvisioning } from "../modules/customer/provisioning";
 import { GetWhiteLabelProvisioningResponse, RetryWhiteLabelProvisioningResponse } from "@workspace/api-zod";
+import { GetCustomerNotificationsResponse, MarkCustomerNotificationsReadBody, MarkCustomerNotificationsReadResponse } from "@workspace/api-zod";
+import { customerNotifications, markNotificationsRead } from "../modules/customer/notifications";
 const router = Router();
 router.use(["/customer", "/operator"], requireAuthentication, sameOriginMutation);
+router.get("/customer/notifications", async (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(GetCustomerNotificationsResponse.parse(await customerNotifications(principalFrom(res))));
+});
+router.put("/customer/notifications/read", async (req, res) => {
+  res.json(MarkCustomerNotificationsReadResponse.parse(await markNotificationsRead(principalFrom(res), MarkCustomerNotificationsReadBody.parse(req.body).ids)));
+});
 router.get("/operator/white-label-requests/:requestId/provisioning", async (req, res) => {
   res.set("Cache-Control", "no-store");
   res.json(GetWhiteLabelProvisioningResponse.parse(await getProvisioning(principalFrom(res), GetWhiteLabelRequestParams.parse(req.params).requestId)));

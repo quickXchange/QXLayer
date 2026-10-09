@@ -1,11 +1,12 @@
 import { withDatabase } from "@workspace/db";
-import { SetTenantOverridesBody } from "@workspace/api-zod";
+import { SetTenantOverridesBody, UpdateSubscriptionCommercialBody } from "@workspace/api-zod";
 import type { z } from "zod";
 import { HttpError } from "../../lib/errors";
 import { audit } from "../../lib/audit";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { readAddon, readPlan, validateEntries } from "./catalog";
 import { lockTenant, resolveEntitlements } from "./resolver";
+import { discountBasisPoints } from "./commercial-pricing";
 
 export function changeTenantPlan(principal: Principal, tenantId: string, planId: string) {
   requireSuperAdmin(principal);
@@ -14,6 +15,7 @@ export function changeTenantPlan(principal: Principal, tenantId: string, planId:
     const before = await resolveEntitlements(client, tenantId);
     const plan = await readPlan(client, planId);
     if (plan.status !== "enabled" && before.plan?.id !== planId) throw new HttpError(400, "Only enabled plans can receive new assignments.");
+    if (before.addons.some(a => a.currency !== plan.currency)) throw new HttpError(409, "Remove add-ons in the old currency before changing the plan currency.");
     await client.query(
       "INSERT INTO tenant_subscriptions (tenant_id,plan_id,status) VALUES ($1,$2,$3) ON CONFLICT (tenant_id) DO UPDATE SET plan_id=EXCLUDED.plan_id,updated_at=now()",
       [tenantId, planId, before.tenantStatus === "suspended" ? "suspended" : "active"],
@@ -34,6 +36,7 @@ export function setTenantAddons(principal: Principal, tenantId: string, ids: str
     for (const id of unique) {
       const addon = await readAddon(client, id);
       if (!addon.enabled && !before.addons.some((a) => a.id === id)) throw new HttpError(400, "A disabled add-on cannot receive new assignments.");
+      if (addon.currency !== before.plan.currency) throw new HttpError(400, "Add-ons must use the plan currency; no currency conversion is performed.");
     }
     await client.query("DELETE FROM tenant_addons WHERE tenant_id=$1", [tenantId]);
     for (const id of unique) await client.query("INSERT INTO tenant_addons (tenant_id,addon_id) VALUES ($1,$2)", [tenantId, id]);
@@ -66,6 +69,7 @@ export function setTenantSuspension(principal: Principal, tenantId: string, susp
   return withDatabase(contextFor(principal, tenantId, true), async (client) => {
     await lockTenant(client, tenantId);
     const before = await resolveEntitlements(client, tenantId);
+    if (before.status === "cancelled") throw new HttpError(409, "Restore the cancelled subscription explicitly before changing suspension.");
     if (suspended && before.tenantStatus !== "suspended") {
       await client.query("UPDATE tenant_subscriptions SET resume_status=$2,status='suspended',updated_at=now() WHERE tenant_id=$1", [tenantId, before.tenantStatus]);
       await client.query("UPDATE tenants SET status='suspended',updated_at=now() WHERE id=$1", [tenantId]);
@@ -76,6 +80,34 @@ export function setTenantSuspension(principal: Principal, tenantId: string, susp
     }
     const after = await resolveEntitlements(client, tenantId);
     await audit(client, principal, tenantId, suspended ? "tenant.suspended" : "tenant.unsuspended", reason.trim(), { before: before.tenantStatus, after: after.tenantStatus });
+    return after;
+  });
+}
+
+export function updateSubscriptionCommercial(principal: Principal, tenantId: string, input: z.infer<typeof UpdateSubscriptionCommercialBody>) {
+  requireSuperAdmin(principal);
+  discountBasisPoints(input.discountPercent);
+  if (input.reason.trim().length < 2) throw new HttpError(400, "A change reason is required.");
+  return withDatabase(contextFor(principal, tenantId, true), async client => {
+    await lockTenant(client, tenantId);
+    const before = await resolveEntitlements(client, tenantId);
+    if (!before.plan) throw new HttpError(409, "Assign a plan before managing this subscription.");
+    await client.query("UPDATE tenant_subscriptions SET billing_period=$2,discount_percent=$3,operator_note=$4,updated_at=now() WHERE tenant_id=$1",
+      [tenantId, input.billingPeriod, input.discountPercent, input.operatorNote.trim()]);
+    if (input.action === "cancel" && before.status !== "cancelled") {
+      await client.query(`UPDATE tenant_subscriptions SET cancelled=true,status='suspended',
+        resume_status=CASE WHEN $2 IN ('draft','active') THEN $2 ELSE resume_status END,updated_at=now() WHERE tenant_id=$1`, [tenantId, before.tenantStatus]);
+      await client.query("UPDATE tenants SET status='suspended',updated_at=now() WHERE id=$1", [tenantId]);
+    }
+    if (input.action === "restore" && before.status === "cancelled") {
+      const previous = await client.query("SELECT resume_status FROM tenant_subscriptions WHERE tenant_id=$1", [tenantId]);
+      await client.query("UPDATE tenant_subscriptions SET cancelled=false,status='active',updated_at=now() WHERE tenant_id=$1", [tenantId]);
+      await client.query("UPDATE tenants SET status=$2,updated_at=now() WHERE id=$1", [tenantId, previous.rows[0].resume_status]);
+    }
+    const after = await resolveEntitlements(client, tenantId);
+    await audit(client, principal, tenantId, `subscription.commercial_${input.action}`, input.reason.trim(),
+      { before: { period: before.billingPeriod, discount: before.discountPercent, status: before.status },
+        after: { period: after.billingPeriod, discount: after.discountPercent, status: after.status }, paymentCollected: false, recordsPreserved: true });
     return after;
   });
 }

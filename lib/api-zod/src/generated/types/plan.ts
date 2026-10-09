@@ -11,4 +11,5 @@ export type Plan = PlanInput & {
   id: string;
   createdAt: Date;
   updatedAt: Date;
+  pricingConfigured?: boolean;
 };

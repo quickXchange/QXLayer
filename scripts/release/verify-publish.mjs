@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { verifyProvisioningPlan } from "./provisioning-schema-contract.mjs";
+import { verifyCommercialPlan } from "./commercial-schema-contract.mjs";
 
 const forbidden = /\b(?:db:push|push-force|drizzle-kit|pg_restore|pg_dump|db:seed|catalog:initialize|catalog:upgrade|core:upgrade|access:assign|remove-database-rls)\b/i;
 const artifacts = [
@@ -50,6 +51,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     readFileSync(resolve(root, "lib/db/src/schema/white-label-requests.ts"), "utf8"),
   );
   console.log(`PASS: reviewed native provisioning plan (${provisioning}); no SQL executed.`);
+  const commercial = verifyCommercialPlan(
+    JSON.parse(readFileSync(resolve(root, "reports/commercial-white-label-release/native-schema-diff.json"), "utf8")),
+    path => readFileSync(resolve(root, path), "utf8"),
+  );
+  console.log(`PASS: commercial migration (${commercial}); no SQL executed.`);
   console.log("This is a source-bound review snapshot, not a fresh Production readback. Review the live Publish plan before applying.");
   console.log("PASS: current-source builds, native routing/health checks, clean output and no database mutation hooks.");
   console.log("Republish deploys code and native schema changes; it does not merge configuration rows.");

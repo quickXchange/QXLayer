@@ -18,6 +18,8 @@ export async function prepareReviewedWebsite(c: DatabaseClient, p: Principal, ro
   const tenant = await prepareTenant(c, p, {
     name: row.configuration.brandName, slug: `wl-${row.id}`, planId: selection.plan.id,
   }, selection.addons.map(a => a.id));
+  await c.query("UPDATE tenant_subscriptions SET billing_period=$2 WHERE tenant_id=$1",
+    [tenant.id, row.configuration.billingPeriod === "yearly" ? "yearly" : "monthly"]);
   const effective = await resolveEntitlements(c, tenant.id);
   requireFeature(effective, "website"); requireFeature(effective, "crypto_exchange");
   for (const action of row.configuration.actions as string[]) requireFeature(effective, action);

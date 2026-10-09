@@ -1,0 +1,35 @@
+{
+  "capturedAt": "2026-10-09T12:45:01.953Z",
+  "diff": {
+    "columnsToRemove": [],
+    "hasDiff": true,
+    "hasStructuralDataLoss": false,
+    "matViewsToRemove": [],
+    "maybeNonBackwardsCompatible": false,
+    "schemasToRemove": [],
+    "statementsToExecute": [
+      "CREATE TABLE \"customer_notification_reads\" (\n\t\"customer_user_id\" text NOT NULL,\n\t\"event_id\" uuid NOT NULL,\n\t\"read_at\" timestamp with time zone DEFAULT now() NOT NULL,\n\tCONSTRAINT \"customer_notification_reads_customer_user_id_event_id_pk\" PRIMARY KEY(\"customer_user_id\",\"event_id\")\n);\n",
+      "ALTER TABLE \"addons\" ADD COLUMN \"discount_percent\" numeric(5, 2) DEFAULT '0' NOT NULL;",
+      "ALTER TABLE \"addons\" ADD COLUMN \"pricing_confirmed\" boolean DEFAULT false NOT NULL;",
+      "ALTER TABLE \"tenant_subscriptions\" ADD COLUMN \"billing_period\" text DEFAULT 'monthly' NOT NULL;",
+      "ALTER TABLE \"tenant_subscriptions\" ADD COLUMN \"discount_percent\" numeric(5, 2) DEFAULT '0' NOT NULL;",
+      "ALTER TABLE \"tenant_subscriptions\" ADD COLUMN \"cancelled\" boolean DEFAULT false NOT NULL;",
+      "ALTER TABLE \"tenant_subscriptions\" ADD COLUMN \"operator_note\" text DEFAULT '' NOT NULL;",
+      "ALTER TABLE \"plans\" ADD COLUMN \"pricing_configured\" boolean DEFAULT false NOT NULL;",
+      "ALTER TABLE \"plans\" ADD COLUMN \"discount_percent\" numeric(5, 2) DEFAULT '0' NOT NULL;",
+      "ALTER TABLE \"customer_notification_reads\" ADD CONSTRAINT \"customer_notification_reads_event_id_white_label_events_id_fk\" FOREIGN KEY (\"event_id\") REFERENCES \"public\".\"white_label_events\"(\"id\") ON DELETE no action ON UPDATE no action;",
+      "ALTER TABLE \"addons\" ADD CONSTRAINT \"addons_discount\" CHECK ((discount_percent >= (0)::numeric) AND (discount_percent <= (100)::numeric));",
+      "ALTER TABLE \"tenant_subscriptions\" ADD CONSTRAINT \"subscription_billing_period\" CHECK (billing_period = ANY (ARRAY['monthly'::text, 'yearly'::text]));",
+      "ALTER TABLE \"tenant_subscriptions\" ADD CONSTRAINT \"subscription_discount\" CHECK ((discount_percent >= (0)::numeric) AND (discount_percent <= (100)::numeric));",
+      "ALTER TABLE \"plans\" ADD CONSTRAINT \"plans_discount\" CHECK ((discount_percent >= (0)::numeric) AND (discount_percent <= (100)::numeric));"
+    ],
+    "success": true,
+    "tablesToRemove": [],
+    "tablesToTruncate": [],
+    "warnings": []
+  },
+  "schemaDigests": {
+    "lib/db/src/schema/plans.ts": "14f4748e6c183d6b4a7301d38b1008f7faaa3baa3549b6e11e61903dec2fced1",
+    "lib/db/src/schema/customer-notifications.ts": "8c6cc9db64f658dda8e2452db2791e388459f1c7ae16e29c29ea371c2f181f1a"
+  }
+}

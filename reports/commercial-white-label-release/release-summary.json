@@ -1,0 +1,34 @@
+{
+  "status": "ready-for-native-publication",
+  "commercialPrices": "Unconfigured; no real rates invented or confirmed",
+  "verified": {
+    "automatedReleaseTests": 34,
+    "serviceScenarios": 7,
+    "workspaceTypecheck": "passed",
+    "consoleProductionBuild": "passed",
+    "websiteProductionBuild": "passed",
+    "browser": "changed Development flows verified with disclosed delivered-summary gap",
+    "responsiveWidths": [
+      1440,
+      768,
+      390
+    ],
+    "developmentOriginalTables": 40,
+    "productionOriginalTables": 39,
+    "productionWrites": 0,
+    "nativeAdditiveStatements": 14
+  },
+  "preservation": {
+    "development": "Original-column parity; new addons.pricing_confirmed=false independently verified",
+    "production": "All 39 original table fingerprints match pre-publish readback",
+    "qa": "Recorded business records and temporary access removed; Clerk identities retained unassigned",
+    "novax": "Renderer unchanged; retained records preserved"
+  },
+  "pending": [
+    "User must publish through native workflow with Development-data overwrite disabled",
+    "Latest release has not been certified Live; authenticated Live verification remains",
+    "Delivered-project customer summary not browser-inspected; no activation/delivery performed",
+    "Real payment collection and outbound email providers remain unconnected"
+  ],
+  "layoutCorrections": "Tablet metric grid and selected mobile tab visibility corrected after browser pass; typecheck/build verified, no repeat browser pass"
+}

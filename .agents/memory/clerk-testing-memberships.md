@@ -2,6 +2,12 @@
 name: Clerk UI testing memberships
 description: Authenticate normally and grant the actual generated test identity temporary access to an isolated sandbox tenant.
 ---
+For programmatic browser QA, a plain `fetch('/api/me')` can return 401 while Clerk has a valid session. That is not proof that the sign-in helper failed.
+
+**Why:** Two generated QA sessions were loaded and signed in, but manual requests authenticated only when the current SDK session token was attached.
+
+**How to apply:** Inspect loaded/session state first. For manual browser API probes, obtain the token in-browser and immediately send it as Bearer authorization; never print or persist it. Leave application authentication unchanged and grant only the identity returned by the authenticated principal response.
+
 For Clerk UI checks, use a normal generated test identity and assign its actual Clerk user ID a temporary tenant membership. Extra `sub` or `userId` arguments to the current sign-in testing helper do not override the session identity.
 
 **Why:** The helper accepted those extra arguments but ignored them, leaving the session authenticated as its generated user rather than the pre-seeded synthetic ID.

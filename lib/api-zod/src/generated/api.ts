@@ -738,6 +738,10 @@ export const getWhiteLabelCatalogResponsePlansItemOneSetupFeeMax = 18;
 
 
 export const getWhiteLabelCatalogResponsePlansItemOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelCatalogResponsePlansItemOneDiscountPercentMax = 6;
+
+
+export const getWhiteLabelCatalogResponsePlansItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getWhiteLabelCatalogResponsePlansItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getWhiteLabelCatalogResponsePlansItemOneBillingLabelMax = 160;
 
@@ -758,6 +762,10 @@ export const getWhiteLabelCatalogResponseAddonsItemOneMonthlyPriceRegExp = new R
 export const getWhiteLabelCatalogResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getWhiteLabelCatalogResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getWhiteLabelCatalogResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelCatalogResponseAddonsItemOneDiscountPercentMax = 6;
+
+
+export const getWhiteLabelCatalogResponseAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getWhiteLabelCatalogResponseAddonsItemOneNameMin = 2;
 export const getWhiteLabelCatalogResponseAddonsItemOneNameMax = 120;
 
@@ -779,9 +787,10 @@ export const GetWhiteLabelCatalogResponse = zod.object({
   "plans": zod.array(zod.object({
   "name": zod.string().min(getWhiteLabelCatalogResponsePlansItemOneNameMin).max(getWhiteLabelCatalogResponsePlansItemOneNameMax),
   "description": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneDescriptionMax),
-  "monthlyPrice": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceMax).regex(getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneYearlyPriceMax).regex(getWhiteLabelCatalogResponsePlansItemOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneSetupFeeMax).regex(getWhiteLabelCatalogResponsePlansItemOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceMax).regex(getWhiteLabelCatalogResponsePlansItemOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneYearlyPriceMax).regex(getWhiteLabelCatalogResponsePlansItemOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneSetupFeeMax).regex(getWhiteLabelCatalogResponsePlansItemOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneDiscountPercentMax).regex(getWhiteLabelCatalogResponsePlansItemOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(getWhiteLabelCatalogResponsePlansItemOneCurrencyRegExp),
   "billingLabel": zod.string().max(getWhiteLabelCatalogResponsePlansItemOneBillingLabelMax),
   "displayOrder": zod.number().int().min(getWhiteLabelCatalogResponsePlansItemOneDisplayOrderMin).max(getWhiteLabelCatalogResponsePlansItemOneDisplayOrderMax),
@@ -793,13 +802,15 @@ export const GetWhiteLabelCatalogResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 }))),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(getWhiteLabelCatalogResponseAddonsItemOneDiscountPercentMax).regex(getWhiteLabelCatalogResponseAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(getWhiteLabelCatalogResponseAddonsItemOneNameMin).max(getWhiteLabelCatalogResponseAddonsItemOneNameMax),
   "description": zod.string().max(getWhiteLabelCatalogResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -853,6 +864,10 @@ export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax =
 
 
 export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentMax = 6;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax = 160;
 
@@ -873,6 +888,10 @@ export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPri
 export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin = 2;
 export const getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax = 120;
 
@@ -905,6 +924,10 @@ export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax = 
 
 
 export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentMax = 6;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax = 160;
 
@@ -925,6 +948,10 @@ export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPric
 export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin = 2;
 export const getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax = 120;
 
@@ -974,9 +1001,10 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
   "requestedPlan": zod.union([zod.object({
   "name": zod.string().min(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMin).max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMax),
   "description": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentMax).regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMin).max(getMyWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMax),
@@ -988,13 +1016,15 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentMax).regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin).max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax),
   "description": zod.string().max(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1009,9 +1039,10 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
   "approvedPlan": zod.union([zod.object({
   "name": zod.string().min(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMin).max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMax),
   "description": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentMax).regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMin).max(getMyWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMax),
@@ -1023,13 +1054,15 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentMax).regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin).max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax),
   "description": zod.string().max(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1104,6 +1137,10 @@ export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax = 1
 
 
 export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentMax = 6;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax = 160;
 
@@ -1124,6 +1161,10 @@ export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPrice
 export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin = 2;
 export const getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax = 120;
 
@@ -1156,6 +1197,10 @@ export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax = 18
 
 
 export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentMax = 6;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax = 160;
 
@@ -1176,6 +1221,10 @@ export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceR
 export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin = 2;
 export const getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax = 120;
 
@@ -1225,9 +1274,10 @@ export const GetWhiteLabelRequestResponse = zod.object({
   "requestedPlan": zod.union([zod.object({
   "name": zod.string().min(getWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMin).max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneNameMax),
   "description": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentMax).regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMin).max(getWhiteLabelRequestResponseOrderRequestedPlanOneOneDisplayOrderMax),
@@ -1239,13 +1289,15 @@ export const GetWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentMax).regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMin).max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneNameMax),
   "description": zod.string().max(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1260,9 +1312,10 @@ export const GetWhiteLabelRequestResponse = zod.object({
   "approvedPlan": zod.union([zod.object({
   "name": zod.string().min(getWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMin).max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneNameMax),
   "description": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentMax).regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMin).max(getWhiteLabelRequestResponseOrderApprovedPlanOneOneDisplayOrderMax),
@@ -1274,13 +1327,15 @@ export const GetWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentMax).regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMin).max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneNameMax),
   "description": zod.string().max(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1432,6 +1487,10 @@ export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax = 18
 
 
 export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentMax = 6;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const listMyWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax = 160;
 
@@ -1452,6 +1511,10 @@ export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceR
 export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin = 2;
 export const listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax = 120;
 
@@ -1484,6 +1547,10 @@ export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax = 18;
 
 
 export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentMax = 6;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const listMyWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax = 160;
 
@@ -1504,6 +1571,10 @@ export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRe
 export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin = 2;
 export const listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax = 120;
 
@@ -1552,9 +1623,10 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "requestedPlan": zod.union([zod.object({
   "name": zod.string().min(listMyWhiteLabelRequestsResponseRequestedPlanOneOneNameMin).max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneNameMax),
   "description": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentMax).regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMin).max(listMyWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMax),
@@ -1566,13 +1638,15 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentMax).regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin).max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax),
   "description": zod.string().max(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1587,9 +1661,10 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "approvedPlan": zod.union([zod.object({
   "name": zod.string().min(listMyWhiteLabelRequestsResponseApprovedPlanOneOneNameMin).max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneNameMax),
   "description": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentMax).regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMin).max(listMyWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMax),
@@ -1601,13 +1676,15 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentMax).regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin).max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax),
   "description": zod.string().max(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1732,6 +1809,10 @@ export const submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax = 18;
 
 
 export const submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentMax = 6;
+
+
+export const submitWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const submitWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax = 160;
 
@@ -1752,6 +1833,10 @@ export const submitWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRe
 export const submitWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const submitWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMin = 2;
 export const submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMax = 120;
 
@@ -1784,6 +1869,10 @@ export const submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax = 18;
 
 
 export const submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentMax = 6;
+
+
+export const submitWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const submitWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax = 160;
 
@@ -1804,6 +1893,10 @@ export const submitWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceReg
 export const submitWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const submitWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMin = 2;
 export const submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMax = 120;
 
@@ -1852,9 +1945,10 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
   "requestedPlan": zod.union([zod.object({
   "name": zod.string().min(submitWhiteLabelRequestResponseRequestedPlanOneOneNameMin).max(submitWhiteLabelRequestResponseRequestedPlanOneOneNameMax),
   "description": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentMax).regex(submitWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(submitWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(submitWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(submitWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin).max(submitWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax),
@@ -1866,13 +1960,15 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(submitWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentMax).regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMin).max(submitWhiteLabelRequestResponseRequestedAddonsItemOneNameMax),
   "description": zod.string().max(submitWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1887,9 +1983,10 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
   "approvedPlan": zod.union([zod.object({
   "name": zod.string().min(submitWhiteLabelRequestResponseApprovedPlanOneOneNameMin).max(submitWhiteLabelRequestResponseApprovedPlanOneOneNameMax),
   "description": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentMax).regex(submitWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(submitWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(submitWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(submitWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin).max(submitWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax),
@@ -1901,13 +1998,15 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(submitWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentMax).regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMin).max(submitWhiteLabelRequestResponseApprovedAddonsItemOneNameMax),
   "description": zod.string().max(submitWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -1968,6 +2067,10 @@ export const listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax = 18;
 
 
 export const listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentMax = 6;
+
+
+export const listWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const listWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax = 160;
 
@@ -1988,6 +2091,10 @@ export const listWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceReg
 export const listWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const listWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin = 2;
 export const listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax = 120;
 
@@ -2020,6 +2127,10 @@ export const listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax = 18;
 
 
 export const listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentMax = 6;
+
+
+export const listWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const listWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax = 160;
 
@@ -2040,6 +2151,10 @@ export const listWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegE
 export const listWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const listWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin = 2;
 export const listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax = 120;
 
@@ -2088,9 +2203,10 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
   "requestedPlan": zod.union([zod.object({
   "name": zod.string().min(listWhiteLabelRequestsResponseRequestedPlanOneOneNameMin).max(listWhiteLabelRequestsResponseRequestedPlanOneOneNameMax),
   "description": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentMax).regex(listWhiteLabelRequestsResponseRequestedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(listWhiteLabelRequestsResponseRequestedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(listWhiteLabelRequestsResponseRequestedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(listWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMin).max(listWhiteLabelRequestsResponseRequestedPlanOneOneDisplayOrderMax),
@@ -2102,13 +2218,15 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(listWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentMax).regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMin).max(listWhiteLabelRequestsResponseRequestedAddonsItemOneNameMax),
   "description": zod.string().max(listWhiteLabelRequestsResponseRequestedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -2123,9 +2241,10 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
   "approvedPlan": zod.union([zod.object({
   "name": zod.string().min(listWhiteLabelRequestsResponseApprovedPlanOneOneNameMin).max(listWhiteLabelRequestsResponseApprovedPlanOneOneNameMax),
   "description": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentMax).regex(listWhiteLabelRequestsResponseApprovedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(listWhiteLabelRequestsResponseApprovedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(listWhiteLabelRequestsResponseApprovedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(listWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMin).max(listWhiteLabelRequestsResponseApprovedPlanOneOneDisplayOrderMax),
@@ -2137,13 +2256,15 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(listWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentMax).regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMin).max(listWhiteLabelRequestsResponseApprovedAddonsItemOneNameMax),
   "description": zod.string().max(listWhiteLabelRequestsResponseApprovedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -2231,6 +2352,10 @@ export const reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax = 18;
 
 
 export const reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentMax = 6;
+
+
+export const reviewWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const reviewWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax = 160;
 
@@ -2251,6 +2376,10 @@ export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRe
 export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMin = 2;
 export const reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMax = 120;
 
@@ -2283,6 +2412,10 @@ export const reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax = 18;
 
 
 export const reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentMax = 6;
+
+
+export const reviewWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const reviewWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax = 160;
 
@@ -2303,6 +2436,10 @@ export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceReg
 export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMin = 2;
 export const reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMax = 120;
 
@@ -2351,9 +2488,10 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
   "requestedPlan": zod.union([zod.object({
   "name": zod.string().min(reviewWhiteLabelRequestResponseRequestedPlanOneOneNameMin).max(reviewWhiteLabelRequestResponseRequestedPlanOneOneNameMax),
   "description": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentMax).regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(reviewWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(reviewWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(reviewWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin).max(reviewWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax),
@@ -2365,13 +2503,15 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentMax).regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMin).max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneNameMax),
   "description": zod.string().max(reviewWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -2386,9 +2526,10 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
   "approvedPlan": zod.union([zod.object({
   "name": zod.string().min(reviewWhiteLabelRequestResponseApprovedPlanOneOneNameMin).max(reviewWhiteLabelRequestResponseApprovedPlanOneOneNameMax),
   "description": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentMax).regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(reviewWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(reviewWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(reviewWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin).max(reviewWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax),
@@ -2400,13 +2541,15 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentMax).regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMin).max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneNameMax),
   "description": zod.string().max(reviewWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -2475,6 +2618,10 @@ export const provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax = 
 
 
 export const provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentMax = 6;
+
+
+export const provisionWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const provisionWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax = 160;
 
@@ -2495,6 +2642,10 @@ export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPric
 export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMin = 2;
 export const provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMax = 120;
 
@@ -2527,6 +2678,10 @@ export const provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax = 1
 
 
 export const provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentMax = 6;
+
+
+export const provisionWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const provisionWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax = 160;
 
@@ -2547,6 +2702,10 @@ export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPrice
 export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentMax = 6;
+
+
+export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMin = 2;
 export const provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMax = 120;
 
@@ -2595,9 +2754,10 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
   "requestedPlan": zod.union([zod.object({
   "name": zod.string().min(provisionWhiteLabelRequestResponseRequestedPlanOneOneNameMin).max(provisionWhiteLabelRequestResponseRequestedPlanOneOneNameMax),
   "description": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentMax).regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(provisionWhiteLabelRequestResponseRequestedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(provisionWhiteLabelRequestResponseRequestedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(provisionWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMin).max(provisionWhiteLabelRequestResponseRequestedPlanOneOneDisplayOrderMax),
@@ -2609,13 +2769,15 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentMax).regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMin).max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneNameMax),
   "description": zod.string().max(provisionWhiteLabelRequestResponseRequestedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -2630,9 +2792,10 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
   "approvedPlan": zod.union([zod.object({
   "name": zod.string().min(provisionWhiteLabelRequestResponseApprovedPlanOneOneNameMin).max(provisionWhiteLabelRequestResponseApprovedPlanOneOneNameMax),
   "description": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentMax).regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(provisionWhiteLabelRequestResponseApprovedPlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(provisionWhiteLabelRequestResponseApprovedPlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(provisionWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMin).max(provisionWhiteLabelRequestResponseApprovedPlanOneOneDisplayOrderMax),
@@ -2644,13 +2807,15 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentMax).regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMin).max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneNameMax),
   "description": zod.string().max(provisionWhiteLabelRequestResponseApprovedAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -5494,6 +5659,10 @@ export const listPlansResponseOneSetupFeeMax = 18;
 
 
 export const listPlansResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const listPlansResponseOneDiscountPercentMax = 6;
+
+
+export const listPlansResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listPlansResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const listPlansResponseOneBillingLabelMax = 160;
 
@@ -5515,9 +5684,10 @@ export const listPlansResponseOneEntitlementsMax = 200;
 export const ListPlansResponseItem = zod.object({
   "name": zod.string().min(listPlansResponseOneNameMin).max(listPlansResponseOneNameMax),
   "description": zod.string().max(listPlansResponseOneDescriptionMax),
-  "monthlyPrice": zod.string().max(listPlansResponseOneMonthlyPriceMax).regex(listPlansResponseOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(listPlansResponseOneYearlyPriceMax).regex(listPlansResponseOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(listPlansResponseOneSetupFeeMax).regex(listPlansResponseOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(listPlansResponseOneMonthlyPriceMax).regex(listPlansResponseOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(listPlansResponseOneYearlyPriceMax).regex(listPlansResponseOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(listPlansResponseOneSetupFeeMax).regex(listPlansResponseOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(listPlansResponseOneDiscountPercentMax).regex(listPlansResponseOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(listPlansResponseOneCurrencyRegExp),
   "billingLabel": zod.string().max(listPlansResponseOneBillingLabelMax),
   "displayOrder": zod.number().int().min(listPlansResponseOneDisplayOrderMin).max(listPlansResponseOneDisplayOrderMax),
@@ -5529,7 +5699,8 @@ export const ListPlansResponseItem = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 export const ListPlansResponse = zod.array(ListPlansResponseItem)
 
@@ -5551,6 +5722,10 @@ export const createPlanBodySetupFeeMax = 18;
 
 
 export const createPlanBodySetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanBodyDiscountPercentMax = 6;
+
+
+export const createPlanBodyDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const createPlanBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const createPlanBodyBillingLabelMax = 160;
 
@@ -5572,9 +5747,10 @@ export const createPlanBodyEntitlementsMax = 200;
 export const CreatePlanBody = zod.object({
   "name": zod.string().min(createPlanBodyNameMin).max(createPlanBodyNameMax),
   "description": zod.string().max(createPlanBodyDescriptionMax),
-  "monthlyPrice": zod.string().max(createPlanBodyMonthlyPriceMax).regex(createPlanBodyMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(createPlanBodyYearlyPriceMax).regex(createPlanBodyYearlyPriceRegExp),
-  "setupFee": zod.string().max(createPlanBodySetupFeeMax).regex(createPlanBodySetupFeeRegExp),
+  "monthlyPrice": zod.string().max(createPlanBodyMonthlyPriceMax).regex(createPlanBodyMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(createPlanBodyYearlyPriceMax).regex(createPlanBodyYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(createPlanBodySetupFeeMax).regex(createPlanBodySetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(createPlanBodyDiscountPercentMax).regex(createPlanBodyDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(createPlanBodyCurrencyRegExp),
   "billingLabel": zod.string().max(createPlanBodyBillingLabelMax),
   "displayOrder": zod.number().int().min(createPlanBodyDisplayOrderMin).max(createPlanBodyDisplayOrderMax),
@@ -5602,6 +5778,10 @@ export const createPlanResponseOneSetupFeeMax = 18;
 
 
 export const createPlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const createPlanResponseOneDiscountPercentMax = 6;
+
+
+export const createPlanResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const createPlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const createPlanResponseOneBillingLabelMax = 160;
 
@@ -5623,9 +5803,10 @@ export const createPlanResponseOneEntitlementsMax = 200;
 export const CreatePlanResponse = zod.object({
   "name": zod.string().min(createPlanResponseOneNameMin).max(createPlanResponseOneNameMax),
   "description": zod.string().max(createPlanResponseOneDescriptionMax),
-  "monthlyPrice": zod.string().max(createPlanResponseOneMonthlyPriceMax).regex(createPlanResponseOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(createPlanResponseOneYearlyPriceMax).regex(createPlanResponseOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(createPlanResponseOneSetupFeeMax).regex(createPlanResponseOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(createPlanResponseOneMonthlyPriceMax).regex(createPlanResponseOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(createPlanResponseOneYearlyPriceMax).regex(createPlanResponseOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(createPlanResponseOneSetupFeeMax).regex(createPlanResponseOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(createPlanResponseOneDiscountPercentMax).regex(createPlanResponseOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(createPlanResponseOneCurrencyRegExp),
   "billingLabel": zod.string().max(createPlanResponseOneBillingLabelMax),
   "displayOrder": zod.number().int().min(createPlanResponseOneDisplayOrderMin).max(createPlanResponseOneDisplayOrderMax),
@@ -5637,8 +5818,18 @@ export const CreatePlanResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 }))
+
+
+export const DeletePlanParams = zod.object({
+  "planId": zod.coerce.string().uuid()
+})
+
+export const DeletePlanResponse = zod.object({
+  "ok": zod.boolean()
+})
 
 
 export const GetPlanParams = zod.object({
@@ -5662,6 +5853,10 @@ export const getPlanResponseOneSetupFeeMax = 18;
 
 
 export const getPlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getPlanResponseOneDiscountPercentMax = 6;
+
+
+export const getPlanResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getPlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getPlanResponseOneBillingLabelMax = 160;
 
@@ -5683,9 +5878,10 @@ export const getPlanResponseOneEntitlementsMax = 200;
 export const GetPlanResponse = zod.object({
   "name": zod.string().min(getPlanResponseOneNameMin).max(getPlanResponseOneNameMax),
   "description": zod.string().max(getPlanResponseOneDescriptionMax),
-  "monthlyPrice": zod.string().max(getPlanResponseOneMonthlyPriceMax).regex(getPlanResponseOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(getPlanResponseOneYearlyPriceMax).regex(getPlanResponseOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(getPlanResponseOneSetupFeeMax).regex(getPlanResponseOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(getPlanResponseOneMonthlyPriceMax).regex(getPlanResponseOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(getPlanResponseOneYearlyPriceMax).regex(getPlanResponseOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(getPlanResponseOneSetupFeeMax).regex(getPlanResponseOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(getPlanResponseOneDiscountPercentMax).regex(getPlanResponseOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(getPlanResponseOneCurrencyRegExp),
   "billingLabel": zod.string().max(getPlanResponseOneBillingLabelMax),
   "displayOrder": zod.number().int().min(getPlanResponseOneDisplayOrderMin).max(getPlanResponseOneDisplayOrderMax),
@@ -5697,7 +5893,8 @@ export const GetPlanResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 
 
@@ -5722,6 +5919,10 @@ export const updatePlanBodySetupFeeMax = 18;
 
 
 export const updatePlanBodySetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanBodyDiscountPercentMax = 6;
+
+
+export const updatePlanBodyDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const updatePlanBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const updatePlanBodyBillingLabelMax = 160;
 
@@ -5743,9 +5944,10 @@ export const updatePlanBodyEntitlementsMax = 200;
 export const UpdatePlanBody = zod.object({
   "name": zod.string().min(updatePlanBodyNameMin).max(updatePlanBodyNameMax),
   "description": zod.string().max(updatePlanBodyDescriptionMax),
-  "monthlyPrice": zod.string().max(updatePlanBodyMonthlyPriceMax).regex(updatePlanBodyMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(updatePlanBodyYearlyPriceMax).regex(updatePlanBodyYearlyPriceRegExp),
-  "setupFee": zod.string().max(updatePlanBodySetupFeeMax).regex(updatePlanBodySetupFeeRegExp),
+  "monthlyPrice": zod.string().max(updatePlanBodyMonthlyPriceMax).regex(updatePlanBodyMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(updatePlanBodyYearlyPriceMax).regex(updatePlanBodyYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(updatePlanBodySetupFeeMax).regex(updatePlanBodySetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(updatePlanBodyDiscountPercentMax).regex(updatePlanBodyDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(updatePlanBodyCurrencyRegExp),
   "billingLabel": zod.string().max(updatePlanBodyBillingLabelMax),
   "displayOrder": zod.number().int().min(updatePlanBodyDisplayOrderMin).max(updatePlanBodyDisplayOrderMax),
@@ -5773,6 +5975,10 @@ export const updatePlanResponseOneSetupFeeMax = 18;
 
 
 export const updatePlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updatePlanResponseOneDiscountPercentMax = 6;
+
+
+export const updatePlanResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const updatePlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const updatePlanResponseOneBillingLabelMax = 160;
 
@@ -5794,9 +6000,10 @@ export const updatePlanResponseOneEntitlementsMax = 200;
 export const UpdatePlanResponse = zod.object({
   "name": zod.string().min(updatePlanResponseOneNameMin).max(updatePlanResponseOneNameMax),
   "description": zod.string().max(updatePlanResponseOneDescriptionMax),
-  "monthlyPrice": zod.string().max(updatePlanResponseOneMonthlyPriceMax).regex(updatePlanResponseOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(updatePlanResponseOneYearlyPriceMax).regex(updatePlanResponseOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(updatePlanResponseOneSetupFeeMax).regex(updatePlanResponseOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(updatePlanResponseOneMonthlyPriceMax).regex(updatePlanResponseOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(updatePlanResponseOneYearlyPriceMax).regex(updatePlanResponseOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(updatePlanResponseOneSetupFeeMax).regex(updatePlanResponseOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(updatePlanResponseOneDiscountPercentMax).regex(updatePlanResponseOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(updatePlanResponseOneCurrencyRegExp),
   "billingLabel": zod.string().max(updatePlanResponseOneBillingLabelMax),
   "displayOrder": zod.number().int().min(updatePlanResponseOneDisplayOrderMin).max(updatePlanResponseOneDisplayOrderMax),
@@ -5808,7 +6015,8 @@ export const UpdatePlanResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 
 
@@ -5833,6 +6041,10 @@ export const duplicatePlanResponseOneSetupFeeMax = 18;
 
 
 export const duplicatePlanResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const duplicatePlanResponseOneDiscountPercentMax = 6;
+
+
+export const duplicatePlanResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const duplicatePlanResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const duplicatePlanResponseOneBillingLabelMax = 160;
 
@@ -5854,9 +6066,10 @@ export const duplicatePlanResponseOneEntitlementsMax = 200;
 export const DuplicatePlanResponse = zod.object({
   "name": zod.string().min(duplicatePlanResponseOneNameMin).max(duplicatePlanResponseOneNameMax),
   "description": zod.string().max(duplicatePlanResponseOneDescriptionMax),
-  "monthlyPrice": zod.string().max(duplicatePlanResponseOneMonthlyPriceMax).regex(duplicatePlanResponseOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(duplicatePlanResponseOneYearlyPriceMax).regex(duplicatePlanResponseOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(duplicatePlanResponseOneSetupFeeMax).regex(duplicatePlanResponseOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(duplicatePlanResponseOneMonthlyPriceMax).regex(duplicatePlanResponseOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(duplicatePlanResponseOneYearlyPriceMax).regex(duplicatePlanResponseOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(duplicatePlanResponseOneSetupFeeMax).regex(duplicatePlanResponseOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(duplicatePlanResponseOneDiscountPercentMax).regex(duplicatePlanResponseOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(duplicatePlanResponseOneCurrencyRegExp),
   "billingLabel": zod.string().max(duplicatePlanResponseOneBillingLabelMax),
   "displayOrder": zod.number().int().min(duplicatePlanResponseOneDisplayOrderMin).max(duplicatePlanResponseOneDisplayOrderMax),
@@ -5868,7 +6081,8 @@ export const DuplicatePlanResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 
 
@@ -5897,6 +6111,10 @@ export const setPlanStatusResponseOneSetupFeeMax = 18;
 
 
 export const setPlanStatusResponseOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setPlanStatusResponseOneDiscountPercentMax = 6;
+
+
+export const setPlanStatusResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const setPlanStatusResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const setPlanStatusResponseOneBillingLabelMax = 160;
 
@@ -5918,9 +6136,10 @@ export const setPlanStatusResponseOneEntitlementsMax = 200;
 export const SetPlanStatusResponse = zod.object({
   "name": zod.string().min(setPlanStatusResponseOneNameMin).max(setPlanStatusResponseOneNameMax),
   "description": zod.string().max(setPlanStatusResponseOneDescriptionMax),
-  "monthlyPrice": zod.string().max(setPlanStatusResponseOneMonthlyPriceMax).regex(setPlanStatusResponseOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(setPlanStatusResponseOneYearlyPriceMax).regex(setPlanStatusResponseOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(setPlanStatusResponseOneSetupFeeMax).regex(setPlanStatusResponseOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(setPlanStatusResponseOneMonthlyPriceMax).regex(setPlanStatusResponseOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(setPlanStatusResponseOneYearlyPriceMax).regex(setPlanStatusResponseOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(setPlanStatusResponseOneSetupFeeMax).regex(setPlanStatusResponseOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(setPlanStatusResponseOneDiscountPercentMax).regex(setPlanStatusResponseOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(setPlanStatusResponseOneCurrencyRegExp),
   "billingLabel": zod.string().max(setPlanStatusResponseOneBillingLabelMax),
   "displayOrder": zod.number().int().min(setPlanStatusResponseOneDisplayOrderMin).max(setPlanStatusResponseOneDisplayOrderMax),
@@ -5932,7 +6151,8 @@ export const SetPlanStatusResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 }))
 
 
@@ -5940,6 +6160,10 @@ export const listAddonsResponseOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\
 export const listAddonsResponseOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listAddonsResponseOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const listAddonsResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listAddonsResponseOneDiscountPercentMax = 6;
+
+
+export const listAddonsResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const listAddonsResponseOneNameMin = 2;
 export const listAddonsResponseOneNameMax = 120;
 
@@ -5962,6 +6186,7 @@ export const ListAddonsResponseItem = zod.object({
   "yearlyPrice": zod.string().regex(listAddonsResponseOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(listAddonsResponseOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(listAddonsResponseOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(listAddonsResponseOneDiscountPercentMax).regex(listAddonsResponseOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(listAddonsResponseOneNameMin).max(listAddonsResponseOneNameMax),
   "description": zod.string().max(listAddonsResponseOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -5980,6 +6205,10 @@ export const createAddonBodyMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1
 export const createAddonBodyYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const createAddonBodySetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const createAddonBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const createAddonBodyDiscountPercentMax = 6;
+
+
+export const createAddonBodyDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const createAddonBodyNameMin = 2;
 export const createAddonBodyNameMax = 120;
 
@@ -6002,6 +6231,7 @@ export const CreateAddonBody = zod.object({
   "yearlyPrice": zod.string().regex(createAddonBodyYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(createAddonBodySetupFeeRegExp).nullish(),
   "currency": zod.string().regex(createAddonBodyCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(createAddonBodyDiscountPercentMax).regex(createAddonBodyDiscountPercentRegExp).optional(),
   "name": zod.string().min(createAddonBodyNameMin).max(createAddonBodyNameMax),
   "description": zod.string().max(createAddonBodyDescriptionMax),
   "enabled": zod.boolean(),
@@ -6015,6 +6245,10 @@ export const createAddonResponseOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\
 export const createAddonResponseOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const createAddonResponseOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const createAddonResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const createAddonResponseOneDiscountPercentMax = 6;
+
+
+export const createAddonResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const createAddonResponseOneNameMin = 2;
 export const createAddonResponseOneNameMax = 120;
 
@@ -6037,6 +6271,7 @@ export const CreateAddonResponse = zod.object({
   "yearlyPrice": zod.string().regex(createAddonResponseOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(createAddonResponseOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(createAddonResponseOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(createAddonResponseOneDiscountPercentMax).regex(createAddonResponseOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(createAddonResponseOneNameMin).max(createAddonResponseOneNameMax),
   "description": zod.string().max(createAddonResponseOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -6050,6 +6285,15 @@ export const CreateAddonResponse = zod.object({
 }))
 
 
+export const DeleteAddonParams = zod.object({
+  "addonId": zod.coerce.string().uuid()
+})
+
+export const DeleteAddonResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
 export const UpdateAddonParams = zod.object({
   "addonId": zod.coerce.string().uuid()
 })
@@ -6058,6 +6302,10 @@ export const updateAddonBodyMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1
 export const updateAddonBodyYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const updateAddonBodySetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const updateAddonBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updateAddonBodyDiscountPercentMax = 6;
+
+
+export const updateAddonBodyDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const updateAddonBodyNameMin = 2;
 export const updateAddonBodyNameMax = 120;
 
@@ -6080,6 +6328,7 @@ export const UpdateAddonBody = zod.object({
   "yearlyPrice": zod.string().regex(updateAddonBodyYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(updateAddonBodySetupFeeRegExp).nullish(),
   "currency": zod.string().regex(updateAddonBodyCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(updateAddonBodyDiscountPercentMax).regex(updateAddonBodyDiscountPercentRegExp).optional(),
   "name": zod.string().min(updateAddonBodyNameMin).max(updateAddonBodyNameMax),
   "description": zod.string().max(updateAddonBodyDescriptionMax),
   "enabled": zod.boolean(),
@@ -6093,6 +6342,10 @@ export const updateAddonResponseOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\
 export const updateAddonResponseOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const updateAddonResponseOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const updateAddonResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updateAddonResponseOneDiscountPercentMax = 6;
+
+
+export const updateAddonResponseOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const updateAddonResponseOneNameMin = 2;
 export const updateAddonResponseOneNameMax = 120;
 
@@ -6115,6 +6368,7 @@ export const UpdateAddonResponse = zod.object({
   "yearlyPrice": zod.string().regex(updateAddonResponseOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(updateAddonResponseOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(updateAddonResponseOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(updateAddonResponseOneDiscountPercentMax).regex(updateAddonResponseOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(updateAddonResponseOneNameMin).max(updateAddonResponseOneNameMax),
   "description": zod.string().max(updateAddonResponseOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -6149,6 +6403,10 @@ export const getTenantSubscriptionResponsePlanOneOneSetupFeeMax = 18;
 
 
 export const getTenantSubscriptionResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const getTenantSubscriptionResponsePlanOneOneDiscountPercentMax = 6;
+
+
+export const getTenantSubscriptionResponsePlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getTenantSubscriptionResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const getTenantSubscriptionResponsePlanOneOneBillingLabelMax = 160;
 
@@ -6169,6 +6427,10 @@ export const getTenantSubscriptionResponseAddonsItemOneMonthlyPriceRegExp = new 
 export const getTenantSubscriptionResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getTenantSubscriptionResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const getTenantSubscriptionResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getTenantSubscriptionResponseAddonsItemOneDiscountPercentMax = 6;
+
+
+export const getTenantSubscriptionResponseAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const getTenantSubscriptionResponseAddonsItemOneNameMin = 2;
 export const getTenantSubscriptionResponseAddonsItemOneNameMax = 120;
 
@@ -6200,13 +6462,20 @@ export const getTenantSubscriptionResponseOverridesItemTwoReasonMax = 500;
 export const GetTenantSubscriptionResponse = zod.object({
   "tenantId": zod.string().uuid(),
   "tenantStatus": zod.string(),
-  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "status": zod.enum(['active', 'suspended', 'cancelled', 'unassigned']),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "discountPercent": zod.string().optional(),
+  "operatorNote": zod.string().optional(),
+  "recurringEstimate": zod.string().nullish(),
+  "currency": zod.string().nullish(),
+  "billingConnected": zod.boolean().optional(),
   "plan": zod.union([zod.object({
   "name": zod.string().min(getTenantSubscriptionResponsePlanOneOneNameMin).max(getTenantSubscriptionResponsePlanOneOneNameMax),
   "description": zod.string().max(getTenantSubscriptionResponsePlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(getTenantSubscriptionResponsePlanOneOneMonthlyPriceMax).regex(getTenantSubscriptionResponsePlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(getTenantSubscriptionResponsePlanOneOneYearlyPriceMax).regex(getTenantSubscriptionResponsePlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(getTenantSubscriptionResponsePlanOneOneSetupFeeMax).regex(getTenantSubscriptionResponsePlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(getTenantSubscriptionResponsePlanOneOneMonthlyPriceMax).regex(getTenantSubscriptionResponsePlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(getTenantSubscriptionResponsePlanOneOneYearlyPriceMax).regex(getTenantSubscriptionResponsePlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(getTenantSubscriptionResponsePlanOneOneSetupFeeMax).regex(getTenantSubscriptionResponsePlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(getTenantSubscriptionResponsePlanOneOneDiscountPercentMax).regex(getTenantSubscriptionResponsePlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(getTenantSubscriptionResponsePlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(getTenantSubscriptionResponsePlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(getTenantSubscriptionResponsePlanOneOneDisplayOrderMin).max(getTenantSubscriptionResponsePlanOneOneDisplayOrderMax),
@@ -6218,13 +6487,15 @@ export const GetTenantSubscriptionResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(getTenantSubscriptionResponseAddonsItemOneDiscountPercentMax).regex(getTenantSubscriptionResponseAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(getTenantSubscriptionResponseAddonsItemOneNameMin).max(getTenantSubscriptionResponseAddonsItemOneNameMax),
   "description": zod.string().max(getTenantSubscriptionResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -6282,6 +6553,10 @@ export const changeTenantPlanResponsePlanOneOneSetupFeeMax = 18;
 
 
 export const changeTenantPlanResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const changeTenantPlanResponsePlanOneOneDiscountPercentMax = 6;
+
+
+export const changeTenantPlanResponsePlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const changeTenantPlanResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const changeTenantPlanResponsePlanOneOneBillingLabelMax = 160;
 
@@ -6302,6 +6577,10 @@ export const changeTenantPlanResponseAddonsItemOneMonthlyPriceRegExp = new RegEx
 export const changeTenantPlanResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const changeTenantPlanResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const changeTenantPlanResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const changeTenantPlanResponseAddonsItemOneDiscountPercentMax = 6;
+
+
+export const changeTenantPlanResponseAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const changeTenantPlanResponseAddonsItemOneNameMin = 2;
 export const changeTenantPlanResponseAddonsItemOneNameMax = 120;
 
@@ -6333,13 +6612,20 @@ export const changeTenantPlanResponseOverridesItemTwoReasonMax = 500;
 export const ChangeTenantPlanResponse = zod.object({
   "tenantId": zod.string().uuid(),
   "tenantStatus": zod.string(),
-  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "status": zod.enum(['active', 'suspended', 'cancelled', 'unassigned']),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "discountPercent": zod.string().optional(),
+  "operatorNote": zod.string().optional(),
+  "recurringEstimate": zod.string().nullish(),
+  "currency": zod.string().nullish(),
+  "billingConnected": zod.boolean().optional(),
   "plan": zod.union([zod.object({
   "name": zod.string().min(changeTenantPlanResponsePlanOneOneNameMin).max(changeTenantPlanResponsePlanOneOneNameMax),
   "description": zod.string().max(changeTenantPlanResponsePlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(changeTenantPlanResponsePlanOneOneMonthlyPriceMax).regex(changeTenantPlanResponsePlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(changeTenantPlanResponsePlanOneOneYearlyPriceMax).regex(changeTenantPlanResponsePlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(changeTenantPlanResponsePlanOneOneSetupFeeMax).regex(changeTenantPlanResponsePlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(changeTenantPlanResponsePlanOneOneMonthlyPriceMax).regex(changeTenantPlanResponsePlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(changeTenantPlanResponsePlanOneOneYearlyPriceMax).regex(changeTenantPlanResponsePlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(changeTenantPlanResponsePlanOneOneSetupFeeMax).regex(changeTenantPlanResponsePlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(changeTenantPlanResponsePlanOneOneDiscountPercentMax).regex(changeTenantPlanResponsePlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(changeTenantPlanResponsePlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(changeTenantPlanResponsePlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(changeTenantPlanResponsePlanOneOneDisplayOrderMin).max(changeTenantPlanResponsePlanOneOneDisplayOrderMax),
@@ -6351,13 +6637,15 @@ export const ChangeTenantPlanResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(changeTenantPlanResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(changeTenantPlanResponseAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(changeTenantPlanResponseAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(changeTenantPlanResponseAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(changeTenantPlanResponseAddonsItemOneDiscountPercentMax).regex(changeTenantPlanResponseAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(changeTenantPlanResponseAddonsItemOneNameMin).max(changeTenantPlanResponseAddonsItemOneNameMax),
   "description": zod.string().max(changeTenantPlanResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -6390,6 +6678,203 @@ export const ChangeTenantPlanResponse = zod.object({
 })
 
 
+export const UpdateSubscriptionCommercialParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const updateSubscriptionCommercialBodyDiscountPercentMax = 6;
+
+
+export const updateSubscriptionCommercialBodyDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
+export const updateSubscriptionCommercialBodyOperatorNoteMax = 2000;
+
+export const updateSubscriptionCommercialBodyReasonMin = 2;
+export const updateSubscriptionCommercialBodyReasonMax = 500;
+
+
+
+export const UpdateSubscriptionCommercialBody = zod.object({
+  "billingPeriod": zod.enum(['monthly', 'yearly']),
+  "discountPercent": zod.string().max(updateSubscriptionCommercialBodyDiscountPercentMax).regex(updateSubscriptionCommercialBodyDiscountPercentRegExp),
+  "operatorNote": zod.string().max(updateSubscriptionCommercialBodyOperatorNoteMax),
+  "action": zod.enum(['save', 'cancel', 'restore']),
+  "reason": zod.string().min(updateSubscriptionCommercialBodyReasonMin).max(updateSubscriptionCommercialBodyReasonMax)
+})
+
+export const updateSubscriptionCommercialResponsePlanOneOneNameMin = 2;
+export const updateSubscriptionCommercialResponsePlanOneOneNameMax = 120;
+
+export const updateSubscriptionCommercialResponsePlanOneOneDescriptionMax = 3000;
+
+export const updateSubscriptionCommercialResponsePlanOneOneMonthlyPriceMax = 18;
+
+
+export const updateSubscriptionCommercialResponsePlanOneOneMonthlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updateSubscriptionCommercialResponsePlanOneOneYearlyPriceMax = 18;
+
+
+export const updateSubscriptionCommercialResponsePlanOneOneYearlyPriceRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updateSubscriptionCommercialResponsePlanOneOneSetupFeeMax = 18;
+
+
+export const updateSubscriptionCommercialResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const updateSubscriptionCommercialResponsePlanOneOneDiscountPercentMax = 6;
+
+
+export const updateSubscriptionCommercialResponsePlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
+export const updateSubscriptionCommercialResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updateSubscriptionCommercialResponsePlanOneOneBillingLabelMax = 160;
+
+export const updateSubscriptionCommercialResponsePlanOneOneDisplayOrderMin = 0;
+export const updateSubscriptionCommercialResponsePlanOneOneDisplayOrderMax = 100000;
+
+export const updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemKeyMax = 80;
+
+
+export const updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemValueTwoMax = 38;
+
+
+export const updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const updateSubscriptionCommercialResponsePlanOneOneEntitlementsMax = 200;
+
+export const updateSubscriptionCommercialResponseAddonsItemOneMonthlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateSubscriptionCommercialResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateSubscriptionCommercialResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
+export const updateSubscriptionCommercialResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updateSubscriptionCommercialResponseAddonsItemOneDiscountPercentMax = 6;
+
+
+export const updateSubscriptionCommercialResponseAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
+export const updateSubscriptionCommercialResponseAddonsItemOneNameMin = 2;
+export const updateSubscriptionCommercialResponseAddonsItemOneNameMax = 120;
+
+export const updateSubscriptionCommercialResponseAddonsItemOneDescriptionMax = 3000;
+
+export const updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemKeyMax = 80;
+
+
+export const updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemValueTwoMax = 38;
+
+
+export const updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const updateSubscriptionCommercialResponseAddonsItemOneEntitlementsMax = 200;
+
+export const updateSubscriptionCommercialResponseOverridesItemOneKeyMax = 80;
+
+
+export const updateSubscriptionCommercialResponseOverridesItemOneKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateSubscriptionCommercialResponseOverridesItemOneValueTwoMax = 38;
+
+
+export const updateSubscriptionCommercialResponseOverridesItemOneValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+export const updateSubscriptionCommercialResponseOverridesItemTwoReasonMin = 2;
+export const updateSubscriptionCommercialResponseOverridesItemTwoReasonMax = 500;
+
+
+
+export const UpdateSubscriptionCommercialResponse = zod.object({
+  "tenantId": zod.string().uuid(),
+  "tenantStatus": zod.string(),
+  "status": zod.enum(['active', 'suspended', 'cancelled', 'unassigned']),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "discountPercent": zod.string().optional(),
+  "operatorNote": zod.string().optional(),
+  "recurringEstimate": zod.string().nullish(),
+  "currency": zod.string().nullish(),
+  "billingConnected": zod.boolean().optional(),
+  "plan": zod.union([zod.object({
+  "name": zod.string().min(updateSubscriptionCommercialResponsePlanOneOneNameMin).max(updateSubscriptionCommercialResponsePlanOneOneNameMax),
+  "description": zod.string().max(updateSubscriptionCommercialResponsePlanOneOneDescriptionMax),
+  "monthlyPrice": zod.string().max(updateSubscriptionCommercialResponsePlanOneOneMonthlyPriceMax).regex(updateSubscriptionCommercialResponsePlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(updateSubscriptionCommercialResponsePlanOneOneYearlyPriceMax).regex(updateSubscriptionCommercialResponsePlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(updateSubscriptionCommercialResponsePlanOneOneSetupFeeMax).regex(updateSubscriptionCommercialResponsePlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(updateSubscriptionCommercialResponsePlanOneOneDiscountPercentMax).regex(updateSubscriptionCommercialResponsePlanOneOneDiscountPercentRegExp).optional(),
+  "currency": zod.string().regex(updateSubscriptionCommercialResponsePlanOneOneCurrencyRegExp),
+  "billingLabel": zod.string().max(updateSubscriptionCommercialResponsePlanOneOneBillingLabelMax),
+  "displayOrder": zod.number().int().min(updateSubscriptionCommercialResponsePlanOneOneDisplayOrderMin).max(updateSubscriptionCommercialResponsePlanOneOneDisplayOrderMax),
+  "status": zod.enum(['enabled', 'disabled', 'archived']),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemKeyMax).regex(updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemValueTwoMax).regex(updateSubscriptionCommercialResponsePlanOneOneEntitlementsItemValueTwoRegExp)])
+})).max(updateSubscriptionCommercialResponsePlanOneOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
+})),zod.null()]),
+  "addons": zod.array(zod.object({
+  "monthlyPrice": zod.string().regex(updateSubscriptionCommercialResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
+  "yearlyPrice": zod.string().regex(updateSubscriptionCommercialResponseAddonsItemOneYearlyPriceRegExp).nullish(),
+  "setupFee": zod.string().regex(updateSubscriptionCommercialResponseAddonsItemOneSetupFeeRegExp).nullish(),
+  "currency": zod.string().regex(updateSubscriptionCommercialResponseAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(updateSubscriptionCommercialResponseAddonsItemOneDiscountPercentMax).regex(updateSubscriptionCommercialResponseAddonsItemOneDiscountPercentRegExp).optional(),
+  "name": zod.string().min(updateSubscriptionCommercialResponseAddonsItemOneNameMin).max(updateSubscriptionCommercialResponseAddonsItemOneNameMax),
+  "description": zod.string().max(updateSubscriptionCommercialResponseAddonsItemOneDescriptionMax),
+  "enabled": zod.boolean(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemKeyMax).regex(updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemValueTwoMax).regex(updateSubscriptionCommercialResponseAddonsItemOneEntitlementsItemValueTwoRegExp)])
+})).max(updateSubscriptionCommercialResponseAddonsItemOneEntitlementsMax)
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "pricingConfigured": zod.boolean().optional()
+}))),
+  "overrides": zod.array(zod.object({
+  "key": zod.string().max(updateSubscriptionCommercialResponseOverridesItemOneKeyMax).regex(updateSubscriptionCommercialResponseOverridesItemOneKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(updateSubscriptionCommercialResponseOverridesItemOneValueTwoMax).regex(updateSubscriptionCommercialResponseOverridesItemOneValueTwoRegExp)])
+}).and(zod.object({
+  "reason": zod.string().min(updateSubscriptionCommercialResponseOverridesItemTwoReasonMin).max(updateSubscriptionCommercialResponseOverridesItemTwoReasonMax)
+}))),
+  "features": zod.record(zod.string(), zod.boolean()),
+  "limits": zod.record(zod.string(), zod.string()),
+  "sources": zod.record(zod.string(), zod.string()),
+  "usage": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "used": zod.string(),
+  "limit": zod.string(),
+  "exceeded": zod.boolean()
+})),
+  "enabledModules": zod.array(zod.string()),
+  "overLimit": zod.boolean()
+})
+
+
+export const getCustomerNotificationsResponseUnreadCountMin = 0;
+
+
+
+export const GetCustomerNotificationsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "requestId": zod.string().uuid(),
+  "orderReference": zod.string(),
+  "message": zod.string(),
+  "status": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "readAt": zod.coerce.date().nullable()
+})),
+  "unreadCount": zod.number().int().min(getCustomerNotificationsResponseUnreadCountMin),
+  "outboundConnected": zod.boolean()
+})
+
+
+export const markCustomerNotificationsReadBodyIdsMax = 100;
+
+
+
+export const MarkCustomerNotificationsReadBody = zod.object({
+  "ids": zod.array(zod.string().uuid()).max(markCustomerNotificationsReadBodyIdsMax)
+})
+
+export const MarkCustomerNotificationsReadResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
 export const SetTenantAddonsParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
@@ -6415,6 +6900,10 @@ export const setTenantAddonsResponsePlanOneOneSetupFeeMax = 18;
 
 
 export const setTenantAddonsResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantAddonsResponsePlanOneOneDiscountPercentMax = 6;
+
+
+export const setTenantAddonsResponsePlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const setTenantAddonsResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const setTenantAddonsResponsePlanOneOneBillingLabelMax = 160;
 
@@ -6435,6 +6924,10 @@ export const setTenantAddonsResponseAddonsItemOneMonthlyPriceRegExp = new RegExp
 export const setTenantAddonsResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const setTenantAddonsResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const setTenantAddonsResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const setTenantAddonsResponseAddonsItemOneDiscountPercentMax = 6;
+
+
+export const setTenantAddonsResponseAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const setTenantAddonsResponseAddonsItemOneNameMin = 2;
 export const setTenantAddonsResponseAddonsItemOneNameMax = 120;
 
@@ -6466,13 +6959,20 @@ export const setTenantAddonsResponseOverridesItemTwoReasonMax = 500;
 export const SetTenantAddonsResponse = zod.object({
   "tenantId": zod.string().uuid(),
   "tenantStatus": zod.string(),
-  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "status": zod.enum(['active', 'suspended', 'cancelled', 'unassigned']),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "discountPercent": zod.string().optional(),
+  "operatorNote": zod.string().optional(),
+  "recurringEstimate": zod.string().nullish(),
+  "currency": zod.string().nullish(),
+  "billingConnected": zod.boolean().optional(),
   "plan": zod.union([zod.object({
   "name": zod.string().min(setTenantAddonsResponsePlanOneOneNameMin).max(setTenantAddonsResponsePlanOneOneNameMax),
   "description": zod.string().max(setTenantAddonsResponsePlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(setTenantAddonsResponsePlanOneOneMonthlyPriceMax).regex(setTenantAddonsResponsePlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(setTenantAddonsResponsePlanOneOneYearlyPriceMax).regex(setTenantAddonsResponsePlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(setTenantAddonsResponsePlanOneOneSetupFeeMax).regex(setTenantAddonsResponsePlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(setTenantAddonsResponsePlanOneOneMonthlyPriceMax).regex(setTenantAddonsResponsePlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(setTenantAddonsResponsePlanOneOneYearlyPriceMax).regex(setTenantAddonsResponsePlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(setTenantAddonsResponsePlanOneOneSetupFeeMax).regex(setTenantAddonsResponsePlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(setTenantAddonsResponsePlanOneOneDiscountPercentMax).regex(setTenantAddonsResponsePlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(setTenantAddonsResponsePlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(setTenantAddonsResponsePlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(setTenantAddonsResponsePlanOneOneDisplayOrderMin).max(setTenantAddonsResponsePlanOneOneDisplayOrderMax),
@@ -6484,13 +6984,15 @@ export const SetTenantAddonsResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(setTenantAddonsResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(setTenantAddonsResponseAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(setTenantAddonsResponseAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(setTenantAddonsResponseAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(setTenantAddonsResponseAddonsItemOneDiscountPercentMax).regex(setTenantAddonsResponseAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(setTenantAddonsResponseAddonsItemOneNameMin).max(setTenantAddonsResponseAddonsItemOneNameMax),
   "description": zod.string().max(setTenantAddonsResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -6568,6 +7070,10 @@ export const setTenantOverridesResponsePlanOneOneSetupFeeMax = 18;
 
 
 export const setTenantOverridesResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantOverridesResponsePlanOneOneDiscountPercentMax = 6;
+
+
+export const setTenantOverridesResponsePlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const setTenantOverridesResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const setTenantOverridesResponsePlanOneOneBillingLabelMax = 160;
 
@@ -6588,6 +7094,10 @@ export const setTenantOverridesResponseAddonsItemOneMonthlyPriceRegExp = new Reg
 export const setTenantOverridesResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const setTenantOverridesResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const setTenantOverridesResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const setTenantOverridesResponseAddonsItemOneDiscountPercentMax = 6;
+
+
+export const setTenantOverridesResponseAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const setTenantOverridesResponseAddonsItemOneNameMin = 2;
 export const setTenantOverridesResponseAddonsItemOneNameMax = 120;
 
@@ -6619,13 +7129,20 @@ export const setTenantOverridesResponseOverridesItemTwoReasonMax = 500;
 export const SetTenantOverridesResponse = zod.object({
   "tenantId": zod.string().uuid(),
   "tenantStatus": zod.string(),
-  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "status": zod.enum(['active', 'suspended', 'cancelled', 'unassigned']),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "discountPercent": zod.string().optional(),
+  "operatorNote": zod.string().optional(),
+  "recurringEstimate": zod.string().nullish(),
+  "currency": zod.string().nullish(),
+  "billingConnected": zod.boolean().optional(),
   "plan": zod.union([zod.object({
   "name": zod.string().min(setTenantOverridesResponsePlanOneOneNameMin).max(setTenantOverridesResponsePlanOneOneNameMax),
   "description": zod.string().max(setTenantOverridesResponsePlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(setTenantOverridesResponsePlanOneOneMonthlyPriceMax).regex(setTenantOverridesResponsePlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(setTenantOverridesResponsePlanOneOneYearlyPriceMax).regex(setTenantOverridesResponsePlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(setTenantOverridesResponsePlanOneOneSetupFeeMax).regex(setTenantOverridesResponsePlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(setTenantOverridesResponsePlanOneOneMonthlyPriceMax).regex(setTenantOverridesResponsePlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(setTenantOverridesResponsePlanOneOneYearlyPriceMax).regex(setTenantOverridesResponsePlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(setTenantOverridesResponsePlanOneOneSetupFeeMax).regex(setTenantOverridesResponsePlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(setTenantOverridesResponsePlanOneOneDiscountPercentMax).regex(setTenantOverridesResponsePlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(setTenantOverridesResponsePlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(setTenantOverridesResponsePlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(setTenantOverridesResponsePlanOneOneDisplayOrderMin).max(setTenantOverridesResponsePlanOneOneDisplayOrderMax),
@@ -6637,13 +7154,15 @@ export const SetTenantOverridesResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(setTenantOverridesResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(setTenantOverridesResponseAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(setTenantOverridesResponseAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(setTenantOverridesResponseAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(setTenantOverridesResponseAddonsItemOneDiscountPercentMax).regex(setTenantOverridesResponseAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(setTenantOverridesResponseAddonsItemOneNameMin).max(setTenantOverridesResponseAddonsItemOneNameMax),
   "description": zod.string().max(setTenantOverridesResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),
@@ -6707,6 +7226,10 @@ export const setTenantSuspensionResponsePlanOneOneSetupFeeMax = 18;
 
 
 export const setTenantSuspensionResponsePlanOneOneSetupFeeRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,2})?$');
+export const setTenantSuspensionResponsePlanOneOneDiscountPercentMax = 6;
+
+
+export const setTenantSuspensionResponsePlanOneOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const setTenantSuspensionResponsePlanOneOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
 export const setTenantSuspensionResponsePlanOneOneBillingLabelMax = 160;
 
@@ -6727,6 +7250,10 @@ export const setTenantSuspensionResponseAddonsItemOneMonthlyPriceRegExp = new Re
 export const setTenantSuspensionResponseAddonsItemOneYearlyPriceRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const setTenantSuspensionResponseAddonsItemOneSetupFeeRegExp = new RegExp('^\\d{1,12}(\\.\\d{1,2})?$');
 export const setTenantSuspensionResponseAddonsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const setTenantSuspensionResponseAddonsItemOneDiscountPercentMax = 6;
+
+
+export const setTenantSuspensionResponseAddonsItemOneDiscountPercentRegExp = new RegExp('^\\d{1,3}(\\.\\d{1,2})?$');
 export const setTenantSuspensionResponseAddonsItemOneNameMin = 2;
 export const setTenantSuspensionResponseAddonsItemOneNameMax = 120;
 
@@ -6758,13 +7285,20 @@ export const setTenantSuspensionResponseOverridesItemTwoReasonMax = 500;
 export const SetTenantSuspensionResponse = zod.object({
   "tenantId": zod.string().uuid(),
   "tenantStatus": zod.string(),
-  "status": zod.enum(['active', 'suspended', 'unassigned']),
+  "status": zod.enum(['active', 'suspended', 'cancelled', 'unassigned']),
+  "billingPeriod": zod.enum(['monthly', 'yearly']).optional(),
+  "discountPercent": zod.string().optional(),
+  "operatorNote": zod.string().optional(),
+  "recurringEstimate": zod.string().nullish(),
+  "currency": zod.string().nullish(),
+  "billingConnected": zod.boolean().optional(),
   "plan": zod.union([zod.object({
   "name": zod.string().min(setTenantSuspensionResponsePlanOneOneNameMin).max(setTenantSuspensionResponsePlanOneOneNameMax),
   "description": zod.string().max(setTenantSuspensionResponsePlanOneOneDescriptionMax),
-  "monthlyPrice": zod.string().max(setTenantSuspensionResponsePlanOneOneMonthlyPriceMax).regex(setTenantSuspensionResponsePlanOneOneMonthlyPriceRegExp),
-  "yearlyPrice": zod.string().max(setTenantSuspensionResponsePlanOneOneYearlyPriceMax).regex(setTenantSuspensionResponsePlanOneOneYearlyPriceRegExp),
-  "setupFee": zod.string().max(setTenantSuspensionResponsePlanOneOneSetupFeeMax).regex(setTenantSuspensionResponsePlanOneOneSetupFeeRegExp),
+  "monthlyPrice": zod.string().max(setTenantSuspensionResponsePlanOneOneMonthlyPriceMax).regex(setTenantSuspensionResponsePlanOneOneMonthlyPriceRegExp).nullable(),
+  "yearlyPrice": zod.string().max(setTenantSuspensionResponsePlanOneOneYearlyPriceMax).regex(setTenantSuspensionResponsePlanOneOneYearlyPriceRegExp).nullable(),
+  "setupFee": zod.string().max(setTenantSuspensionResponsePlanOneOneSetupFeeMax).regex(setTenantSuspensionResponsePlanOneOneSetupFeeRegExp).nullable(),
+  "discountPercent": zod.string().max(setTenantSuspensionResponsePlanOneOneDiscountPercentMax).regex(setTenantSuspensionResponsePlanOneOneDiscountPercentRegExp).optional(),
   "currency": zod.string().regex(setTenantSuspensionResponsePlanOneOneCurrencyRegExp),
   "billingLabel": zod.string().max(setTenantSuspensionResponsePlanOneOneBillingLabelMax),
   "displayOrder": zod.number().int().min(setTenantSuspensionResponsePlanOneOneDisplayOrderMin).max(setTenantSuspensionResponsePlanOneOneDisplayOrderMax),
@@ -6776,13 +7310,15 @@ export const SetTenantSuspensionResponse = zod.object({
 }).and(zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "pricingConfigured": zod.boolean().optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(setTenantSuspensionResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
   "yearlyPrice": zod.string().regex(setTenantSuspensionResponseAddonsItemOneYearlyPriceRegExp).nullish(),
   "setupFee": zod.string().regex(setTenantSuspensionResponseAddonsItemOneSetupFeeRegExp).nullish(),
   "currency": zod.string().regex(setTenantSuspensionResponseAddonsItemOneCurrencyRegExp).optional(),
+  "discountPercent": zod.string().max(setTenantSuspensionResponseAddonsItemOneDiscountPercentMax).regex(setTenantSuspensionResponseAddonsItemOneDiscountPercentRegExp).optional(),
   "name": zod.string().min(setTenantSuspensionResponseAddonsItemOneNameMin).max(setTenantSuspensionResponseAddonsItemOneNameMax),
   "description": zod.string().max(setTenantSuspensionResponseAddonsItemOneDescriptionMax),
   "enabled": zod.boolean(),

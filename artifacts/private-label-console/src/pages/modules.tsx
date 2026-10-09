@@ -80,7 +80,7 @@ function RegisterForm({ taken, onDone }: { taken: string[]; onDone: () => void }
           </div>))}
         {lims.length < 50 && <Button type="button" size="sm" variant="outline" data-testid="button-add-limit" onClick={() => setLims([...lims, { key: '', label: '', valueType: 'integer' }])}>Add limit</Button>}</div>
       <div className="flex items-center justify-end gap-3">
-        {err && key !== '' && <span className="mr-auto text-sm text-destructive" data-testid="text-register-error">{err}</span>}
+        {err && key !== '' && <span role="alert" className="mr-auto text-sm text-destructive" data-testid="text-register-error">{err}</span>}
         <Button type="button" variant="ghost" onClick={onDone} data-testid="button-cancel-register">Cancel</Button>
         <Button data-testid="button-register-product" disabled={!!err || m.isPending}>{m.isPending ? 'Registering' : 'Register manifest'}</Button>
       </div>

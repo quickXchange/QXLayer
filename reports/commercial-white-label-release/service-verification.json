@@ -1,0 +1,30 @@
+[
+  {
+    "test": "Plan create/edit supports unconfigured/explicit pricing; mixed pricing and customer writes denied",
+    "result": "PASS"
+  },
+  {
+    "test": "Plan/add-on assignment and exact recurring estimates; yearly billing, discount and private notes persist",
+    "result": "PASS"
+  },
+  {
+    "test": "Cancellation suspends access, blocks unsuspend bypass, and explicit restore retains all settings/assignments",
+    "result": "PASS"
+  },
+  {
+    "test": "Real customer event notifications isolate owners/internal notes; read receipts persist and remain idempotent",
+    "result": "PASS"
+  },
+  {
+    "test": "Historical order references protect plans and add-ons even without a current subscription",
+    "result": "PASS"
+  },
+  {
+    "test": "Unreferenced catalog deletion succeeds, while preserving customers and unrelated configuration",
+    "result": "PASS"
+  },
+  {
+    "test": "Clearing configured add-on pricing persists nulls; unknown subscription totals never become free",
+    "result": "PASS"
+  }
+]

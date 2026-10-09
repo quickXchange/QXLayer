@@ -4,6 +4,7 @@ import { contextFor, type Principal } from "../authentication/service";
 import { definitions, readAddon, readPlan, validateEntries, type Entry } from "./catalog";
 import { decimal, decimalString } from "./decimal";
 import { applyDependencies, readRegistry } from "../product-registry/service";
+import { recurringEstimate } from "./commercial-pricing";
 
 export function currentPeriod(now = new Date()) { return now.toISOString().slice(0, 7); }
 export async function lockTenant(client: DatabaseClient, tenantId: string) {
@@ -14,7 +15,7 @@ export async function lockTenant(client: DatabaseClient, tenantId: string) {
 export async function resolveEntitlements(client: DatabaseClient, tenantId: string) {
   const tenant = await client.query("SELECT status FROM tenants WHERE id=$1", [tenantId]);
   if (!tenant.rowCount) throw new HttpError(404, "Tenant not found.");
-  const sub = await client.query("SELECT plan_id,status FROM tenant_subscriptions WHERE tenant_id=$1", [tenantId]);
+  const sub = await client.query("SELECT plan_id,status,billing_period,discount_percent,cancelled,operator_note FROM tenant_subscriptions WHERE tenant_id=$1", [tenantId]);
   const plan = sub.rowCount ? await readPlan(client, sub.rows[0].plan_id) : null;
   const assigned = await client.query("SELECT addon_id FROM tenant_addons WHERE tenant_id=$1 ORDER BY addon_id", [tenantId]);
   const addons = [];
@@ -43,7 +44,7 @@ export async function resolveEntitlements(client: DatabaseClient, tenantId: stri
     for (const addon of addons) await apply(addon.entitlements, `add-on: ${addon.name}`, true);
     await apply(overrides, "super-admin override", false);
   }
-  const status = !plan ? "unassigned" : tenant.rows[0].status === "suspended" || sub.rows[0].status === "suspended" ? "suspended" : "active";
+  const status = !plan ? "unassigned" : sub.rows[0].cancelled ? "cancelled" : tenant.rows[0].status === "suspended" || sub.rows[0].status === "suspended" ? "suspended" : "active";
   if (status !== "active") {
     for (const key of Object.keys(features)) features[key] = false;
     for (const key of Object.keys(limits)) limits[key] = "0";
@@ -67,7 +68,12 @@ export async function resolveEntitlements(client: DatabaseClient, tenantId: stri
     exceeded: decimal(counts[d.key] ?? "0") > decimal(limits[d.key] ?? "0"),
   }));
   return {
-    tenantId, tenantStatus: tenant.rows[0].status as string, status: status as "active" | "suspended" | "unassigned",
+    tenantId, tenantStatus: tenant.rows[0].status as string, status: status as "active" | "suspended" | "cancelled" | "unassigned",
+    billingPeriod: (sub.rows[0]?.billing_period ?? "monthly") as "monthly" | "yearly",
+    discountPercent: sub.rows[0]?.discount_percent as string ?? "0",
+    operatorNote: sub.rows[0]?.operator_note as string ?? "",
+    recurringEstimate: plan ? recurringEstimate([plan, ...addons], sub.rows[0].billing_period, sub.rows[0].discount_percent) : null,
+    currency: plan?.currency ?? null, billingConnected: false,
     plan, addons, overrides, features, limits, sources, usage,
     enabledModules: registry.filter((m) => features[m.key]).map((m) => m.key),
     overLimit: usage.some((u) => u.exceeded),
@@ -87,7 +93,10 @@ export function enforceLimit(effective: EffectiveEntitlements, key: string, proj
   if (decimal(projectedUsage) > decimal(effective.limits[key])) throw new HttpError(409, `Limit '${key}' exceeded (${projectedUsage} requested; ${effective.limits[key]} allowed).`);
 }
 export function getSubscription(principal: Principal, tenantId: string) {
-  return withDatabase(contextFor(principal, tenantId), (client) => resolveEntitlements(client, tenantId));
+  return withDatabase(contextFor(principal, tenantId), async client => {
+    const sub = await resolveEntitlements(client, tenantId);
+    return principal.role === "super_admin" ? sub : { ...sub, operatorNote: "" };
+  });
 }
 
 /**

@@ -5,6 +5,7 @@ import { HttpError } from "../../lib/errors";
 import { audit } from "../../lib/audit";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { isInteger, normalizeDecimal } from "./decimal";
+import { discountBasisPoints, pricingTriple } from "./commercial-pricing";
 
 export type PlanInput = z.infer<typeof CreatePlanBody>;
 export type AddonInput = z.infer<typeof CreateAddonBody>;
@@ -45,8 +46,9 @@ export async function readPlan(client: DatabaseClient, id: string) {
   const e = await client.query("SELECT key,value FROM plan_entitlements WHERE plan_id=$1 ORDER BY key", [id]);
   return {
     id: p.id as string, name: p.name as string, description: p.description as string,
-    monthlyPrice: p.monthly_price as string, yearlyPrice: p.yearly_price as string,
-    setupFee: p.setup_fee as string, currency: p.currency as string, billingLabel: p.billing_label as string,
+    monthlyPrice: p.pricing_configured ? p.monthly_price as string : null, yearlyPrice: p.pricing_configured ? p.yearly_price as string : null,
+    setupFee: p.pricing_configured ? p.setup_fee as string : null, pricingConfigured: p.pricing_configured as boolean,
+    discountPercent: p.discount_percent as string, currency: p.currency as string, billingLabel: p.billing_label as string,
     displayOrder: p.display_order as number, status: p.status as "enabled" | "disabled" | "archived",
     entitlements: e.rows as Entry[], createdAt: p.created_at as Date, updatedAt: p.updated_at as Date,
   };
@@ -56,10 +58,12 @@ export async function readAddon(client: DatabaseClient, id: string) {
   const r = await client.query("SELECT * FROM addons WHERE id=$1", [id]);
   const a = r.rows[0];
   if (!a) throw new HttpError(404, "Add-on not found.");
+  const configured = a.pricing_configured && a.pricing_confirmed;
   const e = await client.query("SELECT key,value FROM addon_entitlements WHERE addon_id=$1 ORDER BY key", [id]);
   return { id: a.id as string, name: a.name as string, description: a.description as string, enabled: a.enabled as boolean, entitlements: e.rows as Entry[],
-    monthlyPrice: a.pricing_configured ? a.monthly_price as string : null, yearlyPrice: a.pricing_configured ? a.yearly_price as string : null,
-    setupFee: a.pricing_configured ? a.setup_fee as string : null, currency: a.currency as string, pricingConfigured: a.pricing_configured as boolean };
+    monthlyPrice: configured ? a.monthly_price as string : null, yearlyPrice: configured ? a.yearly_price as string : null,
+    setupFee: configured ? a.setup_fee as string : null, currency: a.currency as string, pricingConfigured: configured as boolean,
+    discountPercent: a.discount_percent as string };
 }
 export async function listDefinitions(principal: Principal) {
   if (principal.role === "unassigned") throw new HttpError(403, "Administrator access required.");
@@ -90,11 +94,14 @@ export function listAddons(principal: Principal) {
 async function writePlan(client: DatabaseClient, input: PlanInput, id?: string) {
   if (input.name.trim().length < 2) throw new HttpError(400, "Plan name must contain at least two non-whitespace characters.");
   const entries = await validateEntries(client, input.entitlements);
-  const args = [input.name.trim(), input.description, input.monthlyPrice, input.yearlyPrice, input.setupFee, input.currency, input.billingLabel, input.displayOrder, input.status];
+  const configured = pricingTriple([input.monthlyPrice, input.yearlyPrice, input.setupFee]);
+  discountBasisPoints(input.discountPercent);
+  const args = [input.name.trim(), input.description, input.monthlyPrice ?? "0", input.yearlyPrice ?? "0", input.setupFee ?? "0", input.currency, input.billingLabel, input.displayOrder, input.status];
   const r = id
-    ? await client.query("UPDATE plans SET name=$1,description=$2,monthly_price=$3,yearly_price=$4,setup_fee=$5,currency=$6,billing_label=$7,display_order=$8,status=$9,updated_at=now() WHERE id=$10 RETURNING id", [...args, id])
+    ? await client.query("UPDATE plans SET name=$1,description=$2,monthly_price=CASE WHEN $11 THEN $3 ELSE monthly_price END,yearly_price=CASE WHEN $11 THEN $4 ELSE yearly_price END,setup_fee=CASE WHEN $11 THEN $5 ELSE setup_fee END,currency=$6,billing_label=$7,display_order=$8,status=$9,updated_at=now() WHERE id=$10 RETURNING id", [...args, id, configured])
     : await client.query("INSERT INTO plans (name,description,monthly_price,yearly_price,setup_fee,currency,billing_label,display_order,status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id", args);
   const planId = r.rows[0].id as string;
+  await client.query("UPDATE plans SET pricing_configured=$2,discount_percent=COALESCE($3,discount_percent) WHERE id=$1", [planId, configured, input.discountPercent ?? null]);
   await client.query("DELETE FROM plan_entitlements WHERE plan_id=$1", [planId]);
   for (const e of entries) await client.query("INSERT INTO plan_entitlements (plan_id,key,value) VALUES ($1,$2,$3::jsonb)", [planId, e.key, JSON.stringify(e.value)]);
   return readPlan(client, planId);
@@ -141,16 +148,42 @@ export function saveAddon(principal: Principal, input: AddonInput, id?: string) 
     const r = id
       ? await client.query("UPDATE addons SET name=$1,description=$2,enabled=$3 WHERE id=$4 RETURNING id", [input.name.trim(), input.description, input.enabled, id])
       : await client.query("INSERT INTO addons (name,description,enabled) VALUES ($1,$2,$3) RETURNING id", [input.name.trim(), input.description, input.enabled]);
-    await client.query("UPDATE addons SET monthly_price=$2,yearly_price=$3,setup_fee=$4,currency=$5 WHERE id=$1", [
-      r.rows[0].id, input.monthlyPrice ?? before?.monthlyPrice ?? "0", input.yearlyPrice ?? before?.yearlyPrice ?? "0",
-      input.setupFee ?? before?.setupFee ?? "0", input.currency ?? before?.currency ?? "USD",
+    const hasPrices = ["monthlyPrice", "yearlyPrice", "setupFee"].some(key => key in input);
+    const configured = hasPrices ? pricingTriple([input.monthlyPrice, input.yearlyPrice, input.setupFee]) : before?.pricingConfigured ?? false;
+    discountBasisPoints(input.discountPercent ?? before?.discountPercent);
+    await client.query("UPDATE addons SET monthly_price=CASE WHEN $6 THEN $2 ELSE monthly_price END,yearly_price=CASE WHEN $6 THEN $3 ELSE yearly_price END,setup_fee=CASE WHEN $6 THEN $4 ELSE setup_fee END,currency=$5,pricing_configured=$6,pricing_confirmed=$6,discount_percent=$7 WHERE id=$1", [
+      r.rows[0].id, hasPrices ? input.monthlyPrice ?? "0" : before?.monthlyPrice ?? "0",
+      hasPrices ? input.yearlyPrice ?? "0" : before?.yearlyPrice ?? "0",
+      hasPrices ? input.setupFee ?? "0" : before?.setupFee ?? "0", input.currency ?? before?.currency ?? "USD",
+      configured, input.discountPercent ?? before?.discountPercent ?? "0",
     ]);
-    if (input.monthlyPrice != null && input.yearlyPrice != null && input.setupFee != null) await client.query("UPDATE addons SET pricing_configured=true WHERE id=$1", [r.rows[0].id]);
     const addonId = r.rows[0].id as string;
     await client.query("DELETE FROM addon_entitlements WHERE addon_id=$1", [addonId]);
     for (const e of entries) await client.query("INSERT INTO addon_entitlements (addon_id,key,value) VALUES ($1,$2,$3::jsonb)", [addonId, e.key, JSON.stringify(e.value)]);
     const after = await readAddon(client, addonId);
     await audit(client, principal, null, id ? "addon.updated" : "addon.created", `Saved add-on ${after.name}`, { before, after });
     return after;
+  });
+}
+
+/** Keep every historical order reference and live subscription; only truly unused records may be deleted. */
+export function deleteCatalogRecord(principal: Principal, id: string, kind: "plan" | "addon") {
+  requireSuperAdmin(principal);
+  return withDatabase(contextFor(principal, undefined, true), async client => {
+    await catalogLock(client, `${kind}:${id}`, true);
+    const before = kind === "plan" ? await readPlan(client, id) : await readAddon(client, id);
+    const refs = kind === "plan"
+      ? await client.query(`SELECT 1 FROM tenant_subscriptions WHERE plan_id=$1 UNION ALL
+        SELECT 1 FROM white_label_requests WHERE configuration->>'requestedPlanId'=$1::text
+        OR configuration->'catalogSnapshot'->'plan'->>'id'=$1::text OR approved_configuration->'plan'->>'id'=$1::text LIMIT 1`, [id])
+      : await client.query(`SELECT 1 FROM tenant_addons WHERE addon_id=$1 UNION ALL
+        SELECT 1 FROM white_label_requests WHERE COALESCE(configuration->'requestedAddonIds','[]'::jsonb) ? $1::text
+        OR EXISTS(SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(configuration->'catalogSnapshot'->'addons')='array' THEN configuration->'catalogSnapshot'->'addons' ELSE '[]'::jsonb END) a WHERE a->>'id'=$1::text)
+        OR EXISTS(SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(approved_configuration->'addons')='array' THEN approved_configuration->'addons' ELSE '[]'::jsonb END) a WHERE a->>'id'=$1::text) LIMIT 1`, [id]);
+    if (refs.rowCount) throw new HttpError(409, `This ${kind === "plan" ? "plan" : "add-on"} is referenced by a subscription or order. Disable${kind === "plan" ? " or archive" : ""} it instead; customer records must be preserved.`);
+    await client.query(kind === "plan" ? "DELETE FROM plan_entitlements WHERE plan_id=$1" : "DELETE FROM addon_entitlements WHERE addon_id=$1", [id]);
+    await client.query(kind === "plan" ? "DELETE FROM plans WHERE id=$1" : "DELETE FROM addons WHERE id=$1", [id]);
+    await audit(client, principal, null, `${kind}.deleted`, `Deleted unused ${kind}; no customer records removed`, { id, before });
+    return { ok: true };
   });
 }

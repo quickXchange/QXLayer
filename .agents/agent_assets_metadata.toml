@@ -658,3 +658,17 @@ mtime_ms = 1791542953796
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ed026107-5ed2-4276-a36e-a5da0075cadb/9b7f696c-604d-46dd-bff8-f885ed060a9c"
 storage_version_token = "1791543005073965"
 content_type = "text/html"
+
+[[outputs]]
+id = "HXktGVcpCfipt5NMxliV8"
+uri = "file://reports/commercial-white-label-release/release-report.html"
+type = "html"
+title = "QXLayer release verification report"
+description = "Controls, test results, preservation proof, cleanup and publication gaps. Self-contained report."
+logical_id = "21ef30e1-924c-4d3e-a17f-a6ab443e3027"
+content_hash = "sha256:c91dd0bfc43f04a9de2d36fee88461b1d041665886d85c4d65978400e67e4468"
+size = 143623
+mtime_ms = 1791553230569
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/21ef30e1-924c-4d3e-a17f-a6ab443e3027/911dc388-764d-426b-a619-5d012717e238"
+storage_version_token = "1791553231117886"
+content_type = "text/html"

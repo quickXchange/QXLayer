@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useGatedMutate } from '@/components/super-admin/review-gate';
 import {
   useGetTenantSubscription, getGetTenantSubscriptionQueryKey, useListPlans, useListAddons, useListEntitlementDefinitions,
-  useChangeTenantPlan, useSetTenantAddons, useSetTenantOverrides, useSetTenantSuspension, type SubscriptionView,
+  useChangeTenantPlan, useSetTenantAddons, useSetTenantOverrides, useSetTenantSuspension, useUpdateSubscriptionCommercial, type SubscriptionView,
 } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -129,18 +130,79 @@ function OverridesPanel({ sub }: { sub: SubscriptionView }) {
   );
 }
 
+function CommercialPanel({ sub }: { sub: SubscriptionView }) {
+  const m = useUpdateSubscriptionCommercial();
+  const gM = useGatedMutate(m.mutate, 'Update commercial settings');
+  const d = useDone(sub.tenantId);
+  const [period, setPeriod] = useState<'monthly' | 'yearly'>(sub.billingPeriod ?? 'monthly');
+  const [disc, setDisc] = useState(sub.discountPercent ?? '0');
+  const [note, setNote] = useState(sub.operatorNote ?? '');
+  const [reason, setReason] = useState('');
+  const key = `${sub.tenantId}|${sub.billingPeriod}|${sub.discountPercent}|${sub.operatorNote}`;
+  useEffect(() => { setPeriod(sub.billingPeriod ?? 'monthly'); setDisc(sub.discountPercent ?? '0'); setNote(sub.operatorNote ?? ''); }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
+  const cancelled = sub.status === 'cancelled';
+  const bad = !/^\d{1,3}(\.\d{1,2})?$/.test(disc) || Number(disc) > 100 ? 'Discount is a percentage from 0 to 100' : '';
+  const send = (action: 'save' | 'cancel' | 'restore') => gM({ tenantId: sub.tenantId, data: { billingPeriod: action === 'save' ? period : (sub.billingPeriod ?? 'monthly'), discountPercent: action === 'save' ? disc : (sub.discountPercent ?? '0'), operatorNote: action === 'save' ? note : (sub.operatorNote ?? ''), action, reason: reason.trim() } },
+    { onSuccess: () => { setReason(''); d.ok(action === 'save' ? 'Commercial settings saved' : action === 'cancel' ? 'Subscription cancelled' : 'Subscription restored'); }, onError: d.fail });
+  const est = sub.recurringEstimate;
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-[180px_160px_1fr]">
+        <div className="space-y-1.5"><p className="text-sm">Billing period</p>
+          <Select value={period} onValueChange={(v) => { if (v === 'monthly' || v === 'yearly') setPeriod(v); }}><SelectTrigger data-testid="select-commercial-period"><SelectValue>{period === 'yearly' ? 'Yearly' : 'Monthly'}</SelectValue></SelectTrigger><SelectContent><SelectItem value="monthly">Monthly</SelectItem><SelectItem value="yearly">Yearly</SelectItem></SelectContent></Select></div>
+        <div className="space-y-1.5"><label htmlFor="com-disc" className="text-sm">Discount %</label><Input id="com-disc" data-testid="input-commercial-discount" inputMode="decimal" aria-invalid={!!bad} value={disc} onChange={(e) => setDisc(e.target.value)} /></div>
+        <div className="space-y-1.5"><label htmlFor="com-note" className="text-sm">Operator note</label><Textarea id="com-note" data-testid="input-commercial-note" rows={2} maxLength={2000} value={note} onChange={(e) => setNote(e.target.value)} /></div>
+      </div>
+      <div className="rounded-md border bg-muted/30 p-3 text-sm" data-testid="text-recurring-estimate">
+        <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Saved recurring estimate</p>
+        <p className="mt-1">{est == null ? 'Unconfigured: one or more assigned items has no price (Requires review).' : `${sub.currency ?? ''} ${est} / ${sub.billingPeriod === 'yearly' ? 'year' : 'month'}`}</p>
+        <p className="mt-1 text-xs text-muted-foreground">Save your settings to recalculate this estimate. Calculated from current catalog metadata with discounts on recurring prices only. It is not an invoice and does not replace an approved quotation. No payment is collected{sub.billingConnected === false ? '; billing is not connected' : ''}.</p></div>
+      <div className="space-y-1.5">
+        <label htmlFor="commercial-reason" className="text-sm">Change reason (required for save, cancel or restore)</label>
+        <Input id="commercial-reason" data-testid="input-commercial-reason" className="max-w-md" minLength={2} maxLength={500} value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why are you making this change?" />
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button data-testid="button-save-commercial" disabled={!!bad || reason.trim().length < 2 || m.isPending} onClick={() => send('save')}>{m.isPending ? 'Saving' : 'Save commercial settings'}</Button>
+        {bad && <span role="alert" className="text-sm text-destructive">{bad}</span>}
+      </div>
+      <div className="space-y-2 border-t pt-4">
+        <p className="text-sm text-muted-foreground">{cancelled ? 'This subscription is cancelled. Records and configuration are retained but tenant access stays suspended until you restore it explicitly.' : 'Cancelling retains all records and configuration but suspends tenant access. Restore is a separate explicit action.'}</p>
+        <div className="flex flex-wrap gap-2">
+          <Button data-testid={cancelled ? 'button-restore-subscription' : 'button-cancel-subscription'} variant={cancelled ? 'outline' : 'destructive'} disabled={reason.trim().length < 2 || m.isPending} onClick={() => send(cancelled ? 'restore' : 'cancel')}>{cancelled ? 'Restore subscription' : 'Cancel subscription'}</Button></div>
+      </div>
+    </div>
+  );
+}
+
+function ReadOnlySummary({ sub }: { sub: SubscriptionView }) {
+  const per = sub.billingPeriod === 'yearly' ? 'year' : 'month';
+  const rows: [string, string][] = [
+    ['Plan', sub.plan?.name ?? 'None assigned'], ['Status', sub.status],
+    ['Add-ons', sub.addons.length ? sub.addons.map((a) => a.name).join(', ') : 'None'],
+    ['Billing period', sub.billingPeriod ?? 'monthly'], ['Recurring discount', `${sub.discountPercent ?? '0'}% (recurring prices only, never setup)`],
+    ['Recurring estimate', sub.recurringEstimate == null ? 'Not configured' : `${sub.currency ?? ''} ${sub.recurringEstimate} / ${per}`],
+  ];
+  return (
+    <div className="space-y-2" data-testid="summary-subscription-readonly">
+      <dl className="divide-y rounded-md border text-sm">{rows.map(([k, v]) => <div key={k} className="flex flex-wrap justify-between gap-x-4 gap-y-1 p-3"><dt className="text-muted-foreground">{k}</dt><dd className="min-w-0 capitalize [overflow-wrap:anywhere]">{v}</dd></div>)}</dl>
+      <p className="text-xs text-muted-foreground">Estimate from current catalog metadata. It is not an invoice, no payment is collected, and it does not replace an approved quotation.</p>
+    </div>
+  );
+}
+
 function SuspensionPanel({ sub }: { sub: SubscriptionView }) {
   const m = useSetTenantSuspension();
   const gM = useGatedMutate(m.mutate, 'Change suspension');
   const d = useDone(sub.tenantId);
   const [reason, setReason] = useState('');
-  const suspended = sub.status === 'suspended' || sub.tenantStatus === 'suspended';
+  const cancelled = sub.status === 'cancelled';
+  const suspended = sub.status === 'suspended' || sub.tenantStatus === 'suspended' || cancelled;
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">{suspended ? 'This tenant is suspended: its public site is unavailable and its client admin is read-only. It cannot be activated until unsuspended.' : 'Suspending makes the tenant site unavailable and locks the client admin to read-only.'}</p>
+      <p className="text-sm text-muted-foreground">{cancelled ? 'The subscription is cancelled, so access is suspended. Unsuspending cannot bypass this: restore the subscription under Commercial settings.' : suspended ? 'This tenant is suspended: its public site is unavailable and its client admin is read-only. It cannot be activated until unsuspended.' : 'Suspending makes the tenant site unavailable and locks the client admin to read-only.'}</p>
       <div className="flex flex-wrap gap-2">
         <Input data-testid="input-suspend-reason" className="max-w-md" placeholder="Reason (required)" value={reason} onChange={(e) => setReason(e.target.value)} />
-        <Button data-testid="button-suspend" variant={suspended ? 'outline' : 'destructive'} disabled={reason.trim().length < 2 || m.isPending}
+        <Button data-testid="button-suspend" variant={suspended ? 'outline' : 'destructive'} disabled={cancelled || reason.trim().length < 2 || m.isPending}
           onClick={() => gM({ tenantId: sub.tenantId, data: { suspended: !suspended, reason: reason.trim() } }, { onSuccess: () => { setReason(''); d.ok(suspended ? 'Tenant unsuspended' : 'Tenant suspended'); }, onError: d.fail })}>
           {m.isPending ? 'Working' : suspended ? 'Unsuspend' : 'Suspend tenant'}</Button>
       </div>
@@ -148,7 +210,7 @@ function SuspensionPanel({ sub }: { sub: SubscriptionView }) {
   );
 }
 
-export function SubscriptionSections({ tenantId, canManage, show }: { tenantId: string; canManage: boolean; show?: ('capabilities' | 'plan' | 'addons' | 'overrides' | 'suspension')[] }) {
+export function SubscriptionSections({ tenantId, canManage, show }: { tenantId: string; canManage: boolean; show?: ('capabilities' | 'plan' | 'addons' | 'overrides' | 'suspension' | 'commercial' | 'summary')[] }) {
   const on = (k: NonNullable<typeof show>[number]) => !show || show.includes(k);
   const q = useSubscription(tenantId);
   const sub = q.data;
@@ -157,11 +219,13 @@ export function SubscriptionSections({ tenantId, canManage, show }: { tenantId: 
       {on('capabilities') && <Section n="S1" title={canManage ? 'Subscription' : 'Your capabilities'} note="Effective rights resolved from plan, add-ons and tenant overrides." footer={<span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{canManage ? 'Operator controls below' : 'Managed by your platform operator'}</span>}>
         {q.isLoading ? <Skeleton className="h-48" /> : q.isError || !sub ? <ErrorState what="subscription" onRetry={() => q.refetch()} /> : <Capabilities sub={sub} />}
       </Section>}
+      {!canManage && sub && on('summary') && <Section n="S2" title="Plan and pricing" note="Read-only. Changes are made by your platform operator." footer={<span />}><ReadOnlySummary sub={sub} /></Section>}
       {canManage && sub && (
         <>
           {on('plan') && <Section n="S2" title="Plan" note="Disabled or archived plans cannot be newly assigned." footer={<span />}><PlanPanel sub={sub} /></Section>}
           {on('addons') && <Section n="S3" title="Add-ons" note="Feature grants combine with the plan; numeric increments add to it." footer={<span />}><AddonsPanel sub={sub} /></Section>}
           {on('overrides') && <Section n="S4" title="Overrides" note="Tenant-only feature and limit replacements, each with a reason." footer={<span />}><OverridesPanel sub={sub} /></Section>}
+          {on('commercial') && <Section n="S6" title="Commercial settings" note="Billing period, recurring discount and cancellation. Metadata only; nothing is charged." footer={<span />}><CommercialPanel sub={sub} /></Section>}
           {on('suspension') && <Section n="S5" title="Suspension" note="Reason is recorded in activity." footer={<span />}><SuspensionPanel sub={sub} /></Section>}
         </>)}
     </div>

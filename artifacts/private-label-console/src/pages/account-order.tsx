@@ -3,6 +3,7 @@ import { useGetMyWhiteLabelRequest, getGetMyWhiteLabelRequestQueryKey } from '@w
 import { PageHeader, ErrorState, ListSkeleton, EmptyState } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
 import { OrderStatus, OrderSummary, Timeline } from '@/components/customer/order-view';
+import { StageTracker } from '@/components/customer/stage-tracker';
 import { orderRef } from '@/lib/wl';
 
 export default function AccountOrderDetail() {
@@ -16,6 +17,7 @@ export default function AccountOrderDetail() {
   return (
     <>
       <PageHeader eyebrow={`Order ${orderRef(o)}`} title={o.projectName}><OrderStatus status={o.status} /><Button asChild variant="outline" size="sm"><Link href="/account/orders">All orders</Link></Button></PageHeader>
+      <StageTracker o={o} history={customer} />
       {['delivered', 'provisioned'].includes(o.status) && tid && <div className="mb-4"><Button asChild><Link href={`/clients/${tid}/exchange`}>Open Admin</Link></Button></div>}
       {delivered && (o.websiteUrl || admin) && <div className="mb-4 space-y-2 rounded-md border bg-card p-4 text-sm" data-testid="panel-delivery">
         <p>Your website has been delivered. Sign in with this account to manage it in the Admin Panel.</p>

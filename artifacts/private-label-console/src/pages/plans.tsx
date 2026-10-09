@@ -31,7 +31,7 @@ export default function Plans() {
   const cols: Col<Plan>[] = [
     { key: 'n', header: 'Plan', primary: true, cell: (p) => <span><Link href={`/plans/${p.id}`} className="font-display text-xl hover:underline" data-testid={`link-plan-${p.id}`}>{p.name}</Link><span className="block max-w-xs truncate text-xs text-muted-foreground">{p.description || 'No description'}</span></span> },
     { key: 's', header: 'Status', cell: (p) => <span className={`rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase ${planTone(p.status)}`}>{p.status}</span> },
-    { key: 'pr', header: 'Prices', cell: (p) => <span className="font-mono text-xs">{p.monthlyPrice} / mo<br />{p.yearlyPrice} / yr<br />{p.setupFee} setup {p.currency}</span> },
+    { key: 'pr', header: 'Prices', cell: (p) => <span className="font-mono text-xs">{p.pricingConfigured === false || p.monthlyPrice == null ? 'Unconfigured' : <>{p.monthlyPrice} / mo<br />{p.yearlyPrice ?? '-'} / yr<br />{p.setupFee ?? '-'} setup {p.currency}{p.discountPercent && Number(p.discountPercent) > 0 ? <><br />{p.discountPercent}% off recurring</> : null}</>}</span> },
     { key: 'b', header: 'Billing', cell: (p) => p.billingLabel || 'No label' },
     { key: 'f', header: 'Features / limits', cell: (p) => `${p.entitlements.filter((e) => !limitKeys.has(e.key) && e.value === true).length} / ${p.entitlements.filter((e) => limitKeys.has(e.key)).length}` },
     { key: 'u', header: 'Used by', cell: (p) => { if (!pm) return 'Unavailable'; const u = usage(pm.projects, (x) => x.planId === p.id); return `${u.customers} customers, ${u.tenants} projects`; } },
@@ -42,7 +42,7 @@ export default function Plans() {
   return (
     <>
       <PageHeader eyebrow="Commercial" title="Plans"><Button asChild data-testid="button-new-plan"><Link href="/plans/new">New plan</Link></Button></PageHeader>
-      <p className="mb-4 max-w-2xl text-sm text-muted-foreground">Changes apply to newly assigned clients. Existing subscribers keep what they have.</p>
+      <p className="mb-4 max-w-2xl text-sm text-muted-foreground">Editing a plan's entitlements updates the rights of current subscribers immediately. Quotations already issued remain historical snapshots. Blank prices mean pricing is not configured and customers see Requires review.</p>
       {q.isLoading ? <ListSkeleton /> : q.isError ? <ErrorState what="plans" onRetry={() => q.refetch()} /> : (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3"><SearchBox id="plans" value={s} onChange={setS} placeholder="Search plans" />
@@ -52,7 +52,7 @@ export default function Plans() {
           {list.length > 0 && <Pager id="plans" p={pg} />}
         </div>)}
       <ReviewDialog open={!!pend} onClose={() => setPend(null)} title={pend ? `${pend.kind === 'duplicate' ? 'duplicate' : pend.kind} plan` : ''} pending={dup.isPending || st.isPending} error={err} destructive={pend?.kind === 'archived'} onApply={apply}
-        rows={pend ? [['Plan', pend.plan.name], ['Change', pend.kind === 'duplicate' ? 'Create a copy as a new plan' : `${pend.plan.status} to ${pend.kind}`], ['Existing subscribers', 'Keep their current plan']] : []} />
+        rows={pend ? [['Plan', pend.plan.name], ['Change', pend.kind === 'duplicate' ? 'Create a copy as a new plan' : `${pend.plan.status} to ${pend.kind}`], ['Existing subscribers', pend.kind === 'duplicate' ? 'Unaffected by the copy' : 'Keep their current plan; new assignment is blocked unless enabled']] : []} />
     </>
   );
 }

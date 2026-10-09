@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { getGetTenantQueryKey, getGetTenantSubscriptionQueryKey, getListTenantsQueryKey, getGetPlatformOverviewQueryKey, getListPlatformActivityQueryKey, getListPlansQueryKey, getListAddonsQueryKey } from '@workspace/api-client-react';
+import { getGetTenantQueryKey, getGetTenantSubscriptionQueryKey, getListTenantsQueryKey, getGetPlatformOverviewQueryKey, getListPlatformActivityQueryKey, getListPlansQueryKey, getListAddonsQueryKey, getGetCustomerNotificationsQueryKey, getGetWhiteLabelCatalogQueryKey } from '@workspace/api-client-react';
 export function useInvalidateTenant() {
   const qc = useQueryClient();
   return (tenantId?: string) => {
@@ -10,6 +10,9 @@ export function useInvalidateTenant() {
     qc.invalidateQueries({ queryKey: getListTenantsQueryKey() });
     qc.invalidateQueries({ queryKey: getGetPlatformOverviewQueryKey() });
     qc.invalidateQueries({ queryKey: getListPlatformActivityQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetCustomerNotificationsQueryKey() });
+    qc.invalidateQueries({ queryKey: getListPlansQueryKey() });
+    qc.invalidateQueries({ queryKey: getListAddonsQueryKey() });
   };
 }
 export function useInvalidateCatalog() {
@@ -17,6 +20,8 @@ export function useInvalidateCatalog() {
   return () => {
     qc.invalidateQueries({ queryKey: getListPlansQueryKey() });
     qc.invalidateQueries({ queryKey: getListAddonsQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetWhiteLabelCatalogQueryKey() });
+    qc.invalidateQueries({ queryKey: getGetCustomerNotificationsQueryKey() });
     qc.invalidateQueries({ queryKey: getListPlatformActivityQueryKey() });
     qc.invalidateQueries({ queryKey: getGetPlatformOverviewQueryKey() });
     qc.invalidateQueries({ queryKey: getListTenantsQueryKey() });
