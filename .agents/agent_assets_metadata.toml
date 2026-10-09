@@ -700,3 +700,17 @@ mtime_ms = 1791575827305
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ef3a6037-b61d-4709-81e4-b687d4df1aad/0eb68a11-ffd8-49e1-a7a2-baaf8dc41bc4"
 storage_version_token = "1791575827962307"
 content_type = "text/html"
+
+[[outputs]]
+id = "tubws0ohgrvMVFPslkJhf"
+uri = "file://generated-artifacts/production-rls-readonly-preflight.html"
+type = "html"
+title = "Production SQL Runner — read-only SQL check"
+description = "Contains a downloadable .sql file and numbered SELECT-only instructions. Not a migration; no Production writes."
+logical_id = "deb70892-ee0e-4436-8628-b025f04e839b"
+content_hash = "sha256:5a9d3c7bd447a1b7b3e91a71cb55b8a1419edb988ed662fec62d25c5693c1e70"
+size = 5701
+mtime_ms = 1791578468606
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/deb70892-ee0e-4436-8628-b025f04e839b/5b66c733-044b-41d7-963b-73166f4f8f0e"
+storage_version_token = "1791578469222965"
+content_type = "text/html"

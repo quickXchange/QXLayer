@@ -1,0 +1,799 @@
+{
+  "capturedAt": "2026-10-09T20:40:18.198Z",
+  "productionReplica": {
+    "tables": [
+      {
+        "rls": false,
+        "force": false,
+        "table": "addon_entitlements",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "addons",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "api_keys",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "asset_catalog",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "asset_network_catalog",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "audit_events",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "blockchain_provider_configs",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "customer_notification_reads",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "entitlement_definitions",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "exchange_orders",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "landing_products",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "module_catalog",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "network_catalog",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "notification_events",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "payment_invoices",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "plan_entitlements",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "plans",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "platform_admins",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "pricing_rules",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "provider_assignments",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "provider_catalog",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "provider_policies",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_addons",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_asset_networks",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_branding",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_configuration",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_domains",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_entitlement_overrides",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_memberships",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_modules",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_payment_methods",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_product_configuration",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_subscriptions",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenant_usage_counters",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "tenants",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "wallet_configurations",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "webhook_endpoints",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "white_label_attachments",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "white_label_events",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": false,
+        "force": false,
+        "table": "white_label_requests",
+        "policy_count": 0,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      }
+    ],
+    "in_recovery": true,
+    "current_role": "neondb_owner",
+    "runtime_role": {
+      "exists": true,
+      "bypassrls": false,
+      "superuser": false,
+      "can_set_role": true,
+      "schema_usage": true
+    },
+    "session_role": "neondb_owner",
+    "server_version": "16.15 (9355089)",
+    "login_bypassrls": true,
+    "login_superuser": false,
+    "login_createrole": true,
+    "public_schema_usage": true,
+    "public_schema_create": true,
+    "transaction_read_only": "on"
+  },
+  "development": {
+    "tables": [
+      {
+        "rls": true,
+        "force": true,
+        "table": "addon_entitlements",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "addons",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "api_keys",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "asset_catalog",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "asset_network_catalog",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "audit_events",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "blockchain_provider_configs",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "customer_notification_reads",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "entitlement_definitions",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "exchange_orders",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "landing_products",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "module_catalog",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "network_catalog",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "notification_events",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "payment_invoices",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "plan_entitlements",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "plans",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "platform_admins",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "pricing_rules",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "provider_assignments",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "provider_catalog",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "provider_policies",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_addons",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_asset_networks",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_branding",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_configuration",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_domains",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_entitlement_overrides",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_integrations",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_memberships",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_modules",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_payment_methods",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_product_configuration",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_subscriptions",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_telegram_receipts",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenant_usage_counters",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "tenants",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "wallet_configurations",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "webhook_endpoints",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "white_label_attachments",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "white_label_events",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      },
+      {
+        "rls": true,
+        "force": true,
+        "table": "white_label_requests",
+        "policy_count": 2,
+        "can_set_owner_role": true,
+        "owner_is_current_role": true,
+        "owner_privileges_inherited": true
+      }
+    ],
+    "in_recovery": false,
+    "current_role": "postgres",
+    "runtime_role": {
+      "exists": true,
+      "bypassrls": false,
+      "superuser": false,
+      "can_set_role": true,
+      "schema_usage": true
+    },
+    "session_role": "postgres",
+    "server_version": "16.10",
+    "login_bypassrls": true,
+    "login_superuser": true,
+    "login_createrole": true,
+    "public_schema_usage": true,
+    "public_schema_create": true,
+    "transaction_read_only": "off"
+  },
+  "nativePreviewCounts": {
+    "statements": 134,
+    "creates": 2,
+    "policies": 84,
+    "missingUsing": 84,
+    "missingChecks": 42,
+    "grants": 0,
+    "forces": 0
+  },
+  "limitations": {
+    "actualSqlRunnerSessionVerified": false,
+    "isolatedMigrationRehearsalRun": false,
+    "republishAfterManualDdlTested": false,
+    "productionModified": false,
+    "customProductionMigrationGenerated": false
+  }
+}
