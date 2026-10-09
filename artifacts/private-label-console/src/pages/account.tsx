@@ -75,7 +75,7 @@ export function AccountWhiteLabels() {
         {orphan.map((p) => (
           <div key={p.tenantId} className="rounded-md border bg-card p-5" data-testid={`card-wl-panel-${p.tenantId}`}>
             <p className="font-mono text-[11px] uppercase text-copper">{p.slug}</p><p className="font-display mt-1 text-2xl">{p.brandName}</p>
-            <Button asChild size="sm" className="mt-4"><Link href={`/clients/${p.tenantId}/exchange`}>Open Admin</Link></Button>
+            <div className="mt-4 flex flex-wrap gap-2"><Button asChild size="sm"><Link href={`/clients/${p.tenantId}/exchange`}>Open Admin</Link></Button><Button asChild size="sm" variant="outline"><Link href={`/clients/${p.tenantId}/integrations`} data-testid={`link-integrations-${p.tenantId}`}>Integrations</Link></Button></div>
           </div>))}
       </div>}
     </>
@@ -94,7 +94,7 @@ export function AdminPanels() {
         <div key={p.tenantId} className="rounded-md border bg-card p-5" data-testid={`card-panel-${p.tenantId}`}>
           <div className="flex items-center justify-between"><p className="font-display text-2xl">{p.brandName}</p><StatusBadge status={p.status} /></div>
           <p className="mt-1 font-mono text-[11px] uppercase text-copper">{p.slug} · {p.role.replace('_', ' ')}</p>
-          <Button asChild className="mt-4"><Link href={`/clients/${p.tenantId}/exchange`}>Open Admin</Link></Button>
+          <div className="mt-4 flex flex-wrap gap-2"><Button asChild><Link href={`/clients/${p.tenantId}/exchange`}>Open Admin</Link></Button><Button asChild variant="outline"><Link href={`/clients/${p.tenantId}/integrations`} data-testid={`link-integrations-${p.tenantId}`}>Integrations</Link></Button></div>
         </div>))}</div>}
     </>
   );

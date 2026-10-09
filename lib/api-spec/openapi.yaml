@@ -17,6 +17,18 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /public/sites/{slug}/telegram/config:
+    $ref: './integration-runtime.yaml#/paths/~1public~1sites~1{slug}~1telegram~1config'
+  /tenants/{tenantId}/integrations/telegram_bot/webhook:
+    $ref: './integration-runtime.yaml#/paths/~1tenants~1{tenantId}~1integrations~1telegram_bot~1webhook'
+  /integrations/runtime:
+    $ref: './integration-runtime.yaml#/paths/~1integrations~1runtime'
+  /tenants/{tenantId}/integrations:
+    $ref: './integration-runtime.yaml#/paths/~1tenants~1{tenantId}~1integrations'
+  /tenants/{tenantId}/integrations/{providerKey}:
+    $ref: './integration-runtime.yaml#/paths/~1tenants~1{tenantId}~1integrations~1{providerKey}'
+  /tenants/{tenantId}/integrations/{providerKey}/test:
+    $ref: './integration-runtime.yaml#/paths/~1tenants~1{tenantId}~1integrations~1{providerKey}~1test'
   /providers/foundation:
     get:
       operationId: getProviderFoundation

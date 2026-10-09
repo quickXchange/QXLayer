@@ -8,6 +8,194 @@
 import * as zod from 'zod';
 
 
+export const GetPublicTelegramMiniConfigParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const GetPublicTelegramMiniConfigResponse = zod.object({
+  "enabled": zod.boolean(),
+  "sandboxOnly": zod.boolean(),
+  "tenantSlug": zod.string(),
+  "brandName": zod.string(),
+  "logoUrl": zod.string(),
+  "primaryColor": zod.string(),
+  "backgroundColor": zod.string(),
+  "menu": zod.array(zod.string()),
+  "botUsername": zod.string(),
+  "miniAppPath": zod.string()
+})
+
+
+export const RegisterTenantTelegramWebhookParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const registerTenantTelegramWebhookBodyReasonMin = 2;
+export const registerTenantTelegramWebhookBodyReasonMax = 500;
+
+
+
+export const RegisterTenantTelegramWebhookBody = zod.object({
+  "reason": zod.string().min(registerTenantTelegramWebhookBodyReasonMin).max(registerTenantTelegramWebhookBodyReasonMax)
+})
+
+export const RegisterTenantTelegramWebhookResponse = zod.object({
+  "registered": zod.boolean(),
+  "sandboxOnly": zod.boolean()
+})
+
+
+export const GetIntegrationRuntimeResponse = zod.object({
+  "sourceCommit": zod.string(),
+  "sandboxOnly": zod.boolean(),
+  "executionEnabled": zod.boolean(),
+  "vaultAvailable": zod.boolean(),
+  "definitions": zod.array(zod.object({
+  "key": zod.string(),
+  "name": zod.string(),
+  "capability": zod.string(),
+  "secretFields": zod.array(zod.string()),
+  "manualFallback": zod.boolean()
+})),
+  "connections": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "providerKey": zod.string(),
+  "environment": zod.enum(['sandbox']),
+  "credentialManagement": zod.enum(['super_admin', 'customer', 'both']),
+  "enabled": zod.boolean(),
+  "settings": zod.record(zod.string(), zod.unknown()),
+  "credentialsConfigured": zod.boolean(),
+  "canManageCredentials": zod.boolean(),
+  "revision": zod.number().int(),
+  "health": zod.record(zod.string(), zod.unknown()),
+  "updatedAt": zod.coerce.date()
+})),
+  "tenants": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string()
+})),
+  "assetNetworks": zod.array(zod.object({
+  "assetId": zod.string(),
+  "networkId": zod.string(),
+  "symbol": zod.string(),
+  "networkName": zod.string()
+}))
+})
+
+
+export const GetTenantIntegrationRuntimeParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const GetTenantIntegrationRuntimeResponse = zod.object({
+  "sourceCommit": zod.string(),
+  "sandboxOnly": zod.boolean(),
+  "executionEnabled": zod.boolean(),
+  "vaultAvailable": zod.boolean(),
+  "definitions": zod.array(zod.object({
+  "key": zod.string(),
+  "name": zod.string(),
+  "capability": zod.string(),
+  "secretFields": zod.array(zod.string()),
+  "manualFallback": zod.boolean()
+})),
+  "connections": zod.array(zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "providerKey": zod.string(),
+  "environment": zod.enum(['sandbox']),
+  "credentialManagement": zod.enum(['super_admin', 'customer', 'both']),
+  "enabled": zod.boolean(),
+  "settings": zod.record(zod.string(), zod.unknown()),
+  "credentialsConfigured": zod.boolean(),
+  "canManageCredentials": zod.boolean(),
+  "revision": zod.number().int(),
+  "health": zod.record(zod.string(), zod.unknown()),
+  "updatedAt": zod.coerce.date()
+})),
+  "tenants": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "status": zod.string()
+})),
+  "assetNetworks": zod.array(zod.object({
+  "assetId": zod.string(),
+  "networkId": zod.string(),
+  "symbol": zod.string(),
+  "networkName": zod.string()
+}))
+})
+
+
+export const SaveTenantIntegrationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "providerKey": zod.coerce.string()
+})
+
+export const saveTenantIntegrationBodyReasonMin = 2;
+export const saveTenantIntegrationBodyReasonMax = 500;
+
+
+
+export const SaveTenantIntegrationBody = zod.object({
+  "enabled": zod.boolean(),
+  "credentialManagement": zod.enum(['super_admin', 'customer', 'both']).optional(),
+  "settings": zod.record(zod.string(), zod.unknown()),
+  "secrets": zod.record(zod.string(), zod.string()).optional(),
+  "clearCredentials": zod.boolean().optional(),
+  "reason": zod.string().min(saveTenantIntegrationBodyReasonMin).max(saveTenantIntegrationBodyReasonMax)
+})
+
+export const SaveTenantIntegrationResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "providerKey": zod.string(),
+  "environment": zod.enum(['sandbox']),
+  "credentialManagement": zod.enum(['super_admin', 'customer', 'both']),
+  "enabled": zod.boolean(),
+  "settings": zod.record(zod.string(), zod.unknown()),
+  "credentialsConfigured": zod.boolean(),
+  "canManageCredentials": zod.boolean(),
+  "revision": zod.number().int(),
+  "health": zod.record(zod.string(), zod.unknown()),
+  "updatedAt": zod.coerce.date()
+})
+
+
+export const TestTenantIntegrationParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "providerKey": zod.coerce.string()
+})
+
+export const testTenantIntegrationBodyReasonMin = 2;
+export const testTenantIntegrationBodyReasonMax = 500;
+
+
+
+export const TestTenantIntegrationBody = zod.object({
+  "reason": zod.string().min(testTenantIntegrationBodyReasonMin).max(testTenantIntegrationBodyReasonMax)
+})
+
+export const TestTenantIntegrationResponse = zod.object({
+  "id": zod.string(),
+  "tenantId": zod.string(),
+  "providerKey": zod.string(),
+  "environment": zod.enum(['sandbox']),
+  "credentialManagement": zod.enum(['super_admin', 'customer', 'both']),
+  "enabled": zod.boolean(),
+  "settings": zod.record(zod.string(), zod.unknown()),
+  "credentialsConfigured": zod.boolean(),
+  "canManageCredentials": zod.boolean(),
+  "revision": zod.number().int(),
+  "health": zod.record(zod.string(), zod.unknown()),
+  "updatedAt": zod.coerce.date()
+})
+
+
 export const getProviderFoundationResponseProvidersItemOneNameMax = 120;
 
 export const getProviderFoundationResponseProvidersItemOneLogoUrlMax = 500;

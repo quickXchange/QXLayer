@@ -73,5 +73,11 @@
     "vite": "catalog:",
     "wouter": "^3.3.5",
     "zod": "catalog:"
+  },
+  "dependencies": {
+    "@workspace/amount-format": "workspace:*",
+    "@workspace/i18n": "workspace:*",
+    "@workspace/payment-logo": "workspace:*",
+    "@workspace/quickxchange-mini-core": "workspace:*"
   }
 }

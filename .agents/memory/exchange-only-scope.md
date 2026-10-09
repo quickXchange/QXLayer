@@ -3,6 +3,12 @@ name: White Label Exchange-only development
 description: Current product development boundary after the approved visual phase.
 ---
 
+Current exception: the user explicitly approved tenant-isolated Exchange integrations adapted from the verified QuickXchange source, including read-only 1Forge/WhiteBIT/Quickex diagnostics, RPC health, and the Exchange Telegram Bot/Mini App. The earlier prohibition below applies to the previous phase and remains applicable to unrelated standalone products, not these approved Exchange channels.
+
+**Why:** The expanded request authorizes these scoped integrations but keeps financial execution Sandbox, forbids sharing QuickXchange data/credentials, and forbids Production writes or publishing.
+
+**How to apply:** Do not expand other products. Distinguish configuration, locally tested adapters, externally verified connectivity and financial execution. Preserve the approved shared master and existing customer settings.
+
 Develop only White Label Exchange as a multi-tenant sandbox, followed by its tenant-specific Client Admin Panel. After completing both, stop and show the full result before starting any other product.
 
 **Why:** The user explicitly corrected the scope. Crypto Payment Gateway, Crypto Card, Crypto Engine, Staking API, Earn API, DEX, Telegram Bot, Telegram Mini App, WhatsApp Bot, iOS App, Android App, RPC/Nodes, Cloud Mining, Articles/Content and Kolo remain visual product previews/planned services.

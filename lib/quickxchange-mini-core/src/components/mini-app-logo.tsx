@@ -1,0 +1,186 @@
+import { sourceText } from "@workspace/i18n/runtime";
+import { useI18n as useCustomerI18n } from "@workspace/i18n";
+import React, { useEffect, useState } from 'react';
+import { NetworkBadge, PaymentLogo } from '@workspace/payment-logo';
+import { cn } from '../lib/utils';
+import { getCachedPaymentLogoFit, measurePaymentLogoFit, type PaymentLogoFit } from '../lib/payment-logo-fit';
+import type { MiniAppVisual } from '../lib/logo-catalog';
+import bbvaTransparentLogoUrl from '../../../../attached_assets/bbva-logo-transparent.png';
+import bbvaWhiteLogoUrl from '../../../../attached_assets/bbva-logo-white-transparent.png';
+
+// The component is also server-rendered in the unit tests, where CSS imports
+// are not supported by Node. In the browser this module loads the shared styles
+// once, alongside the shared renderer.
+if (typeof document !== 'undefined') void import('@workspace/payment-logo/styles.css');
+
+export type MiniAppLogoSize = 'small' | 'normal' | 'medium' | 'large';
+
+const sizeClasses: Record<MiniAppLogoSize, { container: string; text: string; badge: number }> = {
+  small: { container: 'size-6', text: sourceText("customer.m6acc6ebd3f58"), badge: 10 },
+  normal: { container: 'size-8', text: sourceText("customer.mc93a0125ded0"), badge: 12 },
+  medium: { container: 'size-10', text: sourceText("customer.mb72aa61c792e"), badge: 14 },
+  large: { container: 'size-14', text: 'text-xs', badge: 18 },
+};
+
+export function normalizeMiniAppImageUrl(url?: string | null) {
+  if (!url) return undefined;
+  return url.startsWith('/objects/') ? `/api/storage${url}` : url;
+}
+
+export function MiniAppLogo({
+  src,
+  logoUrl,
+  fallbackSrcs = [],
+  badgeSrc,
+  badgeUrl,
+  network,
+  fallback,
+  alt = '',
+  size = 'normal',
+  badgeVariant = 'network',
+  variant = 'asset',
+  className,
+}: {
+  src?: string | null;
+  logoUrl?: string | null;
+  fallbackSrcs?: Array<string | null | undefined>;
+  badgeSrc?: string | null;
+  badgeUrl?: string | null;
+  network?: string | null;
+  fallback?: string | null;
+  alt?: string;
+  size?: MiniAppLogoSize;
+  badgeVariant?: 'network' | 'flag';
+  variant?: 'asset' | 'payment';
+  className?: string;
+}) {
+  const { t: uiT, tx: uiText } = useCustomerI18n();
+
+  const isBbva = (src || logoUrl) === bbvaTransparentLogoUrl;
+  const [isDark, setIsDark] = useState(() => typeof document !== 'undefined' && document.documentElement.classList.contains('dark'));
+  useEffect(() => {
+    if (!isBbva) return;
+    const observer = new MutationObserver(() => setIsDark(document.documentElement.classList.contains('dark')));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, [isBbva]);
+  const sources = Array.from(new Set(
+    [isBbva && isDark ? bbvaWhiteLogoUrl : src || logoUrl, ...fallbackSrcs]
+      .map(normalizeMiniAppImageUrl)
+      .filter((value): value is string => Boolean(value)),
+  ));
+  const sourceKey = sources.join('\0');
+  const normalizedBadge = normalizeMiniAppImageUrl(badgeSrc || badgeUrl);
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const [measuredFit, setMeasuredFit] = useState<{ src: string; fit: PaymentLogoFit } | null>(null);
+  const classes = sizeClasses[size];
+
+  useEffect(() => setSourceIndex(0), [sourceKey]);
+
+  const currentSrc = sources[sourceIndex];
+  const logoFit = currentSrc
+    ? (measuredFit?.src === currentSrc ? measuredFit.fit : getCachedPaymentLogoFit(currentSrc))
+    : undefined;
+
+  return (
+    <span className={cn(
+      'relative inline-flex shrink-0 items-center justify-center rounded-full',
+      classes.container,
+      className,
+    )}>
+      <span className={cn(
+        'flex h-full w-full items-center justify-center overflow-hidden rounded-full border border-primary/10',
+        variant === 'payment'
+          ? 'border-black/10 bg-transparent dark:border-white/15 dark:bg-transparent'
+          : 'border-primary/10 bg-primary/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_0_14px_-10px_hsl(var(--primary))] dark:border-white/10 dark:bg-white/[0.055]',
+      )}>
+        {variant === 'payment' ? (
+          <PaymentLogo
+            sources={sources}
+            size="100%"
+            alt={uiText(alt)}
+            className="!border-0 !bg-transparent"
+            imageClassName="!bg-transparent"
+            fallback={(
+              <span className={cn('font-bold uppercase tracking-tight text-primary', classes.text)}>
+                {uiText((fallback || '?').slice(0, 4))}
+              </span>
+            )}
+          />
+        ) : currentSrc ? (
+          <img
+            src={currentSrc}
+            alt={uiText(alt)}
+            className={cn(
+              'block h-full w-full max-h-full max-w-full bg-transparent object-contain object-center',
+            )}
+            style={{
+              transform: `translate(${logoFit?.x ?? 0}%, ${logoFit?.y ?? 0}%) scale(${logoFit?.scale ?? 0.92})`,
+            }}
+            onLoad={event => {
+              const fit = measurePaymentLogoFit(currentSrc, event.currentTarget);
+              setMeasuredFit({ src: currentSrc, fit });
+            }}
+            onError={() => setSourceIndex(index => index + 1)}
+          />
+        ) : (
+          <span className={cn('font-bold uppercase tracking-tight text-primary', classes.text)}>
+            {uiText((fallback || '?').slice(0, 4))}
+          </span>
+        )}
+      </span>
+      {(badgeVariant === 'network' ? network || normalizedBadge : normalizedBadge) && (
+        <NetworkBadge
+          network={network}
+          src={normalizedBadge}
+          variant={badgeVariant}
+          size={classes.badge}
+          className="!absolute -right-1 -bottom-1"
+        />
+      )}
+    </span>
+  );
+}
+
+export function MiniAppLogoPair({
+  source,
+  target,
+  sourceAlt,
+  targetAlt,
+}: {
+  source: MiniAppVisual;
+  target: MiniAppVisual;
+  sourceAlt: string;
+  targetAlt: string;
+}) {
+  const { t: uiT, tx: uiText } = useCustomerI18n();
+
+  const cryptoInFront = source.variant === 'payment' && target.variant !== 'payment';
+  return (
+    <span className="flex -space-x-2 shrink-0">
+      <MiniAppLogo {...source} alt={uiText(sourceAlt)} size="medium" className={cryptoInFront ? undefined : 'z-10'} />
+      <MiniAppLogo {...target} alt={uiText(targetAlt)} size="medium" className={cryptoInFront ? 'z-10' : undefined} />
+    </span>
+  );
+}
+
+export function MiniAppBrandLogo({ className, brandName, lightLogoUrl, darkLogoUrl }: {
+  className?: string; brandName: string; lightLogoUrl?: string | null; darkLogoUrl?: string | null;
+}) {
+  const light = normalizeMiniAppImageUrl(lightLogoUrl);
+  const dark = normalizeMiniAppImageUrl(darkLogoUrl || lightLogoUrl);
+  const [lightFailed, setLightFailed] = useState(false);
+  const [darkFailed, setDarkFailed] = useState(false);
+
+  if (!light && !dark) {
+    return <span className={cn('font-bold tracking-tight text-primary', className)}>{brandName}</span>;
+  }
+
+  return (
+    <span className={cn('inline-flex min-w-0 max-w-full items-center', className)}>
+      {light && !lightFailed && <img src={light} alt={brandName} onError={() => setLightFailed(true)} className="block h-7 w-auto max-w-full object-contain object-left dark:hidden" />}
+      {dark && !darkFailed && <img src={dark} alt={brandName} onError={() => setDarkFailed(true)} className="hidden h-7 w-auto max-w-full object-contain object-left dark:block" />}
+      {lightFailed && darkFailed && <span className="font-bold tracking-tight text-primary">{brandName}</span>}
+    </span>
+  );
+}

@@ -18,6 +18,7 @@ const nav = [
   { href: '/add-ons', label: 'Add-ons', icon: Puzzle, op: true, group: 'Commercial' },
   { href: '/modules', label: 'Modules', icon: Boxes, group: 'Platform' },
   { href: '/providers', label: 'Providers', icon: Plug, op: true, group: 'Platform' },
+  { href: '/integrations', label: 'Integrations', icon: Plug, op: true, group: 'Platform' },
   { href: '/provisioning', label: 'Provisioning', icon: Workflow, op: true, group: 'System' },
   { href: '/activity', label: 'Activity', icon: ScrollText, group: 'System' },
   { href: '/landing-products', label: 'Landing', icon: LayoutGrid, op: true, group: 'Additional' },

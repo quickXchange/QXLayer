@@ -54,6 +54,7 @@ import type {
   ExchangeVisualCatalog,
   GetDomainHostingProof200,
   HealthStatus,
+  IntegrationRuntimeBundle,
   LandingProduct,
   LandingProductInput,
   ListExchangeAuditParams,
@@ -78,9 +79,12 @@ import type {
   ProviderPolicyInput,
   PublicExchange,
   PublicSite,
+  PublicTelegramMiniConfig,
+  RegisterTenantTelegramWebhook200,
   ResourceCreated,
   ResourceInput,
   ResourceItem,
+  SaveTenantIntegrationInput,
   StaffPermissions,
   SubscriptionAddonInput,
   SubscriptionCommercialInput,
@@ -92,8 +96,10 @@ import type {
   TenantAdministratorStatusInput,
   TenantConfigurationInput,
   TenantInput,
+  TenantIntegrationRuntime,
   TenantModulesInput,
   TenantSummary,
+  TestTenantIntegrationInput,
   WebsiteErrorDiagnostic,
   WebsitePreview,
   WebsiteSettings,
@@ -133,6 +139,472 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetPublicTelegramMiniConfigUrl = (slug: string,) => {
+
+
+
+
+  return `/api/public/sites/${slug}/telegram/config`
+}
+
+export const getPublicTelegramMiniConfig = async (slug: string, options?: Parameters<typeof customFetch>[1]): Promise<PublicTelegramMiniConfig> => {
+
+  return customFetch<PublicTelegramMiniConfig>(getGetPublicTelegramMiniConfigUrl(slug),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicTelegramMiniConfigQueryKey = (slug: string,) => {
+    return [
+    `/api/public/sites/${slug}/telegram/config`
+    ] as const;
+    }
+
+
+export const getGetPublicTelegramMiniConfigQueryOptions = <TData = Awaited<ReturnType<typeof getPublicTelegramMiniConfig>>, TError = ErrorType<unknown>>(slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicTelegramMiniConfig>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicTelegramMiniConfigQueryKey(slug);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicTelegramMiniConfig>>> = ({ signal }) => getPublicTelegramMiniConfig(slug, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicTelegramMiniConfig>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicTelegramMiniConfigQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicTelegramMiniConfig>>>
+export type GetPublicTelegramMiniConfigQueryError = ErrorType<unknown>
+
+
+
+export function useGetPublicTelegramMiniConfig<TData = Awaited<ReturnType<typeof getPublicTelegramMiniConfig>>, TError = ErrorType<unknown>>(
+ slug: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicTelegramMiniConfig>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicTelegramMiniConfigQueryOptions(slug,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRegisterTenantTelegramWebhookUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/integrations/telegram_bot/webhook`
+}
+
+export const registerTenantTelegramWebhook = async (tenantId: string,
+    testTenantIntegrationInput: TestTenantIntegrationInput, options?: Parameters<typeof customFetch>[1]): Promise<RegisterTenantTelegramWebhook200> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<RegisterTenantTelegramWebhook200>(getRegisterTenantTelegramWebhookUrl(tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(testTenantIntegrationInput)
+  }
+);}
+
+
+
+
+
+export const getRegisterTenantTelegramWebhookMutationKey = () => ['registerTenantTelegramWebhook'] as const;
+
+export const getRegisterTenantTelegramWebhookMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerTenantTelegramWebhook>>, TError,RegisterTenantTelegramWebhookMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerTenantTelegramWebhook>>, TError,RegisterTenantTelegramWebhookMutationVariables, TContext> => {
+
+const mutationKey = getRegisterTenantTelegramWebhookMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerTenantTelegramWebhook>>, RegisterTenantTelegramWebhookMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  registerTenantTelegramWebhook(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterTenantTelegramWebhookMutationResult = NonNullable<Awaited<ReturnType<typeof registerTenantTelegramWebhook>>>
+    export type RegisterTenantTelegramWebhookMutationBody = BodyType<TestTenantIntegrationInput>
+    export type RegisterTenantTelegramWebhookMutationError = ErrorType<unknown>
+    export type RegisterTenantTelegramWebhookMutationVariables = {tenantId: string;data: BodyType<TestTenantIntegrationInput>}
+
+    export const useRegisterTenantTelegramWebhook = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerTenantTelegramWebhook>>, TError,RegisterTenantTelegramWebhookMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof registerTenantTelegramWebhook>>,
+        TError,
+        RegisterTenantTelegramWebhookMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRegisterTenantTelegramWebhookMutationOptions(options));
+    }
+
+export const getGetIntegrationRuntimeUrl = () => {
+
+
+
+
+  return `/api/integrations/runtime`
+}
+
+export const getIntegrationRuntime = async ( options?: Parameters<typeof customFetch>[1]): Promise<IntegrationRuntimeBundle> => {
+
+  return customFetch<IntegrationRuntimeBundle>(getGetIntegrationRuntimeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIntegrationRuntimeQueryKey = () => {
+    return [
+    `/api/integrations/runtime`
+    ] as const;
+    }
+
+
+export const getGetIntegrationRuntimeQueryOptions = <TData = Awaited<ReturnType<typeof getIntegrationRuntime>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntegrationRuntime>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIntegrationRuntimeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIntegrationRuntime>>> = ({ signal }) => getIntegrationRuntime({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIntegrationRuntime>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetIntegrationRuntimeQueryResult = NonNullable<Awaited<ReturnType<typeof getIntegrationRuntime>>>
+export type GetIntegrationRuntimeQueryError = ErrorType<unknown>
+
+
+
+export function useGetIntegrationRuntime<TData = Awaited<ReturnType<typeof getIntegrationRuntime>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getIntegrationRuntime>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetIntegrationRuntimeQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetTenantIntegrationRuntimeUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/integrations`
+}
+
+export const getTenantIntegrationRuntime = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<IntegrationRuntimeBundle> => {
+
+  return customFetch<IntegrationRuntimeBundle>(getGetTenantIntegrationRuntimeUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTenantIntegrationRuntimeQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/integrations`
+    ] as const;
+    }
+
+
+export const getGetTenantIntegrationRuntimeQueryOptions = <TData = Awaited<ReturnType<typeof getTenantIntegrationRuntime>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantIntegrationRuntime>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTenantIntegrationRuntimeQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTenantIntegrationRuntime>>> = ({ signal }) => getTenantIntegrationRuntime(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTenantIntegrationRuntime>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTenantIntegrationRuntimeQueryResult = NonNullable<Awaited<ReturnType<typeof getTenantIntegrationRuntime>>>
+export type GetTenantIntegrationRuntimeQueryError = ErrorType<unknown>
+
+
+
+export function useGetTenantIntegrationRuntime<TData = Awaited<ReturnType<typeof getTenantIntegrationRuntime>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTenantIntegrationRuntime>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTenantIntegrationRuntimeQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveTenantIntegrationUrl = (tenantId: string,
+    providerKey: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/integrations/${providerKey}`
+}
+
+export const saveTenantIntegration = async (tenantId: string,
+    providerKey: string,
+    saveTenantIntegrationInput: SaveTenantIntegrationInput, options?: Parameters<typeof customFetch>[1]): Promise<TenantIntegrationRuntime> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<TenantIntegrationRuntime>(getSaveTenantIntegrationUrl(tenantId,providerKey),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(saveTenantIntegrationInput)
+  }
+);}
+
+
+
+
+
+export const getSaveTenantIntegrationMutationKey = () => ['saveTenantIntegration'] as const;
+
+export const getSaveTenantIntegrationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveTenantIntegration>>, TError,SaveTenantIntegrationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveTenantIntegration>>, TError,SaveTenantIntegrationMutationVariables, TContext> => {
+
+const mutationKey = getSaveTenantIntegrationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveTenantIntegration>>, SaveTenantIntegrationMutationVariables> = (props) => {
+          const {tenantId,providerKey,data} = props ?? {};
+
+          return  saveTenantIntegration(tenantId,providerKey,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveTenantIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof saveTenantIntegration>>>
+    export type SaveTenantIntegrationMutationBody = BodyType<SaveTenantIntegrationInput>
+    export type SaveTenantIntegrationMutationError = ErrorType<unknown>
+    export type SaveTenantIntegrationMutationVariables = {tenantId: string;providerKey: string;data: BodyType<SaveTenantIntegrationInput>}
+
+    export const useSaveTenantIntegration = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveTenantIntegration>>, TError,SaveTenantIntegrationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveTenantIntegration>>,
+        TError,
+        SaveTenantIntegrationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveTenantIntegrationMutationOptions(options));
+    }
+
+export const getTestTenantIntegrationUrl = (tenantId: string,
+    providerKey: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/integrations/${providerKey}/test`
+}
+
+export const testTenantIntegration = async (tenantId: string,
+    providerKey: string,
+    testTenantIntegrationInput: TestTenantIntegrationInput, options?: Parameters<typeof customFetch>[1]): Promise<TenantIntegrationRuntime> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<TenantIntegrationRuntime>(getTestTenantIntegrationUrl(tenantId,providerKey),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(testTenantIntegrationInput)
+  }
+);}
+
+
+
+
+
+export const getTestTenantIntegrationMutationKey = () => ['testTenantIntegration'] as const;
+
+export const getTestTenantIntegrationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testTenantIntegration>>, TError,TestTenantIntegrationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof testTenantIntegration>>, TError,TestTenantIntegrationMutationVariables, TContext> => {
+
+const mutationKey = getTestTenantIntegrationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof testTenantIntegration>>, TestTenantIntegrationMutationVariables> = (props) => {
+          const {tenantId,providerKey,data} = props ?? {};
+
+          return  testTenantIntegration(tenantId,providerKey,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TestTenantIntegrationMutationResult = NonNullable<Awaited<ReturnType<typeof testTenantIntegration>>>
+    export type TestTenantIntegrationMutationBody = BodyType<TestTenantIntegrationInput>
+    export type TestTenantIntegrationMutationError = ErrorType<unknown>
+    export type TestTenantIntegrationMutationVariables = {tenantId: string;providerKey: string;data: BodyType<TestTenantIntegrationInput>}
+
+    export const useTestTenantIntegration = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof testTenantIntegration>>, TError,TestTenantIntegrationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof testTenantIntegration>>,
+        TError,
+        TestTenantIntegrationMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTestTenantIntegrationMutationOptions(options));
+    }
 
 export const getGetProviderFoundationUrl = () => {
 

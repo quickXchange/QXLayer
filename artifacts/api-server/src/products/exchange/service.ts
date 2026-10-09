@@ -12,6 +12,7 @@ import { ACTIONS, emptySettings, readExchange, validateExchange } from "./settin
 import { calculateQuote } from "./calculation";
 import { publicExchangeConfiguration } from "./public-configuration";
 import { statusesForOrderView } from "./order-views";
+import { assertTelegramTransaction } from "../../modules/integrations/channel";
 
 const hash = (v: string) => createHash("sha256").update(v).digest("hex");
 function sign(v: string) {
@@ -120,10 +121,11 @@ async function operationalExchange(client: DatabaseClient, tenantId: string, act
   if (reference.rows[0]?.currency !== e.plan?.currency) throw new HttpError(409, "The plan currency changed. Review and save the sandbox reference rates in Exchange Admin before requesting quotes.");
   return e;
 }
-export async function sandboxQuote(slug: string, input: ExchangeQuoteInput) {
+export async function sandboxQuote(slug: string, input: ExchangeQuoteInput, channel?: "telegram") {
   const tenantId = await publicTenantId(slug);
   return withDatabase({ actorId: "sandbox-visitor", tenantId }, async client => {
     const e = await operationalExchange(client, tenantId, input.action);
+    if (channel) await assertTelegramTransaction(client, tenantId, input.action);
     const { configuration: s, catalog } = await readExchange(client, tenantId);
     const { quote, volume } = calculateQuote(s, catalog, input);
     quoteAdmission(e, volume);
@@ -149,18 +151,20 @@ async function orderRow(client: DatabaseClient, tenantId: string, id: string, lo
   if (!r.rowCount) throw new HttpError(404, "Sandbox order not found.");
   return r.rows[0];
 }
-export async function sandboxOrder(slug: string, input: ExchangeOrderInput) {
+export async function sandboxOrder(slug: string, input: ExchangeOrderInput, channel?: "telegram") {
   const tenantId = await publicTenantId(slug);
   return withDatabase({ actorId: "sandbox-visitor", tenantId, canWrite: true }, async client => {
     await lockTenant(client, tenantId);
     const e = await operationalExchange(client, tenantId);
     const old = await client.query<OrderRow>("SELECT id,status,request,created_at FROM exchange_orders WHERE tenant_id=$1 AND request->>'product'='crypto_exchange' AND request->>'idempotencyHash'=$2", [tenantId, hash(input.idempotencyKey)]);
     if (old.rowCount) {
+      if (channel) await assertTelegramTransaction(client, tenantId, old.rows[0].request.action);
       if (old.rows[0].request.quoteHash !== hash(input.quoteToken)) throw new HttpError(409, "This idempotency key belongs to another request.");
       return { order: serializeOrder(old.rows[0]), trackingToken: sign(`track:${tenantId}:${old.rows[0].id}`) };
     }
     const { configuration: s, catalog } = await readExchange(client, tenantId);
     const request = verify(input.quoteToken, tenantId, s, e.plan!.currency);
+    if (channel) await assertTelegramTransaction(client, tenantId, request.action);
     guard(e, request.action);
     const { quote, volume, paymentMethod } = calculateQuote(s, catalog, request);
     await consumeMonthlyUsage(client, tenantId, "crypto_exchange", volume);
@@ -184,7 +188,17 @@ export async function trackOrder(slug: string, id: string, token: string) {
 }
 export function tenantOrder(principal: Principal, tenantId: string, id: string, input?: ExchangeStatusInput) {
   return withDatabase(contextFor(principal, tenantId, !!input, "configuration.manage"), async client => {
-    if (input) { await lockTenant(client, tenantId); requireFeature(await resolveEntitlements(client, tenantId), "crypto_exchange"); }
+    if (input) {
+      // A suspended customer's website/new orders/Admin are blocked. Super Admin
+      // may still reconcile existing Sandbox orders without restoring access.
+      if (principal.role === "super_admin") {
+        const tenant = await client.query("SELECT id FROM tenants WHERE id=$1 FOR UPDATE", [tenantId]);
+        if (!tenant.rowCount) throw new HttpError(404, "Tenant not found.");
+      } else {
+        await lockTenant(client, tenantId);
+        requireFeature(await resolveEntitlements(client, tenantId), "crypto_exchange");
+      }
+    }
     const row = await orderRow(client, tenantId, id, !!input);
     if (input) {
       if (input.expectedStatus !== undefined && input.expectedStatus !== row.status) throw new HttpError(409, "This order changed after review. Refresh its details and review again.");

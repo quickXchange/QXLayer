@@ -1,0 +1,29 @@
+{
+  "name": "@workspace/quickxchange-mini-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "catalog:",
+    "@workspace/amount-format": "workspace:*",
+    "@workspace/api-client-react": "workspace:*",
+    "@workspace/i18n": "workspace:*",
+    "@workspace/payment-logo": "workspace:*",
+    "clsx": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwind-merge": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tsx": "catalog:"
+  },
+  "scripts": {
+    "test": "NODE_OPTIONS='--experimental-loader=./src/test-asset-loader.mjs' tsx --test src/lib/*.test.ts src/components/mini-app-logo.test.ts src/components/exchange-rate-summary.test.ts src/index-css.test.ts"
+  }
+}

@@ -35,11 +35,15 @@ function Side({ label, asset, onPick, value, onValue, readOnly, fiat, fiatCurren
   );
 }
 
-export function ExchangeWidget({ site, caps, presentation = false }: { site: PublicSite; caps: Caps; presentation?: boolean }) {
+export interface RateInfo { mode: 'swap' | 'convert' | null; sourceAsset: string | null; targetAsset: string | null; rate: string | null; loading: boolean; error: boolean }
+
+/** The optional props are used only by the Telegram Mini App; master defaults are unchanged. */
+export function ExchangeWidget({ site, caps, presentation = false, allowedActions, initialAction, onRateInfo }: { site: PublicSite; caps: Caps; presentation?: boolean; allowedActions?: ExchangeTab[]; initialAction?: ExchangeTab; onRateInfo?: (info: RateInfo) => void }) {
   const exchangeQ = useGetPublicExchange(site.tenantSlug, { request: websitePreviewRequest(site.tenantSlug), query: { queryKey: getGetPublicExchangeQueryKey(site.tenantSlug), enabled: !presentation, refetchInterval: 15000 } });
   const config = exchangeQ.data;
   const assets = presentation ? site.assets : config?.assets ?? [];
-  const tabs = presentation || !config ? caps.tabs : config.actions;
+  const allTabs = presentation || !config ? caps.tabs : config.actions;
+  const tabs = allowedActions ? allTabs.filter((t) => allowedActions.includes(t)) : allTabs;
   const previewProof = useMemo(() => !presentation && !!websitePreviewRequest(site.tenantSlug).headers, [presentation, site.tenantSlug]);
   const loadingCfg = !presentation && exchangeQ.isLoading;
   const errorCfg = !presentation && !loadingCfg && exchangeQ.isError;
@@ -78,7 +82,7 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
     if (presentation) return;
     if (!initialized.current && config) {
       initialized.current = true;
-      setTab(config.defaultAction && tabs.includes(config.defaultAction) ? config.defaultAction : tabs[0] ?? 'swap');
+      setTab(initialAction && tabs.includes(initialAction) ? initialAction : config.defaultAction && tabs.includes(config.defaultAction) ? config.defaultAction : tabs[0] ?? 'swap');
       if (assets[0]) setFromKey(assetKey(assets[0]));
       const other = assets.find(a => assetKey(a) !== assetKey(assets[0]));
       if (other) setToKey(assetKey(other));
@@ -87,6 +91,19 @@ export function ExchangeWidget({ site, caps, presentation = false }: { site: Pub
     if (fromKey && !assets.some(a => assetKey(a) === fromKey)) setFromKey(null);
     if (toKey && !assets.some(a => assetKey(a) === toKey)) setToKey(null);
   }, [config, presentation, tab, fromKey, toKey]);
+  useEffect(() => {
+    if (presentation || !initialAction || !tabs.includes(initialAction)) return;
+    setTab((cur) => { if (cur === initialAction) return cur; setTouched(false); setPaymentMethodId(''); reset(); return initialAction; });
+  }, [initialAction]);
+  const rateCb = useRef(onRateInfo);
+  rateCb.current = onRateInfo;
+  useEffect(() => {
+    rateCb.current?.({
+      mode: tab === 'swap' || tab === 'convert' ? tab : null,
+      sourceAsset: from?.symbol ?? null, targetAsset: to?.symbol ?? null,
+      rate: quote?.rate ?? null, loading: quoting, error: !!status && !quote && !quoting,
+    });
+  }, [quote, quoting, status, tab, from, to]);
   useEffect(() => {
     if (presentation) return;
     setQuote(null); setStatus(null); setQuoting(false);

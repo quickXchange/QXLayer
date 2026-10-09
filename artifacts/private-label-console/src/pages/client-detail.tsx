@@ -97,6 +97,7 @@ function ClientDetailInner() {
               <div key={l} className="bg-card p-4"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="mt-1 text-sm capitalize">{v}</p></div>))}
           </div>
           {showFn && <Link href={`/clients/${t.id}/exchange`} className="mb-6 block rounded-md border bg-card p-4 text-sm hover:bg-muted/50" data-testid="link-exchange-panel">Open exchange panel: orders, assets, routes, pricing and settings for this tenant</Link>}
+          {showFn && <Link href={`/clients/${t.id}/integrations`} className="mb-6 block rounded-md border bg-card p-4 text-sm hover:bg-muted/50" data-testid="link-tenant-integrations">Integrations: provider settings, credentials and health for this tenant</Link>}
            {!!t.activationBlockers?.length && <section className="mb-6 space-y-3 rounded-md border border-copper/40 bg-copper/5 p-4" data-testid="panel-activation-blockers">
              <h2 className="font-display text-lg">Finish Exchange setup before activation</h2>
              <ul className="list-disc space-y-1 pl-5 text-sm">{t.activationBlockers.map(message => <li key={message}>{message}</li>)}</ul>

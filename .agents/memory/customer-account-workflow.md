@@ -1,7 +1,13 @@
 ---
 name: QXLayer customer account workflow
-description: Customer identity, navigation and operator-controlled White Label handoff.
+description: Same-account customer access; new approvals deliver the isolated master independently of financial setup.
 ---
+
+For NEW approvals, automatically provision and deliver the isolated NovaX-master website and customer Admin Panel in the existing account. Website/Admin delivery is independent of financial configuration readiness; do not fabricate routes, provider connectivity or custom design work. Existing linked requests retain their lifecycle and settings.
+
+**Why:** The user's expanded integration request explicitly supersedes the earlier manual-delivery boundary for new approvals, while preserving existing customers and the retained review fixture.
+
+**How to apply:** Apply the new approval rule without reprocessing existing linked orders. Keep financial setup validation separate from account access and preserve permanent Owner access.
 
 Customers use their existing QXLayer account and session for both their customer workspace and their delivered Exchange administration. Never create a second tenant/admin login.
 

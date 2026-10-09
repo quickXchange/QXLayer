@@ -20,6 +20,7 @@ import { containsCredential } from "../products/exchange/providers";
 import { HttpError } from "../lib/errors";
 import { visualCatalog, visualFile } from "../products/exchange/visual-assets";
 import { authorizedWebsitePreview } from "../modules/website/operator-preview";
+import { assertMiniAction } from "../modules/integrations/telegram";
 
 const router = Router();
 router.get("/exchange/visual-catalog", (_req, res) => {
@@ -56,12 +57,20 @@ router.use("/public/sites/:slug/exchange", sameOriginMutation, (req, res, next) 
   }
   next();
 });
+router.use("/public/sites/:slug/exchange", async (req, _res, next) => {
+  if (req.get("X-QX-Channel") === "telegram") {
+    const action = req.method === "POST" ? req.body?.action :
+      req.path.startsWith("/orders/") ? "tracking" : undefined;
+    await assertMiniAction(String(req.params.slug), typeof action === "string" ? action : undefined);
+  }
+  next();
+});
 router.get("/public/sites/:slug/exchange", async (req, res) => {
   const { slug } = GetPublicExchangeParams.parse(req.params);
   res.json(GetPublicExchangeResponse.parse(await publicExchange(slug, await authorizedWebsitePreview(req, slug))));
 });
-router.post("/public/sites/:slug/exchange/quotes", guardPublicDemo, async (req, res) => res.json(CreateSandboxQuoteResponse.parse(await sandboxQuote(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxQuoteBody.parse(req.body)))));
-router.post("/public/sites/:slug/exchange/orders", guardPublicDemo, async (req, res) => res.status(201).json(CreateSandboxOrderResponse.parse(await sandboxOrder(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxOrderBody.parse(req.body)))));
+router.post("/public/sites/:slug/exchange/quotes", guardPublicDemo, async (req, res) => res.json(CreateSandboxQuoteResponse.parse(await sandboxQuote(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxQuoteBody.parse(req.body), req.get("X-QX-Channel") === "telegram" ? "telegram" : undefined))));
+router.post("/public/sites/:slug/exchange/orders", guardPublicDemo, async (req, res) => res.status(201).json(CreateSandboxOrderResponse.parse(await sandboxOrder(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxOrderBody.parse(req.body), req.get("X-QX-Channel") === "telegram" ? "telegram" : undefined))));
 router.get("/public/sites/:slug/exchange/orders/:orderId", async (req, res) => {
   const { slug, orderId } = TrackSandboxOrderParams.parse(req.params);
   res.json(TrackSandboxOrderResponse.parse(await trackOrder(slug, orderId, req.get("trackingToken") ?? "")));

@@ -339,6 +339,10 @@ export async function customFetch<T = unknown>(
   // A demo is an explicit per-tab context, never a replacement for the Owner's
   // real Clerk session in other tabs. The server still verifies its signed cookie.
   if (typeof window !== "undefined") {
+    if (/\/[^/]+\/telegram\/?$/.test(window.location.pathname) &&
+      /\/api\/public\/sites\/[^/]+\/exchange(?:\/|$)/.test(resolveUrl(input))) {
+      headers.set("X-QX-Channel", "telegram");
+    }
     try {
       if (window.sessionStorage.getItem("qx-isolated-demo") === "read-only" && resolveUrl(input).startsWith("/api/") &&
         !/^\/api\/(?:public\/|landing\/|diagnostics\/)/.test(resolveUrl(input))) {

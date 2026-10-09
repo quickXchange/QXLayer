@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import Entry from '@/pages/entry';
 import { SiteHome, FeaturePage, LegalPage } from '@/pages/site';
 import NotFound from '@/pages/not-found';
+const TelegramMini = lazy(() => import('@/pages/telegram-mini'));
 import OrderTracking from '@/pages/order-tracking';
 import {
   Route,
@@ -60,6 +61,7 @@ function Router() {
         <Route path="/:slug" component={SiteHome} />
         <Route path="/:slug/privacy">{() => <LegalPage kind="privacy" />}</Route>
         <Route path="/:slug/terms">{() => <LegalPage kind="terms" />}</Route>
+        <Route path="/:slug/telegram">{() => <Suspense fallback={null}><TelegramMini /></Suspense>}</Route>
         <Route path="/:slug/:feature" component={FeaturePage} />
         <Route component={NotFound} />
       </Switch>

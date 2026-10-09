@@ -1,0 +1,94 @@
+.qx-network-badge {
+  box-sizing: border-box;
+  position: relative;
+  display: inline-grid;
+  width: var(--qx-network-badge-size, 18px);
+  height: var(--qx-network-badge-size, 18px);
+  min-width: var(--qx-network-badge-size, 18px);
+  min-height: var(--qx-network-badge-size, 18px);
+  flex: none;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 2px solid hsl(var(--background));
+  border-radius: 50%;
+  background: hsl(var(--background));
+  box-shadow: 0 0 0 1px hsl(var(--foreground) / 0.28);
+  vertical-align: middle;
+}
+
+.qx-network-badge > .qx-network-badge-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 50%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.qx-network-badge > .qx-network-badge-fallback {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  border-radius: 50%;
+  background: hsl(var(--primary) / 0.14);
+  color: hsl(var(--foreground));
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.payment-logo-frame {
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 auto;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  vertical-align: middle;
+}
+
+.payment-logo-frame > .payment-logo-image {
+  box-sizing: border-box;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  flex: 0 0 100%;
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+}
+
+html.dark .payment-logo-frame > .payment-logo-image-low-luminance,
+.dark .payment-logo-frame > .payment-logo-image-low-luminance {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.76));
+}
+
+html.dark .payment-logo-frame-low-luminance,
+.dark .payment-logo-frame-low-luminance {
+  background: #f5f6f8;
+  border-color: rgba(255, 255, 255, 0.88);
+}
+
+html.dark .payment-logo-frame > .payment-logo-image-unknown-luminance,
+.dark .payment-logo-frame > .payment-logo-image-unknown-luminance {
+  filter: drop-shadow(0 0 0.75px rgba(255, 255, 255, 0.38));
+}
+
+.payment-logo-frame > .payment-logo-fallback {
+  display: inline-flex;
+  max-width: 100%;
+  max-height: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: inherit;
+  font: inherit;
+}

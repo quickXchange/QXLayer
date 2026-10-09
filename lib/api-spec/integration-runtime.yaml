@@ -1,0 +1,182 @@
+openapi: 3.1.0
+info: {title: IntegrationRuntime, version: 1.0.0}
+paths:
+  /public/sites/{slug}/telegram/config:
+    get:
+      operationId: getPublicTelegramMiniConfig
+      tags: [website]
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+      responses:
+        '200':
+          description: Tenant-scoped public Mini App branding and enabled menus
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PublicTelegramMiniConfig'}
+  /tenants/{tenantId}/integrations/telegram_bot/webhook:
+    post:
+      operationId: registerTenantTelegramWebhook
+      tags: [platform]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TestTenantIntegrationInput'}
+      responses:
+        '200':
+          description: Actual Bot webhook and Mini App menu registered
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [registered, sandboxOnly]
+                properties:
+                  registered: {type: boolean}
+                  sandboxOnly: {type: boolean}
+  /integrations/runtime:
+    get:
+      operationId: getIntegrationRuntime
+      tags: [platform]
+      responses:
+        '200':
+          description: Super Admin tenant integration overview, no credential values
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/IntegrationRuntimeBundle'}
+  /tenants/{tenantId}/integrations:
+    get:
+      operationId: getTenantIntegrationRuntime
+      tags: [platform]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: Authorized tenant integration configuration
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/IntegrationRuntimeBundle'}
+  /tenants/{tenantId}/integrations/{providerKey}:
+    put:
+      operationId: saveTenantIntegration
+      tags: [platform]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: providerKey, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SaveTenantIntegrationInput'}
+      responses:
+        '200':
+          description: Saved masked configuration; financial execution remains disabled
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TenantIntegrationRuntime'}
+  /tenants/{tenantId}/integrations/{providerKey}/test:
+    post:
+      operationId: testTenantIntegration
+      tags: [platform]
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: providerKey, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TestTenantIntegrationInput'}
+      responses:
+        '200':
+          description: Genuine read-only diagnostic, no transactions created
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TenantIntegrationRuntime'}
+components:
+  schemas:
+    PublicTelegramMiniConfig:
+      type: object
+      required: [enabled, sandboxOnly, tenantSlug, brandName, logoUrl, primaryColor, backgroundColor, menu, botUsername, miniAppPath]
+      properties:
+        enabled: {type: boolean}
+        sandboxOnly: {type: boolean}
+        tenantSlug: {type: string}
+        brandName: {type: string}
+        logoUrl: {type: string}
+        primaryColor: {type: string}
+        backgroundColor: {type: string}
+        menu: {type: array, items: {type: string}}
+        botUsername: {type: string}
+        miniAppPath: {type: string}
+    IntegrationRuntimeBundle:
+      type: object
+      required: [sourceCommit, sandboxOnly, executionEnabled, vaultAvailable, definitions, connections, tenants, assetNetworks]
+      properties:
+        sourceCommit: {type: string}
+        sandboxOnly: {type: boolean}
+        executionEnabled: {type: boolean}
+        vaultAvailable: {type: boolean}
+        definitions:
+          type: array
+          items:
+            type: object
+            required: [key, name, capability, secretFields, manualFallback]
+            properties:
+              key: {type: string}
+              name: {type: string}
+              capability: {type: string}
+              secretFields: {type: array, items: {type: string}}
+              manualFallback: {type: boolean}
+        connections: {type: array, items: {$ref: '#/components/schemas/TenantIntegrationRuntime'}}
+        tenants:
+          type: array
+          items:
+            type: object
+            required: [id, name, slug, status]
+            properties:
+              id: {type: string}
+              name: {type: string}
+              slug: {type: string}
+              status: {type: string}
+        assetNetworks:
+          type: array
+          items:
+            type: object
+            required: [assetId, networkId, symbol, networkName]
+            properties:
+              assetId: {type: string}
+              networkId: {type: string}
+              symbol: {type: string}
+              networkName: {type: string}
+    TenantIntegrationRuntime:
+      type: object
+      required: [id, tenantId, providerKey, environment, credentialManagement, enabled, settings, credentialsConfigured, canManageCredentials, revision, health, updatedAt]
+      properties:
+        id: {type: string}
+        tenantId: {type: string}
+        providerKey: {type: string}
+        environment: {type: string, enum: [sandbox]}
+        credentialManagement: {type: string, enum: [super_admin, customer, both]}
+        enabled: {type: boolean}
+        settings: {type: object, additionalProperties: true}
+        credentialsConfigured: {type: boolean}
+        canManageCredentials: {type: boolean}
+        revision: {type: integer}
+        health: {type: object, additionalProperties: true}
+        updatedAt: {type: string, format: date-time}
+    SaveTenantIntegrationInput:
+      type: object
+      required: [enabled, settings, reason]
+      properties:
+        enabled: {type: boolean}
+        credentialManagement: {type: string, enum: [super_admin, customer, both]}
+        settings: {type: object, additionalProperties: true}
+        secrets: {type: object, writeOnly: true, additionalProperties: {type: string}}
+        clearCredentials: {type: boolean}
+        reason: {type: string, minLength: 2, maxLength: 500}
+    TestTenantIntegrationInput:
+      type: object
+      required: [reason]
+      properties:
+        reason: {type: string, minLength: 2, maxLength: 500}

@@ -20,6 +20,7 @@ export async function resolvePrincipal(userId: string): Promise<Principal> {
       `SELECT m.tenant_id, m.role, m.permissions FROM tenant_memberships m
        WHERE m.clerk_user_id=$1 AND m.active=true
          AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=m.tenant_id AND w.status<>'delivered')
+         AND NOT EXISTS (SELECT 1 FROM tenants t WHERE t.id=m.tenant_id AND t.status='suspended')
        ORDER BY m.created_at`, [userId],
     );
     const mapped = memberships.rows.map((m) => ({ tenantId: m.tenant_id, role: m.role, permissions: m.permissions }));

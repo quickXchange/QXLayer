@@ -38,6 +38,8 @@ const Modules = lazy(() => import('@/pages/modules'));
 const Activity = lazy(() => import('@/pages/activity'));
 const WhiteLabels = lazy(() => import('@/pages/white-labels'));
 const Provisioning = lazy(() => import('@/pages/provisioning'));
+const Integrations = lazy(() => import('@/pages/integrations'));
+const TenantIntegrations = lazy(() => import('@/pages/integrations').then(m => ({ default: m.TenantIntegrations })));
 const Providers = lazy(() => import('@/pages/providers'));
 const CustomerDetail = lazy(() => import('@/pages/customer-detail'));
 const Plans = lazy(() => import('@/pages/plans'));
@@ -189,8 +191,9 @@ function DeliveredOnly({ children }: { children: ReactNode }) {
 }
 const guard = (C: ComponentType) => () => <Protected><SuperOnly><C /></SuperOnly></Protected>;
 const open = (C: ComponentType) => () => <Protected><C /></Protected>;
+const rTenantInt = () => <Protected><DeliveredOnly><TenantIntegrations /></DeliveredOnly></Protected>;
 const rDelivered = () => <Protected><DeliveredOnly><Exchange /></DeliveredOnly></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rProv = guard(Provisioning), rProviders = guard(Providers), rCust = guard(CustomerDetail);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rProv = guard(Provisioning), rProviders = guard(Providers), rInt = guard(Integrations), rCust = guard(CustomerDetail);
 const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile), rOrdD = open(AccountOrderDetail);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -232,11 +235,13 @@ function ClerkProviderWithRoutes() {
               <Route path="/white-labels" component={rWLs} />
               <Route path="/provisioning" component={rProv} />
               <Route path="/providers" component={rProviders} />
+              <Route path="/integrations" component={rInt} />
               <Route path="/customers/:customerId" component={rCust} />
               <Route path="/admin" component={rAdmin} />
               <Route path="/clients" component={rClients} />
               <Route path="/clients/new" component={rNew} />
               <Route path="/clients/:id/exchange/:section?/:orderId?" component={rDelivered} />
+              <Route path="/clients/:id/integrations" component={rTenantInt} />
               <Route path="/clients/:id" component={rDetail} />
               <Route path="/modules" component={rModules} />
               <Route path="/plans" component={rPlans} />

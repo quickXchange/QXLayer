@@ -2202,6 +2202,126 @@ export interface CapabilityStatus {
   message: string;
 }
 
+export interface PublicTelegramMiniConfig {
+  enabled: boolean;
+  sandboxOnly: boolean;
+  tenantSlug: string;
+  brandName: string;
+  logoUrl: string;
+  primaryColor: string;
+  backgroundColor: string;
+  menu: string[];
+  botUsername: string;
+  miniAppPath: string;
+}
+
+export type IntegrationRuntimeBundleDefinitionsItem = {
+  key: string;
+  name: string;
+  capability: string;
+  secretFields: string[];
+  manualFallback: boolean;
+};
+
+export type IntegrationRuntimeBundleTenantsItem = {
+  id: string;
+  name: string;
+  slug: string;
+  status: string;
+};
+
+export type IntegrationRuntimeBundleAssetNetworksItem = {
+  assetId: string;
+  networkId: string;
+  symbol: string;
+  networkName: string;
+};
+
+export type TenantIntegrationRuntimeEnvironment = typeof TenantIntegrationRuntimeEnvironment[keyof typeof TenantIntegrationRuntimeEnvironment];
+
+
+export const TenantIntegrationRuntimeEnvironment = {
+  sandbox: 'sandbox',
+} as const;
+
+export type TenantIntegrationRuntimeCredentialManagement = typeof TenantIntegrationRuntimeCredentialManagement[keyof typeof TenantIntegrationRuntimeCredentialManagement];
+
+
+export const TenantIntegrationRuntimeCredentialManagement = {
+  super_admin: 'super_admin',
+  customer: 'customer',
+  both: 'both',
+} as const;
+
+export type TenantIntegrationRuntimeSettings = { [key: string]: unknown };
+
+export type TenantIntegrationRuntimeHealth = { [key: string]: unknown };
+
+export interface TenantIntegrationRuntime {
+  id: string;
+  tenantId: string;
+  providerKey: string;
+  environment: TenantIntegrationRuntimeEnvironment;
+  credentialManagement: TenantIntegrationRuntimeCredentialManagement;
+  enabled: boolean;
+  settings: TenantIntegrationRuntimeSettings;
+  credentialsConfigured: boolean;
+  canManageCredentials: boolean;
+  revision: number;
+  health: TenantIntegrationRuntimeHealth;
+  updatedAt: string;
+}
+
+export interface IntegrationRuntimeBundle {
+  sourceCommit: string;
+  sandboxOnly: boolean;
+  executionEnabled: boolean;
+  vaultAvailable: boolean;
+  definitions: IntegrationRuntimeBundleDefinitionsItem[];
+  connections: TenantIntegrationRuntime[];
+  tenants: IntegrationRuntimeBundleTenantsItem[];
+  assetNetworks: IntegrationRuntimeBundleAssetNetworksItem[];
+}
+
+export type SaveTenantIntegrationInputCredentialManagement = typeof SaveTenantIntegrationInputCredentialManagement[keyof typeof SaveTenantIntegrationInputCredentialManagement];
+
+
+export const SaveTenantIntegrationInputCredentialManagement = {
+  super_admin: 'super_admin',
+  customer: 'customer',
+  both: 'both',
+} as const;
+
+export type SaveTenantIntegrationInputSettings = { [key: string]: unknown };
+
+export type SaveTenantIntegrationInputSecrets = {[key: string]: string};
+
+export interface SaveTenantIntegrationInput {
+  enabled: boolean;
+  credentialManagement?: SaveTenantIntegrationInputCredentialManagement;
+  settings: SaveTenantIntegrationInputSettings;
+  secrets?: SaveTenantIntegrationInputSecrets;
+  clearCredentials?: boolean;
+  /**
+     * @minLength 2
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export interface TestTenantIntegrationInput {
+  /**
+     * @minLength 2
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type RegisterTenantTelegramWebhook200 = {
+  registered: boolean;
+  sandboxOnly: boolean;
+};
+
 export type ListExchangeAuditParams = {
 /**
  * @minimum 1

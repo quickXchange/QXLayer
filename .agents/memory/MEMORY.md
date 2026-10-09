@@ -29,3 +29,4 @@
 - [Commercial pricing safety](commercial-pricing-safety.md) — undecided prices are not zero; separate real commercial configuration from technical recovery.
 - [Public marketing baseline](public-marketing-baseline.md) — presentation-only recovery can ship with code; it is not Production database or owner-access restoration.
 - [Hostname normalization](hostname-normalization.md) — IDN conversion can discard URL syntax; validate customer input before canonicalizing it.
+- [Integration verification boundaries](integration-verification-boundaries.md) — privileged-role RLS queries are not isolation proof; source-schema references need a bounded allowlist.

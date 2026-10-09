@@ -20,7 +20,9 @@ export function myAdminPanels(p: Principal) {
   return Promise.all(p.memberships.map(m => withDatabase(contextFor(p, m.tenantId), async c => {
     const r = await c.query(`SELECT t.id AS "tenantId",t.name,coalesce(b.brand_name,t.name) AS "brandName",t.slug,t.status
       FROM tenants t LEFT JOIN tenant_branding b ON b.tenant_id=t.id
-      WHERE t.id=$1 AND 'exchange_provisioned'=ANY(t.completed_steps) AND t.status IN ('active','suspended')
+       WHERE t.id=$1 AND ('exchange_provisioned'=ANY(t.completed_steps) OR EXISTS
+         (SELECT 1 FROM white_label_requests ready WHERE ready.tenant_id=t.id AND ready.status='delivered'))
+         AND t.status IN ('active','suspended')
         AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')`, [m.tenantId]);
     return r.rows.map(row => ({ ...row, role: m.role }));
   }))).then(rows => rows.flat());
@@ -28,7 +30,10 @@ export function myAdminPanels(p: Principal) {
 export function assertDeliveredExchangeAccess(p: Principal, tenantId: string) {
   if (p.role === "super_admin") return Promise.resolve();
   return withDatabase(contextFor(p, tenantId), async c => {
-    const r = await c.query(`SELECT id FROM tenants t WHERE id=$1 AND 'exchange_provisioned'=ANY(completed_steps) AND status IN ('active','suspended')
+    const r = await c.query(`SELECT id FROM tenants t WHERE id=$1 AND
+      ('exchange_provisioned'=ANY(completed_steps) OR EXISTS
+        (SELECT 1 FROM white_label_requests ready WHERE ready.tenant_id=t.id AND ready.status='delivered'))
+      AND status IN ('active','suspended')
       AND NOT EXISTS (SELECT 1 FROM white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')`, [tenantId]);
     if (!r.rowCount) throw new HttpError(403, "This Exchange has not been provisioned for your account.");
   });

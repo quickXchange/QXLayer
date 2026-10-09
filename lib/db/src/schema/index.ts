@@ -1,3 +1,5 @@
+export * from "./tenant-integrations";
+export * from "./tenant-telegram";
 export * from "./product-config";
 export * from "./white-label-requests";
 export * from "./landing-products";
