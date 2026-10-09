@@ -1,0 +1,16 @@
+{
+  "columnsToRemove": [],
+  "hasDiff": true,
+  "hasStructuralDataLoss": false,
+  "matViewsToRemove": [],
+  "maybeNonBackwardsCompatible": true,
+  "schemasToRemove": [],
+  "statementsToExecute": [
+    "ALTER TABLE \"white_label_requests\" DROP CONSTRAINT \"white_label_request_delivery\";",
+    "ALTER TABLE \"white_label_requests\" ADD CONSTRAINT \"white_label_request_delivery_requires_tenant\" CHECK ((status <> 'delivered'::text) OR (tenant_id IS NOT NULL));"
+  ],
+  "success": true,
+  "tablesToRemove": [],
+  "tablesToTruncate": [],
+  "warnings": []
+}

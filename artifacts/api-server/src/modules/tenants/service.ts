@@ -62,7 +62,11 @@ export async function getTenant(principal: Principal, tenantId: string) {
 export async function listTenants(principal: Principal) {
   if (principal.role === "super_admin") return withDatabase(contextFor(principal), async (client) => {
     const rows = await client.query("SELECT id FROM tenants ORDER BY created_at DESC");
-    return Promise.all(rows.rows.map((row) => readTenant(client, row.id)));
+    // This transaction owns one pg client. Keep its queries sequential instead
+    // of concurrently reusing that client across multiple tenant readbacks.
+    const tenants = [];
+    for (const row of rows.rows) tenants.push(await readTenant(client, row.id));
+    return tenants;
   });
   if (!principal.memberships.length) throw new HttpError(403, "Administrator access has not been assigned.");
   const tenants = await Promise.all(principal.memberships.map((m) => getTenant(principal, m.tenantId)));

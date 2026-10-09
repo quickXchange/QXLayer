@@ -2,6 +2,7 @@ import type { DatabaseClient } from "@workspace/db";
 import type { EffectiveEntitlements } from "../../modules/entitlements/resolver";
 import { HttpError } from "../../lib/errors";
 import { ACTIONS, readExchange, validateExchange } from "./settings";
+import { networkCapacityBlockers } from "./readiness-limits";
 
 /** Operational readiness only: optional integration metadata never makes an Exchange ready. */
 export async function exchangeActivationBlockers(client: DatabaseClient, tenantId: string, effective: EffectiveEntitlements, legacyEnabled: boolean) {
@@ -47,6 +48,7 @@ export async function exchangeActivationBlockers(client: DatabaseClient, tenantI
   if (!availableNetworks.size) blockers.push("Enable an available Exchange network for an enabled asset.");
   const available = (endpoint: string) => endpoint === `fiat:${settings.fiatCurrency}` || availableNetworks.has(endpoint);
   const usableRoutes = settings.routes.filter(route => route.enabled && settings.actions[route.action] && available(route.source) && available(route.destination));
+  blockers.push(...networkCapacityBlockers(settings.networks, usableRoutes));
   if (!usableRoutes.length) blockers.push("Save an enabled route connecting available Exchange endpoints.");
   const requestedActions = new Set(linked.rows.flatMap(row => Array.isArray(row.actions) ? row.actions as string[] : []));
   for (const action of ACTIONS) {

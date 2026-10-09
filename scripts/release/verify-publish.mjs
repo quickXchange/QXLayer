@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { verifyProvisioningPlan } from "./provisioning-schema-contract.mjs";
 
 const forbidden = /\b(?:db:push|push-force|drizzle-kit|pg_restore|pg_dump|db:seed|catalog:initialize|catalog:upgrade|core:upgrade|access:assign|remove-database-rls)\b/i;
 const artifacts = [
@@ -44,6 +45,12 @@ export function verifyPublish(read) {
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const root = resolve(import.meta.dirname, "../..");
   verifyPublish(path => readFileSync(resolve(root, path), "utf8"));
+  const provisioning = verifyProvisioningPlan(
+    JSON.parse(readFileSync(resolve(root, "reports/provisioning-constraint-investigation/native-publish-review.json"), "utf8")),
+    readFileSync(resolve(root, "lib/db/src/schema/white-label-requests.ts"), "utf8"),
+  );
+  console.log(`PASS: reviewed native provisioning plan (${provisioning}); no SQL executed.`);
+  console.log("This is a source-bound review snapshot, not a fresh Production readback. Review the live Publish plan before applying.");
   console.log("PASS: current-source builds, native routing/health checks, clean output and no database mutation hooks.");
   console.log("Republish deploys code and native schema changes; it does not merge configuration rows.");
   console.log("Keep Development-data copy/overwrite disabled to preserve existing Production records.");

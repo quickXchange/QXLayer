@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "release:check": "node scripts/release/verify-publish.mjs && pnpm run typecheck",
-    "release:test": "node --test scripts/release/verify-publish.test.mjs",
+    "release:test": "node --test scripts/release/verify-publish.test.mjs scripts/release/provisioning-schema-contract.test.mjs && pnpm --filter @workspace/api-server exec tsx --test src/products/exchange/readiness-limits.test.ts src/products/exchange/calculation.test.ts src/products/exchange/public-configuration.test.ts",
     "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
     "build": "pnpm run typecheck && pnpm -r --if-present run build",
     "typecheck:libs": "tsc --build",

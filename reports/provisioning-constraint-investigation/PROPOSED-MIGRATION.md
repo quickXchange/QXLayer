@@ -1,16 +1,20 @@
 # QXLayer provisioning constraint investigation
 
-**Status: correction tested; Production execution BLOCKED. No approval requested.**
+**Status: implemented in Development; exact native Production migration detected.
+Production application requires the user's Publish action.**
 
-No Production writes, Development database changes, Republish, UI changes,
-account changes or live provider connections were performed. Only an isolated
-rehearsal and investigation files were added.
+The corrected schema has been applied in Development using the project's
+`pnpm --filter @workspace/db run push` command. No Production writes, Republish,
+NovaX design changes or live provider connections were performed by the agent.
+Disposable Development identities/records are used for browser verification;
+existing owner/customer records and the retained Asterlane fixture stay protected.
 
 ## Exact incompatibility
 
 Table: `public.white_label_requests`
 
-Constraint: `white_label_request_delivery`
+Legacy Production constraint: `white_label_request_delivery`.
+Corrected constraint: `white_label_request_delivery_requires_tenant`.
 
 Production currently has a validated, non-deferrable CHECK:
 
@@ -49,14 +53,26 @@ needs to be replaced.
   website guards deny pre-delivery access. Private preview remains Super Admin
   only. None of these guards are changed by the proposed CHECK correction.
 
-## Prepared migration specification — NOT an executable Production script
+## Supported migration — prepared for native Publish
 
-The intended schema migration replaces only the named CHECK's predicate,
-retaining its name and validated state. It must use Replit's supported managed
-schema-publishing process, not a custom Production DDL script, startup repair,
-deployment-build hook, credential workaround or bootstrap endpoint.
+The migration replaces only the legacy CHECK with the corrected, validated
+CHECK under a distinct descriptive name. A Development-only rename probe
+proved that the native publishing detector recognizes changed CHECK names but
+does not recognize changed expressions under the same name. The Drizzle source
+now uses the distinct name and the supported Development push has applied it.
 
-Required acceptance conditions before requesting execution approval:
+`publish-plan.json` and `native-publish-review.json` contain the actual native
+publishing diff. It consists of exactly two statements: drop the legacy CHECK
+and add the corrected CHECK. There is no table/column removal, truncation or
+structural data loss. The platform marks it potentially non-backwards-compatible;
+review that warning and allow for a brief migration window.
+
+Production must use Replit's supported managed publishing process, not a custom
+Production DDL script, startup repair, deployment-build hook, credential
+workaround or bootstrap endpoint. Saved statements are evidence, not a separate
+SQL runner. Do not copy or overwrite Development data.
+
+Deployment acceptance conditions:
 
 1. Fresh read-only metadata confirms the exact old definition, or confirms the
    correct definition is already installed and no migration is needed.
@@ -71,10 +87,19 @@ Required acceptance conditions before requesting execution approval:
    verify the owner account/access and test the authorized Live lifecycle
    before declaring the platform fixed.
 
-The isolated rehearsal uses a bounded lock timeout, one transaction, replacement
-plus validation, exact-definition guards, data fingerprints and automatic
-rollback. It is hard-guarded to a disposable private Unix-socket database and
-cannot run against Development or Production.
+The isolated rehearsal now replays the exact native replacement statements
+inside its guarded transaction, with lock timeout, validation, definition
+guards, data fingerprints and automatic rollback. It is hard-guarded to a
+disposable private Unix-socket database and cannot run against Development or
+Production. This validates the SQL and application semantics; it does not
+independently prove the platform publisher's transaction implementation.
+
+The existing read-only release preflight now validates the source-bound native
+review snapshot. It rejects stale source evidence, the old empty-diff mismatch,
+unexpected/duplicate/unvalidated CHECKs, wrong predicate/order, extra SQL and
+destructive native diff fields. It never connects to or mutates a database.
+This snapshot guard is not a live Production readback; the Publish UI's fresh
+plan must still be reviewed at release time.
 
 ## Rollback protection
 
@@ -98,7 +123,7 @@ The frozen global configuration supplied the existing catalog dependencies.
 Column defaults were checked against Production; four numeric/array syntax
 differences were verified semantically equivalent with read-only SELECTs.
 
-**13 checks passed:**
+**15 isolated checks passed:**
 
 1. Original CHECK reproduces failure in the actual approval service and rolls
    back every preparation write.
@@ -120,28 +145,47 @@ differences were verified semantically equivalent with read-only SELECTs.
 12. Already-delivered retry is idempotent.
 13. Custom-design activation does not deliver early; explicit Ready review
     remains required.
+14. Tenant/catalog reads do not issue concurrent queries on one transaction
+    client; customer tenant listings exclude other customers' tenants.
+15. Zero network capacity blocks activation/delivery without changing limits or
+    granting membership. Explicit valid settings allow the normal lifecycle.
 
-API TypeScript check: `pnpm --filter @workspace/api-server exec tsc --noEmit` passed.
+Release guard regression suite: 11 checks passed; Exchange regressions: 11 passed.
+The browser lifecycle and unrelated-customer denials passed in Development.
+Testing found a missing-capacity readiness gap; the application now blocks
+release when a used network's maximum is zero or its source range cannot overlap
+the route. Draft configuration saves remain allowed. Existing client-detail
+blocker messages and the disabled Activate button expose the problem before
+handoff, without arbitrary default limits or visual changes.
+
+After delivery, the public Sandbox website is intentionally accessible.
+That is not Production publishing, live domain activation or real financial
+execution. Draft and undelivered sites—including active custom-design tenants
+awaiting Ready—remain private. Operator previews stay authenticated/read-only.
+
+Full workspace type checking,
+release preflight and console/website builds were checked; final browser results
+and build status are recorded in the implementation report.
 
 Evidence: `verification-results.json`, `production-readback.json`, and
 `artifacts/api-server/src/verification/provisioning-constraint-isolated.ts`.
 These are database/service tests, not real Clerk-session/browser or Live tests.
 The disposable PostgreSQL server was stopped after testing.
 
-## Unresolved execution blocker
+## Exact final Production action
 
-Fresh direct metadata confirms different CHECK semantics in Development and
-Production, but `explainSchemaDiff()` returned:
+Open Publishing and review the fresh schema migration. It must remove
+`white_label_request_delivery` and add
+`white_label_request_delivery_requires_tenant` with
+`status <> 'delivered' OR tenant_id IS NOT NULL`, without other database changes.
+Keep Development-data copy/overwrite OFF. A warning about CHECK replacement is
+expected, not permission to remove tables or records. Click Publish/Republish
+to apply the managed migration and deploy current-source builds.
 
-- `success: true`
-- `hasDiff: false`
-- `statementsToExecute: []`
-
-Therefore **Republish is not currently a verified correction path**. Development's
-predicate is already correct; rewriting it unchanged is not a migration.
-Do not request approval to execute an empty publishing plan or invent a
-standalone Production schema migration. A supported constraint-aware publishing
-reconciliation must be established and reviewed first.
+Stop if the actual plan is empty while the legacy CHECK remains, includes other
+changes, proposes resetting/copying data, or asks to remove tables/columns.
+After Publish, fresh Production metadata and an authorized Live lifecycle test
+are required before declaring the Production workflow verified.
 
 Read-only inspection found one active Production administrator and no orders,
 tenants or memberships at inspection time. This is not permission to reset the

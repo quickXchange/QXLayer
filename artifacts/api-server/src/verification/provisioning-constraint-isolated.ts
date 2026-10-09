@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
+import type { DatabaseClient } from "@workspace/db";
 
 const expectedSocket = "/tmp/qx-provisioning-constraint/socket";
 const url = new URL(process.env.DATABASE_URL ?? "invalid:");
@@ -20,6 +21,7 @@ const { pool } = await import("../../../../lib/db/src/index");
 const orders = await import("../modules/customer/service");
 const tenants = await import("../modules/tenants/service");
 const auth = await import("../modules/authentication/service");
+const catalog = await import("../modules/entitlements/catalog");
 const previews = await import("../modules/website/preview-service");
 const website = await import("../modules/website/service");
 const exchange = await import("../products/exchange/service");
@@ -37,11 +39,21 @@ const ownerId = "isolated-fixture-owner";
 const existingCustomerId = "isolated-existing-customer";
 const oldDefinition = "CHECK (((status = 'delivered'::text) = (tenant_id IS NOT NULL)))";
 const correctedDefinition = "CHECK (((status <> 'delivered'::text) OR (tenant_id IS NOT NULL)))";
+const correctedName = "white_label_request_delivery_requires_tenant";
+const publishPlan = JSON.parse(readFileSync(`${reportDir}/publish-plan.json`, "utf8"));
+assert.equal(publishPlan.success, true);
+assert.equal(publishPlan.hasStructuralDataLoss, false);
+assert.deepEqual(publishPlan.statementsToExecute, [
+  'ALTER TABLE "white_label_requests" DROP CONSTRAINT "white_label_request_delivery";',
+  `ALTER TABLE "white_label_requests" ADD CONSTRAINT "${correctedName}" CHECK ((status <> 'delivered'::text) OR (tenant_id IS NOT NULL));`,
+]);
 const results: { test: string; result: string }[] = [];
 const pass = (test: string) => { results.push({ test, result: "PASS" }); console.log(`PASS: ${test}`); };
 const query = (s: string, values?: unknown[]) => pool.query(s, values);
 async function definition() {
-  return (await query("SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='white_label_requests'::regclass AND conname='white_label_request_delivery'")).rows[0].definition;
+  const rows = (await query("SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='white_label_requests'::regclass AND conname=ANY($1::text[])", [["white_label_request_delivery", correctedName]])).rows;
+  assert.equal(rows.length, 1);
+  return rows[0].definition;
 }
 async function fingerprints() {
   const data: Record<string, string> = {};
@@ -49,7 +61,7 @@ async function fingerprints() {
   return data;
 }
 async function otherConstraints() {
-  return (await query("SELECT conrelid::regclass::text AS table_name,conname,pg_get_constraintdef(oid) AS definition,convalidated FROM pg_constraint WHERE connamespace='public'::regnamespace AND conname<>'white_label_request_delivery' ORDER BY conrelid::regclass::text,conname")).rows;
+  return (await query("SELECT conrelid::regclass::text AS table_name,conname,pg_get_constraintdef(oid) AS definition,convalidated FROM pg_constraint WHERE connamespace='public'::regnamespace AND NOT conname=ANY($1::text[]) ORDER BY conrelid::regclass::text,conname", [["white_label_request_delivery", correctedName]])).rows;
 }
 async function expectFailure(work: () => Promise<unknown>, code: string | number) {
   await assert.rejects(async () => await work(), (e: any) => e.code === code || e.status === code);
@@ -64,11 +76,11 @@ async function correctFixture(options: { failLate?: boolean; oldRequired?: boole
     await c.query("BEGIN");
     await c.query("SET LOCAL lock_timeout='1s'; SET LOCAL statement_timeout='10s'");
     await c.query(`LOCK TABLE ${tableNames.map(quote).join(",")} IN SHARE MODE`);
-    const current = (await c.query("SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='white_label_requests'::regclass AND conname='white_label_request_delivery'")).rows[0]?.definition;
+    const current = (await c.query("SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='white_label_requests'::regclass AND conname=ANY($1::text[])", [["white_label_request_delivery", correctedName]])).rows[0]?.definition;
     if (!options.oldRequired && current === correctedDefinition) { await c.query("COMMIT"); return; }
     assert.equal(current, oldDefinition, "Unexpected constraint: stop rather than changing another rule.");
-    await c.query("ALTER TABLE white_label_requests DROP CONSTRAINT white_label_request_delivery, ADD CONSTRAINT white_label_request_delivery CHECK (status <> 'delivered' OR tenant_id IS NOT NULL) NOT VALID");
-    await c.query("ALTER TABLE white_label_requests VALIDATE CONSTRAINT white_label_request_delivery");
+    for (const statement of publishPlan.statementsToExecute) await c.query(statement);
+    await c.query(`ALTER TABLE white_label_requests VALIDATE CONSTRAINT ${correctedName}`);
     for (const t of tableNames) {
       const digest = (await c.query(`SELECT md5(coalesce(string_agg(md5(to_jsonb(r)::text),',' ORDER BY md5(to_jsonb(r)::text)),'')) AS digest FROM ${quote(t)} r`)).rows[0].digest;
       assert.equal(digest, before[t], `Existing data changed: ${t}`);
@@ -86,7 +98,7 @@ async function guardedFixtureRollback() {
     await c.query("LOCK TABLE white_label_requests IN ACCESS EXCLUSIVE MODE");
     const incompatible = await c.query("SELECT count(*)::int AS n FROM white_label_requests WHERE NOT ((status='delivered') = (tenant_id IS NOT NULL))");
     if (incompatible.rows[0].n) throw new Error("Rollback blocked: preserve pre-delivery tenant links");
-    await c.query("ALTER TABLE white_label_requests DROP CONSTRAINT white_label_request_delivery, ADD CONSTRAINT white_label_request_delivery CHECK ((status='delivered') = (tenant_id IS NOT NULL))");
+    await c.query(`ALTER TABLE white_label_requests DROP CONSTRAINT ${correctedName}, ADD CONSTRAINT white_label_request_delivery CHECK ((status='delivered') = (tenant_id IS NOT NULL))`);
     await c.query("COMMIT");
   } catch (e) { await c.query("ROLLBACK"); throw e; }
   finally { c.release(); }
@@ -120,6 +132,8 @@ try {
   const plan = source.plans.find((p: any) => p.name === "White Label Exchange Sandbox Demo");
   assert(plan);
   const existingTenant = (await query("INSERT INTO tenants (name,slug,status,completed_steps) VALUES ('Preserved fixture Exchange','preserved-fixture','active',ARRAY['exchange_provisioned']) RETURNING id")).rows[0].id;
+  await query("INSERT INTO tenant_branding (tenant_id,brand_name) VALUES ($1,'Preserved fixture Exchange')", [existingTenant]);
+  await query("INSERT INTO tenant_configuration (tenant_id) VALUES ($1)", [existingTenant]);
   await query("INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role,active) VALUES ($1,$2,'client_admin',true)", [existingTenant, existingCustomerId]);
   for (const status of ["new", "delivered"]) await query("INSERT INTO white_label_requests (customer_user_id,idempotency_key,configuration,status,tenant_id) VALUES ($1,$2,$3,$4,$5)", [existingCustomerId, randomUUID(), JSON.stringify({ projectName: "Preserved order", brandName: "Preserved brand", actions: ["swap"], details: "" }), status, status === "delivered" ? existingTenant : null]);
   const owner = await auth.resolvePrincipal(ownerId);
@@ -206,7 +220,17 @@ try {
   assert.equal(pairs.length, 2);
   await tenants.saveAssets(owner, tenantId, pairs.map((p: any) => p.id));
   const config = await exchange.exchangeConfiguration(owner, tenantId);
-  await exchange.exchangeConfiguration(owner, tenantId, { ...masterExchangeDefaults(config.catalog, ["swap"], plan.currency), enabled: true });
+  const readySettings = { ...masterExchangeDefaults(config.catalog, ["swap"], plan.currency), enabled: true };
+  await exchange.exchangeConfiguration(owner, tenantId, {
+    ...readySettings, networks: readySettings.networks.map(network => ({ ...network, minimum: "0", maximum: "0" })),
+  });
+  assert((await tenants.getTenant(owner, tenantId)).activationBlockers.some(message => message.includes("positive maximum")));
+  const incompleteSnapshot = await fingerprints();
+  await expectFailure(() => tenants.activateTenant(owner, tenantId), 400);
+  assert.deepEqual(await fingerprints(), incompleteSnapshot);
+  assert.deepEqual(await orders.myAdminPanels(await auth.resolvePrincipal(customer.userId)), []);
+  pass("Unconfigured zero network capacity blocks activation and delivery without granting access or assigning arbitrary limits");
+  await exchange.exchangeConfiguration(owner, tenantId, readySettings);
   await tenants.activateTenant(owner, tenantId);
   const delivered = (await orders.orderDetail(owner, order.id, true)).order;
   assert.equal(delivered.status, "delivered");
@@ -237,18 +261,53 @@ try {
   await exchange.exchangeConfiguration(owner, customId, { ...masterExchangeDefaults(customConfig.catalog, ["swap"], plan.currency), enabled: true });
   await tenants.activateTenant(owner, customId);
   assert.equal((await orders.orderDetail(owner, custom.id, true)).order.status, "customization");
+  // Active is not sufficient for public access: an undelivered custom order
+  // remains private until the explicit Ready review performs the handoff.
+  await expectFailure(() => website.getPublicSite(`wl-${custom.id}`), 404);
+  await expectFailure(() => tenants.getTenant(deliveredCustomer, customId), 403);
+  assert(!(await orders.myAdminPanels(await auth.resolvePrincipal(customer.userId))).some(panel => panel.tenantId === customId));
   await expectFailure(() => orders.deliverRequest(owner, custom.id, customId), 409);
   const customReady = await orders.reviewRequest(owner, custom.id, { ...customReview, status: "ready" });
   assert.equal(customReady.status, "delivered");
   assert.equal((await auth.resolvePrincipal(ownerId)).role, "super_admin");
   pass("Custom-design activation does not deliver early; explicit Ready review remains required");
+  const originalConnect = pool.connect;
+  // Reject concurrent use of one transaction client, while allowing separate
+  // authorized customer connections to run independently.
+  (pool as any).connect = async () => {
+    const client = await (originalConnect as () => Promise<DatabaseClient>).call(pool);
+    const originalQuery = client.query;
+    const originalRelease = client.release.bind(client);
+    let busy = false;
+    client.query = ((...args: any[]) => {
+      assert.equal(busy, false, "Concurrent query on one transaction client");
+      busy = true;
+      return Promise.resolve((originalQuery as any).apply(client, args)).finally(() => { busy = false; });
+    }) as typeof client.query;
+    client.release = (...args: Parameters<typeof client.release>) => {
+      client.query = originalQuery;
+      originalRelease(...args);
+    };
+    return client;
+  };
+  try {
+    const operatorTenants = await tenants.listTenants(owner);
+    assert.deepEqual(new Set(operatorTenants.map(t => t.id)), new Set([existingTenant, tenantId, customId]));
+    const customerTenants = await tenants.listTenants(await auth.resolvePrincipal(customer.userId));
+    assert.deepEqual(new Set(customerTenants.map(t => t.id)), new Set([tenantId, customId]));
+    assert.deepEqual((await tenants.listTenants(existingCustomer)).map(t => t.id), [existingTenant]);
+    assert.equal((await catalog.listPlans(owner)).length, source.plans.length);
+    assert.equal((await catalog.listAddons(owner)).length, source.addons.length);
+  } finally { pool.connect = originalConnect; }
+  pass("Tenant and catalog listings use each transaction client sequentially and preserve customer isolation");
 
   writeFileSync(`${reportDir}/verification-results.json`, JSON.stringify({
     status: "PASSED_ISOLATED_SERVICE_AND_DATABASE_REHEARSAL",
     database: "PostgreSQL 16, private Unix socket, disposable synthetic database",
     originalConstraint: oldDefinition, proposedConstraint: correctedDefinition,
     productionChanged: false, developmentDatabaseChanged: false, republished: false,
-    realClerkOrBrowserJourneyTested: false, nativePublishCurrentlyDetectsChange: false, tests: results,
+    realClerkOrBrowserJourneyTested: false, nativePublishCurrentlyDetectsChange: true,
+    correctedConstraintName: correctedName, replayedExactNativePublishStatements: true, tests: results,
   }, null, 2) + "\n");
   console.log(`All ${results.length} isolated checks passed.`);
 } finally { await pool.end(); }

@@ -1,0 +1,85 @@
+{
+  "reviewedAt": "2026-10-09T08:57:20.734Z",
+  "scope": "Native CHECK replacement only; review snapshot, no SQL execution",
+  "schemaSha256": "a18af635171c50d578d655780716ec9e26206379f98005f805a3109b01a8801f",
+  "diff": {
+    "columnsToRemove": [],
+    "hasDiff": true,
+    "hasStructuralDataLoss": false,
+    "matViewsToRemove": [],
+    "maybeNonBackwardsCompatible": true,
+    "schemasToRemove": [],
+    "statementsToExecute": [
+      "ALTER TABLE \"white_label_requests\" DROP CONSTRAINT \"white_label_request_delivery\";",
+      "ALTER TABLE \"white_label_requests\" ADD CONSTRAINT \"white_label_request_delivery_requires_tenant\" CHECK ((status <> 'delivered'::text) OR (tenant_id IS NOT NULL));"
+    ],
+    "success": true,
+    "tablesToRemove": [],
+    "tablesToTruncate": [],
+    "warnings": []
+  },
+  "development": [
+    {
+      "name": "white_label_request_delivery_requires_tenant",
+      "validated": true,
+      "definition": "CHECK (((status <> 'delivered'::text) OR (tenant_id IS NOT NULL)))"
+    },
+    {
+      "name": "white_label_request_status",
+      "validated": true,
+      "definition": "CHECK ((status = ANY (ARRAY['new'::text, 'reviewing'::text, 'waiting_for_client'::text, 'quote_ready'::text, 'approved'::text, 'in_setup'::text, 'customization'::text, 'ready'::text, 'delivered'::text, 'rejected'::text, 'cancelled'::text])))"
+    },
+    {
+      "name": "white_label_requests_order_number_unique",
+      "validated": true,
+      "definition": "UNIQUE (order_number)"
+    },
+    {
+      "name": "white_label_requests_pkey",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "white_label_requests_tenant_id_tenants_id_fk",
+      "validated": true,
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)"
+    },
+    {
+      "name": "white_label_requests_tenant_id_unique",
+      "validated": true,
+      "definition": "UNIQUE (tenant_id)"
+    }
+  ],
+  "production": [
+    {
+      "name": "white_label_request_delivery",
+      "validated": true,
+      "definition": "CHECK (((status = 'delivered'::text) = (tenant_id IS NOT NULL)))"
+    },
+    {
+      "name": "white_label_request_status",
+      "validated": true,
+      "definition": "CHECK ((status = ANY (ARRAY['new'::text, 'reviewing'::text, 'waiting_for_client'::text, 'quote_ready'::text, 'approved'::text, 'in_setup'::text, 'customization'::text, 'ready'::text, 'delivered'::text, 'rejected'::text, 'cancelled'::text])))"
+    },
+    {
+      "name": "white_label_requests_order_number_unique",
+      "validated": true,
+      "definition": "UNIQUE (order_number)"
+    },
+    {
+      "name": "white_label_requests_pkey",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "white_label_requests_tenant_id_tenants_id_fk",
+      "validated": true,
+      "definition": "FOREIGN KEY (tenant_id) REFERENCES tenants(id)"
+    },
+    {
+      "name": "white_label_requests_tenant_id_unique",
+      "validated": true,
+      "definition": "UNIQUE (tenant_id)"
+    }
+  ]
+}

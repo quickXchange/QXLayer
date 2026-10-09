@@ -6,16 +6,19 @@ description: Why schema-diff and SQL success envelopes are insufficient proof of
 Check the exact named CHECK definition and validation state independently of
 the publishing schema diff. A reported empty diff does not prove CHECK parity.
 
-**Why:** The managed read-only diff reported no changes while direct constraint
-metadata still showed the old validated delivery equivalence.
+**Why:** The managed read-only diff ignored changed expressions under the same
+CHECK name while direct metadata showed different semantics. A name-only
+Development probe made the native diff emit the required drop/add replacement.
 
 **How to apply:** Compare exact metadata to the intended predicate before
 claiming schema readiness; never add a startup/build migration to compensate.
 An empty native publishing plan can persist even when same-named CHECK
-expressions have different semantics. Do not claim Republish will correct that
-drift or request execution approval until a supported constraint-aware
-migration plan is visible. Managed schema repair must use the supported
-publishing flow, not a standalone Production DDL script or credential workaround.
+expressions have different semantics. For approved semantic changes, use a
+distinct descriptive CHECK name in the schema source, apply through the supported
+Development flow, and verify that the native diff replaces the old rule without
+data-bearing structural changes. Do not claim publishing readiness without that
+readback. Managed schema repair must use the supported publishing flow, not a
+standalone Production DDL script or credential workaround.
 
 Restoring a stricter historical CHECK after a correction may be incompatible
 with newly valid records. Guard reversals and refuse them when they would

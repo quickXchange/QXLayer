@@ -7,7 +7,9 @@
   "developmentDatabaseChanged": false,
   "republished": false,
   "realClerkOrBrowserJourneyTested": false,
-  "nativePublishCurrentlyDetectsChange": false,
+  "nativePublishCurrentlyDetectsChange": true,
+  "correctedConstraintName": "white_label_request_delivery_requires_tenant",
+  "replayedExactNativePublishStatements": true,
   "tests": [
     {
       "test": "Original Production constraint rejects the actual approval service; all preparation and linkage roll back",
@@ -50,6 +52,10 @@
       "result": "PASS"
     },
     {
+      "test": "Unconfigured zero network capacity blocks activation and delivery without granting access or assigning arbitrary limits",
+      "result": "PASS"
+    },
+    {
       "test": "Real setup/activation/delivery services grant only the correct customer access and preserve cross-tenant denial",
       "result": "PASS"
     },
@@ -59,6 +65,10 @@
     },
     {
       "test": "Custom-design activation does not deliver early; explicit Ready review remains required",
+      "result": "PASS"
+    },
+    {
+      "test": "Tenant and catalog listings use each transaction client sequentially and preserve customer isolation",
       "result": "PASS"
     }
   ]

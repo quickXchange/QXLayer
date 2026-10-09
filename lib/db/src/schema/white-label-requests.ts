@@ -22,7 +22,9 @@ export const whiteLabelRequestsTable = pgTable("white_label_requests", {
 }, t => [
   uniqueIndex("white_label_request_idempotency").on(t.customerUserId, t.idempotencyKey),
   check("white_label_request_status", sql`status IN ('new','reviewing','waiting_for_client','quote_ready','approved','in_setup','customization','ready','delivered','rejected','cancelled')`),
-  check("white_label_request_delivery", sql`status <> 'delivered' OR tenant_id IS NOT NULL`),
+  // Publish detects CHECK names, but not changed expressions under the same name.
+  // A distinct name makes the legacy equivalence -> implication replacement explicit.
+  check("white_label_request_delivery_requires_tenant", sql`status <> 'delivered' OR tenant_id IS NOT NULL`),
 ]);
 export const insertWhiteLabelRequestSchema = createInsertSchema(whiteLabelRequestsTable).omit({ id: true, createdAt: true, updatedAt: true });
 export type WhiteLabelRequestRow = typeof whiteLabelRequestsTable.$inferSelect;

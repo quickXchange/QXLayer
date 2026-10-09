@@ -1,0 +1,59 @@
+{
+  "environment": "Development",
+  "verdict": "PASSED_WITH_CONFIGURATION_GAP_FIXED_AND_REGRESSION_TESTED",
+  "realClerkBackedSessions": true,
+  "authenticationByTestingHelper": true,
+  "lifecycleThroughUI": true,
+  "sqlSeededTenantConfigurationDeliveryOrMembership": false,
+  "checks": [
+    "Customer order submission",
+    "Operator review and linked draft preparation",
+    "Manual tenant setup",
+    "Sandbox activation and automatic standard delivery",
+    "Original account Admin Panel after reload",
+    "Customer/unrelated customer private preview denial",
+    "Unrelated customer Admin Panel and protected tenant API denial",
+    "Sandbox quote at explicitly configured rates and network limits; no order submitted"
+  ],
+  "publicAfterDelivery": "Intended public Sandbox projection; no Production publish or live execution",
+  "customReadyAndActivePreDeliveryPrivacy": "Verified by isolated real-service tests, not a second browser lifecycle",
+  "configurationGap": "Network maximum 0 blocked quotes after activation; fixed readiness guard now forbids release with zero used-network capacity and disjoint source-route bounds. Draft saves allowed; no automatic limits.",
+  "followupBrowserReport": "Completed the remaining checks on the existing QA Lifecycle Exchange fixture; I did not repeat the lifecycle, change source files, configure a live provider, or submit an order.\n\n- **Unrelated customer access:** The direct Admin Panel route rendered “Not provisioned — This Exchange admin is not delivered to your account.” The protected tenant API requests also returned 403. The customer did not see Exchange administration data.\n- **Private preview:** The unrelated customer’s `?preview=1` URL showed “This site is unavailable,” with no preview content. Resource 401s appeared in the browser log, consistent with the denied preview request.\n- **Public quote diagnosis:** In the normal, non-preview public site, I explicitly selected ETH on Ethereum Sepolia → USDC on Ethereum Sepolia and entered 1 ETH. The first quote attempt returned `HTTP 400: Amount on ETH is outside this network's minimum/maximum`, even though the widget displayed route limits of 0.01–100. The operator UI showed the ETH and USDC network bindings each had network-level minimum/maximum set to 0. This was not an empty asset selection; the binding limits were missing and prevented the quote.\n- **Resolution and re-test:** In the disposable QA tenant only, I set both network bindings’ minimum to 0.01 and maximum to 100, left their fees at 0 and providers at Manual / sandbox, and saved the settings. A fresh quote then resolved: 1 ETH = 1 USDC, receive amount 1 USDC, source fee 0 ETH, destination fee 0 USDC, and no error. The Create order button became enabled, but I did not click it; no order was placed.\n\nThe quote path works after the tenant network limits are aligned with the displayed route limits. There is a configuration/UI consistency gap worth noting: before correction, the public widget advertised 0.01–100 while the network bindings were 0/0, and did not explain that mismatch beyond the quote error. No code or file changes were made; only the two network-limit settings on this QA tenant were updated.",
+  "screenshots": [
+    {
+      "description": "Fresh unauthenticated browser context at the tenant path without `?preview=1`; the QA Lifecycle Exchange site renders publicly, supporting the access-control failure.",
+      "id": "jtxb4g"
+    },
+    {
+      "description": "Customer-authenticated session at the operator preview URL receives “This site is unavailable,” showing preview access is not inherited by the customer session.",
+      "id": "vmix3s"
+    },
+    {
+      "description": "Operator client-detail view after activation, with Active/Sandbox/Complete status and the “Activated in sandbox” notification.",
+      "id": "woorju"
+    },
+    {
+      "description": "Customer My Orders page after reload, showing order WL-000117 as Delivered.",
+      "id": "fnyspm"
+    },
+    {
+      "description": "Customer Admin Panel dashboard after delivery, showing the exchange enabled and the configured tenant metrics.",
+      "id": "wec5tt"
+    },
+    {
+      "description": "Unrelated customer direct Admin Panel route showing the Not provisioned denial state and no Exchange admin data.",
+      "id": "igcofa"
+    },
+    {
+      "description": "Unrelated customer’s private-preview URL showing the unavailable page with no tenant preview content.",
+      "id": "8kxiw8"
+    },
+    {
+      "description": "Final normal public widget state showing the resolved 1 ETH to 1 USDC quote, 0 source and destination fees, and enabled sandbox-order CTA; no order was submitted.",
+      "id": "ejv4au"
+    }
+  ],
+  "novaX": "No website/console/design source changed; shared Master regression passes. Dedicated browser NovaX comparison not reported by tester.",
+  "productionLiveLifecycleVerified": false,
+  "cleanupComplete": true
+}

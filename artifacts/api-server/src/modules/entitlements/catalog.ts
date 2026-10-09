@@ -69,7 +69,9 @@ export function listPlans(principal: Principal) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal), async (client) => {
     const ids = await client.query("SELECT id FROM plans ORDER BY display_order,name,id");
-    return Promise.all(ids.rows.map((r) => readPlan(client, r.id)));
+    const plans = [];
+    for (const row of ids.rows) plans.push(await readPlan(client, row.id));
+    return plans;
   });
 }
 export function getPlan(principal: Principal, id: string) {
@@ -80,7 +82,9 @@ export function listAddons(principal: Principal) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal), async (client) => {
     const ids = await client.query("SELECT id FROM addons ORDER BY name,id");
-    return Promise.all(ids.rows.map((r) => readAddon(client, r.id)));
+    const addons = [];
+    for (const row of ids.rows) addons.push(await readAddon(client, row.id));
+    return addons;
   });
 }
 async function writePlan(client: DatabaseClient, input: PlanInput, id?: string) {
