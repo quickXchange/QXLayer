@@ -1,5 +1,11 @@
 # QXLayer: Supabase / Vercel migration and deployment plan
 
+> **CANCELLED — historical reference only.**
+> The user cancelled Supabase, Vercel and Render migration plans.
+> Keep QXLayer entirely on Replit with its existing Production PostgreSQL.
+> Do not execute this plan or its generated SQL. Preparation commands below
+> are historical and have been removed. No external cutover occurred.
+
 ## 1. Decision and execution boundary
 
 The user authorizes preparing an external Supabase PostgreSQL migration, Vercel

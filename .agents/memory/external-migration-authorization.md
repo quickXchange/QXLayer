@@ -1,24 +1,17 @@
 ---
-name: External migration authorization
-description: Approved QXLayer target architecture and required pre-cutover approval sequence.
+name: Replit-first delivery direction
+description: External migration cancelled; finish QXLayer on Replit without weakening security or losing Production data.
 ---
 
-The user authorizes preparing QXLayer for an external PostgreSQL database using
-Supabase. The target architecture is Vercel frontend hosting, Supabase PostgreSQL,
-and a compatible backend hosting solution for APIs and background workers.
+The user cancelled Supabase, Vercel and Render migration plans for now and said:
+"Do not spend more time preparing external hosting migrations. I want to finish
+QXLayer on Replit first."
 
-First complete and validate the migration/deployment plan and show the exact
-Supabase setup and required connection details before Production database cutover.
-Preserve existing customer accounts, Super Admin access, tenant records and
-configurations. Keep the existing Replit Production database available as fallback
-until the new environment is verified.
+**Why:** The user explicitly reversed the earlier external migration approval.
 
-**Why:** The user explicitly selected an external database after the managed
-native migration omitted security predicates and grants.
-
-**How to apply:** Preparation is authorized, not immediate cutover or DNS changes.
-External target migration scripts are appropriate only for the verified Supabase
-target; the Replit source remains unchanged and its managed schema rules still
-apply. Treat authentication identities and uploaded objects as separate migration
-acceptance requirements, not something a PostgreSQL copy automatically preserves.
-Render is only a recommendation until the user confirms the backend provider.
+**How to apply:** The current delivery requirements are recorded in replit.md.
+Do not revive the external plan without a new explicit request. Historical
+external SQL/report artifacts are not approved execution instructions. Keep
+managed Production schema changes in Replit's native Publish flow; a security
+blocker does not authorize a custom Production migration hook or silent removal
+of database-enforced isolation.

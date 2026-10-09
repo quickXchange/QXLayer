@@ -2,6 +2,19 @@
 
 An independent multi-tenant administration and provisioning foundation, not a live exchange or payment gateway.
 
+## Current delivery requirements
+
+- Keep QXLayer hosted entirely on Replit with the existing Production PostgreSQL.
+- Supabase, Vercel and Render migration plans are cancelled for now. Do not spend
+  more time preparing external hosting migrations.
+- Finish the existing White Label platform's integration, provisioning, tenant
+  management and security work, prepare native publishing, then verify Live.
+- Preserve all Production data, customer accounts, permanent Super Admin access
+  and the approved website design. Do not reset or overwrite Production.
+- Resolve the RLS blocker only through a safe managed-PostgreSQL-compatible
+  approach. Do not silently weaken database isolation, bypass release checks or
+  add Production DDL to scripts, build commands or application startup.
+
 ## Run & Operate
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
@@ -63,7 +76,9 @@ responsive behavior, sandbox boundaries and measured verification results.
 
 - Do NOT connect to, modify, migrate, or depend on the existing QuickXchange project at this stage. This platform is independent; QuickXchange must remain untouched.
 - Build the foundation only. Do not build all crypto products at once.
-- Do not publish to production, connect real wallets/providers, accept real deposits, or request real provider secrets in this stage.
+- Native publishing preparation and subsequent Live verification are now requested;
+  the user performs Publish. Financial execution stays Sandbox: do not connect
+  real wallets, accept real deposits or introduce unrelated live product engines.
 - Current product scope is defined in `.agents/memory/exchange-only-scope.md`. The reusable core remains the foundation; do not automatically start another crypto product.
 
 ## Gotchas

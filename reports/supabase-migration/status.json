@@ -1,0 +1,8 @@
+{
+  "status": "CANCELLED_BY_USER",
+  "executionAuthorized": false,
+  "cutoverOccurred": false,
+  "currentHosting": "Replit",
+  "currentDatabase": "Existing Replit Production PostgreSQL",
+  "instruction": "Historical external migration artifacts must not be executed. Finish QXLayer on Replit first."
+}
