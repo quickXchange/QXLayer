@@ -12,7 +12,8 @@ An independent multi-tenant administration and provisioning foundation, not a li
 - Preserve all Production data, customer accounts, permanent Super Admin access
   and the approved website design. Do not reset or overwrite Production.
 - Resolve the RLS blocker only through a safe managed-PostgreSQL-compatible
-  approach. Do not silently weaken database isolation, bypass release checks or
+  approach. Database-enforced RLS is required; application-only isolation was
+  explicitly rejected. Do not weaken database isolation, bypass release checks or
   add Production DDL to scripts, build commands or application startup.
 
 ## Run & Operate

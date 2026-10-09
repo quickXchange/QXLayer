@@ -1,0 +1,17 @@
+{
+  "status": "PUBLISH_BLOCKED",
+  "developmentReference": "METADATA_VALIDATED; not a new execution of CRUD/browser tests",
+  "tables": 42,
+  "policies": 84,
+  "existingProductionTablesCovered": 40,
+  "nativeStatements": 134,
+  "nativeMissingUsing": 84,
+  "nativeMissingWriteChecks": 42,
+  "nativeGrantStatements": 0,
+  "nativeForceStatements": 0,
+  "noStructuralDataLossFlag": true,
+  "productionSchemaChanged": false,
+  "migrationPreparedOrExecuted": false,
+  "published": false,
+  "liveWorkflowVerified": false
+}

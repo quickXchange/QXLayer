@@ -1,0 +1,424 @@
+{
+  "capturedAt": "2026-10-09T19:49:14.811Z",
+  "environment": "production",
+  "scope": "Read-only metadata; Production replica, not a primary write or migration.",
+  "metadata": {
+    "database": "neondb",
+    "version": "16.15 (9355089)",
+    "tables": [
+      {
+        "name": "addon_entitlements",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "addons",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "api_keys",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "asset_catalog",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "asset_network_catalog",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "audit_events",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "blockchain_provider_configs",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "customer_notification_reads",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "entitlement_definitions",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "exchange_orders",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "landing_products",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "module_catalog",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "network_catalog",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "notification_events",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "payment_invoices",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "plan_entitlements",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "plans",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "platform_admins",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "pricing_rules",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "provider_assignments",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "provider_catalog",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "provider_policies",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_addons",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_asset_networks",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_branding",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_configuration",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_domains",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_entitlement_overrides",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_memberships",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_modules",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_payment_methods",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_product_configuration",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_subscriptions",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenant_usage_counters",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "tenants",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "wallet_configurations",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "webhook_endpoints",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "white_label_attachments",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "white_label_events",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      },
+      {
+        "name": "white_label_requests",
+        "owner": "neondb_owner",
+        "rls": false,
+        "force": false,
+        "select": false,
+        "insert": false,
+        "update": false,
+        "delete": false
+      }
+    ],
+    "policies": [],
+    "role": {
+      "name": "pg_database_owner",
+      "superuser": false,
+      "bypass": false
+    },
+    "sequences": [
+      {
+        "name": "white_label_requests_order_number_seq",
+        "usage": false,
+        "select": false
+      }
+    ]
+  }
+}

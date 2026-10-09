@@ -686,3 +686,17 @@ mtime_ms = 1791571585189
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/55e50171-f8c6-4f3d-a716-f9753b5c9253/7f28b0de-938f-4fef-b871-c1077fc0683e"
 storage_version_token = "1791571585762947"
 content_type = "text/html"
+
+[[outputs]]
+id = "pNTI_d0Y2kZ3hZPGRmOjz"
+uri = "file://generated-artifacts/replit-rls-release-evidence.html"
+type = "html"
+title = "QXLayer — Replit RLS release evidence"
+description = "Verified existing policy/grant metadata, missing native migration fields and required platform correction. Not an executable Production migration; release remains held."
+logical_id = "ef3a6037-b61d-4709-81e4-b687d4df1aad"
+content_hash = "sha256:cb22d5daf06b5cb6a195f3d00afc97acedd73ae545d4c40b3228fb7f384bb883"
+size = 85159
+mtime_ms = 1791575827305
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ef3a6037-b61d-4709-81e4-b687d4df1aad/0eb68a11-ffd8-49e1-a7a2-baaf8dc41bc4"
+storage_version_token = "1791575827962307"
+content_type = "text/html"
