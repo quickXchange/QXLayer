@@ -5,6 +5,8 @@ import { HttpError } from "../../lib/errors";
 export const settingsSchema = z.object({
   manualFallback: z.boolean().optional(),
   healthMonitoring: z.boolean().optional(),
+  customerActivation: z.boolean().optional(),
+  quoteActions: z.array(z.enum(["swap", "convert"])).max(2).optional(),
   adapterKind: z.enum(["evm", "tron", "solana", "bitcoin"]).optional(),
   chainId: z.string().max(100).optional(),
   confirmationsRequired: z.number().int().min(1).max(10000).optional(),

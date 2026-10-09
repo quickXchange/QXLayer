@@ -117,6 +117,14 @@ components:
         sandboxOnly: {type: boolean}
         executionEnabled: {type: boolean}
         vaultAvailable: {type: boolean}
+        databaseRuntime:
+          type: object
+          description: "Super Admin only; measured on the actual API transaction connection. Not a claim that database isolation has passed."
+          required: [role, superuser, bypassesRls]
+          properties:
+            role: {type: string}
+            superuser: {type: boolean}
+            bypassesRls: {type: boolean}
         definitions:
           type: array
           items:

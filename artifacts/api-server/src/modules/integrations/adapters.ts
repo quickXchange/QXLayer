@@ -18,7 +18,7 @@ export async function testProvider(key: string, settings: Record<string, any>, s
     url.searchParams.set("pairs", "EUR/USD,USD/EUR"); url.searchParams.set("api_key", secrets.apiKey);
     const quotes = await read(url.toString());
     if (!Array.isArray(quotes) || !quotes.some(q => Number(q.price ?? q.p) > 0 && /EUR|USD/.test(String(q.symbol ?? q.s)))) throw new HttpError(502, "1Forge returned no valid reference rates.");
-    return { state: "connected", message: "Reference-rate API verified. Sandbox quote arithmetic is unchanged." };
+    return { state: "connected", message: "Reference-rate API verified. Authorized Sandbox pricing may use read-only rates; financial execution remains disabled." };
   }
   if (key === "whitebit") {
     if (!secrets.apiKey || !secrets.secretKey || !nonce) throw new HttpError(409, "WhiteBIT key and secret are required.");
@@ -30,7 +30,9 @@ export async function testProvider(key: string, settings: Record<string, any>, s
     const value = await read("https://whitebit.com" + path, { method: "POST", body, headers: {
       "Content-Type": "application/json", "X-TXC-APIKEY": secrets.apiKey, "X-TXC-PAYLOAD": payload, "X-TXC-SIGNATURE": signature,
     } });
-    if (!value || typeof value !== "object" || Array.isArray(value)) throw new HttpError(502, "WhiteBIT returned an invalid diagnostic response.");
+    if (!value || typeof value !== "object" || Array.isArray(value) ||
+      ["error", "message", "code", "errors"].some(k => k in value))
+      throw new HttpError(502, "WhiteBIT returned an invalid diagnostic response.");
     return { state: "connected", message: "Signed balance API verified. No address, deposit, trade or withdrawal created." };
   }
   if (key === "quickex") {
@@ -40,6 +42,7 @@ export async function testProvider(key: string, settings: Record<string, any>, s
   }
   if (key === "rpc" || key === "alchemy") {
     if (!secrets.rpcUrl || !settings.adapterKind || !settings.networkCode) throw new HttpError(409, "RPC URL, network code and adapter kind are required.");
+    if (settings.adapterKind === "evm" && !settings.chainId) throw new HttpError(409, "Configure the expected EVM chain ID before verifying this network.");
     safeProviderEndpoint(secrets.rpcUrl);
     const adapter = createBlockchainMonitorAdapter({
       endpoint: secrets.rpcUrl, apiKey: secrets.apiKey, networkCode: settings.networkCode,

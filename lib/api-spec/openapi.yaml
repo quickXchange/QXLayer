@@ -1687,6 +1687,7 @@ components:
         maximum: {type: string}
         spreadBps: {type: integer}
         sandboxOnly: {type: boolean, const: true}
+        pricingSource: {type: string, description: "Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution."}
     ExchangeOrderInput:
       type: object
       required: [quoteToken, idempotencyKey]
@@ -1716,6 +1717,7 @@ components:
       properties:
         id: {type: string, format: uuid}
         status: {type: string}
+        pricingSource: {type: string, description: "Immutable pricing source retained from the signed Sandbox quote."}
         action: {$ref: "#/components/schemas/ExchangeAction"}
         source: {type: string}
         destination: {type: string}

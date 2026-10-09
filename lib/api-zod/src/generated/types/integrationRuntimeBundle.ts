@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { IntegrationRuntimeBundleAssetNetworksItem } from './integrationRuntimeBundleAssetNetworksItem';
+import type { IntegrationRuntimeBundleDatabaseRuntime } from './integrationRuntimeBundleDatabaseRuntime';
 import type { IntegrationRuntimeBundleDefinitionsItem } from './integrationRuntimeBundleDefinitionsItem';
 import type { IntegrationRuntimeBundleTenantsItem } from './integrationRuntimeBundleTenantsItem';
 import type { TenantIntegrationRuntime } from './tenantIntegrationRuntime';
@@ -15,6 +16,8 @@ export interface IntegrationRuntimeBundle {
   sandboxOnly: boolean;
   executionEnabled: boolean;
   vaultAvailable: boolean;
+  /** Super Admin only; measured on the actual API transaction connection. Not a claim that database isolation has passed. */
+  databaseRuntime?: IntegrationRuntimeBundleDatabaseRuntime;
   definitions: IntegrationRuntimeBundleDefinitionsItem[];
   connections: TenantIntegrationRuntime[];
   tenants: IntegrationRuntimeBundleTenantsItem[];

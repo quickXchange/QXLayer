@@ -70,10 +70,22 @@ if (process.argv.includes("--cleanup")) {
     assert.ok((await miniLanguages(ta.slug, "en") as any).translations);
     const route = fixture.base.routes.find(r => r.action === "swap")!;
     const input = { action: "swap" as const, source: route.source, destination: route.destination, amount: "1" };
+    const assignmentRows = await pool.query(`SELECT ac.asset_id AS "assetId",ac.network_id AS "networkId"
+      FROM tenant_asset_networks t JOIN asset_network_catalog ac ON ac.id=t.asset_network_id WHERE t.tenant_id=$1`, [ta.id]);
+    const pricingSettings = { manualFallback: true, customerActivation: true, quoteActions: ["swap"], assignments: assignmentRows.rows };
+    await saveIntegration(op, ta.id, "1forge", { ...body, enabled: false, credentialManagement: "both", settings: pricingSettings });
+    await saveIntegration(a, ta.id, "1forge", { ...body, credentialManagement: "both", settings: pricingSettings });
+    await denied(() => saveIntegration(a, ta.id, "1forge", { ...body, settings: { ...pricingSettings, quoteActions: ["convert"] } }), 403);
     const quote = await sandboxQuote(ta.slug, input, "telegram");
-    const orderInput = { quoteToken: quote.token, idempotencyKey: randomUUID() };
+    assert.equal(quote.pricingSource, "1forge:manual_fallback");
+    await saveIntegration(op, ta.id, "1forge", { ...body, credentialManagement: "both", settings: pricingSettings });
+    await denied(() => sandboxOrder(ta.slug, { quoteToken: quote.token, idempotencyKey: randomUUID() }, "telegram"), 409);
+    const refreshed = await sandboxQuote(ta.slug, input, "telegram");
+    const orderInput = { quoteToken: refreshed.token, idempotencyKey: randomUUID() };
     const order = await sandboxOrder(ta.slug, orderInput, "telegram");
     assert.equal((await sandboxOrder(ta.slug, orderInput, "telegram")).order.id, order.order.id);
+    assert.equal(order.order.pricingSource, "1forge:manual_fallback");
+    checked("customer activation only when authorized, Super Admin action assignments, disclosed fallback and immutable revision-bound provider pricing");
     assert.equal((await trackOrder(ta.slug, order.order.id, order.trackingToken)).id, order.order.id);
     await denied(() => trackOrder(tb.slug, order.order.id, order.trackingToken), 404);
     await saveIntegration(op, ta.id, "telegram_mini_app", { ...mini, settings: { ...mini.settings, menu: ["tracking"] } });
@@ -111,6 +123,10 @@ if (process.argv.includes("--cleanup")) {
     assert.equal((await tenantOrder(op, ta.id, order.order.id, { status: "processing", expectedStatus: "pending", note: "Safe operator handling during suspension" })).status, "processing");
     checked("suspension blocks website/new orders/customer Admin while Super Admin handles existing Sandbox orders");
     await pool.query("UPDATE tenants SET status='active' WHERE id=$1", [ta.id]);
+    assert.ok((await resolvePrincipal(a.userId)).memberships.some(m => m.tenantId === ta.id));
+    await publicMiniConfig(ta.slug);
+    await sandboxQuote(ta.slug, input, "telegram");
+    checked("reactivation restores original tenant membership, branding and safe Sandbox pricing");
     await writeFile(path, JSON.stringify(manifest, null, 2));
     if (!process.argv.includes("--keep")) await cleanup(manifest);
     else console.log("Disposable fixture manifest retained for the one browser verification pass.");

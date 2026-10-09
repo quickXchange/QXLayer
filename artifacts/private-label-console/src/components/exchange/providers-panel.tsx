@@ -31,7 +31,7 @@ export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolea
   return (
     <Section n="X7" title="Providers / Integrations" note="Provider catalog supplied by the platform. This section stores a label, a public HTTPS endpoint and an enabled flag only." footer={<DraftFooter d={d} locked={locked} />}>
       <SimNote />
-      <p className="rounded-md border p-3 text-xs text-muted-foreground" data-testid="text-provider-notice">No API credentials are accepted until a secure real adapter exists. Enabling a provider here is metadata only: it does not connect, quote, or execute anything. Every quote remains manual and sandbox.</p>
+      <p className="rounded-md border p-3 text-xs text-muted-foreground" data-testid="text-provider-notice">Enabling a preference here is metadata only and does not authorize connectivity. Manage independent credentials, connection tests and Super Admin pricing assignments in Integrations. Verified read-only adapters may supply indicative Sandbox prices; orders never move funds or execute trades.</p>
       <FilterBar noun="providers" search={q} onSearch={setQ} placeholder="Search provider or capability" shown={cat.length} total={all.length} onReset={resetF} active={q !== '' || ty !== 'all' || stf !== 'all'}>
         <div className="w-44"><Pick testid="select-provider-type" value={ty} onChange={setTy} options={[['all', 'Any type'], ...types.map((t) => [t, t.replace(/_/g, ' ')] as [string, string])]} /></div>
         <div className="w-48"><Pick testid="select-provider-state" value={stf} onChange={setStf} options={[['all', 'Any state'], ...Object.entries(STATUS)]} /></div>
@@ -60,7 +60,7 @@ export function ProvidersPanel({ d, locked }: { d: ExchangeDraft; locked: boolea
           <Field label="Public endpoint (HTTPS, no secrets)"><Input data-testid="input-provider-endpoint" placeholder="https://" value={f.c.endpoint ?? ''} onChange={(e) => set({ c: { ...f.c, endpoint: e.target.value } })} /></Field>
           <Field label="API key"><Input disabled placeholder="Not accepted" /></Field>
           <Field label="API secret"><Input disabled placeholder="Not accepted" /></Field>
-          <p className="text-xs text-muted-foreground">No credentials accepted until a secure real adapter exists. There is no connection test because no real integration is implemented for this provider.</p>
+          <p className="text-xs text-muted-foreground">This preference does not store credentials or test connections. Implemented providers are managed through the tenant's protected Integrations workspace; unsupported catalog entries remain configuration only.</p>
         </>)}
       </EditDrawer>
       {confirmNode}

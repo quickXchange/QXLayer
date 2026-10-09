@@ -11,6 +11,8 @@ import type { ExchangeOrderEvent } from './exchangeOrderEvent';
 export interface ExchangeOrder {
   id: string;
   status: string;
+  /** Immutable pricing source retained from the signed Sandbox quote. */
+  pricingSource?: string;
   action: ExchangeAction;
   source: string;
   destination: string;

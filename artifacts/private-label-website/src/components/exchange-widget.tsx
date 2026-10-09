@@ -225,6 +225,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
       {(
         <dl className="s-ratebox mt-4 divide-y rounded-[var(--s-r2)] border px-4 py-2.5" style={{ borderColor: 'var(--s-line)' }} data-testid="panel-rate">
           {rate('rate', 'Rate')}{rate('min', 'Minimum')}{rate('max', 'Maximum')}{rate('fee', 'Source fees')}
+          {quote?.pricingSource && <p className="s-muted py-2 text-xs" data-testid="text-pricing-source">Sandbox pricing source: {quote.pricingSource.replace(':manual_fallback', ' — manual fallback')}</p>}
           {!presentation && quote?.destinationFee && <div className="flex justify-between gap-3 py-1.5 text-xs"><dt>Destination fees</dt><dd className="s-muted">{quote.destinationFee} {quote.destinationSymbol}</dd></div>}
           <p className="s-muted pt-2 text-xs">{presentation ? `${NOQ} Nothing here is an estimate.` : 'Sandbox rates only. Fees include applicable service, network and payment-method charges. Destination fees are included in the output. No real funds or execution.'}</p>
           {!presentation && !inactive && amount && !quote && !quoting && <button type="button" className="s-link mt-2 text-xs" onClick={() => setRefreshQuote(n => n + 1)} data-testid="button-refresh-quote">Request fresh sandbox quote</button>}
@@ -238,6 +239,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
       </div>
       {created && <div className="s-ratebox mt-4 rounded-[var(--s-r2)] border p-4 text-xs" style={{ borderColor: 'var(--s-line)' }} data-testid="panel-sandbox-order">
         <p className="font-semibold">Sandbox order · {created.order.action}</p><p className="s-muted mt-1 break-all">{created.order.id}</p>
+        {created.order.pricingSource && <p className="s-muted mt-2">Sandbox pricing source: {created.order.pricingSource.replace(':manual_fallback', ' — manual fallback')}</p>}
         <p className="mt-2">{created.order.inputAmount} {created.order.sourceSymbol} → {created.order.outputAmount} {created.order.destinationSymbol}</p><p className="mt-2 capitalize" data-testid="text-order-status">Status: {created.order.status}</p>
         <button type="button" className="s-btn mt-3" data-testid="button-refresh-order" onClick={async () => { try { const order = await trackSandboxOrder(site.tenantSlug, created.order.id, { headers: { trackingToken: created.trackingToken } }); setCreated({ ...created, order }); } catch (e) { setStatus((e as Error).message); } }}>Refresh tracking</button>
         <a className="s-link ml-3" href={`${import.meta.env.BASE_URL}${site.tenantSlug}/orders/${created.order.id}#${created.trackingToken}`} data-testid="link-track-order">Track order</a>

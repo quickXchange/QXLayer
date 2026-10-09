@@ -50,6 +50,11 @@ export const GetIntegrationRuntimeResponse = zod.object({
   "sandboxOnly": zod.boolean(),
   "executionEnabled": zod.boolean(),
   "vaultAvailable": zod.boolean(),
+  "databaseRuntime": zod.object({
+  "role": zod.string(),
+  "superuser": zod.boolean(),
+  "bypassesRls": zod.boolean()
+}).optional().describe('Super Admin only; measured on the actual API transaction connection. Not a claim that database isolation has passed.'),
   "definitions": zod.array(zod.object({
   "key": zod.string(),
   "name": zod.string(),
@@ -95,6 +100,11 @@ export const GetTenantIntegrationRuntimeResponse = zod.object({
   "sandboxOnly": zod.boolean(),
   "executionEnabled": zod.boolean(),
   "vaultAvailable": zod.boolean(),
+  "databaseRuntime": zod.object({
+  "role": zod.string(),
+  "superuser": zod.boolean(),
+  "bypassesRls": zod.boolean()
+}).optional().describe('Super Admin only; measured on the actual API transaction connection. Not a claim that database isolation has passed.'),
   "definitions": zod.array(zod.object({
   "key": zod.string(),
   "name": zod.string(),
@@ -3565,6 +3575,7 @@ export const ListExchangeOrdersResponse = zod.object({
   "orders": zod.array(zod.object({
   "id": zod.string().uuid(),
   "status": zod.string(),
+  "pricingSource": zod.string().optional().describe('Immutable pricing source retained from the signed Sandbox quote.'),
   "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
   "source": zod.string(),
   "destination": zod.string(),
@@ -3603,6 +3614,7 @@ export const GetExchangeOrderParams = zod.object({
 export const GetExchangeOrderResponse = zod.object({
   "id": zod.string().uuid(),
   "status": zod.string(),
+  "pricingSource": zod.string().optional().describe('Immutable pricing source retained from the signed Sandbox quote.'),
   "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
   "source": zod.string(),
   "destination": zod.string(),
@@ -3647,6 +3659,7 @@ export const UpdateExchangeOrderStatusBody = zod.object({
 export const UpdateExchangeOrderStatusResponse = zod.object({
   "id": zod.string().uuid(),
   "status": zod.string(),
+  "pricingSource": zod.string().optional().describe('Immutable pricing source retained from the signed Sandbox quote.'),
   "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
   "source": zod.string(),
   "destination": zod.string(),
@@ -3697,6 +3710,7 @@ export const GetExchangeDashboardResponse = zod.object({
   "recentOrders": zod.array(zod.object({
   "id": zod.string().uuid(),
   "status": zod.string(),
+  "pricingSource": zod.string().optional().describe('Immutable pricing source retained from the signed Sandbox quote.'),
   "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
   "source": zod.string(),
   "destination": zod.string(),
@@ -3861,7 +3875,8 @@ export const CreateSandboxQuoteResponse = zod.object({
   "minimum": zod.string(),
   "maximum": zod.string(),
   "spreadBps": zod.number().int(),
-  "sandboxOnly": zod.literal(true)
+  "sandboxOnly": zod.literal(true),
+  "pricingSource": zod.string().optional().describe('Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution.')
 })
 
 
@@ -3883,6 +3898,7 @@ export const CreateSandboxOrderResponse = zod.object({
   "order": zod.object({
   "id": zod.string().uuid(),
   "status": zod.string(),
+  "pricingSource": zod.string().optional().describe('Immutable pricing source retained from the signed Sandbox quote.'),
   "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
   "source": zod.string(),
   "destination": zod.string(),
@@ -3928,6 +3944,7 @@ export const TrackSandboxOrderHeader = zod.object({
 export const TrackSandboxOrderResponse = zod.object({
   "id": zod.string().uuid(),
   "status": zod.string(),
+  "pricingSource": zod.string().optional().describe('Immutable pricing source retained from the signed Sandbox quote.'),
   "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
   "source": zod.string(),
   "destination": zod.string(),

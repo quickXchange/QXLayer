@@ -25,4 +25,6 @@ export interface ExchangeQuote {
   maximum: string;
   spreadBps: number;
   sandboxOnly: true;
+  /** Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution. */
+  pricingSource?: string;
 }

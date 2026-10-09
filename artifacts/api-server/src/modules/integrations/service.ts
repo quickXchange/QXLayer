@@ -28,6 +28,8 @@ export async function accessible(p: Principal, tenantId: string, write = false) 
 export async function integrationBundle(p: Principal, tenantId?: string) {
   const ctx = tenantId ? await accessible(p, tenantId) : (requireSuperAdmin(p), contextFor(p));
   return withDatabase(ctx, async c => {
+    const runtime = p.role === "super_admin" ? (await c.query(`SELECT current_user AS role,
+      rolsuper AS superuser,(rolsuper OR rolbypassrls) AS "bypassesRls" FROM pg_roles WHERE rolname=current_user`)).rows[0] : undefined;
     const r = await c.query(`SELECT * FROM tenant_integrations ${tenantId ? "WHERE tenant_id=$1" : ""} ORDER BY tenant_id,provider_key`, tenantId ? [tenantId] : []);
     const tenants = await c.query(`SELECT id,name,slug,status FROM tenants ${tenantId ? "WHERE id=$1" : ""} ORDER BY name`, tenantId ? [tenantId] : []);
     const assetNetworks = tenantId ? await c.query(`SELECT ac.asset_id AS "assetId",ac.network_id AS "networkId",a.symbol,n.name AS "networkName"
@@ -39,7 +41,7 @@ export async function integrationBundle(p: Principal, tenantId?: string) {
         ...d, secretFields: connections.find(r => r.providerKey === d.key)?.canManageCredentials ? d.secretFields : [],
       }));
     return { sourceCommit: SOURCE_COMMIT, sandboxOnly: true, executionEnabled: false, vaultAvailable: vaultAvailable(),
-      definitions: visibleDefinitions, connections, tenants: tenants.rows, assetNetworks: assetNetworks.rows };
+      definitions: visibleDefinitions, connections, tenants: tenants.rows, assetNetworks: assetNetworks.rows, databaseRuntime: runtime };
   });
 }
 export async function saveIntegration(p: Principal, tenantId: string, key: string, input: unknown) {
@@ -50,7 +52,10 @@ export async function saveIntegration(p: Principal, tenantId: string, key: strin
   if (body.secrets?.rpcUrl) safeProviderEndpoint(body.secrets.rpcUrl);
   for (const u of [body.settings.webhookUrl, body.settings.miniAppUrl]) if (u) {
     const parsed = new URL(u);
-    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) throw new HttpError(400, "Use a public HTTPS channel URL without credentials or query parameters.");
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash ||
+      parsed.port && parsed.port !== "443" || !parsed.hostname.includes(".") || /^\d+\.\d+\.\d+\.\d+$/.test(parsed.hostname) ||
+      parsed.hostname.startsWith("[") || /(?:^|\.)(?:localhost|local|internal|test|invalid|example)$/.test(parsed.hostname))
+      throw new HttpError(400, "Use a public HTTPS domain on port 443 without credentials, IP literals or query parameters.");
   }
   return withDatabase(ctx, async c => {
     await c.query("SELECT id FROM tenants WHERE id=$1 FOR UPDATE", [tenantId]);
@@ -58,7 +63,22 @@ export async function saveIntegration(p: Principal, tenantId: string, key: strin
     const old = prior.rows[0];
     if (!old && p.role !== "super_admin") throw new HttpError(403, "Super Admin must first authorize this tenant integration.");
     const mode = body.credentialManagement ?? old?.credential_management ?? "super_admin";
-    if (p.role !== "super_admin" && (mode !== old.credential_management || body.enabled !== old.enabled)) throw new HttpError(403, "Only Super Admin can change management policy or activate modules.");
+    if (p.role !== "super_admin" && (mode !== old.credential_management ||
+      (body.enabled !== old.enabled && !old.settings.customerActivation) ||
+      (body.settings.customerActivation === true) !== (old.settings.customerActivation === true) ||
+      JSON.stringify(body.settings.quoteActions ?? []) !== JSON.stringify(old.settings.quoteActions ?? []) ||
+      JSON.stringify(body.settings.assignments ?? []) !== JSON.stringify(old.settings.assignments ?? [])))
+      throw new HttpError(403, "Only Super Admin can change authorization, assignments or credential policy. Customer activation requires explicit permission.");
+    if ((body.settings.quoteActions?.length ?? 0) && !["1forge", "whitebit", "quickex"].includes(key))
+      throw new HttpError(400, "This integration is not a pricing provider.");
+    if (key === "quickex" && body.settings.quoteActions?.includes("swap"))
+      throw new HttpError(400, "Quickex pricing is assigned to Convert only.");
+    if (body.settings.quoteActions?.length) {
+      const overlap = await c.query(`SELECT provider_key FROM tenant_integrations WHERE tenant_id=$1 AND provider_key<>$2
+        AND EXISTS(SELECT 1 FROM jsonb_array_elements_text(coalesce(settings->'quoteActions','[]'::jsonb)) action
+          WHERE action=ANY($3::text[]))`, [tenantId, key, body.settings.quoteActions]);
+      if (overlap.rowCount) throw new HttpError(409, "Remove this action's previous pricing assignment before assigning another provider.");
+    }
     const role = p.role === "super_admin" ? p.role : p.memberships.find(m => m.tenantId === tenantId)?.role;
     if ((body.secrets || body.clearCredentials) && !mayManageSecrets(role ?? "", mode)) throw new HttpError(403, "Credential management is not permitted for your tenant role.");
     for (const a of body.settings.assignments ?? []) {

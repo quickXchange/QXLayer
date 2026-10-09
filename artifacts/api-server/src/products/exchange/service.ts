@@ -13,6 +13,7 @@ import { calculateQuote } from "./calculation";
 import { publicExchangeConfiguration } from "./public-configuration";
 import { statusesForOrderView } from "./order-views";
 import { assertTelegramTransaction } from "../../modules/integrations/channel";
+import { applyPricing, sandboxPricing, assertPricingSnapshot, type PricingSnapshot } from "./provider-pricing";
 
 const hash = (v: string) => createHash("sha256").update(v).digest("hex");
 function sign(v: string) {
@@ -24,9 +25,9 @@ function equal(a: string, b: string) {
   const x = Buffer.from(a), y = Buffer.from(b);
   return x.length === y.length && timingSafeEqual(x, y);
 }
-function issue(tenantId: string, input: ExchangeQuoteInput, s: ExchangeSettings, planCurrency: string) {
+function issue(tenantId: string, input: ExchangeQuoteInput, s: ExchangeSettings, planCurrency: string, pricing?: PricingSnapshot) {
   const expiresAt = new Date(Date.now() + 90000).toISOString();
-  const body = Buffer.from(JSON.stringify({ tenantId, input, settingsHash: hash(JSON.stringify(s)), planCurrency, expiresAt })).toString("base64url");
+  const body = Buffer.from(JSON.stringify({ tenantId, input, settingsHash: hash(JSON.stringify(s)), planCurrency, expiresAt, pricing })).toString("base64url");
   return { token: `${body}.${sign(body)}`, expiresAt };
 }
 function verify(token: string, tenantId: string, settings: ExchangeSettings, planCurrency: string) {
@@ -38,7 +39,7 @@ function verify(token: string, tenantId: string, settings: ExchangeSettings, pla
   if (value.planCurrency !== planCurrency) throw new HttpError(409, "Plan currency changed. Request a fresh sandbox quote.");
   if (!Number.isFinite(Date.parse(value.expiresAt)) || Date.parse(value.expiresAt) <= Date.now()) throw new HttpError(409, "Quote expired. Request a fresh quote.");
   if (value.settingsHash !== hash(JSON.stringify(settings))) throw new HttpError(409, "Exchange configuration changed. Request a fresh quote.");
-  return CreateSandboxQuoteBody.parse(value.input);
+  return { ...CreateSandboxQuoteBody.parse(value.input), pricing: value.pricing as PricingSnapshot | undefined };
 }
 function guard(e: EffectiveEntitlements, action?: string, readOnlyPreview = false) {
   if (e.tenantStatus !== "active" && !(readOnlyPreview && e.tenantStatus === "draft")) throw new HttpError(404, "Exchange website is not active.");
@@ -127,14 +128,17 @@ export async function sandboxQuote(slug: string, input: ExchangeQuoteInput, chan
     const e = await operationalExchange(client, tenantId, input.action);
     if (channel) await assertTelegramTransaction(client, tenantId, input.action);
     const { configuration: s, catalog } = await readExchange(client, tenantId);
-    const { quote, volume } = calculateQuote(s, catalog, input);
+    const pricing = await sandboxPricing(client, tenantId, input, s, catalog);
+    const { quote, volume } = calculateQuote(applyPricing(s, pricing), catalog, input);
     quoteAdmission(e, volume);
-    return { ...quote, ...issue(tenantId, input, s, e.plan!.currency) };
+    return { ...quote, pricingSource: pricing ? (pricing.manualFallback ? `${pricing.providerKey}:manual_fallback` : pricing.providerKey) : "manual",
+      ...issue(tenantId, input, s, e.plan!.currency, pricing) };
   });
 }
 type StoredRequest = ReturnType<typeof calculateQuote>["quote"] & {
   product: "crypto_exchange"; quoteHash: string; idempotencyHash: string;
   paymentMethod: string | null; paymentMethodId?: string | null; volume: string; history: { status: string; at: string; note: string }[];
+  pricingSource?: string;
 };
 interface OrderRow { id: string; status: string; request: StoredRequest; created_at: Date }
 function serializeOrder(row: OrderRow): ExchangeOrder {
@@ -144,7 +148,7 @@ function serializeOrder(row: OrderRow): ExchangeOrder {
     outputAmount: r.outputAmount, rate: r.rate, fee: r.fee, destinationFee: r.destinationFee ?? "0", spreadBps: r.spreadBps,
     paymentMethod: r.paymentMethod, paymentMethodId: r.paymentMethodId ?? null, createdAt: row.created_at,
     updatedAt: new Date(r.history.at(-1)?.at ?? row.created_at), customerName: null, customerEmail: null,
-    history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true };
+    history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true, pricingSource: r.pricingSource ?? "manual" };
 }
 async function orderRow(client: DatabaseClient, tenantId: string, id: string, lock = false) {
   const r = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE tenant_id=$1 AND id=$2 AND request->>'product'='crypto_exchange'${lock ? " FOR UPDATE" : ""}`, [tenantId, id]);
@@ -164,12 +168,14 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
     }
     const { configuration: s, catalog } = await readExchange(client, tenantId);
     const request = verify(input.quoteToken, tenantId, s, e.plan!.currency);
+    await assertPricingSnapshot(client, tenantId, request.pricing, request.action);
     if (channel) await assertTelegramTransaction(client, tenantId, request.action);
     guard(e, request.action);
-    const { quote, volume, paymentMethod } = calculateQuote(s, catalog, request);
+    const { quote, volume, paymentMethod } = calculateQuote(applyPricing(s, request.pricing), catalog, request);
     await consumeMonthlyUsage(client, tenantId, "crypto_exchange", volume);
     const id = randomUUID();
     const stored: StoredRequest = { ...quote, product: "crypto_exchange", paymentMethod, paymentMethodId: request.paymentMethodId ?? null, volume,
+      pricingSource: request.pricing ? (request.pricing.manualFallback ? `${request.pricing.providerKey}:manual_fallback` : request.pricing.providerKey) : "manual",
       quoteHash: hash(input.quoteToken), idempotencyHash: hash(input.idempotencyKey),
       history: [{ status: "pending", at: new Date().toISOString(), note: "Sandbox order created. No funds, wallets, deposit addresses or payments exist." }] };
     const result = await client.query<OrderRow>("INSERT INTO exchange_orders (id,tenant_id,pricing_rule_id,status,request) VALUES ($1,$2,$3,'pending',$4) RETURNING id,status,request,created_at", [id, tenantId, quote.routeId, JSON.stringify(stored)]);

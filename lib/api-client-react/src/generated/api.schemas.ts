@@ -1116,6 +1116,8 @@ export interface ExchangeQuote {
   maximum: string;
   spreadBps: number;
   sandboxOnly: true;
+  /** Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution. */
+  pricingSource?: string;
 }
 
 export interface ExchangeOrderInput {
@@ -1169,6 +1171,8 @@ export interface ExchangeOrderEvent {
 export interface ExchangeOrder {
   id: string;
   status: string;
+  /** Immutable pricing source retained from the signed Sandbox quote. */
+  pricingSource?: string;
   action: ExchangeAction;
   source: string;
   destination: string;
@@ -2215,6 +2219,15 @@ export interface PublicTelegramMiniConfig {
   miniAppPath: string;
 }
 
+/**
+ * Super Admin only; measured on the actual API transaction connection. Not a claim that database isolation has passed.
+ */
+export type IntegrationRuntimeBundleDatabaseRuntime = {
+  role: string;
+  superuser: boolean;
+  bypassesRls: boolean;
+};
+
 export type IntegrationRuntimeBundleDefinitionsItem = {
   key: string;
   name: string;
@@ -2277,6 +2290,8 @@ export interface IntegrationRuntimeBundle {
   sandboxOnly: boolean;
   executionEnabled: boolean;
   vaultAvailable: boolean;
+  /** Super Admin only; measured on the actual API transaction connection. Not a claim that database isolation has passed. */
+  databaseRuntime?: IntegrationRuntimeBundleDatabaseRuntime;
   definitions: IntegrationRuntimeBundleDefinitionsItem[];
   connections: TenantIntegrationRuntime[];
   tenants: IntegrationRuntimeBundleTenantsItem[];

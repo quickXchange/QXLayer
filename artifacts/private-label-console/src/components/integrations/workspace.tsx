@@ -23,6 +23,7 @@ const when = (v: unknown) => { const d = typeof v === 'string' ? new Date(v) : n
 
 interface Form {
   enabled: boolean; mgmt: string; manualFallback: boolean; healthMonitoring: boolean; assignments: string[];
+  customerActivation: boolean; quoteActions: string[];
   adapterKind: string; networkCode: string; chainId: string; confirmationsRequired: string;
   botUsername: string; webhookUrl: string; miniAppUrl: string; logoUrl: string; primaryColor: string; backgroundColor: string; menu: string[];
 }
@@ -31,6 +32,7 @@ function fromConn(c?: TenantIntegrationRuntime): Form {
   const a = Array.isArray(s.assignments) ? (s.assignments as { assetId?: string; networkId?: string }[]).map((x) => `${x.assetId}|${x.networkId}`) : [];
   return {
     enabled: c?.enabled ?? false, mgmt: c?.credentialManagement ?? 'super_admin', manualFallback: s.manualFallback === true, healthMonitoring: s.healthMonitoring === true, assignments: a,
+    customerActivation: s.customerActivation === true, quoteActions: Array.isArray(s.quoteActions) ? s.quoteActions as string[] : [],
     adapterKind: str(s.adapterKind), networkCode: str(s.networkCode), chainId: str(s.chainId), confirmationsRequired: str(s.confirmationsRequired),
     botUsername: str(s.botUsername), webhookUrl: str(s.webhookUrl), miniAppUrl: str(s.miniAppUrl), logoUrl: str(s.logoUrl),
     primaryColor: str(s.primaryColor), backgroundColor: str(s.backgroundColor), menu: Array.isArray(s.menu) ? (s.menu as string[]) : [],
@@ -88,11 +90,13 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
     const s: Record<string, unknown> = {};
     if (def.manualFallback) s.manualFallback = f.manualFallback;
     s.healthMonitoring = f.healthMonitoring;
+    s.customerActivation = f.customerActivation;
+    if (['1forge', 'whitebit', 'quickex'].includes(k)) s.quoteActions = f.quoteActions;
     s.assignments = f.assignments.map((a) => { const [assetId, networkId] = a.split('|'); return { assetId, networkId }; });
     if (!telegram) {
       if (f.adapterKind) s.adapterKind = f.adapterKind;
       if (f.networkCode.trim()) s.networkCode = f.networkCode.trim();
-      if (f.chainId.trim() && !isNaN(Number(f.chainId))) s.chainId = Number(f.chainId);
+      if (f.chainId.trim()) s.chainId = f.chainId.trim();
       if (f.confirmationsRequired.trim() && !isNaN(Number(f.confirmationsRequired))) s.confirmationsRequired = Number(f.confirmationsRequired);
     } else {
       for (const key of ['botUsername', 'webhookUrl', 'miniAppUrl', 'logoUrl', 'primaryColor', 'backgroundColor'] as const) if (f[key].trim()) s[key] = f[key].trim();
@@ -153,6 +157,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
       <dl className="mt-3 grid gap-2 rounded border bg-muted/30 p-3 text-sm sm:grid-cols-3" data-testid={`health-${k}`}>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Last checked</dt><dd>{when(health.checkedAt)}</dd></div>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Latency</dt><dd>{typeof health.latencyMs === 'number' ? `${health.latencyMs} ms` : 'Not measured'}</dd></div>
+        {['alchemy', 'rpc'].includes(k) && <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Observed network head</dt><dd>{str(health.head) || 'Not observed'}{health.chainId != null && <span className="block text-xs">Chain {str(health.chainId)}</span>}</dd></div>}
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Message</dt><dd className="[overflow-wrap:anywhere]" data-testid={`text-health-message-${k}`}>{hMessage || 'None recorded'}{hCode && <span className="block font-mono text-xs text-muted-foreground" data-testid={`text-health-code-${k}`}>{hCode}</span>}</dd></div>
         {hState === 'ready' && <p className="text-xs text-muted-foreground sm:col-span-3" data-testid={`note-ready-${k}`}>Configuration ready means the settings are complete. It is not an external connection.</p>}
       </dl>
@@ -172,9 +177,26 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
           </div>
         ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? `Enablement and credential policy are set by QXLayer (${conn.credentialManagement.replace('_', ' ')}).` : 'Not authorized yet. QXLayer must authorize this integration first.'}</p>}
 
+        {isSuper && <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
+          <span>Allow customer to activate this authorized integration</span>
+          <Switch checked={f.customerActivation} onCheckedChange={v => upd({ customerActivation: v })} data-testid={`switch-customer-activation-${k}`} />
+        </label>}
+        {!isSuper && conn && f.customerActivation && <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
+          <span>Activate authorized integration</span>
+          <Switch checked={f.enabled} onCheckedChange={v => upd({ enabled: v })} data-testid={`switch-customer-enabled-${k}`} />
+        </label>}
+        {['1forge', 'whitebit', 'quickex'].includes(k) && <div className="rounded border p-3 text-sm">
+          <p className="font-medium">Sandbox pricing assignment</p>
+          <p className="text-xs text-muted-foreground">Read-only rates; no trades, deposits or withdrawals. Select only one provider per action and assign both route asset/networks below.</p>
+          <div className="mt-2 flex gap-4">{(k === 'quickex' ? ['convert'] : ['swap', 'convert']).map(action => <label key={action} className="flex items-center gap-2">
+            <input type="checkbox" disabled={!isSuper} checked={f.quoteActions.includes(action)}
+              onChange={e => upd({ quoteActions: e.target.checked ? [...f.quoteActions, action] : f.quoteActions.filter(a => a !== action) })}
+              data-testid={`pricing-${k}-${action}`} />{action}
+          </label>)}</div>
+        </div>}
         {def.manualFallback && (
           <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
-            <span><span className="block font-medium">Manual fallback</span><span className="text-xs text-muted-foreground">Operators handle requests by hand when the provider is unavailable.</span></span>
+            <span><span className="block font-medium">Manual fallback</span><span className="text-xs text-muted-foreground">Use the configured manual Sandbox rate when read-only provider pricing fails. Quotes explicitly disclose the fallback.</span></span>
             <Switch checked={f.manualFallback} onCheckedChange={(v) => upd({ manualFallback: v })} data-testid={`switch-fallback-${k}`} aria-label="Manual fallback" />
           </label>
         )}
@@ -222,7 +244,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
             <div role="group" aria-label="Assignments" className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
               {mine.map((a) => { const v = `${a.assetId}|${a.networkId}`; return (
                 <label key={v} className="flex items-center gap-2 rounded border px-3 py-1.5 text-sm">
-                  <input type="checkbox" checked={f.assignments.includes(v)} onChange={() => upd({ assignments: toggle(f.assignments, v) })} data-testid={`check-assign-${k}-${a.assetId}-${a.networkId}`} />
+                  <input type="checkbox" disabled={!isSuper} checked={f.assignments.includes(v)} onChange={() => upd({ assignments: toggle(f.assignments, v) })} data-testid={`check-assign-${k}-${a.assetId}-${a.networkId}`} />
                   <span>{a.symbol} on {a.networkName}</span></label>); })}
             </div>)}
         </div>
@@ -285,6 +307,11 @@ export function IntegrationsWorkspace({ tenantId }: { tenantId: string }) {
           {dirtyKeys.current.size > 0 && <span className="text-xs text-muted-foreground" data-testid="text-unsaved">Unsaved edits are kept during refresh.</span>}
         </div>
       </Panel>
+      {isSuper && b.databaseRuntime && <div className="rounded border border-amber-500/30 bg-amber-500/5 p-3 text-sm" data-testid="notice-database-runtime">
+        Actual API database role: <strong>{b.databaseRuntime.role}</strong>. {b.databaseRuntime.bypassesRls
+          ? 'This role bypasses RLS. Application tenant checks remain active, but database-level isolation is not enforced.'
+          : 'This role does not bypass RLS. Policy and cross-tenant isolation tests are still required before claiming database enforcement.'}
+      </div>}
       {b.definitions.length === 0 && <p className="text-sm text-muted-foreground">No integration definitions are available.</p>}
       {b.definitions.map((d) => (
         <ProviderCard key={`${tenantId}:${d.key}`} tenantId={tenantId} def={d} bundle={b} isSuper={isSuper} readOnly={!!p.demo} canConfigure={canConfigure}

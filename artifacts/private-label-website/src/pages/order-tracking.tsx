@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { trackSandboxOrder } from '@workspace/api-client-react';
@@ -8,6 +8,12 @@ export default function OrderTracking() {
   const { slug = '', orderId = '' } = useParams<{ slug: string; orderId: string }>();
   const [token, setToken] = useState(() => window.location.hash.slice(1));
   const [entry, setEntry] = useState(token);
+  useEffect(() => {
+    const sync = () => { const next = window.location.hash.slice(1); setToken(next); setEntry(next); };
+    sync();
+    window.addEventListener('hashchange', sync);
+    return () => window.removeEventListener('hashchange', sync);
+  }, [slug, orderId]);
   const malformedToken = token.length > 0 && token.length < 32;
   const q = useQuery({
     queryKey: ['sandbox-order-tracking', slug, orderId, token],
@@ -26,10 +32,11 @@ export default function OrderTracking() {
       </form>}
       {q.isLoading && token && <p className="s-muted mt-6">Loading order…</p>}
       {(q.isError || malformedToken) && <p role="alert" className="mt-6 text-sm">Order not available. Check your private tracking link and the client website.</p>}
-      {q.data && <div className="mt-6 space-y-4" data-testid="page-order-tracking">
+      {q.data && !q.isError && !malformedToken && token.length >= 32 && <div className="mt-6 space-y-4" data-testid="page-order-tracking">
         <p className="font-semibold capitalize" data-testid="text-tracking-status">{q.data.action} · {q.data.status}</p>
         <p>{q.data.inputAmount} {q.data.sourceSymbol} → {q.data.outputAmount} {q.data.destinationSymbol}</p>
         <p className="s-muted text-sm">Rate: {q.data.rate} · source fee: {q.data.fee} {q.data.sourceSymbol} · markup: {q.data.spreadBps / 100}%</p>
+        {q.data.pricingSource && <p className="s-muted text-sm">Sandbox pricing source: {q.data.pricingSource.replace(':manual_fallback', ' — manual fallback')}</p>}
         {q.data.destinationFee && <p className="s-muted text-sm">Destination fees: {q.data.destinationFee} {q.data.destinationSymbol} (network and/or payment-method charges, included in output)</p>}
         {q.data.paymentMethod && <p className="s-muted text-sm">Configured method: {q.data.paymentMethod} (not charged)</p>}
         <ol className="space-y-3 border-t pt-4" style={{ borderColor: 'var(--s-line)' }}>{q.data.history.map((event, i) => <li key={i} className="text-sm"><p className="capitalize">{event.status} · {new Date(event.at).toLocaleString()}</p><p className="s-muted mt-1">{event.note}</p></li>)}</ol>

@@ -83,6 +83,7 @@ export * from './getDomainHostingProof200';
 export * from './healthStatus';
 export * from './integrationRuntimeBundle';
 export * from './integrationRuntimeBundleAssetNetworksItem';
+export * from './integrationRuntimeBundleDatabaseRuntime';
 export * from './integrationRuntimeBundleDefinitionsItem';
 export * from './integrationRuntimeBundleTenantsItem';
 export * from './landingProduct';
