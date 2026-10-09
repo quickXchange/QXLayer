@@ -672,3 +672,17 @@ mtime_ms = 1791553230569
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/21ef30e1-924c-4d3e-a17f-a6ab443e3027/911dc388-764d-426b-a619-5d012717e238"
 storage_version_token = "1791553231117886"
 content_type = "text/html"
+
+[[outputs]]
+id = "Go7Pp1LE6cDFPmb1HuFqb"
+uri = "file://generated-artifacts/supabase/qxlayer-migration-plan.html"
+type = "html"
+title = "QXLayer — Supabase migration & deployment plan"
+description = "Exact setup and connection checklist, prepared SQL scope, Vercel/Render deployment design, identity/file preservation, validation gates and rollback limits. Production remains unchanged."
+logical_id = "55e50171-f8c6-4f3d-a716-f9753b5c9253"
+content_hash = "sha256:cd69ff1d2e2d80c0b6b8446cea5f8452020faf96e9a5a7c698c3a2c5a8c928d3"
+size = 29317
+mtime_ms = 1791571585189
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/55e50171-f8c6-4f3d-a716-f9753b5c9253/7f28b0de-938f-4fef-b871-c1077fc0683e"
+storage_version_token = "1791571585762947"
+content_type = "text/html"

@@ -1,0 +1,698 @@
+{
+  "scope": "External Supabase ONLY; generation is not target execution or migration acceptance.",
+  "sourceTables": [
+    "addon_entitlements",
+    "addons",
+    "api_keys",
+    "asset_catalog",
+    "asset_network_catalog",
+    "audit_events",
+    "blockchain_provider_configs",
+    "customer_notification_reads",
+    "entitlement_definitions",
+    "exchange_orders",
+    "landing_products",
+    "module_catalog",
+    "network_catalog",
+    "notification_events",
+    "payment_invoices",
+    "plan_entitlements",
+    "plans",
+    "platform_admins",
+    "pricing_rules",
+    "provider_assignments",
+    "provider_catalog",
+    "provider_policies",
+    "tenant_addons",
+    "tenant_asset_networks",
+    "tenant_branding",
+    "tenant_configuration",
+    "tenant_domains",
+    "tenant_entitlement_overrides",
+    "tenant_memberships",
+    "tenant_modules",
+    "tenant_payment_methods",
+    "tenant_product_configuration",
+    "tenant_subscriptions",
+    "tenant_usage_counters",
+    "tenants",
+    "wallet_configurations",
+    "webhook_endpoints",
+    "white_label_attachments",
+    "white_label_events",
+    "white_label_requests"
+  ],
+  "targetTables": [
+    {
+      "name": "addon_entitlements",
+      "columns": [
+        "addon_id",
+        "key",
+        "value"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "addons",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "enabled",
+        "monthly_price",
+        "yearly_price",
+        "setup_fee",
+        "currency",
+        "pricing_configured",
+        "pricing_confirmed",
+        "discount_percent"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "api_keys",
+      "columns": [
+        "id",
+        "tenant_id",
+        "label",
+        "key_hash",
+        "scopes",
+        "environment",
+        "revoked_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "asset_catalog",
+      "columns": [
+        "id",
+        "symbol",
+        "name"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "asset_network_catalog",
+      "columns": [
+        "id",
+        "asset_id",
+        "network_id"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "audit_events",
+      "columns": [
+        "id",
+        "tenant_id",
+        "actor_id",
+        "event_type",
+        "description",
+        "metadata",
+        "created_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "blockchain_provider_configs",
+      "columns": [
+        "id",
+        "tenant_id",
+        "network_id",
+        "adapter",
+        "priority",
+        "environment"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "customer_notification_reads",
+      "columns": [
+        "customer_user_id",
+        "event_id",
+        "read_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR customer_user_id=coalesce(current_setting('app.actor_id',true),''))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR customer_user_id=coalesce(current_setting('app.actor_id',true),'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "entitlement_definitions",
+      "columns": [
+        "key",
+        "label",
+        "kind",
+        "value_type"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "exchange_orders",
+      "columns": [
+        "id",
+        "tenant_id",
+        "pricing_rule_id",
+        "status",
+        "environment",
+        "request",
+        "created_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "landing_products",
+      "columns": [
+        "key",
+        "visible",
+        "name",
+        "description",
+        "icon",
+        "starting_price",
+        "setup_fee",
+        "currency",
+        "billing_period",
+        "status",
+        "cta_label",
+        "display_order"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "module_catalog",
+      "columns": [
+        "key",
+        "name",
+        "description",
+        "category",
+        "sandbox_available",
+        "definition"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "network_catalog",
+      "columns": [
+        "id",
+        "name",
+        "testnet"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "notification_events",
+      "columns": [
+        "id",
+        "tenant_id",
+        "channel",
+        "payload",
+        "status",
+        "environment"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "payment_invoices",
+      "columns": [
+        "id",
+        "tenant_id",
+        "amount",
+        "currency",
+        "status",
+        "environment",
+        "created_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "plan_entitlements",
+      "columns": [
+        "plan_id",
+        "key",
+        "value"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "plans",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "monthly_price",
+        "yearly_price",
+        "setup_fee",
+        "pricing_configured",
+        "discount_percent",
+        "currency",
+        "billing_label",
+        "display_order",
+        "status",
+        "created_at",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "platform_admins",
+      "columns": [
+        "clerk_user_id",
+        "active",
+        "created_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR clerk_user_id=coalesce(current_setting('app.actor_id',true),''))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "pricing_rules",
+      "columns": [
+        "id",
+        "tenant_id",
+        "name",
+        "fee_bps",
+        "environment"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "provider_assignments",
+      "columns": [
+        "id",
+        "tenant_id",
+        "provider_id",
+        "capability",
+        "environment",
+        "configuration",
+        "created_at",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "provider_catalog",
+      "columns": [
+        "id",
+        "definition",
+        "created_at",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(true)",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true') AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "provider_policies",
+      "columns": [
+        "id",
+        "tenant_id",
+        "scope",
+        "resource_id",
+        "capability",
+        "definition",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_addons",
+      "columns": [
+        "tenant_id",
+        "addon_id"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_asset_networks",
+      "columns": [
+        "tenant_id",
+        "asset_network_id"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_branding",
+      "columns": [
+        "tenant_id",
+        "brand_name",
+        "logo_url",
+        "primary_color",
+        "accent_color",
+        "theme_mode",
+        "default_language",
+        "supported_languages",
+        "website_settings"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_configuration",
+      "columns": [
+        "tenant_id",
+        "environment",
+        "exchange_enabled",
+        "payments_enabled",
+        "allow_guest_checkout"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_domains",
+      "columns": [
+        "tenant_id",
+        "domain",
+        "status",
+        "verification_token",
+        "verified_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.public_domain',true),'')<>'' AND domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified'))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_entitlement_overrides",
+      "columns": [
+        "tenant_id",
+        "key",
+        "value",
+        "reason"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_integrations",
+      "columns": [
+        "id",
+        "tenant_id",
+        "provider_key",
+        "environment",
+        "credential_management",
+        "enabled",
+        "settings",
+        "encrypted_credentials",
+        "credential_identity",
+        "revision",
+        "last_nonce",
+        "health",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_memberships",
+      "columns": [
+        "tenant_id",
+        "clerk_user_id",
+        "role",
+        "permissions",
+        "label",
+        "active",
+        "created_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND clerk_user_id=coalesce(current_setting('app.actor_id',true),'')))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR ((tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') AND coalesce(current_setting('app.can_manage_staff',true),'')='true')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_modules",
+      "columns": [
+        "tenant_id",
+        "module_key",
+        "enabled",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_payment_methods",
+      "columns": [
+        "id",
+        "tenant_id",
+        "label",
+        "environment"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_product_configuration",
+      "columns": [
+        "tenant_id",
+        "module_key",
+        "configuration",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_subscriptions",
+      "columns": [
+        "tenant_id",
+        "plan_id",
+        "status",
+        "resume_status",
+        "billing_period",
+        "discount_percent",
+        "cancelled",
+        "operator_note",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_telegram_receipts",
+      "columns": [
+        "id",
+        "tenant_id",
+        "integration_id",
+        "update_id",
+        "payload_hash",
+        "state",
+        "created_at",
+        "completed_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "(((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND EXISTS (SELECT 1 FROM public.tenant_integrations i WHERE i.id=integration_id AND i.tenant_id=tenant_telegram_receipts.tenant_id)) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenant_usage_counters",
+      "columns": [
+        "tenant_id",
+        "key",
+        "period",
+        "used"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "tenants",
+      "columns": [
+        "id",
+        "name",
+        "slug",
+        "status",
+        "environment",
+        "completed_steps",
+        "created_at",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR\n      (coalesce(current_setting('app.tenant_id',true),'')='' AND id IN (SELECT tenant_id FROM public.tenant_memberships WHERE clerk_user_id=coalesce(current_setting('app.actor_id',true),'') AND active)) OR\n      (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'') AND status='active') OR\n      (coalesce(current_setting('app.public_domain',true),'')<>'' AND status='active' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "wallet_configurations",
+      "columns": [
+        "id",
+        "tenant_id",
+        "asset_network_id",
+        "strategy",
+        "environment"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "webhook_endpoints",
+      "columns": [
+        "id",
+        "tenant_id",
+        "url",
+        "label",
+        "enabled",
+        "environment"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "white_label_attachments",
+      "columns": [
+        "id",
+        "owner_user_id",
+        "request_id",
+        "object_key",
+        "file_name",
+        "content_type",
+        "size",
+        "category",
+        "created_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR owner_user_id=coalesce(current_setting('app.actor_id',true),''))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR owner_user_id=coalesce(current_setting('app.actor_id',true),'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "white_label_events",
+      "columns": [
+        "id",
+        "request_id",
+        "kind",
+        "author_user_id",
+        "visibility",
+        "message",
+        "status",
+        "created_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR (visibility='customer' AND request_id IN (SELECT id FROM public.white_label_requests WHERE customer_user_id=coalesce(current_setting('app.actor_id',true),''))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR (request_id IN (SELECT id FROM public.white_label_requests WHERE customer_user_id=coalesce(current_setting('app.actor_id',true),'')) AND author_user_id=coalesce(current_setting('app.actor_id',true),'') AND visibility='customer')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    },
+    {
+      "name": "white_label_requests",
+      "columns": [
+        "id",
+        "order_number",
+        "customer_user_id",
+        "idempotency_key",
+        "configuration",
+        "status",
+        "monthly_price",
+        "setup_price",
+        "currency",
+        "operator_note",
+        "customization_price",
+        "custom_design_decision",
+        "approved_configuration",
+        "tenant_id",
+        "created_at",
+        "updated_at"
+      ],
+      "policies": {
+        "read": "(coalesce(current_setting('app.is_super_admin',true),'')='true' OR customer_user_id=coalesce(current_setting('app.actor_id',true),'') OR (tenant_id::text=coalesce(current_setting('app.tenant_id',true),'') AND coalesce(current_setting('app.tenant_id',true),'')<>'') OR (coalesce(current_setting('app.tenant_id',true),'')='' AND tenant_id IN (SELECT id FROM public.tenants WHERE\n (coalesce(current_setting('app.public_slug',true),'')<>'' AND slug=coalesce(current_setting('app.public_slug',true),'')) OR\n (coalesce(current_setting('app.public_domain',true),'')<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=coalesce(current_setting('app.public_domain',true),'') AND status='verified')))))",
+        "write": "((coalesce(current_setting('app.is_super_admin',true),'')='true' OR customer_user_id=coalesce(current_setting('app.actor_id',true),'')) AND coalesce(current_setting('app.can_write',true),'')='true')"
+      }
+    }
+  ],
+  "sequences": [
+    "white_label_requests_order_number_seq"
+  ],
+  "runtimeRole": "qxlayer_runtime",
+  "loginRole": "qxlayer_app",
+  "sqlSha256": "e61b648416ab95a54e9ff1e26908f8386fecec9633df77b674024bbee06c55c1",
+  "migrationApplied": false,
+  "targetVerified": false,
+  "cutoverAuthorized": false
+}

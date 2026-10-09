@@ -1,0 +1,20 @@
+{
+  "preparedAt": "2026-10-09T18:45:45.682Z",
+  "status": "STATIC_PREPARATION_VALIDATED_NOT_EXECUTED",
+  "sourceTables": 40,
+  "targetTables": 42,
+  "completePolicies": 84,
+  "preservedColumnCoverage": 243,
+  "bootstrapSha256": "a7f22acf15e2caa71259fa1b84ac6ab0e245e623cacd1b0d394286cd870efe72",
+  "securitySha256": "e61b648416ab95a54e9ff1e26908f8386fecec9633df77b674024bbee06c55c1",
+  "outstanding": [
+    "Target connection and PostgreSQL execution",
+    "Constraint/type/data parity rehearsal",
+    "Actual qxlayer_app/qxlayer_runtime cross-tenant tests",
+    "Clerk Production identity portability",
+    "Storage transfer",
+    "Vercel/Render portability implementation",
+    "User-approved cutover",
+    "Live verification"
+  ]
+}
