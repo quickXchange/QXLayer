@@ -2,6 +2,8 @@ import type { DatabaseClient } from "@workspace/db";
 import type { WhiteLabelStatus } from "@workspace/api-zod";
 import type { Principal } from "../authentication/service";
 import { HttpError } from "../../lib/errors";
+import { deliveryLinks } from "./delivery-links";
+import { hostingObservation } from "../domains/hosting";
 
 export const requestColumns = `id,order_number AS "orderNumber",customer_user_id AS "customerUserId",configuration,status,
 monthly_price AS "monthlyPrice",setup_price AS "setupPrice",currency,operator_note AS "operatorNote",
@@ -35,7 +37,19 @@ export function assertFinalPricing(row: Record<string, any>) {
 export async function orderView(c: DatabaseClient, row: Record<string, any>) {
   const cfg = row.configuration;
   const files = await c.query(`SELECT ${attachmentColumns} FROM white_label_attachments WHERE request_id=$1 ORDER BY created_at,id`, [row.id]);
+  const linked = row.status === "delivered" && row.tenantId
+    ? await c.query(`SELECT t.slug,d.domain,d.status AS domain_status,d.verification_token
+      FROM tenants t LEFT JOIN tenant_domains d ON d.tenant_id=t.id WHERE t.id=$1`, [row.tenantId]) : null;
+  const links = deliveryLinks(row as { status: string; tenantId?: string }, linked?.rows[0]?.slug);
+  const domain = linked?.rows[0];
+  if (domain?.domain_status === "verified") {
+    const observation = (await hostingObservation(c, row.tenantId, domain.verification_token)).rows[0];
+    if (observation?.metadata.connected && Date.now() - new Date(observation.created_at).getTime() < 24 * 60 * 60 * 1000) {
+      links.websiteUrl = `https://${domain.domain}`;
+    }
+  }
   return {
+    ...links,
     id: row.id, orderReference: `WL-${String(row.orderNumber).padStart(6, "0")}`, customerUserId: row.customerUserId,
     projectName: cfg.projectName, websiteName: cfg.websiteName ?? cfg.brandName, brandName: cfg.brandName, preferredDomain: cfg.preferredDomain ?? null, actions: cfg.actions, details: cfg.details,
     companyName: cfg.companyName ?? null, design: cfg.design ?? null, billingPeriod: cfg.billingPeriod ?? "monthly",

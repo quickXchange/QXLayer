@@ -1,0 +1,23 @@
+{
+  "assignmentId": "70ec4dd7-c4ec-4758-95b1-a4d9045f074a",
+  "jobId": "white-label-delivery-lifecycle:1867",
+  "kind": "testing",
+  "name": "white-label-delivery-lifecycle",
+  "screenshots": [
+    {
+      "description": "Operator Delivery tab after successful Retry: all six provisioning steps complete and delivered website/Admin Panel links present.",
+      "id": "fcomrl"
+    },
+    {
+      "description": "Customer tenant Branding page showing the saved #2563EB primary color and “Brand saved” confirmation.",
+      "id": "2c0gnb"
+    },
+    {
+      "description": "Delivered public QA site at 390×844 showing the responsive mobile layout, tenant branding, and sandbox swap interface.",
+      "id": "jw0ntm"
+    }
+  ],
+  "status": "completed",
+  "text": "I exercised the Development lifecycle end-to-end and cleaned the disposable data, but I cannot certify this run as fully compliant with the hard pre-write scope rule: the backend generated the plan/order/tenant UUIDs, so the file contained actor IDs plus candidate UUIDs before writes; I added each actual service-returned UUID immediately after its creation, not before. The retained scope file now has the exact actual IDs and `cleanupStatus: cleaned`. No app files were changed and I did not restart the already-serving workflows.\n\nObserved lifecycle: fresh Clerk identities were authenticated programmatically only. `/api/me` supplied the actual operator `user_3KSCx2Jft2JQrPq38Bl3ydnTEXZ` and customer `user_3KSCy7y9UJSdHM5Rs3QHdUjN0Cr`; only the fresh operator ID received the Development `platform_admins` grant, and reload confirmed `super_admin`. The customer UI submitted a standard, swap-only request with no domain. The order was approved through Review & pricing with the QA plan and USD 1 monthly/setup values, including both review confirmations. Initial provisioning showed 3/6 with real configuration blockers; Retry left it blocked at 3/6 on the same tenant. After configuring only that tenant through the authenticated API with two ETH/USDC Sepolia testnet asset-network IDs and an enabled swap/USD rate-1 route, browser Retry delivered it at 6/6.\n\nThe original customer session refreshed without another sign-in and retained the same `/api/me` user ID, now with `client_admin` membership for the QA tenant. The refreshed order page exposed delivered website and Admin Panel links. In that tenant’s Admin Panel, the customer saved primary color `#2563EB`; the unique domain `qa-w3vd9r7squ.example.com` was saved as unverified. The UI showed the TXT challenge instructions, hosting not connected, HTTPS not proven, and Check hosting disabled. A real Check DNS attempt returned `HTTP 400: DNS TXT challenge is not available yet`; I did not create DNS records or simulate DNS/TLS success. The delivered public URL loaded the QA brand in an unauthenticated context; a 390×844 check showed the responsive stacked layout and sandbox/no-funds messaging. GET-only isolation checks returned 403 for the customer against the existing Asterlane draft and NovaX admin tenant, and 404 for Asterlane’s public site.\n\nCleanup ran in a scoped transaction. Verification found zero rows for the QA order, tenant, plan, plan entitlements, order history/attachments, exchange orders, pricing rules, audit events, selected tenant-child rows, and the temporary operator grant. The Clerk identities were not deleted; the customer session returned to `unassigned` with no tenant membership. Existing Asterlane/NovaX/sample data and global catalogs were not modified. The delivered QA URL is now unavailable because its tenant was removed. The scope file remains at `.local/white-label-platform-browser-qa.json`.\n\nBrowser observations included the expected 400 DNS response and 403/404 isolation responses, plus Clerk development-key and structural-CSS warnings. No live financial order was placed. Evidence: operator delivery at 6/6, saved customer branding, and the 390px public site.",
+  "verdict": "unable"
+}

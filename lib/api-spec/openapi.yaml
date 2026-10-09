@@ -228,6 +228,17 @@ paths:
       requestBody: {required: true, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelNoteInput"}}}}
       responses:
         "201": {description: Appended immutable note, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelEvent"}}}}
+  /operator/white-label-requests/{requestId}/provisioning:
+    get:
+      operationId: getWhiteLabelProvisioning
+      parameters: [{name: requestId, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses:
+        "200": {description: Actual provisioning progress and actionable blockers, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelProvisioning"}}}}
+    post:
+      operationId: retryWhiteLabelProvisioning
+      parameters: [{name: requestId, in: path, required: true, schema: {type: string, format: uuid}}]
+      responses:
+        "200": {description: Idempotently resume approved provisioning without copying customer data, content: {application/json: {schema: {$ref: "#/components/schemas/WhiteLabelProvisioning"}}}}
   /customer/admin-panels:
     get:
       operationId: listMyAdminPanels
@@ -560,7 +571,7 @@ paths:
       parameters: [{$ref: "#/components/parameters/TenantId"}]
       responses:
         "200":
-          description: DNS ownership challenge (not a hosting connection)
+          description: DNS ownership challenge and independently checked hosting connection
           content:
             application/json:
               schema: {$ref: "#/components/schemas/DomainVerification"}
@@ -574,6 +585,21 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/DomainVerification"}
+  /tenants/{tenantId}/domain-hosting:
+    post:
+      operationId: checkTenantDomainHosting
+      tags: [tenants]
+      parameters: [{$ref: "#/components/parameters/TenantId"}]
+      responses:
+        "200": {description: Checked live HTTPS and signed QXLayer routing proof, content: {application/json: {schema: {$ref: "#/components/schemas/DomainVerification"}}}}
+  /public/domains/{hostname}/hosting-proof/{nonce}:
+    get:
+      operationId: getDomainHostingProof
+      parameters:
+        - {name: hostname, in: path, required: true, schema: {type: string, maxLength: 253}}
+        - {name: nonce, in: path, required: true, schema: {type: string, pattern: "^[a-f0-9]{48}$"}}
+      responses:
+        "200": {description: Nonce-bound proof of verified delivered tenant routing, content: {application/json: {schema: {type: object, required: [proof], properties: {proof: {type: string}}}}}}
   /public/domains/{hostname}:
     get:
       operationId: resolvePublicDomain
@@ -1431,6 +1457,8 @@ components:
         websiteName: {type: string}
         brandName: {type: string}
         preferredDomain: {type: ["string", "null"]}
+        websiteUrl: {type: ["string", "null"]}
+        adminPanelUrl: {type: ["string", "null"]}
         actions: {type: array, items: {$ref: "#/components/schemas/ExchangeAction"}}
         details: {type: string}
         status: {$ref: "#/components/schemas/WhiteLabelStatus"}
@@ -1861,7 +1889,36 @@ components:
         txtName: {type: ["string", "null"]}
         txtValue: {type: ["string", "null"]}
         hostingConnected: {type: boolean}
+        httpsReady: {type: boolean}
+        hostingCheckedAt: {type: ["string", "null"], format: date-time}
+        hostingError: {type: ["string", "null"]}
+        websiteUrl: {type: ["string", "null"]}
+        instructions: {type: array, items: {type: string}}
       required: [domain, status, txtName, txtValue, hostingConnected]
+    WhiteLabelProvisioning:
+      type: object
+      required: [requestId, tenantId, completedCount, totalCount, steps, blockers, canRetry, lastError, websiteUrl, adminPanelUrl]
+      properties:
+        requestId: {type: string, format: uuid}
+        tenantId: {type: ["string", "null"]}
+        completedCount: {type: integer}
+        totalCount: {type: integer}
+        steps:
+          type: array
+          items: {$ref: "#/components/schemas/WhiteLabelProvisioningStep"}
+        blockers: {type: array, items: {type: string}}
+        canRetry: {type: boolean}
+        lastError: {type: ["string", "null"]}
+        websiteUrl: {type: ["string", "null"]}
+        adminPanelUrl: {type: ["string", "null"]}
+    WhiteLabelProvisioningStep:
+      type: object
+      required: [key, label, state, message]
+      properties:
+        key: {type: string}
+        label: {type: string}
+        state: {type: string, enum: [complete, waiting, blocked, failed]}
+        message: {type: string}
     HealthStatus:
       type: object
       properties:

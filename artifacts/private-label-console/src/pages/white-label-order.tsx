@@ -10,6 +10,7 @@ import { ReviewForm } from '@/components/operator/review-form';
 import { NoteForm, Delivery } from '@/components/operator/notes-delivery';
 import { OrderActions } from '@/components/super-admin/order-actions';
 import { Panel } from '@/components/super-admin/kit';
+import { ProvisioningProgress } from '@/components/operator/provisioning-progress';
 import { orderRef } from '@/lib/wl';
 
 export default function WhiteLabelOrder() {
@@ -35,7 +36,7 @@ export default function WhiteLabelOrder() {
         </TabsList></div>
         <TabsContent value="summary"><OrderSummary o={o} /></TabsContent>
         <TabsContent value="review"><div className="max-w-3xl"><Panel title="Review, pricing and status"><ReviewForm key={`${o.id}-${o.updatedAt}`} o={o} onDone={refresh} /></Panel></div></TabsContent>
-        <TabsContent value="delivery"><div className="max-w-3xl"><Panel title="Delivery"><Delivery o={o} onDone={refresh} /></Panel></div></TabsContent>
+        <TabsContent value="delivery"><div className="max-w-3xl"><Panel title="Delivery"><div className="space-y-4"><ProvisioningProgress requestId={o.id} closed={['rejected', 'cancelled'].includes(o.status)} onDone={refresh} /><Delivery o={o} onDone={refresh} /></div></Panel></div></TabsContent>
         <TabsContent value="internal"><div className="max-w-3xl"><Panel title="Internal notes" note="Never shown to the customer."><NoteForm fixed="internal" id={o.id} onDone={refresh} />
           <div className="mt-5">{notes('internal').length ? <Timeline history={notes('internal')} customerUserId={o.customerUserId} /> : <EmptyState title="No internal notes" body="Notes added here stay with operators." />}</div></Panel></div></TabsContent>
         <TabsContent value="customer"><div className="max-w-3xl"><Panel title="Customer notes" note="Visible to the customer on their order."><NoteForm fixed="customer" id={o.id} onDone={refresh} />

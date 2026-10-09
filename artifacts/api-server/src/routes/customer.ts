@@ -9,8 +9,17 @@ import {
 import { requireAuthentication, principalFrom, sameOriginMutation } from "../middlewares/authentication";
 import { myAdminPanels, listRequests, submitRequest, reviewRequest, deliverRequest, orderDetail, appendNote } from "../modules/customer/service";
 import { whiteLabelCatalog } from "../modules/customer/order-catalog";
+import { getProvisioning, retryProvisioning } from "../modules/customer/provisioning";
+import { GetWhiteLabelProvisioningResponse, RetryWhiteLabelProvisioningResponse } from "@workspace/api-zod";
 const router = Router();
 router.use(["/customer", "/operator"], requireAuthentication, sameOriginMutation);
+router.get("/operator/white-label-requests/:requestId/provisioning", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(GetWhiteLabelProvisioningResponse.parse(await getProvisioning(principalFrom(res), GetWhiteLabelRequestParams.parse(req.params).requestId)));
+});
+router.post("/operator/white-label-requests/:requestId/provisioning", async (req, res) => {
+  res.json(RetryWhiteLabelProvisioningResponse.parse(await retryProvisioning(principalFrom(res), GetWhiteLabelRequestParams.parse(req.params).requestId)));
+});
 router.get("/customer/admin-panels", async (_req, res) => res.json(ListMyAdminPanelsResponse.parse(await myAdminPanels(principalFrom(res)))));
 router.get("/customer/white-label-catalog", async (_req, res) => res.json(GetWhiteLabelCatalogResponse.parse(await whiteLabelCatalog(principalFrom(res)))));
 router.get("/customer/white-label-requests/:requestId", async (req, res) => res.json(GetMyWhiteLabelRequestResponse.parse(await orderDetail(principalFrom(res), GetMyWhiteLabelRequestParams.parse(req.params).requestId))));

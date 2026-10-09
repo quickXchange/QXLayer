@@ -13,6 +13,8 @@ import { activateTenant, createTenant, getTenant, listTenants, saveAssets, saveB
 import { SetStaffPermissionsParams, SetStaffPermissionsBody, SetStaffPermissionsResponse, GetDomainVerificationParams, GetDomainVerificationResponse, VerifyTenantDomainParams, VerifyTenantDomainResponse, GetProductConfigurationParams, GetProductConfigurationResponse, SetProductConfigurationParams, SetProductConfigurationBody, SetProductConfigurationResponse } from "@workspace/api-zod";
 import { setStaffPermissions } from "../modules/entitlements/resources";
 import { getDomainVerification, verifyTenantDomain } from "../modules/domains/service";
+import { checkHosting } from "../modules/domains/hosting";
+import { CheckTenantDomainHostingResponse } from "@workspace/api-zod";
 import { productConfiguration } from "../modules/product-registry/configuration";
 import { ListTenantAdministratorsParams, ListTenantAdministratorsResponse, AssignTenantAdministratorParams, AssignTenantAdministratorBody, AssignTenantAdministratorResponse, SetTenantAdministratorStatusParams, SetTenantAdministratorStatusBody, SetTenantAdministratorStatusResponse } from "@workspace/api-zod";
 import { listTenantAdministrators, assignTenantAdministrator, setTenantAdministratorStatus } from "../modules/tenants/administrators";
@@ -24,6 +26,11 @@ import { PREVIEW_COOKIE, PREVIEW_TTL } from "../modules/website/operator-preview
 
 const router = Router();
 router.use("/tenants", requireAuthentication, sameOriginMutation);
+router.post("/tenants/:tenantId/domain-hosting", async (req, res) => {
+  const { tenantId } = GetTenantParams.parse(req.params);
+  await checkHosting(principalFrom(res), tenantId);
+  res.json(CheckTenantDomainHostingResponse.parse(await getDomainVerification(principalFrom(res), tenantId)));
+});
 router.get("/tenants/:tenantId/website-preview/open", async (req, res) => {
   const { tenantId } = GetTenantParams.parse(req.params);
   const preview = await openTenantWebsitePreview(principalFrom(res), tenantId);

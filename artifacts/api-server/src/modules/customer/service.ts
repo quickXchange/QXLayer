@@ -7,8 +7,8 @@ import { audit } from "../../lib/audit";
 import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
 import { requestColumns as columns, orderView, event, eventColumns, requestContext, assertTransition, assertFinalPricing } from "./order-model";
 import { catalogSelection } from "./order-catalog";
-import { prepareTenant } from "../tenants/service";
-import { applyOrderBranding } from "./order-branding";
+import { prepareReviewedWebsite } from "./preparation";
+import { recordProvisioningFailure } from "./provisioning";
 function stable(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => [k, stable(v)]));
@@ -122,19 +122,7 @@ export function reviewRequest(p: Principal, id: string, raw: WhiteLabelReviewInp
     }
     await audit(c, p, null, "white_label.request.reviewed", "Reviewed Exchange White Label request", { requestId: id, status: input.status });
     if (input.status === "approved" && !old.tenantId && selection.plan) {
-      // The request row lock makes retries idempotent; all preparation and linkage commit together.
-      const tenant = await prepareTenant(c, p, {
-        name: old.configuration.brandName, slug: `wl-${id}`, planId: selection.plan.id,
-      }, selection.addons.map((a: { id: string }) => a.id));
-      const effective = await resolveEntitlements(c, tenant.id);
-      requireFeature(effective, "website"); requireFeature(effective, "crypto_exchange");
-      for (const action of old.configuration.actions as string[]) requireFeature(effective, action);
-      const nextStatus = old.configuration.design?.type === "custom" ? "customization" : "in_setup";
-      await applyOrderBranding(c, tenant.id, tenant.slug, old);
-      const prepared = await c.query(`UPDATE white_label_requests SET tenant_id=$2,status=$3,updated_at=now() WHERE id=$1 RETURNING ${columns}`, [id, tenant.id, nextStatus]);
-      await event(c, p, id, "status", "Admin approved your request and prepared a sandbox Exchange. Setup is in progress; no Admin Panel is available until delivery.", "customer", nextStatus);
-      await audit(c, p, tenant.id, "white_label.request.prepared", "Prepared reviewed Exchange; access not granted", { requestId: id });
-      return orderView(c, prepared.rows[0]);
+      return prepareReviewedWebsite(c, p, r.rows[0], selection);
     }
     if (input.status === "ready" && old.tenantId) {
       const linked = await c.query("SELECT status FROM tenants WHERE id=$1", [old.tenantId]);
@@ -143,6 +131,9 @@ export function reviewRequest(p: Principal, id: string, raw: WhiteLabelReviewInp
       }
     }
     return orderView(c, r.rows[0]);
+  }).catch(async error => {
+    if (input.status === "approved") await recordProvisioningFailure(p, id, error);
+    throw error;
   });
 }
 export async function deliverLinkedRequest(c: DatabaseClient, p: Principal, id: string, tenantId: string) {

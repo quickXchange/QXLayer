@@ -1,4 +1,4 @@
-import { domainToASCII } from "node:url";
+import { customerHostname } from "../domains/hostname";
 import type { DatabaseClient } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { newDomainChallenge } from "../domains/service";
@@ -22,10 +22,7 @@ export async function applyOrderBranding(c: DatabaseClient, tenantId: string, sl
   ]);
   let domain: string | null = null;
   if (config.preferredDomain) {
-    domain = domainToASCII(config.preferredDomain.trim().toLowerCase().replace(/\.$/, ""));
-    if (domain.length > 253 || !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$/.test(domain)) {
-      throw new HttpError(400, "The order domain must be a hostname without protocol or path.");
-    }
+    domain = customerHostname(config.preferredDomain);
     await c.query("INSERT INTO tenant_domains(tenant_id,domain,verification_token) VALUES($1,$2,$3)", [tenantId, domain, newDomainChallenge()]);
   }
   await c.query("UPDATE tenants SET completed_steps=ARRAY(SELECT DISTINCT unnest(completed_steps || ARRAY['brand','domain']::text[])) WHERE id=$1", [tenantId]);

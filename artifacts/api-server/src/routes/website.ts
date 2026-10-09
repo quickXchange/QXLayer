@@ -3,10 +3,16 @@ import { GetPublicSiteParams, GetPublicSiteResponse, GetPublicCapabilityParams, 
 import { getPublicSite } from "../modules/website/service";
 import { ResolvePublicDomainParams, ResolvePublicDomainResponse } from "@workspace/api-zod";
 import { resolvePublicDomain } from "../modules/domains/service";
+import { publicHostingProof } from "../modules/domains/hosting";
+import { GetDomainHostingProofResponse } from "@workspace/api-zod";
 import { publicBrandingFile } from "../modules/website/branding-files";
 import { authorizedWebsitePreview } from "../modules/website/operator-preview";
 
 const router = Router();
+router.get("/public/domains/:hostname/hosting-proof/:nonce", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(GetDomainHostingProofResponse.parse(await publicHostingProof(req.params.hostname, req.params.nonce)));
+});
 router.get("/public/domains/:hostname", async (req, res) => {
   res.set("Cache-Control", "no-store");
   res.json(ResolvePublicDomainResponse.parse(await resolvePublicDomain(ResolvePublicDomainParams.parse(req.params).hostname)));

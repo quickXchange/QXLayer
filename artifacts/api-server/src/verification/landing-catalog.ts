@@ -36,7 +36,7 @@ try {
     await assert.rejects(async () => saveProduct(principal, key, fixture), (e: unknown) => (e as { status: number }).status === 403);
   }
   await saveProduct(admin, key, { ...fixture, visible: false, startingPrice: null, setupFee: null, status: "available" });
-  assert.equal((await publicProducts()).some((p) => p.key === key), false);
+  assert.equal(GetPublicProductCatalogResponse.parse(await publicProducts()).some((p) => p.key === key), false);
   const hidden = (await listProducts(admin)).find((p) => p.key === key);
   assert.equal(hidden?.readiness, "planned"); // A display-status change cannot enable execution.
   assert.equal(hidden?.startingPrice, null);

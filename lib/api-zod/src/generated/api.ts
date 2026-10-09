@@ -950,6 +950,8 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
   "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
+  "websiteUrl": zod.string().nullish(),
+  "adminPanelUrl": zod.string().nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
   "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
@@ -1199,6 +1201,8 @@ export const GetWhiteLabelRequestResponse = zod.object({
   "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
+  "websiteUrl": zod.string().nullish(),
+  "adminPanelUrl": zod.string().nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
   "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
@@ -1342,6 +1346,52 @@ export const AddWhiteLabelNoteResponse = zod.object({
 })
 
 
+export const GetWhiteLabelProvisioningParams = zod.object({
+  "requestId": zod.coerce.string().uuid()
+})
+
+export const GetWhiteLabelProvisioningResponse = zod.object({
+  "requestId": zod.string().uuid(),
+  "tenantId": zod.string().nullable(),
+  "completedCount": zod.number().int(),
+  "totalCount": zod.number().int(),
+  "steps": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "state": zod.enum(['complete', 'waiting', 'blocked', 'failed']),
+  "message": zod.string()
+})),
+  "blockers": zod.array(zod.string()),
+  "canRetry": zod.boolean(),
+  "lastError": zod.string().nullable(),
+  "websiteUrl": zod.string().nullable(),
+  "adminPanelUrl": zod.string().nullable()
+})
+
+
+export const RetryWhiteLabelProvisioningParams = zod.object({
+  "requestId": zod.coerce.string().uuid()
+})
+
+export const RetryWhiteLabelProvisioningResponse = zod.object({
+  "requestId": zod.string().uuid(),
+  "tenantId": zod.string().nullable(),
+  "completedCount": zod.number().int(),
+  "totalCount": zod.number().int(),
+  "steps": zod.array(zod.object({
+  "key": zod.string(),
+  "label": zod.string(),
+  "state": zod.enum(['complete', 'waiting', 'blocked', 'failed']),
+  "message": zod.string()
+})),
+  "blockers": zod.array(zod.string()),
+  "canRetry": zod.boolean(),
+  "lastError": zod.string().nullable(),
+  "websiteUrl": zod.string().nullable(),
+  "adminPanelUrl": zod.string().nullable()
+})
+
+
 export const ListMyAdminPanelsResponseItem = zod.object({
   "tenantId": zod.string().uuid(),
   "name": zod.string(),
@@ -1478,6 +1528,8 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
+  "websiteUrl": zod.string().nullish(),
+  "adminPanelUrl": zod.string().nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
   "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
@@ -1776,6 +1828,8 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
   "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
+  "websiteUrl": zod.string().nullish(),
+  "adminPanelUrl": zod.string().nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
   "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
@@ -2010,6 +2064,8 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
   "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
+  "websiteUrl": zod.string().nullish(),
+  "adminPanelUrl": zod.string().nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
   "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
@@ -2271,6 +2327,8 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
   "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
+  "websiteUrl": zod.string().nullish(),
+  "adminPanelUrl": zod.string().nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
   "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
@@ -2513,6 +2571,8 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
   "websiteName": zod.string().optional(),
   "brandName": zod.string(),
   "preferredDomain": zod.string().nullable(),
+  "websiteUrl": zod.string().nullish(),
+  "adminPanelUrl": zod.string().nullish(),
   "actions": zod.array(zod.enum(['swap', 'convert', 'buy', 'sell'])),
   "details": zod.string(),
   "status": zod.enum(['new', 'reviewing', 'waiting_for_client', 'quote_ready', 'approved', 'in_setup', 'customization', 'ready', 'delivered', 'rejected', 'cancelled']),
@@ -4114,7 +4174,12 @@ export const GetDomainVerificationResponse = zod.object({
   "status": zod.enum(['unconfigured', 'unverified', 'verified']),
   "txtName": zod.string().nullable(),
   "txtValue": zod.string().nullable(),
-  "hostingConnected": zod.boolean()
+  "hostingConnected": zod.boolean(),
+  "httpsReady": zod.boolean().optional(),
+  "hostingCheckedAt": zod.coerce.date().nullish(),
+  "hostingError": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "instructions": zod.array(zod.string()).optional()
 })
 
 
@@ -4127,7 +4192,45 @@ export const VerifyTenantDomainResponse = zod.object({
   "status": zod.enum(['unconfigured', 'unverified', 'verified']),
   "txtName": zod.string().nullable(),
   "txtValue": zod.string().nullable(),
-  "hostingConnected": zod.boolean()
+  "hostingConnected": zod.boolean(),
+  "httpsReady": zod.boolean().optional(),
+  "hostingCheckedAt": zod.coerce.date().nullish(),
+  "hostingError": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "instructions": zod.array(zod.string()).optional()
+})
+
+
+export const CheckTenantDomainHostingParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const CheckTenantDomainHostingResponse = zod.object({
+  "domain": zod.string().nullable(),
+  "status": zod.enum(['unconfigured', 'unverified', 'verified']),
+  "txtName": zod.string().nullable(),
+  "txtValue": zod.string().nullable(),
+  "hostingConnected": zod.boolean(),
+  "httpsReady": zod.boolean().optional(),
+  "hostingCheckedAt": zod.coerce.date().nullish(),
+  "hostingError": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "instructions": zod.array(zod.string()).optional()
+})
+
+
+export const getDomainHostingProofPathHostnameMax = 253;
+
+export const getDomainHostingProofPathNonceRegExp = new RegExp('^[a-f0-9]{48}$');
+
+
+export const GetDomainHostingProofParams = zod.object({
+  "hostname": zod.coerce.string().max(getDomainHostingProofPathHostnameMax),
+  "nonce": zod.coerce.string().regex(getDomainHostingProofPathNonceRegExp)
+})
+
+export const GetDomainHostingProofResponse = zod.object({
+  "proof": zod.string()
 })
 
 

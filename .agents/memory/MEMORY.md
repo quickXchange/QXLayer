@@ -28,3 +28,4 @@
 - [QA cleanup durability](qa-cleanup-durability.md) — persist exact disposable fixture scope through workspace restarts; /tmp can vanish before database cleanup.
 - [Commercial pricing safety](commercial-pricing-safety.md) — undecided prices are not zero; separate real commercial configuration from technical recovery.
 - [Public marketing baseline](public-marketing-baseline.md) — presentation-only recovery can ship with code; it is not Production database or owner-access restoration.
+- [Hostname normalization](hostname-normalization.md) — IDN conversion can discard URL syntax; validate customer input before canonicalizing it.

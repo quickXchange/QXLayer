@@ -1,0 +1,42 @@
+[
+  {
+    "test": "unapproved orders expose no links; customer/operator/order isolation",
+    "result": "PASS"
+  },
+  {
+    "test": "failed approval rolls back preparation and persists safe operator-only diagnostics",
+    "result": "PASS"
+  },
+  {
+    "test": "approval atomically creates isolated NovaX master while draft/public/Admin access stays closed",
+    "result": "PASS"
+  },
+  {
+    "test": "concurrent incomplete-setup retries are idempotent and cannot invent configuration or activate",
+    "result": "PASS"
+  },
+  {
+    "test": "valid retry activates and delivers to the same account; repeat delivery preserves settings",
+    "result": "PASS"
+  },
+  {
+    "test": "delivered owner can change logo/colors/branding; unrelated customer cannot read or mutate tenant",
+    "result": "PASS"
+  },
+  {
+    "test": "DNS token checks and split TXT handling; ownership alone never means connected hosting",
+    "result": "PASS"
+  },
+  {
+    "test": "nonce-bound hosting proof, wrong-tenant denial, persisted errors, retry recovery and default URL fallback (injected probe; not real DNS/TLS)",
+    "result": "PASS"
+  },
+  {
+    "test": "domain changes revoke old challenges, hosting observations and public mappings",
+    "result": "PASS"
+  },
+  {
+    "test": "second customer receives distinct master website; no branding/assets/data copied across tenants",
+    "result": "PASS"
+  }
+]

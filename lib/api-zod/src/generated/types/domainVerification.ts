@@ -16,4 +16,12 @@ export interface DomainVerification {
   /** @nullable */
   txtValue: string | null;
   hostingConnected: boolean;
+  httpsReady?: boolean;
+  /** @nullable */
+  hostingCheckedAt?: Date | null;
+  /** @nullable */
+  hostingError?: string | null;
+  /** @nullable */
+  websiteUrl?: string | null;
+  instructions?: string[];
 }

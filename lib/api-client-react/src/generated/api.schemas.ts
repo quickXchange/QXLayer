@@ -663,6 +663,10 @@ export interface WhiteLabelRequest {
   brandName: string;
   /** @nullable */
   preferredDomain: string | null;
+  /** @nullable */
+  websiteUrl?: string | null;
+  /** @nullable */
+  adminPanelUrl?: string | null;
   actions: ExchangeAction[];
   details: string;
   status: WhiteLabelStatus;
@@ -1549,6 +1553,48 @@ export interface DomainVerification {
   /** @nullable */
   txtValue: string | null;
   hostingConnected: boolean;
+  httpsReady?: boolean;
+  /** @nullable */
+  hostingCheckedAt?: string | null;
+  /** @nullable */
+  hostingError?: string | null;
+  /** @nullable */
+  websiteUrl?: string | null;
+  instructions?: string[];
+}
+
+export type WhiteLabelProvisioningStepState = typeof WhiteLabelProvisioningStepState[keyof typeof WhiteLabelProvisioningStepState];
+
+
+export const WhiteLabelProvisioningStepState = {
+  complete: 'complete',
+  waiting: 'waiting',
+  blocked: 'blocked',
+  failed: 'failed',
+} as const;
+
+export interface WhiteLabelProvisioningStep {
+  key: string;
+  label: string;
+  state: WhiteLabelProvisioningStepState;
+  message: string;
+}
+
+export interface WhiteLabelProvisioning {
+  requestId: string;
+  /** @nullable */
+  tenantId: string | null;
+  completedCount: number;
+  totalCount: number;
+  steps: WhiteLabelProvisioningStep[];
+  blockers: string[];
+  canRetry: boolean;
+  /** @nullable */
+  lastError: string | null;
+  /** @nullable */
+  websiteUrl: string | null;
+  /** @nullable */
+  adminPanelUrl: string | null;
 }
 
 export interface HealthStatus {
@@ -2114,4 +2160,8 @@ export type ListExchangeOrdersCustomer = typeof ListExchangeOrdersCustomer[keyof
 export const ListExchangeOrdersCustomer = {
   anonymous: 'anonymous',
 } as const;
+
+export type GetDomainHostingProof200 = {
+  proof: string;
+};
 

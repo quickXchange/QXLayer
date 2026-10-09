@@ -644,3 +644,17 @@ mtime_ms = 1791539635272
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/be8d48f3-63f9-429e-b95f-87dfc263f79e/d02a216a-56bd-42c6-80ac-877a173e21fa"
 storage_version_token = "1791539635775306"
 content_type = "text/html"
+
+[[outputs]]
+id = "o_24sKJH8-L8WgH_5FEy9"
+uri = "file://reports/white-label-platform-completion/CONSOLIDATED-REPORT.html"
+type = "html"
+title = "QXLayer White Label — Consolidated Report"
+description = "Implementation, automated and browser evidence, data-preservation results, verification qualifications, and remaining Production/domain launch steps."
+logical_id = "ed026107-5ed2-4276-a36e-a5da0075cadb"
+content_hash = "sha256:dc670a5ce73ce28e2767eee9c271231b9f94a48be176a612a7c5c62a98317b32"
+size = 13904
+mtime_ms = 1791542953796
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ed026107-5ed2-4276-a36e-a5da0075cadb/9b7f696c-604d-46dd-bff8-f885ed060a9c"
+storage_version_token = "1791543005073965"
+content_type = "text/html"

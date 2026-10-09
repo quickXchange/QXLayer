@@ -22,6 +22,10 @@ export interface WhiteLabelRequest {
   brandName: string;
   /** @nullable */
   preferredDomain: string | null;
+  /** @nullable */
+  websiteUrl?: string | null;
+  /** @nullable */
+  adminPanelUrl?: string | null;
   actions: ExchangeAction[];
   details: string;
   status: WhiteLabelStatus;

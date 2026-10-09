@@ -1,4 +1,4 @@
-import { domainToASCII } from "node:url";
+import { customerHostname } from "../domains/hostname";
 import { withDatabase, type DatabaseClient } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
@@ -126,10 +126,7 @@ export function saveBrand(principal: Principal, tenantId: string, input: z.infer
 export function saveDomain(principal: Principal, tenantId: string, raw: string | null) {
   let domain: string | null = null;
   if (raw) {
-    domain = domainToASCII(raw.trim().toLowerCase().replace(/\.$/, ""));
-    if (domain.length > 253 || !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}$/.test(domain)) {
-      throw new HttpError(400, "Provide a hostname only, such as client.example. No protocol, path, or IP address.");
-    }
+    domain = customerHostname(raw);
   }
   return saveStep(principal, tenantId, "domain", async (client) => {
     if (domain) await client.query("INSERT INTO tenant_domains (tenant_id,domain,verification_token) VALUES ($1,$2,$3) ON CONFLICT (tenant_id) DO UPDATE SET domain=EXCLUDED.domain,status=CASE WHEN tenant_domains.domain=EXCLUDED.domain THEN tenant_domains.status ELSE 'unverified' END,verified_at=CASE WHEN tenant_domains.domain=EXCLUDED.domain THEN tenant_domains.verified_at ELSE NULL END,verification_token=CASE WHEN tenant_domains.domain=EXCLUDED.domain THEN tenant_domains.verification_token ELSE EXCLUDED.verification_token END", [tenantId, domain, newDomainChallenge()]);

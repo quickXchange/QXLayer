@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGatedMutate } from '@/components/super-admin/review-gate';
 import {
-  useGetDomainVerification, getGetDomainVerificationQueryKey, useVerifyTenantDomain, useSetStaffPermissions,
+  useGetDomainVerification, getGetDomainVerificationQueryKey, useVerifyTenantDomain, useCheckTenantDomainHosting, useSetStaffPermissions,
   useListTenantResources, getListTenantResourcesQueryKey, useListProductRegistry, useGetProductConfiguration, getGetProductConfigurationQueryKey,
   useSetProductConfiguration, useListTenantAdministrators, getListTenantAdministratorsQueryKey, useAssignTenantAdministrator, useSetTenantAdministratorStatus, type Tenant, type SubscriptionView, type ProductModule,
 } from '@workspace/api-client-react';
@@ -23,6 +23,8 @@ export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; r
   const q = useGetDomainVerification(tenant.id);
   const m = useVerifyTenantDomain();
   const verify = useGatedMutate(m.mutate, 'Check and record domain ownership (DNS records will not be changed)');
+  const hm = useCheckTenantDomainHosting();
+  const checkHosting = useGatedMutate(hm.mutate, 'Check hosting and HTTPS for the saved domain (read only)');
   const qc = useQueryClient();
   const inv = useInvalidateTenant();
   const { toast } = useToast();
@@ -33,12 +35,12 @@ export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; r
     qc.invalidateQueries({ queryKey: getGetDomainVerificationQueryKey(tenant.id) });
   }, [tenant.domain, tenant.id, qc]);
   return (
-    <Section n="02b" title="Domain ownership" note="A TXT record proves control of the hostname. Hosting is not connected, so nothing is served on it."
-      footer={readOnly ? RO : <Button data-testid="button-verify-domain" disabled={!d || d.status === 'unconfigured' || m.isPending}
+    <Section n="02b" title="Domain ownership" note="A TXT record proves control of the hostname. Ownership alone does not connect hosting; use the hosting check to prove HTTPS."
+      footer={readOnly ? RO : <div className="flex flex-wrap gap-2"><Button variant="outline" data-testid="button-check-hosting" disabled={!d || d.status !== 'verified' || hm.isPending} onClick={() => checkHosting({ tenantId: tenant.id }, { onSuccess: (r) => { qc.setQueryData(getGetDomainVerificationQueryKey(tenant.id), r); qc.invalidateQueries({ queryKey: getGetDomainVerificationQueryKey(tenant.id) }); inv(tenant.id); toast({ title: r.httpsReady ? 'HTTPS is ready' : 'Hosting not ready yet', description: r.httpsReady ? undefined : (r.hostingError ?? 'See the instructions below.') }); }, onError: (e) => toast({ title: 'Hosting check failed', description: (e as Error).message, variant: 'destructive' }) })}>{hm.isPending ? 'Checking hosting' : 'Check hosting and HTTPS'}</Button><Button data-testid="button-verify-domain" disabled={!d || d.status === 'unconfigured' || m.isPending}
         onClick={() => verify({ tenantId: tenant.id }, {
           onSuccess: (r) => { qc.setQueryData(getGetDomainVerificationQueryKey(tenant.id), r); qc.invalidateQueries({ queryKey: getGetDomainVerificationQueryKey(tenant.id) }); inv(tenant.id); toast({ title: r.status === 'verified' ? 'Domain verified' : 'TXT record not found yet', description: r.status === 'verified' ? undefined : 'DNS changes can take time to propagate.' }); },
           onError: (e) => toast({ title: 'Verification failed', description: (e as Error).message, variant: 'destructive' }),
-        })}>{m.isPending ? 'Checking DNS' : 'Check DNS record'}</Button>}>
+        })}>{m.isPending ? 'Checking DNS' : 'Check DNS record'}</Button></div>}>
       {q.isLoading ? <Skeleton className="h-24" /> : q.isError || !d ? <ErrorState what="domain verification" onRetry={() => q.refetch()} /> : d.status === 'unconfigured' ? (
         <p className="text-sm text-muted-foreground" data-testid="text-domain-unconfigured">No domain is saved for this client. Save a domain above to receive a verification record.</p>
       ) : (
@@ -47,12 +49,19 @@ export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; r
             {[['Domain', d.domain ?? ''], ['Ownership', d.status], ['Hosting', d.hostingConnected ? 'connected' : 'not connected']].map(([l, v]) => (
               <div key={l} className="bg-card p-3"><p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{l}</p><p className="mt-1 break-all text-sm" data-testid={`text-domain-${l.toLowerCase()}`}>{v}</p></div>))}
           </div>
-          {d.status !== 'verified' && d.txtName && d.txtValue && (
+          {d.txtName && d.txtValue && (
             <div className="space-y-1 rounded-md border p-3 text-sm">
-              <p>Create this TXT record at your DNS provider, then check again.</p>
+              <p>{d.status === 'verified' ? 'Ownership record (keep it in place).' : 'Create this TXT record at your DNS provider, then check again.'}</p>
               <p className="font-mono text-xs"><span className="text-muted-foreground">Name </span><span data-testid="text-txt-name" className="break-all">{d.txtName}</span></p>
               <p className="font-mono text-xs"><span className="text-muted-foreground">Value </span><span data-testid="text-txt-value" className="break-all">{d.txtValue}</span></p>
             </div>)}
+          <div className="space-y-1 rounded-md border p-3 text-sm" data-testid="panel-hosting">
+            <p>HTTPS: <span data-testid="text-https">{d.httpsReady ? 'ready' : 'not proven'}</span>{d.hostingCheckedAt && <span className="text-muted-foreground"> . checked {new Date(d.hostingCheckedAt).toLocaleString()}</span>}</p>
+            {d.hostingError && <p role="alert" className="text-destructive [overflow-wrap:anywhere]" data-testid="text-hosting-error">{d.hostingError} Fix the records and check again.</p>}
+            {d.httpsReady && d.websiteUrl && <p><a href={d.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-copper underline" data-testid="link-domain-website">{d.websiteUrl}</a></p>}
+            {d.instructions && d.instructions.length > 0 && <ul className="list-disc space-y-1 pl-5" data-testid="list-hosting-instructions">{d.instructions.map((i) => <li key={i}>{i}</li>)}</ul>}
+            <p className="text-xs text-muted-foreground">An authorized publisher must register this exact hostname in Publishing, then the customer applies the DNS records Publishing provides. No records are invented here and native domain enrollment is not automatic. Replit issues and renews the certificate after DNS is correct; the backend proves HTTPS and tenant routing. The platform gate stays active: only an authoritative delivered custom site resolves independently.</p>
+          </div>
         </div>)}
     </Section>
   );

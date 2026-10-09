@@ -51,6 +51,7 @@ import type {
   ExchangeSettings,
   ExchangeStatusInput,
   ExchangeVisualCatalog,
+  GetDomainHostingProof200,
   HealthStatus,
   LandingProduct,
   LandingProductInput,
@@ -97,6 +98,7 @@ import type {
   WhiteLabelEvent,
   WhiteLabelNoteInput,
   WhiteLabelOrderDetail,
+  WhiteLabelProvisioning,
   WhiteLabelRequest,
   WhiteLabelRequestInput,
   WhiteLabelReviewInput
@@ -1567,6 +1569,145 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getAddWhiteLabelNoteMutationOptions(options));
+    }
+
+export const getGetWhiteLabelProvisioningUrl = (requestId: string,) => {
+
+
+
+
+  return `/api/operator/white-label-requests/${requestId}/provisioning`
+}
+
+export const getWhiteLabelProvisioning = async (requestId: string, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelProvisioning> => {
+
+  return customFetch<WhiteLabelProvisioning>(getGetWhiteLabelProvisioningUrl(requestId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWhiteLabelProvisioningQueryKey = (requestId: string,) => {
+    return [
+    `/api/operator/white-label-requests/${requestId}/provisioning`
+    ] as const;
+    }
+
+
+export const getGetWhiteLabelProvisioningQueryOptions = <TData = Awaited<ReturnType<typeof getWhiteLabelProvisioning>>, TError = ErrorType<unknown>>(requestId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelProvisioning>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWhiteLabelProvisioningQueryKey(requestId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWhiteLabelProvisioning>>> = ({ signal }) => getWhiteLabelProvisioning(requestId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: requestId !== null && requestId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelProvisioning>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWhiteLabelProvisioningQueryResult = NonNullable<Awaited<ReturnType<typeof getWhiteLabelProvisioning>>>
+export type GetWhiteLabelProvisioningQueryError = ErrorType<unknown>
+
+
+
+export function useGetWhiteLabelProvisioning<TData = Awaited<ReturnType<typeof getWhiteLabelProvisioning>>, TError = ErrorType<unknown>>(
+ requestId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWhiteLabelProvisioning>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWhiteLabelProvisioningQueryOptions(requestId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRetryWhiteLabelProvisioningUrl = (requestId: string,) => {
+
+
+
+
+  return `/api/operator/white-label-requests/${requestId}/provisioning`
+}
+
+export const retryWhiteLabelProvisioning = async (requestId: string, options?: Parameters<typeof customFetch>[1]): Promise<WhiteLabelProvisioning> => {
+
+  return customFetch<WhiteLabelProvisioning>(getRetryWhiteLabelProvisioningUrl(requestId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRetryWhiteLabelProvisioningMutationKey = () => ['retryWhiteLabelProvisioning'] as const;
+
+export const getRetryWhiteLabelProvisioningMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryWhiteLabelProvisioning>>, TError,RetryWhiteLabelProvisioningMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryWhiteLabelProvisioning>>, TError,RetryWhiteLabelProvisioningMutationVariables, TContext> => {
+
+const mutationKey = getRetryWhiteLabelProvisioningMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryWhiteLabelProvisioning>>, RetryWhiteLabelProvisioningMutationVariables> = (props) => {
+          const {requestId} = props ?? {};
+
+          return  retryWhiteLabelProvisioning(requestId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryWhiteLabelProvisioningMutationResult = NonNullable<Awaited<ReturnType<typeof retryWhiteLabelProvisioning>>>
+
+    export type RetryWhiteLabelProvisioningMutationError = ErrorType<unknown>
+    export type RetryWhiteLabelProvisioningMutationVariables = {requestId: string}
+
+    export const useRetryWhiteLabelProvisioning = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryWhiteLabelProvisioning>>, TError,RetryWhiteLabelProvisioningMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof retryWhiteLabelProvisioning>>,
+        TError,
+        RetryWhiteLabelProvisioningMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetryWhiteLabelProvisioningMutationOptions(options));
     }
 
 export const getListMyAdminPanelsUrl = () => {
@@ -4121,6 +4262,150 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getVerifyTenantDomainMutationOptions(options));
     }
+
+export const getCheckTenantDomainHostingUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/domain-hosting`
+}
+
+export const checkTenantDomainHosting = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<DomainVerification> => {
+
+  return customFetch<DomainVerification>(getCheckTenantDomainHostingUrl(tenantId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCheckTenantDomainHostingMutationKey = () => ['checkTenantDomainHosting'] as const;
+
+export const getCheckTenantDomainHostingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkTenantDomainHosting>>, TError,CheckTenantDomainHostingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkTenantDomainHosting>>, TError,CheckTenantDomainHostingMutationVariables, TContext> => {
+
+const mutationKey = getCheckTenantDomainHostingMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkTenantDomainHosting>>, CheckTenantDomainHostingMutationVariables> = (props) => {
+          const {tenantId} = props ?? {};
+
+          return  checkTenantDomainHosting(tenantId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CheckTenantDomainHostingMutationResult = NonNullable<Awaited<ReturnType<typeof checkTenantDomainHosting>>>
+
+    export type CheckTenantDomainHostingMutationError = ErrorType<unknown>
+    export type CheckTenantDomainHostingMutationVariables = {tenantId: string}
+
+    export const useCheckTenantDomainHosting = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkTenantDomainHosting>>, TError,CheckTenantDomainHostingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof checkTenantDomainHosting>>,
+        TError,
+        CheckTenantDomainHostingMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCheckTenantDomainHostingMutationOptions(options));
+    }
+
+export const getGetDomainHostingProofUrl = (hostname: string,
+    nonce: string,) => {
+
+
+
+
+  return `/api/public/domains/${hostname}/hosting-proof/${nonce}`
+}
+
+export const getDomainHostingProof = async (hostname: string,
+    nonce: string, options?: Parameters<typeof customFetch>[1]): Promise<GetDomainHostingProof200> => {
+
+  return customFetch<GetDomainHostingProof200>(getGetDomainHostingProofUrl(hostname,nonce),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDomainHostingProofQueryKey = (hostname: string,
+    nonce: string,) => {
+    return [
+    `/api/public/domains/${hostname}/hosting-proof/${nonce}`
+    ] as const;
+    }
+
+
+export const getGetDomainHostingProofQueryOptions = <TData = Awaited<ReturnType<typeof getDomainHostingProof>>, TError = ErrorType<unknown>>(hostname: string,
+    nonce: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDomainHostingProof>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDomainHostingProofQueryKey(hostname,nonce);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDomainHostingProof>>> = ({ signal }) => getDomainHostingProof(hostname,nonce, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: hostname !== null && hostname !== undefined && nonce !== null && nonce !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDomainHostingProof>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDomainHostingProofQueryResult = NonNullable<Awaited<ReturnType<typeof getDomainHostingProof>>>
+export type GetDomainHostingProofQueryError = ErrorType<unknown>
+
+
+
+export function useGetDomainHostingProof<TData = Awaited<ReturnType<typeof getDomainHostingProof>>, TError = ErrorType<unknown>>(
+ hostname: string,
+    nonce: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDomainHostingProof>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDomainHostingProofQueryOptions(hostname,nonce,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 export const getResolvePublicDomainUrl = (hostname: string,) => {
 

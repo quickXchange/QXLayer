@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QXLayer White Label — Consolidated Report</title>
+  <style>
+    :root{color-scheme:light;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#182133;background:#f4f6fa}
+    *{box-sizing:border-box}body{margin:0}main{max-width:1080px;margin:auto;padding:40px 24px 64px}
+    header{background:#18263c;color:white;padding:32px;border-radius:16px;margin-bottom:24px}
+    h1{font-size:30px;line-height:1.2;margin:10px 0 16px}h2{font-size:22px;margin:0 0 16px}h3{font-size:17px;margin:24px 0 10px}
+    p,li,td{font-size:14px;line-height:1.65}p{margin:10px 0}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+    section{background:white;border:1px solid #dfe5ee;border-radius:12px;padding:24px;margin:18px 0}
+    .status{display:inline-block;padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700;background:#ffe7b2;color:#5d3d00}
+    .notice{border-left:4px solid #b87a0b;background:#fff8e8;padding:14px 18px;margin:16px 0}
+    .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+    .fact{border:1px solid #dfe5ee;padding:16px;border-radius:8px}.fact strong{display:block;font-size:24px}.fact span{font-size:12px;color:#5b6678}
+    table{width:100%;border-collapse:collapse}th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#5b6678}
+    th,td{padding:12px 10px;vertical-align:top;border-bottom:1px solid #e3e8ef}td:first-child{width:25%;font-weight:600}
+    ul,ol{padding-left:22px}li{margin:7px 0}code{font-size:12px;background:#edf1f7;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+    footer{font-size:12px;color:#657084;margin-top:28px}.muted{color:#657084}.table-wrap{overflow-x:auto}
+    @media(max-width:650px){main{padding:20px 14px}header,section{padding:20px}.facts{grid-template-columns:1fr}h1{font-size:25px}td:first-child{width:32%}}
+    @media print{body{background:white}main{padding:0;max-width:none}header{color:#182133;background:white;border-bottom:2px solid #182133;border-radius:0}section{break-inside:avoid}.notice{background:white}a{color:inherit}}
+  </style>
+</head>
+<body><main>
+  <header>
+    <div class="eyebrow">QXLayer · White Label Exchange · 9 October 2026</div>
+    <h1>Implementation and verification report</h1>
+    <span class="status">Development workflow exercised · Live sign-off pending</span>
+    <p>The existing architecture and NovaX master remain in place. Approval prepares an isolated customer website; readiness, controlled delivery, same-account access and domain onboarding have been extended rather than recreated.</p>
+  </header>
+
+  <section>
+    <h2>1. Executive result</h2>
+    <p>The Development lifecycle was exercised from a fresh customer request through approval, blocked setup, retry, delivery, same-account Admin Panel access, customer branding/domain configuration and a public mobile website.</p>
+    <div class="facts">
+      <div class="fact"><strong>12</strong><span>New domain/routing unit tests passed</span></div>
+      <div class="fact"><strong>10</strong><span>Real-service regression scenarios passed</span></div>
+      <div class="fact"><strong>39 / 39</strong><span>Original tables preserved in each database</span></div>
+    </div>
+    <div class="notice"><strong>This is not a Production launch certification.</strong> No publication was executed. No real customer hostname was registered, no customer DNS was changed, and no actual customer-domain certificate or authenticated Live lifecycle was verified. Exchange remains Sandbox: no wallets, payments, funds or blockchain execution.</div>
+  </section>
+
+  <section>
+    <h2>2. Functional coverage</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Requirement</th><th>Implementation and evidence</th></tr></thead>
+      <tbody>
+        <tr><td>Provision after approval</td><td>Approval creates and links the isolated tenant and applies this order's NovaX-master branding in one transaction. Failed approval rolls back partial preparation while recording a safe operator-only diagnostic.</td></tr>
+        <tr><td>Isolated customer sites</td><td>Each request has its own tenant, persisted slug and configuration. The shared NovaX renderer is reused, not copied into per-customer frontends. No demo customers, orders, rates, assets or histories are copied.</td></tr>
+        <tr><td>Customer controls</td><td>Existing branding, logo, colors, website settings, domain, assets/networks and Exchange controls remain. Real-service checks covered customer branding/logo metadata and permission isolation; the browser confirmed a saved color and domain. Logo upload and every existing Exchange control were not separately re-tested in this pass.</td></tr>
+        <tr><td>Operator progress</td><td>The Delivery tab polls six actual steps: approval, tenant, master website, configuration, activation and customer access. It shows readiness blockers, persisted errors and eligible retries—not invented progress.</td></tr>
+        <tr><td>Safe retries</td><td>Retries use current rows under a request lock, do not replace saved tenant settings or pricing, and cannot activate incomplete setup. Concurrent retries retained one tenant. Ready standard setup can activate in Sandbox and deliver; custom designs retain the explicit Ready requirement.</td></tr>
+        <tr><td>Delivery and login</td><td>Delivered orders expose the website and platform Admin Panel links. The original customer's existing Clerk session acquired the tenant membership without a second sign-in. Undelivered customers received no Admin Panel or public draft access.</td></tr>
+        <tr><td>Domain onboarding</td><td>Ownership TXT instructions remain visible after verification. The UI distinguishes ownership, hosting and HTTPS; offers checks/retries; and explains exact native Publishing records and certificate renewal. It never invents provider IPs or treats ownership as connected hosting.</td></tr>
+        <tr><td>Public hostname routing</td><td>Only an authoritative verified, active, delivered customer mapping authorizes the custom-host website exception. Root routes to that tenant's existing site. Other tenants and private administration remain inaccessible on that hostname.</td></tr>
+        <tr><td>HTTPS checks</td><td>The backend performs public-IP filtering, DNS pinning, certificate/hostname validation, bounded DNS/network/response handling, no redirects, and a nonce-bound proof for the correct tenant. Changed domain challenges invalidate old observations; stale successful checks are not permanent connectivity claims.</td></tr>
+        <tr><td>Architecture and design</td><td>No replacement template, new customer frontend fork, financial provider connection or database startup initializer was introduced. The main platform gate, Clerk permissions and retained fixtures remain intact.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>3. Verification evidence</h2>
+    <h3>Automated and service checks</h3>
+    <ul>
+      <li><strong>Release preflight and workspace type checks:</strong> passed. Native source/build/routing checks reported no database mutation hook. This source-bound release review is not a new Live deployment.</li>
+      <li><strong>22 existing release tests:</strong> passed—11 publishing/schema checks and 11 Exchange calculation, readiness and public-configuration checks.</li>
+      <li><strong>12 new unit tests:</strong> passed—six hostname/IP/proof/link/error checks and six authoritative-host routing/access checks.</li>
+      <li><strong>10 real Development service scenarios:</strong> passed, including approval rollback diagnostics, incomplete/concurrent retries, delivery, unchanged settings, second-customer separation, permission denial, domain changes and hosting failure/recovery.</li>
+      <li><strong>Important distinction:</strong> successful DNS/proof paths in service regression used injected lookup/probe functions. They validate application logic, not real customer DNS or TLS issuance.</li>
+      <li><strong>Builds:</strong> API, console and customer website built; relevant managed workflows were restarted and served requests. Source-map, Clerk development-key and structural-CSS warnings were observed, not app-blocking failures.</li>
+    </ul>
+    <h3>Signed-in browser observations</h3>
+    <ol>
+      <li>A fresh customer submitted a standard swap-only request; a separate fresh QA operator approved it through the existing confirmations.</li>
+      <li>Initial progress showed <strong>3 of 6</strong> with real blockers. Incomplete retry stayed blocked on the same tenant.</li>
+      <li>After configuring only that tenant with explicit QA test-network/manual-rate settings, browser Retry showed <strong>6 of 6</strong>, delivered website and Admin Panel links.</li>
+      <li>The original customer session refreshed to client-admin access with the same user identity, without another login.</li>
+      <li>The customer saved a branding color and a unique unverified domain. DNS instructions were visible; hosting was not connected, HTTPS was not proven and hosting check was disabled.</li>
+      <li>A real DNS attempt correctly returned “DNS TXT challenge is not available yet.” No DNS or certificate success was simulated in the browser.</li>
+      <li>The delivered public website loaded the customer brand without authentication; a <strong>390 × 844</strong> viewport showed the responsive master and Sandbox/no-funds messaging.</li>
+      <li>Read-only checks denied access to the retained Asterlane draft and NovaX administration. The retained draft was not public.</li>
+    </ol>
+    <div class="notice"><strong>Browser-run qualification:</strong> the tester reported an “unable” certification verdict for a fixture-recording procedure, not an observed delivery failure. Actor IDs and candidate UUIDs were recorded before writes, but backend-generated plan/order/tenant UUIDs were recorded immediately after creation, rather than beforehand. Exact actual scope was retained; cleanup and independent full-table fingerprints subsequently confirmed preservation. These observations should not be represented as an unqualified all-criteria browser certification.</div>
+    <p class="muted">Browser evidence captured: operator 6/6 delivery panel, saved customer branding, and the mobile public website. The disposable website URL was removed with its tenant after testing.</p>
+  </section>
+
+  <section>
+    <h2>4. Data, access and cleanup</h2>
+    <ul>
+      <li>Development and Production row-count/content fingerprints matched the originals across <strong>all 39 tables</strong> after service and browser cleanup. No Production database mutation was performed.</li>
+      <li>The permanent owner, retained Asterlane customer/order/uploads/tenant, NovaX, sample tenants and global catalog records were preserved.</li>
+      <li>Disposable orders, tenants, plans, plan entitlements, histories, pricing rules, tenant-child records, audits and the temporary operator grant were removed and checked.</li>
+      <li><strong>Two generated Development Clerk QA identities remain.</strong> Their application privileges and memberships were removed; the customer returned to unassigned. They were not deleted from the authentication provider.</li>
+      <li>The exact cleanup scope remains in a local workspace manifest. Supporting verification JSON is retained alongside this report.</li>
+      <li>New hosting/failure observations use existing audit storage. No new database schema migration or commercial configuration import was needed for this feature.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>5. Remaining launch requirements</h2>
+    <ol>
+      <li><strong>Authorized publication:</strong> publish the approved code while preserving Production data and leaving Development-data overwrite disabled. Recheck the native schema plan before applying; no publication was executed here.</li>
+      <li><strong>Exact customer hostname:</strong> an authorized publisher must register it in native Publishing. The customer then applies the exact displayed A/CNAME and verification TXT records. Keep the native verification TXT for certificate renewal; each subdomain needs its own connection.</li>
+      <li><strong>Real HTTPS and routing:</strong> verify ownership, allow native TLS issuance, then run the app's hosting check and inspect the actual customer hostname's root/site. Automated native hostname enrollment is not implemented.</li>
+      <li><strong>Authenticated Live lifecycle:</strong> verify approval, setup/retry, delivery, original-account access, customer edits and isolation against actual Production identities. The Development browser pass is not Live proof.</li>
+      <li><strong>Pre-launch platform gate:</strong> it remains active. Default platform-host website/Admin Panel URLs still depend on authorized access to that gate until an explicit launch change; Clerk tenant authentication remains separate. Only the delivered verified custom-site exception is public.</li>
+      <li><strong>Financial scope:</strong> keep Sandbox clearly labeled. Real execution requires a separate approved provider/payment/wallet implementation and verification.</li>
+    </ol>
+    <p><strong>Conclusion:</strong> the Development delivery implementation and observed customer journey are working, with the stated testing qualification. Real-customer Production launch remains pending publication, authorized domain setup and actual Live verification.</p>
+  </section>
+  <footer>QXLayer · Consolidated implementation/verification report · 9 October 2026<br>Self-contained report. No credentials, real customer identities or authentication tokens included.</footer>
+</main></body>
+</html>
