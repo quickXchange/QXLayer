@@ -14,7 +14,7 @@
 - [Workspace package installer](workspace-package-installer.md) — root refreshes need a temporary pnpm root-check setting; the package callback rejects CLI flags and empty lists.
 - [Dependency security review](dependency-security-review-policy.md) — no unsupported major overrides to clear scanners; distinguish bounded non-exploitability from an upstream fix.
 - [Public Exchange demo](public-exchange-demo.md) — public credentials use read-only expiring sessions, not editable Clerk accounts; preserve delivered customer assignments.
-- [Production parity policy](production-parity-policy.md) — current Development is authoritative; compare read-only first, never restore deleted configuration or blindly republish.
+- [Production parity policy](production-parity-policy.md) — latest approved releases preserve Production data; new configuration requires safe migration and actual Live verification.
 - [Exchange filter safety](exchange-admin-filter-safety.md) — Payment Methods alone preserves hidden selections; zero matches must not hide filters or Reset.
 - [Exchange visual identity](exchange-visual-catalog-policy.md) — catalog variants are not new records; currency flags are not customer countries; order privacy differs from authorized configuration.
 - [Migration project roles](migration-project-roles.md) — Project 2 is the white-label source; Project 1 is reference-only despite the archive's eventual destination wording.

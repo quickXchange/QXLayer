@@ -96,6 +96,23 @@ The user broadened the request to landing products, modules, plans, add-ons and 
 
 **How to apply:** Check all configuration tables and their dependencies. Demo/test offerings are not automatically approved commercial configuration; obtain the exact scope decision before importing them. If Agent cannot execute, the user now requests one clear, simple execution step through an authorized Production connection. A single native Production SQL-runner action is allowed for this request; do not resume a multi-step Shell/credential recovery process or bypass Agent's read-only channel. Verify actual Production records and the actual Live website after execution, then prepare Republish only if needed. Do not claim completion before Live verification.
 
+## Standing requirements for every Republish
+
+- Every Republish must deploy the latest approved code and preserve the existing Production database.
+- For any new products, modules, plans, pricing, or configuration added in Development, provide a safe, automated Production migration as part of deployment.
+- Never overwrite or delete existing Production data, customer accounts, or Super Admin access.
+- Verify that all new features and required data appear on the Live website after deployment.
+- Report any migration failure clearly.
+
+**Why:** The user explicitly requested these standing requirements for this project.
+
+**How to apply:** Treat these as release acceptance requirements, not evidence that
+automation already exists or that a deployment or migration has succeeded.
+Report unavailable configuration-data automation as a release blocker rather
+than implying Republish copies Development records. Preserve the authorized
+execution boundaries above and distinguish actual Live verification from
+build success or read-only preparation.
+
 The Production access-code gate is temporary pre-launch hiding only, not a replacement for account authentication or customer delivery. Gate work must not change Clerk accounts, Exchange logic, the database, DNS, the landing page, customer sites, or prepared Production migration SQL. The user approved redesigning ONLY the Private Access page to use the existing QXLayer identity and light/dark behavior.
 
 **Why:** The user explicitly required a separate Production Domain Access Gate and later authorized fixing its Production runtime and redesigning only its Private Access screen, while preserving the other product surfaces and database.
