@@ -1,0 +1,65 @@
+{
+  "status": "PASSED_ISOLATED_SERVICE_AND_DATABASE_REHEARSAL",
+  "database": "PostgreSQL 16, private Unix socket, disposable synthetic database",
+  "originalConstraint": "CHECK (((status = 'delivered'::text) = (tenant_id IS NOT NULL)))",
+  "proposedConstraint": "CHECK (((status <> 'delivered'::text) OR (tenant_id IS NOT NULL)))",
+  "productionChanged": false,
+  "developmentDatabaseChanged": false,
+  "republished": false,
+  "realClerkOrBrowserJourneyTested": false,
+  "nativePublishCurrentlyDetectsChange": false,
+  "tests": [
+    {
+      "test": "Original Production constraint rejects the actual approval service; all preparation and linkage roll back",
+      "result": "PASS"
+    },
+    {
+      "test": "Concurrent write lock causes a bounded timeout with no schema or data change",
+      "result": "PASS"
+    },
+    {
+      "test": "Injected post-validation failure restores original constraint and every existing record",
+      "result": "PASS"
+    },
+    {
+      "test": "Correction preserves all 39 tables' data, existing owner access, customer memberships and every other constraint",
+      "result": "PASS"
+    },
+    {
+      "test": "Already-corrected rerun is a no-op",
+      "result": "PASS"
+    },
+    {
+      "test": "Guarded reversal is safe before any newly permitted tenant links exist",
+      "result": "PASS"
+    },
+    {
+      "test": "All 22 status/link combinations checked; delivered-without-tenant remains forbidden",
+      "result": "PASS"
+    },
+    {
+      "test": "Foreign-key and one-order-per-tenant protections still reject invalid or duplicate tenant links",
+      "result": "PASS"
+    },
+    {
+      "test": "Actual approval prepares a linked draft; customer access, anonymous website, premature delivery and incomplete activation stay blocked",
+      "result": "PASS"
+    },
+    {
+      "test": "Rollback refuses to discard or clear a valid pre-delivery tenant link",
+      "result": "PASS"
+    },
+    {
+      "test": "Real setup/activation/delivery services grant only the correct customer access and preserve cross-tenant denial",
+      "result": "PASS"
+    },
+    {
+      "test": "Already-delivered retry remains idempotent",
+      "result": "PASS"
+    },
+    {
+      "test": "Custom-design activation does not deliver early; explicit Ready review remains required",
+      "result": "PASS"
+    }
+  ]
+}

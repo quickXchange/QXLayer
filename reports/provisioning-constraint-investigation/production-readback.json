@@ -1,0 +1,49 @@
+{
+  "status": "READ_ONLY_PRODUCTION_INSPECTION_NO_CHANGES",
+  "constraintName": "public.white_label_requests.white_label_request_delivery",
+  "productionDefinition": "CHECK (((status = 'delivered'::text) = (tenant_id IS NOT NULL)))",
+  "productionValidated": true,
+  "developmentDefinition": "CHECK (((status <> 'delivered'::text) OR (tenant_id IS NOT NULL)))",
+  "developmentValidated": true,
+  "nativePublishingDiff": {
+    "success": true,
+    "hasDiff": false,
+    "statementsToExecute": [],
+    "hasStructuralDataLoss": false
+  },
+  "productionCounts": {
+    "orders": 0,
+    "tenants": 0,
+    "memberships": 0,
+    "activeSuperAdmins": 1,
+    "invalidDeliveredWithoutTenant": 0
+  },
+  "fixtureDefaultExpressionsSemanticallyMatchProduction": true,
+  "equivalentDefaultSyntaxDifferences": [
+    {
+      "column": "addons.monthly_price",
+      "development": "0",
+      "production": "'0'::numeric"
+    },
+    {
+      "column": "addons.setup_fee",
+      "development": "0",
+      "production": "'0'::numeric"
+    },
+    {
+      "column": "addons.yearly_price",
+      "development": "0",
+      "production": "'0'::numeric"
+    },
+    {
+      "column": "tenant_branding.supported_languages",
+      "development": "ARRAY['en'::text]",
+      "production": "'{en}'::text[]"
+    }
+  ],
+  "defaultEquivalenceVerifiedReadOnly": true,
+  "executionBlocked": true,
+  "productionWrites": 0,
+  "developmentDatabaseWrites": 0,
+  "republished": false
+}

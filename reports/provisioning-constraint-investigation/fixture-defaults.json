@@ -1,0 +1,577 @@
+[
+  {
+    "table": "addons",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "addons",
+    "column": "description",
+    "expression": "''::text"
+  },
+  {
+    "table": "addons",
+    "column": "enabled",
+    "expression": "true"
+  },
+  {
+    "table": "addons",
+    "column": "monthly_price",
+    "expression": "0"
+  },
+  {
+    "table": "addons",
+    "column": "yearly_price",
+    "expression": "0"
+  },
+  {
+    "table": "addons",
+    "column": "setup_fee",
+    "expression": "0"
+  },
+  {
+    "table": "addons",
+    "column": "currency",
+    "expression": "'USD'::text"
+  },
+  {
+    "table": "addons",
+    "column": "pricing_configured",
+    "expression": "false"
+  },
+  {
+    "table": "api_keys",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "api_keys",
+    "column": "scopes",
+    "expression": "'{}'::text[]"
+  },
+  {
+    "table": "api_keys",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "audit_events",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "audit_events",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "audit_events",
+    "column": "metadata",
+    "expression": "'{}'::jsonb"
+  },
+  {
+    "table": "blockchain_provider_configs",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "blockchain_provider_configs",
+    "column": "adapter",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "blockchain_provider_configs",
+    "column": "priority",
+    "expression": "'primary'::text"
+  },
+  {
+    "table": "blockchain_provider_configs",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "exchange_orders",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "exchange_orders",
+    "column": "status",
+    "expression": "'draft'::text"
+  },
+  {
+    "table": "exchange_orders",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "exchange_orders",
+    "column": "request",
+    "expression": "'{}'::jsonb"
+  },
+  {
+    "table": "exchange_orders",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "landing_products",
+    "column": "visible",
+    "expression": "true"
+  },
+  {
+    "table": "landing_products",
+    "column": "currency",
+    "expression": "'USD'::text"
+  },
+  {
+    "table": "landing_products",
+    "column": "billing_period",
+    "expression": "'on_request'::text"
+  },
+  {
+    "table": "landing_products",
+    "column": "status",
+    "expression": "'coming_soon'::text"
+  },
+  {
+    "table": "landing_products",
+    "column": "cta_label",
+    "expression": "'Learn More'::text"
+  },
+  {
+    "table": "landing_products",
+    "column": "display_order",
+    "expression": "0"
+  },
+  {
+    "table": "module_catalog",
+    "column": "sandbox_available",
+    "expression": "true"
+  },
+  {
+    "table": "module_catalog",
+    "column": "definition",
+    "expression": "'{}'::jsonb"
+  },
+  {
+    "table": "network_catalog",
+    "column": "testnet",
+    "expression": "true"
+  },
+  {
+    "table": "notification_events",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "notification_events",
+    "column": "payload",
+    "expression": "'{}'::jsonb"
+  },
+  {
+    "table": "notification_events",
+    "column": "status",
+    "expression": "'sandbox_queued'::text"
+  },
+  {
+    "table": "notification_events",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "payment_invoices",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "payment_invoices",
+    "column": "status",
+    "expression": "'pending'::text"
+  },
+  {
+    "table": "payment_invoices",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "payment_invoices",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "plans",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "plans",
+    "column": "description",
+    "expression": "''::text"
+  },
+  {
+    "table": "plans",
+    "column": "monthly_price",
+    "expression": "'0'::numeric"
+  },
+  {
+    "table": "plans",
+    "column": "yearly_price",
+    "expression": "'0'::numeric"
+  },
+  {
+    "table": "plans",
+    "column": "setup_fee",
+    "expression": "'0'::numeric"
+  },
+  {
+    "table": "plans",
+    "column": "currency",
+    "expression": "'USD'::text"
+  },
+  {
+    "table": "plans",
+    "column": "billing_label",
+    "expression": "''::text"
+  },
+  {
+    "table": "plans",
+    "column": "display_order",
+    "expression": "0"
+  },
+  {
+    "table": "plans",
+    "column": "status",
+    "expression": "'disabled'::text"
+  },
+  {
+    "table": "plans",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "plans",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "platform_admins",
+    "column": "active",
+    "expression": "true"
+  },
+  {
+    "table": "platform_admins",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "pricing_rules",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "pricing_rules",
+    "column": "fee_bps",
+    "expression": "'0'::numeric"
+  },
+  {
+    "table": "pricing_rules",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "provider_assignments",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "provider_assignments",
+    "column": "configuration",
+    "expression": "'{}'::jsonb"
+  },
+  {
+    "table": "provider_assignments",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "provider_assignments",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "provider_catalog",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "provider_catalog",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "provider_catalog",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "provider_policies",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "provider_policies",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "tenant_branding",
+    "column": "primary_color",
+    "expression": "'#0F766E'::text"
+  },
+  {
+    "table": "tenant_branding",
+    "column": "accent_color",
+    "expression": "'#14B8A6'::text"
+  },
+  {
+    "table": "tenant_branding",
+    "column": "theme_mode",
+    "expression": "'system'::text"
+  },
+  {
+    "table": "tenant_branding",
+    "column": "default_language",
+    "expression": "'en'::text"
+  },
+  {
+    "table": "tenant_branding",
+    "column": "supported_languages",
+    "expression": "ARRAY['en'::text]"
+  },
+  {
+    "table": "tenant_branding",
+    "column": "website_settings",
+    "expression": "'{}'::jsonb"
+  },
+  {
+    "table": "tenant_configuration",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "tenant_configuration",
+    "column": "exchange_enabled",
+    "expression": "false"
+  },
+  {
+    "table": "tenant_configuration",
+    "column": "payments_enabled",
+    "expression": "false"
+  },
+  {
+    "table": "tenant_configuration",
+    "column": "allow_guest_checkout",
+    "expression": "false"
+  },
+  {
+    "table": "tenant_domains",
+    "column": "status",
+    "expression": "'unverified'::text"
+  },
+  {
+    "table": "tenant_memberships",
+    "column": "role",
+    "expression": "'client_admin'::text"
+  },
+  {
+    "table": "tenant_memberships",
+    "column": "active",
+    "expression": "true"
+  },
+  {
+    "table": "tenant_memberships",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "tenant_memberships",
+    "column": "label",
+    "expression": "''::text"
+  },
+  {
+    "table": "tenant_memberships",
+    "column": "permissions",
+    "expression": "'{}'::text[]"
+  },
+  {
+    "table": "tenant_modules",
+    "column": "enabled",
+    "expression": "false"
+  },
+  {
+    "table": "tenant_modules",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "tenant_payment_methods",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "tenant_payment_methods",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "tenant_product_configuration",
+    "column": "configuration",
+    "expression": "'{}'::jsonb"
+  },
+  {
+    "table": "tenant_product_configuration",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "tenant_subscriptions",
+    "column": "status",
+    "expression": "'active'::text"
+  },
+  {
+    "table": "tenant_subscriptions",
+    "column": "resume_status",
+    "expression": "'draft'::text"
+  },
+  {
+    "table": "tenant_subscriptions",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "tenant_usage_counters",
+    "column": "used",
+    "expression": "'0'::numeric"
+  },
+  {
+    "table": "tenants",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "tenants",
+    "column": "status",
+    "expression": "'draft'::text"
+  },
+  {
+    "table": "tenants",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "tenants",
+    "column": "completed_steps",
+    "expression": "'{}'::text[]"
+  },
+  {
+    "table": "tenants",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "tenants",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "wallet_configurations",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "wallet_configurations",
+    "column": "strategy",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "wallet_configurations",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "webhook_endpoints",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "webhook_endpoints",
+    "column": "enabled",
+    "expression": "false"
+  },
+  {
+    "table": "webhook_endpoints",
+    "column": "environment",
+    "expression": "'sandbox'::text"
+  },
+  {
+    "table": "webhook_endpoints",
+    "column": "label",
+    "expression": "'Webhook'::text"
+  },
+  {
+    "table": "white_label_attachments",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "white_label_events",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "white_label_events",
+    "column": "visibility",
+    "expression": "'customer'::text"
+  },
+  {
+    "table": "white_label_events",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "white_label_requests",
+    "column": "id",
+    "expression": "gen_random_uuid()"
+  },
+  {
+    "table": "white_label_requests",
+    "column": "status",
+    "expression": "'new'::text"
+  },
+  {
+    "table": "white_label_requests",
+    "column": "operator_note",
+    "expression": "''::text"
+  },
+  {
+    "table": "white_label_requests",
+    "column": "created_at",
+    "expression": "now()"
+  },
+  {
+    "table": "white_label_requests",
+    "column": "updated_at",
+    "expression": "now()"
+  },
+  {
+    "table": "white_label_requests",
+    "column": "order_number",
+    "expression": "nextval('white_label_requests_order_number_seq'::regclass)"
+  },
+  {
+    "table": "white_label_requests",
+    "column": "custom_design_decision",
+    "expression": "'pending'::text"
+  }
+]

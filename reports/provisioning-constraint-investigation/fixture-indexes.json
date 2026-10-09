@@ -1,0 +1,14 @@
+[
+  {
+    "table": "provider_assignments",
+    "definition": "CREATE UNIQUE INDEX provider_assignment_scope ON public.provider_assignments USING btree (tenant_id, provider_id, capability, environment)"
+  },
+  {
+    "table": "provider_policies",
+    "definition": "CREATE UNIQUE INDEX provider_policy_scope ON public.provider_policies USING btree (tenant_id, scope, resource_id, capability)"
+  },
+  {
+    "table": "white_label_requests",
+    "definition": "CREATE UNIQUE INDEX white_label_request_idempotency ON public.white_label_requests USING btree (customer_user_id, idempotency_key)"
+  }
+]

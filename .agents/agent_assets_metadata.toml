@@ -616,3 +616,17 @@ mtime_ms = 1791506117894
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e114eea5-dc55-43a1-9d60-58fb3f85a524/338824d6-d794-4309-b26c-6f848317554e"
 storage_version_token = "1791506118914489"
 content_type = "text/html"
+
+[[outputs]]
+id = "B91HdVoNtA8o7kOBZama4"
+uri = "file://reports/provisioning-constraint-investigation/report.html"
+type = "html"
+title = "Provisioning constraint — fix, tests and rollback plan"
+description = "Read-only investigation: exact correction, 13 passing isolated checks, rollback safeguards and the unresolved native migration-plan blocker. No Production changes or Republish."
+logical_id = "e5d96b27-6d7f-4115-a42e-f6969af2cd4a"
+content_hash = "sha256:cdc4cdfac4a4f242d96efa8176e1246920e8f969ccfdcdeef1bcd13982befff6"
+size = 9757
+mtime_ms = 1791508944690
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e5d96b27-6d7f-4115-a42e-f6969af2cd4a/d354cb33-eaec-4d3c-bb3f-277aee2578b1"
+storage_version_token = "1791508945393824"
+content_type = "text/html"
