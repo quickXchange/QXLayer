@@ -43,3 +43,17 @@ For the QXLayer Production release, the user instructed:
 the no-cutover and no-security-weakening constraints remain. Do not
 substitute another report or support referral for a completed migration, and
 state clearly when a requested action cannot be performed.
+
+## Production snapshot preparation
+
+For the QXLayer-to-Supabase database preparation, the user selected:
+"Prepare an export script for me to run later", rather than supplying an existing
+Production backup.
+
+**Why:** The user requested preparation without executing anything, preserving
+all actual QXLayer Production records and excluding QuickXchange.
+
+**How to apply:** Preparing the operator's read-only export is authorized; running
+that export, importing the snapshot, or changing either live connection still
+requires new explicit approval. Never substitute Development data or claim an
+offline export kit already contains Production records.

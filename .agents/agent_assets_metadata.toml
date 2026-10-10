@@ -826,3 +826,45 @@ mtime_ms = 1791591468997
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fe79a2e7-632d-4a0a-81fa-a94bb8af62ca/9335b8f7-8a2d-4363-8f8f-5a7add60e6f6"
 storage_version_token = "1791591475414740"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "tUMkFFEJzRqegZ1xOF4O-"
+uri = "file://generated-artifacts/qxlayer-production-transfer-kit.zip"
+type = "unspecified"
+title = "QXLayer Production export & Supabase restore kit"
+description = "Operator-run read-only export, atomic restore-file generator, reviewed RLS/LOGIN SQL, checksums and instructions. No Production records are included until you run the export."
+logical_id = "16befe4d-65fc-4a5f-9c53-a6e463dd2b24"
+content_hash = "sha256:8273e7d1395454aea145dea099650dd8591aecfaa4d9ae9b7ae8027a12530643"
+size = 49369
+mtime_ms = 1791593072811
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/16befe4d-65fc-4a5f-9c53-a6e463dd2b24/f1f67794-d843-422f-aa12-b3dd750ad44c"
+storage_version_token = "1791593144010429"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "IMa3V8lxMoLLycBOc1kc_"
+uri = "file://generated-artifacts/qxlayer-production-transfer/README.md"
+type = "text"
+title = "QXLayer migration — step-by-step instructions"
+description = "Source setup, approved export, empty Supabase restore order, migration-history handling, verification and account-preservation requirements."
+logical_id = "0adb5fc6-0539-4736-abf9-38217b125113"
+content_hash = "sha256:7a723a1c6b221f86556aaae12047180e2fba2ec264e23fe592d602ca3685f1fc"
+size = 20415
+mtime_ms = 1791592921506
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0adb5fc6-0539-4736-abf9-38217b125113/6ec50674-7a32-49cb-aaef-3e6ce586fb69"
+storage_version_token = "1791593144523330"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "erPMkbVNkbS6eW7N2XPeG"
+uri = "file://generated-artifacts/qxlayer-production-transfer/00-target-preflight.sql"
+type = "unspecified"
+title = "00-target-preflight.sql"
+description = "Standalone read-only Supabase inventory for later use. Not executed."
+logical_id = "d6713fcf-54a6-4a3a-aaae-a8a6bd0ece83"
+content_hash = "sha256:3900add49320d2a11b0d50133646eb0b35715aa5b4bdc71751c05fbd49506930"
+size = 991
+mtime_ms = 1791592476411
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d6713fcf-54a6-4a3a-aaae-a8a6bd0ece83/db45d931-a6aa-4f53-bae5-c2dc68a665f7"
+storage_version_token = "1791593145035190"
+content_type = "application/octet-stream"
