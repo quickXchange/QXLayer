@@ -21,6 +21,20 @@ plaintext on ordinary Replit storage. A local synthetic roundtrip or configured-
 prove external key retention or independent durable recovery of a real backup;
 get operator confirmation and verify the later receiving copy separately.
 
+Give asynchronous plaintext consumers ownership of their chunk buffers. Never
+zero a yielded buffer when the generator advances: a stream can prefetch its next
+chunk while a pending asynchronous write still references the previous one.
+Use independent bounded consumer copies, wipe internal buffers, and keep all
+consumer plaintext memory-only after full authentication.
+
+**Why:** A real multi-chunk package failed verification although small fixtures
+and synchronous hashing passed. A delayed synthetic writable reproduced the
+early-zeroization corruption; a larger complete package covered the missing case.
+
+**How to apply:** Test large payloads through backpressured/asynchronous consumers,
+not just direct loops that synchronously hash/copy chunks. Retain whole-envelope
+and whole-package verification; do not weaken validation to fix streaming errors.
+
 Use the existing Replit environment for QXLayer-only encrypted export preparation.
 The user superseded the Mac/iCloud approach and rejected AWS account creation.
 Do not use their Mac or personal files. Prefer an existing service for an
