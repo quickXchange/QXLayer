@@ -34,9 +34,11 @@ are removed, so shutdown is not a harmless reversible maintenance pause.
 **How to apply:** Use private temporary ciphertext-only staging outside the
 workspace, never Git, public download routes, Library or deployment artifacts.
 Retain the original key independently outside Replit and separate from ciphertext.
-An existing Supabase project's private Storage is a proposed receiving destination,
-not a verified connection. Verify its access controls and fresh receiving bytes
-against the original receipt; do not call a Replit-only copy an independent backup.
+Use the operator's existing intended Supabase project's private Storage as the
+receiving destination, not a new account/service. Verify access controls and fresh
+receiving bytes against the original receipt. A successful synthetic receiving
+check verifies the route, not a real backup or outside-Replit key recoverability;
+do not call a Replit-only copy an independent backup.
 A temporary all-table lock barrier only blocks table writes/DDL: separately hold
 standalone sequence callers and external side effects, disclose write timeouts,
 and never claim a fully operational freeze from flags alone. Safeguard checks
