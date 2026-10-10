@@ -980,3 +980,31 @@ mtime_ms = 1791638537446
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/77b67bc5-23fc-4273-9de2-991134405ea1/cc7457d1-f186-4c21-8c6f-16cfad9593b8"
 storage_version_token = "1791638769586423"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "Hc6uQsNu_cHqqDtu4YHvh"
+uri = "file://generated-artifacts/qxlayer-production-secure-export-preparation.zip"
+type = "unspecified"
+title = "QXLayer Secure Export Preparation Kit"
+description = "Credential-free kit with a metadata-only primary preflight, tested authenticated streaming encryption, explicit blockers and refreshed checksums. Contains no Production records or backups. No export or freeze is authorized."
+logical_id = "7c8d92ff-ac28-4451-99f7-db05642f9637"
+content_hash = "sha256:4c1e4f318fa0e9c12421aeb902f62c6cc0e54f4c974ea43f511b7866e03cd96c"
+size = 138831
+mtime_ms = 1791639711079
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7c8d92ff-ac28-4451-99f7-db05642f9637/3000999b-bd21-4e65-a980-a094707674ce"
+storage_version_token = "1791639732824681"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "Dd0wCxsiatj0iSRw8h1B_"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/SECURE-EXPORT-PREPARATION.md"
+type = "text"
+title = "Exact Secure Setup Steps and Prerequisites"
+description = "iPad-friendly steps for the existing Production connection, dedicated Secrets, independent backup-key retention, and safe preflight commands. Explains why the managed replica and legacy plaintext exporter cannot be used for this encrypted destination."
+logical_id = "fab0002c-d79c-4d8f-8ae3-df649074206f"
+content_hash = "sha256:086d048bb9a384e6ed89767e4c64e06cca7352d6321d0bb3b4e17939aa639452"
+size = 7444
+mtime_ms = 1791639603854
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fab0002c-d79c-4d8f-8ae3-df649074206f/5fb432e2-a4dd-497f-8565-bb2eac8cfe0c"
+storage_version_token = "1791639733349906"
+content_type = "text/markdown"

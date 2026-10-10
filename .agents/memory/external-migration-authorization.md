@@ -120,3 +120,17 @@ otherwise exact catalog comparison.
 
 **How to apply:** Preserve catalog integers using Python/exact-integer tools and
 test their equality against the original capture before distributing a kit.
+
+## Secure read-only preparation boundary
+
+The user authorized secure reuse of the existing QXLayer Production connection
+and encrypted backup preparation, but explicitly prohibited Production changes,
+write freeze, record export, Supabase restore and deployment at this stage.
+
+**Why:** The user requested prerequisite verification before any actual data copy.
+
+**How to apply:** Metadata-only primary preflight is allowed after secure source
+configuration. Never mistake the managed Production replica for the primary.
+Keep the backup key independently recoverable outside Replit; do not treat a
+private directory as an encrypted filesystem or approve legacy plaintext
+assembly into a ciphertext-only destination. QuickXchange stays separate.
