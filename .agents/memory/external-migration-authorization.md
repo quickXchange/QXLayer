@@ -1,22 +1,28 @@
 ---
 name: External preparation authorization
-description: External migration authorization history, read-only hosting verification boundaries, and the Production/cutover hold.
+description: External migration authorization history, isolated staging creation, paid-resource notice, and the Production/cutover hold.
 ---
 
-## Hosting access does not authorize deployment
+## Current staging configuration authorization
 
 Connecting Vercel, adding a Render credential and verifying hosting configuration
-authorize connection/read-only checks, not service creation or deployment. The
-user explicitly limited the subsequent Render verification to read-only requests:
-no new services, deployment, Production changes or DNS changes.
+initially authorized connection/read-only checks, not service creation or
+deployment. The user subsequently approved creating and configuring isolated
+QXLayer staging API/worker services on Render, using the existing architecture
+and a separate staging Supabase environment.
 
-**Why:** The user repeated these boundaries when reconnecting hosting accounts
-and requesting verification, superseding earlier execution scope for this phase.
+Keep the existing QXLayer name, branding, domains and project identifiers
+unchanged. Keep automatic deployments disabled initially. Tell the user before
+enabling paid resources. Do not modify Production, restore data or change DNS.
 
-**How to apply:** Use GET-only hosting checks, retain completed migration evidence,
-and require fresh explicit authorization before creating or deploying staging
-services. Do not infer deployment permission from successful authentication or
-the earlier broad staging implementation request.
+**Why:** The user explicitly authorized isolated staging creation after the
+read-only verification, while repeating these boundaries and the cost-notice
+requirement.
+
+**How to apply:** Create/configure only approved staging resources; retain
+completed migration evidence and do not rerun restores. Announce compute costs
+before provisioning paid instances. Do not infer Production release or cutover
+permission from staging authorization or successful account authentication.
 
 ## Earlier implementation authorization
 
