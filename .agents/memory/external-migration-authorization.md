@@ -80,6 +80,20 @@ identities and Super Admin permissions. Check actual managed-workspace authority
 ordinary Clerk transfer documentation alone does not establish managed-tenant
 eligibility or continuity of Replit provisioning and billing.
 
+The user clarified that they do not have Owner/Admin access to the existing
+managed application's workspace and cannot inspect its Team, Invite or Transfer
+controls. Do not request those screenshots again unless source access changes.
+
+**Why:** The user explicitly corrected the assumption that they could inspect
+source-workspace administration. Replit's dashboard-entry authorization does not
+establish that authority.
+
+**How to apply:** An independently created receiving dashboard account cannot
+self-grant membership or initiate a source-side transfer. With no verified
+self-service claim route, retain the managed application and explain the
+source-authority prerequisite without creating a replacement or contacting
+support on the user's behalf.
+
 The user inspected Publishing settings and reported that the existing
 Production authentication keys are hidden or protected.
 
