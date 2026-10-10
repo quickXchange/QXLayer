@@ -42,6 +42,19 @@ replacement identities or substituting Development users for Production users.
 Preserving business-database records alone does not prove that hosted sign-in
 and the registered-account directory are retained.
 
+The user inspected Publishing settings and reported that the existing
+Production authentication keys are hidden or protected.
+
+**Why:** The proposed Publishing-settings credential-copy route was checked by
+the user and could not supply the retained managed credentials.
+
+**How to apply:** Do not send the user back to the same copy-key instructions.
+Do not bypass protection, rotate keys or replace the tenant. Authorized
+read-only inspection through Replit's managed dashboard is a distinct possible
+route, but dashboard authorization is not proof that keys can be exported or
+the tenant can be transferred. Keep external authentication held until the
+retained-instance connection is established through a supported method.
+
 ## Earlier implementation authorization
 
 The user subsequently authorized preparing permanent GitHub-based deployment:
