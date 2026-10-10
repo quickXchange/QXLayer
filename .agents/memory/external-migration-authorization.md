@@ -57,3 +57,21 @@ all actual QXLayer Production records and excluding QuickXchange.
 that export, importing the snapshot, or changing either live connection still
 requires new explicit approval. Never substitute Development data or claim an
 offline export kit already contains Production records.
+
+## Confirmed primary baseline and staged target upgrade
+
+The operator verified the actual QXLayer Production primary through Replit's
+browser SQL runner and confirmed that the integration schema in the newer source
+has not reached Production. The user operates this migration from an iPad.
+
+**Why:** The earlier export kit assumed the newer source model was the existing
+Production baseline. The user explicitly prohibited adding the missing schema to
+Production or using Development data to reconcile the mismatch.
+
+**How to apply:** Pin export review to actual primary metadata and preserve the
+existing baseline first. Any additive application-compatibility schema belongs
+only on the isolated Supabase candidate, under a separate approval after source
+preservation checks. Keep application startup/cutover held; do not bypass the
+runtime's full isolation readiness checks. Use browser metadata capture when
+workstation tools are unavailable; metadata checks never authorize export,
+freeze or restore.

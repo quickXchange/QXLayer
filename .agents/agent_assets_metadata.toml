@@ -868,3 +868,45 @@ mtime_ms = 1791592476411
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d6713fcf-54a6-4a3a-aaae-a8a6bd0ece83/a1b34402-3ba6-43b3-83a9-a3277ae5dcb5"
 storage_version_token = "1791622198007769"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "gIIMLchmhfG45G2xNooGq"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40-table-kit.zip"
+type = "unspecified"
+title = "QXLayer Production Export & Supabase Restore — 40-Table Kit"
+description = "Corrected offline preparation kit: exact Production baseline, 80 reviewed policies, primary metadata approval, and a separately guarded target-only compatibility upgrade. Contains no Production records."
+logical_id = "75b39d38-78dd-40a6-b8d4-7be532ed041a"
+content_hash = "sha256:9125181b378604064b6388a0eb8b2790f1c5de9cd5a3eb57a9176cd32851a337"
+size = 96486
+mtime_ms = 1791624389359
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/75b39d38-78dd-40a6-b8d4-7be532ed041a/d487df94-00a1-4612-8884-952c12ae4ee4"
+storage_version_token = "1791624424295408"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "hzj6891j6deWWwKdwgmb3"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/README.md"
+type = "text"
+title = "Updated Step-by-Step Instructions — iPad Next Step"
+description = "Explains the 40-table restore, application compatibility hold, separate Supabase-only upgrade, and safe browser metadata capture."
+logical_id = "73bb0764-bffa-4756-9887-5df6ed6767d0"
+content_hash = "sha256:fef336407062d0d36c84460cdbf54b0fb296489583cea696e80823aebf74f4a1"
+size = 16530
+mtime_ms = 1791624306743
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/73bb0764-bffa-4756-9887-5df6ed6767d0/75e3230d-1263-4e96-a05e-11edbe5863ac"
+storage_version_token = "1791624424918774"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "3D0HVyr0EGyc7VFh7ESRn"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/01-primary-metadata-only.sql"
+type = "unspecified"
+title = "iPad: Read-Only Production Primary Metadata Check"
+description = "Run later in QXLayer Production Database SQL runner. Reads system-catalog schema/security metadata only; no customer records, credentials, migrations or export."
+logical_id = "7c75004d-e5e6-4808-8b8e-56d1250a564f"
+content_hash = "sha256:16ea6069cbc4bdfe224312ca301b7787f1cee3e1fc6dfdd111de300ef7f39738"
+size = 3296
+mtime_ms = 1791624388627
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7c75004d-e5e6-4808-8b8e-56d1250a564f/85ab301d-2870-499a-8b75-290ee5520ad2"
+storage_version_token = "1791624425475216"
+content_type = "application/octet-stream"
