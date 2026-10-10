@@ -84,3 +84,14 @@ preparation/capture reports still existed, but could not supply the missing inpu
 Recover and authenticate the existing independent ciphertext and receipt evidence
 under reviewed authorization; never create a new capture or bypass the original
 receipt/GCM checks to make restoration proceed.
+
+After a stopped restore, receiving-copy recovery/verification approval does not
+authorize retrying the restore. Wait for new explicit restore approval, even when
+all receiving-copy checks pass.
+
+**Why:** The user expressly approved recovery and verification only, prohibited
+any database restore or remote changes, and required reporting before another
+restore approval.
+
+**How to apply:** Keep recovery GET-only, retain original encrypted bytes and
+receipt evidence without recapture, and end after the verification report.
