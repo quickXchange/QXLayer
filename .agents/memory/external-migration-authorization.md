@@ -27,8 +27,8 @@ permission from staging authorization or successful account authentication.
 ## Existing authentication preservation
 
 Preserve the existing login system, customer accounts, roles and Super Admin
-permissions. Do not introduce Clerk or require new accounts unless technically
-necessary. Do not change Production.
+permissions. Do not create a replacement Clerk application, migrate users, change
+authentication keys or modify Production without explicit approval.
 
 **Why:** The user explicitly restated these migration boundaries after a
 credential request made it sound as though they needed a personal Clerk
@@ -63,9 +63,22 @@ change was denied. Public Replit dashboard documentation also conflicted with
 observed authorized access; generic Clerk transfer support does not establish
 eligibility for this managed application.
 
-**How to apply:** Obtain provider confirmation of scoped independent membership
-or same-application ownership transfer before proposing any execution. Do not
-infer a precise workspace role from the display name or one denied operation.
+**How to apply:** Verify an actually authorized self-service route or obtain
+provider confirmation of scoped independent membership or same-application
+ownership transfer before proposing execution. Do not infer a precise workspace
+role from the display name or one denied operation.
+
+The user requested read-only inspection of self-service linking to their own
+Clerk dashboard account without contacting support, if technically supported.
+Explain alternatives before making changes if direct linking is unsupported.
+
+**Why:** The user explicitly requested this investigation; having a personal
+dashboard account does not authorize replacement of the existing application.
+
+**How to apply:** Distinguish dashboard team membership from QXLayer end-user
+identities and Super Admin permissions. Check actual managed-workspace authority;
+ordinary Clerk transfer documentation alone does not establish managed-tenant
+eligibility or continuity of Replit provisioning and billing.
 
 The user inspected Publishing settings and reported that the existing
 Production authentication keys are hidden or protected.
