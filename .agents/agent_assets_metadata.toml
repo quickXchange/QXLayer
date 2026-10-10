@@ -728,3 +728,17 @@ mtime_ms = 1791588389642
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/20885ba2-b11e-4ed7-a392-a460d40464f7/df8ff2c4-ff0a-4c0f-90bd-2c253edb514a"
 storage_version_token = "1791588512140396"
 content_type = "text/html"
+
+[[outputs]]
+id = "D621lHfeMr491o1MgbcKf"
+uri = "file://generated-artifacts/supabase-security/guide.html"
+type = "html"
+title = "QXLayer Supabase role and RLS setup"
+description = "Safe SQL Editor steps, downloadable inspection/setup/exact-verification SQL, and secure password instructions. Includes all 42 tables and the exact 84 repository policy definitions; no cloud changes were made."
+logical_id = "fc08d810-70a6-4e2f-a2c8-a65a2e12fd92"
+content_hash = "sha256:05e78beaba5ab2391154baa1c94c7bbe807cfe892014c0265933f583b10e8511"
+size = 358030
+mtime_ms = 1791590417336
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fc08d810-70a6-4e2f-a2c8-a65a2e12fd92/44cf3e95-987b-4ddb-87d9-9249af33679a"
+storage_version_token = "1791590474051413"
+content_type = "text/html"
