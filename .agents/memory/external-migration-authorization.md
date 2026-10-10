@@ -105,6 +105,17 @@ successful managed-dashboard entry.
 the available management check cannot reveal it. Do not ask for credentials in
 chat, screenshots or ordinary forms.
 
+The user requires Staging and Production to remain completely separate while
+keeping existing Clerk authentication unchanged.
+
+**Why:** The user explicitly restated full separation for continued migration.
+
+**How to apply:** Do not reuse live Clerk credentials as a shortcut for Staging.
+Investigate the existing Development instance and Staging-only identity bindings;
+preserve the Production identity store, roles and application configuration.
+Earlier preparation reports expecting live credentials are not permission to
+share the Production authentication store.
+
 Staging that shares the Production Clerk instance does not isolate identity
 mutations merely because its business database is separate.
 
