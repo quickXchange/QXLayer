@@ -1008,3 +1008,17 @@ mtime_ms = 1791639603854
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fab0002c-d79c-4d8f-8ae3-df649074206f/5fb432e2-a4dd-497f-8565-bb2eac8cfe0c"
 storage_version_token = "1791639733349906"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "rGZAWRKBoTE5G5nrl6cwh"
+uri = "file://generated-artifacts/qxlayer-mac-icloud-migration-preparation.zip"
+type = "unspecified"
+title = "QXLayer — Mac & Private iCloud Workflow"
+description = "Updated kit with exact Mac setup, Keychain storage, direct encrypted capture, private iCloud transfer/fresh download verification, and an approval-gated write-lock runbook. Preparation only; contains no Production records or credentials. Start with MAC-ICLOUD-STEPS.md."
+logical_id = "0e420b63-a55e-4ca4-bec1-862724af2d7b"
+content_hash = "sha256:7d1003d1bf81d6ae897de280e38226f095232a56a972235e1915eb73e4b4372f"
+size = 182578
+mtime_ms = 1791646741674
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0e420b63-a55e-4ca4-bec1-862724af2d7b/663c884c-65b0-4f25-b07b-d24df0c909bd"
+storage_version_token = "1791646782495692"
+content_type = "application/octet-stream"
