@@ -75,3 +75,17 @@ preservation checks. Keep application startup/cutover held; do not bypass the
 runtime's full isolation readiness checks. Use browser metadata capture when
 workstation tools are unavailable; metadata checks never authorize export,
 freeze or restore.
+
+## Browser metadata capture must be one SELECT
+
+Keep Production SQL Runner's Enable Editing OFF. Its read-only gate rejects
+transaction and session-setting statements, even around a catalog-only query.
+
+**Why:** The operator's metadata capture was rejected with "Cannot run
+modification statements in read-only mode"; the user explicitly required one
+read-only SELECT and no Production changes.
+
+**How to apply:** Use only a SELECT with read-only catalog functions; no
+transaction wrappers, SET or setting-changing functions. Download complete query
+results as CSV rather than copying a truncated grid cell, with payload byte
+length and digest checked offline before metadata approval.
