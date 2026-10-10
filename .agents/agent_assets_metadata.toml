@@ -1022,3 +1022,17 @@ mtime_ms = 1791646741674
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0e420b63-a55e-4ca4-bec1-862724af2d7b/663c884c-65b0-4f25-b07b-d24df0c909bd"
 storage_version_token = "1791646782495692"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "gln5woZG3ZNe8zMK_7O2W"
+uri = "file://generated-artifacts/qxlayer-staging-setup/replit-managed-clerk-access-request.html"
+type = "html"
+title = "Prepared Replit Support Request"
+description = "Eligibility-only request for independent access to QXLayer’s existing managed Clerk application. Not submitted; no secrets included."
+logical_id = "bd816b93-ff90-4158-ba46-4d25c27cce1d"
+content_hash = "sha256:98968ab97f2da68220170a43e76bd99be7d361c39e1a90ecccd5bec2fe7b8410"
+size = 4704
+mtime_ms = 1791671990759
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/bd816b93-ff90-4158-ba46-4d25c27cce1d/59be2018-3b54-4c6e-add8-57a670e3579a"
+storage_version_token = "1791672100249047"
+content_type = "text/html"

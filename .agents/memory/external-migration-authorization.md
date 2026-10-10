@@ -42,6 +42,31 @@ replacement identities or substituting Development users for Production users.
 Preserving business-database records alone does not prove that hosted sign-in
 and the registered-account directory are retained.
 
+While managed authentication access is unresolved, continue safe independent
+staging migration work, but do not create a replacement Clerk application or
+activate staging authentication. Prepare support requests as drafts, not sent
+requests or permission to make ownership changes. Report only remaining blockers
+and the next required action.
+
+**Why:** The user explicitly requested these boundaries while seeking independent
+Owner/Admin access to the existing application.
+
+**How to apply:** Keep the existing tenant, users, keys, Super Admin mapping,
+database, branding and Production intact. Do not treat technically possible
+replacement authentication as authorized.
+
+An `authorized` managed-dashboard status proves entry access, not independent
+workspace ownership or administrator permissions.
+
+**Why:** The user entered the dashboard through Replit but an email-profile
+change was denied. Public Replit dashboard documentation also conflicted with
+observed authorized access; generic Clerk transfer support does not establish
+eligibility for this managed application.
+
+**How to apply:** Obtain provider confirmation of scoped independent membership
+or same-application ownership transfer before proposing any execution. Do not
+infer a precise workspace role from the display name or one denied operation.
+
 The user inspected Publishing settings and reported that the existing
 Production authentication keys are hidden or protected.
 
