@@ -15,26 +15,30 @@ Production freeze, real export, Supabase restore and deployment.
 
 **How to apply:** Keep source capture directly streamed into authenticated
 encryption. Preserve Python integer-safe metadata; require complete framed
-receipt/sequence checks and independent checksum readback. Plaintext recovery
-belongs only on a trusted offline device, after complete envelope AND package
-verification. A local synthetic roundtrip or configured-key canary does not
+receipt/sequence checks and independent checksum readback. Any plaintext consumer
+requires complete envelope AND package verification first; never persist
+plaintext on ordinary Replit storage. A local synthetic roundtrip or configured-key canary does not
 prove external key retention or independent durable recovery of a real backup;
 get operator confirmation and verify the later receiving copy separately.
 
-The user chose their Mac and a private iCloud Drive folder for the independent
-encrypted QXLayer backup destination. Prefer directly capturing on the Mac after
-approval rather than inventing a Replit/public download path for live backups.
+Use the existing Replit environment for QXLayer-only encrypted export preparation.
+The user superseded the Mac/iCloud approach and rejected AWS account creation.
+Do not use their Mac or personal files. Prefer an existing service for an
+independent encrypted backup copy outside Replit.
 
-**Why:** The user explicitly requested the simplest secure Mac/iCloud workflow.
+**Why:** The user explicitly requested the shortest path using existing services
+and said: "Stop proposing new infrastructure unless absolutely necessary."
 Replit's official shutdown/unpublish documentation says custom-domain connections
 are removed, so shutdown is not a harmless reversible maintenance pause.
 
-**How to apply:** Use the original key through local Keychain/private password
-manager retention, never secret CLI arguments or cloud-folder key files.
-Remote iCloud readback must be a fresh download from the authenticated website,
-checked against the original independent receipt, not the local sync cache.
+**How to apply:** Use private temporary ciphertext-only staging outside the
+workspace, never Git, public download routes, Library or deployment artifacts.
+Retain the original key independently outside Replit and separate from ciphertext.
+An existing Supabase project's private Storage is a proposed receiving destination,
+not a verified connection. Verify its access controls and fresh receiving bytes
+against the original receipt; do not call a Replit-only copy an independent backup.
 A temporary all-table lock barrier only blocks table writes/DDL: separately hold
 standalone sequence callers and external side effects, disclose write timeouts,
-and never claim a fully operational freeze from flags alone. Production locking,
-Mac setup and cloud receiving-copy verification remain unperformed until the
-appropriate operator steps/explicit approval.
+and never claim a fully operational freeze from flags alone. Safeguard checks
+must precede explicit approval for any Production locking or real export.
+Supabase restore and hosting/cutover remain separately approval-gated.
