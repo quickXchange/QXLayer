@@ -7,7 +7,7 @@ import Entry from '@/pages/entry';
 import { SiteHome, FeaturePage, LegalPage } from '@/pages/site';
 import NotFound from '@/pages/not-found';
 const TelegramMini = lazy(() => import('@/pages/telegram-mini'));
-import OrderTracking from '@/pages/order-tracking';
+const OrderTracking = lazy(() => import('@/pages/order-tracking'));
 import {
   Route,
   Switch,
@@ -57,7 +57,7 @@ function Router() {
       <Switch>
         <Route path="/" component={MainPlatformEntry} />
         <Route path="/sandbox/site-finder" component={Entry} />
-        <Route path="/:slug/orders/:orderId" component={OrderTracking} />
+        <Route path="/:slug/orders/:orderId">{() => <Suspense fallback={null}><OrderTracking /></Suspense>}</Route>
         <Route path="/:slug" component={SiteHome} />
         <Route path="/:slug/privacy">{() => <LegalPage kind="privacy" />}</Route>
         <Route path="/:slug/terms">{() => <LegalPage kind="terms" />}</Route>

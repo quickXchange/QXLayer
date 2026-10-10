@@ -1,0 +1,805 @@
+{
+  "tables": [
+    {
+      "name": "addon_entitlements",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "addons",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "api_keys",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "asset_catalog",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "asset_network_catalog",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "audit_events",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "blockchain_provider_configs",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "customer_notification_reads",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "entitlement_definitions",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "exchange_orders",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "landing_products",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "module_catalog",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "network_catalog",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "notification_events",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "payment_invoices",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "plan_entitlements",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "plans",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "platform_admins",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (clerk_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "pricing_rules",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "provider_assignments",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "provider_catalog",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "provider_policies",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_addons",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_asset_networks",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_branding",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_configuration",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_domains",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (status = 'verified'::text)))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_entitlement_overrides",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_integrations",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_memberships",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (clerk_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text) AND (COALESCE(current_setting('app.can_manage_staff'::text, true), ''::text) = 'true'::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text) AND (COALESCE(current_setting('app.can_manage_staff'::text, true), ''::text) = 'true'::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_modules",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_payment_methods",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_product_configuration",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_subscriptions",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_telegram_receipts",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (EXISTS ( SELECT 1\n   FROM tenant_integrations i\n  WHERE ((i.id = tenant_telegram_receipts.integration_id) AND (i.tenant_id = tenant_telegram_receipts.tenant_id)))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (EXISTS ( SELECT 1\n   FROM tenant_integrations i\n  WHERE ((i.id = tenant_telegram_receipts.integration_id) AND (i.tenant_id = tenant_telegram_receipts.tenant_id)))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenant_usage_counters",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "tenants",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (id IN ( SELECT tenant_memberships.tenant_id\n   FROM tenant_memberships\n  WHERE ((tenant_memberships.clerk_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)) AND tenant_memberships.active)))) OR ((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text)) AND (status = 'active'::text)) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (status = 'active'::text) AND (id IN ( SELECT tenant_domains.tenant_id\n   FROM tenant_domains\n  WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "wallet_configurations",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "webhook_endpoints",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "white_label_attachments",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (owner_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (owner_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (owner_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "white_label_events",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR ((visibility = 'customer'::text) AND (request_id IN ( SELECT white_label_requests.id\n   FROM white_label_requests\n  WHERE (white_label_requests.customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR ((request_id IN ( SELECT white_label_requests.id\n   FROM white_label_requests\n  WHERE (white_label_requests.customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)))) AND (author_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)) AND (visibility = 'customer'::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR ((request_id IN ( SELECT white_label_requests.id\n   FROM white_label_requests\n  WHERE (white_label_requests.customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)))) AND (author_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)) AND (visibility = 'customer'::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "white_label_requests",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id\n   FROM tenants\n  WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id\n           FROM tenant_domains\n          WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text))))))))))",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "(((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (customer_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    }
+  ],
+  "sequences": [
+    "white_label_requests_order_number_seq"
+  ]
+}

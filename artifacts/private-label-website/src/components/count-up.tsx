@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 /** Counts to a real configured value once visible. Reduced motion shows the final value. */
 export function CountUp({ to, ms = 1400 }: { to: number; ms?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [v, setV] = useState(to);
   useEffect(() => {
     const el = ref.current;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!el || motion.matches || typeof IntersectionObserver === 'undefined') { setV(to); return; }
+    if (!el) return;
+    const setV = (value: number) => { const text = String(value); if (el.textContent !== text) el.textContent = text; };
+    if (motion.matches || typeof IntersectionObserver === 'undefined') { setV(to); return; }
     // Keep truthful values in offscreen DOM. Reset only when the existing
     // count-up animation actually starts, not while waiting for visibility.
     setV(to);
@@ -35,5 +36,5 @@ export function CountUp({ to, ms = 1400 }: { to: number; ms?: number }) {
     motion.addEventListener('change', stop);
     return () => { io.disconnect(); cancelAnimationFrame(raf); motion.removeEventListener('change', stop); };
   }, [to, ms]);
-  return <span ref={ref}>{v}</span>;
+  return <span ref={ref}>{to}</span>;
 }

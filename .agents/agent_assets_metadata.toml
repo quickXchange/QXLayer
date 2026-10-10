@@ -714,3 +714,311 @@ mtime_ms = 1791578468606
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/deb70892-ee0e-4436-8628-b025f04e839b/5b66c733-044b-41d7-963b-73166f4f8f0e"
 storage_version_token = "1791578469222965"
 content_type = "text/html"
+
+[[outputs]]
+id = "BIpa6pRdk-ZcSdlDTlhef"
+uri = "file://generated-artifacts/performance/report.html"
+type = "html"
+title = "QXLayer performance report"
+description = "Measured before/after results, completed checks, design/security safeguards and explicit lab/cloud limitations."
+logical_id = "20885ba2-b11e-4ed7-a392-a460d40464f7"
+content_hash = "sha256:d4f6ec8a8dd379cd0170a4c734527de83d645d22e12f50bbc37068ad3f830ba1"
+size = 7794
+mtime_ms = 1791588389642
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/20885ba2-b11e-4ed7-a392-a460d40464f7/df8ff2c4-ff0a-4c0f-90bd-2c253edb514a"
+storage_version_token = "1791588512140396"
+content_type = "text/html"
+
+[[outputs]]
+id = "D621lHfeMr491o1MgbcKf"
+uri = "file://generated-artifacts/supabase-security/guide.html"
+type = "html"
+title = "QXLayer Supabase role and RLS setup"
+description = "Safe SQL Editor steps, downloadable inspection/setup/exact-verification SQL, and secure password instructions. Includes all 42 tables and the exact 84 repository policy definitions; no cloud changes were made."
+logical_id = "fc08d810-70a6-4e2f-a2c8-a65a2e12fd92"
+content_hash = "sha256:05e78beaba5ab2391154baa1c94c7bbe807cfe892014c0265933f583b10e8511"
+size = 358030
+mtime_ms = 1791590417336
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fc08d810-70a6-4e2f-a2c8-a65a2e12fd92/44cf3e95-987b-4ddb-87d9-9249af33679a"
+storage_version_token = "1791590474051413"
+content_type = "text/html"
+
+[[outputs]]
+id = "vrP3ZPnRhOfrbs3_sTMmn"
+uri = "file://generated-artifacts/supabase-security/login-migration-guide.html"
+type = "html"
+title = "Reviewed QXLayer LOGIN + RLS migration"
+description = "Complete downloadable LOGIN migration, exact 42-table/84-policy security verification and SQL Editor instructions. Locally tested; no Supabase or Production changes executed."
+logical_id = "7fbb07f3-dbd5-4e39-9746-468d07e65343"
+content_hash = "sha256:dc9f84d3a1539931b25ed97179c3533da05e3007dd56991dfa259c017a3a860e"
+size = 360518
+mtime_ms = 1791591125226
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7fbb07f3-dbd5-4e39-9746-468d07e65343/88f2b530-d69c-4c7f-9d0f-35e52c3a6644"
+storage_version_token = "1791591125791902"
+content_type = "text/html"
+
+[[outputs]]
+id = "mBtcT_tWfCQ14iGy4FpCB"
+uri = "file://generated-artifacts/supabase-security/01-inspect.sql"
+type = "unspecified"
+title = "01-inspect.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "ed72966d-5132-415b-834f-747b07ba3eeb"
+content_hash = "sha256:04a0656d32793fd09e985c9860a36ff0fa019ceb4c10ce73549a1c7347f79026"
+size = 62252
+mtime_ms = 1791590188034
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ed72966d-5132-415b-834f-747b07ba3eeb/673298f1-65a3-4863-84d7-6946f321c658"
+storage_version_token = "1791591473319280"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "IN3oRaKy3TminD7yi-7IS"
+uri = "file://generated-artifacts/supabase-security/05-create-login-and-enforce-rls.sql"
+type = "unspecified"
+title = "05-create-login-and-enforce-rls.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "4b2730af-7d43-4355-a241-54293ac35bf5"
+content_hash = "sha256:41cb51605177021bff1d7c21e950ee158462a142f5ce511a106a6db64f0f8bb3"
+size = 218075
+mtime_ms = 1791590954338
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/4b2730af-7d43-4355-a241-54293ac35bf5/0631e912-960a-48ee-8783-badd0e557f76"
+storage_version_token = "1791591473841855"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "QYIVyhsBFuzqib05_zlsS"
+uri = "file://generated-artifacts/supabase-security/06-verify-login-and-security.sql"
+type = "unspecified"
+title = "06-verify-login-and-security.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "70932edb-5cf2-4702-96bf-9b33e058f8e2"
+content_hash = "sha256:08f05990a699f3949c454e4a83071f78e4d2cd45370ef7310bd3048d3f995a55"
+size = 64534
+mtime_ms = 1791590954518
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/70932edb-5cf2-4702-96bf-9b33e058f8e2/8b7f6a38-c7c9-4db0-a189-e2f822f420a9"
+storage_version_token = "1791591474308228"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "ZGxguSrr-HfWLDhIHDEpX"
+uri = "file://generated-artifacts/supabase-security/04-runtime-readonly-check.sql"
+type = "unspecified"
+title = "04-runtime-readonly-check.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "c900b21f-a769-46b5-bc3b-5946e0c61f98"
+content_hash = "sha256:915c6b43f1758dfdbde9b2247279b93bbf86feecccca1f459c913a1b138911f4"
+size = 1048
+mtime_ms = 1791590417024
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/c900b21f-a769-46b5-bc3b-5946e0c61f98/7c276d2a-fe4a-463b-b9af-b21c6e43441f"
+storage_version_token = "1791591474876957"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "T8MhlCJEIDPVg2CvSxL8a"
+uri = "file://generated-artifacts/supabase-security/qxlayer-supabase-migration.zip"
+type = "unspecified"
+title = "qxlayer-supabase-migration.zip"
+description = "All four complete SQL files, verified byte-for-byte against the originals."
+logical_id = "fe79a2e7-632d-4a0a-81fa-a94bb8af62ca"
+content_hash = "sha256:c3b304a9ef2dd6d582652b683c8f6035732f32734012b5f3503e9a7f62e46a98"
+size = 16811
+mtime_ms = 1791591468997
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fe79a2e7-632d-4a0a-81fa-a94bb8af62ca/9335b8f7-8a2d-4363-8f8f-5a7add60e6f6"
+storage_version_token = "1791591475414740"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "tUMkFFEJzRqegZ1xOF4O-"
+uri = "file://generated-artifacts/qxlayer-production-transfer-kit.zip"
+type = "unspecified"
+title = "QXLayer Production Export & Supabase Restore Kit"
+description = "Original verified preparation kit. Contains no Production records; no database operations executed."
+logical_id = "16befe4d-65fc-4a5f-9c53-a6e463dd2b24"
+content_hash = "sha256:8273e7d1395454aea145dea099650dd8591aecfaa4d9ae9b7ae8027a12530643"
+size = 49369
+mtime_ms = 1791593072811
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/16befe4d-65fc-4a5f-9c53-a6e463dd2b24/9984134e-5fff-40dc-b04f-1ac59b680fe8"
+storage_version_token = "1791622196936794"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "IMa3V8lxMoLLycBOc1kc_"
+uri = "file://generated-artifacts/qxlayer-production-transfer/README.md"
+type = "text"
+title = "Step-by-Step Export & Restore Instructions"
+description = "Complete original instructions recovered from the unchanged ZIP, including approval boundaries and verification steps."
+logical_id = "0adb5fc6-0539-4736-abf9-38217b125113"
+content_hash = "sha256:7a723a1c6b221f86556aaae12047180e2fba2ec264e23fe592d602ca3685f1fc"
+size = 20415
+mtime_ms = 1791622196439
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0adb5fc6-0539-4736-abf9-38217b125113/3e106e52-2c2c-480e-bcff-2083bc5c6609"
+storage_version_token = "1791622197470536"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "erPMkbVNkbS6eW7N2XPeG"
+uri = "file://generated-artifacts/qxlayer-production-transfer/00-target-preflight.sql"
+type = "unspecified"
+title = "Read-Only Supabase Target Preflight"
+description = "Existing SQL file for later approved target checks. Not executed."
+logical_id = "d6713fcf-54a6-4a3a-aaae-a8a6bd0ece83"
+content_hash = "sha256:3900add49320d2a11b0d50133646eb0b35715aa5b4bdc71751c05fbd49506930"
+size = 991
+mtime_ms = 1791592476411
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d6713fcf-54a6-4a3a-aaae-a8a6bd0ece83/a1b34402-3ba6-43b3-83a9-a3277ae5dcb5"
+storage_version_token = "1791622198007769"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "gIIMLchmhfG45G2xNooGq"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40-table-kit.zip"
+type = "unspecified"
+title = "QXLayer Production Export & Supabase Restore — 40-Table Kit"
+description = "Corrected offline preparation kit: exact Production baseline, 80 reviewed policies, primary metadata approval, and a separately guarded target-only compatibility upgrade. Contains no Production records."
+logical_id = "75b39d38-78dd-40a6-b8d4-7be532ed041a"
+content_hash = "sha256:9125181b378604064b6388a0eb8b2790f1c5de9cd5a3eb57a9176cd32851a337"
+size = 96486
+mtime_ms = 1791624389359
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/75b39d38-78dd-40a6-b8d4-7be532ed041a/d487df94-00a1-4612-8884-952c12ae4ee4"
+storage_version_token = "1791624424295408"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "hzj6891j6deWWwKdwgmb3"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/README.md"
+type = "text"
+title = "Updated Export and Restore Instructions"
+description = "Revised instructions matching both verified metadata captures. Export, freeze, restore, startup and deployment remain unstarted and separately gated."
+logical_id = "73bb0764-bffa-4756-9887-5df6ed6767d0"
+content_hash = "sha256:d4ab7e1e790c0df8230c69165f9b71784d474d985b92a4c7e72e38eb52efbe80"
+size = 18592
+mtime_ms = 1791638545518
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/73bb0764-bffa-4756-9887-5df6ed6767d0/140aaa67-6bd5-46b0-a911-4ad45f1e02a7"
+storage_version_token = "1791638770103831"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "3D0HVyr0EGyc7VFh7ESRn"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/01-primary-metadata-only.sql"
+type = "unspecified"
+title = "Corrected Production Metadata Check — Single SELECT"
+description = "Complete replacement SQL. Keep Enable Editing OFF. Returns full JSON text plus byte length and MD5 for CSV integrity checks. Catalog-only; no transaction or session changes."
+logical_id = "7c75004d-e5e6-4808-8b8e-56d1250a564f"
+content_hash = "sha256:37dcd6bfb1ce851517e949399781ae5676ce720b81f3f4a66685bdac55e65a54"
+size = 3775
+mtime_ms = 1791625356505
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7c75004d-e5e6-4808-8b8e-56d1250a564f/79bf5c5e-456d-4bf8-b162-365ae75be6df"
+storage_version_token = "1791625373776305"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "iTlfKH6yocAybdxn5zcgW"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40-table-kit-single-select.zip"
+type = "unspecified"
+title = "Updated 40-Table Migration Kit — Single-SELECT Capture"
+description = "Includes corrected browser metadata SQL, CSV download instructions, refreshed checksums, and passing offline tests. No Production records or executed migrations."
+logical_id = "b0f90c0d-7f81-4db2-a754-d6f443b26c2c"
+content_hash = "sha256:9969fd86404391e96b40dbb1a0056bcf37f1ebbe29aa742b1aa0fcb69ff2323b"
+size = 97819
+mtime_ms = 1791625357214
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/b0f90c0d-7f81-4db2-a754-d6f443b26c2c/fcd4dfd1-97a5-40c0-ae37-3d0d9566e92c"
+storage_version_token = "1791625374324293"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "F_jo5mO4uadlhIMIQChki"
+uri = "file://generated-artifacts/qxlayer-production-metadata-review.md"
+type = "text"
+title = "Production Metadata Verification — Findings and Export Blocker"
+description = "Offline comparison of the complete Production JSON against the 40-table kit, including schema matches, default differences, RLS status, and native Replit migration-ledger requirements."
+logical_id = "ccdb84aa-7529-4702-a875-4403bca17fd3"
+content_hash = "sha256:721ba9694ea9439de15cd4b46f470604e12a37c742e2d252568760bae9d67740"
+size = 6885
+mtime_ms = 1791626558914
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ccdb84aa-7529-4702-a875-4403bca17fd3/efbabc78-be9d-4d48-b057-36f4aba73584"
+storage_version_token = "1791626616366672"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "kxbqFRMUaCohf9eZl1CR4"
+uri = "file://generated-artifacts/qxlayer-production-ledger-supplement.sql"
+type = "unspecified"
+title = "Next Read-Only Check — Replit Ledger, Sequences and Extensions"
+description = "One SELECT, starting directly with SELECT. Keep Enable Editing OFF. Catalog metadata only; no customer/history records or database changes. Download the complete result as CSV or JSON for offline review."
+logical_id = "4a5f2d22-2a97-494e-8048-b8452df49d9a"
+content_hash = "sha256:21f892f809b31f0571662c97eac1c1ac0c30fb460071df2b630891a5f449243e"
+size = 8039
+mtime_ms = 1791626534850
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/4a5f2d22-2a97-494e-8048-b8452df49d9a/478d75ea-a959-4da6-8216-fb1f6653730b"
+storage_version_token = "1791626616954400"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "RlcOn1Wl9PaUujBW9JuVQ"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40-table-kit-native-ledger.zip"
+type = "unspecified"
+title = "QXLayer 40-Table Kit — Verified Replit Ledger Support"
+description = "Updated offline kit for 40 application tables plus the exact native Replit ledger and both owned sequences. Includes reviewed metadata, passive-history safeguards, 17 passing offline tests, and refreshed checksums. Contains no Production records."
+logical_id = "b6cfadcf-fa84-4616-b9c7-8d0a8c37c040"
+content_hash = "sha256:d13bbbed11f3754e209a80adfb5db8e4611608d29711b8cb2cb1196ab6ba7ba7"
+size = 125100
+mtime_ms = 1791638738798
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/b6cfadcf-fa84-4616-b9c7-8d0a8c37c040/346c2a94-3061-48ff-bcc7-42bb8e8a3b72"
+storage_version_token = "1791638769062337"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "PdUkoe-ayJ6fNu4hePag1"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/NATIVE-LEDGER.md"
+type = "text"
+title = "Native Ledger Preservation and Safe Next Steps"
+description = "Explains exact history/sequence preservation, offline baseline approval, and the private credentials/encrypted-storage approvals needed before any export."
+logical_id = "77b67bc5-23fc-4273-9de2-991134405ea1"
+content_hash = "sha256:1094d32ff3694045ede32e8fe10ea89c70ff8deb3ccd0d6b0b7dea90c702e5d7"
+size = 6358
+mtime_ms = 1791638537446
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/77b67bc5-23fc-4273-9de2-991134405ea1/cc7457d1-f186-4c21-8c6f-16cfad9593b8"
+storage_version_token = "1791638769586423"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "Hc6uQsNu_cHqqDtu4YHvh"
+uri = "file://generated-artifacts/qxlayer-production-secure-export-preparation.zip"
+type = "unspecified"
+title = "QXLayer — Verified Encrypted Export Kit"
+description = "Encrypted streaming exporter, whole-envelope authenticated recovery, independent synthetic verification and one-page authorization instructions. No Production records, credentials or backups included. Open AUTHORIZE-EXPORT.md for the next step."
+logical_id = "7c8d92ff-ac28-4451-99f7-db05642f9637"
+content_hash = "sha256:7cfeab67187847afa9e15089ba1a9b1a5157aa207c7dde293fc547cd7f079f01"
+size = 165888
+mtime_ms = 1791643642567
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7c8d92ff-ac28-4451-99f7-db05642f9637/e9d6fd7a-a74f-450c-a2e1-eaec289cf821"
+storage_version_token = "1791643663989022"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "Dd0wCxsiatj0iSRw8h1B_"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/SECURE-EXPORT-PREPARATION.md"
+type = "text"
+title = "Exact Secure Setup Steps and Prerequisites"
+description = "iPad-friendly steps for the existing Production connection, dedicated Secrets, independent backup-key retention, and safe preflight commands. Explains why the managed replica and legacy plaintext exporter cannot be used for this encrypted destination."
+logical_id = "fab0002c-d79c-4d8f-8ae3-df649074206f"
+content_hash = "sha256:086d048bb9a384e6ed89767e4c64e06cca7352d6321d0bb3b4e17939aa639452"
+size = 7444
+mtime_ms = 1791639603854
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fab0002c-d79c-4d8f-8ae3-df649074206f/5fb432e2-a4dd-497f-8565-bb2eac8cfe0c"
+storage_version_token = "1791639733349906"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "rGZAWRKBoTE5G5nrl6cwh"
+uri = "file://generated-artifacts/qxlayer-mac-icloud-migration-preparation.zip"
+type = "unspecified"
+title = "QXLayer — Mac & Private iCloud Workflow"
+description = "Updated kit with exact Mac setup, Keychain storage, direct encrypted capture, private iCloud transfer/fresh download verification, and an approval-gated write-lock runbook. Preparation only; contains no Production records or credentials. Start with MAC-ICLOUD-STEPS.md."
+logical_id = "0e420b63-a55e-4ca4-bec1-862724af2d7b"
+content_hash = "sha256:7d1003d1bf81d6ae897de280e38226f095232a56a972235e1915eb73e4b4372f"
+size = 182578
+mtime_ms = 1791646741674
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/0e420b63-a55e-4ca4-bec1-862724af2d7b/663c884c-65b0-4f25-b07b-d24df0c909bd"
+storage_version_token = "1791646782495692"
+content_type = "application/octet-stream"

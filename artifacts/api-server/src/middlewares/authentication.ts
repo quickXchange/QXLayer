@@ -29,7 +29,9 @@ export function principalFrom(res: Response): Principal {
 export const sameOriginMutation: RequestHandler = (req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) { next(); return; }
   const origin = req.get("origin");
-  const canonicalHost = req.get("x-forwarded-host")?.split(",")[0]?.trim() ?? req.get("host");
+  const canonicalHost = process.env.QXLAYER_DATABASE_PROVIDER === "supabase"
+    ? new URL(process.env.QXLAYER_PLATFORM_URL!).host
+    : req.get("x-forwarded-host")?.split(",")[0]?.trim() ?? req.get("host");
   const fetchSite = req.get("sec-fetch-site");
   if (fetchSite === "cross-site") { res.status(403).json({ error: "Cross-site mutation denied." }); return; }
   try {

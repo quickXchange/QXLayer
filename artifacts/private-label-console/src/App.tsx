@@ -11,12 +11,13 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorState } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
-import { AdminShell } from '@/components/app/shell';
+const AdminShell = lazy(() => import('@/components/app/shell').then(m => ({ default: m.AdminShell })));
 import { PrincipalContext, usePrincipal } from '@/lib/principal';
 import NotFound from '@/pages/not-found';
 import Home from '@/pages/home';
 const DemoAdmin = lazy(() => import('@/pages/demo-admin'));
-import { CustomerShell } from '@/components/app/customer-shell';
+const CustomerShell = lazy(() => import('@/components/app/customer-shell').then(m => ({ default: m.CustomerShell })));
+import { RoutePrefetch } from '@/components/app/route-prefetch';
 import { useAdminPanels } from '@/lib/customer';
 const AccountDashboard = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountDashboard })));
 const AccountOrders = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountOrders })));
@@ -53,7 +54,9 @@ import { ConsoleThemeScope } from '@/components/app/console-frame';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
-const clerkPubKey = publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+const clerkPubKey = import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true"
+  ? import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+  : publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -155,18 +158,19 @@ function PrincipalGate({ children }: { children: ReactNode }) {
   }
   return (
     <PrincipalContext.Provider value={q.data}>
+      <RoutePrefetch />
       {q.data.role === 'super_admin' ? <AdminShell>{children}</AdminShell> : <CustomerShell>{children}</CustomerShell>}
     </PrincipalContext.Provider>
   );
 }
 
 function Protected({ children }: { children: ReactNode }) {
-  const demo = useGetDemoSession({ query: { queryKey: getGetDemoSessionQueryKey(), retry: false, staleTime: 0, refetchInterval: 60000 } });
   let demoTab = false;
   try { demoTab = sessionStorage.getItem("qx-isolated-demo") === "read-only"; } catch { /* no demo context */ }
+  const demo = useGetDemoSession({ query: { queryKey: getGetDemoSessionQueryKey(), enabled: demoTab, retry: false, staleTime: 0, refetchInterval: 60000 } });
   if (demoTab && demo.error) return <Redirect to="/demo/admin" />;
   if (demoTab && demo.data?.active) return <PrincipalGate>{children}</PrincipalGate>;
-  if (demo.isLoading) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
+  if (demoTab && demo.isLoading) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   return (
     <>
       <Show when="signed-in"><PrincipalGate>{children}</PrincipalGate></Show>

@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { Link } from 'wouter';
 import { useGetPublicProductCatalog, type LandingProduct } from '@workspace/api-client-react';
 import { SiteShell } from '@site/components/site-shell';
 import { Hero } from '@site/components/hero';
 import { resolveCaps } from '@site/lib/capabilities';
 import { PLATFORM_SITE } from '@/lib/platform-site';
-import { PlatformCatalog } from './platform-catalog';
+const PlatformCatalog = lazy(() => import('./platform-catalog').then(m => ({ default: m.PlatformCatalog })));
 import { LiveDemo } from './live-demo';
 import { BrandLogo } from '@/components/brand-logo';
 import { QXLAYER_LIGHT_LOGO_URL, QXLAYER_LIGHT_ICON_URL } from '@/lib/brand';
@@ -18,7 +18,7 @@ const NAV = [
 ];
 
 export function CatalogLanding({ preview }: { preview?: boolean }) {
-  const q = useGetPublicProductCatalog({ query: { refetchInterval: 30000, refetchOnWindowFocus: true, staleTime: 0 } as never });
+  const q = useGetPublicProductCatalog({ query: { refetchInterval: 30000, refetchOnWindowFocus: true, staleTime: 15000 } as never });
   const [openKey, setOpenKey] = useState<string | null>(null);
   const items = useMemo(() => [...(q.data ?? [])].sort((a, b) => a.displayOrder - b.displayOrder), [q.data]);
   const open = items.find((p) => p.key === openKey) ?? null;
@@ -39,7 +39,9 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
     <div data-testid="page-landing">
       <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV, actions, footer, lightLogoUrl: QXLAYER_LIGHT_LOGO_URL, lightFaviconUrl: QXLAYER_LIGHT_ICON_URL }}>
         <Hero site={PLATFORM_SITE} caps={caps} root={root} secondary={{ id: 'products', label: 'Browse products' }} />
-        <PlatformCatalog items={items} loading={q.isLoading} error={q.isError} onRetry={() => void q.refetch()} open={open} setOpen={(p: LandingProduct | null) => setOpenKey(p ? p.key : null)} />
+        <Suspense fallback={<div className="s-wrap py-20" aria-busy="true"><div className="s-skel h-8 w-64" /></div>}>
+          <PlatformCatalog items={items} loading={q.isLoading} error={q.isError} onRetry={() => void q.refetch()} open={open} setOpen={(p: LandingProduct | null) => setOpenKey(p ? p.key : null)} />
+        </Suspense>
         <LiveDemo />
       </SiteShell>
     </div>

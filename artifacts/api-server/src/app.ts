@@ -38,7 +38,12 @@ app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(express.json({ limit: "128kb" }));
 app.use(express.urlencoded({ extended: true, limit: "128kb" }));
 app.use(clerkMiddleware((req) => ({
-  publishableKey: publishableKeyFromHost(getClerkProxyHost(req) ?? "", process.env.CLERK_PUBLISHABLE_KEY),
+  publishableKey: process.env.QXLAYER_DATABASE_PROVIDER === "supabase"
+    ? process.env.CLERK_PUBLISHABLE_KEY
+    : publishableKeyFromHost(getClerkProxyHost(req) ?? "", process.env.CLERK_PUBLISHABLE_KEY),
+  ...(process.env.QXLAYER_DATABASE_PROVIDER === "supabase" ? {
+    authorizedParties: (process.env.CLERK_AUTHORIZED_PARTIES ?? "").split(",").map(s => s.trim()).filter(Boolean),
+  } : {}),
 })));
 
 app.use("/api", router);

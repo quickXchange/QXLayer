@@ -1,10 +1,9 @@
 # QXLayer: Supabase / Vercel migration and deployment plan
 
-> **CANCELLED — historical reference only.**
-> The user cancelled Supabase, Vercel and Render migration plans.
-> Keep QXLayer entirely on Replit with its existing Production PostgreSQL.
-> Do not execute this plan or its generated SQL. Preparation commands below
-> are historical and have been removed. No external cutover occurred.
+> **Historical inspection/reference, not an execution entrypoint.**
+> External preparation has been reauthorized. Current commands and boundaries
+> are in `docs/external-deployment.md`. Earlier generated SQL and removed commands
+> below must not be executed. No Production transfer or external cutover occurred.
 
 ## 1. Decision and execution boundary
 

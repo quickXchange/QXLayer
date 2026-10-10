@@ -1,26 +1,12 @@
-import { Storage } from "@google-cloud/storage";
+import { privateObject } from "../../lib/private-object-storage";
 import { createHash, randomUUID } from "node:crypto";
 import { withDatabase, type DatabaseClient } from "@workspace/db";
 import type { Principal } from "../authentication/service";
 import { HttpError } from "../../lib/errors";
 import { requestContext, attachmentColumns } from "./order-model";
 
-// Replit's private object storage, with the existing Clerk principal and
-// PostgreSQL ownership checks. Never public URLs or a second authentication flow.
-const sidecar = "http://127.0.0.1:1106";
-const storage = new Storage({
-  projectId: "",
-  credentials: {
-    audience: "replit", subject_token_type: "access_token", token_url: `${sidecar}/token`, type: "external_account",
-    credential_source: { url: `${sidecar}/credential`, format: { type: "json", subject_token_field_name: "access_token" } },
-    universe_domain: "googleapis.com",
-  },
-});
-export function privateFile(key: string) {
-  const segments = process.env.PRIVATE_OBJECT_DIR?.split("/").filter(Boolean);
-  if (!segments?.length || segments.length < 2) throw new HttpError(503, "Private upload storage is not configured.");
-  return storage.bucket(segments[0]).file(`${segments.slice(1).join("/")}/${key}`);
-}
+// Provider changes do not change keys, Clerk ownership or database authorization.
+export const privateFile = privateObject;
 export const allowedCategories = ["logo", "favicon", "design_reference", "requirement"] as const;
 const extensions: Record<string, string[]> = {
   "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"], "image/webp": [".webp"], "image/gif": [".gif"],

@@ -4,11 +4,11 @@ An independent multi-tenant administration and provisioning foundation, not a li
 
 ## Current delivery requirements
 
-- Keep QXLayer hosted entirely on Replit with the existing Production PostgreSQL.
-- Supabase, Vercel and Render migration plans are cancelled for now. Do not spend
-  more time preparing external hosting migrations.
-- Finish the existing White Label platform's integration, provisioning, tenant
-  management and security work, prepare native publishing, then verify Live.
+- Prepare GitHub-based hosting: Vercel frontends, Render API/worker and Supabase
+  PostgreSQL with complete RLS. Replit remains Development and the current live
+  Production stays unchanged until a separately approved cutover.
+- Preparation does not authorize transferring Production data, changing DNS,
+  shutting down the current website, replacing Clerk identities or touching QuickXchange.
 - Preserve all Production data, customer accounts, permanent Super Admin access
   and the approved website design. Do not reset or overwrite Production.
 - Resolve the RLS blocker only through a safe managed-PostgreSQL-compatible
@@ -55,7 +55,7 @@ An independent multi-tenant administration and provisioning foundation, not a li
 
 - Use one modular monolith and one shared backend; channels must reuse tenant branding, assets, entitlements, pricing, orders, payments, and provider boundaries.
 - Administrator privileges are explicitly assigned by an operator, never inferred from sign-up order or browser-provided roles.
-- Owner-approved database isolation: every request transaction uses PostgreSQL's built-in `pg_database_owner` role (not superuser/BYPASSRLS), verifies policies/permissions, and applies transaction-local RLS context. Retain server-side role, membership, ownership and explicitly tenant-scoped SQL checks. Runtime table access must use `withDatabase`, never raw `pool`/`db`. Read-only transactions reject writes. The pool login remains privileged for explicit Development maintenance only; this is not protection against compromised server/database credentials.
+- Database isolation: Replit requests retain `pg_database_owner`; explicitly configured external Supabase requests use restricted `qxlayer_app` → `qxlayer_runtime`. Both verify policies/permissions and transaction-local RLS context. Retain server-side role, membership, ownership and tenant-scoped checks. Runtime table access must use `withDatabase`, never raw `pool`/`db`. Read-only transactions reject writes. Supabase migrations use a separate protected operator credential, never startup/build DDL or Replit Production.
 - Client administrators can edit their tenant configuration and manage staff grants; only super administrators assign Client Admins or manage plans, add-ons, subscriptions, overrides, suspension and registry registration. Staff default to read-only and may receive four narrowly scoped configuration grants; staff never manage memberships.
 - Effective rights come from database plans → additive add-ons → replacing tenant overrides. Missing features deny and missing limits are zero. Direct legacy module writes cannot bypass this resolver.
 - Disabling or archiving a plan/add-on blocks new assignments, but retains existing assignments. Tenant suspension denies capability access and configuration mutations.
@@ -77,17 +77,19 @@ responsive behavior, sandbox boundaries and measured verification results.
 
 - Do NOT connect to, modify, migrate, or depend on the existing QuickXchange project at this stage. This platform is independent; QuickXchange must remain untouched.
 - Build the foundation only. Do not build all crypto products at once.
-- Native publishing preparation and subsequent Live verification are now requested;
-  the user performs Publish. Financial execution stays Sandbox: do not connect
+- External hosting preparation is now requested; current Replit Production remains
+  unchanged until a separately approved cutover. Financial execution stays Sandbox: do not connect
   real wallets, accept real deposits or introduce unrelated live product engines.
 - Current product scope is defined in `.agents/memory/exchange-only-scope.md`. The reusable core remains the foundation; do not automatically start another crypto product.
 
 ## Gotchas
 
-- Schema declarations include RLS policies. Review the native Publish plan for policy enablement and built-in-role table/schema/sequence privileges; no custom roles are required. Never put schema/policy/grant DDL in build, startup or deployment hooks. Missing isolation metadata fails request transactions closed.
+- Schema declarations include RLS policies. For native Replit Publish, review policy enablement and built-in-role grants; no custom roles are required. Never put DDL in app build/startup or native deployment hooks. External Supabase migrations use only the separate approved, pinned operator job. Missing isolation metadata fails request transactions closed.
 - No public first-signup administrator endpoint exists. New accounts can use the customer workspace and submit Exchange requests immediately; tenant administrator access requires explicit Super Admin provisioning/ownership assignment.
 - Use the Zod namespace matching a generated schema for inferred types and caught validation errors; see `.agents/memory/validation-compatibility.md`.
-- Keep database credentials server-side. Do not provision custom runtime roles. No Production migration/build/startup DDL is provided here; the user triggers native Publish and must keep Development-data overwrite disabled.
+- Keep database credentials server-side. External restricted roles are prepared
+  only for explicitly pinned Supabase targets; never provision them on Replit.
+  Native Replit Production DDL and Development-data overwrite remain prohibited.
 
 ## Pointers
 

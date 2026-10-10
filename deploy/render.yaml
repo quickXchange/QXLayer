@@ -1,0 +1,53 @@
+# Preparation only. Importing a Blueprint can incur hosting charges.
+# No automatic deploy, database provisioning, migration, DNS or data transfer.
+services:
+  - type: web
+    name: qxlayer-api
+    runtime: node
+    plan: starter
+    branch: main
+    numInstances: 1
+    autoDeployTrigger: "off"
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
+    startCommand: node artifacts/api-server/dist/index.mjs
+    healthCheckPath: /api/healthz
+    envVars:
+      - fromGroup: qxlayer-external
+      - key: DB_POOL_MAX
+        value: "6"
+  - type: worker
+    name: qxlayer-health-worker
+    runtime: node
+    plan: starter
+    branch: main
+    numInstances: 1
+    autoDeployTrigger: "off"
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
+    startCommand: node artifacts/api-server/dist/worker.mjs
+    envVars:
+      - fromGroup: qxlayer-external
+      - key: DB_POOL_MAX
+        value: "2"
+      - key: QXLAYER_HEALTH_MONITOR_ENABLED
+        value: "false"
+envVarGroups:
+  - name: qxlayer-external
+    envVars:
+      - key: NODE_VERSION
+        value: "24.11.1"
+      - key: NODE_ENV
+        value: production
+      - key: QXLAYER_DATABASE_PROVIDER
+        value: supabase
+      - key: QXLAYER_STORAGE_PROVIDER
+        value: supabase
+      - key: QXLAYER_EXTERNAL_STARTUP_APPROVED
+        value: "false"
+      - key: QXLAYER_HEALTH_MONITOR_MODE
+        value: disabled
+      - key: PRODUCTION_ACCESS_GATE_ENABLED
+        value: "true"
+      - key: DB_TLS_CA_FILE
+        value: /etc/secrets/supabase-ca.crt
+      # Add the other names from deploy/env/api.env.example securely to this
+      # group in Render. Secret prompts are not supported in environment groups.

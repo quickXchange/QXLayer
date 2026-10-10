@@ -1,5 +1,6 @@
 import { Storage } from "@google-cloud/storage";
 import manifest from "./visual-catalog.json";
+import { privateObject } from "../../lib/private-object-storage";
 
 // Imported visuals are public artwork, never customer uploads or order documents.
 // Only hash-addressed objects in the compiled manifest can be served.
@@ -14,6 +15,8 @@ export const visualStorage = new Storage({
   },
 });
 export function visualFile(filename: string) {
+  if (process.env.QXLAYER_STORAGE_PROVIDER === "supabase")
+    return privateObject(`qxlayer-development-visuals/${filename}`);
   const segments = process.env.PRIVATE_OBJECT_DIR?.split("/").filter(Boolean);
   if (!segments || segments.length < 2) throw new Error("Visual asset storage is not configured.");
   return visualStorage.bucket(segments[0]).file(`${segments.slice(1).join("/")}/qxlayer-development-visuals/${filename}`);
