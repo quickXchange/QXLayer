@@ -924,3 +924,31 @@ mtime_ms = 1791625357214
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/b0f90c0d-7f81-4db2-a754-d6f443b26c2c/fcd4dfd1-97a5-40c0-ae37-3d0d9566e92c"
 storage_version_token = "1791625374324293"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "F_jo5mO4uadlhIMIQChki"
+uri = "file://generated-artifacts/qxlayer-production-metadata-review.md"
+type = "text"
+title = "Production Metadata Verification — Findings and Export Blocker"
+description = "Offline comparison of the complete Production JSON against the 40-table kit, including schema matches, default differences, RLS status, and native Replit migration-ledger requirements."
+logical_id = "ccdb84aa-7529-4702-a875-4403bca17fd3"
+content_hash = "sha256:721ba9694ea9439de15cd4b46f470604e12a37c742e2d252568760bae9d67740"
+size = 6885
+mtime_ms = 1791626558914
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ccdb84aa-7529-4702-a875-4403bca17fd3/efbabc78-be9d-4d48-b057-36f4aba73584"
+storage_version_token = "1791626616366672"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "kxbqFRMUaCohf9eZl1CR4"
+uri = "file://generated-artifacts/qxlayer-production-ledger-supplement.sql"
+type = "unspecified"
+title = "Next Read-Only Check — Replit Ledger, Sequences and Extensions"
+description = "One SELECT, starting directly with SELECT. Keep Enable Editing OFF. Catalog metadata only; no customer/history records or database changes. Download the complete result as CSV or JSON for offline review."
+logical_id = "4a5f2d22-2a97-494e-8048-b8452df49d9a"
+content_hash = "sha256:21f892f809b31f0571662c97eac1c1ac0c30fb460071df2b630891a5f449243e"
+size = 8039
+mtime_ms = 1791626534850
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/4a5f2d22-2a97-494e-8048-b8452df49d9a/478d75ea-a959-4da6-8216-fb1f6653730b"
+storage_version_token = "1791626616954400"
+content_type = "application/octet-stream"

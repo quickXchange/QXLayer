@@ -89,3 +89,17 @@ read-only SELECT and no Production changes.
 transaction wrappers, SET or setting-changing functions. Download complete query
 results as CSV rather than copying a truncated grid cell, with payload byte
 length and digest checked offline before metadata approval.
+
+## Native platform history is not application migration history
+
+Discover native Replit migration-ledger objects separately from the application's
+Drizzle/deployment history before approving a full Production export.
+
+**Why:** The operator's complete primary metadata exposed a system-managed
+ledger outside the export kit's assumed application-history schemas. Merely
+allowing that schema would leave dependency, DDL and sequence capture incomplete.
+
+**How to apply:** Review the platform ledger's exact objects and preservation
+requirements, retain its original rows/IDs in the source backup, and keep its
+history separate from active target migration execution. Never synthesize
+application ledger entries or omit unknown history to make validation pass.
