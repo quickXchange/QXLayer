@@ -756,3 +756,73 @@ mtime_ms = 1791591125226
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7fbb07f3-dbd5-4e39-9746-468d07e65343/88f2b530-d69c-4c7f-9d0f-35e52c3a6644"
 storage_version_token = "1791591125791902"
 content_type = "text/html"
+
+[[outputs]]
+id = "mBtcT_tWfCQ14iGy4FpCB"
+uri = "file://generated-artifacts/supabase-security/01-inspect.sql"
+type = "unspecified"
+title = "01-inspect.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "ed72966d-5132-415b-834f-747b07ba3eeb"
+content_hash = "sha256:04a0656d32793fd09e985c9860a36ff0fa019ceb4c10ce73549a1c7347f79026"
+size = 62252
+mtime_ms = 1791590188034
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ed72966d-5132-415b-834f-747b07ba3eeb/673298f1-65a3-4863-84d7-6946f321c658"
+storage_version_token = "1791591473319280"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "IN3oRaKy3TminD7yi-7IS"
+uri = "file://generated-artifacts/supabase-security/05-create-login-and-enforce-rls.sql"
+type = "unspecified"
+title = "05-create-login-and-enforce-rls.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "4b2730af-7d43-4355-a241-54293ac35bf5"
+content_hash = "sha256:41cb51605177021bff1d7c21e950ee158462a142f5ce511a106a6db64f0f8bb3"
+size = 218075
+mtime_ms = 1791590954338
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/4b2730af-7d43-4355-a241-54293ac35bf5/0631e912-960a-48ee-8783-badd0e557f76"
+storage_version_token = "1791591473841855"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "QYIVyhsBFuzqib05_zlsS"
+uri = "file://generated-artifacts/supabase-security/06-verify-login-and-security.sql"
+type = "unspecified"
+title = "06-verify-login-and-security.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "70932edb-5cf2-4702-96bf-9b33e058f8e2"
+content_hash = "sha256:08f05990a699f3949c454e4a83071f78e4d2cd45370ef7310bd3048d3f995a55"
+size = 64534
+mtime_ms = 1791590954518
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/70932edb-5cf2-4702-96bf-9b33e058f8e2/8b7f6a38-c7c9-4db0-a189-e2f822f420a9"
+storage_version_token = "1791591474308228"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "ZGxguSrr-HfWLDhIHDEpX"
+uri = "file://generated-artifacts/supabase-security/04-runtime-readonly-check.sql"
+type = "unspecified"
+title = "04-runtime-readonly-check.sql"
+description = "Complete standalone SQL file. Provided for download only; not executed."
+logical_id = "c900b21f-a769-46b5-bc3b-5946e0c61f98"
+content_hash = "sha256:915c6b43f1758dfdbde9b2247279b93bbf86feecccca1f459c913a1b138911f4"
+size = 1048
+mtime_ms = 1791590417024
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/c900b21f-a769-46b5-bc3b-5946e0c61f98/7c276d2a-fe4a-463b-b9af-b21c6e43441f"
+storage_version_token = "1791591474876957"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "T8MhlCJEIDPVg2CvSxL8a"
+uri = "file://generated-artifacts/supabase-security/qxlayer-supabase-migration.zip"
+type = "unspecified"
+title = "qxlayer-supabase-migration.zip"
+description = "All four complete SQL files, verified byte-for-byte against the originals."
+logical_id = "fe79a2e7-632d-4a0a-81fa-a94bb8af62ca"
+content_hash = "sha256:c3b304a9ef2dd6d582652b683c8f6035732f32734012b5f3503e9a7f62e46a98"
+size = 16811
+mtime_ms = 1791591468997
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fe79a2e7-632d-4a0a-81fa-a94bb8af62ca/9335b8f7-8a2d-4363-8f8f-5a7add60e6f6"
+storage_version_token = "1791591475414740"
+content_type = "application/octet-stream"
