@@ -1,7 +1,24 @@
 ---
 name: External preparation authorization
-description: Supabase candidate restore and working external staging are authorized; existing Replit Production, Production DNS and final cutover remain protected.
+description: External migration authorization history, read-only hosting verification boundaries, and the Production/cutover hold.
 ---
+
+## Hosting access does not authorize deployment
+
+Connecting Vercel, adding a Render credential and verifying hosting configuration
+authorize connection/read-only checks, not service creation or deployment. The
+user explicitly limited the subsequent Render verification to read-only requests:
+no new services, deployment, Production changes or DNS changes.
+
+**Why:** The user repeated these boundaries when reconnecting hosting accounts
+and requesting verification, superseding earlier execution scope for this phase.
+
+**How to apply:** Use GET-only hosting checks, retain completed migration evidence,
+and require fresh explicit authorization before creating or deploying staging
+services. Do not infer deployment permission from successful authentication or
+the earlier broad staging implementation request.
+
+## Earlier implementation authorization
 
 The user subsequently authorized preparing permanent GitHub-based deployment:
 Replit Development, Vercel frontend if compatible, Render API/workers, and
