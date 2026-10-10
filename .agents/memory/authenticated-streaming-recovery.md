@@ -70,3 +70,17 @@ Restoring session row_security=on fixed the verified target rehearsal.
 
 **How to apply:** Exercise the real provider's non-superuser authority with
 synthetic always-rollback transactions in addition to local superuser tests.
+
+Do not treat a private backup under the runner's home directory as durably retained
+across sessions. Check the encrypted file and original receipt actually exist
+before relying on earlier verification reports. An independent receiving copy is
+the recovery source, not permission to repeat the Production capture.
+
+**Why:** A later approved restore attempt found the previously verified private
+directory, ciphertext and receipt absent in the current runtime. The retained
+preparation/capture reports still existed, but could not supply the missing inputs.
+
+**How to apply:** Stop on missing inputs and honor any stop-on-failure instruction.
+Recover and authenticate the existing independent ciphertext and receipt evidence
+under reviewed authorization; never create a new capture or bypass the original
+receipt/GCM checks to make restoration proceed.
