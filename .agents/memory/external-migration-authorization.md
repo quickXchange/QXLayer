@@ -38,6 +38,17 @@ If unchanged, reuse the verified candidate with no new backup. If changed, stop
 and seek approval for one necessary final capture and controlled replacement.
 No ongoing replication, speculative delta merges or new infrastructure.
 
+Vercel staging must use a Preview deployment, not the Production release flag or
+Production alias. Keep Production release steps explicitly target-gated.
+
+**Why:** The user authorized working staging while retaining the explicit
+Production DNS/final-cutover hold; a shared deployment command previously
+selected Vercel Production mode even for the staging target.
+
+**How to apply:** Do not use --prod for staging, substitute the live Replit API
+for an unavailable staging backend, or treat successful builds as a hosted,
+Supabase-connected application. Report the exact missing hosting authorization.
+
 **Why:** The user explicitly reinstated external preparation, but said:
 "Do not migrate Production data, expose secrets, switch DNS, or shut down the
 existing website yet."

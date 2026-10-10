@@ -9,6 +9,17 @@ import { createStaticHandler } from "../../lib/production-access-gate/static-han
 import { targetConfiguration } from "../external-postgres/migrate.mjs";
 import { createHash } from "node:crypto";
 
+test("Staging release uses a Preview deployment, not the Production alias", async () => {
+  const workflow = await readFile(new URL("../../.github/workflows/external-release.yml", import.meta.url), "utf8");
+  const preview = workflow.split("- name: Deploy Vercel staging Preview")[1]
+    ?.split("- name: Release Vercel Production package")[0];
+  assert.ok(preview, "Staging deployment step is required");
+  assert.match(preview, /if: inputs\.target == 'qxlayer-staging'/);
+  assert.match(preview, /deploy --prebuilt --yes/);
+  assert.doesNotMatch(preview, /--prod/);
+  assert.match(workflow, /name: Release Vercel Production package to protected project\s+if: inputs\.target == 'qxlayer-production'/);
+});
+
 test("Migration approval/target pins fail closed and refuse Replit/transaction pooling", () => {
   assert.throws(() => targetConfiguration({}));
   const base = { QXLAYER_EXTERNAL_MIGRATIONS_APPROVED:"true", SUPABASE_PROJECT_REF:"syntheticproject",
