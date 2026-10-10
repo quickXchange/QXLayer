@@ -94,6 +94,18 @@ self-service claim route, retain the managed application and explain the
 source-authority prerequisite without creating a replacement or contacting
 support on the user's behalf.
 
+Any migration to the user's personal Clerk account must be tested on Staging
+first, preserving customer records, IDs, Super Admin permissions and tenant roles.
+Do not delete or modify the existing managed Clerk application, change Production
+or deploy anything without explicit approval.
+
+**Why:** The user requested a safe migration plan, not migration execution.
+
+**How to apply:** Planning does not authorize creating destination applications,
+exporting/importing users, activating Staging authentication or deploying.
+Explain native Clerk ID changes and session reauthentication explicitly before
+seeking execution approval; preserving database records alone is insufficient.
+
 The user inspected Publishing settings and reported that the existing
 Production authentication keys are hidden or protected.
 
