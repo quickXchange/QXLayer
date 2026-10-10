@@ -24,6 +24,24 @@ completed migration evidence and do not rerun restores. Announce compute costs
 before provisioning paid instances. Do not infer Production release or cutover
 permission from staging authorization or successful account authentication.
 
+## Existing authentication preservation
+
+Preserve the existing login system, customer accounts, roles and Super Admin
+permissions. Do not introduce Clerk or require new accounts unless technically
+necessary. Do not change Production.
+
+**Why:** The user explicitly restated these migration boundaries after a
+credential request made it sound as though they needed a personal Clerk
+account. The platform management check confirmed the existing authentication
+tenant is Replit-managed, not a separately owned external Clerk account.
+
+**How to apply:** Treat managed authentication as the existing service, not a new
+provider setup. Verify management status before changes. Establish supported
+access to the retained identity tenant without replacing managed keys, creating
+replacement identities or substituting Development users for Production users.
+Preserving business-database records alone does not prove that hosted sign-in
+and the registered-account directory are retained.
+
 ## Earlier implementation authorization
 
 The user subsequently authorized preparing permanent GitHub-based deployment:
