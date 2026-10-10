@@ -887,14 +887,14 @@ content_type = "application/octet-stream"
 id = "hzj6891j6deWWwKdwgmb3"
 uri = "file://generated-artifacts/qxlayer-production-transfer-40/README.md"
 type = "text"
-title = "Updated iPad Metadata Download Instructions"
-description = "Run the single SELECT with editing off, download the complete query result as CSV, and retain all three columns for offline completeness checks."
+title = "Updated Export and Restore Instructions"
+description = "Revised instructions matching both verified metadata captures. Export, freeze, restore, startup and deployment remain unstarted and separately gated."
 logical_id = "73bb0764-bffa-4756-9887-5df6ed6767d0"
-content_hash = "sha256:a42fcafa66f7a0bf5343c3f57bbcb7846f9eeee7c099a1f2ecc9ac9326a21db1"
-size = 17417
-mtime_ms = 1791625322046
-storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/73bb0764-bffa-4756-9887-5df6ed6767d0/42de74ce-00cc-4566-8bb7-e91489bbe855"
-storage_version_token = "1791625374851735"
+content_hash = "sha256:d4ab7e1e790c0df8230c69165f9b71784d474d985b92a4c7e72e38eb52efbe80"
+size = 18592
+mtime_ms = 1791638545518
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/73bb0764-bffa-4756-9887-5df6ed6767d0/140aaa67-6bd5-46b0-a911-4ad45f1e02a7"
+storage_version_token = "1791638770103831"
 content_type = "text/markdown"
 
 [[outputs]]
@@ -952,3 +952,31 @@ mtime_ms = 1791626534850
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/4a5f2d22-2a97-494e-8048-b8452df49d9a/478d75ea-a959-4da6-8216-fb1f6653730b"
 storage_version_token = "1791626616954400"
 content_type = "application/octet-stream"
+
+[[outputs]]
+id = "RlcOn1Wl9PaUujBW9JuVQ"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40-table-kit-native-ledger.zip"
+type = "unspecified"
+title = "QXLayer 40-Table Kit — Verified Replit Ledger Support"
+description = "Updated offline kit for 40 application tables plus the exact native Replit ledger and both owned sequences. Includes reviewed metadata, passive-history safeguards, 17 passing offline tests, and refreshed checksums. Contains no Production records."
+logical_id = "b6cfadcf-fa84-4616-b9c7-8d0a8c37c040"
+content_hash = "sha256:d13bbbed11f3754e209a80adfb5db8e4611608d29711b8cb2cb1196ab6ba7ba7"
+size = 125100
+mtime_ms = 1791638738798
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/b6cfadcf-fa84-4616-b9c7-8d0a8c37c040/346c2a94-3061-48ff-bcc7-42bb8e8a3b72"
+storage_version_token = "1791638769062337"
+content_type = "application/octet-stream"
+
+[[outputs]]
+id = "PdUkoe-ayJ6fNu4hePag1"
+uri = "file://generated-artifacts/qxlayer-production-transfer-40/NATIVE-LEDGER.md"
+type = "text"
+title = "Native Ledger Preservation and Safe Next Steps"
+description = "Explains exact history/sequence preservation, offline baseline approval, and the private credentials/encrypted-storage approvals needed before any export."
+logical_id = "77b67bc5-23fc-4273-9de2-991134405ea1"
+content_hash = "sha256:1094d32ff3694045ede32e8fe10ea89c70ff8deb3ccd0d6b0b7dea90c702e5d7"
+size = 6358
+mtime_ms = 1791638537446
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/77b67bc5-23fc-4273-9de2-991134405ea1/cc7457d1-f186-4c21-8c6f-16cfad9593b8"
+storage_version_token = "1791638769586423"
+content_type = "text/markdown"

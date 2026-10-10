@@ -103,3 +103,20 @@ allowing that schema would leave dependency, DDL and sequence capture incomplete
 requirements, retain its original rows/IDs in the source backup, and keep its
 history separate from active target migration execution. Never synthesize
 application ledger entries or omit unknown history to make validation pass.
+
+Preserve native history as passive source history, never an active target
+migration runner. Deny application/Data API access to it; bind rows, DDL and both
+sequence states/ownership links to the source snapshot and all later preservation
+checks. No unknown system-schema allowance is justified by one verified ledger.
+
+**Why:** The reviewed native ledger includes a separate owned bigint sequence;
+application-only sequence capture would lose its original state and ownership.
+
+Metadata with PostgreSQL bigint ranges must use integer-safe decoding and
+serialization, not JavaScript JSON number round-tripping.
+
+**Why:** JavaScript silently rounds the 64-bit sequence maximum, invalidating an
+otherwise exact catalog comparison.
+
+**How to apply:** Preserve catalog integers using Python/exact-integer tools and
+test their equality against the original capture before distributing a kit.
