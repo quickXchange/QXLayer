@@ -58,3 +58,15 @@ standalone sequence callers and external side effects, disclose write timeouts,
 and never claim a fully operational freeze from flags alone. Safeguard checks
 must precede explicit approval for any Production locking or real export.
 Supabase restore and hosting/cutover remain separately approval-gated.
+
+After rendering a PostgreSQL dump, explicitly re-enable session row_security
+before forced-RLS preservation readback. Dump output sets row_security=off;
+that fails on Supabase's non-superuser operator even with a valid Super Admin
+policy context. Keep FORCE RLS and the restricted roles; do not use bypass rights.
+
+**Why:** A superuser local fixture passed while the actual PostgreSQL 17
+Supabase synthetic rollback rehearsal rejected the query as affected by RLS.
+Restoring session row_security=on fixed the verified target rehearsal.
+
+**How to apply:** Exercise the real provider's non-superuser authority with
+synthetic always-rollback transactions in addition to local superuser tests.

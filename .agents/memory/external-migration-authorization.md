@@ -1,12 +1,38 @@
 ---
 name: External preparation authorization
-description: GitHub/Vercel/Render/Supabase preparation is authorized; Production transfer and cutover are not.
+description: External preparation and verified encrypted backup are authorized; actual Supabase restore and cutover remain separately gated.
 ---
 
 The user subsequently authorized preparing permanent GitHub-based deployment:
 Replit Development, Vercel frontend if compatible, Render API/workers, and
 Supabase Production PostgreSQL with complete RLS. This supersedes the previous
 cancellation of external preparation.
+
+The user subsequently approved the temporary Production freeze, encrypted export
+and private receiving-copy verification only; that backup milestone is complete.
+They then authorized safe restore preparation and final synchronization planning,
+not executing the actual restore, deployment or DNS changes.
+
+**Why:** The user said "Prepare everything necessary for the actual restore, then
+request my approval to execute it" and "Do not repeat completed backup work."
+
+**How to apply:** Reuse the authenticated retained backup; prepare/test target
+roles, ACLs, RLS and required additive migrations, then request bounded real
+restore approval. Keep candidate inactive and the original Source unchanged.
+Do not mistake the earlier capture approval or new preparation request for
+restore/cutover authorization.
+
+QXLayer "has not launched publicly and has no real customers"; keep final
+synchronization simple while preventing data loss. Preserve ALL 41 source tables,
+records, IDs, Super Admin assignments, native history and both sequence states.
+
+**Why:** The user explicitly stated the launch/customer context and preservation
+scope; an unlaunched project does not justify discarding test data.
+
+**How to apply:** Prefer a final approved writer hold and exact parity comparison.
+If unchanged, reuse the verified candidate with no new backup. If changed, stop
+and seek approval for one necessary final capture and controlled replacement.
+No ongoing replication, speculative delta merges or new infrastructure.
 
 **Why:** The user explicitly reinstated external preparation, but said:
 "Do not migrate Production data, expose secrets, switch DNS, or shut down the
