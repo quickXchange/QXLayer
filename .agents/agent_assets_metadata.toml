@@ -742,3 +742,17 @@ mtime_ms = 1791590417336
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/fc08d810-70a6-4e2f-a2c8-a65a2e12fd92/44cf3e95-987b-4ddb-87d9-9249af33679a"
 storage_version_token = "1791590474051413"
 content_type = "text/html"
+
+[[outputs]]
+id = "vrP3ZPnRhOfrbs3_sTMmn"
+uri = "file://generated-artifacts/supabase-security/login-migration-guide.html"
+type = "html"
+title = "Reviewed QXLayer LOGIN + RLS migration"
+description = "Complete downloadable LOGIN migration, exact 42-table/84-policy security verification and SQL Editor instructions. Locally tested; no Supabase or Production changes executed."
+logical_id = "7fbb07f3-dbd5-4e39-9746-468d07e65343"
+content_hash = "sha256:dc9f84d3a1539931b25ed97179c3533da05e3007dd56991dfa259c017a3a860e"
+size = 360518
+mtime_ms = 1791591125226
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7fbb07f3-dbd5-4e39-9746-468d07e65343/88f2b530-d69c-4c7f-9d0f-35e52c3a6644"
+storage_version_token = "1791591125791902"
+content_type = "text/html"
