@@ -94,6 +94,29 @@ self-service claim route, retain the managed application and explain the
 source-authority prerequisite without creating a replacement or contacting
 support on the user's behalf.
 
+The user subsequently confirmed successful access to the existing application's
+Production dashboard. Workspace ownership and key-access permissions remain
+distinct from this entry access; do not assume either denied or granted.
+
+**Why:** Earlier inability to inspect the source was superseded by the user's
+successful managed-dashboard entry.
+
+**How to apply:** Request only missing read-only permission/domain metadata when
+the available management check cannot reveal it. Do not ask for credentials in
+chat, screenshots or ordinary forms.
+
+Staging that shares the Production Clerk instance does not isolate identity
+mutations merely because its business database is separate.
+
+**Why:** The user requests retained-instance Staging while prohibiting changes to
+existing users and Production. Sign-up, account administration and credential
+changes can affect the shared identity store; sign-in creates live auth sessions.
+
+**How to apply:** Establish existing approved domain/proxy configuration and
+credential authority first. Keep identity writes disabled and authentication
+activation held pending approval; do not change the primary Production proxy or
+register a new satellite under a no-Production-change instruction.
+
 Any migration to the user's personal Clerk account must be tested on Staging
 first, preserving customer records, IDs, Super Admin permissions and tenant roles.
 Do not delete or modify the existing managed Clerk application, change Production
