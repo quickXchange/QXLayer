@@ -1,6 +1,6 @@
 ---
 name: External preparation authorization
-description: External preparation and verified encrypted backup are authorized; actual Supabase restore and cutover remain separately gated.
+description: Supabase candidate restore and working external staging are authorized; existing Replit Production, Production DNS and final cutover remain protected.
 ---
 
 The user subsequently authorized preparing permanent GitHub-based deployment:
@@ -9,18 +9,22 @@ Supabase Production PostgreSQL with complete RLS. This supersedes the previous
 cancellation of external preparation.
 
 The user subsequently approved the temporary Production freeze, encrypted export
-and private receiving-copy verification only; that backup milestone is complete.
-They then authorized safe restore preparation and final synchronization planning,
-not executing the actual restore, deployment or DNS changes.
+and private receiving-copy verification; reuse that completed backup milestone.
+They later authorized actual restoration into the approved isolated Supabase
+candidate and implementation of a working Vercel staging deployment connected
+to Supabase, including application compatibility fixes and end-to-end testing.
 
-**Why:** The user said "Prepare everything necessary for the actual restore, then
-request my approval to execute it" and "Do not repeat completed backup work."
+**Why:** The user said "Start execution now and report actual completed
+milestones", "Stop repeating completed audits and backup checks", and "Do not
+ask for approval after every routine implementation step."
 
-**How to apply:** Reuse the authenticated retained backup; prepare/test target
-roles, ACLs, RLS and required additive migrations, then request bounded real
-restore approval. Keep candidate inactive and the original Source unchanged.
-Do not mistake the earlier capture approval or new preparation request for
-restore/cutover authorization.
+**How to apply:** Reuse completed work and verified evidence; execute candidate
+restore and staging implementation without restarting planning or recapturing.
+Use secure environment variables, preserve existing architecture and identities,
+and report exact genuine blockers with the shortest safe resolution. Do not
+modify the existing Replit Production application, copy Production secrets into
+logs/reports, switch Production DNS or perform final synchronization/cutover
+without new explicit approval.
 
 QXLayer "has not launched publicly and has no real customers"; keep final
 synchronization simple while preventing data loss. Preserve ALL 41 source tables,
@@ -39,8 +43,9 @@ No ongoing replication, speculative delta merges or new infrastructure.
 existing website yet."
 
 **How to apply:** The current delivery requirements are recorded in replit.md.
-Preparation is authorized; target provisioning, Production transfer and cutover
-still require separate approval. Historical SQL/reports are not current execution
+Staging implementation and isolated candidate restore are now authorized; final
+Source synchronization and Production cutover still require separate approval.
+Historical SQL/reports are not current execution
 instructions. Preserve accounts, Super Admin, design and isolation; do not touch
 QuickXchange. Keep
 managed Production schema changes in Replit's native Publish flow; a security
