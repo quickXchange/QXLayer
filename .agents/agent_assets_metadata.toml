@@ -985,14 +985,14 @@ content_type = "text/markdown"
 id = "Hc6uQsNu_cHqqDtu4YHvh"
 uri = "file://generated-artifacts/qxlayer-production-secure-export-preparation.zip"
 type = "unspecified"
-title = "QXLayer Secure Export Preparation Kit"
-description = "Credential-free kit with a metadata-only primary preflight, tested authenticated streaming encryption, explicit blockers and refreshed checksums. Contains no Production records or backups. No export or freeze is authorized."
+title = "QXLayer Kit — Primary Preflight Passed"
+description = "Updated credential-free kit and checksums. Hostname pin, primary/read-only identity, verified TLS 1.3, reviewed catalog and existing privileges passed. Contains no Production records; export remains unauthorized."
 logical_id = "7c8d92ff-ac28-4451-99f7-db05642f9637"
-content_hash = "sha256:4c1e4f318fa0e9c12421aeb902f62c6cc0e54f4c974ea43f511b7866e03cd96c"
-size = 138831
-mtime_ms = 1791639711079
-storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7c8d92ff-ac28-4451-99f7-db05642f9637/3000999b-bd21-4e65-a980-a094707674ce"
-storage_version_token = "1791639732824681"
+content_hash = "sha256:228897804f9769a0513d595cb3a40459cd31b3e8fa0cb40c186f004986fc5e47"
+size = 140554
+mtime_ms = 1791642169994
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/7c8d92ff-ac28-4451-99f7-db05642f9637/1224c9fb-7d37-4ccd-b790-99cf1c89575e"
+storage_version_token = "1791642221059642"
 content_type = "application/octet-stream"
 
 [[outputs]]

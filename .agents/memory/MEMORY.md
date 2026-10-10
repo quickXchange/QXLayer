@@ -32,3 +32,4 @@
 - [Integration verification boundaries](integration-verification-boundaries.md) — privileged-role RLS queries are not isolation proof; source-schema references need a bounded allowlist.
 - [External preparation](external-migration-authorization.md) — GitHub/Vercel/Render/Supabase preparation authorized; no Production transfer, DNS change or cutover.
 - [Performance comparisons](performance-comparisons.md) — normalize build/auth settings; distinguish bootstrap, complete-route bytes, lab clicks and field/cloud results.
+- [Production client TLS](production-client-tls.md) — provider backend SSL flags do not prove client transport; require verified client TLS without weakening CA/hostname or channel binding.
