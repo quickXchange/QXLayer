@@ -45,6 +45,23 @@ user-editable metadata.
    hosted sign-in and tenant isolation afterward; local tests are not proof of
    hosted acceptance.
 
+## First deployment and the Preview-origin dependency
+
+An undeployed Vercel project does not have a generated Preview URL. Its default
+project domain is a Production alias, not evidence of a Preview origin. Do not
+invent a deployment hash, substitute the Production alias or allow wildcard
+authorized parties.
+
+The safe first release is a separately approved, access-gated Vercel Preview
+only. Capture its exact provider-returned URL, then save that origin to the held
+Staging API settings. Keep Render suspended and startup approval false throughout
+this bootstrap. API activation, paid compute and hosted login testing require
+additional approval. No DNS changes are needed.
+
+If the GitHub connection cannot modify workflow files, report that limitation.
+Application-source synchronization must not be described as a complete workflow
+sync. Do not alter or dispatch existing release automation as a workaround.
+
 The configure script is fail-closed and save-only for the pinned existing
 targets. It refuses Git-linked/deployed Vercel projects and Render groups with
 additional services, active services, enabled autodeploys or auth overrides.

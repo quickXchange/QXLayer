@@ -130,6 +130,33 @@ Apply the same canonical actor to authorization, RLS, ownership, directory and
 private operator previews. Never take an alias from browser input or editable
 user metadata.
 
+For an explicitly requested Staging Super Admin resolution, select the existing
+authorized Development operator, not an account inferred from email. A unique
+active Development Super Admin and unique preserved Staging Super Admin can be
+bound for this requested operator role only; ambiguity requires user selection.
+Do not extend this approval to customer bindings or Production identity changes.
+
+**Why:** The user authorized resolving the Staging operator binding while
+prohibiting Production ID/role changes. Existing operator authority provided a
+safe selector without creating users or rewriting preserved authorization.
+
+**How to apply:** Verify the native identity is present and unblocked, save only
+the server-side Staging binding, and confirm the restricted runtime can resolve
+the preserved active admin through RLS. Keep original role-record fingerprints
+unchanged. Hosted sign-in remains separate acceptance work.
+
+An exact generated Vercel Preview origin does not exist before the first
+deployment. The default project domain is a Production alias, not a Preview URL.
+
+**Why:** Read-only provider inventory showed no deployments, and Vercel creates
+generated Preview URLs when deploying. Using a predicted URL or default alias
+would not establish an approved fixed authentication origin.
+
+**How to apply:** Request a separately approved gated Preview-only bootstrap,
+capture the provider-returned URL, then configure the still-held API origin.
+Keep Render suspended, paid compute and DNS changes unapproved, and request
+separate API activation approval. Do not deploy merely to resolve the URL.
+
 Staging that shares the Production Clerk instance does not isolate identity
 mutations merely because its business database is separate.
 
