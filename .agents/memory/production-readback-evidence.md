@@ -36,6 +36,15 @@ can default to permissive access, even though the Development policies passed.
 the release if the supported plan loses them; do not add Production DDL or startup
 repair, and do not label a passing Development isolation check as Live acceptance.
 
+An explicit constant-true read policy is not a workaround for the native
+generator's omitted predicates.
+
+**Why:** Regeneration still omitted `USING` after source and Development metadata
+both independently confirmed a literal true pricing read condition.
+
+**How to apply:** Retain the native plan exactly as returned, report the blocker,
+and never edit its SQL to fabricate a passing review.
+
 **Why:** Isolated lifecycle verification showed that legitimate pre-delivery
 tenant links must survive; transaction rollback is safe before commit, but an
 unconditional post-commit schema reversal can reject valid new state.

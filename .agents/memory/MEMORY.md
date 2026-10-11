@@ -37,3 +37,4 @@
 - [Vercel Preview boundary](vercel-preview-boundary.md) — first uploads were classified as Production even with Preview requested; verify provider target and do not repeat unresolved uploads.
 - [Restored schema equivalence](restored-schema-equivalence.md) — preserve raw captures and restored data; accept only reviewed, typed constant-default equivalences.
 - [Staging owner access](staging-owner-access-policy.md) — original owner password via explicit Staging verifier; independent signing and native-form verification, no Replit password changes.
+- [Public pricing policy](public-pricing-policy.md) — pricing rules are public-read-only; preserve administrative writes and other tenant boundaries.
