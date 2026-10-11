@@ -8,7 +8,7 @@ const rows=[];
 for(const device of ['desktop','tablet','mobile']) for(const route of ['/','/private-label-website/novax-live-demo']){
   const b=before.runs.filter(r=>r.device===device&&r.route===route),a=after.runs.filter(r=>r.device===device&&r.route===route);
   const bm=median(b.map(r=>r.lcpMs)),am=median(a.map(r=>r.lcpMs));
-  rows.push([route==='/'?'QXLayer landing':'NovaX',device,bm+' ms',am+' ms',pct(bm,am),
+  rows.push([route==='/'?'VYNOX LAYER landing':'NovaX',device,bm+' ms',am+' ms',pct(bm,am),
     Math.max(...a.map(r=>r.cls)).toFixed(6),
     median(a.map(r=>r.measuredInteractionMs))+' ms']);
 }
@@ -24,7 +24,7 @@ for(const theme of ['dark','light']){
 const packageStats=JSON.parse(await readFile(`${dir}/package.json`,'utf8'));
 const qa=JSON.parse(await readFile(`${dir}/verification.json`,'utf8'));
 const table=(headers,rows)=>`| ${headers.join(' | ')} |\n| ${headers.map(()=> '---').join(' | ')} |\n${rows.map(row=>'| '+row.join(' | ')+' |').join('\n')}`;
-const text=`# QXLayer Development performance report
+const text=`# VYNOX LAYER Development performance report
 
 ## Measured results
 Median of three cold-cache runs per route/viewport. Positive improvement means faster; negative means slower.
@@ -91,7 +91,7 @@ function markdownHtml(source) {
   }
   return blocks.join('\n');
 }
-const html=`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>QXLayer performance report</title><style>body{font:16px/1.6 system-ui,sans-serif;background:#f6f7f9;color:#172033;margin:0}main{max-width:1080px;margin:32px auto;padding:32px;background:white;border:1px solid #dde2e9;border-radius:12px}h1{line-height:1.2}h2{margin-top:36px}p,li{max-width:90ch}li{margin-bottom:10px}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;padding:10px;border-bottom:1px solid #dde2e9}th{background:#eef2f6}section{overflow:auto}@media(max-width:600px){main{padding:16px;margin:0;border-radius:0}}</style><main>${markdownHtml(text)}</main></html>`;
+const html=`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VYNOX LAYER performance report</title><style>body{font:16px/1.6 system-ui,sans-serif;background:#f6f7f9;color:#172033;margin:0}main{max-width:1080px;margin:32px auto;padding:32px;background:white;border:1px solid #dde2e9;border-radius:12px}h1{line-height:1.2}h2{margin-top:36px}p,li{max-width:90ch}li{margin-bottom:10px}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;padding:10px;border-bottom:1px solid #dde2e9}th{background:#eef2f6}section{overflow:auto}@media(max-width:600px){main{padding:16px;margin:0;border-radius:0}}</style><main>${markdownHtml(text)}</main></html>`;
 if(Buffer.byteLength(html,'utf8')>5*1024*1024)throw Error('Report exceeds delivery budget.');
 await writeFile(`${dir}/report.html`,html);
 console.log('Performance report generated.');

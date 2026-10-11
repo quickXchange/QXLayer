@@ -14,5 +14,5 @@ export async function getQuickexCredentialStorageState(): Promise<any> {
     verificationVersion: null, verifiedCredentialFingerprint: null, verifiedAt: null } : { status: "absent" };
 }
 export async function activateQuickexCredentials(..._args: unknown[]): Promise<never> {
-  throw new Error("Live Quickex credential activation is disabled in QXLayer Sandbox.");
+  throw new Error("Live Quickex credential activation is disabled in VYNOX LAYER Sandbox.");
 }

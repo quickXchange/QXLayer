@@ -1,4 +1,8 @@
-# Project-owned authentication — Development and Staging only
+# VYNOX LAYER project-owned authentication — Development and Staging only
+
+The application name, authenticator issuer and email subjects use VYNOX LAYER.
+Existing `QXLAYER_*` keys and `qxlayer_auth` storage remain stable compatibility
+identifiers; renaming them would invalidate integrations or existing credentials.
 
 Normal sign-in uses Better Auth and private PostgreSQL storage, not Clerk.
 Clerk remains available solely for proving ownership of an existing account

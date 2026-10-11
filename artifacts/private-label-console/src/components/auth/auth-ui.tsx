@@ -47,7 +47,7 @@ export function SuccessLine({ children, id }: { children?: ReactNode; id?: strin
 }
 export function MailNotice({ status, failed }: { status: OwnedStatus | null; failed: boolean }) {
   if (failed) return <ErrorLine id="text-status-error">Could not reach the authentication service. Reload to retry.</ErrorLine>;
-  if (status && !status.enabled) return <ErrorLine id="text-owned-disabled">QXLayer account sign-in is not enabled on this deployment.</ErrorLine>;
+  if (status && !status.enabled) return <ErrorLine id="text-owned-disabled">VYNOX LAYER account sign-in is not enabled on this deployment.</ErrorLine>;
   if (status && !status.mailReady) return <div data-testid="text-mail-unavailable" className="flex gap-2 rounded-md border border-[#cfc6b3] bg-secondary px-3 py-2 text-sm text-foreground"><MailWarning className="mt-0.5 h-4 w-4 shrink-0 text-copper" /><span>Email delivery is not configured yet. Verification and password-reset emails cannot be sent until an administrator connects a mail provider. Verification is never bypassed.</span></div>;
   return null;
 }

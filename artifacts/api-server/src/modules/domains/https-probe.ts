@@ -45,7 +45,7 @@ export async function fetchHostingProof(domain: string, nonce: string): Promise<
       hostname: domain, servername: domain, family: pinned.family, port: 443, method: "GET",
       path: `/api/public/domains/${encodeURIComponent(domain)}/hosting-proof/${nonce}`,
       lookup: (_hostname, _options, callback) => callback(null, pinned.address, pinned.family),
-      rejectUnauthorized: true, headers: { Accept: "application/json", "User-Agent": "QXLayer-domain-verification/1" },
+      rejectUnauthorized: true, headers: { Accept: "application/json", "User-Agent": "VynoxLayer-domain-verification/1" },
     }, res => {
       if (res.statusCode !== 200 || !res.headers["content-type"]?.includes("application/json")) {
         res.resume(); reject(new Error("wrong_route")); return;

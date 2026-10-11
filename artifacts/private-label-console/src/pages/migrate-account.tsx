@@ -30,10 +30,10 @@ function Enroll() {
     } catch { setErr('Could not complete migration. Try again.'); } finally { setBusy(false); }
   };
   if (done) return <SuccessLine id="text-migrated">Migration complete. Redirecting to sign in with your new password...</SuccessLine>;
-  if (!isSignedIn) return <SignIn routing="hash" />;
+  if (!isSignedIn) return <SignIn routing="hash" appearance={{ elements: { header: '!hidden', logoBox: '!hidden' } }} />;
   return (
     <Form onSubmit={submit}>
-      <Field id="migrate-password" label="New QXLayer password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint="12 to 128 characters. Your old password is unchanged and is never copied." />
+      <Field id="migrate-password" label="New VYNOX LAYER password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint="12 to 128 characters. Your old password is unchanged and is never copied." />
       <Field id="migrate-confirm" label="Confirm new password" type="password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
       <ErrorLine>{err}</ErrorLine>
       <Submit id="button-migrate" busy={busy} disabled={!pw}>Create my new sign-in</Submit>
@@ -44,7 +44,7 @@ function Enroll() {
 export default function MigrateAccountPage() {
   return (
     <AuthFrame title="Move your existing account" subtitle="One-time migration" footer={<>Already migrated? <A id="link-sign-in" href="/sign-in">Sign in</A></>}>
-      <p className="text-sm text-muted-foreground">Sign in once with your existing QXLayer account. That verifies your email and identity, so there is no new verification email and no need to create a new account. Then choose a password for the new sign-in. Your roles and data stay attached, and this works only once per account.</p>
+      <p className="text-sm text-muted-foreground">Sign in once with your existing VYNOX LAYER account. That verifies your email and identity, so there is no new verification email and no need to create a new account. Then choose a password for the new sign-in. Your roles and data stay attached, and this works only once per account.</p>
       {pk ? <ClerkProvider publishableKey={pk} signInUrl={`${base}/migrate-account`}><Enroll /></ClerkProvider> : <ErrorLine>The previous sign-in service is not configured here.</ErrorLine>}
     </AuthFrame>
   );

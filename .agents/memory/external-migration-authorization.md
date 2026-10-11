@@ -11,8 +11,8 @@ deployment. The user subsequently approved creating and configuring isolated
 QXLayer staging API/worker services on Render, using the existing architecture
 and a separate staging Supabase environment.
 
-Keep the existing QXLayer name, branding, domains and project identifiers
-unchanged. Keep automatic deployments disabled initially. Tell the user before
+Keep the existing domains and project identifiers unchanged. Keep automatic
+deployments disabled initially. Tell the user before
 enabling paid resources. Do not modify Production, restore data or change DNS.
 
 **Why:** The user explicitly authorized isolated staging creation after the

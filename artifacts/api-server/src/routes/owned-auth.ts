@@ -34,7 +34,7 @@ async function legacyProof(req: Parameters<typeof getAuth>[0]) {
   const businessId = applicationUserId(native.userId);
   if (!email || !businessId) throw new HttpError(403, "A verified existing account and approved identity binding are required.");
   return { businessId, subject: native.userId, email: email.emailAddress.toLowerCase(),
-    name: [user.firstName, user.lastName].filter(Boolean).join(" ") || "QXLayer account" };
+    name: [user.firstName, user.lastName].filter(Boolean).join(" ") || "VYNOX LAYER account" };
 }
 router.post("/auth-migration/enroll", async (req, res) => {
   const { password } = z.object({ password: z.string().min(12).max(128) }).strict().parse(req.body);

@@ -142,8 +142,8 @@ background:radial-gradient(60% 55% at 70% 20%,color-mix(in srgb,var(--sc-light,v
 .sc-tag-l .qx-logo i,.sc-bar .qx-logo i{color:var(--s-fg)}
 .qx-logo{display:inline-flex;align-items:center;gap:.65em;flex-shrink:0;white-space:nowrap;line-height:1}
 .qx-logo small{font-weight:500;opacity:.75;margin-left:.1em}
-.qx-preview-wordmark{display:inline-flex;width:var(--qx-logo-width);aspect-ratio:1174/510;flex:none;align-items:center}
-.qx-preview-wordmark svg{width:100%;height:100%;flex:none;overflow:hidden}
+.qx-preview-wordmark{display:inline-flex;width:var(--qx-logo-width);aspect-ratio:1604/855;flex:none;align-items:center}
+.qx-preview-wordmark svg,.qx-preview-wordmark img{width:100%;height:100%;flex:none;overflow:hidden}
 .qx-preview-mark{display:inline-flex;flex:none;align-items:center;justify-content:center}
 .qx-preview-mark img{width:100%;height:100%;object-fit:contain}
 .sx-mobile-brand{display:none}

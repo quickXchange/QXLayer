@@ -63,7 +63,7 @@ function TwoFactor({ enabled, onChanged }: { enabled: boolean; onChanged: () => 
   const reset = () => { clear(); setMode('idle'); setErr(''); };
   const run = async (fn: () => Promise<void>) => { setBusy(true); setErr(''); setOk(''); try { await fn(); } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); } };
   const start = () => run(async () => {
-    const r = await authClient.twoFactor.enable({ password: pw, issuer: 'QXLayer' });
+    const r = await authClient.twoFactor.enable({ password: pw, issuer: 'VYNOX LAYER' });
     if (r.error) { setErr(authErrorText(r.error)); return; }
     const d = r.data as { totpURI?: string; backupCodes?: string[] };
     if (!d.totpURI) { setErr('Authenticator setup is unavailable.'); return; }
@@ -160,7 +160,7 @@ export function SecurityPanel() {
       <Section id="password" title="Password" desc="Changing it signs out every other session."><PasswordForm /></Section>
       <Section id="two-factor" title="Two-factor authentication" desc="Authenticator app (TOTP) with one-time backup codes. Required for super administrator access."><TwoFactor enabled={!!user.twoFactorEnabled} onChanged={() => void s.refetch()} /></Section>
       <Section id="sessions" title="Active sessions"><Sessions currentToken={s.data?.session?.token} /></Section>
-      <Section id="migration" title="Link an existing QXLayer account" desc="One-time migration for people who already used the previous sign-in. It cannot copy your old password.">
+      <Section id="migration" title="Link an existing VYNOX LAYER account" desc="One-time migration for people who already used the previous sign-in. It cannot copy your old password.">
         <Button asChild variant="outline"><Link href="/account/link-existing" data-testid="link-existing-account"><Link2 className="mr-2 h-4 w-4" />Link existing account</Link></Button>
       </Section>
     </div>

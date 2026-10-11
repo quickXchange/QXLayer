@@ -15,7 +15,7 @@ import * as schema from "./schema";
 export const authDatabase = drizzle(pool, { schema });
 export function createOwnedAuth(baseURL: string, secret: string, deliver = sendAuthMail) {
   return betterAuth({
-    appName: "QXLayer", baseURL, basePath: "/api/auth", secret,
+    appName: "VYNOX LAYER", baseURL, basePath: "/api/auth", secret,
     // Adapter failures can otherwise log credential/query parameters.
     logger: { disabled: true },
     database: drizzleAdapter(authDatabase, { provider: "pg", schema, transaction: true }),
@@ -24,11 +24,11 @@ export function createOwnedAuth(baseURL: string, secret: string, deliver = sendA
       enabled: true, requireEmailVerification: true, autoSignIn: false,
       minPasswordLength: 12, maxPasswordLength: 128, revokeSessionsOnPasswordReset: true,
       resetPasswordTokenExpiresIn: 900,
-      sendResetPassword: async ({ user, url }) => deliver(user.email, "Reset your QXLayer password", url),
+      sendResetPassword: async ({ user, url }) => deliver(user.email, "Reset your VYNOX LAYER password", url),
     },
     emailVerification: {
       sendOnSignUp: true, expiresIn: 1800,
-      sendVerificationEmail: async ({ user, url }) => deliver(user.email, "Verify your QXLayer email", url),
+      sendVerificationEmail: async ({ user, url }) => deliver(user.email, "Verify your VYNOX LAYER email", url),
     },
     user: { deleteUser: { enabled: false }, changeEmail: { enabled: false } },
     account: { accountLinking: { enabled: false } },
@@ -40,7 +40,7 @@ export function createOwnedAuth(baseURL: string, secret: string, deliver = sendA
       defaultCookieAttributes: { httpOnly: true, sameSite: "lax", secure: baseURL.startsWith("https:") },
       // No forwarded client-IP headers trusted from arbitrary API callers.
       ipAddress: { ipAddressHeaders: [] } },
-    plugins: [twoFactor({ issuer: "QXLayer", skipVerificationOnEnable: false,
+    plugins: [twoFactor({ issuer: "VYNOX LAYER", skipVerificationOnEnable: false,
       backupCodeOptions: { storeBackupCodes: "encrypted" }, accountLockout: { enabled: true, maxFailedAttempts: 5, durationSeconds: 900 } })],
   });
 }

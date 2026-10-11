@@ -16,7 +16,7 @@ function hsl(h: string): string {
   return `${hh.toFixed(1)} ${(s * 100).toFixed(1)}% ${(l * 100).toFixed(1)}%`;
 }
 
-/** Console variables derived from the real QXLayer theme generator. */
+/** Console variables derived from the real VYNOX LAYER theme generator. */
 export function consoleVars(dark: boolean): Record<string, string> {
   const t = tokens(PLATFORM_SITE, dark);
   const bg = t['--s-bg'], fg = t['--s-fg'], bg2 = t['--s-bg2'];

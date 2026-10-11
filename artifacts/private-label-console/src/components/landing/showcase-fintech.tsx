@@ -29,9 +29,9 @@ export const fintechScenes: Record<string, () => ReactNode> = {
           <div className="sx-two"><Chart a={[28, 36, 33, 48, 44, 58, 52, 67, 61, 78]} b={[20, 26, 30, 34, 38, 41, 47, 50, 55, 60]} h={9} /><Donut parts={[[41, 'var(--s-primary)'], [33, 'var(--s-accent)'], [26, '#f4b73e']]} v="1,284" s="by method" /></div>
           <div>
             <Tr head cols="6.5em 1fr 6.5em 5em" c={['Order', 'Pair', 'Amount', 'Status']} />
-            <Tr cols="6.5em 1fr 6.5em 5em" c={['QX-48213', <><Cn c="BTC" />to<Cn c="ETH" /></>, '$5,716.40', <St t="Filled" />]} />
-            <Tr cols="6.5em 1fr 6.5em 5em" c={['QX-48212', <><Cn c="USDT" />to<Cn c="SOL" /></>, '$1,240.00', <St t="Filled" />]} />
-            <Tr cols="6.5em 1fr 6.5em 5em" c={['QX-48211', <><Cn c="ETH" />to<Cn c="USDC" /></>, '$3,880.15', <St t="Pending" k="wait" />]} />
+            <Tr cols="6.5em 1fr 6.5em 5em" c={['VX-48213', <><Cn c="BTC" />to<Cn c="ETH" /></>, '$5,716.40', <St t="Filled" />]} />
+            <Tr cols="6.5em 1fr 6.5em 5em" c={['VX-48212', <><Cn c="USDT" />to<Cn c="SOL" /></>, '$1,240.00', <St t="Filled" />]} />
+            <Tr cols="6.5em 1fr 6.5em 5em" c={['VX-48211', <><Cn c="ETH" />to<Cn c="USDC" /></>, '$3,880.15', <St t="Pending" k="wait" />]} />
           </div>
         </div>
       </div></Win></L>
@@ -66,7 +66,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
       </div></div>
       <Btn t="I have sent the payment" />
     </Win></L>
-    <L x={4} y={73} w={36} d={14} z={3} fl={2}><Win title="Payment link"><div className="sx-link"><span>pay.qxlayer.demo/l/studio-kit</span><em>Copy</em></div><Kv k="Amount" v="$49.00 in USDC" /><Kv k="Status" v={<St t="Active" />} /></Win></L>
+    <L x={4} y={73} w={36} d={14} z={3} fl={2}><Win title="Payment link"><div className="sx-link"><span>pay.vynoxlayer.demo/l/studio-kit</span><em>Copy</em></div><Kv k="Amount" v="$49.00 in USDC" /><Kv k="Status" v={<St t="Active" />} /></Win></L>
     <L x={44} y={74} w={30} d={8} z={2}><Win title="Settlement"><Cols v={[40, 55, 48, 72, 60, 86, 74]} labels={['M', 'T', 'W', 'T', 'F', 'S', 'S']} h={4} /></Win></L>
   </>,
 

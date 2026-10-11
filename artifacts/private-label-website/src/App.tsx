@@ -21,7 +21,7 @@ function MainPlatformEntry() {
   // Cross-artifact navigation: the main platform is registered at /,
   // while this router handles only /private-label-website/.
   useEffect(() => { window.location.replace('/'); }, []);
-  return <a href="/">Open QXLayer Main Platform</a>;
+  return <a href="/">Open VYNOX LAYER Main Platform</a>;
 }
 
 function RouteScroll() {

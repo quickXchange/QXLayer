@@ -14,7 +14,7 @@ export function customerHostname(raw: string) {
     try { reserved.add(new URL(process.env.QXLAYER_PLATFORM_URL).hostname); } catch { /* Invalid platform configuration grants no routing. */ }
   }
   if (reserved.has(domain) || domain.endsWith(".replit.dev") || domain === "localhost") {
-    throw new HttpError(400, "Use a customer-owned domain, not a reserved QXLayer platform or Development hostname.");
+    throw new HttpError(400, "Use a customer-owned domain, not a reserved VYNOX LAYER platform or Development hostname.");
   }
   return domain;
 }

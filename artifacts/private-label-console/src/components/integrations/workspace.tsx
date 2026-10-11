@@ -175,7 +175,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
                 {MGMT.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select></label>
           </div>
-        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? `Enablement and credential policy are set by QXLayer (${conn.credentialManagement.replace('_', ' ')}).` : 'Not authorized yet. QXLayer must authorize this integration first.'}</p>}
+        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? `Enablement and credential policy are set by VYNOX LAYER (${conn.credentialManagement.replace('_', ' ')}).` : 'Not authorized yet. VYNOX LAYER must authorize this integration first.'}</p>}
 
         {isSuper && <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
           <span>Allow customer to activate this authorized integration</span>

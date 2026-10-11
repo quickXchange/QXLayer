@@ -33,8 +33,8 @@ function Linker() {
       finally { window.location.assign(`${base}/sign-in`); }
     } catch { setErr('Could not complete linking. Try again.'); } finally { setBusy(false); }
   };
-  if (!isSignedIn) return <SignIn routing="hash" />;
-  return <div className="space-y-4 text-center"><p className="text-sm">Existing account verified. Link it to your new QXLayer account?</p><ErrorLine id="text-link-error">{err}</ErrorLine>
+  if (!isSignedIn) return <SignIn routing="hash" appearance={{ elements: { header: '!hidden', logoBox: '!hidden' } }} />;
+  return <div className="space-y-4 text-center"><p className="text-sm">Existing account verified. Link it to your new VYNOX LAYER account?</p><ErrorLine id="text-link-error">{err}</ErrorLine>
     <Button data-testid="button-link-account" disabled={busy} onClick={() => void link()} className="w-full">{busy ? 'Linking...' : 'Link accounts'}</Button></div>;
 }
 
@@ -42,7 +42,7 @@ export default function LinkExistingPage() {
   return (
     <OwnedSessionGate>
       <AuthFrame title="Link your existing account" subtitle="One-time migration" footer={<Link href="/account/security" data-testid="link-back-security" className="font-medium text-[#b4551f] hover:underline">Back to account security</Link>}>
-        <p className="text-sm text-muted-foreground">Sign in to your previous QXLayer account once to prove ownership. We then attach its existing access to this new account. Your old password cannot be copied, and access is never granted by matching email addresses.</p>
+        <p className="text-sm text-muted-foreground">Sign in to your previous VYNOX LAYER account once to prove ownership. We then attach its existing access to this new account. Your old password cannot be copied, and access is never granted by matching email addresses.</p>
         {pk ? <ClerkProvider publishableKey={pk} signInUrl={`${base}/account/link-existing`}><Linker /></ClerkProvider> : <ErrorLine>The previous sign-in service is not configured here.</ErrorLine>}
       </AuthFrame>
     </OwnedSessionGate>

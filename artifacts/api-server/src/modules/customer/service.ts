@@ -174,8 +174,8 @@ export async function deliverLinkedRequest(c: DatabaseClient, p: Principal, id: 
     if (used.rowCount) throw new HttpError(409, "This Exchange has already been delivered.");
     await c.query("INSERT INTO tenant_memberships (tenant_id,clerk_user_id,role,label,active) VALUES ($1,$2,'client_admin','Customer account owner',true) ON CONFLICT (tenant_id,clerk_user_id) DO UPDATE SET role='client_admin',active=true", [tenantId, row.customerUserId]);
     const r = await c.query(`UPDATE white_label_requests SET status='delivered',tenant_id=$2,updated_at=now() WHERE id=$1 RETURNING ${columns}`, [id, tenantId]);
-    await event(c, p, id, "status", "White Label delivered to your existing QXLayer account. Your authorized Admin Panel is available.", "customer", "delivered");
-    await audit(c, p, tenantId, "white_label.provisioned", "Delivered Exchange into the existing QXLayer customer account", { requestId: id });
+    await event(c, p, id, "status", "White Label delivered to your existing VYNOX LAYER account. Your authorized Admin Panel is available.", "customer", "delivered");
+    await audit(c, p, tenantId, "white_label.provisioned", "Delivered Exchange into the existing VYNOX LAYER customer account", { requestId: id });
     return orderView(c, r.rows[0]);
 }
 export function deliverRequest(p: Principal, id: string, tenantId: string) {
@@ -194,7 +194,10 @@ export function orderDetail(p: Principal, id: string, operator = false) {
     const r = await c.query(`SELECT ${columns} FROM white_label_requests WHERE id=$1 ${operator ? "" : "AND customer_user_id=$2"}`, operator ? [id] : [id, p.userId]);
     if (!r.rowCount) throw new HttpError(404, "White Label order not found.");
     const history = await c.query(`SELECT ${eventColumns} FROM white_label_events WHERE request_id=$1 ${operator ? "" : "AND visibility='customer'"} ORDER BY created_at,id`, [id]);
-    return { order: await orderView(c, r.rows[0]), history: history.rows };
+    return { order: await orderView(c, r.rows[0]), history: history.rows.map(row =>
+      row.kind === "status" && typeof row.message === "string"
+        ? { ...row, message: row.message.replace(/\bQX\s?Layer\b/gi, "VYNOX LAYER") }
+        : row) };
   });
 }
 export function appendNote(p: Principal, id: string, raw: WhiteLabelNoteInput) {

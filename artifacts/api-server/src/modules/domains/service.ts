@@ -24,7 +24,7 @@ export function getDomainVerification(principal: Principal, tenantId: string) {
       websiteUrl: connected ? `https://${row.domain}` : null,
       instructions: [
         "Create the ownership TXT record below at your DNS provider, then verify ownership.",
-        "An authorized QXLayer publisher must add this exact hostname in Replit Publishing → Custom domains.",
+        "An authorized VYNOX LAYER publisher must add this exact hostname in Replit Publishing → Custom domains.",
         "Apply the exact A/CNAME and verification TXT records displayed by Publishing; do not guess an IP address.",
         "Keep Publishing's verification TXT record permanently for certificate renewal. Each subdomain needs its own connection.",
         "Replit issues and renews HTTPS after DNS is correct. Once the website is activated and delivered, check HTTPS and routing below.",

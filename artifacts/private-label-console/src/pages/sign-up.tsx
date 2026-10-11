@@ -18,7 +18,7 @@ export default function SignUpPage() {
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (
-    <AuthFrame title="Create a QXLayer account" subtitle="Configure and request your White Label Exchange" footer={<>Already registered? <A id="link-sign-in" href="/sign-in">Sign in</A></>}>
+    <AuthFrame title="Create a VYNOX LAYER account" subtitle="Configure and request your White Label Exchange" footer={<>Already registered? <A id="link-sign-in" href="/sign-in">Sign in</A></>}>
       <MailNotice status={status} failed={failed} />
       {done ? <div className="space-y-3"><SuccessLine>Account created. Open the verification link we emailed to {email} before signing in.</SuccessLine><A id="link-to-sign-in" href="/sign-in">Continue to sign in</A></div> : (
         <Form onSubmit={submit}>

@@ -255,7 +255,7 @@ paths:
     get:
       operationId: listMyAdminPanels
       responses:
-        "200": {description: Provisioned Exchange projects authorized for the current QXLayer session, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/CustomerAdminPanel"}}}}}
+        "200": {description: Provisioned Exchange projects authorized for the current VYNOX LAYER session, content: {application/json: {schema: {type: array, items: {$ref: "#/components/schemas/CustomerAdminPanel"}}}}}
   /customer/white-label-requests:
     get:
       operationId: listMyWhiteLabelRequests
@@ -603,7 +603,7 @@ paths:
       tags: [tenants]
       parameters: [{$ref: "#/components/parameters/TenantId"}]
       responses:
-        "200": {description: Checked live HTTPS and signed QXLayer routing proof, content: {application/json: {schema: {$ref: "#/components/schemas/DomainVerification"}}}}
+        "200": {description: Checked live HTTPS and signed VYNOX LAYER routing proof, content: {application/json: {schema: {$ref: "#/components/schemas/DomainVerification"}}}}
   /public/domains/{hostname}/hosting-proof/{nonce}:
     get:
       operationId: getDomainHostingProof

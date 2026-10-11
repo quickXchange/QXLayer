@@ -1,4 +1,4 @@
-name: External preparation checks
+name: VYNOX LAYER build and deployment checks
 on:
   pull_request:
   push:

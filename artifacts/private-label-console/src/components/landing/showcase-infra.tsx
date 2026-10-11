@@ -23,7 +23,7 @@ export const infraScenes: Record<string, () => ReactNode> = {
     <L x={72} y={9} w={26} d={8}><Mod n="05" t="Nodes" a={['Chains synced', '9 / 9']} b={['Block lag', '1.2 s']} p={96} /></L>
     <L x={72} y={33} w={26} d={10} fl={2}><Mod n="06" t="Payments" a={['Open invoices', '218']} b={['Webhooks ok', '97.8%']} p={78} /></L>
     <L x={72} y={57} w={26} d={12}><Mod n="07" t="APIs" a={['Requests / s', '842']} b={['p95 latency', '96 ms']} p={88} /></L>
-    <L x={40} y={11} w={20} d={22} z={4} fl={1} m="n"><div className="sx-hub"><div className="r1" /><div className="r2" /><div className="core"><QXMark s={4.2} /><b>QXLayer</b><small>02 Engine</small></div></div></L>
+    <L x={40} y={11} w={20} d={22} z={4} fl={1} m="n"><div className="sx-hub"><div className="r1" /><div className="r2" /><div className="core"><QXMark s={4.2} /><b>VYNOX LAYER</b><small>02 Engine</small></div></div></L>
     <L x={31} y={57} w={38} d={10} z={3} m><Win title="Traffic and health monitor"><Kpis items={[['Requests / min', '50,482', '+4.2%'], ['Error rate', '0.18%', '-0.03%'], ['Uptime 30d', '99.94%']]} /><Chart a={[44, 50, 48, 58, 54, 66, 62, 70, 66, 74]} b={[30, 34, 40, 38, 46, 44, 52, 50, 56, 58]} h={5} /></Win></L>
   </>,
 
@@ -62,7 +62,7 @@ export const infraScenes: Record<string, () => ReactNode> = {
 
   kolo: () => <>
     <L x={31} y={8} w={38} d={20} z={4} fl={1} m="n"><div className="sx-wheel"><div className="ring a" /><div className="ring b" /><div className="spokes" /><div className="ring c" />
-      <div className="core"><QXMark s={5} /><b>QXLayer Kolo</b><small>Ecosystem core</small></div>
+      <div className="core"><QXMark s={5} /><b>VYNOX LAYER Kolo</b><small>Ecosystem core</small></div>
       {(['Wallet', 'Pay', 'Earn', 'Swap', 'Card', 'Nodes'] as const).map((t, i) => <span key={t} className="sat" style={{ ['--a' as string]: `${i * 60 - 90}deg` } as CSSProperties}><em>{t}</em></span>)}
     </div></L>
     <L x={2} y={14} w={27} d={8} z={2} fl={2}><Win title="Kolo wallet"><Kv k="Balance" v="$9,214.60" /><div className="sx-coinrow"><Coin c="BTC" size={1.9} /><Coin c="ETH" size={1.9} /><Coin c="USDT" size={1.9} /><Coin c="SOL" size={1.9} /></div></Win></L>
