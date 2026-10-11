@@ -12,6 +12,7 @@ const sdk = new ReplitConnectors();
 const project = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx";
 const team = "team_eoJE6FCcm9esuqnRTUsmopzy";
 const integrated = process.env.QXLAYER_VERIFY_INTEGRATED_PREVIEW === "true";
+const ownerGate = process.env.QXLAYER_VERIFY_OWNER_GATE === "true";
 const receipt = JSON.parse(await readFile(
   `generated-artifacts/qxlayer-staging-setup/${integrated ? "integrated-preview-deployment" : "preview-deployment"}.json`, "utf8"));
 if (process.env.QXLAYER_PREVIEW_VERIFICATION_APPROVED !== "true" ||
@@ -94,7 +95,7 @@ try {
     method: "POST", redirect: "manual",
     headers: { ...auth, Cookie: csrfCookie, Origin: receipt.url,
       "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ csrf, accessCode: env.PRODUCTION_ACCESS_CODE, returnTo: "/" }),
+    body: new URLSearchParams({ csrf, accessCode: env.QXLAYER_STAGING_ACCESS_CODE ?? env.PRODUCTION_ACCESS_CODE, returnTo: "/" }),
   });
   if (unlock.status !== 303) throw new Error(`Hosted gate unlock failed (HTTP ${unlock.status}).`);
   const session = unlock.headers.getSetCookie().map(c => c.split(";")[0]).join("; ");
@@ -148,6 +149,10 @@ try {
   server = createServer(async (req, res) => {
     try {
       // Test credentials are available only over this loopback listener, never deployed.
+      if (ownerGate && req.url === "/__qx_test_gate_code" && req.method === "GET") {
+        res.setHeader("Content-Type", "application/json"); res.setHeader("Cache-Control", "no-store");
+        res.end(JSON.stringify({ code: env.QXLAYER_STAGING_ACCESS_CODE })); return;
+      }
       if (ownerTicket && req.url === "/__qx_test_owner_ticket" && req.method === "GET") {
         res.setHeader("Content-Type", "application/json"); res.setHeader("Cache-Control", "no-store");
         res.end(JSON.stringify({ ticket: ownerTicket.token })); return;
@@ -162,10 +167,12 @@ try {
       }
       const body = [];
       for await (const chunk of req) body.push(chunk);
-      const proxyHeaders = { ...headers, Accept: req.headers.accept ?? "*/*" };
+      // Owner-gate verification must submit the actual browser form: no pre-unlocked
+      // cookie injection. Vercel protection transport is independent of the app gate.
+      const proxyHeaders = { ...(ownerGate ? auth : headers), Accept: req.headers.accept ?? "*/*" };
       if (req.headers.authorization) proxyHeaders.Authorization = req.headers.authorization;
       if (req.headers["x-qx-demo"] === "read-only") proxyHeaders["x-qx-demo"] = "read-only";
-      if (req.headers.cookie) proxyHeaders.Cookie += `; ${req.headers.cookie}`;
+      if (req.headers.cookie) proxyHeaders.Cookie = [proxyHeaders.Cookie, req.headers.cookie].filter(Boolean).join("; ");
       if (req.headers["content-type"]) proxyHeaders["Content-Type"] = req.headers["content-type"];
       if (req.headers.origin) proxyHeaders.Origin = receipt.url;
       const target = new URL(req.url, receipt.url);
