@@ -12,10 +12,19 @@ Production access credentials as a fallback. The private gate remains mandatory.
 with temporary test access, and requested secure, persistent Staging-only access
 without Production, DNS or existing Clerk permission changes.
 
-**How to apply:** Direct the owner to the dedicated Staging code in the environment
-group linked to the existing Render Staging API. Keep server-side frontend/API
-configuration synchronized. Credential rotation must update both Staging servers;
-never alter Production or Clerk permissions to solve gate access.
+**How to apply:** Give a direct authenticated link to the existing Render Staging
+API's Environment settings, not generic navigation instructions. Verify the
+connected account's active workspace membership and secret-viewing role.
+Keep server-side frontend/API configuration synchronized; never alter Production
+or Clerk permissions to solve gate access.
+
+Maintain an owner-visible copy on the Staging API service while retaining the
+linked group as the canonical credential. Rotation must synchronize the group,
+API service override and Vercel Preview secret.
+
+**Why:** The owner could not find the group-only code on the service's variable
+list. Render lists inherited and direct variables separately, and direct service
+values override group values. Unsynchronized copies would break future rotation.
 
 Verify the actual browser form from a fresh context and then reload and open the
 website/owner console. A bridge that injects a pre-unlocked gate cookie is not

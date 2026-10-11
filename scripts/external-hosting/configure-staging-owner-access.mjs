@@ -6,6 +6,7 @@ import { ReplitConnectors } from "@replit/connectors-sdk";
 if (process.env.QXLAYER_STAGING_OWNER_ACCESS_APPROVED !== "true")
   throw new Error("Staging owner-access approval required.");
 const groupId = "evg-db5ate8473hc73agdon0";
+const apiId = "srv-db5b47qjnfac739s374g";
 const project = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx";
 const team = "team_eoJE6FCcm9esuqnRTUsmopzy";
 const key = "QXLAYER_STAGING_ACCESS_CODE";
@@ -27,10 +28,12 @@ async function vercel(route, method = "GET", body) {
 }
 const [g, p, worker, api] = await Promise.all([
   render(`env-groups/${groupId}`), vercel(`/v9/projects/${project}`),
-  render("services/srv-db5b48o473hc73ah56d0"), render("services/srv-db5b47qjnfac739s374g"),
+  render("services/srv-db5b48o473hc73ah56d0"), render(`services/${apiId}`),
 ]);
 const before = Object.fromEntries(g.envVars.map(x => [x.key, x.value]));
 if (g.environmentId !== "evm-db5ateflot8c73eam1ug" ||
+    api.environmentId !== g.environmentId || api.ownerId !== g.ownerId ||
+    g.ownerId !== "tea-db4mt30473hc73euumb0" ||
     before.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging" ||
     before.QXLAYER_EXTERNAL_STARTUP_APPROVED !== "false" ||
     before.PRODUCTION_ACCESS_GATE_ENABLED !== "true" ||
@@ -40,6 +43,10 @@ if (g.environmentId !== "evm-db5ateflot8c73eam1ug" ||
   throw new Error("Pinned Staging scope changed.");
 const code = before[key] ?? randomBytes(32).toString("base64url");
 if (!/^[A-Za-z0-9_-]{43,128}$/.test(code)) throw new Error("Review the existing Staging credential securely.");
+const serviceBefore = Object.fromEntries(
+  (await render(`services/${apiId}/env-vars?limit=100`)).map(x => {
+    const v = x.envVar ?? x; return [v.key, v.value];
+  }));
 const envs = (await vercel(`/v10/projects/${project}/env`)).envs;
 const existing = envs.filter(x => x.key === key);
 if (existing.length > 1 || existing.some(x => x.gitBranch ||
@@ -62,9 +69,21 @@ const value = readback.value;
 if (typeof value !== "string" || !timingSafeEqual(createHash("sha256").update(code).digest(),
     createHash("sha256").update(value).digest()))
   throw new Error("Staging credential readback did not match.");
+// Render lists service variables separately from inherited group variables.
+// Keep the group canonical, with the same owner-visible value on this API only.
+if (serviceBefore[key] !== code)
+  await render(`services/${apiId}/env-vars/${key}`, "PUT", { value: code });
+const serviceAfter = Object.fromEntries(
+  (await render(`services/${apiId}/env-vars?limit=100`)).map(x => {
+    const v = x.envVar ?? x; return [v.key, v.value];
+  }));
+if (serviceAfter[key] !== code ||
+    Object.keys(serviceBefore).some(k => k !== key && serviceBefore[k] !== serviceAfter[k]))
+  throw new Error("Owner-visible Staging service configuration did not match.");
 await writeFile("generated-artifacts/qxlayer-staging-setup/staging-owner-access-configuration.json",
   JSON.stringify({ status: "STAGING_OWNER_CREDENTIAL_PERSISTED", key,
     previewOnly: true, serverSideOnly: true, credentialValuesRecorded: false,
     existingCredentialsPreserved: true, gateEnabled: true, workerSuspended: true,
+     ownerVisibleOnStagingApi: true, stagingGroupAndServiceSynchronized: true,
     productionChanged: false, dnsChanged: false }, null, 2) + "\n");
 console.info("Staging owner credential persisted and matched across servers; no values recorded.");
