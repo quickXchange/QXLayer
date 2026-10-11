@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { readSchema } from "./schema-reference.mjs";
+import { readSchema, canonicalSchema } from "./schema-reference.mjs";
 
 /** Read-only schema/security readback, never repairs or silently accepts drift. */
 export async function verifyTarget(client) {
   const expected = JSON.parse(await readFile(new URL("../../deploy/migrations/rls-reference.json", import.meta.url), "utf8"));
   const schema = JSON.parse(await readFile(new URL("../../deploy/migrations/schema-reference.json", import.meta.url), "utf8"));
-  assert.deepEqual(await readSchema(client), schema, "Actual columns, defaults, constraints and indexes must match.");
+  assert.deepEqual(canonicalSchema(await readSchema(client)), canonicalSchema(schema),
+    "Actual columns, reviewed constant defaults, constraints and indexes must match.");
   const actual = await client.query(`SELECT c.relname AS name,c.relrowsecurity AS enabled,
     c.relforcerowsecurity AS forced,
     (SELECT jsonb_agg(jsonb_build_object('name',p.polname,'command',p.polcmd,
