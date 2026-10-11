@@ -1,5 +1,5 @@
 import { Link } from 'wouter';
-import { UserProfile } from '@clerk/react';
+import { UserProfile } from '@/lib/auth';
 import { PageHeader, ErrorState, EmptyState, ListSkeleton, StatusBadge } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
 import { ConfigureExchange } from '@/components/customer/configure';

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useClerk } from '@clerk/react';
+import { useClerk } from '@/lib/auth';
 import { LayoutGrid, Users, Boxes, ScrollText, LogOut, Globe2, Puzzle, Plug, Workflow, Eye } from 'lucide-react';
 import { useHealthCheck } from '@workspace/api-client-react';
 import { usePrincipal } from '@/lib/principal';

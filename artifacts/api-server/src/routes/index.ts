@@ -13,6 +13,7 @@ import providerFoundationRouter from "./provider-foundation";
 import integrationsRouter from "./integrations";
 import customerRouter from "./customer";
 import orderFilesRouter from "./order-files";
+import ownedAuthRouter from "./owned-auth";
 import { requireAuthentication, principalFrom } from "../middlewares/authentication";
 import { assertDeliveredExchangeAccess } from "../modules/customer/service";
 import { GetTenantParams } from "@workspace/api-zod";
@@ -22,6 +23,7 @@ import demoIsolationRouter from "./demo-isolation";
 
 router.use(demoIsolationRouter);
 router.use(healthRouter);
+router.use(ownedAuthRouter);
 router.use(demoRouter);
 router.use(landingCatalogRouter);
 router.use(websiteRouter);

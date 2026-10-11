@@ -70,6 +70,8 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
           MIGRATION_EXPECTED_HOST: ${{ vars.MIGRATION_EXPECTED_HOST }}
           DB_TLS_CA_FILE: ${{ runner.temp }}/supabase-ca.crt
+          QXLAYER_EXTERNAL_ENVIRONMENT: "staging"
+          QXLAYER_OWNED_AUTH_SCHEMA_APPROVED: "true"
       - name: Require exact read-only database/security readback
         run: node scripts/external-postgres/readback.mjs
         env:
@@ -94,6 +96,7 @@ jobs:
           VITE_CLERK_PROXY_URL: ${{ vars.CLERK_PROXY_PUBLIC_URL }}
           QXLAYER_EXTERNAL_ENVIRONMENT: ${{ inputs.target == 'qxlayer-staging' && 'staging' || 'production' }}
           QXLAYER_CLERK_DEVELOPMENT_HOST: ${{ vars.QXLAYER_CLERK_DEVELOPMENT_HOST }}
+          QXLAYER_AUTH_PROVIDER: ${{ vars.QXLAYER_AUTH_PROVIDER }}
       - name: Deploy Vercel staging Preview (no Production alias)
         if: inputs.target == 'qxlayer-staging'
         id: preview
@@ -121,6 +124,7 @@ jobs:
         env:
           QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
           QXLAYER_STAGING_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          QXLAYER_AUTH_PROVIDER: ${{ vars.QXLAYER_AUTH_PROVIDER }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
       - name: Apply the verified origin to the exact Staging API commit

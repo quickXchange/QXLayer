@@ -4,6 +4,8 @@ import type { PlatformCustomer, PlatformProject } from "@workspace/api-zod";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { PROVIDER_CATALOG } from "../../products/exchange/providers";
 import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
+import { ownedAuthentication } from "../owned-auth/config";
+import { ownedDirectory } from "../owned-auth/service";
 
 type IdentityLink = { user_id: string; tenant_id: string | null; name: string | null; created_at: Date };
 const iso = (value: Date | string) => new Date(value).toISOString();
@@ -52,9 +54,12 @@ export async function platformManagement(principal: Principal) {
     // operators and staff-only identities; customer/staff dual roles remain.
     const pageSize = 100;
     for (let offset = 0; ; offset += pageSize) {
-      const page = await clerkClient.users.getUserList({ limit: pageSize, offset, orderBy: "+created_at" });
+      const ownUsers = ownedAuthentication() ? await ownedDirectory() : null;
+      const page = ownUsers
+        ? { data: ownUsers.slice(offset, offset + pageSize), totalCount: ownUsers.length }
+        : await clerkClient.users.getUserList({ limit: pageSize, offset, orderBy: "+created_at" });
       for (const user of page.data) {
-        const id = applicationUserId(user.id);
+        const id = ownedAuthentication() ? user.id : applicationUserId(user.id);
         if (!id || operators.has(id) || (staff.has(id) && !linked.has(id))) continue;
         registeredCustomers.add(id);
         const email = user.emailAddresses.find(e => e.id === user.primaryEmailAddressId)?.emailAddress ?? null;

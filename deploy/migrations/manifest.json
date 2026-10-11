@@ -6,5 +6,9 @@
   {
     "file": "0002_runtime_security.sql",
     "sha256": "a264bf8bf3951addd48b94a1b137b9706b06a26c5504fa1e77fe7b3904a4139d"
+  },
+  {
+    "file": "0003_owned_auth.sql",
+    "sha256": "3814d317a99cc091168ef93f98996acc97e4d0d8ea253b570291e746a885153d"
   }
 ]
