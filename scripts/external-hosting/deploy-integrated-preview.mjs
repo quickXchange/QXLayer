@@ -22,7 +22,7 @@ async function api(route, method = "GET", body, headers) {
   }
   throw new Error("Scoped upload/readback throttled; no deployment retry.");
 }
-const previous = JSON.parse(await readFile("generated-artifacts/qxlayer-staging-setup/preview-deployment.json", "utf8"));
+const previous = JSON.parse(await readFile("generated-artifacts/qxlayer-staging-setup/integrated-preview-deployment.json", "utf8"));
 const p = await api(`/v9/projects/${project}`);
 const old = await api(`/v13/deployments/${previous.id}`);
 if (p.id !== project || p.name !== "qxlayer-staging" || p.accountId !== team ||

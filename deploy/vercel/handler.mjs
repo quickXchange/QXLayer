@@ -9,7 +9,9 @@ if (process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging") {
   // runtime identity; only Render needs a subsequent explicit origin readback.
   process.env.QXLAYER_PLATFORM_URL = `https://${process.env.VERCEL_URL}`;
 }
-if (!process.env.PRODUCTION_ACCESS_CODE || process.env.PRODUCTION_ACCESS_GATE_ENABLED !== "true" ||
+const gateCode = process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging"
+  ? process.env.QXLAYER_STAGING_ACCESS_CODE : process.env.PRODUCTION_ACCESS_CODE;
+if (!gateCode || process.env.PRODUCTION_ACCESS_GATE_ENABLED !== "true" ||
     !process.env.QXLAYER_PLATFORM_URL)
   throw new Error("Approved platform URL and Private Access configuration are required.");
 export default createStaticHandler(fileURLToPath(new URL("./static/", import.meta.url)));
