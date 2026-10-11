@@ -30,16 +30,22 @@ Verified configuration:
   Development Clerk public settings, verified CA and encrypted deployment secrets.
 - An expiring Vercel credential was created with the documented Staging-project
   scope and installed directly into protected GitHub secrets. Renew before expiry.
-- GitHub checks-only dispatch passed. A Staging release reached the required-owner
-  review gate; no administrative bypass or self-approval was used.
+- GitHub checks-only dispatch passed. The final Staging release passed its checks
+  and required-owner review under the user's automatic-release authorization.
+  No administrative bypass was used.
 - Full restored schema/security verification passed for 42 tables and 84 policies.
   Explicit Staging-only baseline adoption registered the private checksum ledger
   without bootstrap replay or application-data changes; checksum readback matched.
 
-Remaining: owner acceptance of the protected Staging release, then verification
-of its exact Render commit and resulting READY Vercel Preview/origin. Preserve
-the currently working Preview until acceptance. Do not enable Production, DNS,
-data transfer, extra paid services or the suspended Worker.
+The final protected release completed successfully. Render's live API commit
+matches the release; Vercel is READY in the pinned Staging project and is not a
+Production deployment. The exact Preview origin was rebound and applied through
+a second exact-commit API release. Native Private Access and hosted routes passed
+on the new origin:
+https://qxlayer-staging-mndf6kzjd-vynox3.vercel.app
+
+Production, DNS, data transfer, extra paid services and the suspended Worker
+remain untouched. Independent Clerk ownership is still unproven as detailed below.
 
 ## Verified Staging workflows
 
