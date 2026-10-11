@@ -2,6 +2,24 @@ import { createRequire } from "node:module";
 import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
+/**
+ * pg_dump/restore can spell these four reviewed constant defaults differently.
+ * Keep the raw capture intact; canonicalize only comparison, never arbitrary SQL.
+ */
+export function canonicalSchema(schema) {
+  return { ...schema, columns: schema.columns.map(column => {
+    let value = column.default_value;
+    if (column.table_name === "addons" &&
+        ["monthly_price", "yearly_price", "setup_fee"].includes(column.name) &&
+        column.type === "numeric(22,2)" && column.required === true &&
+        value === "'0'::numeric") value = "0";
+    if (column.table_name === "tenant_branding" && column.name === "supported_languages" &&
+        column.type === "text[]" && column.required === true &&
+        value === "'{en}'::text[]") value = "ARRAY['en'::text]";
+    return { ...column, default_value: value };
+  }) };
+}
+
 export async function readSchema(client) {
   const columns = await client.query(`SELECT c.relname AS table_name,a.attname AS name,
     format_type(a.atttypid,a.atttypmod) AS type,a.attnotnull AS required,

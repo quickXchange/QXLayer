@@ -15,8 +15,13 @@ const receiptPath = "generated-artifacts/qxlayer-staging-setup/preview-deploymen
 let prior;
 try { prior = JSON.parse(await readFile(receiptPath, "utf8")); }
 catch (error) { if (error.code !== "ENOENT") throw error; }
-if (prior?.status === "BLOCKED_PROVIDER_FORCES_FIRST_UPLOAD_TO_PRODUCTION_TARGET")
-  throw new Error("Preview target override is unresolved. Investigate read-only; do not upload again.");
+const initializer = JSON.parse(await readFile(
+  "generated-artifacts/qxlayer-staging-setup/initializer-deployment.json", "utf8"));
+if (initializer.status !== "INITIALIZER_READY_VERIFIED" || initializer.projectId !== project ||
+    !initializer.projectInitialized || !initializer.uploadedPlaceholderContentVerified)
+  throw new Error("The verified isolated Staging initializer is required.");
+if (prior?.id)
+  throw new Error("An existing Preview attempt must be reconciled before creating another.");
 async function vercel(route, method = "GET", body, headers) {
   for (let attempt = 0; attempt < 4; attempt++) {
     const r = await sdk.proxy("vercel",
@@ -29,8 +34,14 @@ async function vercel(route, method = "GET", body, headers) {
     }
     if (!r.ok) {
       let code = "unknown";
-      try { code = (await r.json()).error?.code ?? code; } catch {}
-      throw new Error(`Vercel ${method} failed: HTTP ${r.status}, ${code}`);
+      let message = "";
+      try {
+        const error = (await r.json()).error;
+        code = error?.code ?? code;
+        message = String(error?.message ?? "").replace(
+          /\b(?:sk|pk)_(?:live|test)_[A-Za-z0-9]+/g, "[redacted]");
+      } catch {}
+      throw new Error(`Vercel ${method} failed: HTTP ${r.status}, ${code}: ${message}`);
     }
     if (route.startsWith("/v2/files")) return;
     return r.json();
@@ -69,8 +80,14 @@ const domainsBefore = await vercel(`/v9/projects/${project}/domains`);
 const envBefore = await vercel(`/v10/projects/${project}/env`);
 const inventory = await vercel(`/v7/deployments?projectId=${project}&limit=2`);
 if (before.id !== project || before.name !== "qxlayer-staging" || before.accountId !== team ||
-    before.link || before.autoExposeSystemEnvs === false || inventory.deployments.length)
-  throw new Error("The approved isolated first-Preview target is not ready.");
+    before.link || before.autoExposeSystemEnvs === false || !before.hasDeployments ||
+    before.autoAssignCustomDomains !== false || inventory.deployments.length !== 1 ||
+    inventory.deployments[0].uid !== initializer.id)
+  throw new Error("The approved initialized Staging Preview target is not ready.");
+const initializedDeployment = await vercel(`/v13/deployments/${initializer.id}`);
+if (initializedDeployment.projectId !== project || initializedDeployment.readyState !== "READY" ||
+    initializedDeployment.target !== "production")
+  throw new Error("The inert Staging initializer no longer matches its verified identity.");
 const applicable = envBefore.envs.filter(e => e.target?.includes("preview"));
 for (const key of ["VITE_CLERK_PUBLISHABLE_KEY", "QXLAYER_EXTERNAL_ENVIRONMENT",
   "PRODUCTION_ACCESS_CODE", "PRODUCTION_ACCESS_GATE_ENABLED"]) {
@@ -120,16 +137,17 @@ await Promise.all(Array.from({ length: 3 }, async () => {
   }
 }));
 const latest = await vercel(`/v7/deployments?projectId=${project}&limit=1`);
-if (latest.deployments.length) throw new Error("Concurrent deployment detected; do not create another.");
+if (latest.deployments.length !== 1 || latest.deployments[0].uid !== initializer.id)
+  throw new Error("Concurrent deployment detected; do not create another.");
 const deployment = await vercel("/v13/deployments?prebuilt=1&skipAutoDetectionConfirmation=1",
   "POST", {
-    name: "qxlayer-staging", project, files, target: "preview",
+    name: "qxlayer-staging", project, files,
     autoAssignCustomDomains: false,
-    env: { QXLAYER_PREVIEW_BOOTSTRAP: "true" },
     projectSettings: { framework: null, nodeVersion: "24.x" },
     meta: { qxlayerScope: "approved-gated-preview-only", qxlayerApi: "disabled" },
-    // Explicit target is essential: the provider promoted the first CLI-style
-    // upload when target was omitted, despite its documented Preview default.
+    // Vercel's API selects Preview by omitting target (literal "preview" can be
+    // treated as a custom environment). The verified initializer prevents its
+    // first-deployment Production override. Validate provider/runtime readback.
   });
 const receipt = {
   status: "DEPLOYMENT_CREATED_TARGET_VERIFICATION_PENDING", id: deployment.id,
@@ -152,6 +170,9 @@ for (let poll = 0; poll < 60 && !["READY", "ERROR", "CANCELED"].includes(final.r
   final = await vercel(`/v13/deployments/${deployment.id}`);
 }
 receipt.providerState = final.readyState;
+receipt.providerTarget = final.target ?? null;
+if (final.projectId !== project || ![null, undefined, "preview"].includes(final.target))
+  throw new Error("Final provider metadata does not identify the isolated Preview.");
 receipt.status = final.readyState === "READY" ? "PREVIEW_READY" : "PREVIEW_NOT_READY";
 const after = await vercel(`/v9/projects/${project}`);
 const domainsAfter = await vercel(`/v9/projects/${project}/domains`);

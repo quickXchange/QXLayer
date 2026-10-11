@@ -67,4 +67,22 @@ connecting to Production data, or using Production credentials.
 **How to apply:** Use the existing Development authentication configuration and
 a database-disconnected, API-disabled bootstrap. Return the exact verified
 Preview URL only after successful provider-target readback. Obtain separate
-approval for backend configuration or activation.
+approval for backend configuration or activation unless the current migration
+request explicitly authorizes save-only Staging preparation.
+
+## Continuing migration authorization
+
+The user authorized automatic safe Staging build, configuration and deployment
+fixes, frontend Preview verification, and Render/Supabase Staging preparation.
+Do not ask repeatedly for approval for these safe Staging fixes. Never modify
+the live Production website, database, credentials or DNS. Paid Render service
+activation still requires explicit approval.
+
+**Why:** The user expanded the scope after initializer verification but explicitly
+kept the live-Production and paid-activation boundaries.
+
+**How to apply:** Save the verified Preview origin into isolated suspended
+Staging configuration while retaining startup/deployment holds. Use only Staging
+variables and Clerk Development credentials. Backend-dependent frontend features
+remain unavailable until approved activation and API routing; distinguish a
+rendered sign-in form from authenticated account/tenant acceptance.
