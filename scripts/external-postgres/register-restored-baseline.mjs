@@ -8,13 +8,15 @@ import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { targetConfiguration } from "./migrate.mjs";
 import { verifyTarget } from "./verify-target.mjs";
+import { STAGING_SUPABASE_PROJECT } from "../external-hosting/staging-targets.mjs";
 
 export async function registerRestoredBaseline(env = process.env) {
   if (env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging" ||
       env.QXLAYER_RESTORED_BASELINE_APPROVED !== "true")
     throw Error("Explicit restored Staging baseline approval required.");
   const options = targetConfiguration(env);
-  if (!env.QXLAYER_STAGING_EXPECTED_PROJECT_REF ||
+  if (env.SUPABASE_PROJECT_REF !== STAGING_SUPABASE_PROJECT ||
+      !env.QXLAYER_STAGING_EXPECTED_PROJECT_REF ||
       env.SUPABASE_PROJECT_REF !== env.QXLAYER_STAGING_EXPECTED_PROJECT_REF)
     throw Error("Previously verified Staging project pin required.");
   if (options.caFile) {

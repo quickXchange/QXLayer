@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
+import { STAGING_SUPABASE_PROJECT } from "./staging-targets.mjs";
 
 export function validateStagingRelease(env) {
   assert.equal(env.RENDER_API_SERVICE_ID, "srv-db5b47qjnfac739s374g");
   assert.equal(env.VERCEL_ORG_ID, "team_eoJE6FCcm9esuqnRTUsmopzy");
   assert.equal(env.VERCEL_PROJECT_ID, "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx");
   assert.equal(env.QXLAYER_API_ORIGIN, "https://qxlayer-api.onrender.com");
-  assert.match(env.SUPABASE_PROJECT_REF ?? "", /^[a-z0-9]+$/);
+  assert.equal(env.SUPABASE_PROJECT_REF, STAGING_SUPABASE_PROJECT);
   const url = new URL(env.MIGRATION_DATABASE_URL);
   assert.equal(url.hostname, env.MIGRATION_EXPECTED_HOST);
   assert.equal(url.pathname, "/postgres");

@@ -5,6 +5,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
+import { STAGING_SUPABASE_PROJECT } from "./staging-targets.mjs";
 const repo = "quickXchange/QXLayer", target = "qxlayer-staging";
 if (process.env.QXLAYER_STAGING_GITHUB_SETUP_APPROVED !== "true")
   throw Error("Staging GitHub setup approval required.");
@@ -34,7 +35,7 @@ if (url.hostname !== env.DB_EXPECTED_HOST || runtime.hostname !== url.hostname |
   throw Error("Migration connection is not the existing Staging database.");
 const username = decodeURIComponent(url.username);
 const ref = username.startsWith("postgres.") ? username.slice(9) : url.hostname.match(/^db\.([a-z0-9]+)\.supabase\.co$/)?.[1];
-if (!ref || !/^[a-z0-9]+$/.test(ref)) throw Error("Pinned Supabase project required.");
+if (ref !== STAGING_SUPABASE_PROJECT) throw Error("Pinned existing Staging Supabase project required.");
 const ca = group.secretFiles.find(x => x.name === "supabase-ca.crt")?.content;
 if (!ca?.includes("BEGIN CERTIFICATE")) throw Error("Existing verified Staging CA required.");
 const root = `/repos/${repo}/environments/${target}`;
@@ -75,7 +76,8 @@ const actualSecrets = await github(`${root}/secrets`);
 const actualVars = await github(`${root}/variables`);
 if (!actual.protection_rules.some(x => x.type === "required_reviewers" &&
     x.reviewers.some(r => r.reviewer.id === owner.id)) ||
-    actual.deployment_branch_policy?.custom_branch_policies !== true)
+    actual.deployment_branch_policy?.custom_branch_policies !== true ||
+    actual.can_admins_bypass !== false)
   throw Error("Environment protection readback failed.");
 for (const key of Object.keys(secrets))
   if (!actualSecrets.secrets.some(x => x.name === key)) throw Error("Secret existence readback failed.");
