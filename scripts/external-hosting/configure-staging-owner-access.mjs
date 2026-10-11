@@ -41,18 +41,20 @@ if (g.environmentId !== "evm-db5ateflot8c73eam1ug" ||
     api.serviceDetails.plan !== "starter" || api.autoDeploy !== "no" ||
     p.id !== project || p.name !== "qxlayer-staging" || p.accountId !== team || p.link)
   throw new Error("Pinned Staging scope changed.");
-const code = before[key] ?? randomBytes(32).toString("base64url");
-if (!/^[A-Za-z0-9_-]{43,128}$/.test(code)) throw new Error("Review the existing Staging credential securely.");
 const serviceBefore = Object.fromEntries(
   (await render(`services/${apiId}/env-vars?limit=100`)).map(x => {
     const v = x.envVar ?? x; return [v.key, v.value];
   }));
+// The owner-visible service setting takes precedence at Render and is canonical.
+// Preserve it during synchronization instead of reverting an owner's existing code.
+const code = serviceBefore[key] ?? before[key] ?? randomBytes(32).toString("base64url");
+if (!/^[A-Za-z0-9_-]{43,128}$/.test(code)) throw new Error("Review the existing Staging credential securely.");
 const envs = (await vercel(`/v10/projects/${project}/env`)).envs;
 const existing = envs.filter(x => x.key === key);
 if (existing.length > 1 || existing.some(x => x.gitBranch ||
     x.target?.length !== 1 || x.target[0] !== "preview"))
   throw new Error("Staging credential must be Preview-only.");
-if (!before[key]) await render(`env-groups/${groupId}/env-vars/${key}`, "PUT", { value: code });
+if (before[key] !== code) await render(`env-groups/${groupId}/env-vars/${key}`, "PUT", { value: code });
 if (existing.length) {
   await vercel(`/v9/projects/${project}/env/${existing[0].id}`, "PATCH",
     { value: code, type: "encrypted", target: ["preview"] });
@@ -61,7 +63,7 @@ if (existing.length) {
     { key, value: code, type: "encrypted", target: ["preview"] });
 }
 const after = Object.fromEntries((await render(`env-groups/${groupId}`)).envVars.map(x => [x.key, x.value]));
-if (Object.keys(before).some(k => before[k] !== after[k]))
+if (Object.keys(before).some(k => k !== key && before[k] !== after[k]) || after[key] !== code)
   throw new Error("Existing Staging configuration changed unexpectedly.");
 const item = (await vercel(`/v10/projects/${project}/env`)).envs.find(x => x.key === key);
 const readback = await vercel(`/v1/projects/${project}/env/${item.id}`);
@@ -70,7 +72,7 @@ if (typeof value !== "string" || !timingSafeEqual(createHash("sha256").update(co
     createHash("sha256").update(value).digest()))
   throw new Error("Staging credential readback did not match.");
 // Render lists service variables separately from inherited group variables.
-// Keep the group canonical, with the same owner-visible value on this API only.
+// Keep the owner-visible API setting and inherited group synchronized.
 if (serviceBefore[key] !== code)
   await render(`services/${apiId}/env-vars/${key}`, "PUT", { value: code });
 const serviceAfter = Object.fromEntries(
@@ -85,5 +87,6 @@ await writeFile("generated-artifacts/qxlayer-staging-setup/staging-owner-access-
     previewOnly: true, serverSideOnly: true, credentialValuesRecorded: false,
     existingCredentialsPreserved: true, gateEnabled: true, workerSuspended: true,
      ownerVisibleOnStagingApi: true, stagingGroupAndServiceSynchronized: true,
+     existingOwnerVisibleCodePreserved: !serviceBefore[key] || serviceBefore[key] === code,
     productionChanged: false, dnsChanged: false }, null, 2) + "\n");
 console.info("Staging owner credential persisted and matched across servers; no values recorded.");
