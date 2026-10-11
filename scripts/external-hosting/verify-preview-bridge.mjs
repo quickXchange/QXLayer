@@ -35,20 +35,29 @@ const ownerSessions = new Set();
 async function cleanup() {
   if (closing) return;
   closing = true;
-  if (server) await new Promise(resolve => server.close(resolve));
+  if (server?.listening) await new Promise(resolve => server.close(resolve));
   if (ownerClient) {
     for (const id of ownerSessions) await ownerClient.sessions.revokeSession(id).catch(() => {});
     if (ownerTicket) await ownerClient.signInTokens.revokeSignInToken(ownerTicket.id).catch(() => {});
   }
   if (bypass) {
-    await vercel(`/v1/projects/${project}/protection-bypass`, "PATCH",
-      { revoke: { secret: bypass, regenerate: false } });
+    const current = await vercel(`/v9/projects/${project}`);
+    if (Object.hasOwn(current.protectionBypass ?? {}, bypass))
+      await vercel(`/v1/projects/${project}/protection-bypass`, "PATCH",
+        { revoke: { secret: bypass, regenerate: false } });
     console.info("Temporary Staging automation bypass revoked.");
   }
 }
 process.on("SIGTERM", () => void cleanup().then(() => process.exit()));
 process.on("SIGINT", () => void cleanup().then(() => process.exit()));
 try {
+  // Fail before issuing credentials if a prior test listener still owns the port.
+  const probe = createServer();
+  await new Promise((resolve, reject) => {
+    probe.once("error", reject);
+    probe.listen(4555, "127.0.0.1", resolve);
+  });
+  await new Promise(resolve => probe.close(resolve));
   const note = `Temporary QXLayer Staging verification ${randomUUID()}`;
   const b = await vercel(`/v1/projects/${project}/protection-bypass`, "PATCH",
     { generate: { note } });
@@ -167,13 +176,18 @@ try {
       res.statusCode = upstream.status;
       for (const key of ["content-type", "cache-control", "content-security-policy"])
         if (upstream.headers.has(key)) res.setHeader(key, upstream.headers.get(key));
+      const cookies = upstream.headers.getSetCookie();
+      if (cookies.length) res.setHeader("Set-Cookie", cookies);
       const location = upstream.headers.get("location");
       if (location) res.setHeader("location", location.replace(receipt.url, ""));
       res.end(Buffer.from(await upstream.arrayBuffer()));
     } catch { res.writeHead(502); res.end("Preview verification proxy request failed."); }
   });
-  server.listen(4555, "127.0.0.1", () => console.info(
-    "Hosted Preview gate/routes passed. Loopback browser bridge ready at http://127.0.0.1:4555"));
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(4555, "127.0.0.1", resolve);
+  });
+  console.info("Hosted Preview gate/routes passed. Loopback browser bridge ready at http://127.0.0.1:4555");
   setTimeout(() => void cleanup().then(() => process.exit()), 12 * 60_000).unref();
 } catch (error) {
   await cleanup();
