@@ -1,4 +1,11 @@
-# QXLayer Crypto Platform — Sandbox Foundation
+# VYNOX LAYER Crypto Platform — Sandbox Foundation
+
+Platform brand: **VYNOX LAYER**. The supplied VYNOX LAYER logo is the official master.
+Legacy `QXLAYER_*` configuration keys, database identifiers, API paths, service IDs,
+repository/branch names and domains are compatibility contracts, not display branding.
+Do not rename these without a coordinated, separately approved migration.
+Rebranding is approved in Development and isolated Staging only; do not change
+Production deployments/authentication, credentials, DNS, plans or activate the Worker.
 
 An independent multi-tenant administration and provisioning foundation, not a live exchange or payment gateway.
 

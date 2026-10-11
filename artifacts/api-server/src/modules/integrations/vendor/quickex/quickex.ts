@@ -1211,7 +1211,7 @@ function assertQuickexCreateProof(
 }
 
 export function createQuickexOrder(input: { fromCurrency: string; fromNetwork: string; toCurrency: string; toNetwork: string; amount: number; destinationAddress: string; destinationMemo?: string; refundAddress?: string; refundMemo?: string; email: string; rateMode?: QuickexRateMode; quote?: QuickexQuote }) {
-  throw new QuickexApiError("QUICKEX_NOT_CONFIGURED", "Live financial execution is disabled in QXLayer Sandbox.", 403);
+  throw new QuickexApiError("QUICKEX_NOT_CONFIGURED", "Live financial execution is disabled in VYNOX LAYER Sandbox.", 403);
   return serializeQuickexCreate(() => createQuickexOrderSerial(input));
 }
 

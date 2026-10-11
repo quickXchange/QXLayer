@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '@clerk/react';
+import { useAuth } from '@/lib/auth';
 import type { Addon, WhiteLabelAttachment, WhiteLabelCatalog, WhiteLabelDesign, WhiteLabelEvent, WhiteLabelOrderDetail, WhiteLabelRequest } from '@workspace/api-client-react';
 
 export type Att = WhiteLabelAttachment;

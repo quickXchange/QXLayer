@@ -30,3 +30,8 @@ channel = "stable-25_05"
 [userenv.shared]
 QXLAYER_PLATFORM_HOSTS = "www.quicklychan.xyz,private-label-crypto-platform.replit.app"
 QXLAYER_PLATFORM_URL = "https://www.quicklychan.xyz"
+
+[userenv.development]
+QXLAYER_AUTH_PROVIDER = "owned"
+QXLAYER_AUTH_URL = "https://372d2684-97ec-4ce5-b16a-77fb322db72a-00-3vzuovktccar2.reed.replit.dev"
+VITE_QXLAYER_AUTH_PROVIDER = "owned"

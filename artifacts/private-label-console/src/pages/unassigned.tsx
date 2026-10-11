@@ -1,4 +1,4 @@
-import { useClerk } from '@clerk/react';
+import { useClerk } from '@/lib/auth';
 import { useQueryClient } from '@tanstack/react-query';
 import { getGetCurrentPrincipalQueryKey } from '@workspace/api-client-react';
 import { KeyRound } from 'lucide-react';

@@ -30,7 +30,7 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
   const footer = (
     <footer className="s-footer relative z-[2] mt-10 border-t" style={{ borderColor: 'var(--s-line)', background: 'var(--s-bg2)' }}>
       <div className="s-wrap flex flex-col gap-1 py-6 text-xs s-muted sm:flex-row sm:justify-between">
-        <span className="flex items-center gap-2"><BrandLogo size={24} />QXLayer · <a href="/private-label-website/novax-live-demo" data-testid="link-live-demo" className="underline">Live Demo (sandbox)</a></span>
+        <span className="flex items-center gap-2"><BrandLogo size={24} />VYNOX LAYER · <a href="/private-label-website/novax-live-demo" data-testid="link-live-demo" className="underline">Live Demo (sandbox)</a></span>
         <span className="s-mono uppercase tracking-widest">Sandbox environment - account requests are not purchases - no live finance</span>
       </div>
     </footer>

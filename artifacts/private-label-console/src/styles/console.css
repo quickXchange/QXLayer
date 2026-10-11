@@ -1,4 +1,4 @@
-/* QXLayer console: scoped to html.qx-console (set only while the authenticated console is mounted). */
+/* VYNOX LAYER console: scoped to html.qx-console (set only while the authenticated console is mounted). */
 html.qx-console body{font-family:var(--s-font);background:var(--s-bg);color:var(--s-fg)}
 html.qx-console .qx-root{overflow-x:clip}
 html.qx-console .font-display,html.qx-console .qx-main :is(h1,h2,h3){font-family:var(--s-font);letter-spacing:-.03em;font-weight:650;text-wrap:balance}

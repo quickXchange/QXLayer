@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useLocation } from 'wouter';
-import { useClerk } from '@clerk/react';
+import { useClerk } from '@/lib/auth';
 import { LayoutGrid, ShoppingBag, Layers, ShieldCheck, UserRound, LogOut } from 'lucide-react';
 import { usePrincipal } from '@/lib/principal';
 import { useAdminPanels } from '@/lib/customer';

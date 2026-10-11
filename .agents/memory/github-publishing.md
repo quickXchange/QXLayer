@@ -14,3 +14,40 @@ When reproducing existing Git history through the GitHub Git Data API, preserve 
 **Why:** Removing the original trailing newline preserved the visible message but changed the commit hash.
 
 **How to apply:** Read the original commit object's message rather than trimming formatted Git output. Check each recreated tree and commit against its local hash; stop if another writer changes the destination branch.
+
+Contents-write access through the GitHub App does not prove permission to change
+GitHub Actions workflows. In this connection, tree writes containing workflow
+changes returned HTTP 404, while application-only tree writes succeeded.
+
+**Why:** Staging source synchronization encountered this boundary even though
+blob creation and ordinary source-tree writes were authorized.
+
+**How to apply:** When the user requires existing automation to remain unchanged,
+preserve the remote workflow files and verify the resulting application/config
+tree against that intentional scope. Do not claim a complete workflow/history
+export. If workflow synchronization is requested, resolve its authorization
+instead of silently excluding it. Keep Production branches unchanged when
+publishing an isolated staging snapshot.
+
+The integration proxy can throttle concurrent GitHub blob writes independently
+of what successful repository reads suggest about available access.
+
+**Why:** A burst of concurrent source-blob writes returned HTTP 429 during staging
+synchronization.
+
+**How to apply:** Bound write concurrency and payload sizes, honor rate-limit
+backoff, and verify tree and branch integrity after synchronization rather than
+assuming partial object uploads mean the source has been published.
+
+For user-authorized native Git pushes with a saved PAT, use an ephemeral
+credential helper reading `GITHUB_TOKEN`; never embed credentials in a remote URL
+or persist them in Git configuration. Verify the destination ref afterward.
+
+**Why:** Direct native authentication succeeded where the source-control
+connection lacked workflow permission. A token-shaped shell variable name does
+not reference the saved `GITHUB_TOKEN` variable.
+
+**How to apply:** Disable inherited Git traces before authenticated commands.
+Unset `GIT_CURL_VERBOSE` entirely: setting it to `0` still enabled verbose HTTP
+logging. Keep credential redaction enabled and capture/sanitize errors before
+displaying them.

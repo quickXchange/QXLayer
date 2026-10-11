@@ -46,14 +46,14 @@ const DroidSwap = () => <>
   <div style={{ flex: 1 }} /><div className="and-fab">Confirm swap</div>
 </>;
 const TgChat = ({ mini }: { mini?: boolean }) => <>
-  <div className="tg-top"><Sb /><div className="tg-h"><span>&lsaquo;</span>{!mini && <QXMark s={2.2} />}<div><b>{mini ? 'Wallet Bot' : 'QXLayer Bot'}</b><small>bot</small></div></div></div>
+  <div className="tg-top"><Sb /><div className="tg-h"><span>&lsaquo;</span>{!mini && <QXMark s={2.2} />}<div><b>{mini ? 'Wallet Bot' : 'VYNOX LAYER Bot'}</b><small>bot</small></div></div></div>
   <div className="tg-body">
     <div className="tg-b in">Welcome. Pick a service to continue.<time>10:02</time></div>
     <div className="tg-kb"><span>Exchange</span><span>Payment link</span><span>Wallet</span><span>Support</span></div>
     <div className="tg-b out">Exchange<time>10:03 read</time></div>
     <div className="tg-b in">Quote (demo)<br />0.0842 BTC to 1.7186 ETH<br />Network: Bitcoin to Ethereum<br />Rate locked for 02:00<time>10:03</time></div>
     <div className="tg-kb two"><span>Confirm</span><span>Cancel</span></div>
-    {mini ? <div className="tg-kb"><span className="web">Open Wallet</span></div> : <div className="tg-b in">Order QX-48213 created. Awaiting deposit (sandbox).<time>10:04</time></div>}
+    {mini ? <div className="tg-kb"><span className="web">Open Wallet</span></div> : <div className="tg-b in">Order VX-48213 created. Awaiting deposit (sandbox).<time>10:04</time></div>}
   </div>
   <div className="tg-in"><span>Message</span><i /></div>
 </>;
@@ -69,7 +69,7 @@ const TgMini = () => <>
   </div>
 </>;
 const WaChat = () => <>
-  <div className="wa-top"><Sb /><div className="wa-h"><span>&lsaquo;</span><QXMark s={2.2} /><div><b>QXLayer Pay</b><small>Business account</small></div></div></div>
+  <div className="wa-top"><Sb /><div className="wa-h"><span>&lsaquo;</span><QXMark s={2.2} /><div><b>VYNOX LAYER Pay</b><small>Business account</small></div></div></div>
   <div className="wa-body">
     <div className="wa-day">Today</div>
     <div className="wa-b in">Hi Mira, your payment link is ready.<time>09:12</time></div>
@@ -77,7 +77,7 @@ const WaChat = () => <>
     <div className="wa-b out">How long do I have?<time>09:13 read</time></div>
     <div className="wa-b in">The quote holds for 15 minutes. I will message you when it confirms.<time>09:13</time></div>
     <div className="wa-qr"><span>Paid</span><span>Need help</span><span>Status</span></div>
-    <div className="wa-b in ok">Payment confirmed. Receipt QX-R-3391 sent.<time>09:21</time></div>
+    <div className="wa-b in ok">Payment confirmed. Receipt VX-R-3391 sent.<time>09:21</time></div>
   </div>
   <div className="wa-in"><span>Type a message</span></div>
 </>;
@@ -100,9 +100,9 @@ export const phoneScenes: Record<string, () => ReactNode> = {
   telegram_bot: () => <>
     <L x={2} y={10} w={52} d={6} z={1}><div className="tgd">
       <div className="tgd-side"><div className="tgd-s">Search</div>
-        {([['QXLayer Bot', 'Order QX-48213 created', '10:04'], ['Saved Messages', 'Rates sheet', '09:40'], ['Ops channel', 'Daily summary ready', 'Mon']] as const).map(([n, m, t], i) => <div key={n} className={`tgd-c ${i === 0 ? 'on' : ''}`}><span className="ph-av">{i === 0 ? 'B' : n[0]}</span><span><b>{n}</b><small>{m}</small></span><time>{t}</time></div>)}
+        {([['VYNOX LAYER Bot', 'Order VX-48213 created', '10:04'], ['Saved Messages', 'Rates sheet', '09:40'], ['Ops channel', 'Daily summary ready', 'Mon']] as const).map(([n, m, t], i) => <div key={n} className={`tgd-c ${i === 0 ? 'on' : ''}`}><span className="ph-av">{i === 0 ? 'B' : n[0]}</span><span><b>{n}</b><small>{m}</small></span><time>{t}</time></div>)}
       </div>
-      <div className="tgd-main"><div className="tgd-h"><b>QXLayer Bot</b><small>bot</small></div>
+      <div className="tgd-main"><div className="tgd-h"><b>VYNOX LAYER Bot</b><small>bot</small></div>
         <div className="tg-b in">/start<time>10:01</time></div>
         <div className="tg-b in">Welcome. Exchange, pay links and wallet in one chat.<time>10:02</time></div>
         <div className="tg-kb"><span>Exchange</span><span>Payment link</span><span>Wallet</span></div>

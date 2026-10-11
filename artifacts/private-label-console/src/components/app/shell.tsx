@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useClerk } from '@clerk/react';
+import { useClerk } from '@/lib/auth';
 import { LayoutGrid, Users, Boxes, ScrollText, LogOut, Globe2, Puzzle, Plug, Workflow, Eye } from 'lucide-react';
 import { useHealthCheck } from '@workspace/api-client-react';
 import { usePrincipal } from '@/lib/principal';
@@ -29,7 +29,7 @@ export function Logo({ light }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
       <BrandLogo />
-      <span className={`font-display text-xl leading-none ${light ? 'text-sidebar-accent-foreground' : ''}`}>QXLayer</span>
+      <span className={`font-display text-xl leading-none ${light ? 'text-sidebar-accent-foreground' : ''}`}>VYNOX LAYER</span>
     </div>
   );
 }

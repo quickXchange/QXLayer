@@ -1,5 +1,10 @@
-/** Color-only derivatives of the unmodified master. Never tenant fallbacks. */
-export const QXLAYER_LOGO_URL = `${import.meta.env.BASE_URL}qxlayer-logo-dark.webp`;
-export const QXLAYER_LIGHT_LOGO_URL = `${import.meta.env.BASE_URL}qxlayer-logo-light.webp`;
-export const QXLAYER_ICON_URL = `${import.meta.env.BASE_URL}qxlayer-icon-dark-32.png`;
-export const QXLAYER_LIGHT_ICON_URL = `${import.meta.env.BASE_URL}qxlayer-icon-light-32.png`;
+/** Official VYNOX LAYER artwork: transparent-alpha derivatives of the unmodified master. Never tenant fallbacks. */
+export const VYNOX_LOGO_URL = `${import.meta.env.BASE_URL}vynox-logo.webp`;
+export const VYNOX_ICON_URL = `${import.meta.env.BASE_URL}vynox-icon-32.png`;
+export const VYNOX_ICON_LARGE_URL = `${import.meta.env.BASE_URL}vynox-icon.png`;
+export const VYNOX_LOGO_ASPECT = 1604 / 855;
+/** Legacy compatibility aliases (same art; one transparent asset serves both themes). */
+export const QXLAYER_LOGO_URL = VYNOX_LOGO_URL;
+export const QXLAYER_LIGHT_LOGO_URL = VYNOX_LOGO_URL;
+export const QXLAYER_ICON_URL = VYNOX_ICON_URL;
+export const QXLAYER_LIGHT_ICON_URL = VYNOX_ICON_URL;

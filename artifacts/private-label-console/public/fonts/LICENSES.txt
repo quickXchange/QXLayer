@@ -1,4 +1,4 @@
-QXLayer self-hosted fonts: original upstream font files, unmodified.
+VYNOX LAYER self-hosted fonts: original upstream font files, unmodified.
 
 ===== inter =====
 Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)

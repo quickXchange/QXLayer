@@ -39,9 +39,9 @@ export async function checkHosting(p: Principal, tenantId: string, probe = fetch
     const proof = await probe(row.domain, nonce);
     const expected = hostingProof(row.domain, row.slug, nonce);
     connected = /^[a-f0-9]{64}$/.test(proof) && timingSafeEqual(Buffer.from(proof, "hex"), Buffer.from(expected, "hex"));
-    if (!connected) error = "HTTPS reached a different website. Check that this exact hostname is connected to QXLayer Publishing.";
+    if (!connected) error = "HTTPS reached a different website. Check that this exact hostname is connected to VYNOX LAYER Publishing.";
   } catch {
-    error = "HTTPS or QXLayer routing is not ready. Link this hostname in Publishing, apply its exact DNS records, wait for TLS issuance, then retry.";
+    error = "HTTPS or VYNOX LAYER routing is not ready. Link this hostname in Publishing, apply its exact DNS records, wait for TLS issuance, then retry.";
   }
   await withDatabase(contextFor(p, tenantId, true, "domains.manage"), async c => {
     const current = await c.query("SELECT domain,verification_token FROM tenant_domains WHERE tenant_id=$1 FOR UPDATE", [tenantId]);

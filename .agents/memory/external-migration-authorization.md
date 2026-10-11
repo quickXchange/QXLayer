@@ -24,6 +24,207 @@ completed migration evidence and do not rerun restores. Announce compute costs
 before provisioning paid instances. Do not infer Production release or cutover
 permission from staging authorization or successful account authentication.
 
+## API-only paid activation
+
+The user approved activating only the existing Render Staging API on Starter,
+connecting isolated Supabase Staging and Vercel Preview, and automatically
+diagnosing, fixing, deploying and testing that integration. Keep the worker
+suspended. Do not activate additional paid services without approval. Do not
+modify Production, live data, existing credentials or DNS.
+
+**Why:** The user explicitly approved the API activation while retaining these
+limits; approval for one service does not extend to the worker or other costs.
+
+**How to apply:** Configure and redeploy only the approved API and Preview within
+this integration scope. Preserve the shared startup hold, disabled monitoring
+and worker suspension. Separate new ephemeral test sessions from changes to
+existing account credentials or permissions.
+
+## Existing authentication preservation
+
+Independent Clerk ownership preparation is not permission to activate a new
+identity tenant. Keep any separately owned Development candidate Staging-only
+and unactivated until owner custody and explicit identity bindings are accepted.
+Managed-dashboard access and possession of an API key do not prove independent
+account ownership or recovery control. Do not delete the managed Production
+tenant to obtain independence.
+
+**Why:** The user requested an independent ownership solution while explicitly
+preserving Production authentication. Current managed-instance documentation
+does not provide a supported in-place external transfer.
+
+**How to apply:** Separate candidate preparation from actual authentication
+replacement. Report ownership/transfer limitations plainly; never count business
+database mappings alone as preservation of native identities or passwords.
+
+Preserve the existing login system, customer accounts, roles and Super Admin
+permissions. Do not create a replacement Clerk application, migrate users, change
+authentication keys or modify Production without explicit approval.
+
+**Why:** The user explicitly restated these migration boundaries after a
+credential request made it sound as though they needed a personal Clerk
+account. The platform management check confirmed the existing authentication
+tenant is Replit-managed, not a separately owned external Clerk account.
+
+**How to apply:** Treat managed authentication as the existing service, not a new
+provider setup. Verify management status before changes. Establish supported
+access to the retained identity tenant without replacing managed keys, creating
+replacement identities or substituting Development users for Production users.
+Preserving business-database records alone does not prove that hosted sign-in
+and the registered-account directory are retained.
+
+While managed authentication access is unresolved, continue safe independent
+staging migration work, but do not create a replacement Clerk application or
+activate staging authentication. Prepare support requests as drafts, not sent
+requests or permission to make ownership changes. Report only remaining blockers
+and the next required action.
+
+**Why:** The user explicitly requested these boundaries while seeking independent
+Owner/Admin access to the existing application.
+
+**How to apply:** Keep the existing tenant, users, keys, Super Admin mapping,
+database, branding and Production intact. Do not treat technically possible
+replacement authentication as authorized.
+
+An `authorized` managed-dashboard status proves entry access, not independent
+workspace ownership or administrator permissions.
+
+**Why:** The user entered the dashboard through Replit but an email-profile
+change was denied. Public Replit dashboard documentation also conflicted with
+observed authorized access; generic Clerk transfer support does not establish
+eligibility for this managed application.
+
+**How to apply:** Verify an actually authorized self-service route or obtain
+provider confirmation of scoped independent membership or same-application
+ownership transfer before proposing execution. Do not infer a precise workspace
+role from the display name or one denied operation.
+
+The user requested read-only inspection of self-service linking to their own
+Clerk dashboard account without contacting support, if technically supported.
+Explain alternatives before making changes if direct linking is unsupported.
+
+**Why:** The user explicitly requested this investigation; having a personal
+dashboard account does not authorize replacement of the existing application.
+
+**How to apply:** Distinguish dashboard team membership from QXLayer end-user
+identities and Super Admin permissions. Check actual managed-workspace authority;
+ordinary Clerk transfer documentation alone does not establish managed-tenant
+eligibility or continuity of Replit provisioning and billing.
+
+The user clarified that they do not have Owner/Admin access to the existing
+managed application's workspace and cannot inspect its Team, Invite or Transfer
+controls. Do not request those screenshots again unless source access changes.
+
+**Why:** The user explicitly corrected the assumption that they could inspect
+source-workspace administration. Replit's dashboard-entry authorization does not
+establish that authority.
+
+**How to apply:** An independently created receiving dashboard account cannot
+self-grant membership or initiate a source-side transfer. With no verified
+self-service claim route, retain the managed application and explain the
+source-authority prerequisite without creating a replacement or contacting
+support on the user's behalf.
+
+The user subsequently confirmed successful access to the existing application's
+Production dashboard. Workspace ownership and key-access permissions remain
+distinct from this entry access; do not assume either denied or granted.
+
+**Why:** Earlier inability to inspect the source was superseded by the user's
+successful managed-dashboard entry.
+
+**How to apply:** Request only missing read-only permission/domain metadata when
+the available management check cannot reveal it. Do not ask for credentials in
+chat, screenshots or ordinary forms.
+
+The user requires Staging and Production to remain completely separate while
+keeping existing Clerk authentication unchanged.
+
+**Why:** The user explicitly restated full separation for continued migration.
+
+**How to apply:** Do not reuse live Clerk credentials as a shortcut for Staging.
+Investigate the existing Development instance and Staging-only identity bindings;
+preserve the Production identity store, roles and application configuration.
+Earlier preparation reports expecting live credentials are not permission to
+share the Production authentication store.
+
+Installing existing Development credentials does not authorize choosing which
+Development user inherits a preserved customer's or Super Admin's access.
+Require explicitly approved one-to-one Staging identity bindings; leave access
+denied until those bindings are approved, without rewriting preserved records.
+
+**Why:** Separate Clerk stores have different native identities. The user's
+preservation requirement is not permission to grant another identity existing
+roles, and matching email alone is not sufficient evidence.
+
+**How to apply:** Keep bindings server-controlled and external-Staging-only.
+Apply the same canonical actor to authorization, RLS, ownership, directory and
+private operator previews. Never take an alias from browser input or editable
+user metadata.
+
+For an explicitly requested Staging Super Admin resolution, select the existing
+authorized Development operator, not an account inferred from email. A unique
+active Development Super Admin and unique preserved Staging Super Admin can be
+bound for this requested operator role only; ambiguity requires user selection.
+Do not extend this approval to customer bindings or Production identity changes.
+
+**Why:** The user authorized resolving the Staging operator binding while
+prohibiting Production ID/role changes. Existing operator authority provided a
+safe selector without creating users or rewriting preserved authorization.
+
+**How to apply:** Verify the native identity is present and unblocked, save only
+the server-side Staging binding, and confirm the restricted runtime can resolve
+the preserved active admin through RLS. Keep original role-record fingerprints
+unchanged. Hosted sign-in remains separate acceptance work.
+
+An exact generated Vercel Preview origin does not exist before the first
+deployment. The default project domain is a Production alias, not a Preview URL.
+
+**Why:** Read-only provider inventory showed no deployments, and Vercel creates
+generated Preview URLs when deploying. Using a predicted URL or default alias
+would not establish an approved fixed authentication origin.
+
+**How to apply:** Request a separately approved gated Preview-only bootstrap,
+capture the provider-returned URL, then configure the still-held API origin.
+Keep Render suspended, paid compute and DNS changes unapproved, and request
+separate API activation approval. Do not deploy merely to resolve the URL.
+
+Staging that shares the Production Clerk instance does not isolate identity
+mutations merely because its business database is separate.
+
+**Why:** The user requests retained-instance Staging while prohibiting changes to
+existing users and Production. Sign-up, account administration and credential
+changes can affect the shared identity store; sign-in creates live auth sessions.
+
+**How to apply:** Establish existing approved domain/proxy configuration and
+credential authority first. Keep identity writes disabled and authentication
+activation held pending approval; do not change the primary Production proxy or
+register a new satellite under a no-Production-change instruction.
+
+Any migration to the user's personal Clerk account must be tested on Staging
+first, preserving customer records, IDs, Super Admin permissions and tenant roles.
+Do not delete or modify the existing managed Clerk application, change Production
+or deploy anything without explicit approval.
+
+**Why:** The user requested a safe migration plan, not migration execution.
+
+**How to apply:** Planning does not authorize creating destination applications,
+exporting/importing users, activating Staging authentication or deploying.
+Explain native Clerk ID changes and session reauthentication explicitly before
+seeking execution approval; preserving database records alone is insufficient.
+
+The user inspected Publishing settings and reported that the existing
+Production authentication keys are hidden or protected.
+
+**Why:** The proposed Publishing-settings credential-copy route was checked by
+the user and could not supply the retained managed credentials.
+
+**How to apply:** Do not send the user back to the same copy-key instructions.
+Do not bypass protection, rotate keys or replace the tenant. Authorized
+read-only inspection through Replit's managed dashboard is a distinct possible
+route, but dashboard authorization is not proof that keys can be exported or
+the tenant can be transferred. Keep external authentication held until the
+retained-instance connection is established through a supported method.
+
 ## Earlier implementation authorization
 
 The user subsequently authorized preparing permanent GitHub-based deployment:

@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, type ComponentType, type ReactNode } from 'react';
-import { ClerkProvider, SignIn, SignUp, Show, useClerk } from '@clerk/react';
+import { ClerkProvider, SignIn, SignUp, useClerk as useLegacyClerk } from '@clerk/react';
+import { Show, useClerk } from '@/lib/auth';
+import { authClient, ownedAuth } from '@/lib/owned-auth-client';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
@@ -55,11 +57,11 @@ import { ConsoleThemeScope } from '@/components/app/console-frame';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
 
-const clerkPubKey = import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true"
+const clerkPubKey = ownedAuth ? undefined : import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true"
   ? import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
   : publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-if (import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "staging" &&
+if (!ownedAuth && import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "staging" &&
     (!clerkPubKey?.startsWith("pk_test_") || clerkProxyUrl)) {
   throw new Error("Staging requires Development Clerk authentication without a Production proxy.");
 }
@@ -69,7 +71,7 @@ function stripBase(path: string): string {
   return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path;
 }
 
-if (!clerkPubKey) throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env file');
+if (!ownedAuth && !clerkPubKey) throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env file');
 
 const clerkAppearance = {
   theme: shadcn,
@@ -102,8 +104,8 @@ const clerkAppearance = {
 };
 
 const localization = {
-  signIn: { start: { title: 'Sign in to QXLayer', subtitle: 'Your QXLayer account' } },
-  signUp: { start: { title: 'Create a QXLayer account', subtitle: 'Configure and request your White Label Exchange' } },
+  signIn: { start: { title: 'Sign in to VYNOX LAYER', subtitle: 'Your VYNOX LAYER account' } },
+  signUp: { start: { title: 'Create a VYNOX LAYER account', subtitle: 'Configure and request your White Label Exchange' } },
 };
 
 function AuthFrame({ children }: { children: ReactNode }) {
@@ -113,7 +115,7 @@ const SignInPage = () => <AuthFrame><SignIn routing="path" path={`${basePath}/si
 const SignUpPage = () => <AuthFrame><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} fallbackRedirectUrl={`${basePath}/account`} /></AuthFrame>;
 
 function ClerkQueryClientCacheInvalidator() {
-  const { addListener } = useClerk();
+  const { addListener } = useLegacyClerk();
   const qc = useQueryClient();
   const prev = useRef<string | null | undefined>(undefined);
   useEffect(() => {
@@ -123,6 +125,19 @@ function ClerkQueryClientCacheInvalidator() {
       prev.current = id;
     });
   }, [addListener, qc]);
+  return null;
+}
+
+function OwnedCacheInvalidator() {
+  const qc = useQueryClient();
+  const s = authClient.useSession();
+  const prev = useRef<string | null | undefined>(undefined);
+  const id = s.isPending ? undefined : (s.data?.user?.id ?? null);
+  useEffect(() => {
+    if (id === undefined) return;
+    if (prev.current !== undefined && prev.current !== id) qc.clear();
+    prev.current = id;
+  }, [id, qc]);
   return null;
 }
 
@@ -146,6 +161,7 @@ function PrincipalGate({ children }: { children: ReactNode }) {
   };
   if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div></ConsoleThemeScope>;
   if (demoTab && q.data && !q.data.demo) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
+  if ((q.error as { status?: number } | null)?.status === 428) return <Redirect to="/account/security" />;
   if (q.isError || !q.data) {
     return (
       <ConsoleThemeScope><div className="grid min-h-[100dvh] place-items-center px-5 text-center">
@@ -210,29 +226,32 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
   return <ErrorBoundary resetKey={location}><Suspense fallback={<div className="p-6"><Skeleton className="h-64 w-full" /></div>}>{children}</Suspense></ErrorBoundary>;
 }
 
-function ClerkProviderWithRoutes() {
-  const [, setLocation] = useLocation();
+const OwnedSignIn = lazy(() => import('@/pages/sign-in'));
+const OwnedSignUp = lazy(() => import('@/pages/sign-up'));
+const OwnedForgot = lazy(() => import('@/pages/forgot-password'));
+const OwnedReset = lazy(() => import('@/pages/reset-password'));
+const OwnedVerify = lazy(() => import('@/pages/verify-email'));
+const OwnedTwoFactor = lazy(() => import('@/pages/two-factor'));
+const OwnedSecurity = lazy(() => import('@/pages/account-security'));
+const OwnedMigrate = lazy(() => import('@/pages/migrate-account'));
+const OwnedLink = lazy(() => import('@/pages/link-existing'));
+
+function AppRoutes() {
   return (
-    <ClerkProvider
-      publishableKey={clerkPubKey}
-      proxyUrl={clerkProxyUrl}
-      appearance={clerkAppearance}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
-      localization={localization}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
-    >
-      <ExternalStagingAuthBridge>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <ClerkQueryClientCacheInvalidator />
-          <RoutedErrorBoundary>
-            <Switch>
+  <Switch>
               <Route path="/" component={HomeRedirect} />
               <Route path="/demo/admin" component={DemoAdmin} />
-              <Route path="/sign-in/*?" component={SignInPage} />
-              <Route path="/sign-up/*?" component={SignUpPage} />
+              {!ownedAuth && <Route path="/sign-in/*?" component={SignInPage} />}
+              {!ownedAuth && <Route path="/sign-up/*?" component={SignUpPage} />}
+              {ownedAuth && <Route path="/sign-in" component={OwnedSignIn} />}
+              {ownedAuth && <Route path="/sign-up" component={OwnedSignUp} />}
+              {ownedAuth && <Route path="/forgot-password" component={OwnedForgot} />}
+              {ownedAuth && <Route path="/reset-password" component={OwnedReset} />}
+              {ownedAuth && <Route path="/verify-email" component={OwnedVerify} />}
+              {ownedAuth && <Route path="/two-factor" component={OwnedTwoFactor} />}
+              {ownedAuth && <Route path="/account/security" component={OwnedSecurity} />}
+              {ownedAuth && <Route path="/migrate-account" component={OwnedMigrate} />}
+              {ownedAuth && <Route path="/account/link-existing" component={OwnedLink} />}
               <Route path="/account" component={rAcc} />
               <Route path="/account/orders" component={rOrd} />
               <Route path="/account/orders/:orderId" component={rOrdD} />
@@ -263,6 +282,28 @@ function ClerkProviderWithRoutes() {
               <Route path="/activity" component={rActivity} />
               <Route component={NotFound} />
             </Switch>
+  );
+}
+
+function ClerkProviderWithRoutes() {
+  const [, setLocation] = useLocation();
+  return (
+    <ClerkProvider
+      publishableKey={clerkPubKey!}
+      proxyUrl={clerkProxyUrl}
+      appearance={clerkAppearance}
+      signInUrl={`${basePath}/sign-in`}
+      signUpUrl={`${basePath}/sign-up`}
+      localization={localization}
+      routerPush={(to) => setLocation(stripBase(to))}
+      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
+    >
+      <ExternalStagingAuthBridge>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <ClerkQueryClientCacheInvalidator />
+          <RoutedErrorBoundary>
+            <AppRoutes />
           </RoutedErrorBoundary>
           <Toaster />
         </TooltipProvider>
@@ -272,10 +313,22 @@ function ClerkProviderWithRoutes() {
   );
 }
 
+function OwnedProviderWithRoutes() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <OwnedCacheInvalidator />
+        <RoutedErrorBoundary><AppRoutes /></RoutedErrorBoundary>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
 function App() {
   return (
     <WouterRouter base={basePath}>
-      <ClerkProviderWithRoutes />
+      {ownedAuth ? <OwnedProviderWithRoutes /> : <ClerkProviderWithRoutes />}
     </WouterRouter>
   );
 }

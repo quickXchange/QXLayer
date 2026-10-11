@@ -2,6 +2,7 @@ import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { pathToFileURL } from "node:url";
+import { STAGING_SUPABASE_PROJECT } from "../external-hosting/staging-targets.mjs";
 const require = createRequire(new URL("../../lib/db/package.json", import.meta.url));
 const { Client } = require("pg");
 
@@ -58,6 +59,11 @@ export async function migrate(env = process.env) {
     await c.query("SET LOCAL lock_timeout='5s'");
     await c.query("SET LOCAL statement_timeout='60s'");
     await c.query("SET LOCAL qxlayer.external_migration_authorized='yes'");
+    if ((env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging" && env.SUPABASE_PROJECT_REF === STAGING_SUPABASE_PROJECT &&
+        env.QXLAYER_OWNED_AUTH_SCHEMA_APPROVED === "true") ||
+        (env.QXLAYER_MIGRATION_TEST === "true" && env.NODE_ENV === "test")) {
+      await c.query("SET LOCAL qxlayer.auth_schema_approved='yes'");
+    }
     await c.query("CREATE SCHEMA IF NOT EXISTS qxlayer_migrations");
     await c.query("REVOKE ALL ON SCHEMA qxlayer_migrations FROM PUBLIC");
     await c.query("CREATE TABLE IF NOT EXISTS qxlayer_migrations.versions (file text PRIMARY KEY, sha256 text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now())");

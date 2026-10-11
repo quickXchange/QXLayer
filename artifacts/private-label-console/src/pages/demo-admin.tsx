@@ -32,7 +32,7 @@ export default function DemoAdmin() {
           <Button className="w-full" type="submit" disabled={login.isPending} data-testid="button-demo-signin">{login.isPending ? 'Signing in…' : 'Open Admin Demo'}</Button>
         </form>
       <p className="text-xs text-muted-foreground">No real funds, wallets, providers or payment credentials. Sessions expire after 15 minutes.</p>
-      <a href={`${import.meta.env.BASE_URL}`} onClick={() => sessionStorage.removeItem('qx-isolated-demo')} className="text-sm text-primary underline">Back to QXLayer</a>
+      <a href={`${import.meta.env.BASE_URL}`} onClick={() => sessionStorage.removeItem('qx-isolated-demo')} className="text-sm text-primary underline">Back to VYNOX LAYER</a>
     </div>
   </main></ConsoleThemeScope>;
 }

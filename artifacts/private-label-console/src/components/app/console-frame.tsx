@@ -7,7 +7,7 @@ import { useConsoleTheme } from '@/lib/console-theme';
 
 export interface ConsoleNavItem { key: string; href: string; label: string; icon: ElementType; testId?: string; current: boolean; group?: string }
 
-/** Applies the shared QXLayer theme and renders children inside the themed root. */
+/** Applies the shared VYNOX LAYER theme and renders children inside the themed root. */
 const ThemeCtx = createContext<{ dark: boolean; toggle: () => void } | null>(null);
 type NavigationOverride = { content: ReactNode; label: string };
 const NavigationCtx = createContext<Dispatch<SetStateAction<NavigationOverride | null>> | null>(null);
@@ -41,7 +41,7 @@ function Brand({ href }: { href: string }) {
   return (
     <Link href={href} data-testid="link-logo" className="qx-brand flex min-w-0 items-center gap-2.5">
       <BrandLogo size={32} />
-      <span className="truncate text-[1.05rem] font-semibold tracking-tight">QXLayer</span>
+      <span className="truncate text-[1.05rem] font-semibold tracking-tight">VYNOX LAYER</span>
     </Link>
   );
 }

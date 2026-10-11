@@ -17,7 +17,11 @@ const globals = new Set(["addon_entitlements", "addons", "asset_catalog", "asset
 /** Predicates share one source of truth between Drizzle and Development-only setup. */
 export function rowPolicies(name: string, tenantOwned: boolean) {
   let read: string, write: string;
-  if (name === "tenants") {
+  if (name === "pricing_rules") {
+    read = "true";
+    // Public pricing reads do not grant write access or bypass trusted context.
+    write = `${root} OR (${scope})`;
+  } else if (name === "tenants") {
     read = `${root} OR (id::text=${tenant} AND ${tenant}<>'') OR
       (${tenant}='' AND id IN (SELECT tenant_id FROM public.tenant_memberships WHERE clerk_user_id=${actor} AND active)) OR
       (${slug}<>'' AND slug=${slug} AND status='active') OR

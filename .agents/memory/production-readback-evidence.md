@@ -36,6 +36,27 @@ can default to permissive access, even though the Development policies passed.
 the release if the supported plan loses them; do not add Production DDL or startup
 repair, and do not label a passing Development isolation check as Live acceptance.
 
+An explicit constant-true read policy is not a workaround for the native
+generator's omitted predicates.
+
+**Why:** Regeneration still omitted `USING` after source and Development metadata
+both independently confirmed a literal true pricing read condition.
+
+**How to apply:** Retain the native plan exactly as returned, report the blocker,
+and never edit its SQL to fabricate a passing review.
+
+Local Drizzle dependency alignment does not establish correctness of the managed
+native publishing generator.
+
+**Why:** Offline migration generation preserved all source predicates, while an
+offline push-path reproduction lost them and the native service independently
+returned incomplete policies. The callback does not expose its package versions.
+
+**How to apply:** Distinguish workspace generate/migration and push paths from the
+managed schema-diff service. Require a fresh complete native response; never
+replace that evidence with locally generated SQL or claim a workspace patch fixes
+the inaccessible service.
+
 **Why:** Isolated lifecycle verification showed that legitimate pre-delivery
 tenant links must survive; transaction rollback is safe before commit, but an
 unconditional post-commit schema reversal can reject valid new state.

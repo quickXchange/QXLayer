@@ -34,3 +34,8 @@
 - [Performance comparisons](performance-comparisons.md) — normalize build/auth settings; distinguish bootstrap, complete-route bytes, lab clicks and field/cloud results.
 - [Production client TLS](production-client-tls.md) — provider backend SSL flags do not prove client transport; require verified client TLS without weakening CA/hostname or channel binding.
 - [Authenticated recovery](authenticated-streaming-recovery.md) — GCM update output is unauthenticated; use ciphertext-only caching and whole-envelope/package verification before recovery.
+- [Vercel Preview boundary](vercel-preview-boundary.md) — first uploads were classified as Production even with Preview requested; verify provider target and do not repeat unresolved uploads.
+- [Restored schema equivalence](restored-schema-equivalence.md) — preserve raw captures and restored data; accept only reviewed, typed constant-default equivalences.
+- [Staging owner access](staging-owner-access-policy.md) — original owner password via explicit Staging verifier; independent signing and native-form verification, no Replit password changes.
+- [Public pricing policy](public-pricing-policy.md) — pricing rules are public-read-only; preserve administrative writes and other tenant boundaries.
+- [Project-owned authentication](project-owned-authentication.md) — user wants integrated, self-operated authentication instead of another Clerk application.

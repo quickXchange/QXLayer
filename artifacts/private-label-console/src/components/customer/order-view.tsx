@@ -42,6 +42,6 @@ export function Timeline({ history, empty, customerUserId }: { history: WlEvent[
   if (!history.length) return <p className="text-sm text-muted-foreground">{empty ?? 'No activity yet'}</p>;
   return <ol className="space-y-3 border-l pl-4">{[...history].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map((e) => (
     <li key={e.id} className="relative min-w-0 text-sm [overflow-wrap:anywhere]"><span className={`absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full ${e.kind === 'status' ? 'bg-primary' : 'bg-copper'}`} />
-      <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{stamp(e.createdAt)} · {e.author === customerUserId ? 'Customer' : 'QXLayer team'}{e.visibility === 'internal' ? ' · Internal only' : ''}</p>
+      <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{stamp(e.createdAt)} · {e.author === customerUserId ? 'Customer' : 'VYNOX LAYER team'}{e.visibility === 'internal' ? ' · Internal only' : ''}</p>
       <p className="whitespace-pre-wrap">{e.kind === 'status' && e.status ? <b>{statusText(e.status)}{e.message ? ': ' : ''}</b> : null}{e.message}</p></li>))}</ol>;
 }

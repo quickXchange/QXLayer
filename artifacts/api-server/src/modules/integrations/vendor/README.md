@@ -7,7 +7,7 @@ Commit: `aef093f1ed73357d741e497a2928624944ff7140`
 The blockchain monitoring implementation is copied unchanged from
 `artifacts/api-server/src/lib/blockchain-monitoring`.
 Its transport, parsing, confirmation, canonicality and token identity checks
-remain intact. QXLayer injects independently scoped credentials and configuration.
+remain intact. VYNOX LAYER injects independently scoped credentials and configuration.
 
 1Forge, WhiteBIT and Quickex diagnostic transport/signing in the tenant bridge
 is extracted from the source's manual desk rates, WhiteBIT route and Quickex

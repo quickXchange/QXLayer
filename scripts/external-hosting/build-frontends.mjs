@@ -10,11 +10,15 @@ const api = new URL(process.env.QXLAYER_API_ORIGIN ?? "https://unconfigured.inva
 if (api.protocol !== "https:" || !api.hostname.endsWith(".onrender.com") ||
     api.pathname !== "/" || api.username || api.password || api.search || api.hash)
   throw new Error("QXLAYER_API_ORIGIN must be the exact Render API HTTPS origin.");
-assertFrontendClerk();
+const authProvider = process.env.QXLAYER_AUTH_PROVIDER || "clerk";
+if (authProvider === "owned" && process.env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
+  throw new Error("Owned authentication frontend is Staging-only.");
+assertFrontendClerk(); // Retained only for verified one-time legacy-account migration.
 for (const [name, base] of [["private-label-console", "/"], ["private-label-website", "/private-label-website/"]]) {
   const result = spawnSync("pnpm", ["--filter", `@workspace/${name}`, "run", "build"], {
     stdio: "inherit", env: { ...process.env, NODE_ENV: "production", PORT: "3000", BASE_PATH: base,
       VITE_EXTERNAL_DEPLOYMENT: "true",
+      VITE_QXLAYER_AUTH_PROVIDER: authProvider,
       VITE_QXLAYER_EXTERNAL_ENVIRONMENT: process.env.QXLAYER_EXTERNAL_ENVIRONMENT ?? "production" },
   });
   if (result.status !== 0) throw new Error(`${name} build failed.`);
