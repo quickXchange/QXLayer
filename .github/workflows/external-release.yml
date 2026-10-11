@@ -80,6 +80,8 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
           MIGRATION_EXPECTED_HOST: ${{ vars.MIGRATION_EXPECTED_HOST }}
           DB_TLS_CA_FILE: ${{ runner.temp }}/supabase-ca.crt
+          QXLAYER_EXTERNAL_ENVIRONMENT: "staging"
+          QXLAYER_AUTH_PROVIDER: ${{ vars.QXLAYER_AUTH_PROVIDER || 'clerk' }}
       - name: Deploy and await exact Render API commit (Worker excluded)
         run: node scripts/external-hosting/release-render.mjs
         env:

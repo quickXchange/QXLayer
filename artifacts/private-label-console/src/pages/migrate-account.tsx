@@ -30,7 +30,7 @@ function Enroll() {
     } catch { setErr('Could not complete migration. Try again.'); } finally { setBusy(false); }
   };
   if (done) return <SuccessLine id="text-migrated">Migration complete. Redirecting to sign in with your new password...</SuccessLine>;
-  if (!isSignedIn) return <SignIn routing="hash" />;
+  if (!isSignedIn) return <SignIn routing="hash" appearance={{ elements: { header: '!hidden', logoBox: '!hidden' } }} />;
   return (
     <Form onSubmit={submit}>
       <Field id="migrate-password" label="New VYNOX LAYER password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint="12 to 128 characters. Your old password is unchanged and is never copied." />

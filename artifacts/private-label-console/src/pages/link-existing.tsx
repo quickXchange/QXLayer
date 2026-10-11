@@ -33,7 +33,7 @@ function Linker() {
       finally { window.location.assign(`${base}/sign-in`); }
     } catch { setErr('Could not complete linking. Try again.'); } finally { setBusy(false); }
   };
-  if (!isSignedIn) return <SignIn routing="hash" />;
+  if (!isSignedIn) return <SignIn routing="hash" appearance={{ elements: { header: '!hidden', logoBox: '!hidden' } }} />;
   return <div className="space-y-4 text-center"><p className="text-sm">Existing account verified. Link it to your new VYNOX LAYER account?</p><ErrorLine id="text-link-error">{err}</ErrorLine>
     <Button data-testid="button-link-account" disabled={busy} onClick={() => void link()} className="w-full">{busy ? 'Linking...' : 'Link accounts'}</Button></div>;
 }

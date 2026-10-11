@@ -103,16 +103,26 @@ const clerkAppearance = {
   },
 };
 
+/** Hides the provider-generated header/logo (it may carry the instance's application name); inputs, legal and security UI stay. */
+const hiddenProviderHeader = { elements: { header: '!hidden', logoBox: '!hidden' } };
+
 const localization = {
   signIn: { start: { title: 'Sign in to VYNOX LAYER', subtitle: 'Your VYNOX LAYER account' } },
   signUp: { start: { title: 'Create a VYNOX LAYER account', subtitle: 'Configure and request your White Label Exchange' } },
 };
 
-function AuthFrame({ children }: { children: ReactNode }) {
-  return <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">{children}</div>;
+function AuthFrame({ children, title, subtitle }: { children: ReactNode; title: string; subtitle: string }) {
+  return <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-4 py-8">
+    <div className="flex flex-col items-center gap-1 text-center">
+      <BrandLogo size={80} />
+      <h1 className="text-2xl text-[#12201f]">{title}</h1>
+      <p className="text-sm text-[#5a6664]">{subtitle}</p>
+    </div>
+    {children}
+  </div>;
 }
-const SignInPage = () => <AuthFrame><SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/admin`} /></AuthFrame>;
-const SignUpPage = () => <AuthFrame><SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} fallbackRedirectUrl={`${basePath}/account`} /></AuthFrame>;
+const SignInPage = () => <AuthFrame title={localization.signIn.start.title} subtitle={localization.signIn.start.subtitle}><SignIn appearance={hiddenProviderHeader} routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/admin`} /></AuthFrame>;
+const SignUpPage = () => <AuthFrame title={localization.signUp.start.title} subtitle={localization.signUp.start.subtitle}><SignUp appearance={hiddenProviderHeader} routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} fallbackRedirectUrl={`${basePath}/account`} /></AuthFrame>;
 
 function ClerkQueryClientCacheInvalidator() {
   const { addListener } = useLegacyClerk();

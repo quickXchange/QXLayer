@@ -83,7 +83,8 @@ function run(script, env) {
 run("scripts/external-hosting/build-frontends.mjs", frontendEnv);
 const releaseEnv = { ...cleanEnv, GITHUB_SHA: commit, RENDER_API_SERVICE_ID: apiId,
   QXLAYER_EXTERNAL_RELEASES_APPROVED: "true", QXLAYER_EXTERNAL_ENVIRONMENT: "staging" };
-run("scripts/external-hosting/release-render.mjs", releaseEnv);
+if (process.env.QXLAYER_STAGING_REBRAND_FRONTEND_ONLY !== "true")
+  run("scripts/external-hosting/release-render.mjs", releaseEnv);
 run("scripts/external-hosting/deploy-integrated-preview.mjs", {
   ...cleanEnv, QXLAYER_STAGING_API_INTEGRATION_APPROVED: "true",
 });
