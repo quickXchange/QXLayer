@@ -1,0 +1,122 @@
+name: Approved external release (no DNS or data transfer)
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Protected target environment
+        type: choice
+        options: [qxlayer-staging, qxlayer-production]
+        default: qxlayer-staging
+      approve_release:
+        description: Approve releasing this commit to the configured external target
+        type: boolean
+        default: false
+      apply_schema:
+        description: Apply reviewed versioned migrations (never imports data)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: external-release-${{ inputs.target }}
+  cancel-in-progress: false
+jobs:
+  checks:
+    uses: ./.github/workflows/external-checks.yml
+  release:
+    needs: checks
+    if: inputs.approve_release && vars.QXLAYER_EXTERNAL_RELEASES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Require the isolated Staging source branch
+        if: inputs.target == 'qxlayer-staging'
+        run: test "$GITHUB_REF_NAME" = "qxlayer-staging"
+      - name: Materialize protected migration CA file
+        env:
+          DB_TLS_CA_PEM: ${{ secrets.DB_TLS_CA_PEM }}
+        run: |
+          umask 077
+          test -n "$DB_TLS_CA_PEM"
+          printf '%s\n' "$DB_TLS_CA_PEM" > "$RUNNER_TEMP/supabase-ca.crt"
+      - name: Apply approved external schema versions
+        if: inputs.apply_schema
+        run: pnpm run external:migrate
+        env:
+          QXLAYER_EXTERNAL_MIGRATIONS_APPROVED: "true"
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          MIGRATION_EXPECTED_HOST: ${{ vars.MIGRATION_EXPECTED_HOST }}
+          DB_TLS_CA_FILE: ${{ runner.temp }}/supabase-ca.crt
+      - name: Require exact read-only database/security readback
+        run: node scripts/external-postgres/readback.mjs
+        env:
+          QXLAYER_EXTERNAL_MIGRATIONS_APPROVED: "true"
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          MIGRATION_EXPECTED_HOST: ${{ vars.MIGRATION_EXPECTED_HOST }}
+          DB_TLS_CA_FILE: ${{ runner.temp }}/supabase-ca.crt
+      - name: Deploy and await exact Render API commit (Worker excluded)
+        run: node scripts/external-hosting/release-render.mjs
+        env:
+          QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
+          QXLAYER_EXTERNAL_ENVIRONMENT: ${{ inputs.target == 'qxlayer-staging' && 'staging' || 'production' }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_API_SERVICE_ID: ${{ vars.RENDER_API_SERVICE_ID }}
+          RENDER_WORKER_SERVICE_ID: ${{ vars.RENDER_WORKER_SERVICE_ID }}
+      - name: Package gated frontends
+        run: pnpm run external:build:frontend
+        env:
+          QXLAYER_API_ORIGIN: ${{ vars.QXLAYER_API_ORIGIN }}
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ vars.CLERK_PUBLISHABLE_KEY }}
+          VITE_CLERK_PROXY_URL: ${{ vars.CLERK_PROXY_PUBLIC_URL }}
+          QXLAYER_EXTERNAL_ENVIRONMENT: ${{ inputs.target == 'qxlayer-staging' && 'staging' || 'production' }}
+          QXLAYER_CLERK_DEVELOPMENT_HOST: ${{ vars.QXLAYER_CLERK_DEVELOPMENT_HOST }}
+      - name: Deploy Vercel staging Preview (no Production alias)
+        if: inputs.target == 'qxlayer-staging'
+        id: preview
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+        run: |
+          test "$VERCEL_ORG_ID" = "team_eoJE6FCcm9esuqnRTUsmopzy"
+          test "$VERCEL_PROJECT_ID" = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx"
+          mkdir -p .vercel
+          node -e 'require("fs").writeFileSync(".vercel/project.json", JSON.stringify({orgId:process.env.VERCEL_ORG_ID,projectId:process.env.VERCEL_PROJECT_ID}))'
+          url=$(pnpm dlx vercel@63.1.2 deploy --prebuilt --yes --token "$VERCEL_TOKEN")
+          echo "preview_url=$url" >> "$GITHUB_OUTPUT"
+      - name: Release Vercel Production package to protected project
+        if: inputs.target == 'qxlayer-production'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+        run: pnpm dlx vercel@63.1.2 deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN"
+      - name: Verify Preview identity and bind the exact Staging origin
+        if: inputs.target == 'qxlayer-staging'
+        run: node scripts/external-hosting/bind-staging-preview.mjs
+        env:
+          QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
+          QXLAYER_STAGING_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      - name: Apply the verified origin to the exact Staging API commit
+        if: inputs.target == 'qxlayer-staging'
+        run: node scripts/external-hosting/release-render.mjs
+        env:
+          QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
+          QXLAYER_EXTERNAL_ENVIRONMENT: "staging"
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_API_SERVICE_ID: ${{ vars.RENDER_API_SERVICE_ID }}
+      - name: Remove temporary CA material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/supabase-ca.crt"

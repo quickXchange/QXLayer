@@ -27,6 +27,15 @@ const clerk = createClerkClient({ secretKey: env.CLERK_SECRET_KEY, publishableKe
 const customer = await clerk.users.getUser(f.customerUserId);
 if (!customer.emailAddresses.some(x => x.emailAddress === `qxlayer-qa-${f.id}+clerk_test@example.com`))
   throw Error("Not the exact disposable QA identity.");
+const nativeOwner = Object.keys(bindings).find(key => key !== f.customerUserId);
+for (const id of new Set(f.sessions)) {
+  try {
+    const session = await clerk.sessions.getSession(id);
+    if (![nativeOwner, f.customerUserId].includes(session.userId) ||
+        new Date(session.createdAt).getTime() < new Date(customer.createdAt).getTime() - 5000)
+      throw Error("Do not revoke a foreign or pre-existing session.");
+  } catch (error) { if (error.status !== 404) throw error; }
+}
 const ca = group.secretFiles.find(x => x.name === "supabase-ca.crt")?.content;
 if (!ca?.includes("BEGIN CERTIFICATE")) throw Error("Verified Staging TLS CA unavailable.");
 const url = new URL(env.DATABASE_URL);
@@ -49,7 +58,7 @@ try {
   const otherOrders = await client.query("SELECT id FROM white_label_requests WHERE tenant_id=ANY($1::uuid[]) AND customer_user_id<>$2", [tenants, f.customerUserId]);
   if (otherOrders.rowCount) throw Error("Another customer references a cleanup tenant.");
   const requestIds = orders.rows.map(x => x.id);
-  await client.query("DELETE FROM customer_notifications WHERE event_id IN (SELECT id FROM white_label_events WHERE request_id=ANY($1::uuid[]))", [requestIds]);
+  await client.query("DELETE FROM customer_notification_reads WHERE event_id IN (SELECT id FROM white_label_events WHERE request_id=ANY($1::uuid[]))", [requestIds]);
   await client.query("DELETE FROM audit_events WHERE metadata->>'requestId'=ANY($1::text[])", [requestIds]);
   await client.query("DELETE FROM white_label_requests WHERE customer_user_id=$1", [f.customerUserId]);
   const columns = await client.query("SELECT table_name FROM information_schema.columns WHERE table_schema='public' AND column_name='tenant_id'");
@@ -72,13 +81,22 @@ try {
   }
   await client.query("DELETE FROM tenants WHERE id=ANY($1::uuid[])", [tenants]);
   for (const plan of f.resources.filter(x => x.type === "plan")) {
+    const foreignAssignments = await client.query("SELECT tenant_id FROM tenant_subscriptions WHERE plan_id=$1 AND NOT(tenant_id=ANY($2::uuid[]))", [plan.id, tenants]);
+    if (foreignAssignments.rowCount) throw Error("Another tenant references the disposable plan; preserve it.");
     const p = await client.query("SELECT name FROM plans WHERE id=$1", [plan.id]);
     if (p.rows.length && !/QA/i.test(p.rows[0].name)) throw Error("Disposable plan label required.");
+    await client.query("DELETE FROM plan_entitlements WHERE plan_id=$1", [plan.id]);
     await client.query("DELETE FROM plans WHERE id=$1", [plan.id]);
   }
   await client.query("COMMIT");
 } catch (e) { await client.query("ROLLBACK"); throw e; } finally { await client.end(); }
-for (const session of f.sessions) await clerk.sessions.revokeSession(session).catch(() => {});
+for (const session of new Set(f.sessions)) {
+  try {
+    await clerk.sessions.revokeSession(session);
+    if ((await clerk.sessions.getSession(session)).status === "active")
+      throw Error("Temporary session is still active.");
+  } catch (error) { if (error.status !== 404) throw error; }
+}
 for (const ticket of f.tickets) await clerk.signInTokens.revokeSignInToken(ticket).catch(() => {});
 await clerk.users.deleteUser(f.customerUserId);
 delete bindings[f.customerUserId];
