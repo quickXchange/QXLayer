@@ -75,6 +75,11 @@ try {
       env.QXLAYER_EXTERNAL_STARTUP_APPROVED !== "false" ||
       env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
     throw new Error("Staging scope or paid-compute hold changed.");
+  // Read the existing password only inside this approved local test process.
+  // It is never stored in providers/files, returned in logs, or sent via a URL.
+  const testPassword = env.QXLAYER_STAGING_ACCESS_MODE === "owner-password"
+    ? process.env.PRODUCTION_ACCESS_CODE : env.QXLAYER_STAGING_ACCESS_CODE;
+  if (!testPassword) throw new Error("Approved Staging test credential unavailable.");
   const auth = { "x-vercel-protection-bypass": bypass, Accept: "text/html" };
   let locked;
   for (let attempt = 0; attempt < 6; attempt++) {
@@ -95,7 +100,7 @@ try {
     method: "POST", redirect: "manual",
     headers: { ...auth, Cookie: csrfCookie, Origin: receipt.url,
       "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ csrf, accessCode: env.QXLAYER_STAGING_ACCESS_CODE ?? env.PRODUCTION_ACCESS_CODE, returnTo: "/" }),
+    body: new URLSearchParams({ csrf, accessCode: testPassword, returnTo: "/" }),
   });
   if (unlock.status !== 303) throw new Error(`Hosted gate unlock failed (HTTP ${unlock.status}).`);
   const session = unlock.headers.getSetCookie().map(c => c.split(";")[0]).join("; ");
@@ -151,7 +156,7 @@ try {
       // Test credentials are available only over this loopback listener, never deployed.
       if (ownerGate && req.url === "/__qx_test_gate_code" && req.method === "GET") {
         res.setHeader("Content-Type", "application/json"); res.setHeader("Cache-Control", "no-store");
-        res.end(JSON.stringify({ code: env.QXLAYER_STAGING_ACCESS_CODE, transportBypass: bypass })); return;
+        res.end(JSON.stringify({ code: testPassword, transportBypass: bypass })); return;
       }
       if (ownerTicket && req.url === "/__qx_test_owner_ticket" && req.method === "GET") {
         res.setHeader("Content-Type", "application/json"); res.setHeader("Cache-Control", "no-store");
