@@ -31,7 +31,7 @@ if (p.id !== project || p.name !== "qxlayer-staging" || p.accountId !== team ||
 const root = ".vercel/output";
 const config = JSON.parse(await readFile(`${root}/config.json`, "utf8"));
 if (JSON.stringify(config.routes) !== JSON.stringify([
-  { src: "^/__qx_access/enter$", dest: "https://qxlayer-api.onrender.com/api/__qx_access/enter" },
+  { src: "^/__qx_access/enter$", dest: "/frontend" },
   { src: "^/api(?:/(.*))?$", dest: "https://qxlayer-api.onrender.com/api/$1" },
   { src: "^/(.*)$", dest: "/frontend" },
 ])) throw new Error("Only the existing Staging API may be routed.");

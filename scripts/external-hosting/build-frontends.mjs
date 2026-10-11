@@ -26,7 +26,11 @@ await mkdir(path.join(fn, "static"), { recursive: true });
 await cp("artifacts/private-label-console/dist/public", path.join(fn, "static"), { recursive: true });
 await cp("artifacts/private-label-website/dist/public", path.join(fn, "static/private-label-website"), { recursive: true });
 await cp("lib/production-access-gate", path.join(fn, "lib/production-access-gate"), { recursive: true });
-await cp("deploy/vercel/handler.mjs", path.join(fn, "handler.mjs"));
+const bootstrap = process.env.QXLAYER_PREVIEW_BOOTSTRAP === "true";
+if (bootstrap && process.env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
+  throw new Error("Preview bootstrap packaging is Staging-only.");
+await cp(bootstrap ? "deploy/vercel/preview-bootstrap-handler.mjs" : "deploy/vercel/handler.mjs",
+  path.join(fn, "handler.mjs"));
 await mkdir(path.join(fn, "artifacts/private-label-console/public"), { recursive: true });
 for (const mode of ["light", "dark"])
   await cp(`artifacts/private-label-console/public/qxlayer-logo-${mode}.png`,
@@ -59,10 +63,15 @@ await writeFile(path.join(fn, ".vc-config.json"), JSON.stringify({
   shouldAddHelpers: false, maxDuration: 15,
 }, null, 2));
 // API/uploads bypass the Node function and preserve existing 8-MB uploads.
-// Gate entry posts go to the single Render API's existing bounded rate limiter.
-await writeFile(path.join(output, "config.json"), JSON.stringify({ version: 3, routes: [
-  { src: "^/__qx_access/enter$", dest: `${api.origin}/api/__qx_access/enter` },
+// Staging gate entry stays same-origin in the Vercel function. Production keeps
+// its original Render entry route. API requests still use the existing API gate.
+await writeFile(path.join(output, "config.json"), JSON.stringify({ version: 3, routes: bootstrap
+  ? [{ src: "^/(.*)$", dest: "/frontend" }] : [
+  { src: "^/__qx_access/enter$", dest: process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging"
+    ? "/frontend" : `${api.origin}/api/__qx_access/enter` },
   { src: "^/api(?:/(.*))?$", dest: `${api.origin}/api/$1` },
   { src: "^/(.*)$", dest: "/frontend" },
 ] }, null, 2));
-console.info("Built gated Vercel frontends and same-origin Render routes; nothing deployed.");
+console.info(bootstrap
+  ? "Built gated Preview-only frontends; API disabled and no external rewrites; nothing deployed."
+  : "Built gated Vercel frontends and same-origin Render routes; nothing deployed.");
