@@ -29,6 +29,35 @@ real Preview. This is not authorized by Preview-only approval. If all
 Production-target deployments are forbidden, use an already-initialized isolated
 Staging project instead. Do not treat custom environments as equivalent to Preview.
 
+An approved inert initializer must contain only static placeholder files: no
+application code, secrets, Clerk, database or backend connections. Stop and report
+after initialization; its approval does not authorize the actual Preview.
+
+**Why:** The user explicitly approved one initializer with those boundaries and
+required a report before the real Preview.
+
+**How to apply:** Verify the exact isolated project and absence of
+Production-scoped variables before uploading. Leave live Production, Render,
+custom domains, DNS and existing Vercel protection unchanged.
+
+## Provider verification semantics
+
+Vercel deployment `lambdas` can contain build groups even for a purely static
+deployment. Count runtime resources in each group's `output`, not build groups.
+The project can have `hasDeployments=true` and a READY initializer without a
+`targets.production` pointer when domain assignment is disabled.
+
+**Why:** These metadata shapes were observed for a two-file static initializer;
+requiring an alias pointer or interpreting a build group as a function produced
+false verification failures.
+
+**How to apply:** Verify deployment project/target, READY state, project
+initialization, source-file inventory and runtime outputs separately. The source
+file-content API returns base64 in `data` without an explicit encoding field;
+decode it before digest comparison. Existing Vercel sign-in protection may block
+anonymous page capture; verify source through the scoped API without weakening
+protection.
+
 Preview-only approval with “Keep Production, DNS, and Render unchanged” does not
 authorize saving the newly discovered origin into Render, resuming services,
 connecting to Production data, or using Production credentials.
