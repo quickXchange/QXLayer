@@ -34,3 +34,4 @@
 - [Performance comparisons](performance-comparisons.md) — normalize build/auth settings; distinguish bootstrap, complete-route bytes, lab clicks and field/cloud results.
 - [Production client TLS](production-client-tls.md) — provider backend SSL flags do not prove client transport; require verified client TLS without weakening CA/hostname or channel binding.
 - [Authenticated recovery](authenticated-streaming-recovery.md) — GCM update output is unauthenticated; use ciphertext-only caching and whole-envelope/package verification before recovery.
+- [Vercel Preview boundary](vercel-preview-boundary.md) — first uploads were classified as Production even with Preview requested; verify provider target and do not repeat unresolved uploads.
