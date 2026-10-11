@@ -5,6 +5,7 @@ import { connectionOptions, runtimeRole } from "../../../../lib/db/src/connectio
 import { assertExternalEnvironment } from "./external-environment";
 import { applicationTableNames } from "../../../../lib/db/src/schema-table-names";
 import reference from "../../../../deploy/migrations/rls-reference.json";
+import { clerkProxyMiddleware } from "../middlewares/clerkProxyMiddleware";
 
 test("Existing Replit database defaults stay unchanged; external runtime fails closed", () => {
   assert.deepEqual(applicationTableNames().sort(),reference.tables.map(t=>t.name).sort(),"Code table coverage requires matching reviewed migrations.");
@@ -39,4 +40,41 @@ test("Private storage adapter retains object keys, refuses overwrite and uses bu
   const missing = supabaseObject(key,env,(async()=>new Response(null,{status:404})) as typeof fetch);
   assert.deepEqual(await missing.exists(),[false]);
   await assert.rejects(missing.download());
+});
+
+test("Staging NODE_ENV=production accepts only test keys; Production behavior stays unchanged", () => {
+  const host = "synthetic.clerk.accounts.dev";
+  const base = { QXLAYER_DATABASE_PROVIDER: "supabase", QXLAYER_EXTERNAL_STARTUP_APPROVED: "true",
+    NODE_ENV: "production", QXLAYER_STORAGE_PROVIDER: "supabase", QXLAYER_HEALTH_MONITOR_MODE: "disabled",
+    PRODUCTION_ACCESS_GATE_ENABLED: "true", CLERK_AUTHORIZED_PARTIES: "https://stage.example.invalid",
+    SESSION_SECRET: "synthetic", PRODUCTION_ACCESS_CODE: "synthetic",
+    QXLAYER_PLATFORM_URL: "https://stage.example.invalid",
+    SUPABASE_STORAGE_URL: "https://synthetic.supabase.co", SUPABASE_STORAGE_BUCKET: "synthetic",
+    SUPABASE_STORAGE_SERVICE_KEY: "synthetic", DATABASE_URL: "postgresql://test@db.synthetic.supabase.co/postgres" };
+  const staging = { ...base, QXLAYER_EXTERNAL_ENVIRONMENT: "staging",
+    CLERK_PUBLISHABLE_KEY: `pk_test_${Buffer.from(`${host}$`).toString("base64")}`,
+    CLERK_SECRET_KEY: "sk_test_synthetic", QXLAYER_CLERK_DEVELOPMENT_HOST: host };
+  assert.doesNotThrow(() => assertExternalEnvironment(staging));
+  assert.throws(() => assertExternalEnvironment({ ...staging, CLERK_SECRET_KEY: "sk_live_synthetic" }));
+  assert.throws(() => assertExternalEnvironment({ ...staging, CLERK_AUTHORIZED_PARTIES: "https://wrong.invalid" }));
+  assert.throws(() => assertExternalEnvironment({ ...staging, QXLAYER_EXTERNAL_ENVIRONMENT: "typo" }));
+  const production = { ...base, CLERK_PUBLISHABLE_KEY: "pk_live_synthetic", CLERK_SECRET_KEY: "sk_live_synthetic",
+    CLERK_PROXY_PUBLIC_URL: "https://stage.example.invalid/api/__clerk" };
+  assert.doesNotThrow(() => assertExternalEnvironment(production));
+  assert.throws(() => assertExternalEnvironment({ ...production, CLERK_SECRET_KEY: "sk_test_synthetic" }));
+  assert.throws(() => assertExternalEnvironment({ ...production, CLERK_PROXY_PUBLIC_URL: undefined }));
+});
+
+test("External Staging does not construct the Production Clerk proxy", () => {
+  const before = { ...process.env };
+  try {
+    Object.assign(process.env, { NODE_ENV: "production", QXLAYER_DATABASE_PROVIDER: "supabase",
+      QXLAYER_EXTERNAL_ENVIRONMENT: "staging", CLERK_SECRET_KEY: "sk_test_synthetic" });
+    let passed = false;
+    clerkProxyMiddleware()({} as never, {} as never, (() => { passed = true; }) as never);
+    assert.equal(passed, true);
+  } finally {
+    for (const key of Object.keys(process.env)) if (!(key in before)) delete process.env[key];
+    Object.assign(process.env, before);
+  }
 });
