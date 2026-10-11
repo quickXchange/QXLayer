@@ -40,3 +40,38 @@ at presentation, without rewriting audit records or customer-written content.
 Previously enrolled authenticator entries can retain their original issuer label
 inside the user's authenticator app. Their secrets and backup codes remain valid;
 new enrollment uses VYNOX LAYER. Do not force MFA re-enrollment for a label change.
+
+## Verification and remaining boundaries
+
+The Staging application release is READY at
+https://qxlayer-staging-318zjh6u6-vynox3.vercel.app.
+Render serves the approved release and `/api/healthz` returns `{"status":"ok"}`.
+Read-only Supabase verification confirmed 42 public tables, 84 policies,
+FORCE RLS, least-privilege grants and the exact installed migration ledger.
+Per-table record counts and deterministic content fingerprints were unchanged
+between the final release baseline and readback. No Staging migration was run.
+The inactive project-owned authentication migration remains unapplied while
+Staging uses Clerk; readback permits only this explicitly bounded case.
+
+Development verification covered the root build/typechecks, release and external
+integration suites, isolated PostgreSQL/RLS rehearsal, project-owned auth flows,
+and a real password-confirmed MFA setup followed by read-only Super Admin access
+to orders, clients, tenants and plans. Desktop and mobile branding were checked.
+Logout returned `/api/me` to 401; anonymous Admin navigation retains its existing
+homepage redirect. The exact disposable administrator/auth fixture was removed.
+
+Authenticated Staging browser verification is **not complete**: the existing
+Vercel team SSO protection redirects visitors to `vercel.com` (HTTP 302), and
+there is no existing automation-bypass credential. Direct Backend form attempts
+cannot substitute for the same-origin Vercel private-access form. Do not disable
+protection, fabricate identity claims, or change live authentication to test it.
+An authorized Vercel session or separately approved protected automation path is
+needed for the remaining check.
+
+GitHub's description is rebranded. Repository/branch/environment names, Vercel
+project `qxlayer-staging`, Render `qxlayer-api` / `qxlayer-health-worker` and its
+existing API URL remain unchanged. Supabase project reference, schemas, roles,
+storage identifiers and all compatibility keys are retained. External provider
+application/email branding and real delivery have not been verified; the
+application-owned email templates/display sender are rebranded. Production
+publishing, DNS changes and an authentication-provider cutover were not performed.

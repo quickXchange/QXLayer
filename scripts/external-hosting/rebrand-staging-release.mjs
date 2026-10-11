@@ -63,6 +63,9 @@ try {
     ...cleanEnv, GIT_AUTHOR_NAME: "VYNOX LAYER Release", GIT_AUTHOR_EMAIL: "release@users.noreply.github.com",
     GIT_COMMITTER_NAME: "VYNOX LAYER Release", GIT_COMMITTER_EMAIL: "release@users.noreply.github.com",
   });
+  if (process.env.QXLAYER_STAGING_REBRAND_SOURCE_ONLY === "true" &&
+      git(["diff", "--name-only", prior, commit, "--", "artifacts", "lib", "package.json", "pnpm-lock.yaml"]))
+    throw Error("Source-only follow-up refuses runtime changes; use the full Staging release.");
   git(["push", "origin", `${commit}:refs/heads/${branch}`]);
   if (git(["ls-remote", "origin", `refs/heads/${branch}`]).split(/\s/)[0] !== commit)
     throw Error("Source readback failed.");
@@ -71,6 +74,12 @@ console.info("Staging source synchronized; main remains unchanged.");
 await provider("github", `/repos/${repo}`, "PATCH", {
   description: "VYNOX LAYER — white-label exchange platform. Stable repository identifiers retained for compatibility.",
 });
+if (process.env.QXLAYER_STAGING_REBRAND_SOURCE_ONLY === "true") {
+  const currentMain = await provider("github", `/repos/${repo}/git/ref/heads/main`);
+  if (currentMain.object.sha !== main.object.sha) throw Error("Main boundary changed.");
+  console.info("Documentation/verification tools synchronized; deployed runtime is unchanged.");
+  process.exit(0);
+}
 const frontendEnv = { ...cleanEnv, ...vars, QXLAYER_EXTERNAL_ENVIRONMENT: "staging",
   QXLAYER_API_ORIGIN: "https://qxlayer-api.onrender.com", QXLAYER_AUTH_PROVIDER: cfg.QXLAYER_AUTH_PROVIDER || "clerk",
   VITE_CLERK_PUBLISHABLE_KEY: vars.CLERK_PUBLISHABLE_KEY || cfg.CLERK_PUBLISHABLE_KEY,
