@@ -25,7 +25,8 @@ jobs:
     uses: ./.github/workflows/external-checks.yml
   release:
     needs: checks
-    if: inputs.approve_release && vars.QXLAYER_EXTERNAL_RELEASES_ENABLED == 'true'
+    # This activation is Staging-only. Production remains disabled.
+    if: inputs.approve_release && inputs.target == 'qxlayer-staging' && vars.QXLAYER_STAGING_RELEASES_ENABLED == 'true'
     runs-on: ubuntu-latest
     environment: ${{ inputs.target }}
     steps:
@@ -40,6 +41,19 @@ jobs:
       - name: Require the isolated Staging source branch
         if: inputs.target == 'qxlayer-staging'
         run: test "$GITHUB_REF_NAME" = "qxlayer-staging"
+      - name: Validate protected Staging configuration
+        env:
+          SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          MIGRATION_EXPECTED_HOST: ${{ vars.MIGRATION_EXPECTED_HOST }}
+          RENDER_API_SERVICE_ID: ${{ vars.RENDER_API_SERVICE_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          QXLAYER_API_ORIGIN: ${{ vars.QXLAYER_API_ORIGIN }}
+          MIGRATION_DATABASE_URL: ${{ secrets.MIGRATION_DATABASE_URL }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DB_TLS_CA_PEM: ${{ secrets.DB_TLS_CA_PEM }}
+        run: node scripts/external-hosting/staging-release-configuration.mjs
       - name: Materialize protected migration CA file
         env:
           DB_TLS_CA_PEM: ${{ secrets.DB_TLS_CA_PEM }}
