@@ -37,6 +37,9 @@ jobs:
           node-version: "24"
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
+      - name: Require the isolated Staging source branch
+        if: inputs.target == 'qxlayer-staging'
+        run: test "$GITHUB_REF_NAME" = "qxlayer-staging"
       - name: Materialize protected migration CA file
         env:
           DB_TLS_CA_PEM: ${{ secrets.DB_TLS_CA_PEM }}
@@ -61,10 +64,11 @@ jobs:
           SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
           MIGRATION_EXPECTED_HOST: ${{ vars.MIGRATION_EXPECTED_HOST }}
           DB_TLS_CA_FILE: ${{ runner.temp }}/supabase-ca.crt
-      - name: Deploy and await exact Render API/worker commit
+      - name: Deploy and await exact Render API commit (Worker excluded)
         run: node scripts/external-hosting/release-render.mjs
         env:
           QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
+          QXLAYER_EXTERNAL_ENVIRONMENT: ${{ inputs.target == 'qxlayer-staging' && 'staging' || 'production' }}
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_API_SERVICE_ID: ${{ vars.RENDER_API_SERVICE_ID }}
           RENDER_WORKER_SERVICE_ID: ${{ vars.RENDER_WORKER_SERVICE_ID }}
@@ -78,11 +82,18 @@ jobs:
           QXLAYER_CLERK_DEVELOPMENT_HOST: ${{ vars.QXLAYER_CLERK_DEVELOPMENT_HOST }}
       - name: Deploy Vercel staging Preview (no Production alias)
         if: inputs.target == 'qxlayer-staging'
+        id: preview
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
-        run: pnpm dlx vercel@63.1.2 deploy --prebuilt --yes --token "$VERCEL_TOKEN"
+        run: |
+          test "$VERCEL_ORG_ID" = "team_eoJE6FCcm9esuqnRTUsmopzy"
+          test "$VERCEL_PROJECT_ID" = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx"
+          mkdir -p .vercel
+          node -e 'require("fs").writeFileSync(".vercel/project.json", JSON.stringify({orgId:process.env.VERCEL_ORG_ID,projectId:process.env.VERCEL_PROJECT_ID}))'
+          url=$(pnpm dlx vercel@63.1.2 deploy --prebuilt --yes --token "$VERCEL_TOKEN")
+          echo "preview_url=$url" >> "$GITHUB_OUTPUT"
       - name: Release Vercel Production package to protected project
         if: inputs.target == 'qxlayer-production'
         env:
@@ -90,6 +101,22 @@ jobs:
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
         run: pnpm dlx vercel@63.1.2 deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN"
+      - name: Verify Preview identity and bind the exact Staging origin
+        if: inputs.target == 'qxlayer-staging'
+        run: node scripts/external-hosting/bind-staging-preview.mjs
+        env:
+          QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
+          QXLAYER_STAGING_PREVIEW_URL: ${{ steps.preview.outputs.preview_url }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      - name: Apply the verified origin to the exact Staging API commit
+        if: inputs.target == 'qxlayer-staging'
+        run: node scripts/external-hosting/release-render.mjs
+        env:
+          QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
+          QXLAYER_EXTERNAL_ENVIRONMENT: "staging"
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_API_SERVICE_ID: ${{ vars.RENDER_API_SERVICE_ID }}
       - name: Remove temporary CA material
         if: always()
         run: rm -f "$RUNNER_TEMP/supabase-ca.crt"

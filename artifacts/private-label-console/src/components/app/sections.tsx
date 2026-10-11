@@ -147,6 +147,7 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel, renderAsse
   const m = useUpdateTenantAssetsNetworks();
   const gM = useGatedMutate(m.mutate, 'Save assets and networks');
   const [sel, setSel] = useState<string[]>(tenant.assetNetworkIds);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const key = tenant.assetNetworkIds.join(',');
   useEffect(() => setSel(tenant.assetNetworkIds), [key]); // eslint-disable-line react-hooks/exhaustive-deps
   const toggle = (id: string) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
@@ -156,9 +157,13 @@ export function AssetsSection({ tenant, readOnly, onSaved, saveLabel, renderAsse
     return [...g.entries()];
   }, [cat.data]);
   return (
-    <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { assetNetworkIds: sel } }, { onSuccess: () => save.ok('Assets and networks'), onError: save.fail }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); setSaveError(null); gM({ tenantId: tenant.id, data: { assetNetworkIds: sel } }, {
+      onSuccess: () => { setSaveError(null); save.ok('Assets and networks'); },
+      onError: (error) => { setSaveError(error instanceof Error ? error.message : 'Assets and networks could not be saved.'); save.fail(error); },
+    }); }}>
       <Section n="04" title="Assets and networks" note="Configured sandbox asset/network pairs only."
         footer={<><span className="mr-auto font-mono text-xs text-muted-foreground">{sel.length} selected</span><SaveBtn id="assets" pending={m.isPending} readOnly={readOnly} label={saveLabel} /></>}>
+        {saveError && <p role="alert" data-testid="error-save-assets" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">{saveError}</p>}
         {cat.isLoading ? <Skeleton className="h-40" /> : cat.isError ? <ErrorState what="asset catalog" onRetry={() => cat.refetch()} /> : (
           <div className="divide-y rounded-md border">
             {groups.map(([id, rows]) => (

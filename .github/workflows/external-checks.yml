@@ -2,7 +2,7 @@ name: External preparation checks
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, qxlayer-staging]
   workflow_call:
 permissions:
   contents: read
