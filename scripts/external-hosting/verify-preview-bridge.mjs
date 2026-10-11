@@ -164,6 +164,7 @@ try {
       for await (const chunk of req) body.push(chunk);
       const proxyHeaders = { ...headers, Accept: req.headers.accept ?? "*/*" };
       if (req.headers.authorization) proxyHeaders.Authorization = req.headers.authorization;
+      if (req.headers["x-qx-demo"] === "read-only") proxyHeaders["x-qx-demo"] = "read-only";
       if (req.headers.cookie) proxyHeaders.Cookie += `; ${req.headers.cookie}`;
       if (req.headers["content-type"]) proxyHeaders["Content-Type"] = req.headers["content-type"];
       if (req.headers.origin) proxyHeaders.Origin = receipt.url;
