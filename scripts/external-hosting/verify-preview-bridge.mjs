@@ -151,7 +151,7 @@ try {
       // Test credentials are available only over this loopback listener, never deployed.
       if (ownerGate && req.url === "/__qx_test_gate_code" && req.method === "GET") {
         res.setHeader("Content-Type", "application/json"); res.setHeader("Cache-Control", "no-store");
-        res.end(JSON.stringify({ code: env.QXLAYER_STAGING_ACCESS_CODE })); return;
+        res.end(JSON.stringify({ code: env.QXLAYER_STAGING_ACCESS_CODE, transportBypass: bypass })); return;
       }
       if (ownerTicket && req.url === "/__qx_test_owner_ticket" && req.method === "GET") {
         res.setHeader("Content-Type", "application/json"); res.setHeader("Cache-Control", "no-store");
