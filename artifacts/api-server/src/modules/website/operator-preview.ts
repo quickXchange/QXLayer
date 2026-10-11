@@ -3,6 +3,7 @@ import type { Request } from "express";
 import { resolvePrincipal, requireSuperAdmin } from "../authentication/service";
 import { signProof, readProof } from "../../lib/scoped-proof";
 import { HttpError } from "../../lib/errors";
+import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
 
 export const PREVIEW_TTL = 15 * 60 * 1000;
 export const PREVIEW_COOKIE = "qx_operator_preview";
@@ -23,7 +24,8 @@ export async function authorizedWebsitePreview(req: Request, slug: string): Prom
   if (marker === undefined) return undefined;
   if (marker !== "session" && marker !== "1") throw new HttpError(403, "Invalid private preview.");
   const cookie = req.get("cookie")?.split(";").map(s => s.trim()).find(s => s.startsWith(`${PREVIEW_COOKIE}=`))?.slice(PREVIEW_COOKIE.length + 1);
-  const actorId = getAuth(req).userId;
+  const nativeId = getAuth(req).userId;
+  const actorId = nativeId ? applicationUserId(nativeId) : null;
   const grant = verifyPreview(cookie, slug, actorId);
   if (!grant) throw new HttpError(401, "Sign in as the authorized operator and reopen this private preview.");
   // Revocation is immediate: the signed cookie is NOT sufficient authority.

@@ -58,6 +58,10 @@ const clerkPubKey = import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true"
   ? import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
   : publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
 const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
+if (import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "staging" &&
+    (!clerkPubKey?.startsWith("pk_test_") || clerkProxyUrl)) {
+  throw new Error("Staging requires Development Clerk authentication without a Production proxy.");
+}
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 function stripBase(path: string): string {

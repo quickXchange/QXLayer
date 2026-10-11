@@ -2,6 +2,7 @@ import { getAuth } from "@clerk/express";
 import type { RequestHandler, Response } from "express";
 import { resolvePrincipal, type Principal } from "../modules/authentication/service";
 import { demoPrincipal, assertDemoRequest } from "../modules/demo/session";
+import { applicationUserId } from "../../../../lib/external-clerk/index.mjs";
 
 export const requireAuthentication: RequestHandler = async (req, res, next): Promise<void> => {
   const demo = await demoPrincipal(req);
@@ -17,7 +18,12 @@ export const requireAuthentication: RequestHandler = async (req, res, next): Pro
     res.status(401).json({ error: "Sign-in required." });
     return;
   }
-  res.locals.principal = await resolvePrincipal(userId);
+  const actorId = applicationUserId(userId);
+  if (!actorId) {
+    res.status(403).json({ error: "An approved Staging identity binding is required." });
+    return;
+  }
+  res.locals.principal = await resolvePrincipal(actorId);
   next();
 };
 

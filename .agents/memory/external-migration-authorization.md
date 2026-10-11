@@ -116,6 +116,20 @@ preserve the Production identity store, roles and application configuration.
 Earlier preparation reports expecting live credentials are not permission to
 share the Production authentication store.
 
+Installing existing Development credentials does not authorize choosing which
+Development user inherits a preserved customer's or Super Admin's access.
+Require explicitly approved one-to-one Staging identity bindings; leave access
+denied until those bindings are approved, without rewriting preserved records.
+
+**Why:** Separate Clerk stores have different native identities. The user's
+preservation requirement is not permission to grant another identity existing
+roles, and matching email alone is not sufficient evidence.
+
+**How to apply:** Keep bindings server-controlled and external-Staging-only.
+Apply the same canonical actor to authorization, RLS, ownership, directory and
+private operator previews. Never take an alias from browser input or editable
+user metadata.
+
 Staging that shares the Production Clerk instance does not isolate identity
 mutations merely because its business database is separate.
 

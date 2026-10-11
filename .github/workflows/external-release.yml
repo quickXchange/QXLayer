@@ -74,6 +74,8 @@ jobs:
           QXLAYER_API_ORIGIN: ${{ vars.QXLAYER_API_ORIGIN }}
           VITE_CLERK_PUBLISHABLE_KEY: ${{ vars.CLERK_PUBLISHABLE_KEY }}
           VITE_CLERK_PROXY_URL: ${{ vars.CLERK_PROXY_PUBLIC_URL }}
+          QXLAYER_EXTERNAL_ENVIRONMENT: ${{ inputs.target == 'qxlayer-staging' && 'staging' || 'production' }}
+          QXLAYER_CLERK_DEVELOPMENT_HOST: ${{ vars.QXLAYER_CLERK_DEVELOPMENT_HOST }}
       - name: Deploy Vercel staging Preview (no Production alias)
         if: inputs.target == 'qxlayer-staging'
         env:
