@@ -25,8 +25,10 @@ Prepared automation:
   data is not part of a release. Migrations remain separately opt-in.
 
 Remaining activation steps:
-1. Synchronize reviewed workflow changes to the Staging branch using an
-   authorization that permits writing GitHub Actions workflow files.
+1. Register the reviewed release workflow on the default branch through a
+   separately reviewed source change. The files are synchronized on
+   `qxlayer-staging`, but GitHub requires default-branch registration for manual
+   dispatch; the default branch was intentionally left unchanged.
 2. Configure the protected `qxlayer-staging` GitHub environment: required
    reviewers; Render and Vercel provider credentials; pinned project/service
    identifiers; restricted migration connection; verified CA; build-time
@@ -37,6 +39,32 @@ Remaining activation steps:
    Preserve the current working Preview until the candidate passes.
 4. Enable repeatable Staging dispatch only after that evidence. Keep Production
    releases disabled and retain separate approval for any eventual cutover.
+
+Latest provider readback: the newly supplied GitHub credential successfully
+synchronized both workflow files to Staging, and the actual GitHub
+**External preparation checks** run completed successfully. Workflow-file
+authorization is resolved. The repository still has no environments, Actions
+secrets or Actions variables configured; the default branch does not contain
+the release workflow. No release was dispatched or enabled.
+
+## Verified Staging workflows
+
+- Native Private Access submission with the original password and authorized
+  Clerk customer/Super Admin sign-in.
+- Customer request, technical QA quotation (USD 99 setup / USD 29 recurring),
+  operator review, approval, isolated tenant delivery and customer reload.
+- Tenant-only asset/network selection and settings/rate persistence.
+- A synthetic 0.1 BTC → 1 ETH Swap order on test networks, public confirmation
+  and customer-owned Admin Panel order/details readback. This proves sandbox
+  creation and visibility, not live settlement or completed-order processing.
+- Customer principal: client admin, sandbox-only, one tenant membership;
+  authenticated Super Admin plans endpoint denied with 403; public catalog 200.
+- Rejected asset saves now retain a visible inline error; deployed and confirmed.
+
+Disposable QA data and identity were removed, temporary sessions and transport
+credentials revoked, and the original single owner binding restored. The API
+cleanup deployment is live. Existing plans, Production, DNS, live providers and
+the suspended Worker were not changed.
 
 ## Clerk ownership — unresolved dependency, not a request to replace users
 
