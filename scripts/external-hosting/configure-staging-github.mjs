@@ -7,6 +7,19 @@ import { execFileSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
 import { STAGING_SUPABASE_PROJECT } from "./staging-targets.mjs";
 const repo = "quickXchange/QXLayer", target = "qxlayer-staging";
+function protectedSetting(args, value) {
+  if (typeof value !== "string" || !value) throw Error("Required protected setting unavailable.");
+  try {
+    execFileSync("gh", args, { input: value, stdio: ["pipe", "ignore", "pipe"] });
+  } catch {
+    // Never expose child-process output or credential-bearing error objects.
+    throw Error("Protected GitHub setting write failed.");
+  }
+}
+function protectedDatabaseUrl(value) {
+  try { return new URL(value); }
+  catch { throw Error("Protected database connection unavailable or malformed."); }
+}
 if (process.env.QXLAYER_STAGING_GITHUB_SETUP_APPROVED !== "true")
   throw Error("Staging GitHub setup approval required.");
 async function github(route, method = "GET", body) {
@@ -28,8 +41,8 @@ const group = await response.json();
 const env = Object.fromEntries(group.envVars.map(v => [v.key, v.value]));
 if (env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging" || !env.CLERK_PUBLISHABLE_KEY?.startsWith("pk_test_"))
   throw Error("Staging-only configuration required.");
-const url = new URL(process.env.QXLAYER_SUPABASE_DATABASE_URL);
-const runtime = new URL(env.DATABASE_URL);
+const url = protectedDatabaseUrl(process.env.QXLAYER_SUPABASE_DATABASE_URL);
+const runtime = protectedDatabaseUrl(env.DATABASE_URL);
 if (url.hostname !== env.DB_EXPECTED_HOST || runtime.hostname !== url.hostname ||
     !["", "5432"].includes(url.port) || url.pathname !== "/postgres")
   throw Error("Migration connection is not the existing Staging database.");
@@ -59,18 +72,15 @@ const variables = {
   QXLAYER_CLERK_DEVELOPMENT_HOST: env.QXLAYER_CLERK_DEVELOPMENT_HOST,
 };
 for (const [name, value] of Object.entries(variables))
-  execFileSync("gh", ["variable", "set", name, "--env", target, "--repo", repo],
-    { input: value, stdio: ["pipe", "ignore", "pipe"] });
+  protectedSetting(["variable", "set", name, "--env", target, "--repo", repo], value);
 const secrets = {
   MIGRATION_DATABASE_URL: process.env.QXLAYER_SUPABASE_DATABASE_URL,
   DB_TLS_CA_PEM: ca, RENDER_API_KEY: process.env.RENDER_API_KEY,
   ...(process.env.VERCEL_TOKEN ? { VERCEL_TOKEN: process.env.VERCEL_TOKEN } : {}),
 };
 for (const [name, value] of Object.entries(secrets))
-  execFileSync("gh", ["secret", "set", name, "--env", target, "--repo", repo],
-    { input: value, stdio: ["pipe", "ignore", "pipe"] });
-execFileSync("gh", ["variable", "set", "QXLAYER_STAGING_RELEASES_ENABLED", "--repo", repo],
-  { input: "true", stdio: ["pipe", "ignore", "pipe"] });
+  protectedSetting(["secret", "set", name, "--env", target, "--repo", repo], value);
+protectedSetting(["variable", "set", "QXLAYER_STAGING_RELEASES_ENABLED", "--repo", repo], "true");
 const actual = await github(root);
 const actualSecrets = await github(`${root}/secrets`);
 const actualVars = await github(`${root}/variables`);

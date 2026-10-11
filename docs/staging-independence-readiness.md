@@ -13,8 +13,8 @@ an explicit Staging-only binding, never an existing customer's account or data.
 Prepared automation:
 - Checks run on `main`, `qxlayer-staging`, pull requests and approved releases.
 - Staging release requires `qxlayer-staging` as the source branch.
-- Protected environment approval and `QXLAYER_EXTERNAL_RELEASES_ENABLED` gate
-  all releases. They have not been enabled by this preparation.
+- Protected owner review, no admin bypass, a branch-only deployment rule and
+  `QXLAYER_STAGING_RELEASES_ENABLED` gate Staging releases. Production is disabled.
 - Exact-commit Render releases skip the Worker by default and reject suspended
   services. No script resumes a service or changes its paid plan.
 - Vercel Preview packaging establishes the project context explicitly.
@@ -24,28 +24,22 @@ Prepared automation:
 - Read-only schema/security checks and verified TLS remain mandatory; importing
   data is not part of a release. Migrations remain separately opt-in.
 
-Remaining activation steps:
-1. Register the reviewed release workflow on the default branch through a
-   separately reviewed source change. The files are synchronized on
-   `qxlayer-staging`, but GitHub requires default-branch registration for manual
-   dispatch; the default branch was intentionally left unchanged.
-2. Configure the protected `qxlayer-staging` GitHub environment: required
-   reviewers; Render and Vercel provider credentials; pinned project/service
-   identifiers; restricted migration connection; verified CA; build-time
-   Development Clerk public configuration. Store credentials only in protected
-   provider/GitHub secret stores, never in source or Replit-dependent scripts.
-3. Run the checks on GitHub, then one explicitly approved Staging release and
-   verify its exact source commit, origin, login and customer lifecycle.
-   Preserve the current working Preview until the candidate passes.
-4. Enable repeatable Staging dispatch only after that evidence. Keep Production
-   releases disabled and retain separate approval for any eventual cutover.
+Verified configuration:
+- The default branch registers the reviewed Staging-only release workflow.
+- The protected Staging environment has pinned provider/project identifiers,
+  Development Clerk public settings, verified CA and encrypted deployment secrets.
+- An expiring Vercel credential was created with the documented Staging-project
+  scope and installed directly into protected GitHub secrets. Renew before expiry.
+- GitHub checks-only dispatch passed. A Staging release reached the required-owner
+  review gate; no administrative bypass or self-approval was used.
+- Full restored schema/security verification passed for 42 tables and 84 policies.
+  Explicit Staging-only baseline adoption registered the private checksum ledger
+  without bootstrap replay or application-data changes; checksum readback matched.
 
-Latest provider readback: the newly supplied GitHub credential successfully
-synchronized both workflow files to Staging, and the actual GitHub
-**External preparation checks** run completed successfully. Workflow-file
-authorization is resolved. The repository still has no environments, Actions
-secrets or Actions variables configured; the default branch does not contain
-the release workflow. No release was dispatched or enabled.
+Remaining: owner acceptance of the protected Staging release, then verification
+of its exact Render commit and resulting READY Vercel Preview/origin. Preserve
+the currently working Preview until acceptance. Do not enable Production, DNS,
+data transfer, extra paid services or the suspended Worker.
 
 ## Verified Staging workflows
 
@@ -55,15 +49,22 @@ the release workflow. No release was dispatched or enabled.
   operator review, approval, isolated tenant delivery and customer reload.
 - Tenant-only asset/network selection and settings/rate persistence.
 - A synthetic 0.1 BTC → 1 ETH Swap order on test networks, public confirmation
-  and customer-owned Admin Panel order/details readback. This proves sandbox
-  creation and visibility, not live settlement or completed-order processing.
+  and customer-owned Admin Panel processing pending → processing → completed.
+  Completed persisted after reload and matching-token public tracking retained
+  the full history. Settled Active returned zero rows; Archived returned the
+  completed row. Terminal reopen and stale expected-status writes both returned
+  409 without changing Completed. This proves sandbox operation, not settlement.
+- The completed row briefly shown while switching filters was previous-query
+  placeholder data, not a server filtering error. The loading branch now hides
+  placeholder rows until the new response settles.
 - Customer principal: client admin, sandbox-only, one tenant membership;
   authenticated Super Admin plans endpoint denied with 403; public catalog 200.
 - Rejected asset saves now retain a visible inline error; deployed and confirmed.
 
 Disposable QA data and identity were removed, temporary sessions and transport
 credentials revoked, and the original single owner binding restored. The API
-cleanup deployment is live. Existing plans, Production, DNS, live providers and
+cleanup deployment was read back live.
+Existing plans, Production, DNS, live providers and
 the suspended Worker were not changed.
 
 ## Clerk ownership — unresolved dependency, not a request to replace users
@@ -72,6 +73,12 @@ The management check currently reports **Replit-managed**, with dashboard entry
 authorized. Dashboard access does not establish independent ownership.
 The documentation lookup does not provide a preservation-safe ownership
 transfer procedure for the current instance.
+
+An unactivated independent-Staging candidate preparation command and guards are
+implemented and tested; see `independent-staging-clerk.md`. No candidate account
+was created and no existing keys or identities were replaced. Actual independent
+ownership still requires operator-controlled candidate credentials/identity or
+a supported preservation-safe transfer procedure; it has not been proven.
 
 Obtain a supported ownership-transfer or preservation-safe migration procedure
 for the existing Clerk application before making any authentication change.
