@@ -100,7 +100,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
       </form>
        {dateError && <p role="alert" data-testid="text-order-date-error" className="text-sm text-destructive">{dateError}</p>}
       {failures.length > 0 && <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-bulk-failures"><p className="font-medium">{failures.length} order{failures.length === 1 ? '' : 's'} failed (others succeeded and lists were refreshed)</p><ul className="break-all font-mono text-xs">{failures.map((f) => <li key={f}>{f}</li>)}</ul></div>}
-      {q.isLoading ? <ListSkeleton /> : q.isError || !d ? <ErrorState what="orders" onRetry={() => q.refetch()} /> : orders.length === 0 ? <EmptyState title="No orders match" body="Adjust the filters, or wait for simulated orders from this tenant's widget." /> : (
+      {q.isLoading || q.isPlaceholderData ? <ListSkeleton /> : q.isError || !d ? <ErrorState what="orders" onRetry={() => q.refetch()} /> : orders.length === 0 ? <EmptyState title="No orders match" body="Adjust the filters, or wait for simulated orders from this tenant's widget." /> : (
         <>
           <BulkBar sel={sel} noun="orders" locked={!canEdit} testid="orders">
             <BulkBtn sel={sel} locked={!canEdit || stale || allowed.length === 0} testid="button-bulk-status-orders" onClick={() => { setSnap(chosen.map((o) => ({ id: o.id, status: o.status }))); setTarget(allowed[0]); setStep('form'); }}>Update status</BulkBtn>

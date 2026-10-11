@@ -42,6 +42,21 @@ existing account credentials or permissions.
 
 ## Existing authentication preservation
 
+Independent Clerk ownership preparation is not permission to activate a new
+identity tenant. Keep any separately owned Development candidate Staging-only
+and unactivated until owner custody and explicit identity bindings are accepted.
+Managed-dashboard access and possession of an API key do not prove independent
+account ownership or recovery control. Do not delete the managed Production
+tenant to obtain independence.
+
+**Why:** The user requested an independent ownership solution while explicitly
+preserving Production authentication. Current managed-instance documentation
+does not provide a supported in-place external transfer.
+
+**How to apply:** Separate candidate preparation from actual authentication
+replacement. Report ownership/transfer limitations plainly; never count business
+database mappings alone as preservation of native identities or passwords.
+
 Preserve the existing login system, customer accounts, roles and Super Admin
 permissions. Do not create a replacement Clerk application, migrate users, change
 authentication keys or modify Production without explicit approval.

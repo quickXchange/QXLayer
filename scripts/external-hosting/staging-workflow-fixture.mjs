@@ -37,7 +37,9 @@ fixture.originalBindingCount = 1;
 bindings[user.id] = user.id;
 for (const target of [`env-groups/${groupId}`, `services/${serviceId}`])
   await api(`${target}/env-vars/QXLAYER_STAGING_IDENTITY_BINDINGS`, "PUT", { value: JSON.stringify(bindings) });
-const receipt = JSON.parse(await readFile("generated-artifacts/qxlayer-staging-setup/staging-original-password-deployment.json", "utf8"));
+// Use the current live source, never an older gate-installation receipt.
+const liveDeployments = await api(`services/${serviceId}/deploys?limit=20`);
+const receipt = { commit: liveDeployments.find(x => x.deploy.status === "live")?.deploy.commit?.id };
 if (!/^[a-f0-9]{40}$/.test(receipt.commit)) throw Error("Verified source commit required.");
 const deployment = await api(`services/${serviceId}/deploys`, "POST", { commitId: receipt.commit, clearCache: "do_not_clear" });
 fixture.bindingDeploymentId = deployment.id;
