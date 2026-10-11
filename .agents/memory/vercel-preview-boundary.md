@@ -81,8 +81,8 @@ activation still requires explicit approval.
 **Why:** The user expanded the scope after initializer verification but explicitly
 kept the live-Production and paid-activation boundaries.
 
-**How to apply:** Save the verified Preview origin into isolated suspended
-Staging configuration while retaining startup/deployment holds. Use only Staging
-variables and Clerk Development credentials. Backend-dependent frontend features
-remain unavailable until approved activation and API routing; distinguish a
-rendered sign-in form from authenticated account/tenant acceptance.
+**How to apply:** Follow the later [API-only activation authorization](external-migration-authorization.md)
+for the approved API; the earlier bootstrap-only hold is not a ban on that
+approved integration. Preserve all remaining startup/deployment holds. Use only
+Staging variables and Clerk Development credentials. Distinguish a rendered
+sign-in form from authenticated account/tenant acceptance.

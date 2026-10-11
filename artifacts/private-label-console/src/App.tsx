@@ -18,6 +18,7 @@ import Home from '@/pages/home';
 const DemoAdmin = lazy(() => import('@/pages/demo-admin'));
 const CustomerShell = lazy(() => import('@/components/app/customer-shell').then(m => ({ default: m.CustomerShell })));
 import { RoutePrefetch } from '@/components/app/route-prefetch';
+import { ExternalStagingAuthBridge } from '@/components/app/external-staging-auth';
 import { useAdminPanels } from '@/lib/customer';
 const AccountDashboard = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountDashboard })));
 const AccountOrders = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountOrders })));
@@ -222,6 +223,7 @@ function ClerkProviderWithRoutes() {
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
+      <ExternalStagingAuthBridge>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <ClerkQueryClientCacheInvalidator />
@@ -265,6 +267,7 @@ function ClerkProviderWithRoutes() {
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>
+      </ExternalStagingAuthBridge>
     </ClerkProvider>
   );
 }

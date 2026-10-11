@@ -8,6 +8,35 @@ For programmatic browser QA, a plain `fetch('/api/me')` can return 401 while Cle
 
 **How to apply:** Inspect loaded/session state first. For manual browser API probes, obtain the token in-browser and immediately send it as Bearer authorization; never print or persist it. Leave application authentication unchanged and grant only the identity returned by the authenticated principal response.
 
+For external Staging with an explicit authorized-party allowlist, use a genuine
+browser-issued token at the exact approved Preview origin. Server-created
+Development session tokens can lack `azp` and be intentionally rejected.
+
+**Why:** SDK verification returned `token-invalid-authorized-parties` for an
+otherwise active server-created session; the real Preview browser session
+authenticated successfully without changing the allowlist.
+
+**How to apply:** Do not relax origin checks to make test tokens pass. A protected
+hosting bridge must preserve the browser's real Preview origin, Bearer headers,
+request cookies, explicit read-only demo intent and response `Set-Cookie`.
+Dropping demo intent can produce HTTP 200 for the real owner's principal instead
+of the demo principal; assert active/demo/read-only state, not status alone.
+Dropping demo response cookies creates false access failures. An HTML
+`Accept` header on an API probe can also trigger
+Clerk browser redirects; use JSON for API checks.
+
+External Staging must also exercise the application's automatic principal
+requests, not only an explicit-token probe.
+
+**Why:** A genuine Preview browser session returned a valid Super Admin principal
+when probed with Bearer, while cookie-only automatic console requests returned
+401 through the external API proxy. The scope-approved fix binds the current
+browser SDK token only in external Staging, before API-query children mount.
+
+**How to apply:** Verify automatic console and account requests after navigation
+and reload. Preserve Replit/Production cookie behavior, origin validation and
+identity bindings; a successful manual token probe alone is not UI acceptance.
+
 For Clerk UI checks, use a normal generated test identity and assign its actual Clerk user ID a temporary tenant membership. Extra `sub` or `userId` arguments to the current sign-in testing helper do not override the session identity.
 
 **Why:** The helper accepted those extra arguments but ignored them, leaving the session authenticated as its generated user rather than the pre-seeded synthetic ID.

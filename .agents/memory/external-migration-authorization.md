@@ -24,6 +24,22 @@ completed migration evidence and do not rerun restores. Announce compute costs
 before provisioning paid instances. Do not infer Production release or cutover
 permission from staging authorization or successful account authentication.
 
+## API-only paid activation
+
+The user approved activating only the existing Render Staging API on Starter,
+connecting isolated Supabase Staging and Vercel Preview, and automatically
+diagnosing, fixing, deploying and testing that integration. Keep the worker
+suspended. Do not activate additional paid services without approval. Do not
+modify Production, live data, existing credentials or DNS.
+
+**Why:** The user explicitly approved the API activation while retaining these
+limits; approval for one service does not extend to the worker or other costs.
+
+**How to apply:** Configure and redeploy only the approved API and Preview within
+this integration scope. Preserve the shared startup hold, disabled monitoring
+and worker suspension. Separate new ephemeral test sessions from changes to
+existing account credentials or permissions.
+
 ## Existing authentication preservation
 
 Preserve the existing login system, customer accounts, roles and Super Admin
