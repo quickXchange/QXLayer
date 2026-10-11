@@ -18,13 +18,36 @@ connected account's active workspace membership and secret-viewing role.
 Keep server-side frontend/API configuration synchronized; never alter Production
 or Clerk permissions to solve gate access.
 
-Maintain an owner-visible copy on the Staging API service while retaining the
-linked group as the canonical credential. Rotation must synchronize the group,
-API service override and Vercel Preview secret.
+The owner-visible Staging API service setting is the canonical existing
+credential. Preserve it when synchronizing the linked group and Vercel Preview
+secret; never silently replace it with an older group value.
 
 **Why:** The owner could not find the group-only code on the service's variable
-list. Render lists inherited and direct variables separately, and direct service
-values override group values. Unsynchronized copies would break future rotation.
+list. Later, the service's overriding code differed from the group/frontend:
+frontend-signed CSRF tokens were rejected by the API with a misleading origin/
+CSRF message. Render's direct setting takes precedence and is the value the owner
+retrieves. Unsynchronized copies break authentication even before code comparison.
+
+Staging gate form GET and POST must terminate on the same Vercel function and
+trusted HTTPS Preview origin. Do not send Staging entry through an external
+Render rewrite. Production retains its separate existing route and behavior.
+Still require exact HTTPS Origin, signed double-submit CSRF and secure host cookies.
+
+**Why:** Cross-provider entry unnecessarily couples the browser's form/cookie
+issuer to Render's separately configured origin and overriding secret.
+
+**How to apply:** Keep authenticated API requests routed to the existing Render
+API with matching Staging signing credentials. Reuse valid bounded CSRF cookies
+across tabs; do not replace another tab's live form token or extend its lifetime.
+
+Use `same-origin` Referrer-Policy on the Staging gate while retaining strict
+HTTPS Origin validation. Do not combine a required non-null Origin with
+`no-referrer` on a native HTML form.
+
+**Why:** Chrome navigation-mode form POSTs can emit `Origin: null` under
+`no-referrer`, even for same-origin submissions. Manual HTTP and ordinary fetch
+tests do not reproduce that behavior, so they can pass while real mobile login
+is rejected. Production's existing policy and opaque-origin handling stay unchanged.
 
 Verify the actual browser form from a fresh context and then reload and open the
 website/owner console. A bridge that injects a pre-unlocked gate cookie is not

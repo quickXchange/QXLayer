@@ -63,10 +63,12 @@ await writeFile(path.join(fn, ".vc-config.json"), JSON.stringify({
   shouldAddHelpers: false, maxDuration: 15,
 }, null, 2));
 // API/uploads bypass the Node function and preserve existing 8-MB uploads.
-// Gate entry posts go to the single Render API's existing bounded rate limiter.
+// Staging gate entry stays same-origin in the Vercel function. Production keeps
+// its original Render entry route. API requests still use the existing API gate.
 await writeFile(path.join(output, "config.json"), JSON.stringify({ version: 3, routes: bootstrap
   ? [{ src: "^/(.*)$", dest: "/frontend" }] : [
-  { src: "^/__qx_access/enter$", dest: `${api.origin}/api/__qx_access/enter` },
+  { src: "^/__qx_access/enter$", dest: process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging"
+    ? "/frontend" : `${api.origin}/api/__qx_access/enter` },
   { src: "^/api(?:/(.*))?$", dest: `${api.origin}/api/$1` },
   { src: "^/(.*)$", dest: "/frontend" },
 ] }, null, 2));
