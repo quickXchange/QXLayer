@@ -15,9 +15,18 @@ async function request(path, method = "GET", body) {
   if (!result.ok) throw new Error("Render release request failed.");
   return result.json();
 }
-for (const key of ["RENDER_API_SERVICE_ID", "RENDER_WORKER_SERVICE_ID"]) {
+// A suspended worker is deliberately excluded; deploying it is not approval
+// to resume paid compute. Worker releases require a separate explicit approval.
+const keys = ["RENDER_API_SERVICE_ID"];
+if (process.env.QXLAYER_WORKER_RELEASE_APPROVED === "true") keys.push("RENDER_WORKER_SERVICE_ID");
+for (const key of keys) {
   const id = process.env[key];
   if (!/^srv-[a-z0-9]+$/.test(id ?? "")) throw new Error(`Missing valid ${key}.`);
+  const service = await request(`services/${id}`);
+  if (service.suspended === "suspended") throw new Error("Suspended services cannot be released without separately approved activation.");
+  if (process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging" &&
+      (id !== "srv-db5b47qjnfac739s374g" || service.branch !== "qxlayer-staging" || service.serviceDetails?.plan !== "starter"))
+    throw new Error("Only the existing approved Staging API may be released.");
   const deployment = await request(`services/${id}/deploys`,"POST",{ commitId:commit,clearCache:"do_not_clear" });
   if (!/^dep-[a-z0-9]+$/.test(deployment.id ?? "")) throw new Error("Render did not return a deployment identity.");
   const deadline = Date.now() + 20 * 60_000;

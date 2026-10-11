@@ -201,7 +201,9 @@ try {
     server.listen(4555, "127.0.0.1", resolve);
   });
   console.info("Hosted Preview gate/routes passed. Loopback browser bridge ready at http://127.0.0.1:4555");
-  setTimeout(() => void cleanup().then(() => process.exit()), 12 * 60_000).unref();
+  const requestedMinutes = Number(process.env.QXLAYER_VERIFY_TIMEOUT_MINUTES ?? 12);
+  const minutes = Number.isFinite(requestedMinutes) ? Math.min(45, Math.max(1, requestedMinutes)) : 12;
+  setTimeout(() => void cleanup().then(() => process.exit()), minutes * 60_000).unref();
 } catch (error) {
   await cleanup();
   throw error;
