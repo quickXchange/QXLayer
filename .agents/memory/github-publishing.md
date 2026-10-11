@@ -38,3 +38,16 @@ synchronization.
 **How to apply:** Bound write concurrency and payload sizes, honor rate-limit
 backoff, and verify tree and branch integrity after synchronization rather than
 assuming partial object uploads mean the source has been published.
+
+For user-authorized native Git pushes with a saved PAT, use an ephemeral
+credential helper reading `GITHUB_TOKEN`; never embed credentials in a remote URL
+or persist them in Git configuration. Verify the destination ref afterward.
+
+**Why:** Direct native authentication succeeded where the source-control
+connection lacked workflow permission. A token-shaped shell variable name does
+not reference the saved `GITHUB_TOKEN` variable.
+
+**How to apply:** Disable inherited Git traces before authenticated commands.
+Unset `GIT_CURL_VERBOSE` entirely: setting it to `0` still enabled verbose HTTP
+logging. Keep credential redaction enabled and capture/sanitize errors before
+displaying them.
