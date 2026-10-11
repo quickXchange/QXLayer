@@ -5,8 +5,11 @@ description: Owner credential delivery, persistence and real-form acceptance for
 
 Provide owner access instructions through authenticated Staging provider settings,
 not by printing codes in chat, logs, source, URLs or downloadable credential files.
-Preserve the owner's dedicated Staging credential across redeployments; never use
-Production access credentials as a fallback. The private gate remains mandatory.
+The owner expects the original Private Access password used on Replit Development
+and Live to work on external Staging too, without changing either Replit password.
+Configure that deliberately using a salted password verifier in Staging only;
+never copy its plaintext into provider settings or use a Production runtime fallback.
+Keep the independent strong Staging signing secret and mandatory private gate.
 
 **Why:** The owner encountered an invalid-code gate despite earlier tests passing
 with temporary test access, and requested secure, persistent Staging-only access
@@ -18,15 +21,23 @@ connected account's active workspace membership and secret-viewing role.
 Keep server-side frontend/API configuration synchronized; never alter Production
 or Clerk permissions to solve gate access.
 
-The owner-visible Staging API service setting is the canonical existing
-credential. Preserve it when synchronizing the linked group and Vercel Preview
-secret; never silently replace it with an older group value.
+The owner-visible Staging API access-code setting is now the strong signing
+secret, not the password owners should type in password mode. Preserve it when
+synchronizing the linked group and Vercel Preview secret; never silently replace
+it with an older group value. Authentication uses the original password's
+explicit Staging verifier, and sessions are bound to that verifier.
 
 **Why:** The owner could not find the group-only code on the service's variable
 list. Later, the service's overriding code differed from the group/frontend:
 frontend-signed CSRF tokens were rejected by the API with a misleading origin/
 CSRF message. Render's direct setting takes precedence and is the value the owner
 retrieves. Unsynchronized copies break authentication even before code comparison.
+
+**Why:** The owner subsequently clarified that they use the original Replit
+password, not a separate generated Staging code. Verifying the latter in a browser
+did not satisfy their login requirement. Separate salted password verification
+from high-entropy session signing; password/mode changes must revoke Staging
+sessions while leaving Replit secrets, Production and Clerk permissions untouched.
 
 Staging gate form GET and POST must terminate on the same Vercel function and
 trusted HTTPS Preview origin. Do not send Staging entry through an external

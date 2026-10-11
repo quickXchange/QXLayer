@@ -36,4 +36,4 @@
 - [Authenticated recovery](authenticated-streaming-recovery.md) — GCM update output is unauthenticated; use ciphertext-only caching and whole-envelope/package verification before recovery.
 - [Vercel Preview boundary](vercel-preview-boundary.md) — first uploads were classified as Production even with Preview requested; verify provider target and do not repeat unresolved uploads.
 - [Restored schema equivalence](restored-schema-equivalence.md) — preserve raw captures and restored data; accept only reviewed, typed constant-default equivalences.
-- [Staging owner access](staging-owner-access-policy.md) — secure provider-based credential delivery; verify the real gate form, not pre-injected test cookies.
+- [Staging owner access](staging-owner-access-policy.md) — original owner password via explicit Staging verifier; independent signing and native-form verification, no Replit password changes.
