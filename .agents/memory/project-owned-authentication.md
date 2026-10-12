@@ -38,3 +38,9 @@ Keep Supabase setup authorization scoped to the pinned Staging project. Do not s
 **Why:** Auth configuration writes require both Auth Config and Project Settings Read-write in Supabase's scoped-token UI; the latter grants broader project capabilities. A Legacy token would unnecessarily widen access to Production and other projects.
 
 **How to apply:** Request a separate Staging-only setup token through secure Secrets. Use the dashboard permission names, not only the API's `auth_config_write` and `project_admin_write` identifiers. The issuing account must already have the corresponding rights; token scopes cannot elevate its role. Use the token only for the approved Staging email configuration.
+
+Treat Supabase SMTP secret readback as opaque. Saved configuration and a successful direct SMTP message do not prove that Supabase-generated authentication emails work.
+
+**Why:** The management API's SMTP secret readback differed from the submitted credential without a recognizable masking marker. A direct SMTP test bypasses Supabase Auth and cannot establish signup, recovery or MFA notification behavior.
+
+**How to apply:** Never log or retransmit the opaque readback as a credential, and do not rewrite a password merely because plaintext equality fails. Keep integrated authentication mail readiness unconfirmed until approved Supabase-generated flows pass. Distinguish simulated Resend delivery from real inbox receipt, and do not create test Auth identities under a no-database-change restriction.
