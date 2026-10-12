@@ -1,7 +1,25 @@
 ---
 name: Vercel Preview deployment boundary
-description: Unexpected first-upload Production targeting and the strict Preview-only authorization boundary.
+description: Preview target safety and the distinction between provider management access and protected browser access.
 ---
+
+## Protected Preview verification
+
+Provider management OAuth does not authenticate HTTP visits to a protected
+Preview. Existing Vercel team SSO can return a redirect to Vercel sign-in even
+when deployment metadata is READY and the connected account can manage it.
+Direct Backend private-form requests are not a substitute for the same-origin
+Vercel frontend form.
+
+**Why:** Full Staging browser verification was blocked by existing SSO while
+Development authenticated verification and Staging schema/data readback passed.
+The user's protection and live-auth boundaries must remain intact.
+
+**How to apply:** Separate deployed/healthy from authenticated-browser-verified.
+Use an authorized browser session or an existing approved automation credential;
+never disable protection simply to make a test pass.
+
+## First-deployment target safety
 
 Vercel's first-deployment rule overrides the ordinary Preview default: a new
 project's first deployment is always Production, including non-production Git

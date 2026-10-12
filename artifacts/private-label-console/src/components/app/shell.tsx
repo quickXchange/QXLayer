@@ -28,8 +28,7 @@ const nav = [
 export function Logo({ light }: { light?: boolean }) {
   return (
     <div className="flex items-center gap-2.5">
-      <BrandLogo />
-      <span className={`font-display text-xl leading-none ${light ? 'text-sidebar-accent-foreground' : ''}`}>VYNOX LAYER</span>
+      <BrandLogo size={48} />
     </div>
   );
 }
