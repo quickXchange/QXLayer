@@ -43,8 +43,8 @@ new enrollment uses VYNOX LAYER. Do not force MFA re-enrollment for a label chan
 
 ## Verification and remaining boundaries
 
-The Staging application release is READY at
-https://qxlayer-staging-318zjh6u6-vynox3.vercel.app.
+The current Staging Preview URL is recorded in the operator release receipt
+`generated-artifacts/qxlayer-staging-setup/vynox-rebrand-release.json`.
 Render serves the approved release and `/api/healthz` returns `{"status":"ok"}`.
 Read-only Supabase verification confirmed 42 public tables, 84 policies,
 FORCE RLS, least-privilege grants and the exact installed migration ledger.
@@ -75,3 +75,19 @@ storage identifiers and all compatibility keys are retained. External provider
 application/email branding and real delivery have not been verified; the
 application-owned email templates/display sender are rebranded. Production
 publishing, DNS changes and an authentication-provider cutover were not performed.
+
+## Horizontal PNG header update
+
+The supplied horizontal VYNOX LAYER PNG replaces the earlier stacked logo.
+The platform header contains the image alone, without a repeated text label.
+The original 2172×724 PNG pixels, alpha channel and 3:1 proportions are preserved.
+Login, platform consoles, illustration placements, icons and compatibility asset
+paths use the new artwork; tenant/customer branding is unchanged.
+
+Dark and Light modes were verified in the Development browser at 320, 390,
+768, 1024 and 1280 viewport widths: no horizontal overflow, no duplicate
+header text, matching image proportions and unchanged 68px header content
+height (69px including its existing border). Landscape tablets use the existing
+menu rather than squeezing the logo. Login uses the same transparent PNG.
+Staging provider readiness and deployed asset identity are checked separately;
+Vercel team SSO still prevents anonymous interactive Staging verification.

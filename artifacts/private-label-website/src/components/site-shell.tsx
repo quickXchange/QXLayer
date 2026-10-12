@@ -58,9 +58,9 @@ export function SiteShell({ site, children, ambient = false, platform }: { site:
   return (
     <div className="site min-h-[100dvh]" style={t as CSSProperties} data-exchange-template={platform ? undefined : ws.templateKey ?? 'standard-exchange'} data-qx-theme={platform ? (dark ? 'dark' : 'light') : undefined} data-surface={ws.surfaceStyle ?? 'solid'} data-testid="site-root">
       {ambient && <Ambient />}
-      <header className="s-header">
+      <header className={`s-header${platform ? ' s-platform-header' : ''}`}>
         <div className="s-wrap flex h-[68px] items-center gap-3">
-          <Link href={base} className="flex min-w-0 items-center gap-2.5" data-testid="link-home">
+          <Link href={base} className={`flex min-w-0 items-center gap-2.5${platform?.headerBrand ? ' shrink-0' : ''}`} data-testid="link-home">
             {platform?.headerBrand ?? <><BrandMark site={themedSite} />
               <span className="truncate text-[1.05rem] font-semibold tracking-tight" data-testid="text-brand">{ws.websiteName || site.brandName}</span></>}
           </Link>
