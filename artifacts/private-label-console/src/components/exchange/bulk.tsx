@@ -74,12 +74,25 @@ export function BulkBtn({ sel, locked, onClick, children, testid, destructive }:
 export interface Col<T> { h: string; cell: (r: T) => ReactNode; className?: string }
 
 export function DataTable<T>({ rows, cols, getId, sel, locked, selectionLocked = false, testid, onRowClick, readOnlyRows = false }: { rows: T[]; cols: Col<T>[]; getId: (r: T) => string; sel: Selection; locked?: boolean; selectionLocked?: boolean; testid: string; onRowClick?: (r: T) => void; readOnlyRows?: boolean }) {
+  const scroll = useRef<HTMLDivElement>(null);
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const element = scroll.current;
+    if (!element) return;
+    const measure = () => setWide(element.scrollWidth > element.clientWidth + 1);
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    if (element.firstElementChild) observer.observe(element.firstElementChild);
+    measure();
+    return () => observer.disconnect();
+  }, [rows.length, cols.length]);
   const click = (e: _M, r: T) => { if (!(e.target as HTMLElement).closest('button, input, a, [role="checkbox"], [role="switch"]')) onRowClick?.(r); };
   const selectionLabel = sel.persist ? 'Select all filtered results' : 'Select visible';
   const headCheck = <Checkbox disabled={selectionLocked} aria-label={selectionLabel} checked={sel.all ? true : sel.some ? 'indeterminate' : false} onCheckedChange={() => (sel.all ? (sel.persist ? sel.deselectVisible() : sel.clear()) : sel.selectAll())} />;
   return (
     <div className="max-w-full min-w-0" data-testid={`table-${testid}`}>
-      <div className="hidden max-w-full min-w-0 overflow-x-auto rounded-md border bg-card md:block">
+      {wide && <p id={`${testid}-scroll-hint`} className="mb-2 hidden text-xs text-muted-foreground lg:block">Scroll horizontally to see all columns.</p>}
+      <div ref={scroll} role="region" aria-label={`${testid} table`} aria-describedby={wide ? `${testid}-scroll-hint` : undefined} tabIndex={0} className="hidden max-w-full min-w-0 overflow-x-auto rounded-md border bg-card lg:block">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b font-mono text-[10px] uppercase tracking-wider text-muted-foreground"><tr>
             {!readOnlyRows && <th className="w-10 px-3 py-2">{headCheck}</th>}
@@ -90,7 +103,7 @@ export function DataTable<T>({ rows, cols, getId, sel, locked, selectionLocked =
               {cols.map((c) => <td key={c.h} className={`px-3 py-2 ${c.className ?? ''}`}>{c.cell(r)}</td>)}</tr>); })}</tbody>
         </table>
       </div>
-      <ul className="space-y-2 md:hidden" data-testid={`cards-${testid}`}>
+      <ul className="space-y-2 lg:hidden" data-testid={`cards-${testid}`}>
         <li className="flex items-center gap-2 px-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{!readOnlyRows && headCheck}{readOnlyRows ? 'Records' : selectionLabel}</li>
         {rows.map((r) => { const id = getId(r); const [first, ...rest] = cols; return (
           <li key={id} className={`min-w-0 space-y-2 rounded-md border bg-card p-3 ${sel.has(id) ? 'bg-muted/50' : ''} ${onRowClick ? 'cursor-pointer' : ''}`} data-testid={`card-${testid}-${id}`} onClick={(e) => click(e, r)}>

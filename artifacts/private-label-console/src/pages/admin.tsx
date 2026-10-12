@@ -29,7 +29,7 @@ export default function Admin() {
       <PageHeader eyebrow="Platform" title="Overview">{can.createClients && <Button asChild data-testid="link-new-client"><Link href="/clients/new">New client</Link></Button>}</PageHeader>
       {loading ? <ListSkeleton /> : failed ? <ErrorState what="the overview" onRetry={() => { oq.refetch(); tq.refetch(); pq.refetch(); aq.refetch(); }} /> : (
         <div className="space-y-10">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             {stats.map(([l, v]) => <MetricCard key={l} label={l} value={<span className={typeof v === 'string' && v.length > 6 ? 'text-2xl' : ''}>{v}</span>} id={`stat-${l.toLowerCase().replace(/[^a-z]+/g, '-')}`} />)}
           </div>
           {pm && !pm.directoryAvailable && <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm" data-testid="text-directory-unavailable">Customer total is unavailable: the account directory could not be read ({pm.directoryError ?? 'no reason recorded'}).</p>}

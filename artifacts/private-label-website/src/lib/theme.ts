@@ -35,6 +35,16 @@ export function ensure(fg: string, bg: string, min = 4.5): string {
   for (let t = 0.06; t <= 1.001; t += 0.06) { const c = mix(fg, target, t); if (contrast(c, bg) >= min) return c; }
   return target;
 }
+/** Distinct platform chart series; never use semantic error colours as data. */
+export function platformChartColors(dark: boolean, surface: string): string[] {
+  return [
+    dark ? VYNOX.electric : VYNOX.royal,
+    VYNOX.lavender,
+    VYNOX.glow,
+    VYNOX.deepBlue,
+    dark ? VYNOX.royal : VYNOX.electric,
+  ].map(color => ensure(color, surface, 3));
+}
 export function fontLink(key: string): string | null {
   const g = FONTS[key]?.google;
   return g ? `https://fonts.googleapis.com/css2?family=${g}&display=swap` : null;

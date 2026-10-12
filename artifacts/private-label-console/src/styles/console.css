@@ -50,11 +50,13 @@ html.qx-console .qx-main :is(tbody tr){transition:background-color .2s}
 html.qx-console .qx-main :is(tbody tr):hover{background:color-mix(in srgb,var(--s-fg) 4%,transparent)}
 html.qx-console :is(input:not([type=checkbox],[type=radio],[type=range],[type=file]),textarea,select){background-color:color-mix(in srgb,var(--s-fg) 4%,transparent);border-color:hsl(var(--input));color:var(--s-fg);transition:border-color .2s,box-shadow .2s}
 html.qx-console :is(input,textarea,select):focus-visible{border-color:var(--s-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--s-accent) 28%,transparent);outline:none}
-html.qx-console ::placeholder{color:var(--s-muted);opacity:.8}
+html.qx-console ::placeholder{color:var(--s-muted);opacity:1}
 html.qx-console [data-radix-popper-content-wrapper],html.qx-console [role=dialog],html.qx-console [data-radix-toast-viewport]{font-family:var(--s-font)}
 html.qx-console .bg-black\/80{background:color-mix(in srgb,#070817 72%,transparent);backdrop-filter:blur(3px)}
 
-/* status colours adapt to dark */
+/* Keep semantic meaning and readable status text in both themes. */
+html.qx-console:not(.dark) .text-emerald-600{color:#047857}
+html.qx-console:not(.dark) .text-red-500{color:#B3261E}
 html.qx-console.dark .bg-emerald-100{background:color-mix(in srgb,#34d399 18%,transparent)}
 html.qx-console.dark .text-emerald-900,html.qx-console.dark .text-emerald-600{color:#6ee7b7}
 html.qx-console.dark .bg-amber-100{background:color-mix(in srgb,#fbbf24 18%,transparent)}

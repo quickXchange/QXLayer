@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { PLATFORM_SITE } from './platform-site';
-import { tokens, mix, readable, ensure, fontLink, VYNOX } from '@site/lib/theme';
+import { tokens, mix, readable, ensure, fontLink, VYNOX, platformChartColors } from '@site/lib/theme';
 import { useSiteTheme } from '@site/hooks/use-site-theme';
 
 function hsl(h: string): string {
@@ -27,6 +27,7 @@ export function consoleVars(dark: boolean): Record<string, string> {
   const destructive = dark ? VYNOX.dark.danger : VYNOX.light.danger;
   const line = mix(bg, fg, dark ? 0.16 : 0.15);
   const side = dark ? mix(bg, '#000000', 0.25) : mix(bg, '#ffffff', 0.5);
+  const charts = platformChartColors(dark, card).map(hsl);
   const out: Record<string, string> = {
     ...t,
     '--background': hsl(bg), '--foreground': hsl(fg),
@@ -41,7 +42,7 @@ export function consoleVars(dark: boolean): Record<string, string> {
     '--sidebar': hsl(side), '--sidebar-foreground': hsl(fg), '--sidebar-border': hsl(line),
     '--sidebar-primary': hsl(ensure(t['--s-primary'], side, 3)), '--sidebar-primary-foreground': hsl(t['--s-primary-fg']),
     '--sidebar-accent': hsl(mix(side, accent, 0.16)), '--sidebar-accent-foreground': hsl(fg), '--sidebar-ring': hsl(ink),
-    '--chart-1': hsl(ensure(t['--s-primary'], card, 3)), '--chart-2': hsl(ensure(accent, card, 3)), '--chart-3': hsl(ensure(t['--s-glow'], card, 3)), '--chart-4': hsl(ensure(t['--s-secondary'], card, 3)), '--chart-5': hsl(ensure(VYNOX.lavender, card, 3)),
+    '--chart-1': charts[0], '--chart-2': charts[1], '--chart-3': charts[2], '--chart-4': charts[3], '--chart-5': charts[4],
     '--radius': t['--s-r1'],
     '--app-font-sans': t['--s-font'], '--app-font-serif': t['--s-font'],
     '--elevate-1': dark ? 'rgba(255,255,255,.05)' : 'rgba(16,20,27,.04)',

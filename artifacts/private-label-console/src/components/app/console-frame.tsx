@@ -28,7 +28,7 @@ export function ConsoleThemeScope({ children }: { children: ReactNode }) {
 }
 
 function useDesktop() {
-  const q = '(min-width: 768px)';
+  const q = '(min-width: 1024px)';
   const [v, setV] = useState(() => window.matchMedia(q).matches);
   useEffect(() => {
     const mq = window.matchMedia(q); const h = (e: MediaQueryListEvent) => setV(e.matches);
@@ -92,9 +92,9 @@ function Inner({ homeHref, navLabel, items, footer, mobileAction, maxWidth, chil
     </Link>,
   ]);
   return (
-    <NavigationCtx.Provider value={setNavigation}><div className="qx-frame min-h-[100dvh] md:flex">
+    <NavigationCtx.Provider value={setNavigation}><div className="qx-frame min-h-[100dvh] lg:flex">
       {desktop ? (
-        <aside className="qx-side md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col md:justify-between">
+        <aside className="qx-side lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col lg:justify-between">
           <div className="min-h-0 overflow-y-auto">
             <div className="flex items-center justify-between gap-2">{<Brand href={homeHref} />}{themeBtn}</div>
             <nav aria-label={navigation?.label ?? navLabel} className="qx-nav mt-8 flex flex-col gap-1">{navigation?.content ?? links(false)}</nav>
@@ -124,7 +124,7 @@ function Inner({ homeHref, navLabel, items, footer, mobileAction, maxWidth, chil
           )}
         </header>
       )}
-      <main className="qx-main min-w-0 flex-1 md:ml-64">
+      <main className="qx-main min-w-0 flex-1 lg:ml-64">
         <div className={`mx-auto ${navigation ? 'max-w-none' : maxWidth} px-5 py-8 md:px-10 md:py-12`}>{children}</div>
       </main>
     </div></NavigationCtx.Provider>

@@ -15,3 +15,15 @@ security-credential write rather than a read-only access check.
 no-permission-change restriction, ask before creating an automation credential.
 Never disable protection, add public domain exceptions, alter app roles or
 create test memberships to make visual testing pass.
+
+Use direct HTTPS browser requests for protected form navigation, with the
+approved automation header attached only to the exact Staging origin.
+
+**Why:** Intercepting a loopback response produced Chromium `form-action 'self'`
+refusals even when the actual Staging POST returned a valid same-origin 303.
+Direct requests completed the existing password gate and owner sign-in without
+changing CSP.
+
+**How to apply:** Keep credentials in Node memory, use exact-origin
+`route.continue` rather than loopback `route.fulfill`, and preserve native
+cookies/redirects. Do not weaken CSP or inject an unlocked gate cookie.
