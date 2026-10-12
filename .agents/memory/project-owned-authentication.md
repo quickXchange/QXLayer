@@ -26,3 +26,9 @@ Use the notification alias of the existing support mailbox as the authentication
 **Why:** The user explicitly changed the sender to the notification alias and rejected sharing full support mailbox access. An alias is not a separate mailbox or a separately scoped credential.
 
 **How to apply:** Do not request or use support mailbox passwords, broadly scoped Private Email app passwords, or support IMAP access. Use a genuinely send-only relay credential and preserve Namecheap receiving/MX. Request any required credentials through secure Secrets or the existing integration's secure configuration, never chat. Implement and test actual verification/recovery email delivery in Staging only; keep Production, Clerk, existing accounts, permissions and shared DNS unchanged without separate approval. Diagnose, fix and verify autonomously within these boundaries.
+
+QuickXchange and VYNOX LAYER are independent projects. Preserve QuickXchange's Resend integration, API keys, email delivery and configuration completely; VYNOX must use a separate domain-restricted send-only SMTP key.
+
+**Why:** The user explicitly prohibited changes to QuickXchange. Replit documents account-level reusable connections, so repairing a shared connection in place may affect another project.
+
+**How to apply:** Never update, revoke, rotate or replace the existing account-level Resend credential for this repair. Do not copy QuickXchange credentials. Use separate VYNOX authorization to inspect its domain and provision its SMTP key; privileged setup authorization must not become the SMTP credential. Request new keys or explicit authorization through secure Secrets only. During this repair do not change Production, Clerk, DNS or databases, and never access the Namecheap support mailbox.
