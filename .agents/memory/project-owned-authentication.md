@@ -20,3 +20,9 @@ The user now explicitly requests their own Supabase Auth, reusing compatible cus
 **Why:** The user specified Supabase Auth and an explicit final-switch approval boundary.
 
 **How to apply:** A custom Better Auth implementation is not completion of the Supabase request. Reuse compatible UI and identity-preservation mechanisms, test the Supabase path separately in Staging, and retain the current Clerk path until approved.
+
+Use a Mailtrap sandbox inbox for Staging authentication email tests.
+
+**Why:** The user selected Mailtrap sandbox capture instead of their existing SMTP provider.
+
+**How to apply:** Exercise Supabase's actual verification and recovery messages in the sandbox without delivering them to customers. This choice does not authorize Production email changes or demonstrate delivery to public mailboxes.
