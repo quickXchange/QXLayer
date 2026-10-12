@@ -21,9 +21,9 @@ The user now explicitly requests their own Supabase Auth, reusing compatible cus
 
 **How to apply:** A custom Better Auth implementation is not completion of the Supabase request. Reuse compatible UI and identity-preservation mechanisms, test the Supabase path separately in Staging, and retain the current Clerk path until approved.
 
-Use the notification alias of the existing support mailbox as the authentication email sender, with SMTP credentials that do not grant full support mailbox access.
+Use `notification@quicklychan.xyz` as VYNOX Staging's authentication email sender, with a separate domain-restricted send-only Resend key. This supersedes the earlier `notification@vynoxlayer.com` sender.
 
-**Why:** The user explicitly changed the sender to the notification alias and rejected sharing full support mailbox access. An alias is not a separate mailbox or a separately scoped credential.
+**Why:** The user explicitly confirmed the new sender after identifying `quicklychan.xyz` as the Resend domain. The restriction against full support mailbox access remains in force; an alias is not a separately scoped credential.
 
 **How to apply:** Do not request or use support mailbox passwords, broadly scoped Private Email app passwords, or support IMAP access. Use a genuinely send-only relay credential and preserve Namecheap receiving/MX. Request any required credentials through secure Secrets or the existing integration's secure configuration, never chat. Implement and test actual verification/recovery email delivery in Staging only; keep Production, Clerk, existing accounts, permissions and shared DNS unchanged without separate approval. Diagnose, fix and verify autonomously within these boundaries.
 
