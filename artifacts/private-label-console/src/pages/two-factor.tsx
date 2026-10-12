@@ -26,7 +26,7 @@ export default function TwoFactorPage() {
         <ErrorLine>{err}</ErrorLine>
         <Submit id="button-verify" busy={busy} disabled={!code}>Verify</Submit>
       </Form>
-      <button type="button" data-testid="button-toggle-backup" onClick={() => { setBackup(!backup); setCode(''); setErr(''); }} className="block w-full text-center text-sm font-medium text-[#b4551f] hover:underline">{backup ? 'Use authenticator app instead' : 'Use a backup code'}</button>
+      <button type="button" data-testid="button-toggle-backup" onClick={() => { setBackup(!backup); setCode(''); setErr(''); }} className="block w-full text-center text-sm font-medium text-[var(--s-accent-ink,hsl(var(--primary)))] hover:underline">{backup ? 'Use authenticator app instead' : 'Use a backup code'}</button>
     </AuthFrame>
   );
 }

@@ -9,6 +9,7 @@ const PlatformCatalog = lazy(() => import('./platform-catalog').then(m => ({ def
 import { LiveDemo } from './live-demo';
 import { BrandLogo } from '@/components/brand-logo';
 import { QXLAYER_LIGHT_LOGO_URL, QXLAYER_LIGHT_ICON_URL } from '@/lib/brand';
+import { useConsoleTheme } from '@/lib/console-theme';
 
 const NAV = [
   { id: 'exchange', label: 'Exchange' },
@@ -18,6 +19,8 @@ const NAV = [
 ];
 
 export function CatalogLanding({ preview }: { preview?: boolean }) {
+  // Shared document tokens also theme catalog dialogs, toast portals and scrollbars.
+  useConsoleTheme();
   const q = useGetPublicProductCatalog({ query: { refetchInterval: 30000, refetchOnWindowFocus: true, staleTime: 15000 } as never });
   const [openKey, setOpenKey] = useState<string | null>(null);
   const items = useMemo(() => [...(q.data ?? [])].sort((a, b) => a.displayOrder - b.displayOrder), [q.data]);

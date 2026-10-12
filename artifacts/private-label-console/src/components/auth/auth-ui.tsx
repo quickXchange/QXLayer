@@ -5,6 +5,7 @@ import { BrandLogo } from '@/components/brand-logo';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { ConsoleThemeScope } from '@/components/app/console-frame';
 
 export type OwnedStatus = { enabled: boolean; mailReady: boolean };
 
@@ -48,19 +49,19 @@ export function SuccessLine({ children, id }: { children?: ReactNode; id?: strin
 export function MailNotice({ status, failed }: { status: OwnedStatus | null; failed: boolean }) {
   if (failed) return <ErrorLine id="text-status-error">Could not reach the authentication service. Reload to retry.</ErrorLine>;
   if (status && !status.enabled) return <ErrorLine id="text-owned-disabled">VYNOX LAYER account sign-in is not enabled on this deployment.</ErrorLine>;
-  if (status && !status.mailReady) return <div data-testid="text-mail-unavailable" className="flex gap-2 rounded-md border border-[#cfc6b3] bg-secondary px-3 py-2 text-sm text-foreground"><MailWarning className="mt-0.5 h-4 w-4 shrink-0 text-copper" /><span>Email delivery is not configured yet. Verification and password-reset emails cannot be sent until an administrator connects a mail provider. Verification is never bypassed.</span></div>;
+  if (status && !status.mailReady) return <div data-testid="text-mail-unavailable" className="flex gap-2 rounded-md border border-input bg-secondary px-3 py-2 text-sm text-foreground"><MailWarning className="mt-0.5 h-4 w-4 shrink-0 text-copper" /><span>Email delivery is not configured yet. Verification and password-reset emails cannot be sent until an administrator connects a mail provider. Verification is never bypassed.</span></div>;
   return null;
 }
 
 export function AuthFrame({ title, subtitle, children, footer, wide }: { title: string; subtitle?: string; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4 py-10">
+    <ConsoleThemeScope><div className="flex min-h-[100dvh] items-center justify-center px-4 py-10">
       <div className={`rise w-full ${wide ? 'max-w-3xl' : 'max-w-[440px]'}`}>
-        <div className="overflow-hidden rounded-xl border border-[#ddd5c4] bg-[#fbf8f2]">
-          <div className="h-1.5 bg-primary" />
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_30px_80px_-40px_var(--s-glow)]">
+          <div className="h-1.5 bg-gradient-to-r from-primary via-[var(--s-glow)] to-[var(--s-secondary)]" />
           <div className="space-y-6 p-7 sm:p-9">
             <div className="flex flex-col items-center gap-3 text-center">
-              <Link href="/" className="block" data-testid="link-brand-home"><BrandLogo size={72} theme="light" /></Link>
+              <Link href="/" className="block" data-testid="link-brand-home"><BrandLogo size={72} /></Link>
               <h1 className="font-display text-3xl leading-tight text-foreground" data-testid="text-auth-title">{title}</h1>
               {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
             </div>
@@ -69,7 +70,7 @@ export function AuthFrame({ title, subtitle, children, footer, wide }: { title: 
         </div>
         {footer && <div className="mt-4 text-center text-sm text-muted-foreground">{footer}</div>}
       </div>
-    </div>
+    </div></ConsoleThemeScope>
   );
 }
 
@@ -77,7 +78,7 @@ export function Field({ id, label, type = 'text', value, onChange, autoComplete,
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id} className="text-foreground">{label}</Label>
-      <Input id={id} data-testid={`input-${id}`} type={type} value={value} disabled={disabled} inputMode={inputMode} maxLength={maxLength} autoComplete={autoComplete} onChange={(e) => onChange(e.target.value)} className="border-[#cfc6b3] bg-white" />
+      <Input id={id} data-testid={`input-${id}`} type={type} value={value} disabled={disabled} inputMode={inputMode} maxLength={maxLength} autoComplete={autoComplete} onChange={(e) => onChange(e.target.value)} className="border-input bg-white" />
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
@@ -89,4 +90,4 @@ export function Form({ onSubmit, children }: { onSubmit: () => void | Promise<vo
 export function Submit({ busy, children, id, disabled }: { busy?: boolean; children: ReactNode; id: string; disabled?: boolean }) {
   return <Button type="submit" data-testid={id} disabled={busy || disabled} className="w-full">{busy ? 'Working...' : children}</Button>;
 }
-export const A = ({ href, children, id }: { href: string; children: ReactNode; id: string }) => <Link href={href} data-testid={id} className="font-medium text-[#b4551f] hover:underline">{children}</Link>;
+export const A = ({ href, children, id }: { href: string; children: ReactNode; id: string }) => <Link href={href} data-testid={id} className="font-medium text-[var(--s-accent-ink,hsl(var(--primary)))] hover:underline">{children}</Link>;

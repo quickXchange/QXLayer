@@ -26,7 +26,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
       <div className="sx-split"><Nav items={['Overview', 'Orders', 'Assets', 'Networks', 'Payment methods', 'Analytics']} />
         <div className="sx-grid">
           <Kpis items={[['Orders today', '1,284', '+6.1%'], ['Volume', '$2.41M', '+11.4%'], ['Fee income', '$7,318.20', '+4.9%'], ['Avg settle', '3m 42s', '-0:18']]} />
-          <div className="sx-two"><Chart a={[28, 36, 33, 48, 44, 58, 52, 67, 61, 78]} b={[20, 26, 30, 34, 38, 41, 47, 50, 55, 60]} h={9} /><Donut parts={[[41, 'var(--s-primary)'], [33, 'var(--s-accent)'], [26, '#f4b73e']]} v="1,284" s="by method" /></div>
+          <div className="sx-two"><Chart a={[28, 36, 33, 48, 44, 58, 52, 67, 61, 78]} b={[20, 26, 30, 34, 38, 41, 47, 50, 55, 60]} h={9} /><Donut parts={[[41, 'var(--s-primary)'], [33, 'var(--s-accent)'], [26, 'var(--s-glow)']]} v="1,284" s="by method" /></div>
           <div>
             <Tr head cols="6.5em 1fr 6.5em 5em" c={['Order', 'Pair', 'Amount', 'Status']} />
             <Tr cols="6.5em 1fr 6.5em 5em" c={['VX-48213', <><Cn c="BTC" />to<Cn c="ETH" /></>, '$5,716.40', <St t="Filled" />]} />
@@ -108,7 +108,7 @@ export const fintechScenes: Record<string, () => ReactNode> = {
 
   earn: () => <>
     <L x={2} y={10} w={29} d={8} z={2} m><Win title="Earn portfolio" branded>
-      <div className="sx-center"><Donut parts={[[38, 'var(--s-primary)'], [27, 'var(--s-accent)'], [20, '#f4b73e'], [15, '#26a17b']]} v="$24,918" s="deposited" /></div>
+      <div className="sx-center"><Donut parts={[[38, 'var(--s-primary)'], [27, 'var(--s-accent)'], [20, 'var(--s-glow)'], [15, 'var(--s-secondary)']]} v="$24,918" s="deposited" /></div>
       <Kv k="Accrued" v={<b className="up">+$412.86</b>} /><Kv k="Blended APY" v="4.6%" /><Chips items={['USDC', 'USDT', 'BTC', 'ETH']} />
     </Win></L>
     <L x={33} y={14} w={38} d={14} z={3} fl={2}><Win title="Yield assets">

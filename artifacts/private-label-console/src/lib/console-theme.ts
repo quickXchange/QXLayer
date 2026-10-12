@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { PLATFORM_SITE } from './platform-site';
-import { tokens, mix, readable, ensure, fontLink } from '@site/lib/theme';
+import { tokens, mix, readable, ensure, fontLink, VYNOX } from '@site/lib/theme';
 import { useSiteTheme } from '@site/hooks/use-site-theme';
 
 function hsl(h: string): string {
@@ -24,7 +24,7 @@ export function consoleVars(dark: boolean): Record<string, string> {
   const card = dark ? mix(bg, '#ffffff', 0.05) : mix(bg, '#ffffff', 0.7);
   const pop = dark ? mix(bg2, '#ffffff', 0.04) : '#ffffff';
   const muted = mix(bg, fg, 0.07);
-  const destructive = dark ? '#f0766a' : '#b3261e';
+  const destructive = dark ? VYNOX.dark.danger : VYNOX.light.danger;
   const line = mix(bg, fg, dark ? 0.16 : 0.15);
   const side = dark ? mix(bg, '#000000', 0.25) : mix(bg, '#ffffff', 0.5);
   const out: Record<string, string> = {
@@ -37,11 +37,11 @@ export function consoleVars(dark: boolean): Record<string, string> {
     '--muted': hsl(muted), '--muted-foreground': hsl(t['--s-muted']),
     '--accent': hsl(mix(bg, accent, dark ? 0.2 : 0.16)), '--accent-foreground': hsl(fg),
     '--destructive': hsl(destructive), '--destructive-foreground': hsl(readable(destructive)),
-    '--border': hsl(line), '--input': hsl(mix(bg, fg, dark ? 0.3 : 0.32)), '--ring': hsl(ink),
+    '--border': hsl(line), '--input': hsl(ensure(mix(bg, fg, dark ? 0.3 : 0.42), pop, 3)), '--ring': hsl(ink),
     '--sidebar': hsl(side), '--sidebar-foreground': hsl(fg), '--sidebar-border': hsl(line),
     '--sidebar-primary': hsl(ensure(t['--s-primary'], side, 3)), '--sidebar-primary-foreground': hsl(t['--s-primary-fg']),
     '--sidebar-accent': hsl(mix(side, accent, 0.16)), '--sidebar-accent-foreground': hsl(fg), '--sidebar-ring': hsl(ink),
-    '--chart-1': hsl(t['--s-primary']), '--chart-2': hsl(accent), '--chart-3': hsl(t['--s-glow']), '--chart-4': hsl(t['--s-secondary']), '--chart-5': hsl(destructive),
+    '--chart-1': hsl(ensure(t['--s-primary'], card, 3)), '--chart-2': hsl(ensure(accent, card, 3)), '--chart-3': hsl(ensure(t['--s-glow'], card, 3)), '--chart-4': hsl(ensure(t['--s-secondary'], card, 3)), '--chart-5': hsl(ensure(VYNOX.lavender, card, 3)),
     '--radius': t['--s-r1'],
     '--app-font-sans': t['--s-font'], '--app-font-serif': t['--s-font'],
     '--elevate-1': dark ? 'rgba(255,255,255,.05)' : 'rgba(16,20,27,.04)',

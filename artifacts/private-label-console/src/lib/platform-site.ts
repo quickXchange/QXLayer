@@ -1,4 +1,5 @@
 import type { PublicSite } from '@workspace/api-client-react';
+import { VYNOX } from '@site/lib/theme';
 import { QXLAYER_LOGO_URL, QXLAYER_ICON_URL } from './brand';
 
 /**
@@ -11,16 +12,16 @@ export const PLATFORM_SITE: PublicSite = {
   tenantSlug: '',
   brandName: 'VYNOX LAYER',
   logoUrl: QXLAYER_LOGO_URL,
-  primaryColor: '#8C70ED',
-  accentColor: '#80D6D4',
+  primaryColor: VYNOX.electric,
+  accentColor: VYNOX.lavender,
   themeMode: 'dark',
   domain: null,
   sandboxOnly: true,
   assets: [],
   features: { crypto_exchange: true, swap: true, convert: true },
   websiteSettings: {
-    secondaryColor: '#171F38',
-    glowColor: '#9D7DF9',
+    secondaryColor: VYNOX.deepBlue,
+    glowColor: VYNOX.glow,
     surfaceStyle: 'glass',
     borderRadius: 'rounded',
     fontKey: 'space-grotesk',

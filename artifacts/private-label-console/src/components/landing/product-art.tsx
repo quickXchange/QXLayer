@@ -188,7 +188,7 @@ export function ProductArt({ productKey, className = '' }: { productKey: string;
           <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="1" y2="1"><stop stopColor={A} stopOpacity=".3" /><stop offset="1" stopColor={P} stopOpacity=".1" /></linearGradient>
           <linearGradient id={`${id}-screen`} x1="0" y1="0" x2="0" y2="1"><stop stopColor="#1a2150" /><stop offset="1" stopColor="#0d1128" /></linearGradient>
           <linearGradient id={`${id}-coin`} x1="0" y1="0" x2="1" y2="1"><stop stopColor={G} /><stop offset=".6" stopColor={P} /><stop offset="1" stopColor="#222a58" /></linearGradient>
-          <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#f6e3b0" /><stop offset="1" stopColor="#b48c4c" /></linearGradient>
+          <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#d9d0ff" /><stop offset="1" stopColor="#6a4ae0" /></linearGradient>
           <linearGradient id={`${id}-sheen`} x1="0" y1="0" x2="1" y2="0"><stop stopColor="#fff" stopOpacity="0" /><stop offset=".5" stopColor="#fff" stopOpacity=".28" /><stop offset="1" stopColor="#fff" stopOpacity="0" /></linearGradient>
           <radialGradient id={`${id}-halo`}><stop stopColor={G} stopOpacity=".35" /><stop offset="1" stopColor={G} stopOpacity="0" /></radialGradient>
         </defs>
