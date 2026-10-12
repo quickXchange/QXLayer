@@ -2206,6 +2206,93 @@ export interface CapabilityStatus {
   message: string;
 }
 
+export type SupabaseAuthStatusProvider = typeof SupabaseAuthStatusProvider[keyof typeof SupabaseAuthStatusProvider];
+
+
+export const SupabaseAuthStatusProvider = {
+  supabase: 'supabase',
+} as const;
+
+export interface SupabaseAuthStatus {
+  enabled: boolean;
+  mailReady: boolean;
+  provider: SupabaseAuthStatusProvider;
+}
+
+export interface SupabasePublicUser {
+  id: string;
+  email: string;
+  name: string;
+  emailVerified: boolean;
+  twoFactorEnabled: boolean;
+  /** @nullable */
+  totpFactorId?: string | null;
+}
+
+export interface SupabaseSession {
+  user: SupabasePublicUser | null;
+  mfaRequired: boolean;
+  recovery: boolean;
+}
+
+export type SupabaseActionInputAction = typeof SupabaseActionInputAction[keyof typeof SupabaseActionInputAction];
+
+
+export const SupabaseActionInputAction = {
+  signup: 'signup',
+  login: 'login',
+  logout: 'logout',
+  recover: 'recover',
+  resend: 'resend',
+  verify: 'verify',
+  'reset-password': 'reset-password',
+  'change-password': 'change-password',
+  'mfa-enroll': 'mfa-enroll',
+  'mfa-verify': 'mfa-verify',
+  'mfa-remove': 'mfa-remove',
+  'link-existing': 'link-existing',
+} as const;
+
+export type SupabaseActionInputTokenType = typeof SupabaseActionInputTokenType[keyof typeof SupabaseActionInputTokenType];
+
+
+export const SupabaseActionInputTokenType = {
+  signup: 'signup',
+  recovery: 'recovery',
+} as const;
+
+export interface SupabaseActionInput {
+  action: SupabaseActionInputAction;
+  /** @maxLength 254 */
+  email?: string;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  name?: string;
+  /** @maxLength 128 */
+  password?: string;
+  /** @maxLength 128 */
+  currentPassword?: string;
+  /** @maxLength 2048 */
+  token?: string;
+  tokenType?: SupabaseActionInputTokenType;
+  /** @pattern ^[0-9]{6}$ */
+  code?: string;
+  factorId?: string;
+}
+
+export interface SupabaseActionResult {
+  ok: boolean;
+  mfaRequired?: boolean;
+  user?: SupabasePublicUser;
+  factorId?: string;
+  totpUri?: string;
+  qrCode?: string;
+  secret?: string;
+  linked?: boolean;
+}
+
 export interface PublicTelegramMiniConfig {
   enabled: boolean;
   sandboxOnly: boolean;

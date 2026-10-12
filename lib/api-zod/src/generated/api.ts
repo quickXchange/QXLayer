@@ -8,6 +8,71 @@
 import * as zod from 'zod';
 
 
+export const GetSupabaseAuthStatusResponse = zod.object({
+  "enabled": zod.boolean(),
+  "mailReady": zod.boolean(),
+  "provider": zod.enum(['supabase'])
+})
+
+
+export const GetSupabaseAuthSessionResponse = zod.object({
+  "user": zod.union([zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "emailVerified": zod.boolean(),
+  "twoFactorEnabled": zod.boolean(),
+  "totpFactorId": zod.string().nullish()
+}),zod.null()]),
+  "mfaRequired": zod.boolean(),
+  "recovery": zod.boolean()
+})
+
+
+export const performSupabaseAuthActionBodyEmailMax = 254;
+
+export const performSupabaseAuthActionBodyNameMax = 120;
+
+export const performSupabaseAuthActionBodyPasswordMax = 128;
+
+export const performSupabaseAuthActionBodyCurrentPasswordMax = 128;
+
+export const performSupabaseAuthActionBodyTokenMax = 2048;
+
+export const performSupabaseAuthActionBodyCodeRegExp = new RegExp('^[0-9]{6}$');
+
+
+export const PerformSupabaseAuthActionBody = zod.object({
+  "action": zod.enum(['signup', 'login', 'logout', 'recover', 'resend', 'verify', 'reset-password', 'change-password', 'mfa-enroll', 'mfa-verify', 'mfa-remove', 'link-existing']),
+  "email": zod.string().email().max(performSupabaseAuthActionBodyEmailMax).optional(),
+  "name": zod.string().min(1).max(performSupabaseAuthActionBodyNameMax).optional(),
+  "password": zod.string().max(performSupabaseAuthActionBodyPasswordMax).optional(),
+  "currentPassword": zod.string().max(performSupabaseAuthActionBodyCurrentPasswordMax).optional(),
+  "token": zod.string().max(performSupabaseAuthActionBodyTokenMax).optional(),
+  "tokenType": zod.enum(['signup', 'recovery']).optional(),
+  "code": zod.string().regex(performSupabaseAuthActionBodyCodeRegExp).optional(),
+  "factorId": zod.string().uuid().optional()
+})
+
+export const PerformSupabaseAuthActionResponse = zod.object({
+  "ok": zod.boolean(),
+  "mfaRequired": zod.boolean().optional(),
+  "user": zod.object({
+  "id": zod.string(),
+  "email": zod.string(),
+  "name": zod.string(),
+  "emailVerified": zod.boolean(),
+  "twoFactorEnabled": zod.boolean(),
+  "totpFactorId": zod.string().nullish()
+}).optional(),
+  "factorId": zod.string().optional(),
+  "totpUri": zod.string().optional(),
+  "qrCode": zod.string().optional(),
+  "secret": zod.string().optional(),
+  "linked": zod.boolean().optional()
+})
+
+
 export const GetPublicTelegramMiniConfigParams = zod.object({
   "slug": zod.coerce.string()
 })

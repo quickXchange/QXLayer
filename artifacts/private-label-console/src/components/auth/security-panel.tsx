@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import QRCode from 'react-qr-code';
 import { Link2, Monitor, ShieldCheck } from 'lucide-react';
-import { authClient } from '@/lib/owned-auth-client';
+import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
+import { SupabaseSecurityPanel } from '@/components/auth/supabase-security-panel';
 import { Button } from '@/components/ui/button';
 import { ErrorLine, Field, Form, SuccessLine, Submit, authErrorText } from '@/components/auth/auth-ui';
 
@@ -149,7 +150,7 @@ function Sessions({ currentToken }: { currentToken?: string }) {
   );
 }
 
-export function SecurityPanel() {
+function BetterAuthSecurityPanel() {
   const s = authClient.useSession();
   const user = s.data?.user as { name?: string; email?: string; twoFactorEnabled?: boolean | null } | undefined;
   if (!user) return null;
@@ -166,3 +167,6 @@ export function SecurityPanel() {
     </div>
   );
 }
+
+/** Supabase mode gets its own panel; the Better Auth panel is unchanged. */
+export const SecurityPanel = supabaseAuth ? SupabaseSecurityPanel : BetterAuthSecurityPanel;

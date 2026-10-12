@@ -6,6 +6,8 @@ import { applicationUserId } from "../../../../lib/external-clerk/index.mjs";
 import { ownedAuthentication, authOrigin } from "../modules/owned-auth/config";
 import { ownedSession, ownedBusinessId } from "../modules/owned-auth/service";
 import { HttpError } from "../lib/errors";
+import { supabaseAuthEnabled, supabaseDefaultProvider, supabaseAuthConfiguration } from "../modules/supabase-auth/config";
+import { sessionCookie, readSession, businessId, hasVerifiedFactor, assertAuthOrigin } from "../modules/supabase-auth/session";
 
 export const requireAuthentication: RequestHandler = async (req, res, next): Promise<void> => {
   const demo = await demoPrincipal(req);
@@ -26,6 +28,19 @@ export const requireAuthentication: RequestHandler = async (req, res, next): Pro
     const principal = await resolvePrincipal(await ownedBusinessId(own.user.id));
     if (principal.role === "super_admin" && !own.user.twoFactorEnabled)
       throw new HttpError(428, "MFA_REQUIRED: Enable two-factor authentication in Account Security.");
+    res.locals.principal = principal;
+    next();
+    return;
+  }
+  if (supabaseAuthEnabled() && (supabaseDefaultProvider() || sessionCookie(req))) {
+    if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) assertAuthOrigin(req);
+    const s = await readSession(req);
+    if (!s || s.payload.recovery) throw new HttpError(401, "Sign-in required.");
+    if (hasVerifiedFactor(s.user) && !s.aal2) throw new HttpError(428, "MFA_REQUIRED: Complete two-factor verification.");
+    const principal = await resolvePrincipal(await businessId(s.user.id));
+    principal.authenticationProvider = "supabase";
+    if (principal.role === "super_admin" && (!hasVerifiedFactor(s.user) || !s.aal2))
+      throw new HttpError(428, "MFA_REQUIRED: Enable and verify two-factor authentication in Account Security.");
     res.locals.principal = principal;
     next();
     return;
@@ -53,6 +68,12 @@ export function principalFrom(res: Response): Principal {
 export const sameOriginMutation: RequestHandler = (req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) { next(); return; }
   const origin = req.get("origin");
+  if (supabaseAuthEnabled() && (supabaseDefaultProvider() || sessionCookie(req))) {
+    if (origin !== supabaseAuthConfiguration().origin || req.get("sec-fetch-site") === "cross-site") {
+      res.status(403).json({ error: "Same-origin request required." }); return;
+    }
+    next(); return;
+  }
   if (ownedAuthentication()) {
     try {
       if (!origin || new URL(origin).origin !== authOrigin() || req.get("sec-fetch-site") === "cross-site") {

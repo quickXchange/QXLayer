@@ -17,6 +17,12 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /supabase-auth/status:
+    $ref: './supabase-auth.yaml#/paths/~1supabase-auth~1status'
+  /supabase-auth/session:
+    $ref: './supabase-auth.yaml#/paths/~1supabase-auth~1session'
+  /supabase-auth/action:
+    $ref: './supabase-auth.yaml#/paths/~1supabase-auth~1action'
   /public/sites/{slug}/telegram/config:
     $ref: './integration-runtime.yaml#/paths/~1public~1sites~1{slug}~1telegram~1config'
   /tenants/{tenantId}/integrations/telegram_bot/webhook:

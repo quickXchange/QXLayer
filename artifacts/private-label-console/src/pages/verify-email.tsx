@@ -1,17 +1,24 @@
-import { useEffect, useState } from 'react';
-import { authClient } from '@/lib/owned-auth-client';
+import { useEffect, useRef, useState } from 'react';
+import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
 import { A, AuthFrame, ErrorLine, Field, Form, MailNotice, SuccessLine, Submit, authErrorText, useOwnedStatus } from '@/components/auth/auth-ui';
+
+let verifyOnce: Promise<{ error?: unknown }> | null = null;
 
 export default function VerifyEmailPage() {
   const params = new URLSearchParams(window.location.search);
-  const token = params.get('token'); const verifiedFlag = params.get('verified') === '1'; const urlErr = params.get('error');
+  const tokenRef = useRef((supabaseAuth ? params.get('token_hash') : params.get('token')) ?? null);
+  const token = tokenRef.current;
+  // Better Auth redirects back with verified=1. Supabase never trusts that flag.
+  const verifiedFlag = !supabaseAuth && params.get('verified') === '1'; const urlErr = params.get('error');
   const { status, failed } = useOwnedStatus();
   const [state, setState] = useState<'idle' | 'checking' | 'ok' | 'bad'>(token ? 'checking' : verifiedFlag ? 'ok' : urlErr ? 'bad' : 'idle');
   const [email, setEmail] = useState(''); const [busy, setBusy] = useState(false); const [err, setErr] = useState(''); const [sent, setSent] = useState(false);
   useEffect(() => {
     if (!token) return;
     let live = true;
-    authClient.verifyEmail({ query: { token } }).then((r) => { if (live) setState(r.error ? 'bad' : 'ok'); }).catch(() => { if (live) setState('bad'); });
+    if (supabaseAuth) window.history.replaceState(null, '', window.location.pathname);
+    // Single-use token: share one request across StrictMode effect re-runs.
+    (verifyOnce ??= authClient.verifyEmail({ query: { token } }) as Promise<{ error?: unknown }>).then((r) => { if (live) setState(r.error ? 'bad' : 'ok'); }).catch(() => { if (live) setState('bad'); });
     return () => { live = false; };
   }, [token]);
   const resend = async () => {

@@ -33,3 +33,7 @@ provider cleanup had not removed its temporary protection credential.
 temporary test credentials identified by their dedicated marker, and confirm
 none remain. Do not infer cleanup from a stopped process or change permanent
 protection.
+
+For helpers with asynchronous cleanup, send SIGTERM to the actual Node process
+and wait for its cleanup result before forcibly stopping its background task.
+The generic stop action can end the process before its provider calls complete.

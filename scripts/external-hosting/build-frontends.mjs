@@ -11,7 +11,7 @@ if (api.protocol !== "https:" || !api.hostname.endsWith(".onrender.com") ||
     api.pathname !== "/" || api.username || api.password || api.search || api.hash)
   throw new Error("QXLAYER_API_ORIGIN must be the exact Render API HTTPS origin.");
 const authProvider = process.env.QXLAYER_AUTH_PROVIDER || "clerk";
-if (authProvider === "owned" && process.env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
+if (["owned", "supabase"].includes(authProvider) && process.env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
   throw new Error("Owned authentication frontend is Staging-only.");
 assertFrontendClerk(); // Retained only for verified one-time legacy-account migration.
 for (const [name, base] of [["private-label-console", "/"], ["private-label-website", "/private-label-website/"]]) {

@@ -5,6 +5,57 @@ description: User-approved master logo, shared platform visual language, and the
 
 The supplied VYNOX LAYER image supersedes the former QXLayer master for the main platform, admin console, authentication, browser icons, and platform-owned previews. Keep the new master untouched; never redesign or regenerate the logo.
 
+The user's later horizontal transparent PNG supersedes the earlier stacked
+VYNOX LAYER mark. Website headers use the full logo without a separate
+“VYNOX LAYER” text label next to it. Keep it clearly readable across phone,
+tablet and desktop, and use appropriate sizes on login and other shared
+branding surfaces without changing the rest of the design.
+
+**Why:** The user explicitly requested the new PNG, removal of duplicated
+header text, original proportions/transparency, and Dark/Light verification.
+
+**How to apply:** Preserve the supplied original master; do not redraw,
+stretch or add a background. The later theme-variant approval below permits
+deterministic display derivatives. Keep tenant/customer branding isolated and
+Production/DNS unchanged unless separately authorized.
+
+The user now explicitly authorizes a platform-wide COLOR overhaul using royal
+purple, electric violet, deep blue, soft lavender and subtle purple-blue glows,
+including all Customer, Super Admin and Client Admin screens and authentication.
+This supersedes older “do not redesign” instructions for colors only: preserve
+existing layouts, content, functionality, permissions and business logic.
+Use one shared token system in both themes, retaining accessible semantic
+success/warning/error distinctions. No database modifications or Production,
+DNS or live-service changes; release only to existing Staging.
+
+The user subsequently approved updating the existing Staging API's trusted
+frontend URL and restarting it for this color release. Preserve its existing
+live backend revision: this is not approval to deploy new backend logic.
+Production, DNS, databases, the authentication provider and the Worker remain
+unchanged.
+
+**Why:** The isolated Staging frontend URL is pinned by its authentication
+bindings, so a new frontend Preview needs a matching Staging origin update.
+
+**How to apply:** Limit Staging environment writes to the frontend/auth origin
+bindings, verify unrelated values are unchanged and restart existing backend
+code. Do not infer database or Production permission from this approval.
+
+The user also authorizes separate transparent Dark/Light logo variants made
+from the original: preserve the vibrant dark glow, deepen light lettering and
+reduce light glow, remove only unused alpha padding and switch automatically.
+Preserve shape, lettering, proportions and identity, not necessarily identical
+RGB values in the contrast derivative.
+
+**Why:** The user explicitly requested the full color system and separate
+contrast-adjusted theme logos. Fully transparent images can still load with
+valid dimensions, so visual inspection and alpha/content checks are necessary,
+not just checking the image URL and dimensions.
+
+**How to apply:** Keep the original master intact; use deterministic derivatives,
+not image generation. Treat Customer/Client Admin as platform interfaces;
+tenant public websites retain their own uploaded branding/configuration.
+
 Preserve the new full-logo geometry, proportions, metallic colors and typography. The former QX-above-Layer geometry and its color-derivative instructions describe the superseded asset, not the new VYNOX LAYER master.
 
 **Why:** The user explicitly requested a complete VYNOX LAYER rebrand using the supplied image while preserving functionality and integrations. Prior approval of the platform layout and tenant branding still applies.
@@ -17,7 +68,7 @@ Each complete Product & Services illustration should normally contain only one p
 
 **How to apply:** Keep preview branding separate from shared platform header/admin logo sizing. Use the contrast variant appropriate to the actual illustrated surface, including dark phone screens and hardware inside light-mode pages. Count visible identities across the entire scene, not separately per window or device. If the desktop primary interface is hidden on mobile, use exactly one mobile-only placement in the visible primary interface. Preserve UI details and compositions; remove excessive branding only.
 
-The approved public main platform is the MASTER visual reference for authenticated Customer, Super Admin and White Label tenant management screens. Reuse its existing components and tokens, typography, purple/blue/cyan palette, ambient backgrounds and light/dark modes; do not create separate role-specific UI systems.
+The approved public main platform is the MASTER visual reference for authenticated Customer, Super Admin and White Label tenant management screens. Reuse its components, shared purple/violet/deep-blue/lavender tokens, typography, ambient backgrounds and light/dark modes; do not create separate role-specific UI systems.
 
 **Why:** The user explicitly required all three consoles to belong to one platform, including cards, controls, tables, overlays, badges, spacing, logo placement and responsive navigation.
 
