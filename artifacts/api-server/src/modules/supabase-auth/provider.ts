@@ -49,7 +49,8 @@ export async function authRequest<T>(path: string, options: {
     if (code === "invalid_credentials") throw new HttpError(401, "Email or password is incorrect.");
     if (code === "otp_expired" || code === "flow_state_expired")
       throw new HttpError(400, "This confirmation link has expired. Request another.");
-    if (code === "mfa_verification_failed") throw new HttpError(400, "The authenticator code is invalid.");
+    if (code === "mfa_verification_failed" || code === "mfa_challenge_expired")
+      throw new HttpError(400, "The authenticator code is invalid or expired.");
     throw new HttpError(response.status >= 500 ? 503 : 400, "Authentication request could not be completed.");
   }
   if (response.status === 204) return {} as T;

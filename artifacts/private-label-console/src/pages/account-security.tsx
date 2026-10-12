@@ -11,7 +11,7 @@ import type { ReactNode } from 'react';
 export function OwnedSessionGate({ children }: { children: ReactNode }) {
   const s = authClient.useSession();
   if (s.isPending) return <div className="mx-auto max-w-3xl space-y-3 p-10"><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div>;
-  if (!s.data?.user) return <Redirect to="/sign-in" />;
+  if (!s.data?.user) return <Redirect to={(s as { mfaRequired?: boolean }).mfaRequired ? '/two-factor' : '/sign-in'} />;
   return <>{children}</>;
 }
 

@@ -7,6 +7,7 @@ export interface Membership {
   permissions?: string[];
 }
 export interface Principal {
+  authenticationProvider?: "supabase";
   demo?: boolean;
   userId: string;
   role: "super_admin" | "client_admin" | "staff" | "unassigned";

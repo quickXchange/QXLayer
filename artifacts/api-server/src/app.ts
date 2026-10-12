@@ -74,7 +74,15 @@ const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
   if (error instanceof ZodError || (error?.name === "ZodError" && Array.isArray(error.issues))) {
     res.status(400).json({ error: "Invalid input.", details: error.issues.map((i: { path: unknown; message: string }) => ({ path: i.path, message: i.message })) }); return;
   }
-  if (error instanceof HttpError) { res.status(error.status).json({ error: error.message }); return; }
+  if (error instanceof HttpError) {
+    const authCode = req.path.startsWith("/api/supabase-auth") ? error.message.match(/^([A-Z_]+):/)?.[1] : undefined;
+    res.status(error.status).json({ error: error.message, ...(authCode ? { code: authCode } : {}) }); return;
+  }
+  if (req.path.startsWith("/api/supabase-auth")) {
+    // Auth SQL/network errors must never expose token envelopes or credential parameters.
+    req.log.error({ code: typeof error?.code === "string" ? error.code : "AUTH_UNAVAILABLE" }, "Staging authentication unavailable");
+    res.status(503).json({ error: "Authentication is temporarily unavailable." }); return;
+  }
   const code = (error as { code?: string }).code;
   if (code === "23505") { res.status(409).json({ error: "This slug, domain, or unique configuration is already in use." }); return; }
   if (code === "23503") { res.status(400).json({ error: "Configuration references an unavailable catalog entry or a dependent record." }); return; }

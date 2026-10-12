@@ -6,6 +6,8 @@ import { HttpError } from "../../lib/errors";
 import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
 import { ownedAuthentication } from "../owned-auth/config";
 import { ownedBusinessId, ownedSession } from "../owned-auth/service";
+import { supabaseAuthEnabled } from "../supabase-auth/config";
+import { sessionCookie, readSession, businessId, hasVerifiedFactor } from "../supabase-auth/session";
 
 export const PREVIEW_TTL = 15 * 60 * 1000;
 export const PREVIEW_COOKIE = "qx_operator_preview";
@@ -26,6 +28,14 @@ export async function authorizedWebsitePreview(req: Request, slug: string): Prom
   if (marker === undefined) return undefined;
   if (marker !== "session" && marker !== "1") throw new HttpError(403, "Invalid private preview.");
   const cookie = req.get("cookie")?.split(";").map(s => s.trim()).find(s => s.startsWith(`${PREVIEW_COOKIE}=`))?.slice(PREVIEW_COOKIE.length + 1);
+  if (supabaseAuthEnabled() && sessionCookie(req)) {
+    const s = await readSession(req);
+    const actorId = s && !s.payload.recovery && s.aal2 && hasVerifiedFactor(s.user) ? await businessId(s.user.id) : null;
+    const grant = verifyPreview(cookie, slug, actorId);
+    if (!grant || !actorId) throw new HttpError(401, "Sign in with operator MFA and reopen this private preview.");
+    requireSuperAdmin(await resolvePrincipal(actorId));
+    return grant;
+  }
   const own = ownedAuthentication() ? await ownedSession(req) : null;
   const nativeId = ownedAuthentication() ? null : getAuth(req).userId;
   const actorId = own && own.user.twoFactorEnabled ? await ownedBusinessId(own.user.id) : nativeId ? applicationUserId(nativeId) : null;

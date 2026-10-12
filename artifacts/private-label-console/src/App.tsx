@@ -1,7 +1,8 @@
 import { lazy, Suspense, useEffect, useRef, type ComponentType, type ReactNode } from 'react';
 import { ClerkProvider, SignIn, SignUp, useClerk as useLegacyClerk } from '@clerk/react';
 import { Show, useClerk } from '@/lib/auth';
-import { authClient, ownedAuth } from '@/lib/owned-auth-client';
+import { authClient, ownedAuth, supabaseAuth } from '@/lib/owned-auth-client';
+import { registerSupabaseQueryClient } from '@/lib/supabase-auth-client';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
@@ -67,6 +68,7 @@ if (!ownedAuth && import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "staging
     (!clerkPubKey?.startsWith("pk_test_") || clerkProxyUrl)) {
   throw new Error("Staging requires Development Clerk authentication without a Production proxy.");
 }
+registerSupabaseQueryClient(queryClient);
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 function stripBase(path: string): string {
@@ -263,7 +265,7 @@ function AppRoutes() {
               {ownedAuth && <Route path="/verify-email" component={OwnedVerify} />}
               {ownedAuth && <Route path="/two-factor" component={OwnedTwoFactor} />}
               {ownedAuth && <Route path="/account/security" component={OwnedSecurity} />}
-              {ownedAuth && <Route path="/migrate-account" component={OwnedMigrate} />}
+              {ownedAuth && !supabaseAuth && <Route path="/migrate-account" component={OwnedMigrate} />}
               {ownedAuth && <Route path="/account/link-existing" component={OwnedLink} />}
               <Route path="/account" component={rAcc} />
               <Route path="/account/orders" component={rOrd} />

@@ -90,6 +90,10 @@ import type {
   SubscriptionCommercialInput,
   SubscriptionPlanInput,
   SubscriptionView,
+  SupabaseActionInput,
+  SupabaseActionResult,
+  SupabaseAuthStatus,
+  SupabaseSession,
   SuspensionInput,
   Tenant,
   TenantAdministratorInput,
@@ -139,6 +143,230 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetSupabaseAuthStatusUrl = () => {
+
+
+
+
+  return `/api/supabase-auth/status`
+}
+
+export const getSupabaseAuthStatus = async ( options?: Parameters<typeof customFetch>[1]): Promise<SupabaseAuthStatus> => {
+
+  return customFetch<SupabaseAuthStatus>(getGetSupabaseAuthStatusUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSupabaseAuthStatusQueryKey = () => {
+    return [
+    `/api/supabase-auth/status`
+    ] as const;
+    }
+
+
+export const getGetSupabaseAuthStatusQueryOptions = <TData = Awaited<ReturnType<typeof getSupabaseAuthStatus>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupabaseAuthStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSupabaseAuthStatusQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSupabaseAuthStatus>>> = ({ signal }) => getSupabaseAuthStatus({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSupabaseAuthStatus>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSupabaseAuthStatusQueryResult = NonNullable<Awaited<ReturnType<typeof getSupabaseAuthStatus>>>
+export type GetSupabaseAuthStatusQueryError = ErrorType<unknown>
+
+
+
+export function useGetSupabaseAuthStatus<TData = Awaited<ReturnType<typeof getSupabaseAuthStatus>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupabaseAuthStatus>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSupabaseAuthStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetSupabaseAuthSessionUrl = () => {
+
+
+
+
+  return `/api/supabase-auth/session`
+}
+
+export const getSupabaseAuthSession = async ( options?: Parameters<typeof customFetch>[1]): Promise<SupabaseSession> => {
+
+  return customFetch<SupabaseSession>(getGetSupabaseAuthSessionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSupabaseAuthSessionQueryKey = () => {
+    return [
+    `/api/supabase-auth/session`
+    ] as const;
+    }
+
+
+export const getGetSupabaseAuthSessionQueryOptions = <TData = Awaited<ReturnType<typeof getSupabaseAuthSession>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupabaseAuthSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSupabaseAuthSessionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSupabaseAuthSession>>> = ({ signal }) => getSupabaseAuthSession({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSupabaseAuthSession>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSupabaseAuthSessionQueryResult = NonNullable<Awaited<ReturnType<typeof getSupabaseAuthSession>>>
+export type GetSupabaseAuthSessionQueryError = ErrorType<unknown>
+
+
+
+export function useGetSupabaseAuthSession<TData = Awaited<ReturnType<typeof getSupabaseAuthSession>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupabaseAuthSession>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSupabaseAuthSessionQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPerformSupabaseAuthActionUrl = () => {
+
+
+
+
+  return `/api/supabase-auth/action`
+}
+
+export const performSupabaseAuthAction = async (supabaseActionInput: SupabaseActionInput, options?: Parameters<typeof customFetch>[1]): Promise<SupabaseActionResult> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<SupabaseActionResult>(getPerformSupabaseAuthActionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supabaseActionInput)
+  }
+);}
+
+
+
+
+
+export const getPerformSupabaseAuthActionMutationKey = () => ['performSupabaseAuthAction'] as const;
+
+export const getPerformSupabaseAuthActionMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof performSupabaseAuthAction>>, TError,PerformSupabaseAuthActionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof performSupabaseAuthAction>>, TError,PerformSupabaseAuthActionMutationVariables, TContext> => {
+
+const mutationKey = getPerformSupabaseAuthActionMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof performSupabaseAuthAction>>, PerformSupabaseAuthActionMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  performSupabaseAuthAction(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PerformSupabaseAuthActionMutationResult = NonNullable<Awaited<ReturnType<typeof performSupabaseAuthAction>>>
+    export type PerformSupabaseAuthActionMutationBody = BodyType<SupabaseActionInput>
+    export type PerformSupabaseAuthActionMutationError = ErrorType<void>
+    export type PerformSupabaseAuthActionMutationVariables = {data: BodyType<SupabaseActionInput>}
+
+    export const usePerformSupabaseAuthAction = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof performSupabaseAuthAction>>, TError,PerformSupabaseAuthActionMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof performSupabaseAuthAction>>,
+        TError,
+        PerformSupabaseAuthActionMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPerformSupabaseAuthActionMutationOptions(options));
+    }
 
 export const getGetPublicTelegramMiniConfigUrl = (slug: string,) => {
 

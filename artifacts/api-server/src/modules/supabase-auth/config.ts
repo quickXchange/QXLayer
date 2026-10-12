@@ -30,6 +30,11 @@ export function supabaseAuthConfiguration(env = process.env) {
   };
 }
 
+/** Parallel Staging trial cookies never replace the default Clerk provider. */
+export function supabaseDefaultProvider(env = process.env) {
+  return env.QXLAYER_AUTH_PROVIDER === "supabase" && supabaseAuthEnabled(env);
+}
+
 export function supabaseBusinessId(subject: string): string {
   if (!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(subject))
     throw new Error("Invalid Supabase identity.");

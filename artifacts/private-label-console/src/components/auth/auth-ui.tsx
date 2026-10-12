@@ -6,6 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
+import { supabaseAuth } from '@/lib/owned-auth-client';
+
+/** Minimum length for newly chosen passwords. Sign-in never restricts length. */
+export const MIN_PASSWORD = supabaseAuth ? 12 : 8;
+export const MAX_PASSWORD = 128;
 
 export type OwnedStatus = { enabled: boolean; mailReady: boolean };
 
@@ -14,7 +19,7 @@ export function useOwnedStatus() {
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     const ac = new AbortController();
-    fetch(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/owned-auth/status`, { credentials: 'include', signal: ac.signal })
+    fetch(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/${supabaseAuth ? 'supabase-auth' : 'owned-auth'}/status`, { credentials: 'include', signal: ac.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('status'))))
       .then((j: OwnedStatus) => setStatus(j))
       .catch(() => { if (!ac.signal.aborted) setFailed(true); });

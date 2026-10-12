@@ -9,6 +9,12 @@ An active native GitHub source-control connection and successful public reposito
 
 **How to apply:** Distinguish native source-control authentication from the GitHub App integration. Use the authorized integration without extracting credentials. Do not report a push as successful until the remote branch points to the expected commit.
 
+Repository aliases may redirect API reads even when the configured Git remote is unchanged. The App proxy and an explicitly approved native credential may have different repository access.
+
+**Why:** A bounded Staging read failed through the App proxy while the approved native API read succeeded after GitHub's same-provider repository alias redirect.
+
+**How to apply:** Do not change the repository or connection merely to bypass an alias. Follow only validated HTTPS redirects on api.github.com to the provider's numeric repository path, and never forward credentials to another host. Preserve the existing remote and verify the exact Staging ref.
+
 When reproducing existing Git history through the GitHub Git Data API, preserve commit messages byte-for-byte, including trailing newlines, and verify tree and commit hashes before updating a branch.
 
 **Why:** Removing the original trailing newline preserved the visible message but changed the commit hash.

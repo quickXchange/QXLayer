@@ -1,0 +1,107 @@
+openapi: 3.1.0
+info:
+  title: Supabase authentication trial
+  version: 1.0.0
+paths:
+  /supabase-auth/status:
+    get:
+      operationId: getSupabaseAuthStatus
+      responses:
+        "200":
+          description: Staging-only availability, no credentials
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SupabaseAuthStatus"}
+  /supabase-auth/session:
+    get:
+      operationId: getSupabaseAuthSession
+      responses:
+        "200":
+          description: Public session state; provider tokens never leave the server
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SupabaseSession"}
+  /supabase-auth/action:
+    post:
+      operationId: performSupabaseAuthAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/SupabaseActionInput"}
+      responses:
+        "200":
+          description: Completed authentication action
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/SupabaseActionResult"}
+        "400":
+          description: Invalid input or expired proof
+        "401":
+          description: Authentication required
+        "403":
+          description: Forbidden action or unverified email
+        "409":
+          description: Identity already linked
+        "429":
+          description: Too many attempts
+        "503":
+          description: Provider or mail temporarily unavailable
+components:
+  schemas:
+    SupabaseAuthStatus:
+      type: object
+      required: [enabled, mailReady, provider]
+      properties:
+        enabled: {type: boolean}
+        mailReady: {type: boolean}
+        provider: {type: string, enum: [supabase]}
+    SupabasePublicUser:
+      type: object
+      required: [id, email, name, emailVerified, twoFactorEnabled]
+      properties:
+        id: {type: string}
+        email: {type: string}
+        name: {type: string}
+        emailVerified: {type: boolean}
+        twoFactorEnabled: {type: boolean}
+        totpFactorId: {type: ["string", "null"]}
+    SupabaseSession:
+      type: object
+      required: [user, mfaRequired, recovery]
+      properties:
+        user:
+          oneOf:
+            - {$ref: "#/components/schemas/SupabasePublicUser"}
+            - {type: "null"}
+        mfaRequired: {type: boolean}
+        recovery: {type: boolean}
+    SupabaseActionInput:
+      type: object
+      additionalProperties: false
+      required: [action]
+      properties:
+        action:
+          type: string
+          enum: [signup, login, logout, recover, resend, verify, reset-password, change-password, mfa-enroll, mfa-verify, mfa-remove, link-existing]
+        email: {type: string, format: email, maxLength: 254}
+        name: {type: string, minLength: 1, maxLength: 120}
+        password: {type: string, maxLength: 128}
+        currentPassword: {type: string, maxLength: 128}
+        token: {type: string, maxLength: 2048}
+        tokenType: {type: string, enum: [signup, recovery]}
+        code: {type: string, pattern: '^[0-9]{6}$'}
+        factorId: {type: string, format: uuid}
+    SupabaseActionResult:
+      type: object
+      additionalProperties: false
+      required: [ok]
+      properties:
+        ok: {type: boolean}
+        mfaRequired: {type: boolean}
+        user: {$ref: "#/components/schemas/SupabasePublicUser"}
+        factorId: {type: string}
+        totpUri: {type: string}
+        qrCode: {type: string}
+        secret: {type: string}
+        linked: {type: boolean}
