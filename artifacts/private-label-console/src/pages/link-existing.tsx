@@ -41,7 +41,7 @@ function Linker() {
 export default function LinkExistingPage() {
   return (
     <OwnedSessionGate>
-      <AuthFrame title="Link your existing account" subtitle="One-time migration" footer={<Link href="/account/security" data-testid="link-back-security" className="font-medium text-[#b4551f] hover:underline">Back to account security</Link>}>
+      <AuthFrame title="Link your existing account" subtitle="One-time migration" footer={<Link href="/account/security" data-testid="link-back-security" className="font-medium text-[var(--s-accent-ink,hsl(var(--primary)))] hover:underline">Back to account security</Link>}>
         <p className="text-sm text-muted-foreground">Sign in to your previous VYNOX LAYER account once to prove ownership. We then attach its existing access to this new account. Your old password cannot be copied, and access is never granted by matching email addresses.</p>
         {pk ? <ClerkProvider publishableKey={pk} signInUrl={`${base}/account/link-existing`}><Linker /></ClerkProvider> : <ErrorLine>The previous sign-in service is not configured here.</ErrorLine>}
       </AuthFrame>

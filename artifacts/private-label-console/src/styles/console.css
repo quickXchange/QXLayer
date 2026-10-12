@@ -52,7 +52,7 @@ html.qx-console :is(input:not([type=checkbox],[type=radio],[type=range],[type=fi
 html.qx-console :is(input,textarea,select):focus-visible{border-color:var(--s-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--s-accent) 28%,transparent);outline:none}
 html.qx-console ::placeholder{color:var(--s-muted);opacity:.8}
 html.qx-console [data-radix-popper-content-wrapper],html.qx-console [role=dialog],html.qx-console [data-radix-toast-viewport]{font-family:var(--s-font)}
-html.qx-console .bg-black\/80{background:color-mix(in srgb,#04060c 72%,transparent);backdrop-filter:blur(3px)}
+html.qx-console .bg-black\/80{background:color-mix(in srgb,#070817 72%,transparent);backdrop-filter:blur(3px)}
 
 /* status colours adapt to dark */
 html.qx-console.dark .bg-emerald-100{background:color-mix(in srgb,#34d399 18%,transparent)}

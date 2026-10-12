@@ -8,7 +8,7 @@ import { ErrorLine, Field, Form, SuccessLine, Submit, authErrorText } from '@/co
 
 function Section({ title, desc, children, id }: { title: string; desc?: string; children: React.ReactNode; id: string }) {
   return (
-    <section data-testid={`section-${id}`} className="rounded-xl border border-[#ddd5c4] bg-[#fbf8f2] p-5 sm:p-6">
+    <section data-testid={`section-${id}`} className="rounded-xl border border-border bg-card p-5 sm:p-6">
       <h2 className="font-display text-2xl">{title}</h2>
       {desc && <p className="mt-1 text-sm text-muted-foreground">{desc}</p>}
       <div className="mt-4 space-y-4">{children}</div>
@@ -50,7 +50,7 @@ function PasswordForm() {
 }
 
 function Codes({ codes }: { codes: string[] }) {
-  return <div data-testid="list-backup-codes" className="grid grid-cols-2 gap-2 rounded-md border border-[#cfc6b3] bg-white p-3 font-mono text-sm sm:grid-cols-3">{codes.map((c) => <span key={c}>{c}</span>)}</div>;
+  return <div data-testid="list-backup-codes" className="grid grid-cols-2 gap-2 rounded-md border border-input bg-popover p-3 font-mono text-sm sm:grid-cols-3">{codes.map((c) => <span key={c}>{c}</span>)}</div>;
 }
 
 function TwoFactor({ enabled, onChanged }: { enabled: boolean; onChanged: () => void }) {
@@ -100,7 +100,7 @@ function TwoFactor({ enabled, onChanged }: { enabled: boolean; onChanged: () => 
       {mode === 'enroll' && uri && (
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">Scan this QR code with an authenticator app, then enter the 6-digit code. It is rendered locally and never leaves this page.</p>
-          <div className="inline-block rounded-md border border-[#cfc6b3] bg-white p-3" data-testid="img-totp-qr"><QRCode value={uri} size={176} /></div>
+          <div className="inline-block rounded-md border border-input bg-popover p-3" data-testid="img-totp-qr"><QRCode value={uri} size={176} /></div>
           <details data-testid="details-setup-key" className="text-sm">
             <summary className="cursor-pointer">Can’t scan the QR code?</summary>
             <p className="mt-2 text-muted-foreground">Enter this setup key in your authenticator. Do not share it.</p>
@@ -138,7 +138,7 @@ function Sessions({ currentToken }: { currentToken?: string }) {
       <ErrorLine>{err}</ErrorLine>
       {!list && !err && <p className="text-sm text-muted-foreground">Loading sessions...</p>}
       {list?.map((s) => (
-        <div key={s.id} data-testid={`row-session-${s.id}`} className="flex items-center justify-between gap-3 rounded-md border border-[#ddd5c4] bg-white px-3 py-2">
+        <div key={s.id} data-testid={`row-session-${s.id}`} className="flex items-center justify-between gap-3 rounded-md border border-border bg-popover px-3 py-2">
           <div className="flex min-w-0 items-center gap-3"><Monitor className="h-4 w-4 shrink-0 text-muted-foreground" />
             <div className="min-w-0 text-sm"><p className="truncate">{s.userAgent || 'Unknown device'}{s.token === currentToken && <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary">This device</span>}</p>
               <p className="text-xs text-muted-foreground">{s.ipAddress || 'IP unavailable'} - {new Date(s.createdAt).toLocaleString()}</p></div></div>

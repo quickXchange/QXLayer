@@ -39,7 +39,7 @@ function Health() {
   const text = h.isLoading ? 'Checking API' : h.isError ? 'API unreachable' : `API ${h.data?.status}`;
   return (
     <div data-testid="status-health" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider">
-      <span className={`h-2 w-2 rounded-full ${h.isError ? 'bg-destructive' : ok || h.data ? 'bg-emerald-500' : 'bg-muted-foreground animate-pulse'}`} />
+      <span className={`h-2 w-2 rounded-full ${h.isError ? 'bg-destructive' : ok || h.data ? 'bg-[#2fae6b]' : 'bg-muted-foreground animate-pulse'}`} />
       {text}
     </div>
   );

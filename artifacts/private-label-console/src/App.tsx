@@ -51,7 +51,9 @@ const PlanDetail = lazy(() => import('@/pages/plan-detail'));
 const Addons = lazy(() => import('@/pages/addons'));
 const LandingProducts = lazy(() => import('@/pages/landing-products'));
 const CatalogPreview = lazy(() => import('@/pages/catalog-preview'));
-import { QXLAYER_LIGHT_LOGO_URL } from '@/lib/brand';
+import { QXLAYER_LIGHT_LOGO_URL, VYNOX_DARK_LOGO_URL } from '@/lib/brand';
+import { PLATFORM_SITE } from '@/lib/platform-site';
+import { useSiteTheme } from '@site/hooks/use-site-theme';
 import { BrandLogo } from '@/components/brand-logo';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
 
@@ -77,29 +79,30 @@ const clerkAppearance = {
   theme: shadcn,
   cssLayerName: 'clerk',
   options: { logoPlacement: 'inside' as const, logoLinkUrl: basePath || '/', logoImageUrl: new URL(QXLAYER_LIGHT_LOGO_URL, window.location.origin).href },
+  // Resolve from the mounted theme, including body-portaled provider controls.
   variables: {
-    colorPrimary: '#12423f', colorForeground: '#12201f', colorMutedForeground: '#5a6664', colorDanger: '#b3382a',
-    colorBackground: '#fbf8f2', colorInput: '#ffffff', colorInputForeground: '#12201f', colorNeutral: '#8a7f6c',
-    fontFamily: "'Bricolage Grotesque', sans-serif", borderRadius: '0.5rem',
+    colorPrimary: 'hsl(var(--primary))', colorForeground: 'hsl(var(--foreground))', colorMutedForeground: 'hsl(var(--muted-foreground))', colorDanger: 'hsl(var(--destructive))',
+    colorBackground: 'hsl(var(--card))', colorInput: 'hsl(var(--popover))', colorInputForeground: 'hsl(var(--foreground))', colorNeutral: 'hsl(var(--foreground))',
+    fontFamily: "'Space Grotesk', sans-serif", borderRadius: '0.75rem',
   },
   elements: {
     rootBox: 'w-full flex justify-center',
-    logoImage: '!h-20 !w-20 !object-contain',
-    cardBox: 'bg-[#fbf8f2] border border-[#ddd5c4] rounded-xl w-[440px] max-w-full overflow-hidden',
+    logoImage: '!h-auto !w-[180px] !max-w-full !object-contain',
+    cardBox: 'bg-card border border-border rounded-xl w-[440px] max-w-full overflow-hidden shadow-[0_30px_80px_-40px_var(--s-glow)]',
     card: '!shadow-none !border-0 !bg-transparent !rounded-none',
     footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
-    headerTitle: 'text-[#12201f] text-2xl',
-    headerSubtitle: 'text-[#5a6664]',
-    socialButtonsBlockButtonText: 'text-[#12201f]',
-    formFieldLabel: 'text-[#12201f]',
-    footerActionLink: 'text-[#b4551f] font-medium',
-    footerActionText: 'text-[#5a6664]',
-    dividerText: 'text-[#5a6664]',
-    identityPreviewEditButton: 'text-[#b4551f]',
-    formFieldSuccessText: 'text-[#12423f]',
-    alertText: 'text-[#12201f]',
-    formButtonPrimary: 'bg-[#12423f] hover:bg-[#0d3230] text-[#f6f1e8]',
-    formFieldInput: 'border-[#cfc6b3]',
+    headerTitle: 'text-foreground text-2xl',
+    headerSubtitle: 'text-muted-foreground',
+    socialButtonsBlockButtonText: 'text-foreground',
+    formFieldLabel: 'text-foreground',
+    footerActionLink: 'text-[var(--s-accent-ink)] font-medium',
+    footerActionText: 'text-muted-foreground',
+    dividerText: 'text-muted-foreground',
+    identityPreviewEditButton: 'text-[var(--s-accent-ink)]',
+    formFieldSuccessText: 'text-[var(--s-accent-ink)]',
+    alertText: 'text-foreground',
+    formButtonPrimary: 'bg-primary hover:opacity-90 text-primary-foreground',
+    formFieldInput: 'border-input bg-popover text-foreground',
   },
 };
 
@@ -112,14 +115,14 @@ const localization = {
 };
 
 function AuthFrame({ children, title, subtitle }: { children: ReactNode; title: string; subtitle: string }) {
-  return <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-background px-4 py-8">
+  return <ConsoleThemeScope><div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 px-4 py-8">
     <div className="flex flex-col items-center gap-1 text-center">
       <BrandLogo size={80} />
-      <h1 className="text-2xl text-[#12201f]">{title}</h1>
-      <p className="text-sm text-[#5a6664]">{subtitle}</p>
+      <h1 className="text-2xl text-foreground">{title}</h1>
+      <p className="text-sm text-muted-foreground">{subtitle}</p>
     </div>
     {children}
-  </div>;
+  </div></ConsoleThemeScope>;
 }
 const SignInPage = () => <AuthFrame title={localization.signIn.start.title} subtitle={localization.signIn.start.subtitle}><SignIn appearance={hiddenProviderHeader} routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/admin`} /></AuthFrame>;
 const SignUpPage = () => <AuthFrame title={localization.signUp.start.title} subtitle={localization.signUp.start.subtitle}><SignUp appearance={hiddenProviderHeader} routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} fallbackRedirectUrl={`${basePath}/account`} /></AuthFrame>;
@@ -297,11 +300,13 @@ function AppRoutes() {
 
 function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
+  const { dark } = useSiteTheme(PLATFORM_SITE);
   return (
     <ClerkProvider
       publishableKey={clerkPubKey!}
       proxyUrl={clerkProxyUrl}
-      appearance={clerkAppearance}
+      appearance={{ ...clerkAppearance, options: { ...clerkAppearance.options,
+        logoImageUrl: new URL(dark ? VYNOX_DARK_LOGO_URL : QXLAYER_LIGHT_LOGO_URL, window.location.origin).href } }}
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
       localization={localization}
