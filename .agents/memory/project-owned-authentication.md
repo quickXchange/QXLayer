@@ -32,3 +32,9 @@ QuickXchange and VYNOX LAYER are independent projects. Preserve QuickXchange's R
 **Why:** The user explicitly prohibited changes to QuickXchange. Replit documents account-level reusable connections, so repairing a shared connection in place may affect another project.
 
 **How to apply:** Never update, revoke, rotate or replace the existing account-level Resend credential for this repair. Do not copy QuickXchange credentials. Use separate VYNOX authorization to inspect its domain and provision its SMTP key; privileged setup authorization must not become the SMTP credential. Request new keys or explicit authorization through secure Secrets only. During this repair do not change Production, Clerk, DNS or databases, and never access the Namecheap support mailbox.
+
+Keep Supabase setup authorization scoped to the pinned Staging project. Do not substitute a classic/Legacy account-wide token to work around denied SMTP configuration writes.
+
+**Why:** Auth configuration writes require both Auth Config and Project Settings Read-write in Supabase's scoped-token UI; the latter grants broader project capabilities. A Legacy token would unnecessarily widen access to Production and other projects.
+
+**How to apply:** Request a separate Staging-only setup token through secure Secrets. Use the dashboard permission names, not only the API's `auth_config_write` and `project_admin_write` identifiers. The issuing account must already have the corresponding rights; token scopes cannot elevate its role. Use the token only for the approved Staging email configuration.
