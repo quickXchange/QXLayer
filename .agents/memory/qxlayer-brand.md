@@ -5,6 +5,19 @@ description: User-approved master logo, shared platform visual language, and the
 
 The supplied VYNOX LAYER image supersedes the former QXLayer master for the main platform, admin console, authentication, browser icons, and platform-owned previews. Keep the new master untouched; never redesign or regenerate the logo.
 
+The user's later horizontal transparent PNG supersedes the earlier stacked
+VYNOX LAYER mark. Website headers use the full logo without a separate
+“VYNOX LAYER” text label next to it. Keep it clearly readable across phone,
+tablet and desktop, and use appropriate sizes on login and other shared
+branding surfaces without changing the rest of the design.
+
+**Why:** The user explicitly requested the new PNG, removal of duplicated
+header text, original proportions/transparency, and Dark/Light verification.
+
+**How to apply:** Preserve the supplied pixels and colours; do not redraw,
+stretch or add a background. Keep tenant/customer branding isolated and
+Production/DNS unchanged unless separately authorized.
+
 Preserve the new full-logo geometry, proportions, metallic colors and typography. The former QX-above-Layer geometry and its color-derivative instructions describe the superseded asset, not the new VYNOX LAYER master.
 
 **Why:** The user explicitly requested a complete VYNOX LAYER rebrand using the supplied image while preserving functionality and integrations. Prior approval of the platform layout and tenant branding still applies.

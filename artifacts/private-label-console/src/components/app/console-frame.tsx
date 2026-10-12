@@ -40,8 +40,7 @@ function useDesktop() {
 function Brand({ href }: { href: string }) {
   return (
     <Link href={href} data-testid="link-logo" className="qx-brand flex min-w-0 items-center gap-2.5">
-      <BrandLogo size={32} />
-      <span className="truncate text-[1.05rem] font-semibold tracking-tight">VYNOX LAYER</span>
+      <BrandLogo size={52} />
     </Link>
   );
 }

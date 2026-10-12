@@ -23,7 +23,7 @@ function supportHref(site: PublicSite, anchor: (id: string) => string) {
   return { href: anchor('support'), external: false, anchor: true };
 }
 
-export interface PlatformShell { root: string; nav: { id: string; label: string }[]; actions: ReactNode; footer: ReactNode; lightLogoUrl?: string; lightFaviconUrl?: string }
+export interface PlatformShell { root: string; nav: { id: string; label: string }[]; actions: ReactNode; footer: ReactNode; headerBrand?: ReactNode; lightLogoUrl?: string; lightFaviconUrl?: string }
 
 export function SiteShell({ site, children, ambient = false, platform }: { site: PublicSite; children: ReactNode; ambient?: boolean; platform?: PlatformShell }) {
   const { dark, toggle } = useSiteTheme(site);
@@ -58,11 +58,11 @@ export function SiteShell({ site, children, ambient = false, platform }: { site:
   return (
     <div className="site min-h-[100dvh]" style={t as CSSProperties} data-exchange-template={platform ? undefined : ws.templateKey ?? 'standard-exchange'} data-qx-theme={platform ? (dark ? 'dark' : 'light') : undefined} data-surface={ws.surfaceStyle ?? 'solid'} data-testid="site-root">
       {ambient && <Ambient />}
-      <header className="s-header">
+      <header className={`s-header${platform ? ' s-platform-header' : ''}`}>
         <div className="s-wrap flex h-[68px] items-center gap-3">
-          <Link href={base} className="flex min-w-0 items-center gap-2.5" data-testid="link-home">
-            <BrandMark site={themedSite} />
-            <span className="truncate text-[1.05rem] font-semibold tracking-tight" data-testid="text-brand">{ws.websiteName || site.brandName}</span>
+          <Link href={base} className={`flex min-w-0 items-center gap-2.5${platform?.headerBrand ? ' shrink-0' : ''}`} data-testid="link-home">
+            {platform?.headerBrand ?? <><BrandMark site={themedSite} />
+              <span className="truncate text-[1.05rem] font-semibold tracking-tight" data-testid="text-brand">{ws.websiteName || site.brandName}</span></>}
           </Link>
           <nav className="s-nav ml-6 hidden flex-1 items-center gap-0.5 lg:flex" aria-label="Primary">
             {nav.map((n) => <a key={n.id} href={href(n.id)} onClick={go(n.id)} data-testid={`link-nav-${n.id}`}>{n.label}</a>)}

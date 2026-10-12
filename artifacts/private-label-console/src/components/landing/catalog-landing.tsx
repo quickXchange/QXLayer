@@ -37,7 +37,8 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
   );
   return (
     <div data-testid="page-landing">
-      <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV, actions, footer, lightLogoUrl: QXLAYER_LIGHT_LOGO_URL, lightFaviconUrl: QXLAYER_LIGHT_ICON_URL }}>
+      <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV, actions, footer, lightLogoUrl: QXLAYER_LIGHT_LOGO_URL, lightFaviconUrl: QXLAYER_LIGHT_ICON_URL,
+        headerBrand: <BrandLogo size={60} className="w-[150px] min-[360px]:w-[168px] sm:w-[192px] lg:w-[204px]" style={{ width: undefined, height: 'auto' }} /> }}>
         <Hero site={PLATFORM_SITE} caps={caps} root={root} secondary={{ id: 'products', label: 'Browse products' }} />
         <Suspense fallback={<div className="s-wrap py-20" aria-busy="true"><div className="s-skel h-8 w-64" /></div>}>
           <PlatformCatalog items={items} loading={q.isLoading} error={q.isError} onRetry={() => void q.refetch()} open={open} setOpen={(p: LandingProduct | null) => setOpenKey(p ? p.key : null)} />

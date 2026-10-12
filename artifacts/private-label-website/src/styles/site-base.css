@@ -30,6 +30,13 @@ html.s-smooth{scroll-behavior:smooth}
 @media(max-width:639px){.s-header-cta{display:none}}
 @media(min-width:640px){.s-menu-cta{display:none}}
 @media(min-width:1024px){.s-header .s-menu-trigger{display:none}}
+/* Keep the full platform wordmark readable on landscape tablets.
+   Tenant headers retain their existing breakpoints and branding. */
+@media(min-width:1024px) and (max-width:1199px){
+  .s-platform-header .s-nav{display:none}
+  .s-platform-header .s-menu-trigger{display:inline-flex}
+  .s-platform-header .s-mobile-menu{display:block}
+}
 .s-section{padding:clamp(3.25rem,8vw,7rem) 0;content-visibility:auto;contain-intrinsic-size:auto 700px}
 .s-wrap{max-width:74rem;margin:0 auto;padding:0 1.25rem}
 @media(min-width:768px){.s-wrap{padding:0 2rem}}
