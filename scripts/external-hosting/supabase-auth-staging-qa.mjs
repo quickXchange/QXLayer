@@ -17,7 +17,7 @@ const fixtures = Object.fromEntries(["customer","client_admin","super_admin"].ma
 }]));
 const scope = { marker, project, ref:"muvedavhbpgpdrrnjrih", origin:release.origin,
   bypassNote:`Disposable VYNOX Supabase auth verification ${marker}`,
-  accounts:Object.values(fixtures).map(x=>({role:x.role,email:x.email})), users:[], memberships:[], admins:[] };
+  accounts:Object.values(fixtures).map(x=>({role:x.role,email:x.email})), users:[], memberships:[], admins:[], tenants:[] };
 let server, bypass, closing, cleaned = false;
 let originalMailLimit;
 async function authConfig(body) {
@@ -47,6 +47,29 @@ const deployment = await vercel(`/v13/deployments/${release.previewId}`);
 if(deployment.projectId!==project||deployment.target==="production"||deployment.readyState!=="READY"||
    release.providerTarget!=="preview")throw Error("Only verified Staging Preview can be tested.");
 const originalBypasses = Object.keys(originalProject.protectionBypass??{});
+async function createDisposableTenants() {
+  if(process.env.QXLAYER_STAGING_TEMP_TENANTS_APPROVED!=="true")return;
+  // Simulate only the access-readiness marker on two disposable sandbox tenants.
+  // No real provisioning/activation workflow, plan, order, domain or provider is
+  // executed; exchange/payments remain disabled and entitlements unassigned.
+  scope.tenants=[0,1].map(i=>({id:randomUUID(),
+    slug:`auth-isolation-${marker.replaceAll("-","").slice(0,12)}-${i}`,
+    name:`Disposable auth isolation ${i+1}`}));
+  await saveScope(scope);
+  await ctx.db.query("BEGIN");
+  try {
+    for(const t of scope.tenants){
+      await ctx.db.query(`INSERT INTO public.tenants(id,name,slug,status,environment,completed_steps)
+        VALUES($1,$2,$3,'active','sandbox',ARRAY['exchange_provisioned']::text[])`,[t.id,t.name,t.slug]);
+      await ctx.db.query("INSERT INTO public.tenant_branding(tenant_id,brand_name) VALUES($1,$2)",[t.id,t.name]);
+      await ctx.db.query("INSERT INTO public.tenant_configuration(tenant_id) VALUES($1)",[t.id]);
+    }
+    await ctx.db.query("COMMIT");
+  }catch(e){await ctx.db.query("ROLLBACK");throw e;}
+  const r=await ctx.db.query("SELECT id,slug,status,environment FROM public.tenants WHERE id=ANY($1::uuid[])",[scope.tenants.map(t=>t.id)]);
+  if(r.rowCount!==2||r.rows.some(t=>t.status!=="active"||t.environment!=="sandbox"||
+    !scope.tenants.some(s=>s.id===t.id&&s.slug===t.slug)))throw Error("Disposable tenant creation readback failed.");
+}
 function totp(secret) {
   const alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";let bits="";
   for(const c of secret.toUpperCase().replace(/=+$/,"")){const i=alphabet.indexOf(c);if(i<0)throw Error("Invalid temporary MFA seed");bits+=i.toString(2).padStart(5,"0");}
@@ -89,8 +112,9 @@ async function assign(role) {
   if(!u?.email_confirmed_at)throw Error("Confirm disposable account before assigning a temporary role.");
   const business=`supabase:${u.id}`;
   const tenants=(await ctx.db.query(`SELECT t.id FROM public.tenants t WHERE t.status<>'suspended'
+    AND (cardinality($1::uuid[])=0 OR t.id=ANY($1::uuid[]))
     AND NOT EXISTS(SELECT 1 FROM public.white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')
-    ORDER BY t.created_at LIMIT 2`)).rows;
+    ORDER BY t.created_at,t.id LIMIT 2`,[scope.tenants.map(t=>t.id)])).rows;
   if(role==="client_admin"&&tenants.length<2)throw Error("Two existing isolated Staging tenants are required for read-only Client Admin isolation tests.");
   if(role==="client_admin"){
     if(!scope.memberships.some(x=>x.businessId===business)){
@@ -113,6 +137,13 @@ async function cleanup() {
     await syncUsers();
     for(const x of scope.memberships)await ctx.db.query("DELETE FROM public.tenant_memberships WHERE tenant_id=$1 AND clerk_user_id=$2",[x.tenantId,x.businessId]);
     for(const id of scope.admins)await ctx.db.query("DELETE FROM public.platform_admins WHERE clerk_user_id=$1",[id]);
+    for(const t of scope.tenants){
+      await ctx.db.query("DELETE FROM public.tenant_configuration WHERE tenant_id=$1",[t.id]);
+      await ctx.db.query("DELETE FROM public.tenant_branding WHERE tenant_id=$1",[t.id]);
+      await ctx.db.query("DELETE FROM public.tenants WHERE id=$1 AND slug=$2",[t.id,t.slug]);
+    }
+    if((await ctx.db.query("SELECT count(*)::int AS n FROM public.tenants WHERE id=ANY($1::uuid[])",[scope.tenants.map(t=>t.id)])).rows[0].n)
+      throw Error("Disposable tenants remain.");
     for(const id of scope.users){
       await ctx.db.query("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1",[id]);
       await ctx.db.query("DELETE FROM vynox_supabase_auth.identity_links WHERE subject=$1",[id]);
@@ -143,14 +174,17 @@ async function cleanup() {
     await writeFile(`${SCOPE}/cleanup.json`,JSON.stringify({disposableUsersRemoved:true,temporaryMembershipsRemoved:true,
       temporaryAdminsRemoved:true,temporarySessionsRemoved:true,temporaryProtectionCredentialRevoked:true,
       existingSupabaseIdentitiesUnchanged:true,businessDataAndPermissionsUnchanged:true,clerkUnchanged:true,
-      productionActivated:false,dnsChanged:false,secretsRecorded:false,originalMailQuotaRestored:true,evidence},null,2));
+      productionActivated:false,dnsChanged:false,secretsRecorded:false,originalMailQuotaRestored:true,
+      disposableTenantsRemoved:true,disposableTenantCount:scope.tenants.length,evidence},null,2));
     console.info("Disposable Staging users, roles, sessions and protection credential removed; exact business-data baseline unchanged.");
   }
 }
 process.on("SIGTERM",()=>void cleanup().then(()=>process.exit(cleaned?0:1)).catch(()=>{console.error("Staging QA cleanup requires recovery from the exact fixture manifest.");process.exit(1)}));
 process.on("SIGINT",()=>process.kill(process.pid,"SIGTERM"));
 try {
+  await assertPreserved(ctx.db);
   await saveScope(scope);
+  await createDisposableTenants();
   originalMailLimit=(await authConfig()).rate_limit_email_sent;
   scope.originalMailLimit=originalMailLimit;await saveScope(scope);
   if(originalMailLimit<30)await authConfig({rate_limit_email_sent:30});

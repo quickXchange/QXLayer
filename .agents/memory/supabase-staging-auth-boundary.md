@@ -26,3 +26,9 @@ Keep disposable test-email local parts within the SMTP limit of 64 characters.
 **Why:** A full UUID plus descriptive role made the first sample exceed the limit. Native signup failed with a provider error before creating a user; short planned addresses subsequently passed without any SMTP credential change.
 
 **How to apply:** Use a short random label and persist the exact full planned address before signup. Check recipient validity before treating a sending failure as a broken provider credential or rotating working keys.
+
+Report authorization tests with simulated sandbox readiness separately from real customer provisioning, delivery or commercial readiness.
+
+**Why:** Draft fixtures correctly hit existing delivery guards before tenant reads. Explicitly approved, access-ready disposable fixtures proved tenant isolation, but did not prove product execution or fulfillment.
+
+**How to apply:** Prepare only scoped, approved fixtures to meet the actual authorization prerequisites; never weaken application guards to satisfy a test. Keep execution/providers disabled and subscriptions unassigned when testing authentication alone, then remove the exact fixtures and verify preservation.
