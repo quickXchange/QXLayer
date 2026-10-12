@@ -10,6 +10,10 @@
 .s-tab{min-height:44px;padding:0 1.1rem;border-radius:var(--s-r1);font-size:.9rem;font-weight:600;color:var(--s-muted);transition:color .25s,background-color .25s,box-shadow .25s}
 .s-tab:hover{color:var(--s-fg)}
 .s-tab[aria-selected=true]{background:linear-gradient(180deg,color-mix(in srgb,var(--s-accent) 24%,transparent),color-mix(in srgb,var(--s-accent) 12%,transparent));color:var(--s-fg);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--s-fg) 18%,transparent),0 0 0 1px color-mix(in srgb,var(--s-accent) 40%,transparent)}
+@media(max-width:639px){
+  .s-action-header .s-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));flex:1;min-width:0;overflow:visible}
+  .s-action-header .s-tab{padding-inline:.45rem}
+}
 .s-side{border:1px solid var(--s-line);border-radius:var(--s-r2);background:linear-gradient(180deg,color-mix(in srgb,var(--s-bg) 55%,transparent),color-mix(in srgb,var(--s-fg) 3%,transparent));box-shadow:inset 0 2px 8px -4px rgb(0 0 0/.35);padding:1rem 1.1rem 1rem;transition:border-color .25s,box-shadow .25s}
 .s-side:hover{border-color:color-mix(in srgb,var(--s-fg) 22%,transparent)}
 .s-side:focus-within{border-color:color-mix(in srgb,var(--s-accent) 75%,transparent);box-shadow:inset 0 2px 8px -4px rgb(0 0 0/.35),0 0 0 4px color-mix(in srgb,var(--s-accent) 16%,transparent)}

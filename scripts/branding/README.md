@@ -29,7 +29,10 @@ pnpm --filter @workspace/private-label-website run typecheck
 ```
 
 Tests cover AA contrast for normal text, muted text, links and primary controls
-across the shared surfaces in both modes, plus customer color isolation.
+across the shared surfaces in both modes, distinct chart series at 3:1 contrast,
+readable placeholders/status text, the Staging gate button and customer color
+isolation. The gate's presentation-only overrides apply to Staging; its
+Production HTML/CSS is preserved.
 Also visually check alpha/content: an entirely transparent image can load
 successfully with valid intrinsic dimensions.
 

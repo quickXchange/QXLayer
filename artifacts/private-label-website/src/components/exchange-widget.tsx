@@ -208,7 +208,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
 
   return shell(
     <form onSubmit={submit} noValidate aria-label="Exchange (sandbox)" className={presentation ? undefined : 's-exchange-functional'}>
-      <div className="flex items-center justify-between gap-3">
+      <div className="s-action-header flex items-center justify-between gap-3">
         <div role="tablist" aria-label="Exchange action" className="s-tabs overflow-x-auto">
           {!presentation && !tabs.length && <span className="s-tab" aria-disabled="true" data-testid="state-actions-unconfigured">Actions not configured</span>}
           {tabs.map((t) => <button key={t} type="button" role="tab" id={`tab-${t}`} aria-selected={tab === t} className="s-tab" onClick={() => { setTab(t); setTouched(false); setPaymentMethodId(''); reset(); }} data-testid={`tab-${t}`}>{LABEL[t]}</button>)}

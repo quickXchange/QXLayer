@@ -16,7 +16,10 @@ const repo = 'quickXchange/QXLayer', branch = 'qxlayer-staging';
 const apiId = 'srv-db5b47qjnfac739s374g', workerId = 'srv-db5b48o473hc73ah56d0';
 const groupId = 'evg-db5ate8473hc73agdon0';
 const project = 'prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx', team = 'team_eoJE6FCcm9esuqnRTUsmopzy';
-const evidence = 'generated-artifacts/qxlayer-staging-setup/vynox-colors-release.json';
+const receiptName = process.env.QXLAYER_STAGING_RELEASE_RECEIPT || 'vynox-colors-release.json';
+if (!/^vynox-[a-z0-9-]+-release\.json$/.test(receiptName))
+  throw Error('Expected a bounded, distinct Staging release receipt name.');
+const evidence = `generated-artifacts/qxlayer-staging-setup/${receiptName}`;
 try { await access(evidence); throw Error('Release receipt already exists; reconcile it instead of repeating this release.'); }
 catch (e) { if (e.code !== 'ENOENT') throw e; }
 async function provider(kind, route, method = 'GET', body) {
@@ -65,10 +68,11 @@ const prior = git(['ls-remote', 'origin', `refs/heads/${branch}`]).split(/\s/)[0
 if (!/^[a-f0-9]{40}$/.test(prior)) throw Error('Existing Staging source required.');
 git(['fetch', '--no-tags', 'origin', prior]);
 const prefixes = ['artifacts/private-label-console/', 'artifacts/private-label-website/', 'scripts/branding/'];
-const allowed = file => prefixes.some(prefix => file.startsWith(prefix));
+const presentationFiles = ['lib/production-access-gate/page.mjs'];
+const allowed = file => prefixes.some(prefix => file.startsWith(prefix)) || presentationFiles.includes(file);
 // Automatic workspace checkpoints may already commit the work; compare to the
 // fetched Staging revision, not HEAD or a clean-worktree indicator.
-const changed = git(['diff', '--name-only', prior, '--', ...prefixes]).split('\n').filter(Boolean);
+const changed = git(['diff', '--name-only', prior, '--', ...prefixes, ...presentationFiles]).split('\n').filter(Boolean);
 const added = git(['ls-files', '--others', '--exclude-standard', '--', ...prefixes]).split('\n').filter(Boolean);
 const selected = [...new Set([...changed, ...added, 'scripts/external-hosting/release-staging-colors.mjs'])];
 if (!changed.length || selected.some(file => !allowed(file) && file !== 'scripts/external-hosting/release-staging-colors.mjs'))

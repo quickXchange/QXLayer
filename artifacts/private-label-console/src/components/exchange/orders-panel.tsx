@@ -144,7 +144,7 @@ function Row({ l, v }: { l: string; v: React.ReactNode }) {
 export function OrderDrawer({ tenantId, orderId, canEdit, onClose }: { tenantId: string; orderId: string | null; canEdit: boolean; onClose: () => void }) {
   return (
     <Sheet open={!!orderId} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <SheetContent className="w-full max-w-none overflow-y-auto sm:max-w-md" data-testid="drawer-order">
+      <SheetContent className="w-full max-w-[min(100vw,28rem)] overflow-y-auto [overflow-wrap:anywhere] sm:max-w-[min(100vw,28rem)]" data-testid="drawer-order">
         {orderId && <DrawerBody key={orderId} tenantId={tenantId} orderId={orderId} canEdit={canEdit} />}
       </SheetContent>
     </Sheet>
@@ -202,7 +202,7 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
             <div className="flex flex-wrap items-center gap-3"><OrderStatus status={o.status} /><span className="capitalize text-sm">{o.action}</span><span className="font-mono text-[10px] uppercase text-copper">sandbox only</span></div>
             {vis.isError && <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="text-visual-unavailable">Artwork unavailable; showing text labels. <button type="button" className="underline" onClick={() => vis.refetch()}>Retry</button></p>}
             <Panel title="Send → Receive" testid="order-exchange">
-              <div className="flex flex-col gap-px overflow-hidden rounded-md border bg-border sm:flex-row">{side('Send', o.source, o.sourceSymbol, o.inputAmount)}{side('Receive', o.destination, o.destinationSymbol, o.outputAmount)}</div>
+              <div className="flex flex-col gap-px rounded-md border bg-border">{side('Send', o.source, o.sourceSymbol, o.inputAmount)}{side('Receive', o.destination, o.destinationSymbol, o.outputAmount)}</div>
             </Panel>
             <Panel title="Pricing">
               <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2" data-testid="order-fields">
