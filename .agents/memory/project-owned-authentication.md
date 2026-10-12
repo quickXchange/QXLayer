@@ -21,8 +21,8 @@ The user now explicitly requests their own Supabase Auth, reusing compatible cus
 
 **How to apply:** A custom Better Auth implementation is not completion of the Supabase request. Reuse compatible UI and identity-preservation mechanisms, test the Supabase path separately in Staging, and retain the current Clerk path until approved.
 
-Use a Mailtrap sandbox inbox for Staging authentication email tests.
+Use the user's existing Namecheap Private Email SMTP instead of Mailtrap for Supabase Auth verification and password recovery.
 
-**Why:** The user selected Mailtrap sandbox capture instead of their existing SMTP provider.
+**Why:** The user explicitly replaced the earlier Mailtrap choice with Namecheap Private Email.
 
-**How to apply:** Exercise Supabase's actual verification and recovery messages in the sandbox without delivering them to customers. This choice does not authorize Production email changes or demonstrate delivery to public mailboxes.
+**How to apply:** Request SMTP credentials through secure Secrets only; never expose passwords. Test actual email delivery and recovery links on Staging first. Keep Production, Clerk, existing accounts and permissions unchanged. Diagnose, fix and verify autonomously within these boundaries.
