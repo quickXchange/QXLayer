@@ -43,6 +43,17 @@ For user-authorized native Git pushes with a saved PAT, use an ephemeral
 credential helper reading `GITHUB_TOKEN`; never embed credentials in a remote URL
 or persist them in Git configuration. Verify the destination ref afterward.
 
+For a bounded Staging snapshot, determine changed files against the fetched
+remote Staging revision, not just local HEAD or the worktree's clean status.
+
+**Why:** Automatic workspace checkpoints can commit approved work before the
+next release turn. A clean worktree does not mean Staging already has those
+changes.
+
+**How to apply:** Preserve the remote tree outside explicitly reviewed paths;
+do not broaden a frontend release to backend, schema, package or workflow files
+merely because the local checkpoint contains them.
+
 **Why:** Direct native authentication succeeded where the source-control
 connection lacked workflow permission. A token-shaped shell variable name does
 not reference the saved `GITHUB_TOKEN` variable.

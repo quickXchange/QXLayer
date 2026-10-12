@@ -28,6 +28,19 @@ Use one shared token system in both themes, retaining accessible semantic
 success/warning/error distinctions. No database modifications or Production,
 DNS or live-service changes; release only to existing Staging.
 
+The user subsequently approved updating the existing Staging API's trusted
+frontend URL and restarting it for this color release. Preserve its existing
+live backend revision: this is not approval to deploy new backend logic.
+Production, DNS, databases, the authentication provider and the Worker remain
+unchanged.
+
+**Why:** The isolated Staging frontend URL is pinned by its authentication
+bindings, so a new frontend Preview needs a matching Staging origin update.
+
+**How to apply:** Limit Staging environment writes to the frontend/auth origin
+bindings, verify unrelated values are unchanged and restart existing backend
+code. Do not infer database or Production permission from this approval.
+
 The user also authorizes separate transparent Dark/Light logo variants made
 from the original: preserve the vibrant dark glow, deepen light lettering and
 reduce light glow, remove only unused alpha padding and switch automatically.
