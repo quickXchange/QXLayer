@@ -6,19 +6,26 @@ import { ReplitConnectors } from "@replit/connectors-sdk";
 import { createServer } from "node:http";
 import { randomUUID, randomBytes, createHmac, createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { stagingContext, admin, saveScope, assertPreserved, SCOPE } from "./supabase-auth-staging-context.mjs";
+import { stagingContext, admin, saveScope, assertPreserved, SCOPE, AUTH_REF } from "./supabase-auth-staging-context.mjs";
 const ctx = await stagingContext(), sdk = new ReplitConnectors();
 const release = JSON.parse(await readFile(`${SCOPE}/release.json`, "utf8"));
 const project = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx", team = "team_eoJE6FCcm9esuqnRTUsmopzy";
 const marker = randomUUID();
 const fixtures = Object.fromEntries(["customer","client_admin","super_admin"].map(role => [role, {
-  role, email:`delivered+vynox-auth-${marker}-${role}@resend.dev`,
+  role, email:`delivered+vynox-auth-${marker.replaceAll("-","").slice(0,12)}-${role}@resend.dev`,
   name:`VYNOX disposable ${role}`, password:randomBytes(24).toString("base64url"), nextPassword:randomBytes(24).toString("base64url"),
 }]));
 const scope = { marker, project, ref:"muvedavhbpgpdrrnjrih", origin:release.origin,
   bypassNote:`Disposable VYNOX Supabase auth verification ${marker}`,
   accounts:Object.values(fixtures).map(x=>({role:x.role,email:x.email})), users:[], memberships:[], admins:[] };
 let server, bypass, closing, cleaned = false;
+let originalMailLimit;
+async function authConfig(body) {
+  const r=await fetch(`https://api.supabase.com/v1/projects/${AUTH_REF}/config/auth`,{
+    method:body?"PATCH":"GET",headers:{Authorization:`Bearer ${process.env.QXLAYER_STAGING_SUPABASE_AUTH_SETUP_TOKEN}`,"Content-Type":"application/json"},
+    ...(body?{body:JSON.stringify(body)}:{}),redirect:"error",signal:AbortSignal.timeout(30000)});
+  if(!r.ok)throw Error(`Pinned Staging mail quota configuration HTTP ${r.status}`);return r.json();
+}
 const seeds = new Map(), evidence = [];
 async function vercel(route, method="GET", body) {
   const r = await sdk.proxy("vercel",`${route}?teamId=${team}`,{method,...(body?{body}:{})});
@@ -81,25 +88,31 @@ async function assign(role) {
   await syncUsers();const u=(await users()).find(u=>u.email===fixtures[role].email);
   if(!u?.email_confirmed_at)throw Error("Confirm disposable account before assigning a temporary role.");
   const business=`supabase:${u.id}`;
-  const tenants=(await ctx.db.query("SELECT id FROM public.tenants WHERE status<>'suspended' ORDER BY created_at LIMIT 2")).rows;
-  if(tenants.length<2)throw Error("Two existing isolated Staging tenants are required for read-only isolation tests.");
+  const tenants=(await ctx.db.query(`SELECT t.id FROM public.tenants t WHERE t.status<>'suspended'
+    AND NOT EXISTS(SELECT 1 FROM public.white_label_requests w WHERE w.tenant_id=t.id AND w.status<>'delivered')
+    ORDER BY t.created_at LIMIT 2`)).rows;
+  if(role==="client_admin"&&tenants.length<2)throw Error("Two existing isolated Staging tenants are required for read-only Client Admin isolation tests.");
   if(role==="client_admin"){
-    const id=randomUUID();scope.memberships.push(id);await saveScope(scope);
-    await ctx.db.query(`INSERT INTO public.tenant_memberships(id,tenant_id,clerk_user_id,role,active)
-      VALUES($1,$2,$3,'client_admin',true)`,[id,tenants[0].id,business]);
+    if(!scope.memberships.some(x=>x.businessId===business)){
+      scope.memberships.push({tenantId:tenants[0].id,businessId:business});await saveScope(scope);
+      await ctx.db.query(`INSERT INTO public.tenant_memberships(tenant_id,clerk_user_id,role,active)
+        VALUES($1,$2,'client_admin',true)`,[tenants[0].id,business]);
+    }
   }else{
-    const id=randomUUID();scope.admins.push(id);await saveScope(scope);
-    await ctx.db.query("INSERT INTO public.platform_admins(id,clerk_user_id,active) VALUES($1,$2,true)",[id,business]);
+    if(!scope.admins.includes(business)){
+      scope.admins.push(business);await saveScope(scope);
+      await ctx.db.query("INSERT INTO public.platform_admins(clerk_user_id,active) VALUES($1,true)",[business]);
+    }
   }
-  return {userId:business,ownTenant:tenants[0].id,otherTenant:tenants[1].id};
+  return {userId:business,ownTenant:tenants[0]?.id??null,otherTenant:tenants[1]?.id??null};
 }
 async function cleanup() {
   if(closing)return;closing=true;
   try {
     if(server?.listening)await new Promise(resolve=>server.close(resolve));
     await syncUsers();
-    for(const id of scope.memberships)await ctx.db.query("DELETE FROM public.tenant_memberships WHERE id=$1",[id]);
-    for(const id of scope.admins)await ctx.db.query("DELETE FROM public.platform_admins WHERE id=$1",[id]);
+    for(const x of scope.memberships)await ctx.db.query("DELETE FROM public.tenant_memberships WHERE tenant_id=$1 AND clerk_user_id=$2",[x.tenantId,x.businessId]);
+    for(const id of scope.admins)await ctx.db.query("DELETE FROM public.platform_admins WHERE clerk_user_id=$1",[id]);
     for(const id of scope.users){
       await ctx.db.query("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1",[id]);
       await ctx.db.query("DELETE FROM vynox_supabase_auth.identity_links WHERE subject=$1",[id]);
@@ -111,22 +124,36 @@ async function cleanup() {
     if(createHash("sha256").update(JSON.stringify(remaining)).digest("hex")!==originalFingerprint)
       throw Error("Existing Supabase identities changed.");
     await assertPreserved(ctx.db);
-    if(bypass){await vercel(`/v1/projects/${project}/protection-bypass`,"PATCH",{revoke:{secret:bypass,regenerate:false}});
-      const p=await vercel(`/v9/projects/${project}`);
-      if(Object.hasOwn(p.protectionBypass??{},bypass)||Object.keys(p.protectionBypass??{}).length!==originalBypasses.length)
-        throw Error("Temporary protection credential cleanup failed.");}
     cleaned=true;seeds.clear();for(const f of Object.values(fixtures)){f.password="";f.nextPassword="";}
+  } finally {
+    // Always revoke temporary infrastructure access and restore the bounded
+    // mail quota, even if fixture/data readback found a problem.
+    try {
+      if(bypass){await vercel(`/v1/projects/${project}/protection-bypass`,"PATCH",{revoke:{secret:bypass,regenerate:false}});
+        const p=await vercel(`/v9/projects/${project}`);
+        if(Object.hasOwn(p.protectionBypass??{},bypass)||Object.keys(p.protectionBypass??{}).length!==originalBypasses.length)
+          throw Error("Temporary protection credential cleanup failed.");}
+      if(originalMailLimit!==undefined){
+        await authConfig({rate_limit_email_sent:originalMailLimit});
+        if((await authConfig()).rate_limit_email_sent!==originalMailLimit)throw Error("Staging mail quota restoration failed.");
+      }
+    }finally{await ctx.db.end();}
+  }
+  if(cleaned){
     await writeFile(`${SCOPE}/cleanup.json`,JSON.stringify({disposableUsersRemoved:true,temporaryMembershipsRemoved:true,
       temporaryAdminsRemoved:true,temporarySessionsRemoved:true,temporaryProtectionCredentialRevoked:true,
       existingSupabaseIdentitiesUnchanged:true,businessDataAndPermissionsUnchanged:true,clerkUnchanged:true,
-      productionActivated:false,dnsChanged:false,secretsRecorded:false,evidence},null,2));
+      productionActivated:false,dnsChanged:false,secretsRecorded:false,originalMailQuotaRestored:true,evidence},null,2));
     console.info("Disposable Staging users, roles, sessions and protection credential removed; exact business-data baseline unchanged.");
-  } finally {await ctx.db.end();}
+  }
 }
 process.on("SIGTERM",()=>void cleanup().then(()=>process.exit(cleaned?0:1)).catch(()=>{console.error("Staging QA cleanup requires recovery from the exact fixture manifest.");process.exit(1)}));
 process.on("SIGINT",()=>process.kill(process.pid,"SIGTERM"));
 try {
   await saveScope(scope);
+  originalMailLimit=(await authConfig()).rate_limit_email_sent;
+  scope.originalMailLimit=originalMailLimit;await saveScope(scope);
+  if(originalMailLimit<30)await authConfig({rate_limit_email_sent:30});
   const b=await vercel(`/v1/projects/${project}/protection-bypass`,"PATCH",{generate:{note:scope.bypassNote}});
   bypass=Object.entries(b.protectionBypass??{}).find(([k,v])=>!originalBypasses.includes(k)&&v.note===scope.bypassNote)?.[0];
   if(!bypass)throw Error("Temporary exact-scope protection credential not returned.");

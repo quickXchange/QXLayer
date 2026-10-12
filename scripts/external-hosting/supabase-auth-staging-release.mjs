@@ -30,9 +30,9 @@ function run(file, env) {
   const r = spawnSync("node", [file], { env: { ...process.env, ...env }, stdio: "inherit" });
   if (r.status) throw Error(`Staging integration stopped at ${file}.`);
 }
-const main = await gh("git/ref/heads/main");
-let commit, origin;
+let commit, origin, main;
 try {
+  main = await gh("git/ref/heads/main");
   const api = await render(`services/${API}`), worker = await render("services/srv-db5b48o473hc73ah56d0");
   if (api.branch !== branch || api.autoDeploy !== "no" || api.serviceDetails.plan !== "starter" || worker.suspended !== "suspended")
     throw Error("Staging service boundary changed.");

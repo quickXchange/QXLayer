@@ -71,7 +71,10 @@ function TwoFactor({ enabled }: { enabled: boolean }) {
     if (!fid) { setErr('No authenticator is set up on this account.'); return; }
     const r = await supabaseMfa.remove({ currentPassword: pw, factorId: fid, code: code.replace(/\s/g, '') });
     if (r.error) { setErr(authErrorText(r.error)); return; }
-    clear(); setMode('idle'); setOk('Two-factor authentication is off.');
+    clear();
+    // Removal revokes every server session. A full navigation also discards
+    // detached React Query observers so the previous account state cannot linger.
+    window.location.assign(`${import.meta.env.BASE_URL.replace(/\/$/, "")}/sign-in`);
   });
   return (
     <div className="space-y-4">
