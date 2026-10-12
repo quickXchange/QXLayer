@@ -1,6 +1,6 @@
 ---
 name: Project-owned authentication
-description: User wants authentication owned and operated within QXLayer instead of Clerk.
+description: User requests Supabase Auth with Staging-first verification and an approval-gated Clerk cutover.
 ---
 
 The user wants a full authentication system from their side, integrated with this project, instead of Clerk.
@@ -14,3 +14,9 @@ The user selected “Build and integrate in Staging first (recommended).”
 **Why:** The user approved an isolated Staging implementation, not a Production authentication cutover.
 
 **How to apply:** Verify in Development and Staging before proposing any Production change. Keep Production authentication/data, DNS, paid plans and the suspended Worker untouched.
+
+The user now explicitly requests their own Supabase Auth, reusing compatible custom authentication work. Keep existing account IDs and business data intact. Do not modify Production, remove Clerk, or change existing accounts and permissions until the new system passes all tests and the user approves the final switch.
+
+**Why:** The user specified Supabase Auth and an explicit final-switch approval boundary.
+
+**How to apply:** A custom Better Auth implementation is not completion of the Supabase request. Reuse compatible UI and identity-preservation mechanisms, test the Supabase path separately in Staging, and retain the current Clerk path until approved.
