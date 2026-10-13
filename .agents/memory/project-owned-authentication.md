@@ -9,6 +9,12 @@ The user wants a full authentication system from their side, integrated with thi
 
 **How to apply:** Treat future authentication work as a migration to authentication operated in the project's infrastructure, not as another Clerk ownership or branding exercise. Preserve existing business identities, permanent owner authorization and tenant assignments. Existing external-migration Production safety boundaries still apply until explicitly superseded.
 
+Staging login, 2FA, and session persistence have been manually verified by the user.
+
+**Why:** The user explicitly confirmed these flows before requesting a read-only Development/Staging identity and configuration audit.
+
+**How to apply:** Preserve the verified Staging account and authentication flows; do not recreate an owner or repeat owner authentication through impersonation to establish environment parity.
+
 The user designates their newly verified VYNOX LAYER Staging account as official. Link it through fresh proof of the existing Staging owner account without changing or removing existing owner permissions; configure MFA afterward.
 
 **Why:** The user explicitly identified the account as official and requested this order of operations.

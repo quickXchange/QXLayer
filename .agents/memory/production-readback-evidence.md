@@ -74,6 +74,16 @@ envelope containing only transaction wrapper output, without result rows.
 **How to apply:** Treat missing result sets as unverified, correct the query, and
 never interpret missing output as zero records.
 
+Decode provider file-response envelopes before inspecting deployed content.
+
+**Why:** Vercel's deployment-file API returned JSON containing base64 `data`.
+Searching the response text directly falsely indicated that deployed
+authentication functions were missing.
+
+**How to apply:** Validate the response envelope, decode its file payload, and
+only then compare bytes or inspect source markers. An HTTP 200 or JSON content
+type does not establish that the response body is the original file.
+
 Preservation snapshots must record the exact fingerprint algorithm and original
 column set. Compare original columns across additive schema changes, and verify
 the new columns' intended defaults separately.
