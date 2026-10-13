@@ -51,8 +51,8 @@ A verified persisted identity link is not evidence that the current browser call
 
 **How to apply:** Reconcile the persisted selected-account link first, then independently verify native callback routing, same-origin cookie continuity, deliberate post-link sign-out and the already-linked UI. Keep changed-code harness evidence separate from unchanged hosted Staging acceptance when deployment is prohibited.
 
-The user authorized deploying the verified authentication fix to protected Staging only and will personally complete Clerk verification and account linking.
+The user authorizes protected Staging authentication fixes only after tests pass, including mobile login and account-linking verification.
 
-**Why:** The user explicitly lifted the deployment hold for this Staging fix, while prohibiting Production deployment, DNS changes and changes to Owner IDs, Super Admin permissions or existing data.
+**Why:** The user requires full mobile-flow verification before Staging deployment, while prohibiting Production deployment, DNS changes and changes to Owner IDs, permissions or existing data.
 
-**How to apply:** Keep Vercel Preview and Private Access protection intact, preserve existing identity links and session keys, and deliver the actual provider-verified Staging link. Do not turn this approval into Production permission or automate the owner's verification.
+**How to apply:** Keep Vercel Preview and Private Access protection intact, preserve existing identity links and session keys, and use disposable identities for automated native authentication tests. Do not substitute unit tests or persisted-link readback for mobile browser acceptance. Ask before creating protected-preview automation credentials under the no-permission-change restriction. Never turn this approval into Production permission or impersonate the Owner.

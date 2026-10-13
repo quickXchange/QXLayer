@@ -1,4 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
+import { resetAccountQueries } from "./auth-query-transition";
 import {
   getGetSupabaseAuthSessionQueryKey,
   getSupabaseAuthSession,
@@ -34,17 +35,18 @@ const IDENTITY_ACTIONS = new Set<SupabaseActionInput["action"]>(["signup", "logi
 export async function refreshSupabaseSession(clear: boolean): Promise<SupabaseSession | null> {
   const qc = queryClient; if (!qc) return null;
   const key = getGetSupabaseAuthSessionQueryKey();
-  await qc.cancelQueries();
-  if (clear) qc.clear();
+  await qc.cancelQueries({ queryKey: key });
+  if (clear) await resetAccountQueries(qc);
   try { return await qc.fetchQuery({ queryKey: key, queryFn: ({ signal }) => getSupabaseAuthSession({ signal }), staleTime: 0 }); }
-  catch { await qc.invalidateQueries({ queryKey: key }); return null; }
+  catch { return null; }
 }
 
 async function act(input: SupabaseActionInput): Promise<Result<SupabaseActionResult>> {
   try {
     const data = await performSupabaseAuthAction(input);
     if (!data.ok) return { data: null, error: { message: "The request was not accepted." } };
-    await refreshSupabaseSession(IDENTITY_ACTIONS.has(input.action));
+    const session = await refreshSupabaseSession(IDENTITY_ACTIONS.has(input.action));
+    if (!session) return { data: null, error: { message: "Your request was accepted, but your session could not be confirmed. Check your connection and reload before continuing." } };
     return { data, error: null };
   } catch (e) {
     return { data: null, error: toError(e) };
@@ -62,7 +64,7 @@ export type FacadeSession = {
 
 /** Business UI is signed in only for a full, non-recovery, MFA-satisfied session. */
 function useSession(): FacadeSession {
-  const q = useGetSupabaseAuthSession({ query: { queryKey: getGetSupabaseAuthSessionQueryKey(), refetchInterval: 10000 } });
+  const q = useGetSupabaseAuthSession({ query: { queryKey: getGetSupabaseAuthSessionQueryKey(), retry: false, networkMode: "always", refetchInterval: query => query.state.error ? false : 10000 } });
   const s = q.data;
   const full = !!s?.user && !s.recovery && !s.mfaRequired;
   return {
@@ -76,8 +78,8 @@ function useSession(): FacadeSession {
 }
 /** Raw session state, including recovery and pending-MFA, for the auth screens. */
 export function useSupabaseSessionState() {
-  const q = useGetSupabaseAuthSession({ query: { queryKey: getGetSupabaseAuthSessionQueryKey(), refetchInterval: 10000 } });
-  return { session: q.data ?? null, isPending: q.isLoading, refetch: () => q.refetch() };
+  const q = useGetSupabaseAuthSession({ query: { queryKey: getGetSupabaseAuthSessionQueryKey(), retry: false, networkMode: "always", refetchInterval: query => query.state.error ? false : 10000 } });
+  return { session: q.data ?? null, error: q.error, isPending: q.isLoading, refetch: () => q.refetch() };
 }
 
 export const supabaseFacade = {

@@ -20,7 +20,8 @@ export default function TwoFactorPage() {
       const r = supabaseAuth ? await supabaseMfa.verify(c)
         : backup ? await authClient.twoFactor.verifyBackupCode({ code: c, trustDevice: trust }) : await authClient.twoFactor.verifyTotp({ code: c, trustDevice: trust });
       if (r.error) { setErr(authErrorText(r.error)); return; }
-      qc.clear(); setCode(''); nav(supabaseAuth ? signInDestination(window.location.search) : '/admin');
+      if (!supabaseAuth) qc.clear();
+      setCode(''); nav(supabaseAuth ? signInDestination(window.location.search) : '/admin');
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (

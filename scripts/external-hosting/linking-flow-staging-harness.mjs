@@ -103,6 +103,7 @@ try {
   const result = spawnSync("pnpm", ["--filter", "@workspace/private-label-console", "exec", "vite", "build",
     "--outDir", `${process.cwd()}/${dir}/frontend`], { encoding: "utf8", timeout: 180000,
     env: { ...process.env, NODE_ENV: "production", PORT: "4557", BASE_PATH: "/",
+      VITE_EXTERNAL_DEPLOYMENT: "true",
       VITE_QXLAYER_AUTH_PROVIDER: "supabase", VITE_QXLAYER_EXTERNAL_ENVIRONMENT: "staging",
       VITE_CLERK_PUBLISHABLE_KEY: c.env.CLERK_PUBLISHABLE_KEY, VITE_CLERK_PROXY_URL: "" } });
   await writeFile(`${dir}/build.log`, result.stdout + result.stderr);
@@ -117,16 +118,8 @@ try {
     QXLAYER_STAGING_IDENTITY_BINDINGS: JSON.stringify({
       ...JSON.parse(c.env.QXLAYER_STAGING_IDENTITY_BINDINGS), [legacyId]: legacyId }) });
   const entry = `
-    import express from 'express';
-    import { clerkMiddleware } from '@clerk/express';
-    import router from './src/routes/supabase-auth';
-    import { requireAuthentication, principalFrom } from './src/middlewares/authentication';
+    import app from './src/app';
     import { pool } from '@workspace/db';
-    const app=express(); app.set('trust proxy',1);
-    app.use(clerkMiddleware({authorizedParties:[process.env.QXLAYER_SUPABASE_AUTH_URL]}));
-    app.use(express.json()); app.use('/api',router);
-    app.get('/api/me',requireAuthentication,(_q,r)=>r.json(principalFrom(r)));
-    app.use((e,_q,r,_n)=>r.status(e.status??500).json({error:e.status?e.message:'Isolated API test failed.'}));
     export {app,pool};
   `;
   await build({ stdin: { contents: entry, resolveDir: `${process.cwd()}/artifacts/api-server`, loader: "ts" },

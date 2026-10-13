@@ -42,3 +42,4 @@
 - [Public pricing policy](public-pricing-policy.md) — pricing rules are public-read-only; preserve administrative writes and other tenant boundaries.
 - [Project-owned authentication](project-owned-authentication.md) — user wants integrated, self-operated authentication instead of another Clerk application.
 - [Supabase Staging Auth](supabase-staging-auth-boundary.md) — parallel trial preserves Clerk; opaque server keys require pinned-origin capability checks, not JWT assumptions.
+- [Auth query observers](auth-query-observers.md) — cache eviction can strand active loading observers; preserve session observers and reset account data on confirmed identity changes.
