@@ -50,3 +50,9 @@ A verified persisted identity link is not evidence that the current browser call
 **Why:** The owner reported a failed linking sign-in after an exact server-side link readback had succeeded. Repeating or replacing that link would risk changing a correctly preserved identity.
 
 **How to apply:** Reconcile the persisted selected-account link first, then independently verify native callback routing, same-origin cookie continuity, deliberate post-link sign-out and the already-linked UI. Keep changed-code harness evidence separate from unchanged hosted Staging acceptance when deployment is prohibited.
+
+The user authorized deploying the verified authentication fix to protected Staging only and will personally complete Clerk verification and account linking.
+
+**Why:** The user explicitly lifted the deployment hold for this Staging fix, while prohibiting Production deployment, DNS changes and changes to Owner IDs, Super Admin permissions or existing data.
+
+**How to apply:** Keep Vercel Preview and Private Access protection intact, preserve existing identity links and session keys, and deliver the actual provider-verified Staging link. Do not turn this approval into Production permission or automate the owner's verification.
