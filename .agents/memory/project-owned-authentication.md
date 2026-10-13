@@ -9,6 +9,12 @@ The user wants a full authentication system from their side, integrated with thi
 
 **How to apply:** Treat future authentication work as a migration to authentication operated in the project's infrastructure, not as another Clerk ownership or branding exercise. Preserve existing business identities, permanent owner authorization and tenant assignments. Existing external-migration Production safety boundaries still apply until explicitly superseded.
 
+The user designates their newly verified VYNOX LAYER Staging account as official. Link it through fresh proof of the existing Staging owner account without changing or removing existing owner permissions; configure MFA afterward.
+
+**Why:** The user explicitly identified the account as official and requested this order of operations.
+
+**How to apply:** Do not treat an owner-created official account as a disposable QA fixture. The owner's active private sign-in selects the account to link; do not infer it from the newest registration or email similarity. Keep Production and other projects isolated, and preserve the current deployment approval hold.
+
 The user selected “Build and integrate in Staging first (recommended).”
 
 **Why:** The user approved an isolated Staging implementation, not a Production authentication cutover.
