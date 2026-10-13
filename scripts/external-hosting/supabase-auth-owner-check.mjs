@@ -10,7 +10,7 @@ import { sessionCodec } from "../../artifacts/api-server/src/modules/supabase-au
 
 if(process.env.QXLAYER_STAGING_OWNER_AUTH_APPROVED!=="true")throw Error("Explicit Staging owner verification approval required.");
 const mode=process.argv[2]??"status";
-if(!["prepare","status","restore"].includes(mode))throw Error("Unsupported owner verification operation.");
+if(!["prepare","select","status","restore"].includes(mode))throw Error("Unsupported owner verification operation.");
 const file=`${SCOPE}/owner-verification-baseline.json`;
 const hash=value=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
 let quotaWritePlanned=false;
@@ -72,7 +72,22 @@ try {
     const links=await c.db.query("SELECT subject,proof_subject FROM vynox_supabase_auth.identity_links WHERE business_id=$1",[business]);
     if(links.rowCount>1||links.rows.some(x=>x.proof_subject!==proof))throw Error("Owner proof binding mismatch.");
     const fresh=roster.users.filter(u=>!baseline.originalUserHashes.includes(hash(u.id)));
-    let candidate=links.rowCount?roster.users.find(u=>u.id===links.rows[0].subject):fresh.length===1?fresh[0]:null;
+    if(mode==="select"){
+      // Selecting an account for verification never authenticates it, writes an
+      // identity link, or grants permissions. The native dual-proof flow does that.
+      const email=process.env.QXLAYER_STAGING_OWNER_TARGET_EMAIL?.trim().toLowerCase();
+      if(!email)throw Error("Explicit requested target email required.");
+      const matches=roster.users.filter(u=>u.email?.toLowerCase()===email);
+      if(matches.length!==1||!matches[0].email_confirmed_at)throw Error("Exactly one verified requested Staging account required.");
+      if(links.rows.some(l=>l.subject!==matches[0].id))throw Error("Existing owner link cannot be replaced.");
+      baseline.targetUserHash=hash(matches[0].id);
+      await writeFile(file,JSON.stringify(baseline,null,2),{mode:0o600});
+      console.info("Explicit verified target selected for read-only checks. No authentication link or permission was written.");
+    }
+    const selected=baseline.targetUserHash?roster.users.find(u=>hash(u.id)===baseline.targetUserHash):null;
+    if(baseline.targetUserHash&&!selected)throw Error("Explicit selected Staging account unavailable.");
+    if(selected&&links.rows.some(l=>l.subject!==selected.id))throw Error("Owner link does not match the requested target.");
+    let candidate=selected??(links.rowCount?roster.users.find(u=>u.id===links.rows[0].subject):fresh.length===1?fresh[0]:null);
     if(candidate){
       const detail=await admin(c.key,`/users/${candidate.id}`);
       if(detail.id!==candidate.id)throw Error("Pinned owner profile readback mismatch.");

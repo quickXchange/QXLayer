@@ -15,6 +15,12 @@ The user designates their newly verified VYNOX LAYER Staging account as official
 
 **How to apply:** Do not treat an owner-created official account as a disposable QA fixture. The owner's active private sign-in selects the account to link; do not infer it from the newest registration or email similarity. Keep Production and other projects isolated, and preserve the current deployment approval hold.
 
+Automate technical implementation and verification for Staging owner linking; ask the user only for authentication or approval when necessary.
+
+**Why:** The user explicitly requested this workflow while prohibiting duplicate Owner records, authentication bypasses and deployment.
+
+**How to apply:** Select the explicitly designated verified account for bounded checks, but require the approved native ownership proof before linking. Do not impersonate the owner, assign a second Owner permission, or modify Production, DNS or unrelated projects.
+
 The user selected “Build and integrate in Staging first (recommended).”
 
 **Why:** The user approved an isolated Staging implementation, not a Production authentication cutover.
