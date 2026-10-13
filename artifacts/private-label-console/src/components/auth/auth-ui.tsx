@@ -1,3 +1,4 @@
+import { withRequestDeadline } from '@workspace/api-client-react';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'wouter';
 import { AlertCircle, CheckCircle2, MailWarning } from 'lucide-react';
@@ -19,8 +20,11 @@ export function useOwnedStatus() {
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     const ac = new AbortController();
-    fetch(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/${supabaseAuth ? 'supabase-auth' : 'owned-auth'}/status`, { credentials: 'include', signal: ac.signal })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('status'))))
+    withRequestDeadline(ac.signal, supabaseAuth ? 20000 : 0, async signal => {
+      const r = await fetch(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/${supabaseAuth ? 'supabase-auth' : 'owned-auth'}/status`, { credentials: 'include', signal });
+      if (!r.ok) throw new Error('status');
+      return r.json();
+    })
       .then((j: OwnedStatus) => setStatus(j))
       .catch(() => { if (!ac.signal.aborted) setFailed(true); });
     return () => ac.abort();

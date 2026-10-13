@@ -9,6 +9,8 @@ import { AuthFrame, ErrorLine } from '@/components/auth/auth-ui';
 import { Button } from '@/components/ui/button';
 import { OwnedSessionGate } from '@/pages/account-security';
 import { existingAccountProofReturnUrl, EXISTING_ACCOUNT_LINK_CONTINUATION } from '@/lib/existing-account-link';
+import { ClerkLoadBoundary, ClerkReadiness } from '@/components/auth/clerk-load-boundary';
+import { withRequestDeadline } from '@workspace/api-client-react';
 
 const pk = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -59,13 +61,13 @@ function SupabaseLinker() {
   const link = async () => {
     setErr(''); setBusy(true);
     try {
-      const token = await getToken({ skipCache: true });
+      const token = await withRequestDeadline(undefined, 20000, () => getToken({ skipCache: true }));
       if (!token) { setErr('Your existing-account proof expired. Sign in to the existing account again.'); return; }
       const r = await performSupabaseAuthAction({ action: 'link-existing' }, { credentials: 'same-origin', headers: { Authorization: `Bearer ${token}` } });
       if (!r.ok) { setErr('The link was not accepted.'); return; }
       await qc.cancelQueries();
       const signedOutUrl = new URL(`${base}/sign-in?linked=1`, window.location.origin).href;
-      try { await clerk.signOut({ redirectUrl: signedOutUrl }); } catch { /* proof session cleanup is best effort */ }
+      try { await withRequestDeadline(undefined, 20000, () => clerk.signOut({ redirectUrl: signedOutUrl })); } catch { /* proof session cleanup is best effort */ }
       finally { qc.clear(); window.location.assign(signedOutUrl); }
     } catch (e) {
       const x = e as { status?: number; data?: { code?: string; error?: string; message?: string } | null };
@@ -91,9 +93,13 @@ function SupabaseLinker() {
 }
 
 function SupabaseLinkInfo() {
-  const { session, isPending } = useSupabaseSessionState();
+  const { session, isPending, error, refetch } = useSupabaseSessionState();
   const full = !!session?.user && !session.recovery && !session.mfaRequired;
   const footer = <Link href="/account/security" data-testid="link-back-security" className="font-medium text-[var(--s-accent-ink,hsl(var(--primary)))] hover:underline">Back to account security</Link>;
+  if (error) return <AuthFrame title="Could not verify your session" subtitle="Check your connection or reload private access." footer={footer}>
+    <Button onClick={() => void refetch()}>Retry</Button>
+    <Button variant="outline" onClick={() => window.location.reload()}>Reload private access</Button>
+  </AuthFrame>;
   if (isPending) return <AuthFrame title="Link your existing account" footer={footer}><p className="text-sm text-muted-foreground">Checking your session...</p></AuthFrame>;
   if (session?.mfaRequired) return <Redirect to={`/two-factor?${EXISTING_ACCOUNT_LINK_CONTINUATION}`} />;
   if (!full) return <Redirect to={`/sign-in?${EXISTING_ACCOUNT_LINK_CONTINUATION}`} />;
@@ -111,9 +117,9 @@ function SupabaseLinkInfo() {
       <p className="text-sm text-muted-foreground" data-testid="text-link-explainer">Your existing IDs and access are preserved. Sign in to the existing account to prove you own it. The server then checks that both sign-ins are recent and that this pairing is approved. Matching email addresses never links accounts or grants roles.</p>
       {!verified ? <ErrorLine id="text-link-unverified">Verify this account's email first, then return here.</ErrorLine>
         : !keyOk ? <ErrorLine id="text-link-unconfigured">The existing-account sign-in is not available in this environment.</ErrorLine>
-        : <ClerkProvider publishableKey={pk} signInUrl={`${base}/account/link-existing`}
+        : <ClerkLoadBoundary><ClerkProvider publishableKey={pk} signInUrl={`${base}/account/link-existing`}
           signInForceRedirectUrl={existingAccountProofReturnUrl(base, window.location.origin)}
-          signInFallbackRedirectUrl={existingAccountProofReturnUrl(base, window.location.origin)}><SupabaseLinker /></ClerkProvider>}
+          signInFallbackRedirectUrl={existingAccountProofReturnUrl(base, window.location.origin)}><ClerkReadiness /><SupabaseLinker /></ClerkProvider></ClerkLoadBoundary>}
     </AuthFrame>
   );
 }

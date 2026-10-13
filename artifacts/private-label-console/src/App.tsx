@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, type ComponentType, type ReactNode } from 'react';
+import { Fragment, lazy, Suspense, useEffect, useRef, type ComponentType, type ReactNode } from 'react';
 import { ClerkProvider, SignIn, SignUp, useClerk as useLegacyClerk } from '@clerk/react';
 import { Show, useClerk } from '@/lib/auth';
 import { authClient, ownedAuth, supabaseAuth } from '@/lib/owned-auth-client';
@@ -57,8 +57,20 @@ import { PLATFORM_SITE } from '@/lib/platform-site';
 import { useSiteTheme } from '@site/hooks/use-site-theme';
 import { BrandLogo } from '@/components/brand-logo';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
+import { resetAccountQueries } from '@/lib/auth-query-transition';
+import { setRequestTimeout } from '@workspace/api-client-react';
+import { ClerkLoadBoundary, ClerkReadiness } from '@/components/auth/clerk-load-boundary';
 
-const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } } });
+const externalStaging = import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true" &&
+    import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "staging";
+if (externalStaging) setRequestTimeout(20000);
+const ClerkStartupBoundary = externalStaging ? ClerkLoadBoundary : Fragment;
+
+const queryClient = new QueryClient({ defaultOptions: { queries: {
+  retry: externalStaging ? false : 1,
+  networkMode: externalStaging ? 'always' : 'online',
+  refetchOnWindowFocus: false,
+} } });
 
 const clerkPubKey = ownedAuth ? undefined : import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true"
   ? import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -136,7 +148,10 @@ function ClerkQueryClientCacheInvalidator() {
   useEffect(() => {
     return addListener(({ user }) => {
       const id = user?.id ?? null;
-      if (prev.current !== undefined && prev.current !== id) qc.clear();
+      if (prev.current !== undefined && prev.current !== id) {
+        if (externalStaging) void resetAccountQueries(qc);
+        else qc.clear();
+      }
       prev.current = id;
     });
   }, [addListener, qc]);
@@ -147,10 +162,10 @@ function OwnedCacheInvalidator() {
   const qc = useQueryClient();
   const s = authClient.useSession();
   const prev = useRef<string | null | undefined>(undefined);
-  const id = s.isPending ? undefined : (s.data?.user?.id ?? null);
+  const id = s.isPending || s.error ? undefined : (s.data?.user?.id ?? null);
   useEffect(() => {
     if (id === undefined) return;
-    if (prev.current !== undefined && prev.current !== id) qc.clear();
+    if (prev.current !== undefined && prev.current !== id) void resetAccountQueries(qc);
     prev.current = id;
   }, [id, qc]);
   return null;
@@ -162,7 +177,7 @@ function HomeRedirect() {
 
 function PrincipalGate({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: 10000 } });
+  const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: query => externalStaging && query.state.error ? false : 10000 } });
   const { signOut } = useClerk();
   const qc = useQueryClient();
   let demoTab = false;
@@ -207,12 +222,20 @@ function Protected({ children }: { children: ReactNode }) {
   if (demoTab && demo.error) return <Redirect to="/demo/admin" />;
   if (demoTab && demo.data?.active) return <PrincipalGate>{children}</PrincipalGate>;
   if (demoTab && demo.isLoading) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
+  if (ownedAuth && !demoTab) return <OwnedProtected>{children}</OwnedProtected>;
   return (
     <>
       <Show when="signed-in"><PrincipalGate>{children}</PrincipalGate></Show>
       <Show when="signed-out"><Redirect to="/" /></Show>
     </>
   );
+}
+function OwnedProtected({ children }: { children: ReactNode }) {
+  const s = authClient.useSession();
+  if (s.error) return <ConsoleThemeScope><ErrorState what="your session" onRetry={() => void s.refetch()} /><Button variant="outline" onClick={() => window.location.reload()}>Reload private access</Button></ConsoleThemeScope>;
+  if (s.isPending) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
+  if (!s.data?.user) return <Redirect to={(s as { mfaRequired?: boolean }).mfaRequired ? '/two-factor' : '/sign-in'} />;
+  return <PrincipalGate>{children}</PrincipalGate>;
 }
 function SuperOnly({ children }: { children: ReactNode }) {
   const p = usePrincipal();
@@ -304,7 +327,7 @@ function ClerkProviderWithRoutes() {
   const [, setLocation] = useLocation();
   const { dark } = useSiteTheme(PLATFORM_SITE);
   return (
-    <ClerkProvider
+    <ClerkStartupBoundary><ClerkProvider
       publishableKey={clerkPubKey!}
       proxyUrl={clerkProxyUrl}
       appearance={{ ...clerkAppearance, options: { ...clerkAppearance.options,
@@ -315,6 +338,7 @@ function ClerkProviderWithRoutes() {
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
     >
+      {externalStaging && <ClerkReadiness />}
       <ExternalStagingAuthBridge>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
@@ -326,7 +350,7 @@ function ClerkProviderWithRoutes() {
         </TooltipProvider>
       </QueryClientProvider>
       </ExternalStagingAuthBridge>
-    </ClerkProvider>
+    </ClerkProvider></ClerkStartupBoundary>
   );
 }
 

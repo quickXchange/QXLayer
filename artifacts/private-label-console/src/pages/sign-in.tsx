@@ -15,7 +15,8 @@ export default function SignInPage() {
     try {
       const r = await authClient.signIn.email({ email: email.trim(), password });
       if (r.error) { setNeedsVerify(r.error.code === 'EMAIL_NOT_VERIFIED'); setErr(authErrorText(r.error)); return; }
-      qc.clear(); setPassword('');
+      if (!supabaseAuth) qc.clear();
+      setPassword('');
       const destination = supabaseAuth ? signInDestination(window.location.search) : '/admin';
       if ((r.data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
         nav(destination === '/account/link-existing' ? `/two-factor?${EXISTING_ACCOUNT_LINK_CONTINUATION}` : '/two-factor'); return;

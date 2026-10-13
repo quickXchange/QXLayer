@@ -1,3 +1,4 @@
+import { withRequestDeadline } from "./request-deadline";
 export type CustomFetchOptions = RequestInit & {
   responseType?: "json" | "text" | "blob" | "auto";
 };
@@ -17,6 +18,14 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 
 let _baseUrl: string | null = null;
 let _authTokenGetter: AuthTokenGetter | null = null;
+let _requestTimeoutMs = 0;
+
+/** Opt-in; legacy/Production clients retain their existing request behavior. */
+export function setRequestTimeout(milliseconds: number): void {
+  if (!Number.isSafeInteger(milliseconds) || milliseconds < 0 || milliseconds > 120000)
+    throw new TypeError("Invalid request timeout");
+  _requestTimeoutMs = milliseconds;
+}
 
 /**
  * Set a base URL that is prepended to every relative request URL
@@ -365,21 +374,17 @@ export async function customFetch<T = unknown>(
 
   // Attach bearer token when an auth getter is configured and no
   // Authorization header has been explicitly provided.
-  if (_authTokenGetter && !headers.has("authorization")) {
-    const token = await _authTokenGetter();
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
+  return withRequestDeadline(init.signal ?? (isRequest(input) ? input.signal : undefined), _requestTimeoutMs, async signal => {
+    if (_authTokenGetter && !headers.has("authorization")) {
+      const token = await _authTokenGetter();
+      if (token) headers.set("authorization", `Bearer ${token}`);
     }
-  }
-
-  const requestInfo = { method, url: resolveUrl(input) };
-
-  const response = await fetch(input, { ...init, method, headers });
-
-  if (!response.ok) {
-    const errorData = await parseErrorBody(response, method);
-    throw new ApiError(response, errorData, requestInfo);
-  }
-
-  return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+    const requestInfo = { method, url: resolveUrl(input) };
+    const response = await fetch(input, { ...init, signal, method, headers });
+    if (!response.ok) {
+      const errorData = await parseErrorBody(response, method);
+      throw new ApiError(response, errorData, requestInfo);
+    }
+    return (await parseSuccessBody(response, responseType, requestInfo)) as T;
+  });
 }
