@@ -60,7 +60,13 @@ try {
     const raw = await r.text();
     let text = raw;
     try { const j = JSON.parse(raw); if (j.data) text = Buffer.from(j.data, "base64").toString(); } catch {}
+    let matchesPreparedBundle = null;
+    try {
+      const local = await readFile(f.path.replace(/^\/src\//, ""));
+      matchesPreparedBundle = createHash("sha256").update(local).digest("hex") === createHash("sha256").update(text).digest("hex");
+    } catch {}
     report.findings.assetContent.push({ path: f.path, bytes: text.length,
+      matchesPreparedBundle,
       clearsCache: /\.clear\(\)/.test(text), hasSessionFailureUI: text.includes("Could not verify your session"),
       hasClerkDeadlineUI: text.includes("Reload sign-in"), hasTimeoutUI: text.includes("The request took too long"),
       destroysSessionObserverBeforeFetch: /\.cancelQueries\(\),[a-zA-Z_$]+&&[a-zA-Z_$]+\.clear\(\)/.test(text),

@@ -1,8 +1,8 @@
 /** Genuine HTTPS cookie/redirect trace. No accounts, sessions or identity links are created. */
 import { ReplitConnectors } from "@replit/connectors-sdk";
-import { randomUUID, createHash } from "node:crypto";
+import { randomUUID, randomBytes, createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { stagingContext, SCOPE, fingerprints } from "./supabase-auth-staging-context.mjs";
+import { stagingContext, SCOPE, fingerprints, admin } from "./supabase-auth-staging-context.mjs";
 
 if (process.env.QXLAYER_STAGING_BROWSER_TEST_ACCESS_APPROVED !== "true") throw Error("Approved temporary Staging access required.");
 const c = await stagingContext(), sdk = new ReplitConnectors();
@@ -10,7 +10,7 @@ const receipt = JSON.parse(await readFile(`${SCOPE}/linking-fix-release.json`, "
 const project = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx", team = "team_eoJE6FCcm9esuqnRTUsmopzy";
 const note = `Bounded Staging HTTP diagnosis ${randomUUID()}`;
 const hash = x => createHash("sha256").update(JSON.stringify(x)).digest("hex");
-let bypass;
+let bypass, disposableSubject;
 async function api(route, method = "GET", body) {
   const r = await sdk.proxy("vercel", `${route}?teamId=${team}`, { method, ...(body ? { body } : {}) });
   if (!r.ok) throw Error(`Pinned Staging metadata HTTP ${r.status}`);
@@ -40,13 +40,15 @@ async function request(path, options = {}) {
       httpOnly: flags.some(f => /^httponly$/i.test(f.trim())),
       sameSite: flags.find(f => /^samesite=/i.test(f.trim()))?.trim().split("=")[1],
       path: flags.find(f => /^path=/i.test(f.trim()))?.trim().split("=")[1] });
-    if (flags.some(f => /^max-age=0$/i.test(f.trim()))) jar.delete(name);
+    const expires = flags.find(f => /^expires=/i.test(f.trim()))?.trim().slice("expires=".length);
+    if (flags.some(f => /^max-age=0$/i.test(f.trim())) || (expires && Date.parse(expires) <= Date.now())) jar.delete(name);
   }
   const text = await r.text(), location = r.headers.get("location");
   report.requests.push({ path: path.split("?")[0], method: options.method ?? "GET", status: r.status,
     elapsedMs: Date.now() - started, redirectSameOrigin: location ? new URL(location, receipt.origin).origin === receipt.origin : null,
     redirectPath: location ? new URL(location, receipt.origin).pathname : null,
     cookies: attrs, privateAccessForm: text.includes('/__qx_access/enter'), appHtml: text.includes('id="root"'),
+    moduleScripts: [...text.matchAll(/<script[^>]+src="([^"]+)"/g)].map(m => m[1]).filter(s => s.startsWith("/assets/")),
     referrerPolicy: r.headers.get("referrer-policy") });
   if (location) report.requests.at(-1).linkContinuationPreserved =
     new URL(location, receipt.origin).searchParams.get("next") === "/account/link-existing";
@@ -90,10 +92,56 @@ try {
     Accept: "application/json", Origin: receipt.origin, "Sec-Fetch-Site": "same-origin", "Content-Type": "application/json" },
     body: JSON.stringify({ action: "link-existing" }) });
   report.prooflessLinkRejected = proofless.r.status === 401;
+  if (process.env.QXLAYER_STAGING_DISPOSABLE_LOGIN_TEST_APPROVED === "true") {
+    const password = `${randomBytes(24).toString("base64url")}aA1!`;
+    const email = `delivered+vynox-session-${randomUUID()}@resend.dev`;
+    await writeFile(`${SCOPE}/http-disposable-login-scope.json`, JSON.stringify({ email, subject: null, cleaned: false }));
+    const user = await admin(c.key, "/users", "POST", { email, password, email_confirm: true });
+    disposableSubject = user.id;
+    if (!/^[a-f0-9-]{36}$/i.test(disposableSubject ?? "")) throw Error("Disposable login subject unavailable.");
+    await writeFile(`${SCOPE}/http-disposable-login-scope.json`, JSON.stringify({ email, subject: disposableSubject, cleaned: false }));
+    const headers = { Accept: "application/json", Origin: receipt.origin, "Sec-Fetch-Site": "same-origin", "Content-Type": "application/json" };
+    const login = await request("/api/supabase-auth/action", { method: "POST", headers,
+      body: JSON.stringify({ action: "login", email, password }) });
+    if (login.r.status !== 200 || !JSON.parse(login.text).ok) throw Error("Real disposable password login failed.");
+    const loginCookie = report.requests.at(-1).cookies.find(x => x.name === "__Host-vynox_sb");
+    report.authenticatedCookieAttributesValid = !!loginCookie?.secure && !!loginCookie.httpOnly &&
+      loginCookie.sameSite?.toLowerCase() === "lax" && loginCookie.path === "/";
+    report.repeatedSessionStable = true;
+    for (let i = 0; i < 3; i++) {
+      const session = await request("/api/supabase-auth/session", { headers });
+      const value = JSON.parse(session.text);
+      if (session.r.status !== 200 || value.user?.id !== disposableSubject || value.mfaRequired || value.recovery)
+        report.repeatedSessionStable = false;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    const principal = await request("/api/me", { headers });
+    const identity = JSON.parse(principal.text);
+    report.disposablePrincipalUnprivileged = principal.r.status === 200 && identity.role === "unassigned" &&
+      (identity.memberships ?? []).length === 0;
+    const logout = await request("/api/supabase-auth/action", { method: "POST", headers, body: JSON.stringify({ action: "logout" }) });
+    const afterLogout = await request("/api/supabase-auth/session", { headers });
+    report.logoutHttpOkay = logout.r.status === 200;
+    report.anonymousAfterLogout = JSON.parse(afterLogout.text).user === null;
+    report.authCookieCleared = !jar.has("__Host-vynox_sb");
+    report.logoutStable = report.logoutHttpOkay && report.anonymousAfterLogout && report.authCookieCleared;
+    if (!report.authenticatedCookieAttributesValid || !report.repeatedSessionStable ||
+        !report.disposablePrincipalUnprivileged || !report.logoutStable) throw Error("Live session stability assertion failed.");
+  }
   report.businessDataAndPermissionsPreserved = dataBefore === hash(await fingerprints(c.db));
   report.existingLinksPreserved = linksBefore === hash((await c.db.query("SELECT * FROM vynox_supabase_auth.identity_links ORDER BY subject")).rows);
 } finally {
   try {
+    if (disposableSubject) {
+      await c.db.query("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1", [disposableSubject]);
+      await admin(c.key, `/users/${disposableSubject}`, "DELETE");
+      report.disposableAccountAndSessionsRemoved = true;
+      await writeFile(`${SCOPE}/http-disposable-login-scope.json`, JSON.stringify({ subject: disposableSubject, cleaned: true }));
+    }
+    report.businessDataAndPermissionsPreserved = dataBefore === hash(await fingerprints(c.db));
+    report.existingLinksPreserved = linksBefore === hash((await c.db.query("SELECT * FROM vynox_supabase_auth.identity_links ORDER BY subject")).rows);
+  } finally {
+   try {
     const current = await api(`/v9/projects/${project}`);
     const exact = bypass ?? Object.entries(current.protectionBypass ?? {}).find(([, v]) => v.note === note)?.[0];
     if (exact) await api(`/v1/projects/${project}/protection-bypass`, "PATCH", { revoke: { secret: exact, regenerate: false } });
@@ -105,5 +153,6 @@ try {
     await writeFile(`${SCOPE}/http-diagnostic-credential-scope.json`, JSON.stringify({ project, note, cleaned: true }));
     await writeFile(`${SCOPE}/hosted-http-auth-trace.json`, JSON.stringify(report, null, 2));
     console.info(JSON.stringify(report, null, 2));
-  } finally { await c.db.end(); }
+   } finally { await c.db.end(); }
+  }
 }
