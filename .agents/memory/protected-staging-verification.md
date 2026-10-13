@@ -27,3 +27,17 @@ changing CSP.
 **How to apply:** Keep credentials in Node memory, use exact-origin
 `route.continue` rather than loopback `route.fulfill`, and preserve native
 cookies/redirects. Do not weaken CSP or inject an unlocked gate cookie.
+
+Fresh automation access can initially redirect to Vercel SSO before being
+accepted at the deployment edge. A bounded HTTP diagnostic observed initial
+302 SSO responses followed by a same-origin 307 establishing `_vercel_jwt`
+and then the normal Private Access form.
+
+**Why:** An initial rejected automation probe can move a browser off the
+Staging origin into provider SSO; that is not the application's auth loop.
+
+**How to apply:** Establish the provider's normal bypass-cookie handshake using
+the approved exact-origin automation header and `x-vercel-set-bypass-cookie`.
+Keep credentials in memory, wait for a bounded successful access probe, then
+let the browser follow genuine same-origin redirects. Revocation and existing
+protection readback remain required. This does not verify Clerk login.

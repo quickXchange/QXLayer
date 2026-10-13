@@ -4,6 +4,40 @@ import { QueryClient, QueryObserver } from "@tanstack/react-query";
 import { getGetSupabaseAuthSessionQueryKey } from "@workspace/api-client-react";
 import { resetAccountQueries } from "./auth-query-transition";
 
+test("legacy clear can leave a mounted session signed out even though the replacement fetch succeeds", async () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const key = getGetSupabaseAuthSessionQueryKey();
+  const anonymous = { user: null };
+  const signedIn = { user: { id: "disposable-signed-in" } };
+  qc.setQueryData(key, anonymous);
+  const observer = new QueryObserver(qc, { queryKey: key, queryFn: async () => anonymous, staleTime: Infinity });
+  const unsubscribe = observer.subscribe(() => {});
+  try {
+    await qc.cancelQueries();
+    qc.clear();
+    await qc.fetchQuery({ queryKey: key, queryFn: async () => signedIn, staleTime: 0 });
+    assert.deepEqual(qc.getQueryData(key), signedIn);
+    assert.deepEqual(observer.getCurrentResult().data, anonymous);
+    assert.equal(qc.getQueryCache().find({ queryKey: key })?.getObserversCount(), 0);
+  } finally { unsubscribe(); qc.clear(); }
+});
+
+test("fresh sign-in reaches the mounted anonymous session observer instead of leaving it signed out", async () => {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const key = getGetSupabaseAuthSessionQueryKey();
+  const signedIn = { user: { id: "disposable-signed-in" } };
+  qc.setQueryData(key, { user: null });
+  const observer = new QueryObserver(qc, { queryKey: key, queryFn: async () => signedIn, staleTime: Infinity });
+  const unsubscribe = observer.subscribe(() => {});
+  try {
+    await resetAccountQueries(qc);
+    await qc.fetchQuery({ queryKey: key, queryFn: async () => signedIn, staleTime: 0 });
+    assert.deepEqual(observer.getCurrentResult().data, signedIn);
+    assert.equal(observer.getCurrentResult().isLoading, false);
+    assert.equal(qc.getQueryCache().find({ queryKey: key })?.getObserversCount(), 1);
+  } finally { unsubscribe(); qc.clear(); }
+});
+
 test("identity reset keeps session and pending principal observers alive, and drops old account data", async () => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const key = getGetSupabaseAuthSessionQueryKey();
