@@ -1,10 +1,12 @@
 /**
- * Ephemeral Staging-only browser harness. No deployments or hosted settings change.
+ * Ephemeral Staging-only browser harness. No deployments or identity/role settings change.
+ * An explicitly approved temporary protection credential is revoked on cleanup.
  * Uses disposable unprivileged provider accounts and normal native sign-ins.
  * Serves the actual changed frontend/API under the pinned Staging browser origin
  * via the tester's loopback transport, including the real Private Access form.
  */
 import { createRequire } from "node:module";
+import { ReplitConnectors } from "@replit/connectors-sdk";
 import { randomBytes, randomUUID } from "node:crypto";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
@@ -13,7 +15,16 @@ import { stagingContext, admin, fingerprints, SCOPE, AUTH_REF } from "./supabase
 
 if (process.env.QXLAYER_STAGING_LINKING_TEST_APPROVED !== "true")
   throw Error("Explicit Staging linking test scope required.");
+if (process.env.QXLAYER_STAGING_BROWSER_TEST_ACCESS_APPROVED !== "true")
+  throw Error("Explicit temporary Staging browser access approval required.");
 const c = await stagingContext();
+const sdk = new ReplitConnectors();
+const project = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx", team = "team_eoJE6FCcm9esuqnRTUsmopzy";
+async function vercel(route, method = "GET", body) {
+  const r = await sdk.proxy("vercel", `${route}?teamId=${team}`, { method, ...(body ? { body } : {}) });
+  if (!r.ok) throw Error(`Staging test protection HTTP ${r.status}`);
+  return r.json();
+}
 // Preserve the original test-only credential before loading runtime settings:
 // the inherited Staging PRODUCTION_ACCESS_CODE is not the owner-password input.
 const gatePasswordForTest = c.env.QXLAYER_STAGING_ACCESS_MODE === "owner-password"
@@ -36,10 +47,13 @@ const password = `${randomBytes(24).toString("base64url")}aA1!`;
 const fixture = { email: `delivered+vynox-link-${marker}@resend.dev`,
   legacyEmail: `vynox-link-${marker}+clerk_test@example.com`, password };
 let legacyId = saved?.legacyId, subject = saved?.subject, server, runtimePool, closing = false;
+let bypass, bypassNote = saved?.bypassNote ?? `Staging mobile linking ${marker}`;
+let originalBypasses = [], protectionBefore;
 async function scope() {
   await writeFile(scopeFile, JSON.stringify({ ref: AUTH_REF, origin,
     legacyId: legacyId ?? null, subject: subject ?? null, rolesAssigned: false,
-    hostedSettingsChanged: false, cleaned: false, publicBaseline: before, originalLinks }), { mode: 0o600 });
+    hostedIdentitySettingsChanged: false, cleaned: false, publicBaseline: before, originalLinks,
+    project, bypassNote, temporaryBrowserAccessApproved: true }), { mode: 0o600 });
 }
 async function clerk(path, method = "GET", body) {
   const r = await fetch(`https://api.clerk.com/v1${path}`, {
@@ -65,9 +79,23 @@ async function cleanup() {
       throw Error("Existing identity links changed.");
     await writeFile(scopeFile, JSON.stringify({ ref: AUTH_REF, origin, cleaned: true,
       disposableAccountsAndSessionsRemoved: true, publicDataAndPermissionsPreserved: true,
-      existingIdentityLinksPreserved: true, rolesAssigned: false, hostedSettingsChanged: false }));
+      existingIdentityLinksPreserved: true, rolesAssigned: false, hostedIdentitySettingsChanged: false }));
     console.info("Staging linking fixtures cleaned; original data, permissions and identity links unchanged.");
-  } finally { await c.db.end(); }
+  } finally {
+    try {
+      const p = await vercel(`/v9/projects/${project}`);
+      const temporary = bypass ?? Object.entries(p.protectionBypass ?? {}).find(([, v]) => v.note === bypassNote)?.[0];
+      if (temporary) await vercel(`/v1/projects/${project}/protection-bypass`, "PATCH", { revoke: { secret: temporary, regenerate: false } });
+      const after = await vercel(`/v9/projects/${project}`);
+      if (Object.values(after.protectionBypass ?? {}).some(v => v.note === bypassNote) ||
+          (protectionBefore && JSON.stringify([after.ssoProtection, after.passwordProtection, after.trustedIps]) !== protectionBefore) ||
+          originalBypasses.some(k => !Object.hasOwn(after.protectionBypass ?? {}, k)))
+        throw Error("Temporary Staging test access was not restored.");
+      await writeFile(`${dir}/browser-access-cleanup.json`, JSON.stringify({
+        temporaryCredentialRevoked: true, stagingProtectionPreserved: true, productionChanged: false, dnsChanged: false,
+      }));
+    } finally { await c.db.end(); }
+  }
 }
 process.on("SIGTERM", () => void cleanup().then(() => process.exit(0)).catch(() => {
   console.error("Exact Staging fixture cleanup needs review."); process.exit(1);
@@ -88,7 +116,17 @@ if (recovering) {
   await cleanup(); process.exit(0);
 }
 try {
+  const receipt = JSON.parse(await readFile(`${SCOPE}/linking-fix-release.json`, "utf8"));
+  const [p, d] = await Promise.all([vercel(`/v9/projects/${project}`), vercel(`/v13/deployments/${receipt.previewId}`)]);
+  if (p.id !== project || p.name !== "qxlayer-staging" || !p.ssoProtection || d.projectId !== project ||
+      d.target === "production" || d.readyState !== "READY" || `https://${d.url}` !== origin || receipt.origin !== origin)
+    throw Error("Only the current protected Staging Preview can be tested.");
+  originalBypasses = Object.keys(p.protectionBypass ?? {});
+  protectionBefore = JSON.stringify([p.ssoProtection, p.passwordProtection, p.trustedIps]);
   await scope();
+  const generated = await vercel(`/v1/projects/${project}/protection-bypass`, "PATCH", { generate: { note: bypassNote } });
+  bypass = Object.entries(generated.protectionBypass ?? {}).find(([k, v]) => !originalBypasses.includes(k) && v.note === bypassNote)?.[0];
+  if (!bypass) throw Error("Temporary Staging browser access was not returned.");
   // Verified disposable fixture setup is not an Owner migration or sign-in ticket.
   // The browser must still supply both real password logins and fresh Clerk proof.
   const legacy = await clerk("/users", "POST", { email_address: [fixture.legacyEmail], password });
@@ -133,12 +171,12 @@ try {
     if (req.url === "/__fixture" && local) {
       res.setHeader("Content-Type", "application/json"); res.setHeader("Cache-Control", "no-store");
       res.end(JSON.stringify({ origin, ...fixture,
-        gatePassword: gatePasswordForTest }));
+        gatePassword: gatePasswordForTest, bypass }));
     } else if (req.url?.startsWith("/api/")) api.app(req, res);
     else await staticHandler(req, res);
   });
   await new Promise((resolve, reject) => { server.once("error", reject); server.listen(4557, "127.0.0.1", resolve); });
-  console.info("Isolated native Staging linking harness ready on loopback 4557; no roles, hosted changes or deployments.");
+  console.info("Isolated native Staging linking harness ready on loopback 4557; temporary test access only, no roles or deployments.");
   setTimeout(() => process.kill(process.pid, "SIGTERM"), 30 * 60000).unref();
 } catch (e) {
   console.error(e instanceof Error ? e.message.replace(/(?:postgres(?:ql)?:\/\/)\S+/gi, "[redacted]") : "Harness setup failed.");

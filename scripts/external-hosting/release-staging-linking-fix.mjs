@@ -13,6 +13,15 @@ const ctx = await stagingContext(), sdk = new ReplitConnectors();
 const branch = "qxlayer-staging", project = "prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx";
 const team = "team_eoJE6FCcm9esuqnRTUsmopzy", workerId = "srv-db5b48o473hc73ah56d0";
 const paths = [
+  "artifacts/private-label-console/src/App.tsx",
+  "artifacts/private-label-console/src/components/auth/auth-ui.tsx",
+  "artifacts/private-label-console/src/components/auth/clerk-load-boundary.tsx",
+  "artifacts/private-label-console/src/lib/auth-query-transition.ts",
+  "artifacts/private-label-console/src/lib/supabase-auth-client.ts",
+  "artifacts/private-label-console/src/pages/account-security.tsx",
+  "lib/api-client-react/src/custom-fetch.ts",
+  "lib/api-client-react/src/index.ts",
+  "lib/api-client-react/src/request-deadline.ts",
   "artifacts/api-server/src/modules/supabase-auth/session.ts",
   "artifacts/api-server/src/routes/supabase-auth.ts",
   "artifacts/private-label-console/src/lib/existing-account-link.ts",
@@ -76,7 +85,7 @@ try {
   git(["fetch", "--no-tags", "origin", prior]);
   const diff = git(["diff", "--name-only", prior, "HEAD", "--", "artifacts", "lib", "package.json", "pnpm-lock.yaml"])
     .split("\n").filter(Boolean);
-  if (diff.some(x => !paths.includes(x) && x !== "artifacts/private-label-console/src/lib/existing-account-link.test.ts"))
+   if (diff.some(x => !paths.includes(x) && !/\.test\.tsx?$/.test(x)))
     throw Error(`Unrelated runtime changes require review: ${diff.filter(x => !paths.includes(x)).join(", ")}`);
   const publicBefore = hash(await fingerprints(ctx.db));
   const linksBefore = hash((await ctx.db.query("SELECT * FROM vynox_supabase_auth.identity_links ORDER BY subject")).rows);
@@ -94,7 +103,7 @@ try {
     git(["read-tree", prior], index);
     git(["restore", "--source=HEAD", "--staged", "--", ...paths], index);
     const tree = git(["write-tree"], index);
-    commit = git(["commit-tree", tree, "-p", prior, "-m", "Fix protected Staging existing-account callback and continuation"], {
+    commit = git(["commit-tree", tree, "-p", prior, "-m", "Fix Staging mobile authentication loading and query lifecycle"], {
       ...index, GIT_AUTHOR_NAME: "VYNOX LAYER Release", GIT_AUTHOR_EMAIL: "release@users.noreply.github.com",
       GIT_COMMITTER_NAME: "VYNOX LAYER Release", GIT_COMMITTER_EMAIL: "release@users.noreply.github.com" });
     if (git(["diff", "--name-only", prior, commit]).split("\n").some(x => !paths.includes(x)))
@@ -144,7 +153,7 @@ try {
     protectionPreserved: true, existingIdentityLinksPreserved: true, businessDataAndPermissionsPreserved: true,
     identityBindingsAndSessionSecretPreserved: true, mainUnchanged: true, workerSuspended: true,
     dnsChanged: false, productionDeployed: false, migrationsApplied: false,
-    ownerBrowserAcceptancePending: true,
+    ownerBrowserAcceptancePending: true, mobileLoadingFix: true,
   }, null, 2));
   console.info(`Protected Staging authentication fix deployed: ${origin}`);
 } finally { await ctx.db.end(); }
