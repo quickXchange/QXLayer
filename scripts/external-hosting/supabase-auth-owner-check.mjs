@@ -72,7 +72,12 @@ try {
     const links=await c.db.query("SELECT subject,proof_subject FROM vynox_supabase_auth.identity_links WHERE business_id=$1",[business]);
     if(links.rowCount>1||links.rows.some(x=>x.proof_subject!==proof))throw Error("Owner proof binding mismatch.");
     const fresh=roster.users.filter(u=>!baseline.originalUserHashes.includes(hash(u.id)));
-    const candidate=links.rowCount?roster.users.find(u=>u.id===links.rows[0].subject):fresh.length===1?fresh[0]:null;
+    let candidate=links.rowCount?roster.users.find(u=>u.id===links.rows[0].subject):fresh.length===1?fresh[0]:null;
+    if(candidate){
+      const detail=await admin(c.key,`/users/${candidate.id}`);
+      if(detail.id!==candidate.id)throw Error("Pinned owner profile readback mismatch.");
+      candidate=detail;
+    }
     let aal2=false,recoveryOnly=false,providerValidatedSessions=0,sessionCount=0;
     if(candidate){
       const sessions=await c.db.query("SELECT envelope FROM vynox_supabase_auth.sessions WHERE subject=$1 AND expires_at>now()",[candidate.id]);

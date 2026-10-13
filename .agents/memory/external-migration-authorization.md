@@ -3,7 +3,20 @@ name: External preparation authorization
 description: External migration authorization history, isolated staging creation, paid-resource notice, and the Production/cutover hold.
 ---
 
-## Current staging configuration authorization
+## Current publication and deployment hold
+
+Do not publish or deploy without the user's approval, including Staging.
+Keep Production and all other projects completely isolated and unchanged.
+
+**Why:** The user explicitly imposed this hold while authorizing the remaining
+Staging-only owner linking, MFA and Super Admin verification.
+
+**How to apply:** This supersedes earlier automatic Staging redeployment
+authorization below. Local fixes and read-only verification may continue, but
+ask for approval before deploying any fix. Passing authentication tests is not
+permission to publish, deploy or cut over.
+
+## Earlier staging configuration authorization
 
 Connecting Vercel, adding a Render credential and verifying hosting configuration
 initially authorized connection/read-only checks, not service creation or
