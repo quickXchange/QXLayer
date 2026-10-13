@@ -38,3 +38,9 @@ For real owner migration checks, the owner completes inbox confirmation, recover
 **Why:** The user explicitly requires real-inbox checks and preservation of their owner ID and Super Admin permissions, without sharing secrets or replacing Clerk.
 
 **How to apply:** Verify bounded server-side metadata against a pre-action owner/business baseline. Provider delivery events are not inbox receipt, and an administrator-issued impersonation session is not independent owner proof. Ask for nonsensitive outcomes only; do not report incomplete owner participation as a passed end-to-end test.
+
+An unrecognized masked account hint does not establish that the owner lacks access. Identify the exact verified Staging account before requesting its native authentication.
+
+**Why:** The owner recognized their existing account only after the full Staging identifier was provided. Earlier role-based selection established permission continuity, not personal custody.
+
+**How to apply:** Use a bounded, authorized Staging identity lookup when identification is needed. Do not store the email in memory, inspect Production to resolve it, or treat an inbox-ownership statement as fresh authentication proof.
