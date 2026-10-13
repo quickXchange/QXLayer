@@ -76,6 +76,9 @@ components:
             - {type: "null"}
         mfaRequired: {type: boolean}
         recovery: {type: boolean}
+        existingAccountLinked:
+          type: boolean
+          description: Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs.
     SupabaseActionInput:
       type: object
       additionalProperties: false

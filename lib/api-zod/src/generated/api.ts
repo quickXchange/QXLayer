@@ -25,7 +25,8 @@ export const GetSupabaseAuthSessionResponse = zod.object({
   "totpFactorId": zod.string().nullish()
 }),zod.null()]),
   "mfaRequired": zod.boolean(),
-  "recovery": zod.boolean()
+  "recovery": zod.boolean(),
+  "existingAccountLinked": zod.boolean().optional().describe('Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs.')
 })
 
 

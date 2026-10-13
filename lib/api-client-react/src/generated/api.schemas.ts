@@ -2233,6 +2233,8 @@ export interface SupabaseSession {
   user: SupabasePublicUser | null;
   mfaRequired: boolean;
   recovery: boolean;
+  /** Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs. */
+  existingAccountLinked?: boolean;
 }
 
 export type SupabaseActionInputAction = typeof SupabaseActionInputAction[keyof typeof SupabaseActionInputAction];

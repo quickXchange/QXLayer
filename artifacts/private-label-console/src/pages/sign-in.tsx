@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
+import { signInDestination, EXISTING_ACCOUNT_LINK_CONTINUATION } from '@/lib/existing-account-link';
 import { A, AuthFrame, ErrorLine, Field, Form, MailNotice, SuccessLine, Submit, authErrorText, isMailUnavailable, useOwnedStatus } from '@/components/auth/auth-ui';
 
 export default function SignInPage() {
@@ -15,8 +16,11 @@ export default function SignInPage() {
       const r = await authClient.signIn.email({ email: email.trim(), password });
       if (r.error) { setNeedsVerify(r.error.code === 'EMAIL_NOT_VERIFIED'); setErr(authErrorText(r.error)); return; }
       qc.clear(); setPassword('');
-      if ((r.data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) { nav('/two-factor'); return; }
-      nav('/admin');
+      const destination = supabaseAuth ? signInDestination(window.location.search) : '/admin';
+      if ((r.data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
+        nav(destination === '/account/link-existing' ? `/two-factor?${EXISTING_ACCOUNT_LINK_CONTINUATION}` : '/two-factor'); return;
+      }
+      nav(destination);
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   const resend = async () => {
