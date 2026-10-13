@@ -3,6 +3,7 @@ import { ClerkProvider, SignIn, SignUp, useClerk as useLegacyClerk } from '@cler
 import { Show, useClerk } from '@/lib/auth';
 import { authClient, ownedAuth, supabaseAuth } from '@/lib/owned-auth-client';
 import { registerSupabaseQueryClient } from '@/lib/supabase-auth-client';
+import { StagingAuthHistorySync } from '@/components/auth/staging-auth-navigation';
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { shadcn } from '@clerk/themes';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
@@ -191,7 +192,7 @@ function PrincipalGate({ children }: { children: ReactNode }) {
   };
   if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div></ConsoleThemeScope>;
   if (demoTab && q.data && !q.data.demo) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
-  if ((q.error as { status?: number } | null)?.status === 428) return <Redirect to="/account/security" />;
+  if ((q.error as { status?: number } | null)?.status === 428) return <Redirect to="/account/security" replace={supabaseAuth} />;
   if (q.isError || !q.data) {
     return (
       <ConsoleThemeScope><div className="grid min-h-[100dvh] place-items-center px-5 text-center">
@@ -234,12 +235,12 @@ function OwnedProtected({ children }: { children: ReactNode }) {
   const s = authClient.useSession();
   if (s.error) return <ConsoleThemeScope><ErrorState what="your session" onRetry={() => void s.refetch()} /><Button variant="outline" onClick={() => window.location.reload()}>Reload private access</Button></ConsoleThemeScope>;
   if (s.isPending) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
-  if (!s.data?.user) return <Redirect to={(s as { mfaRequired?: boolean }).mfaRequired ? '/two-factor' : '/sign-in'} />;
+  if (!s.data?.user) return <Redirect to={(s as { mfaRequired?: boolean }).mfaRequired ? '/two-factor' : '/sign-in'} replace={supabaseAuth} />;
   return <PrincipalGate>{children}</PrincipalGate>;
 }
 function SuperOnly({ children }: { children: ReactNode }) {
   const p = usePrincipal();
-  return p.role === 'super_admin' ? <>{children}</> : <Redirect to="/account" />;
+  return p.role === 'super_admin' ? <>{children}</> : <Redirect to="/account" replace={supabaseAuth} />;
 }
 function DeliveredOnly({ children }: { children: ReactNode }) {
   const p = usePrincipal(); const { id = '' } = useParams<{ id: string }>();
@@ -359,7 +360,9 @@ function OwnedProviderWithRoutes() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <OwnedCacheInvalidator />
-        <RoutedErrorBoundary><AppRoutes /></RoutedErrorBoundary>
+        {supabaseAuth
+          ? <StagingAuthHistorySync><RoutedErrorBoundary><AppRoutes /></RoutedErrorBoundary></StagingAuthHistorySync>
+          : <RoutedErrorBoundary><AppRoutes /></RoutedErrorBoundary>}
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

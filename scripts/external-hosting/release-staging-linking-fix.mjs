@@ -16,6 +16,8 @@ const paths = [
   "artifacts/private-label-console/src/App.tsx",
   "artifacts/private-label-console/src/components/auth/auth-ui.tsx",
   "artifacts/private-label-console/src/components/auth/clerk-load-boundary.tsx",
+  "artifacts/private-label-console/src/components/auth/staging-auth-navigation.tsx",
+  "artifacts/private-label-console/src/lib/auth-history.ts",
   "artifacts/private-label-console/src/lib/auth-query-transition.ts",
   "artifacts/private-label-console/src/lib/supabase-auth-client.ts",
   "artifacts/private-label-console/src/pages/account-security.tsx",

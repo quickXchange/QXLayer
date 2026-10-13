@@ -78,8 +78,8 @@ function useSession(): FacadeSession {
 }
 /** Raw session state, including recovery and pending-MFA, for the auth screens. */
 export function useSupabaseSessionState() {
-  const q = useGetSupabaseAuthSession({ query: { queryKey: getGetSupabaseAuthSessionQueryKey(), retry: false, networkMode: "always", refetchInterval: query => query.state.error ? false : 10000 } });
-  return { session: q.data ?? null, error: q.error, isPending: q.isLoading, refetch: () => q.refetch() };
+  const q = useGetSupabaseAuthSession({ query: { queryKey: getGetSupabaseAuthSessionQueryKey(), retry: false, networkMode: "always", refetchOnMount: "always", refetchInterval: query => query.state.error ? false : 10000 } });
+  return { session: q.data ?? null, error: q.error, isPending: q.isLoading, isFetching: q.isFetching, isFetchedAfterMount: q.isFetchedAfterMount, refetch: () => q.refetch() };
 }
 
 export const supabaseFacade = {

@@ -20,3 +20,17 @@ the new session.
 **How to apply:** Also check that a mounted anonymous observer receives the
 fresh session. Inspect the actual deployed public bundle when diagnosing
 Staging; a fixed workspace does not mean the hosted release contains the fix.
+
+History navigation can display a sign-in form even when the server session is
+still authenticated. Treat form visibility as UI state, not logout evidence.
+
+**Why:** Native mobile Chromium checks retained the session cookie and a valid
+server session across Back, Forward and Refresh, while direct navigation to the
+deployed sign-in route still rendered an anonymous form. Automatic role
+redirects could also add history entries and bounce Back to the account page.
+
+**How to apply:** Session-gate Staging sign-in, replace automatic authentication
+and role redirects, and revalidate on persisted pageshow without evicting
+observers. Distinguish first-entry validation from routine polling so background
+checks do not remount the form and erase typed credentials. Keep MFA, recovery
+and account-link continuations intact.

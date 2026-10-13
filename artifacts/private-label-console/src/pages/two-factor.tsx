@@ -21,7 +21,7 @@ export default function TwoFactorPage() {
         : backup ? await authClient.twoFactor.verifyBackupCode({ code: c, trustDevice: trust }) : await authClient.twoFactor.verifyTotp({ code: c, trustDevice: trust });
       if (r.error) { setErr(authErrorText(r.error)); return; }
       if (!supabaseAuth) qc.clear();
-      setCode(''); nav(supabaseAuth ? signInDestination(window.location.search) : '/admin');
+      setCode(''); nav(supabaseAuth ? signInDestination(window.location.search) : '/admin', { replace: supabaseAuth });
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (

@@ -4,8 +4,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
 import { signInDestination, EXISTING_ACCOUNT_LINK_CONTINUATION } from '@/lib/existing-account-link';
 import { A, AuthFrame, ErrorLine, Field, Form, MailNotice, SuccessLine, Submit, authErrorText, isMailUnavailable, useOwnedStatus } from '@/components/auth/auth-ui';
+import { StagingSignInGate } from '@/components/auth/staging-auth-navigation';
 
 export default function SignInPage() {
+  return supabaseAuth ? <StagingSignInGate><SignInForm /></StagingSignInGate> : <SignInForm />;
+}
+
+function SignInForm() {
   const [, nav] = useLocation(); const qc = useQueryClient();
   const { status, failed } = useOwnedStatus();
   const [email, setEmail] = useState(''); const [password, setPassword] = useState('');
@@ -19,9 +24,9 @@ export default function SignInPage() {
       setPassword('');
       const destination = supabaseAuth ? signInDestination(window.location.search) : '/admin';
       if ((r.data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
-        nav(destination === '/account/link-existing' ? `/two-factor?${EXISTING_ACCOUNT_LINK_CONTINUATION}` : '/two-factor'); return;
+        nav(destination === '/account/link-existing' ? `/two-factor?${EXISTING_ACCOUNT_LINK_CONTINUATION}` : '/two-factor', { replace: supabaseAuth }); return;
       }
-      nav(destination);
+      nav(destination, { replace: supabaseAuth });
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   const resend = async () => {
