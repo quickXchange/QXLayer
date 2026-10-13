@@ -32,3 +32,9 @@ Report authorization tests with simulated sandbox readiness separately from real
 **Why:** Draft fixtures correctly hit existing delivery guards before tenant reads. Explicitly approved, access-ready disposable fixtures proved tenant isolation, but did not prove product execution or fulfillment.
 
 **How to apply:** Prepare only scoped, approved fixtures to meet the actual authorization prerequisites; never weaken application guards to satisfy a test. Keep execution/providers disabled and subscriptions unassigned when testing authentication alone, then remove the exact fixtures and verify preservation.
+
+For real owner migration checks, the owner completes inbox confirmation, recovery and fresh existing-account proof privately in the native Staging UI. Do not request or expose passwords or other secrets.
+
+**Why:** The user explicitly requires real-inbox checks and preservation of their owner ID and Super Admin permissions, without sharing secrets or replacing Clerk.
+
+**How to apply:** Verify bounded server-side metadata against a pre-action owner/business baseline. Provider delivery events are not inbox receipt, and an administrator-issued impersonation session is not independent owner proof. Ask for nonsensitive outcomes only; do not report incomplete owner participation as a passed end-to-end test.
