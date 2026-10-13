@@ -41,3 +41,20 @@ the approved exact-origin automation header and `x-vercel-set-bypass-cookie`.
 Keep credentials in memory, wait for a bounded successful access probe, then
 let the browser follow genuine same-origin redirects. Revocation and existing
 protection readback remain required. This does not verify Clerk login.
+
+## Immutable Preview origin rollover
+
+An older protected Staging Preview can still render and accept its genuine
+Private Access form while its shared API accepts only the newly approved
+Preview's exact authentication origin.
+
+**Why:** A previous Preview reproduced “Same-origin authentication request
+required” after successful Private Access, while native mobile Chromium login
+on the current Preview succeeded. Valid cookies do not authorize a different
+document origin.
+
+**How to apply:** Obtain the actual failing address-bar URL before changing
+origin validation. Compare it with the API's pinned origin and the approved
+deployment receipt. Do not allow all Preview subdomains, trust arbitrary
+forwarded hosts, or remove CSRF checks to make old bookmarks work. Mobile
+emulation is not proof of behavior on a physical Android device.
