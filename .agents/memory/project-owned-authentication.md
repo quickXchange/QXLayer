@@ -15,6 +15,12 @@ Staging login, 2FA, and session persistence have been manually verified by the u
 
 **How to apply:** Preserve the verified Staging account and authentication flows; do not recreate an owner or repeat owner authentication through impersonation to establish environment parity.
 
+The user authorizes migrating Replit Development from Better Auth to Supabase Auth using a separate Development configuration. Keep verified Staging completely unchanged, retain Clerk, preserve existing Super Admin business IDs, roles, permissions and data, and verify ownership before linking. Never assign Super Admin from email or create duplicate owners. Do not modify or deploy Production or Staging.
+
+**Why:** The user explicitly approved Development-only implementation and requested login, 2FA, logout, session-persistence and Admin-access testing.
+
+**How to apply:** This extends the prior Staging-only implementation approval to isolated Development, not to a shared provider project or a Production cutover. Do not bypass existing guards by labelling Development as Staging, reuse Staging credentials, or activate an unconfigured provider.
+
 The user designates their newly verified VYNOX LAYER Staging account as official. Link it through fresh proof of the existing Staging owner account without changing or removing existing owner permissions; configure MFA afterward.
 
 **Why:** The user explicitly identified the account as official and requested this order of operations.
