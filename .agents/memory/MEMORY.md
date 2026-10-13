@@ -26,6 +26,7 @@
 - [Provider foundation safety](provider-foundation-safety.md) — catalog/configuration is not connectivity; real adapters, vaults, webhooks and idempotent execution require separate approval.
 - [Production readback evidence](production-readback-evidence.md) — empty schema diffs do not prove CHECK parity; SQL success envelopes must contain the expected results.
 - [QA cleanup durability](qa-cleanup-durability.md) — persist exact disposable fixture scope through workspace restarts; /tmp can vanish before database cleanup.
+- [QA browser credentials](qa-browser-credential-custody.md) — tester subprocesses may lack workspace secrets; validate approved in-memory gate inputs before native journeys.
 - [Commercial pricing safety](commercial-pricing-safety.md) — undecided prices are not zero; separate real commercial configuration from technical recovery.
 - [Public marketing baseline](public-marketing-baseline.md) — presentation-only recovery can ship with code; it is not Production database or owner-access restoration.
 - [Hostname normalization](hostname-normalization.md) — IDN conversion can discard URL syntax; validate customer input before canonicalizing it.

@@ -114,6 +114,11 @@ export async function businessId(subject: string) {
   const link = await pool.query("SELECT business_id FROM vynox_supabase_auth.identity_links WHERE subject=$1", [subject]);
   return link.rows[0]?.business_id ?? id;
 }
+export async function hasExistingAccountLink(subject: string): Promise<boolean> {
+  const result = await pool.query(
+    "SELECT EXISTS(SELECT 1 FROM vynox_supabase_auth.identity_links WHERE subject=$1) AS linked", [subject]);
+  return result.rows[0]?.linked === true;
+}
 export async function needSession(req: Request, allowRecovery = false) {
   const s = await readSession(req);
   if (!s || (!allowRecovery && s.payload.recovery)) throw new HttpError(401, "Sign in to your verified account.");

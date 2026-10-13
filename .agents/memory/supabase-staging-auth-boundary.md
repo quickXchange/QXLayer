@@ -44,3 +44,9 @@ An unrecognized masked account hint does not establish that the owner lacks acce
 **Why:** The owner recognized their existing account only after the full Staging identifier was provided. Earlier role-based selection established permission continuity, not personal custody.
 
 **How to apply:** Use a bounded, authorized Staging identity lookup when identification is needed. Do not store the email in memory, inspect Production to resolve it, or treat an inbox-ownership statement as fresh authentication proof.
+
+A verified persisted identity link is not evidence that the current browser callback and sign-in journey work.
+
+**Why:** The owner reported a failed linking sign-in after an exact server-side link readback had succeeded. Repeating or replacing that link would risk changing a correctly preserved identity.
+
+**How to apply:** Reconcile the persisted selected-account link first, then independently verify native callback routing, same-origin cookie continuity, deliberate post-link sign-out and the already-linked UI. Keep changed-code harness evidence separate from unchanged hosted Staging acceptance when deployment is prohibited.

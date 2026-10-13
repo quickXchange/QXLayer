@@ -3,6 +3,7 @@ import { useLocation } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
 import { supabaseMfa } from '@/lib/supabase-auth-client';
+import { signInDestination } from '@/lib/existing-account-link';
 import { A, AuthFrame, ErrorLine, Field, Form, Submit, authErrorText } from '@/components/auth/auth-ui';
 
 export default function TwoFactorPage() {
@@ -19,7 +20,7 @@ export default function TwoFactorPage() {
       const r = supabaseAuth ? await supabaseMfa.verify(c)
         : backup ? await authClient.twoFactor.verifyBackupCode({ code: c, trustDevice: trust }) : await authClient.twoFactor.verifyTotp({ code: c, trustDevice: trust });
       if (r.error) { setErr(authErrorText(r.error)); return; }
-      qc.clear(); setCode(''); nav('/admin');
+      qc.clear(); setCode(''); nav(supabaseAuth ? signInDestination(window.location.search) : '/admin');
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (
