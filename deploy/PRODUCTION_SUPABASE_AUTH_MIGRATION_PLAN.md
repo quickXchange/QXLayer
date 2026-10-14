@@ -150,9 +150,23 @@ prerequisites and never automatic consequences of migration.
 
 ## Immediate next prerequisite
 
-Identify the original Production Super Admin's native user ID and confirm any
-other genuinely required platform administrator. No whole-customer migration
-inventory or test-account import is needed.
+The focused 2026-10-15 read-only check has now retrieved the exact stored Super
+Admin ID; its original active business record is unchanged. **Confirm only that
+this exact ID appears in Production Auth**, and identify any other genuinely
+required administrator if one exists. Do not ask for both test-user records,
+assume directory membership, or interpret an ID match as native MFA/custody proof.
+
+Encrypted backup preparation is in
+[`PRODUCTION_AUTH_BACKUP_READINESS.md`](PRODUCTION_AUTH_BACKUP_READINESS.md).
+The existing configured-key encryption and authenticated recovery tools passed
+20 synthetic-only checks. No real backup, export, restore or remote Storage write
+was performed. The actual runtime source and independent recovery custody still
+need confirmation before capture/restore can be considered ready.
+
+No whole-customer migration inventory, mass import, new backup service or general
+customer bridge is needed. Source-schema/runtime support and native protected-
+administrator acceptance remain separately reviewed release work, not permission
+to alter Production now.
 
 No Production or Staging account, configuration, role, factor, session, schema,
 data, DNS or deployment was modified by this plan. No account was deleted.

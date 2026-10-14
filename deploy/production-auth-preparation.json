@@ -39,9 +39,28 @@
       "instanceIdentifier": null,
       "totalUsers": 2,
       "totalUsersEvidence": "USER_CONFIRMED_REPLIT_CLOUD_USERS_AUTH_PRODUCTION",
-      "nativeRecordInspectionStatus": "PENDING_PROTECTED_ADMINISTRATOR_IDENTIFICATION",
+      "nativeRecordInspectionStatus": "STORED_ADMIN_ID_READ_DIRECTORY_MATCH_STILL_PENDING",
+      "originalAdminBusinessRowUnchanged": true,
+      "productionDirectoryMatchVerified": false,
       "protectedAdministrationManifestEvidence": null
     }
+  },
+  "backupPreparation": {
+    "status": "ENCRYPTION_VERIFIED_SOURCE_AND_RECOVERY_CUSTODY_PENDING",
+    "procedure": "deploy/PRODUCTION_AUTH_BACKUP_READINESS.md",
+    "syntheticEvidence": "generated-artifacts/auth-security/production-backup-crypto-preparation-20261015.json",
+    "configuredKeySyntheticChecksPassed": 10,
+    "authenticatedStreamingSyntheticChecksPassed": 10,
+    "independentWebCryptoReaderPassed": true,
+    "wholeEnvelopeAuthenticationBeforePlaintextConsumer": true,
+    "ciphertextOnlyPrivateLocalStaging": true,
+    "runtimeSourceBindingVerified": false,
+    "independentDurableReceivingCopyVerified": false,
+    "outsideReplitKeyRecoveryVerified": false,
+    "approvedIsolatedRestoreTargetVerified": false,
+    "productionExportExecuted": false,
+    "productionRestoreExecuted": false,
+    "realBackupAndRestoreVerified": false
   },
   "evidence": {
     "immutableDeployedReleaseAndEffectiveAuthProvider": null,

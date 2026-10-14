@@ -64,3 +64,16 @@ test("test accounts do not require migration and cleanup never becomes implicit"
   silentReenrollment.continuity.factorReenrollmentRequiresExplicitApproval = false;
   assert(check(silentReenrollment).errors.length);
 });
+test("successful synthetic encryption checks are not a verified real backup or Owner match", () => {
+  const p = draft();
+  assert.equal(p.backupPreparation.configuredKeySyntheticChecksPassed, 10);
+  assert.equal(p.backupPreparation.authenticatedStreamingSyntheticChecksPassed, 10);
+  assert.equal(p.backupPreparation.productionExportExecuted, false);
+  assert.equal(p.backupPreparation.realBackupAndRestoreVerified, false);
+  assert.equal(p.continuity.productionDirectory.productionDirectoryMatchVerified, false);
+  const result = check(p);
+  assert.equal(result.status, "EVIDENCE_MISSING");
+  assert(result.missing.includes("evidence.authenticatedBackupAndIsolatedRestore"));
+  assert(result.missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
+  assert.equal(result.deploymentAuthorized, false);
+});

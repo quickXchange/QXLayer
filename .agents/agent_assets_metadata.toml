@@ -1078,3 +1078,17 @@ mtime_ms = 1792017644567
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ef15c2f8-ad16-489d-bcbc-c9af085ff609/ad6e7dcc-8dc5-419f-bcf8-19f75d81b54a"
 storage_version_token = "1792017734800323"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "q5pz5oiM6qexbhgRrme7v"
+uri = "file://deploy/PRODUCTION_AUTH_BACKUP_READINESS.md"
+type = "text"
+title = "Production backup and Auth readiness"
+description = "Twenty synthetic encryption/recovery checks passed using existing tooling. No real backup or Production changes; remaining identity, runtime-source and independent recovery-custody evidence is explicit."
+logical_id = "1841b786-92c5-40ba-bba8-fe0e6e8b7974"
+content_hash = "sha256:36db6782eb04f4c0d0a5afc86cdff16110fc1b7c312d092a5aeb3a632ebce7f6"
+size = 6103
+mtime_ms = 1792019139243
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/1841b786-92c5-40ba-bba8-fe0e6e8b7974/50085fd4-3b74-46f9-90d8-57d129b9bd0f"
+storage_version_token = "1792019245551992"
+content_type = "text/markdown"

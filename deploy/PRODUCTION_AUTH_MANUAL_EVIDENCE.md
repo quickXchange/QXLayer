@@ -22,6 +22,12 @@ Users & Auth → Production. Do not ask for the count again. The next input is
 the **original Super Admin's native user ID**, plus any other account genuinely
 required for platform administration—not a complete test-user export.
 
+Update: the focused read-only database check has retrieved the original Admin's
+exact stored ID. The remaining evidence is **a Production user-details record
+with that exact ID**, not another copy of the count, a new email, or both test-user
+records. If it is absent from the two Production identities, stop; do not create
+another Owner, grant privileges or alter the existing business ID.
+
 1. Open this VYNOX LAYER project in Replit, then open **Auth**.
 2. Select **Production** in its environment selector. Do not use Development
    or create/connect a new Clerk application.
