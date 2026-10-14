@@ -6,6 +6,7 @@ import { readSession, publicUser, hasVerifiedFactor, assertAuthOrigin, hasExisti
 import { performAction } from "../modules/supabase-auth/actions";
 import { recoveryCodeCount } from "../modules/supabase-auth/development-recovery";
 import { applicationMfaSatisfied, emailMfaEligible, emailChallengeExpiresAt } from "../modules/supabase-auth/development-email-mfa";
+import { emailLoginChallengeExpiresAt } from "../modules/supabase-auth/development-email-login";
 
 const router = Router();
 router.use("/supabase-auth", (_req, res, next) => {
@@ -30,6 +31,7 @@ router.get("/supabase-auth/session", async (req, res): Promise<void> => {
     mfaRequired,
     emailMfaAvailable,
     ...(emailMfaAvailable && s ? { emailMfaChallengeExpiresAt: emailChallengeExpiresAt(s) } : {}),
+    ...(developmentSupabaseAuth() ? { emailLoginChallengeExpiresAt: await emailLoginChallengeExpiresAt(req) } : {}),
     recovery: s?.payload.recovery ?? false,
     ...(developmentSupabaseAuth() && s && s.aal2 && !s.payload.recovery
       ? { recoveryCodesRemaining: await recoveryCodeCount(s) } : {}),

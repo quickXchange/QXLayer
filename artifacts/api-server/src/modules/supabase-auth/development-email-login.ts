@@ -21,6 +21,29 @@ function requireDevelopment() {
   return supabaseAuthConfiguration();
 }
 function challengeKey(p: Challenge) { return privateAuthKey("email-login-challenge", `${p.subject}\0${p.emailHash}\0${p.nonce}`); }
+function browserChallenge(req: Request): Challenge | null {
+  const value = req.headers.cookie?.split(";").map(x => x.trim()).find(x => x.startsWith(`${EMAIL_LOGIN_COOKIE}=`))
+    ?.slice(EMAIL_LOGIN_COOKIE.length + 1);
+  if (!value || value.length > 1024) return null;
+  try {
+    const p = sessionCodec(supabaseSessionSecret()).open<Challenge>(value);
+    if (p.purpose !== "email-login" || !/^[A-Za-z0-9_-]{32}$/.test(p.nonce) ||
+        !/^[a-f0-9]{64}$/.test(p.emailHash) || !/^[a-f0-9-]{36}$/i.test(p.subject) ||
+        !Number.isSafeInteger(p.expires)) return null;
+    return p;
+  } catch { return null; }
+}
+
+/** Public cookie readback, not a credential: identical for eligible/unknown accounts. */
+export async function emailLoginChallengeExpiresAt(req: Request): Promise<number | undefined> {
+  if (!developmentSupabaseAuth()) return undefined;
+  requireDevelopment();
+  const p = browserChallenge(req);
+  if (!p || p.expires <= Date.now()) return undefined;
+  const r = await pool.query(`SELECT 1 FROM vynox_supabase_auth.rate_limits
+    WHERE key=$1 AND reset_at>now() AND hits<5`, [challengeKey(p)]);
+  return r.rowCount ? p.expires : undefined;
+}
 
 /** Locate an EXISTING authorized subject for delivery, not email-based role assignment. */
 export async function eligibleEmailLoginUser(email: string): Promise<SupabaseUser | null> {
@@ -63,18 +86,16 @@ export async function sendEmailLogin(email: string, _req: Request, res: Response
   res.cookie(EMAIL_LOGIN_COOKIE, sessionCodec(supabaseSessionSecret()).seal(p),
     { secure: true, httpOnly: true, sameSite: "lax", path: "/", maxAge: Math.max(0, p.expires - Date.now()) });
   // Same response/cookie shape for unknown, customer, unverified and non-Gmail accounts.
+  return p.expires;
 }
 
 export async function verifyEmailLogin(email: string, code: string, req: Request, res: Response) {
   requireDevelopment();
-  const value = req.headers.cookie?.split(";").map(x => x.trim()).find(x => x.startsWith(`${EMAIL_LOGIN_COOKIE}=`))
-    ?.slice(EMAIL_LOGIN_COOKIE.length + 1);
-  let p: Challenge;
-  if (!value) throw restart("The code request is not available in this browser.");
-  if (value && value.length > 1024) throw invalid();
-  try { p = sessionCodec(supabaseSessionSecret()).open<Challenge>(value); } catch { throw restart("The code request can no longer be verified."); }
-  if (p.purpose !== "email-login" || !p.nonce ||
-      p.emailHash !== privateAuthKey("email-login-address", email) || !/^[0-9]{6}$/.test(code)) throw invalid();
+  const p = browserChallenge(req);
+  if (!p) throw restart("The code request is not available in this browser. Secure cookies may be blocked in the embedded preview.");
+  if (p.emailHash !== privateAuthKey("email-login-address", email))
+    throw restart("The email address does not match the code request in this browser.");
+  if (!/^[0-9]{6}$/.test(code)) throw invalid();
   if (p.expires <= Date.now()) throw restart("The five-minute sign-in code request has expired.");
   await developmentLimit("email-login-verify", email, 900, 20);
   // Resolve authority before holding the challenge lock; do not exhaust the pool

@@ -26,6 +26,7 @@ function SignInForm() {
       if (r.error) {
         setErr(authErrorText(r.error));
         if (r.error.status === 429) resendWait.start(r.error.retryAfterSeconds ?? 60);
+        if (r.error.code === 'BROWSER_BINDING_REQUIRED') resendWait.start(60);
         return;
       }
       setCode(''); resendWait.start(60);
@@ -69,6 +70,7 @@ function SignInForm() {
         <Field id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
         {emailMethod ? <>
           <p className="text-sm text-muted-foreground">Super Admins only: use your verified Gmail instead of your password. Google Authenticator is still required before Admin access.</p>
+          <p className="text-sm text-muted-foreground">If this preview blocks secure cookies, <a className="font-medium underline" data-testid="link-direct-development-sign-in" href={`${import.meta.env.VITE_QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL}/sign-in`} target="_blank" rel="noopener noreferrer">open Development sign-in in a new tab</a> and request the code there. Keep that tab open for verification.</p>
           <button type="button" data-testid="button-send-login-code" disabled={busy || !email || resendWait.remaining > 0} className="text-sm font-medium hover:underline" onClick={() => void sendCode()}>
             {resendWait.remaining ? `Send again in ${resendWait.remaining}s` : 'Send email code'}
           </button>

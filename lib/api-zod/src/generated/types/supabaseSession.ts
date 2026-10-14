@@ -14,6 +14,8 @@ export interface SupabaseSession {
   emailMfaAvailable?: boolean;
   /** Development only; expiry in epoch milliseconds of this browser session's usable email MFA challenge. No code or proof is exposed. */
   emailMfaChallengeExpiresAt?: number;
+  /** Development only; public expiry of the current HttpOnly browser-bound passwordless challenge, including indistinguishable ineligible-account challenges. */
+  emailLoginChallengeExpiresAt?: number;
   recovery: boolean;
   /**
      * Development-only unused recovery codes, visible only after MFA.

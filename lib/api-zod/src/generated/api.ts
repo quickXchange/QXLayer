@@ -31,6 +31,7 @@ export const GetSupabaseAuthSessionResponse = zod.object({
   "mfaRequired": zod.boolean(),
   "emailMfaAvailable": zod.boolean().optional().describe('Development only; server-confirmed Super Admin with verified Gmail and existing TOTP. Never inferred from browser metadata.'),
   "emailMfaChallengeExpiresAt": zod.number().int().optional().describe('Development only; expiry in epoch milliseconds of this browser session\'s usable email MFA challenge. No code or proof is exposed.'),
+  "emailLoginChallengeExpiresAt": zod.number().int().optional().describe('Development only; public expiry of the current HttpOnly browser-bound passwordless challenge, including indistinguishable ineligible-account challenges.'),
   "recovery": zod.boolean(),
   "recoveryCodesRemaining": zod.number().int().min(getSupabaseAuthSessionResponseRecoveryCodesRemainingMin).optional().describe('Development-only unused recovery codes, visible only after MFA.'),
   "existingAccountLinked": zod.boolean().optional().describe('Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs.')
@@ -69,6 +70,7 @@ export const PerformSupabaseAuthActionBody = zod.object({
 })
 
 export const PerformSupabaseAuthActionResponse = zod.object({
+  "emailLoginChallengeExpiresAt": zod.number().int().optional().describe('Development passwordless send receipt; must match the subsequent cookie-bound session readback before asking for the emailed code.'),
   "ok": zod.boolean(),
   "recoveryCodes": zod.array(zod.string()).optional().describe('Development-only plaintext codes returned once after fresh password and TOTP proof.'),
   "mfaRequired": zod.boolean().optional(),

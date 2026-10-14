@@ -2,7 +2,7 @@ import test, { mock } from "node:test";
 import assert from "node:assert/strict";
 import type { Request, Response } from "express";
 import { pool } from "@workspace/db";
-import { sendEmailLogin, verifyEmailLogin, EMAIL_LOGIN_COOKIE } from "./development-email-login";
+import { sendEmailLogin, verifyEmailLogin, EMAIL_LOGIN_COOKIE, emailLoginChallengeExpiresAt } from "./development-email-login";
 import { applicationMfaSatisfied, emailMfaEligible } from "./development-email-mfa";
 import { readSession, updateSession, SESSION_COOKIE, type Payload } from "./session";
 import { requireAuthentication } from "../../middlewares/authentication";
@@ -44,6 +44,10 @@ async function scenario(run: (f: {
     if (sql.includes("INSERT INTO vynox_supabase_auth.sessions")) envelope = String(values[2]);
     if (sql.includes("UPDATE vynox_supabase_auth.sessions")) envelope = String(values[1]);
     if (sql.includes("SELECT envelope")) return { rowCount: envelope ? 1 : 0, rows: envelope ? [{ envelope }] : [] };
+    if (sql.includes("SELECT 1 FROM vynox_supabase_auth.rate_limits")) {
+      const r = rows.get(String(values[0]));
+      return { rowCount: r && r.reset > Date.now() && r.hits < 5 ? 1 : 0, rows: [] };
+    }
     if (sql.includes("VALUES($1,0,to_timestamp")) {
       rows.set(String(values[0]), { hits: 0, reset: Number(values[1]) * 1000 });
     } else if (sql.includes("INSERT INTO vynox_supabase_auth.rate_limits")) {
@@ -174,6 +178,31 @@ test("missing and expired browser challenges explain restarting rather than blam
       { status: 400, message: /EMAIL_LOGIN_RESTART:.*five-minute.*expired/ });
     assert(!f.requests.some(p => p.endsWith("/verify")));
     assert(!f.cookies.has(SESSION_COOKIE));
+  });
+});
+test("passwordless send readback confirms the exact browser cookie and cannot restore used challenges", async () => {
+  await scenario(async f => {
+    const result = await performAction({ action: "login-email-send", email: "synthetic@gmail.com" }, f.req, f.res);
+    assert.equal(await emailLoginChallengeExpiresAt(f.req), result.emailLoginChallengeExpiresAt);
+    const cookie = f.cookies.get(EMAIL_LOGIN_COOKIE)!;
+    f.cookies.delete(EMAIL_LOGIN_COOKIE);
+    assert.equal(await emailLoginChallengeExpiresAt(f.req), undefined);
+    f.cookies.set(EMAIL_LOGIN_COOKIE, "tampered");
+    assert.equal(await emailLoginChallengeExpiresAt(f.req), undefined);
+    f.cookies.set(EMAIL_LOGIN_COOKIE, cookie);
+    await verifyEmailLogin("synthetic@gmail.com", "246810", f.req, f.res);
+    f.cookies.set(EMAIL_LOGIN_COOKIE, cookie);
+    assert.equal(await emailLoginChallengeExpiresAt(f.req), undefined);
+  });
+});
+test("unknown-account passwordless challenges have the same readback shape without sending mail", async () => {
+  await scenario(async f => {
+    f.eligible(false);
+    const result = await performAction({ action: "login-email-send", email: "synthetic@gmail.com" }, f.req, f.res);
+    assert.equal(await emailLoginChallengeExpiresAt(f.req), result.emailLoginChallengeExpiresAt);
+    assert(!f.requests.some(p => p.endsWith("/otp")));
+    f.advance(300000);
+    assert.equal(await emailLoginChallengeExpiresAt(f.req), undefined);
   });
 });
 test("wrong-code attempts persist and the sixth attempt cannot redeem even the correct code", async () => {

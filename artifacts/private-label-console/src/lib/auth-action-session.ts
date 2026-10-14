@@ -1,7 +1,11 @@
-import type { SupabaseActionInput, SupabaseSession } from "@workspace/api-client-react";
+import type { SupabaseActionInput, SupabaseActionResult, SupabaseSession } from "@workspace/api-client-react";
 
 /** HTTP success is not proof that this browser retained the new authentication session. */
-export function authActionSessionError(input: SupabaseActionInput, session: SupabaseSession): string | null {
+export function authActionSessionError(input: SupabaseActionInput, session: SupabaseSession, result?: SupabaseActionResult): string | null {
+  if (input.action === "login-email-send" &&
+      (!result?.emailLoginChallengeExpiresAt ||
+       session.emailLoginChallengeExpiresAt !== result.emailLoginChallengeExpiresAt))
+    return "This browser did not retain the secure sign-in challenge. The embedded preview may be blocking cookies. Open Development sign-in in a new tab and request a new code there.";
   if (input.action === "login" || input.action === "login-email-verify") {
     if (!session.user || session.recovery ||
         session.user.email.toLowerCase() !== input.email?.trim().toLowerCase())

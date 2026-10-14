@@ -81,6 +81,9 @@ components:
         emailMfaChallengeExpiresAt:
           type: integer
           description: Development only; expiry in epoch milliseconds of this browser session's usable email MFA challenge. No code or proof is exposed.
+        emailLoginChallengeExpiresAt:
+          type: integer
+          description: Development only; public expiry of the current HttpOnly browser-bound passwordless challenge, including indistinguishable ineligible-account challenges.
         recovery: {type: boolean}
         recoveryCodesRemaining:
           type: integer
@@ -113,6 +116,9 @@ components:
       additionalProperties: false
       required: [ok]
       properties:
+        emailLoginChallengeExpiresAt:
+          type: integer
+          description: Development passwordless send receipt; must match the subsequent cookie-bound session readback before asking for the emailed code.
         ok: {type: boolean}
         recoveryCodes:
           type: array

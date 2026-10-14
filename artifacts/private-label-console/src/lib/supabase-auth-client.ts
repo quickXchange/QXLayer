@@ -50,8 +50,9 @@ async function act(input: SupabaseActionInput): Promise<Result<SupabaseActionRes
     const session = await refreshSupabaseSession(IDENTITY_ACTIONS.has(input.action));
     if (!session) return { data: null, error: { message: "Your request was accepted, but your session could not be confirmed. Check your connection and reload before continuing." } };
     if (import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "development") {
-      const message = authActionSessionError(input, session);
-      if (message) return { data: null, error: { code: "AUTH_SESSION_NOT_CONFIRMED", message } };
+      const message = authActionSessionError(input, session, data);
+      if (message) return { data: null, error: {
+        code: input.action === "login-email-send" ? "BROWSER_BINDING_REQUIRED" : "AUTH_SESSION_NOT_CONFIRMED", message } };
     }
     return { data, error: null };
   } catch (e) {

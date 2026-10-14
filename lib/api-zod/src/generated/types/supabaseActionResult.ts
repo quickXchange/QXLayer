@@ -8,6 +8,8 @@
 import type { SupabasePublicUser } from './supabasePublicUser';
 
 export interface SupabaseActionResult {
+  /** Development passwordless send receipt; must match the subsequent cookie-bound session readback before asking for the emailed code. */
+  emailLoginChallengeExpiresAt?: number;
   ok: boolean;
   /** Development-only plaintext codes returned once after fresh password and TOTP proof. */
   recoveryCodes?: string[];

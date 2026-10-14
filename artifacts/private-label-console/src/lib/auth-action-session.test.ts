@@ -29,8 +29,13 @@ test("MFA success must survive the authoritative session readback", () => {
     { ...pending, recovery: true, mfaRequired: false }));
 });
 
-test("anonymous email sends and logout do not require an authenticated session", () => {
+test("anonymous email sends require their exact new cookie receipt, not an authenticated identity", () => {
   const anonymous = { ...pending, user: null, mfaRequired: false };
-  assert.equal(authActionSessionError({ action: "login-email-send", email: user.email }, anonymous), null);
+  const input = { action: "login-email-send" as const, email: user.email };
+  assert(authActionSessionError(input, anonymous, { ok: true, emailLoginChallengeExpiresAt: 123 }));
+  assert(authActionSessionError(input, { ...anonymous, emailLoginChallengeExpiresAt: 122 },
+    { ok: true, emailLoginChallengeExpiresAt: 123 }));
+  assert.equal(authActionSessionError(input, { ...anonymous, emailLoginChallengeExpiresAt: 123 },
+    { ok: true, emailLoginChallengeExpiresAt: 123 }), null);
   assert.equal(authActionSessionError({ action: "logout" }, anonymous), null);
 });

@@ -98,8 +98,7 @@ export async function performAction(raw: unknown, req: Request, res: Response) {
     throw new HttpError(503, "Verification and recovery email delivery is not configured.");
   switch (a.action) {
     case "login-email-send":
-      await sendEmailLogin(a.email, req, res);
-      return { ok: true };
+      return { ok: true, emailLoginChallengeExpiresAt: await sendEmailLogin(a.email, req, res) };
     case "login-email-verify":
       await verifyEmailLogin(a.email, a.code, req, res);
       return { ok: true, mfaRequired: true };
