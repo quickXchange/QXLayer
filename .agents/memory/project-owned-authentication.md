@@ -1,6 +1,6 @@
 ---
 name: Project-owned authentication
-description: User requests Supabase Auth with Staging-first verification and an approval-gated Clerk cutover.
+description: Isolated Development Supabase migration, verified Staging preservation, and proof-based owner continuity.
 ---
 
 The user wants a full authentication system from their side, integrated with this project, instead of Clerk.
@@ -26,6 +26,12 @@ For new Development Supabase provisioning, separate organization-level project-c
 **Why:** Creating a new project requires organization-level capability, but that must not authorize changing verified Staging, Production or other projects.
 
 **How to apply:** Restrict subsequent Auth Config and Project Settings writes to the newly created Development project. A verified Free plan permits the approved free-project creation attempt, not a paid upgrade or an additional billable instance.
+
+Development owner enrollment transfers verified identity from a fresh native Clerk proof, rather than enabling automatic email confirmation for all registrations. The proof must match the existing active Development Super Admin business ID before a new provider identity is created.
+
+**Why:** Existing owner custody must be proved independently of email similarity; lack of a Development mail service does not authorize reusing protected Staging mail credentials or bypassing verification for new accounts.
+
+**How to apply:** Keep standalone signup/recovery fail-closed until independent Development mail delivery is configured. Require real owner participation for migration and final Admin-access acceptance; disposable-account tests and mocked proof tests are not owner migration evidence.
 
 The user designates their newly verified VYNOX LAYER Staging account as official. Link it through fresh proof of the existing Staging owner account without changing or removing existing owner permissions; configure MFA afterward.
 

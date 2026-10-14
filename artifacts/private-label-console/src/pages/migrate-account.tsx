@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ClerkProvider, SignIn, useAuth as useClerkAuth, useClerk } from '@clerk/react';
 import { A, AuthFrame, ErrorLine, Field, Form, SuccessLine, Submit } from '@/components/auth/auth-ui';
+import { existingClerkKey, existingClerkProxy } from '@/lib/existing-clerk-config';
+import { supabaseDevelopmentAuth } from '@/lib/owned-auth-client';
 
-const pk = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+const pk = existingClerkKey;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 function Enroll() {
@@ -30,13 +32,18 @@ function Enroll() {
     } catch { setErr('Could not complete migration. Try again.'); } finally { setBusy(false); }
   };
   if (done) return <SuccessLine id="text-migrated">Migration complete. Redirecting to sign in with your new password...</SuccessLine>;
-  if (!isSignedIn) return <SignIn routing="hash" appearance={{ elements: { header: '!hidden', logoBox: '!hidden' } }} />;
+  const returnUrl = new URL(`${base}/migrate-account`, window.location.origin).href;
+  if (!isSignedIn) return <SignIn routing="hash"
+    {...(supabaseDevelopmentAuth ? { forceRedirectUrl: returnUrl, fallbackRedirectUrl: returnUrl } : {})}
+    appearance={{ elements: { header: '!hidden', logoBox: '!hidden' } }} />;
   return (
     <Form onSubmit={submit}>
       <Field id="migrate-password" label="New VYNOX LAYER password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint="12 to 128 characters. Your old password is unchanged and is never copied." />
       <Field id="migrate-confirm" label="Confirm new password" type="password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
       <ErrorLine>{err}</ErrorLine>
       <Submit id="button-migrate" busy={busy} disabled={!pw}>Create my new sign-in</Submit>
+      {supabaseDevelopmentAuth && <button type="button" className="text-sm underline" data-testid="button-refresh-existing-proof"
+        onClick={() => void clerk.signOut({ redirectUrl: returnUrl })}>Sign out of the existing account to obtain fresh proof</button>}
     </Form>
   );
 }
@@ -45,7 +52,8 @@ export default function MigrateAccountPage() {
   return (
     <AuthFrame title="Move your existing account" subtitle="One-time migration" footer={<>Already migrated? <A id="link-sign-in" href="/sign-in">Sign in</A></>}>
       <p className="text-sm text-muted-foreground">Sign in once with your existing VYNOX LAYER account. That verifies your email and identity, so there is no new verification email and no need to create a new account. Then choose a password for the new sign-in. Your roles and data stay attached, and this works only once per account.</p>
-      {pk ? <ClerkProvider publishableKey={pk} signInUrl={`${base}/migrate-account`}><Enroll /></ClerkProvider> : <ErrorLine>The previous sign-in service is not configured here.</ErrorLine>}
+      {supabaseDevelopmentAuth && <p className="text-sm text-muted-foreground" data-testid="text-development-owner-proof">This Development enrollment is restricted to the account that already owns the existing Super Admin record. A different verified account cannot receive that access. After migration, enable and verify two-factor authentication before opening Admin.</p>}
+      {pk ? <ClerkProvider publishableKey={pk} proxyUrl={existingClerkProxy} signInUrl={`${base}/migrate-account`}><Enroll /></ClerkProvider> : <ErrorLine>The previous sign-in service is not configured here.</ErrorLine>}
     </AuthFrame>
   );
 }

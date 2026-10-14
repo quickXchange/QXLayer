@@ -11,16 +11,22 @@ import { authDatabase, ownedSession } from "../modules/owned-auth/service";
 import { mailReady } from "../modules/owned-auth/mail";
 import * as schema from "../modules/owned-auth/schema";
 import { applicationUserId } from "../../../../lib/external-clerk/index.mjs";
+import { developmentSupabaseAuth, supabaseAuthConfiguration } from "../modules/supabase-auth/config";
+import { enrollDevelopmentIdentity } from "../modules/supabase-auth/development-enrollment";
+import { publishableKeyFromHost } from "@clerk/shared/keys";
+import { getClerkProxyHost } from "../middlewares/clerkProxyMiddleware";
 
 const router = Router();
 router.get("/owned-auth/status", (_req, res) => {
   res.set("Cache-Control", "no-store").json({ enabled: ownedAuthentication(), mailReady: mailReady() });
 });
 router.use("/auth-migration", (req, res, next) => {
-  if (!ownedAuthentication()) { res.status(404).json({ error: "Migration is not enabled." }); return; }
+  if (!ownedAuthentication() && !developmentSupabaseAuth()) { res.status(404).json({ error: "Migration is not enabled." }); return; }
   sameOriginMutation(req, res, next);
-}, clerkMiddleware(() => ({ publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
-  authorizedParties: [authOrigin()] })));
+}, clerkMiddleware((req) => ({ publishableKey: developmentSupabaseAuth()
+    ? publishableKeyFromHost(getClerkProxyHost(req) ?? "", process.env.CLERK_PUBLISHABLE_KEY)
+    : process.env.CLERK_PUBLISHABLE_KEY,
+   authorizedParties: [developmentSupabaseAuth() ? supabaseAuthConfiguration().origin : authOrigin()] })));
 
 async function legacyProof(req: Parameters<typeof getAuth>[0]) {
   const native = getAuth(req);
@@ -39,6 +45,11 @@ async function legacyProof(req: Parameters<typeof getAuth>[0]) {
 router.post("/auth-migration/enroll", async (req, res) => {
   const { password } = z.object({ password: z.string().min(12).max(128) }).strict().parse(req.body);
   const proof = await legacyProof(req);
+  if (developmentSupabaseAuth()) {
+    await enrollDevelopmentIdentity(req, res, proof, password);
+    res.status(201).json({ enrolled: true });
+    return;
+  }
   // No role changes, email-only matching, password copy or replacement identity.
   const existing = await authDatabase.select().from(schema.identityLink).where(eq(schema.identityLink.businessId, proof.businessId));
   const emailOwner = await authDatabase.select({ id: schema.user.id }).from(schema.user).where(eq(schema.user.email, proof.email));
@@ -54,6 +65,7 @@ router.post("/auth-migration/enroll", async (req, res) => {
   res.status(201).json({ enrolled: true });
 });
 router.post("/auth-migration/link", async (req, res) => {
+  if (!ownedAuthentication()) throw new HttpError(404, "Use the Supabase existing-account linking flow.");
   const own = await ownedSession(req);
   if (!own || Date.now() - new Date(own.session.createdAt).getTime() > 600000)
     throw new HttpError(401, "Sign in again to your verified owned account first.");

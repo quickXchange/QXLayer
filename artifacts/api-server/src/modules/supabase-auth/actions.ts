@@ -6,7 +6,7 @@ import { clerkClient, getAuth } from "@clerk/express";
 import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
 import { HttpError } from "../../lib/errors";
 import { authRequest, type SupabaseTokens } from "./provider";
-import { supabaseAuthConfiguration, supabaseBusinessId } from "./config";
+import { supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret } from "./config";
 import { establishSession, needSession, publicUser, hasVerifiedFactor, reauthenticate, readSession,
   revokeLocalSession, updateSession, type AuthSession } from "./session";
 
@@ -29,8 +29,7 @@ export const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("link-existing") }).strict(),
 ]);
 export async function limitAction(req: Request, action: string, account = "") {
-  const secret = process.env.QXLAYER_SUPABASE_AUTH_SESSION_SECRET;
-  if (!secret) throw new Error("Independent Staging signing configuration required.");
+  const secret = supabaseSessionSecret();
   const key = createHmac("sha256", secret).update(`${req.socket.remoteAddress}\0${action}\0${account}`).digest("hex");
   const maximum = ["login", "signup", "recover", "resend"].includes(action) ? 5 : 15;
   const result = await pool.query(`INSERT INTO vynox_supabase_auth.rate_limits(key,hits,reset_at)

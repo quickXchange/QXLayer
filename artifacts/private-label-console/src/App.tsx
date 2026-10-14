@@ -289,7 +289,7 @@ function AppRoutes() {
               {ownedAuth && <Route path="/verify-email" component={OwnedVerify} />}
               {ownedAuth && <Route path="/two-factor" component={OwnedTwoFactor} />}
               {ownedAuth && <Route path="/account/security" component={OwnedSecurity} />}
-              {ownedAuth && !supabaseAuth && <Route path="/migrate-account" component={OwnedMigrate} />}
+              {ownedAuth && (!supabaseAuth || import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === 'development') && <Route path="/migrate-account" component={OwnedMigrate} />}
               {ownedAuth && <Route path="/account/link-existing" component={OwnedLink} />}
               <Route path="/account" component={rAcc} />
               <Route path="/account/orders" component={rOrd} />

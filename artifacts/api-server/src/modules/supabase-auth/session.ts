@@ -4,9 +4,9 @@ import { pool } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { cookieDigest, sessionCodec } from "./crypto";
 import { authRequest, type SupabaseTokens, type SupabaseUser } from "./provider";
-import { supabaseAuthConfiguration, supabaseBusinessId } from "./config";
+import { supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret, developmentSupabaseAuth } from "./config";
 
-export const SESSION_COOKIE = "__Host-vynox_sb";
+export const SESSION_COOKIE = developmentSupabaseAuth() ? "__Host-vynox_dev_sb" : "__Host-vynox_sb";
 interface Payload {
   accessToken: string;
   refreshToken: string;
@@ -22,9 +22,7 @@ export interface AuthSession {
   aal2: boolean;
 }
 function codec() {
-  const key = process.env.QXLAYER_SUPABASE_AUTH_SESSION_SECRET;
-  if (!key) throw new Error("Independent Staging Supabase session encryption is required.");
-  return sessionCodec(key);
+  return sessionCodec(supabaseSessionSecret());
 }
 export function sessionCookie(req: Request) {
   const raw = req.headers.cookie?.split(";").map(v => v.trim()).find(v => v.startsWith(`${SESSION_COOKIE}=`));

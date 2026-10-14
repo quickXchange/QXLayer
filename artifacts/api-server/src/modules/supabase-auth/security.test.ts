@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { supabaseAuthEnabled, supabaseAuthConfiguration, supabaseBusinessId } from "./config";
+import { supabaseAuthEnabled, supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret } from "./config";
 import { sessionCodec, cookieDigest, pkcePair } from "./crypto";
 import { randomBytes, createHash } from "node:crypto";
 
@@ -50,4 +50,44 @@ test("opaque cookies are hashed; PKCE uses random S256 proof", () => {
   const a = pkcePair(), b = pkcePair();
   assert.notEqual(a.verifier, b.verifier);
   assert.equal(a.challenge, createHash("sha256").update(a.verifier).digest("base64url"));
+});
+
+const development = {
+  QXLAYER_EXTERNAL_ENVIRONMENT: "development", QXLAYER_AUTH_PROVIDER: "supabase",
+  NODE_ENV: "development", REPLIT_DEV_DOMAIN: "auth-test.replit.dev",
+  QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL: "https://auth-test.replit.dev",
+  QXLAYER_DEVELOPMENT_SUPABASE_AUTH_PROJECT_REF: "nktstksmfpcsjnjbeqsk",
+  QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SERVER_KEY: "sb_secret_synthetic_test_only",
+  QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET: "synthetic-development-key-independent-and-long",
+};
+test("Development uses only its pinned project and independent credentials", () => {
+  const cfg = supabaseAuthConfiguration({ ...env, ...development });
+  assert.equal(cfg.providerOrigin, "https://nktstksmfpcsjnjbeqsk.supabase.co");
+  assert.equal(cfg.apiKey, development.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SERVER_KEY);
+  assert.equal(cfg.origin, development.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL);
+  assert.equal(cfg.mailReady, false);
+});
+test("Development refuses production builds, external business databases and missing runtime identity", () => {
+  for (const patch of [{ NODE_ENV: "production" }, { QXLAYER_DATABASE_PROVIDER: "supabase" },
+    { REPLIT_DEV_DOMAIN: "" }, { QXLAYER_EXTERNAL_ENVIRONMENT: "production" }])
+    assert.throws(() => supabaseAuthConfiguration({ ...development, ...patch }));
+});
+test("Development never falls back to Staging project, key, origin or session secret", () => {
+  for (const patch of [
+    { QXLAYER_DEVELOPMENT_SUPABASE_AUTH_PROJECT_REF: "muvedavhbpgpdrrnjrih" },
+    { QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SERVER_KEY: "" },
+    { QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SERVER_KEY: "sb_publishable_not_a_server_key" },
+    { QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL: env.QXLAYER_SUPABASE_AUTH_URL },
+    { QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET: "" },
+  ]) assert.throws(() => supabaseAuthConfiguration({ ...env, ...development, ...patch }));
+  assert.throws(() => supabaseSessionSecret({ ...development,
+    QXLAYER_SUPABASE_AUTH_SESSION_SECRET: development.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET }));
+  assert.throws(() => supabaseSessionSecret({ ...development,
+    SESSION_SECRET: development.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET }));
+});
+test("Development trial does not change the default provider and cannot leak into Staging", () => {
+  assert.equal(supabaseAuthEnabled({ ...development, QXLAYER_AUTH_PROVIDER: "owned" }), false);
+  assert.equal(supabaseAuthEnabled({ ...development, QXLAYER_AUTH_PROVIDER: "owned",
+    QXLAYER_DEVELOPMENT_SUPABASE_AUTH_TRIAL_ENABLED: "true" }), true);
+  assert.throws(() => supabaseAuthEnabled({ ...env, QXLAYER_DEVELOPMENT_SUPABASE_AUTH_TRIAL_ENABLED: "true" }));
 });

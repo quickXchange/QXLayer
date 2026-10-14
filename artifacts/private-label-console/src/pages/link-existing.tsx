@@ -11,8 +11,9 @@ import { OwnedSessionGate } from '@/pages/account-security';
 import { existingAccountProofReturnUrl, EXISTING_ACCOUNT_LINK_CONTINUATION } from '@/lib/existing-account-link';
 import { ClerkLoadBoundary, ClerkReadiness } from '@/components/auth/clerk-load-boundary';
 import { withRequestDeadline } from '@workspace/api-client-react';
+import { existingClerkKey, existingClerkProxy } from '@/lib/existing-clerk-config';
 
-const pk = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+const pk = existingClerkKey;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 function Linker() {
@@ -117,7 +118,7 @@ function SupabaseLinkInfo() {
       <p className="text-sm text-muted-foreground" data-testid="text-link-explainer">Your existing IDs and access are preserved. Sign in to the existing account to prove you own it. The server then checks that both sign-ins are recent and that this pairing is approved. Matching email addresses never links accounts or grants roles.</p>
       {!verified ? <ErrorLine id="text-link-unverified">Verify this account's email first, then return here.</ErrorLine>
         : !keyOk ? <ErrorLine id="text-link-unconfigured">The existing-account sign-in is not available in this environment.</ErrorLine>
-        : <ClerkLoadBoundary><ClerkProvider publishableKey={pk} signInUrl={`${base}/account/link-existing`}
+        : <ClerkLoadBoundary><ClerkProvider publishableKey={pk} proxyUrl={existingClerkProxy} signInUrl={`${base}/account/link-existing`}
           signInForceRedirectUrl={existingAccountProofReturnUrl(base, window.location.origin)}
           signInFallbackRedirectUrl={existingAccountProofReturnUrl(base, window.location.origin)}><ClerkReadiness /><SupabaseLinker /></ClerkProvider></ClerkLoadBoundary>}
     </AuthFrame>

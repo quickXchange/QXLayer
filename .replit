@@ -32,8 +32,13 @@ QXLAYER_PLATFORM_HOSTS = "www.quicklychan.xyz,private-label-crypto-platform.repl
 QXLAYER_PLATFORM_URL = "https://www.quicklychan.xyz"
 
 [userenv.development]
-QXLAYER_AUTH_PROVIDER = "owned"
+QXLAYER_AUTH_PROVIDER = "supabase"
 QXLAYER_AUTH_URL = "https://372d2684-97ec-4ce5-b16a-77fb322db72a-00-3vzuovktccar2.reed.replit.dev"
-VITE_QXLAYER_AUTH_PROVIDER = "owned"
+VITE_QXLAYER_AUTH_PROVIDER = "supabase"
 QXLAYER_DEVELOPMENT_SUPABASE_ORGANIZATION_SLUG = "cvgreqeceunmyluagnud"
 QXLAYER_DEVELOPMENT_SUPABASE_AUTH_PROJECT_REF = "nktstksmfpcsjnjbeqsk"
+QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL = "https://372d2684-97ec-4ce5-b16a-77fb322db72a-00-3vzuovktccar2.reed.replit.dev"
+QXLAYER_EXTERNAL_ENVIRONMENT = "development"
+VITE_QXLAYER_DEVELOPMENT_SUPABASE_AUTH_PROJECT_REF = "nktstksmfpcsjnjbeqsk"
+VITE_QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL = "https://372d2684-97ec-4ce5-b16a-77fb322db72a-00-3vzuovktccar2.reed.replit.dev"
+VITE_QXLAYER_EXTERNAL_ENVIRONMENT = "development"
