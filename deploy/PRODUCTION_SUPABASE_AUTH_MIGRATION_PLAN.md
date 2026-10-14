@@ -173,6 +173,15 @@ was performed. The actual runtime source and independent recovery custody still
 need confirmation before capture/restore can be considered ready. These are the
 next evidence blockers, not a request for further Owner-ID proof or test records.
 
+Read-only follow-through has verified the pinned export connection over TLS 1.3
+against the unchanged Admin baseline and identified the existing private backup
+bucket as **Staging-only, 50 MB/object**. No Storage writes are approved. A
+disposable, Unix-socket-only local PostgreSQL 16.15 restore candidate passed a
+synthetic dump/restore without Production credentials and was removed.
+Management metadata GETs return 403; provider backups/other cloud targets cannot
+be enumerated with current access. The simplest procedure and precise remaining
+custody/source approvals are recorded in the backup-readiness document.
+
 No whole-customer migration inventory, mass import, new backup service or general
 customer bridge is needed. Source-schema/runtime support and native protected-
 administrator acceptance remain separately reviewed release work, not permission

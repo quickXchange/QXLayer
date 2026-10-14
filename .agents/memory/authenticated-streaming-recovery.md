@@ -3,6 +3,29 @@ name: Authenticated streaming recovery
 description: Plaintext-free QXLayer backup staging and whole-envelope verification before any plaintext consumer.
 ---
 
+The existing configured encrypted-backup receiving bucket belongs to protected
+Staging. Its existence/private flag does not authorize new Production backup
+uploads or backup-helper bucket creation there.
+
+**Why:** Read-only receiving verification identified the configured project as
+the pinned Staging environment while the user prohibited Staging changes.
+
+**How to apply:** Use explicit GET/SELECT metadata checks only until storage-only
+write permission is granted or an already-owned non-Staging destination is
+selected. Audit “ready”/“canary” helpers before calling them: readiness may create
+a missing bucket and canaries upload objects.
+
+Use a disposable local PostgreSQL cluster with a private Unix socket, no TCP
+listener and no inherited application/provider credentials for synthetic restore
+preparation; it need not use Staging or create cloud infrastructure.
+
+**Why:** The user requires Staging preservation and the simplest isolated
+restore path; existing local PostgreSQL tools support this without remote writes.
+
+**How to apply:** Match the source major version, use generic synthetic fixtures
+only, remove the cluster afterward, and keep real-data restoration separately
+approval-gated. A synthetic success is not a verified Production backup.
+
 Never stream AES-GCM update output directly to a recovery consumer. Verify the
 entire original tag first, using a temporary ciphertext cache with an ephemeral
 memory-only key and independently authenticated, index-bound chunks. No plaintext
