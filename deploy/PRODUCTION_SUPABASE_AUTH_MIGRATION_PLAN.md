@@ -4,6 +4,19 @@ Status: **plan only**. No Staging/Production change, migration, account operatio
 deployment, DNS change or Republish is authorized by this document. Keep
 `scripts/release/authentication-compatibility.mjs` blocking release.
 
+## Authorized read-only Production inventory
+
+The user subsequently authorized a read-only Production inventory and preparation,
+but no modifications, migration, deployment or Republish. Current findings and
+the complete account/backup/rollback approval checklist are in
+[`PRODUCTION_AUTH_READONLY_INVENTORY.md`](PRODUCTION_AUTH_READONLY_INVENTORY.md).
+Managed Production has 40 business tables, one active legacy-ID Admin and no
+local Supabase application-support schema. Public auth probes returned 403.
+Clerk is consistent with observed configuration, not conclusively verified as
+the running provider. The Production directory count remains unknown; the 42
+audited accounts are Development. Phase 1 is therefore partially evidenced,
+not complete or approved for account operations.
+
 ## Evidence and limits
 
 Development status update, 2026-10-14: the user confirmed the Super Admin login
@@ -37,7 +50,8 @@ Development and Production directories must not be assumed identical. The prior
 Production read-only audit found one original active legacy-ID Super Admin and
 no Supabase application identity-links, sessions or recovery-codes tables.
 Production ingress denied direct auth readback, so its active provider/version
-is not independently confirmed. This turn performs no new Production access.
+is not independently confirmed. The subsequent authorized read-only inventory
+updates this evidence in the report above without changing Production.
 
 ## Non-negotiable invariants
 
@@ -102,6 +116,12 @@ Supabase identity-link/session/recovery structures and least-privilege grants.
 Preserve all current business tables and their identifiers. Enforce unique
 subject/business binding and subject-scoped recovery/session access; do not
 replace business authorization with provider metadata.
+
+For Replit's managed Production database, implement/test source-schema additions
+in Development and use only the reviewed native Publish diff after separate
+approval. Do not create or execute a custom Production schema migration script,
+startup DDL or schema-push deploy hook. If the actual runtime target is proven
+external, revise the plan for its documented migration mechanism before execution.
 
 Rehearse against an approved isolated Production-like snapshot, with provider
 connections disabled and credentials independent. Preserve raw schema/data

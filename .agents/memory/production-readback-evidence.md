@@ -3,6 +3,18 @@ name: Production readback evidence
 description: Why schema-diff and SQL success envelopes are insufficient proof of Production state.
 ---
 
+Production SQL tooling already supplies a read-only transaction wrapper.
+Explicit BEGIN/COMMIT and transaction-control or read-only-mode changes are
+rejected rather than providing an additional safety boundary.
+
+**Why:** An authorized read-only inventory's explicit wrapper was rejected;
+the same bounded SELECT succeeded inside the managed wrapper, whose readback
+reported transaction_read_only=on.
+
+**How to apply:** Use a single SELECT for related snapshot evidence and validate
+its expected result fields. Do not attempt to escape the Production wrapper or
+infer that generic multi-statement examples authorize transaction control there.
+
 Check the exact named CHECK definition and validation state independently of
 the publishing schema diff. A reported empty diff does not prove CHECK parity.
 

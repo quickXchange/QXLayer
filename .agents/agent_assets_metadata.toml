@@ -1050,3 +1050,17 @@ mtime_ms = 1791999794951
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e67d10c4-6887-4685-bfd2-4e9e7f6309ff/6f3646c3-ec1d-4aeb-8153-930f5d3acadd"
 storage_version_token = "1792001100552976"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "CrN2hJiz2JsXHGFhj1Imw"
+uri = "file://deploy/PRODUCTION_AUTH_READONLY_INVENTORY.md"
+type = "text"
+title = "Production Auth inventory and migration readiness"
+description = "Read-only findings, paths for the 42 audited Development accounts, backup/rollback procedures, and approval requirements. No Production or Staging changes."
+logical_id = "f419c6d6-ead0-406a-99d0-d7907c225e89"
+content_hash = "sha256:d5ad8d98eac4d7fc8a9aa535b174197fb20cadf1fddd643a75d77e7c1a9929d7"
+size = 17503
+mtime_ms = 1792017177683
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/f419c6d6-ead0-406a-99d0-d7907c225e89/38a53240-93b0-495f-8436-44ebadaba658"
+storage_version_token = "1792017212859228"
+content_type = "text/markdown"
