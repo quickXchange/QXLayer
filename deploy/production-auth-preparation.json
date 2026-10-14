@@ -31,7 +31,9 @@
     "productionDirectory": {
       "environment": "production",
       "instanceIdentifier": null,
-      "totalUsers": null,
+      "totalUsers": 2,
+      "totalUsersEvidence": "USER_CONFIRMED_REPLIT_CLOUD_USERS_AUTH_PRODUCTION",
+      "nativeRecordInspectionStatus": "BLOCKED_PENDING_TWO_NATIVE_USER_IDS",
       "completePerIdManifestEvidence": null
     }
   },

@@ -42,9 +42,11 @@ Required evidence before proceeding:
 
 1. Read-only identification of the immutable deployed release, effective auth
    selector, pinned issuer/project and actual business-database target.
-2. An authoritative **Production** Clerk directory export/count through the
-   managed Production user administration surface or an approved read-only
-   credential path. Do not substitute the workspace's test-key directory.
+2. The exact native records/IDs of the **2 users the user subsequently observed**
+   in Replit Cloud → Users & Auth → Production, through its managed read-only
+   administration surface. The count is user-confirmed; native record retrieval
+   and per-account mapping remain pending. Do not substitute the workspace's
+   test-key directory or request a raw credential-bearing export.
 3. Native owner/browser acceptance later, under separate migration approval.
 
 The available read tools did not expose a Production Clerk directory credential
@@ -134,11 +136,20 @@ The data inventory contains exact counts and SHA-256 row fingerprints for all
 
 ## 3. Safe paths covering all 42 audited legacy accounts
 
-**The 42-account roster is Development, not verified Production.** Production's
-Clerk user count remains unknown. One business Owner row and no tenant
-memberships do not imply that Production has only one authentication account.
+**The 42-account roster is Development, not verified Production.** The user
+subsequently confirmed **2 users** in Replit Cloud → Users & Auth → Production.
+Their native records/IDs have not been retrieved by the agent. One business
+Owner row and no tenant memberships do not identify either authentication user.
 Do not import all 42 into Production or copy their Development assignments
 merely because they are in the earlier audit.
+
+The focused subsequent Production linkage readback and two-user preservation
+matrix are in
+[`PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md`](PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md#two-production-authentication-users--focused-linkage-evidence).
+It found one unchanged active Super Admin reference and no tenant/customer/actor
+references in the seven typed identity-reference columns. Which, if either, of
+the two Production users matches that Admin remains unresolved without their
+native IDs. Do not infer “one Owner and one customer”.
 
 The existing complete pseudonymous audit is retained. Every one of its 42
 accounts has a conditional continuity path:

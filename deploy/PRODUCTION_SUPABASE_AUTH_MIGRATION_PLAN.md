@@ -20,9 +20,68 @@ the complete account/backup/rollback approval checklist are in
 Managed Production has 40 business tables, one active legacy-ID Admin and no
 local Supabase application-support schema. Public auth probes returned 403.
 Clerk is consistent with observed configuration, not conclusively verified as
-the running provider. The Production directory count remains unknown; the 42
-audited accounts are Development. Phase 1 is therefore partially evidenced,
-not complete or approved for account operations.
+the running provider. The user has now observed **2 users** in **Replit Cloud →
+Users & Auth → Production**; this is a user-confirmed count, not an independently
+retrieved native directory. Their exact native IDs/records remain unavailable
+to the current read tools. The 42 audited accounts are Development. Phase 1 is
+therefore partially evidenced, not complete or approved for account operations.
+
+## Two Production authentication users — focused linkage evidence
+
+The user explicitly authorized read-only inspection and preservation of both
+Production users. No additional permission to read their records is needed;
+the remaining obstacle is access to their exact native identifiers, not
+authorization. Do not request a new API key, raw export or broader permission.
+
+A focused managed-Production SELECT at **2026-10-14 22:49:45 UTC**, protected by
+`transaction_read_only=on`, inspected the seven current typed identity-reference
+columns rather than repeating the completed schema/data audit:
+
+| Business reference | Rows | Finding |
+|---|---:|---|
+| `platform_admins.clerk_user_id` | 1 | Active original Super Admin; full-row SHA-256 matches the earlier inventory. No ID/active-state/data drift in this record. |
+| `tenant_memberships.clerk_user_id` | 0 | No stored client-admin/staff assignment to match. |
+| `white_label_requests.customer_user_id` | 0 | No customer request ownership to match. |
+| `white_label_attachments.owner_user_id` | 0 | No attachment ownership to match. |
+| `white_label_events.author_user_id` | 0 | No event authorship to match. |
+| `customer_notification_reads.customer_user_id` | 0 | No notification-read ownership to match. |
+| `audit_events.actor_id` | 0 | No audit-actor reference to match. |
+
+**Neither authentication record has been independently retrieved or classified.**
+The two-user count cannot identify the Owner. At most one of two distinct native
+IDs can equal the stored Super Admin ID, and **neither may match**. Do not assume
+“one Owner plus one customer”, select an Owner by email, reassign the existing
+Admin record, or grant a role to resolve an apparent mismatch.
+
+| Production authentication record | Native ID | Super Admin link | Customer linkage | Preservation |
+|---|---|---|---|---|
+| UI record 1 — provisional label only | Awaiting native ID | Unresolved | No typed customer/tenant references exist in inspected managed snapshot | Keep account, ID, methods, factors and state unchanged |
+| UI record 2 — provisional label only | Awaiting native ID | Unresolved | No typed customer/tenant references exist in inspected managed snapshot | Same; no deletion or invented assignment |
+
+These labels are not a native-ID ledger. An unreferenced authentication user is
+not disposable and may have ordinary authenticated-customer access without a
+tenant/request row. The actual deployed database target remains unconfirmed, so
+absence in this managed snapshot is not a universal statement about an
+unverified external target.
+
+Next: obtain only each native user ID from its existing Production user-details
+view. Compare those IDs exactly (or their deterministic SHA-256 values) against
+the preserved business identifiers; never by email or display name. Record each
+result as Owner-linked, business-referenced, or unreferenced in this snapshot,
+with the actual Production issuer/instance. Native methods/MFA/locked state still
+need their own read-only metadata; a user ID alone does not prove account custody
+or authorize identity linking.
+
+Protected, credential-free evidence:
+`generated-artifacts/auth-security/production-two-user-business-references.json`.
+It contains counts, native-ID hashes and row fingerprints, not raw native IDs,
+emails, account exports, tokens or secrets. The inert preparation JSON now records
+the user-reported count 2 and explicitly leaves per-account inspection blocked.
+
+Preserve both Production users and all existing canonical business IDs, roles,
+permissions and data. Keep all 42 Development users outside Production scope.
+No Production/Staging account, configuration, role, session or data changes,
+deletions, provider provisioning, credential revocation or Republish occurred.
 
 ## Evidence and limits
 
@@ -79,8 +138,10 @@ updates this evidence in the report above without changing Production.
 
 Before any implementation/cutover approval:
 
-1. Obtain separate authorization to inventory the actual Production Clerk
-   directory, deployed provider/build metadata and business database.
+1. Read-only inspection of the actual Production directory, deployed
+   provider/build metadata and business database is already authorized.
+   Obtain the missing native-ID records through an available authorized
+   read-only surface; do not confuse missing tool access with missing approval.
 2. Paginate the Production directory completely and capture access-controlled
    immutable fingerprints, not only a total count. Record verified sign-in
    methods, blocked/locked state, current MFA and active membership references.

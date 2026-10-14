@@ -14,6 +14,12 @@ provider; a Database page identifies a database, not the app's effective target.
 
 ## A. Production Clerk directory — first user action
 
+**Count step completed by the user:** 2 users observed in Replit Cloud →
+Users & Auth → Production. Do not ask for the count again. The next input is
+the **native user ID from each of those two existing records**, not an email,
+new key or raw export. The original count-collection steps below are retained
+as reference; proceed directly to existing user details.
+
 1. Open this VYNOX LAYER project in Replit, then open **Auth**.
 2. Select **Production** in its environment selector. Do not use Development
    or create/connect a new Clerk application.
@@ -161,9 +167,10 @@ prove an artifact exists or that its native evidence is valid.
 
 ## Send this first
 
-**Open Auth → Production → Users, then send the Production label and displayed
-total count (or “not displayed”). Include the non-secret instance identifier
-only if visible. Do not upload a raw export, key, token, cookie or connection URL.**
+**The user has already confirmed 2 Production users. Open each of those existing
+records in Cloud → Users & Auth → Production and copy only its native User ID.
+Send the two IDs, not emails, passwords, keys, tokens, cookie/connection values
+or a raw export. Do not edit either record.**
 
 If that managed route is unavailable, send the exact access error instead.
 This is the next evidence step, not approval for account migration, configuration

@@ -1041,14 +1041,14 @@ content_type = "text/html"
 id = "kYxgrBAcCMJSTVPNSQVPj"
 uri = "file://deploy/PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md"
 type = "text"
-title = "Production Supabase migration plan"
-description = "Read-only plan preserving identities, roles, sessions and business data. No deployment or Production changes authorized."
+title = "Production Auth migration plan — two-user linkage findings"
+description = "Records the two user-confirmed Production accounts, unchanged active Super Admin reference, absence of customer references in the managed snapshot, and exact-ID evidence still needed. No Production changes authorized or executed."
 logical_id = "e67d10c4-6887-4685-bfd2-4e9e7f6309ff"
-content_hash = "sha256:644edde2f1520e4eecaeec83df1843a1357c5c72b5c7d10ac15072e6e4e979b5"
-size = 10468
-mtime_ms = 1791999794951
-storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e67d10c4-6887-4685-bfd2-4e9e7f6309ff/6f3646c3-ec1d-4aeb-8153-930f5d3acadd"
-storage_version_token = "1792001100552976"
+content_hash = "sha256:c50aaae7f7bd7d270c32b43a3447a0d2d889abe3649b7935bb10b36d96c5e811"
+size = 17821
+mtime_ms = 1792018303055
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e67d10c4-6887-4685-bfd2-4e9e7f6309ff/00156e55-3fe9-4a94-b933-08096db8805d"
+storage_version_token = "1792018306947020"
 content_type = "text/markdown"
 
 [[outputs]]
