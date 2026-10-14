@@ -6,6 +6,14 @@ deployment, DNS change or Republish is authorized by this document. Keep
 
 ## Evidence and limits
 
+Development status update, 2026-10-14: the user confirmed the Super Admin login
+issue is resolved and genuine Development sign-in succeeded. Read-only checks
+preserve the original Owner/TOTP, roles/configuration and both historical
+sessions, with one additional unexpired Owner session. The completed security
+review and per-account audit closure are in
+`docs/authentication-security-review.md`. This updates Development evidence only;
+it neither inventories nor accepts Production.
+
 The read-only Development audit paginated all 42 legacy Clerk accounts and
 confirmed an identical directory fingerprint before and after the audit:
 
@@ -62,6 +70,11 @@ Before any implementation/cutover approval:
 5. Create an explicit continuity decision for every account. Unassigned users
    still require a login-continuity policy. No automatic account deletion,
    abandonment, email matching or duplicate-account creation is allowed.
+6. Record the actual available sign-in methods, not just password/social flags.
+   Development has one retained account with neither flag; email OTP/link or
+   passkey capability must be established rather than assuming the account can
+   be discarded or assigned a new password. Preserve blocked/locked states and
+   use a reviewed recovery policy for accounts that cannot supply normal proof.
 
 Deliver a reviewed account matrix and migration acceptance checklist. Sensitive
 exports must be encrypted in approved storage, never committed to Git or printed.
@@ -108,6 +121,12 @@ Choose and approve a bounded transition design **before** implementation:
 - Build a separately reviewed, issuer/origin-pinned legacy-proof bridge, or an
   approved provider-supported migration flow. Its purpose is account custody,
   not general anonymous account creation or permanent Clerk dependency.
+- Current Development legacy proof/enrollment endpoints return 410. They are not
+  an available migration bridge. Any temporary bridge needs separate approval
+  and isolated tests: fresh issuer/audience/authorized-origin proof, native MFA
+  where required, CSRF/state/nonce binding, bounded lifetime, single-use replay
+  protection, atomic unique links, auditability and no caller-selected role.
+  Do not re-enable a general Clerk fallback in this Development release.
 - Existing users prove control of the exact legacy identity and their verified
   new identity. Any existing Owner additionally requires the approved fresh
   native Owner/MFA proof. Email similarity is never sufficient.
@@ -182,6 +201,8 @@ authorization and demonstrated continuity for every in-scope account.
 
 **NO GO.** This document prepares the migration but executes none of it. The
 Production provider/schema transition and per-account continuity are not yet
-approved or implemented. Development Owner native browser acceptance also needs
-genuine private authentication; preserved bindings and unit tests do not prove
-a fresh Owner login or browser persistence.
+approved or implemented. Genuine Development Owner sign-in has now been confirmed
+by the user, and native TOTP/binding preservation and historical session
+continuity passed read-only checks. This does not replace Production-specific
+Owner/MFA/Admin, reload/new-tab, recovery and rollback acceptance. Owner browser
+persistence was not independently re-observed during this resumption.

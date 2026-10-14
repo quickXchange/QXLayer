@@ -1,5 +1,14 @@
 # Development authentication retirement — Republish blocked
 
+## Latest closure
+
+See [`docs/authentication-security-review.md`](../docs/authentication-security-review.md)
+for the superseding 2026-10-14 closure: user-confirmed resolved Development
+Super Admin sign-in, complete 42-account dispositions, exact preservation of both
+historical sessions plus one Owner addition, 412 passing tests, zero dependency/
+privacy findings, and nine fully dispositioned medium static findings. Production
+remains **NO GO**. Historical evidence and limitations below are retained.
+
 ## Scope and preservation
 
 The working Development application now uses only Supabase Auth. Clerk and

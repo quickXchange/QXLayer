@@ -23,9 +23,25 @@ Staging login, 2FA, and session persistence have been manually verified by the u
 
 The user confirmed that the migrated Development Owner account successfully signs in, has enabled and verified 2FA, and opens the VYNOX LAYER Super Admin dashboard.
 
+The user subsequently confirmed the Super Admin login issue is resolved through
+Development and requested continuing unfinished security/audit/migration work,
+not restarting the completed login investigation.
+
 **Why:** The user explicitly confirmed the private native flows and requested read-only checks of the existing migration before continuing Development work.
 
 **How to apply:** Treat that migrated Development account as official, not disposable QA. Never reset its authenticator, invalidate its sessions, replace its identity link or re-enroll it as a test. Keep owner verification read-only unless a subsequent user request explicitly authorizes an account mutation.
+
+An added legitimate Owner session is not evidence that historical sessions were
+lost. Preserve the original baseline; require exact historical digest/subject
+fingerprint evidence before accepting an additional same-Owner row.
+
+**Why:** A user-confirmed fresh sign-in can legitimately add a session, while an
+aggregate count/hash comparison alone cannot distinguish additions from loss.
+
+**How to apply:** Keep strict verification as the default. An explicit addition
+allowance must still prove every original session is unchanged and reject
+substitutions, wrong-subject additions or ambiguous growth. Never delete sessions
+or overwrite a historical baseline just to make a preservation check pass.
 
 The user authorizes migrating Replit Development from Better Auth to Supabase Auth using a new isolated Development Supabase project and separate Development configuration. Keep verified Staging completely unchanged, retain Clerk, preserve existing Super Admin business IDs, roles, permissions and data, and verify ownership before linking. Never assign Super Admin from email or create duplicate owners. Do not modify or deploy Production or Staging.
 

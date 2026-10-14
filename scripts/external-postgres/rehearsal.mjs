@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import { migrate, targetConfiguration } from "./migrate.mjs";
 import { verifyTarget } from "./verify-target.mjs";
@@ -17,13 +18,16 @@ try {
   await migrate();
   await migrate(); // Idempotent ledger, not repeated schema creation.
   await verifyTarget(admin);
-  await admin.query("ALTER ROLE qxlayer_app LOGIN PASSWORD 'qxlayer_disposable_test_only'");
+  // This role exists only in the guarded disposable database. Never reuse a
+  // published/shared fixture credential; base64url contains no SQL quote characters.
+  const disposablePassword = randomBytes(32).toString("base64url");
+  await admin.query(`ALTER ROLE qxlayer_app LOGIN PASSWORD '${disposablePassword}'`);
   const a = "10000000-0000-4000-8000-000000000001", b = "10000000-0000-4000-8000-000000000002";
   await admin.query("INSERT INTO tenants(id,name,slug,status) VALUES ($1,'Synthetic A','synthetic-a','active'),($2,'Synthetic B','synthetic-b','active')", [a,b]);
   await admin.query("INSERT INTO tenant_branding(tenant_id,brand_name) VALUES ($1,'Synthetic A'),($2,'Synthetic B')", [a,b]);
   await admin.query("INSERT INTO tenant_memberships(tenant_id,clerk_user_id,role) VALUES ($1,'synthetic-a','client_admin'),($2,'synthetic-b','client_admin')", [a,b]);
   const url = new URL(process.env.MIGRATION_DATABASE_URL);
-  url.username = "qxlayer_app"; url.password = "qxlayer_disposable_test_only";
+  url.username = "qxlayer_app"; url.password = disposablePassword;
   runtime = new Client({ connectionString: url.toString() });
   await runtime.connect();
   await assert.rejects(runtime.query("SELECT * FROM tenant_branding"), e => e.code === "42501");

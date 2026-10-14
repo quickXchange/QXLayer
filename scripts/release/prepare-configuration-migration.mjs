@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { frozenSourceChecksumSql } from "./frozen-source-checksum.mjs";
 
 // Generates a reviewed DATA-only file for the owner's native Production SQL runner.
 // Never opens a database connection or changes application/startup/publishing code.
@@ -72,7 +73,7 @@ const lines = [
   "  t text;",
   "BEGIN",
   "  IF NOT approved THEN RAISE EXCEPTION 'Scope not approved. Do not execute this prepared file.'; END IF;",
-  `  IF md5(source_text) <> ${literal(createHash("md5").update(payload).digest("hex"))} THEN RAISE EXCEPTION 'Frozen source payload was changed. Stop for review.'; END IF;`,
+  `  IF ${frozenSourceChecksumSql(payload)} THEN RAISE EXCEPTION 'Frozen source payload was changed. Stop for review.'; END IF;`,
   "  IF current_setting('transaction_read_only')::boolean THEN RAISE EXCEPTION 'A writable authorized Production connection is required.'; END IF;",
   "  PERFORM set_config('lock_timeout', '5s', true);",
   "  PERFORM set_config('TimeZone', 'UTC', true);",
