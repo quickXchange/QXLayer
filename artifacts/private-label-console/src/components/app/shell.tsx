@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import { useClerk } from '@/lib/auth';
+import { useAccountAuth } from '@/lib/auth';
 import { LayoutGrid, Users, Boxes, ScrollText, LogOut, Globe2, Puzzle, Plug, Workflow, Eye } from 'lucide-react';
 import { useHealthCheck } from '@workspace/api-client-react';
 import { usePrincipal } from '@/lib/principal';
@@ -48,7 +48,7 @@ function Health() {
 export function AdminShell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const p = usePrincipal();
-  const { signOut } = useClerk();
+  const { signOut } = useAccountAuth();
   const active = (h: string) => (h === '/admin' ? loc === h : h === '/clients' ? loc.startsWith('/clients') || loc.startsWith('/customers') : loc.startsWith(h));
   const items: ConsoleNavItem[] = nav.filter((n) => !n.op || p.role === 'super_admin').map((n) => ({
     key: n.href, href: n.href, label: n.label, icon: n.icon, testId: `link-nav-${n.label.toLowerCase().replace(/ /g, '')}`, current: active(n.href), group: n.group,

@@ -12,7 +12,7 @@ export default function SignUpPage() {
     if (password !== confirm) { setErr('The passwords do not match.'); return; }
     setBusy(true);
     try {
-      const r = await authClient.signUp.email({ name: name.trim(), email: email.trim(), password, callbackURL: `${import.meta.env.BASE_URL}verify-email?verified=1` });
+      const r = await authClient.signUp.email({ name: name.trim(), email: email.trim(), password });
       if (r.error) { setErr(authErrorText(r.error)); return; }
       setPassword(''); setConfirm(''); setDone(true);
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }

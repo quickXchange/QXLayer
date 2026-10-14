@@ -1,4 +1,4 @@
-import { useClerk } from '@/lib/auth';
+import { useAccountAuth } from '@/lib/auth';
 import { useQueryClient } from '@tanstack/react-query';
 import { getGetCurrentPrincipalQueryKey } from '@workspace/api-client-react';
 import { KeyRound } from 'lucide-react';
@@ -7,7 +7,7 @@ import { Logo } from '@/components/app/shell';
 import { usePrincipal } from '@/lib/principal';
 
 export default function Unassigned() {
-  const { signOut } = useClerk();
+  const { signOut } = useAccountAuth();
   const qc = useQueryClient();
   const p = usePrincipal();
   return (

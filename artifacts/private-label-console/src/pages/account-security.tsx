@@ -3,8 +3,8 @@ import { BrandLogo } from '@/components/brand-logo';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
 import { Skeleton } from '@/components/ui/skeleton';
 import { authClient } from '@/lib/owned-auth-client';
-import { SecurityPanel } from '@/components/auth/security-panel';
-import { useClerk } from '@/lib/auth';
+import { SupabaseSecurityPanel as SecurityPanel } from '@/components/auth/supabase-security-panel';
+import { useAccountAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import type { ReactNode } from 'react';
 import { ErrorState } from '@/components/app/bits';
@@ -18,7 +18,7 @@ export function OwnedSessionGate({ children }: { children: ReactNode }) {
 }
 
 export default function AccountSecurityPage() {
-  const { signOut } = useClerk();
+  const { signOut } = useAccountAuth();
   return (
     <OwnedSessionGate>
       <ConsoleThemeScope><div className="min-h-[100dvh]">

@@ -1,32 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
-import { useQueryClient } from '@tanstack/react-query';
-import { authClient, supabaseAuth, supabaseDevelopmentAuth } from '@/lib/owned-auth-client';
+import { supabaseDevelopmentAuth } from '@/lib/owned-auth-client';
 import { supabaseMfa } from '@/lib/supabase-auth-client';
-import { signInDestination } from '@/lib/existing-account-link';
 import { A, AuthFrame, ErrorLine, Field, Form, Submit, authErrorText } from '@/components/auth/auth-ui';
 
 export default function TwoFactorPage() {
-  const [, nav] = useLocation(); const qc = useQueryClient();
-  const [backupMode, setBackup] = useState(false); const [code, setCode] = useState(''); const [trust, setTrust] = useState(false);
+  const [, nav] = useLocation();
+  const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false); const [err, setErr] = useState('');
   const [lost, setLost] = useState(false); const [pw, setPw] = useState(''); const [confirmReset, setConfirmReset] = useState(false);
-  // Development recovery is explicitly separate from Staging TOTP and legacy backup-code verification.
-  const backup = backupMode && !supabaseAuth;
   useEffect(() => () => setCode(''), []);
   const submit = async () => {
     setBusy(true); setErr('');
     try {
       const c = code.replace(/\s/g, '');
-      const r = supabaseAuth ? await supabaseMfa.verify(c)
-        : backup ? await authClient.twoFactor.verifyBackupCode({ code: c, trustDevice: trust }) : await authClient.twoFactor.verifyTotp({ code: c, trustDevice: trust });
+      const r = await supabaseMfa.verify(c);
       if (r.error) { setErr(authErrorText(r.error)); return; }
-      if (!supabaseAuth) qc.clear();
-      setCode(''); nav(supabaseAuth ? signInDestination(window.location.search) : '/admin', { replace: supabaseAuth });
+      setCode(''); nav('/admin', { replace: true });
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (
-    <AuthFrame title={lost ? 'Recover a lost authenticator' : 'Two-step verification'} subtitle={lost ? 'Use a recovery code you saved earlier and confirm your password.' : backup ? 'Enter one of your unused backup codes.' : 'Enter the 6-digit code from your authenticator app.'} footer={<A id="link-back-sign-in" href="/sign-in">Back to sign in</A>}>
+    <AuthFrame title={lost ? 'Recover a lost authenticator' : 'Two-step verification'} subtitle={lost ? 'Use a recovery code you saved earlier and confirm your password.' : 'Enter the 6-digit code from your authenticator app.'} footer={<A id="link-back-sign-in" href="/sign-in">Back to sign in</A>}>
       {lost ? <Form onSubmit={async () => {
         if (!confirmReset) return;
         setBusy(true); setErr('');
@@ -44,14 +38,12 @@ export default function TwoFactorPage() {
         <ErrorLine>{err}</ErrorLine>
         <Submit id="button-recover-authenticator" busy={busy} disabled={!pw || !code || !confirmReset}>Reset lost authenticator and sign out</Submit>
       </Form> : <Form onSubmit={submit}>
-        <Field id="code" label={backup ? 'Backup code' : 'Authenticator code'} value={code} onChange={setCode} autoComplete="one-time-code" inputMode={backup ? 'text' : 'numeric'} maxLength={backup ? 24 : supabaseAuth ? 6 : 8} />
-        {!supabaseAuth && <label className="flex items-center gap-2 text-sm text-muted-foreground"><input data-testid="checkbox-trust" type="checkbox" checked={trust} onChange={(e) => setTrust(e.target.checked)} /> Trust this device</label>}
+        <Field id="code" label="Authenticator code" value={code} onChange={setCode} autoComplete="one-time-code" inputMode="numeric" maxLength={6} />
         <ErrorLine>{err}</ErrorLine>
         <Submit id="button-verify" busy={busy} disabled={!code}>Verify</Submit>
       </Form>}
       {supabaseDevelopmentAuth && <button type="button" disabled={busy} data-testid="button-toggle-authenticator-recovery" className="block w-full text-center text-sm font-medium hover:underline"
         onClick={() => { setLost(!lost); setCode(''); setPw(''); setErr(''); setConfirmReset(false); }}>{lost ? 'Use authenticator app instead' : 'Lost your authenticator? Use a saved recovery code'}</button>}
-      {!supabaseAuth && <button type="button" data-testid="button-toggle-backup" onClick={() => { setBackup(!backupMode); setCode(''); setErr(''); }} className="block w-full text-center text-sm font-medium text-[var(--s-accent-ink,hsl(var(--primary)))] hover:underline">{backup ? 'Use authenticator app instead' : 'Use a backup code'}</button>}
     </AuthFrame>
   );
 }

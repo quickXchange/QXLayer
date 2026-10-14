@@ -8,7 +8,7 @@ export default function ForgotPasswordPage() {
   const submit = async () => {
     setBusy(true); setErr('');
     try {
-      const r = await authClient.requestPasswordReset({ email: email.trim(), redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}reset-password` });
+      const r = await authClient.requestPasswordReset({ email: email.trim() });
       if (r.error) setErr(authErrorText(r.error)); else setSent(true);
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };

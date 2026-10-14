@@ -8,7 +8,7 @@ if (process.env.QXLAYER_DEVELOPMENT_AUTH_QA_APPROVED !== "true" || !developmentS
   throw new Error("Explicit Development-only disposable QA approval is required.");
 const cfg = supabaseAuthConfiguration();
 const path = new URL("../../../../.local/development-auth-qa-scope.json", import.meta.url);
-type Scope = { email: string; subject?: string };
+type Scope = { email: string; subject?: string; name?: string; startedAt?: string };
 async function provider<T = unknown>(path: string, method = "GET", body?: unknown): Promise<T> {
   const result = await fetch(`${cfg.providerOrigin}/auth/v1/admin/users${path}`, {
     method, headers: { apikey: cfg.apiKey, "Content-Type": "application/json" },
@@ -26,6 +26,13 @@ async function cleanup(scope: Scope) {
     scope.subject = found[0]?.id;
   }
   if (scope.subject) {
+    const used = await pool.query(`SELECT
+      EXISTS(SELECT 1 FROM public.platform_admins WHERE clerk_user_id=$1) OR
+      EXISTS(SELECT 1 FROM public.tenant_memberships WHERE clerk_user_id=$1) OR
+      EXISTS(SELECT 1 FROM public.white_label_requests WHERE customer_user_id=$1) OR
+      EXISTS(SELECT 1 FROM vynox_supabase_auth.identity_links WHERE subject=$2) AS used`,
+      [`supabase:${scope.subject}`, scope.subject]);
+    if (used.rows[0].used) throw Error("Disposable cleanup refused: business records or an identity link exist.");
     await provider(`/${scope.subject}`, "DELETE");
     await pool.query("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1", [scope.subject]);
     await pool.query("DELETE FROM vynox_supabase_auth.recovery_codes WHERE subject=$1", [scope.subject]);
@@ -41,13 +48,25 @@ if (process.argv[2] === "cleanup") {
   console.log(JSON.stringify({ disposableCleanupComplete: true }));
 } else {
   await mkdir(new URL(".", path), { recursive: true });
-  const scope: Scope = { email: `dev-auth-${randomUUID().slice(0, 12)}@example.test` };
+  const requested = process.env.QXLAYER_DEVELOPMENT_AUTH_QA_EMAIL?.trim().toLowerCase();
+  if (requested) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(requested)) throw Error("Invalid controlled QA recipient.");
+    for (let page = 1; page <= 100; page++) {
+      const list = await provider<{ users: { email?: string }[] }>(`?page=${page}&per_page=100`);
+      if (list.users.some(u => u.email?.toLowerCase() === requested)) throw Error("QA recipient already exists.");
+      if (list.users.length < 100) break;
+      if (page === 100) throw Error("Account scan exceeded bounded limit.");
+    }
+  }
+  const scope: Scope = { email: requested ?? `dev-auth-${randomUUID().slice(0, 12)}@example.test`,
+    name: `Disposable Development QA ${randomUUID()}`, startedAt: new Date().toISOString() };
   await writeFile(path, JSON.stringify(scope), { flag: "wx", mode: 0o600 });
   const password = randomBytes(32).toString("base64url");
-  const user = await provider<{ id: string }>("", "POST", { email: scope.email, password, email_confirm: true,
-    user_metadata: { name: "Disposable Development Auth QA" },
-    app_metadata: { qa: "development-auth-verification" } });
-  scope.subject = user.id;
+  if (!requested) {
+    const user = await provider<{ id: string }>("", "POST", { email: scope.email, password, email_confirm: true,
+      user_metadata: { name: scope.name }, app_metadata: { qa: "development-auth-verification" } });
+    scope.subject = user.id;
+  }
   await writeFile(path, JSON.stringify(scope), { mode: 0o600 });
   let stopping = false;
   const server = http.createServer(async (req, res) => {
@@ -55,7 +74,28 @@ if (process.argv[2] === "cleanup") {
     res.setHeader("Cache-Control", "no-store");
     try {
       if (req.method === "GET" && req.url === "/fixture") {
-        res.end(JSON.stringify({ email: scope.email, password, subject: scope.subject }));
+        res.end(JSON.stringify({ email: scope.email, password, name: scope.name, subject: scope.subject }));
+      } else if (req.method === "POST" && ["/adopt", "/verification-link", "/recovery-link"].includes(req.url ?? "")) {
+        const list = await provider<{ users: { id: string; email?: string; created_at: string; user_metadata?: { name?: string } }[] }>("?page=1&per_page=100");
+        const matches = list.users.filter(u => u.email === scope.email && u.user_metadata?.name === scope.name &&
+          Date.parse(u.created_at) >= Date.parse(scope.startedAt!) - 5000);
+        if (matches.length !== 1 || (scope.subject && scope.subject !== matches[0].id)) throw Error("Disposable custody check failed.");
+        scope.subject = matches[0].id;
+        await writeFile(path, JSON.stringify(scope), { mode: 0o600 });
+        if (req.url === "/adopt") { res.end(JSON.stringify({ adopted: true })); return; }
+        // Token issuance is for bounded browser testing, not proof of inbox delivery.
+        // The actual signup/recover forms still exercise the native mail requests.
+        const r = await fetch(`${cfg.providerOrigin}/auth/v1/admin/generate_link`, {
+          method: "POST", headers: { apikey: cfg.apiKey, "Content-Type": "application/json" },
+          redirect: "error", signal: AbortSignal.timeout(15000),
+          body: JSON.stringify({ type: req.url === "/verification-link" ? "signup" : "recovery",
+            email: scope.email, ...(req.url === "/verification-link" ? { password } : {}) }),
+        });
+        if (!r.ok) throw Error("Disposable link issuance failed.");
+        const result = await r.json() as { hashed_token?: string; properties?: { hashed_token?: string } };
+        const token = result.hashed_token ?? result.properties?.hashed_token;
+        if (!token) throw Error("Disposable test token missing.");
+        res.end(JSON.stringify({ url: `${cfg.origin}/${req.url === "/verification-link" ? "verify-email" : "reset-password"}?token_hash=${encodeURIComponent(token)}&type=${req.url === "/verification-link" ? "signup" : "recovery"}` }));
       } else if (req.method === "POST" && req.url === "/totp") {
         let body = "";
         for await (const chunk of req) { body += chunk; if (body.length > 2000) throw new Error("Too much input"); }

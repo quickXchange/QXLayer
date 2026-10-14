@@ -24,7 +24,7 @@ export default function VerifyEmailPage() {
   const resend = async () => {
     setBusy(true); setErr('');
     try {
-      const r = await authClient.sendVerificationEmail({ email: email.trim(), callbackURL: `${import.meta.env.BASE_URL}verify-email?verified=1` });
+      const r = await authClient.sendVerificationEmail({ email: email.trim() });
       if (r.error) setErr(authErrorText(r.error)); else setSent(true);
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };

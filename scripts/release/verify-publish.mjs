@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 import { verifyProvisioningPlan } from "./provisioning-schema-contract.mjs";
 import { verifyCommercialPlan } from "./commercial-schema-contract.mjs";
 import { verifyDatabaseSecurityPlan } from "./database-security-contract.mjs";
+import { verifyAuthenticationCompatibility } from "./authentication-compatibility.mjs";
 
 const forbidden = /\b(?:db:push|push-force|drizzle-kit|pg_restore|pg_dump|db:seed|catalog:initialize|catalog:upgrade|core:upgrade|access:assign|remove-database-rls)\b/i;
 const artifacts = [
@@ -45,6 +46,7 @@ export function verifyPublish(read) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  verifyAuthenticationCompatibility();
   const root = resolve(import.meta.dirname, "../..");
   verifyPublish(path => readFileSync(resolve(root, path), "utf8"));
   console.log(verifyDatabaseSecurityPlan(JSON.parse(readFileSync(

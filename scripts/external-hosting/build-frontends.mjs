@@ -3,17 +3,15 @@ import { cp, mkdir, rm, writeFile, readdir, stat, readFile } from "node:fs/promi
 import { brotliCompressSync, gzipSync, constants } from "node:zlib";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { assertFrontendClerk } from "../../lib/external-clerk/index.mjs";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 process.chdir(root);
 const api = new URL(process.env.QXLAYER_API_ORIGIN ?? "https://unconfigured.invalid");
 if (api.protocol !== "https:" || !api.hostname.endsWith(".onrender.com") ||
     api.pathname !== "/" || api.username || api.password || api.search || api.hash)
   throw new Error("QXLAYER_API_ORIGIN must be the exact Render API HTTPS origin.");
-const authProvider = process.env.QXLAYER_AUTH_PROVIDER || "clerk";
-if (["owned", "supabase"].includes(authProvider) && process.env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
-  throw new Error("Owned authentication frontend is Staging-only.");
-assertFrontendClerk(); // Retained only for verified one-time legacy-account migration.
+const authProvider = process.env.QXLAYER_AUTH_PROVIDER;
+if (authProvider !== "supabase" || process.env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
+  throw new Error("External Supabase frontend builds remain Staging-only; Production migration is not approved.");
 for (const [name, base] of [["private-label-console", "/"], ["private-label-website", "/private-label-website/"]]) {
   const result = spawnSync("pnpm", ["--filter", `@workspace/${name}`, "run", "build"], {
     stdio: "inherit", env: { ...process.env, NODE_ENV: "production", PORT: "3000", BASE_PATH: base,

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useLocation } from 'wouter';
-import { useClerk } from '@/lib/auth';
+import { useAccountAuth } from '@/lib/auth';
 import { LayoutGrid, ShoppingBag, Layers, ShieldCheck, UserRound, LogOut } from 'lucide-react';
 import { usePrincipal } from '@/lib/principal';
 import { useAdminPanels } from '@/lib/customer';
@@ -11,7 +11,7 @@ import { endDemoSession } from '@workspace/api-client-react';
 export function CustomerShell({ children }: { children: ReactNode }) {
   const [loc] = useLocation();
   const p = usePrincipal();
-  const { signOut } = useClerk();
+  const { signOut } = useAccountAuth();
   const qc = useQueryClient();
   const exit = async () => {
     if (!p.demo) { await signOut({ redirectUrl: '/' }); return; }

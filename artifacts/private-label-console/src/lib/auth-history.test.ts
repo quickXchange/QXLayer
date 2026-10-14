@@ -7,7 +7,7 @@ import { getGetSupabaseAuthSessionQueryKey } from "@workspace/api-client-react";
 const full = { user: { id: "disposable" }, recovery: false, mfaRequired: false };
 test("already authenticated sign-in returns to the protected destination", () => {
   assert.equal(authenticatedSignInDestination(full, ""), "/admin");
-  assert.equal(authenticatedSignInDestination(full, "?next=%2Faccount%2Flink-existing"), "/account/link-existing");
+  assert.equal(authenticatedSignInDestination(full, "?next=%2Faccount%2Flink-existing"), "/admin");
 });
 test("untrusted history/query continuations never become redirects", () => {
   for (const next of ["https://attacker.invalid", "//attacker.invalid", "/admin?role=super_admin", "/account/link-existing/evil"])
@@ -18,10 +18,10 @@ test("anonymous and recovery sessions cannot enter protected pages", () => {
   assert.equal(authenticatedSignInDestination({ ...full, user: null }, ""), null);
   assert.equal(authenticatedSignInDestination({ ...full, recovery: true }, ""), null);
 });
-test("history cannot bypass MFA or lose the account-link continuation", () => {
+test("history cannot bypass MFA or restore retired account-link continuations", () => {
   assert.equal(authenticatedSignInDestination({ ...full, mfaRequired: true }, ""), "/two-factor");
   assert.equal(authenticatedSignInDestination({ ...full, mfaRequired: true }, "?next=%2Faccount%2Flink-existing"),
-    "/two-factor?next=%2Faccount%2Flink-existing");
+    "/two-factor");
 });
 test("BFCache restore revalidates, normal load does not duplicate fetch, and cleanup removes listener", () => {
   const target = new EventTarget();

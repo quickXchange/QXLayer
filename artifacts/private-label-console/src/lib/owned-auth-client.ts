@@ -1,5 +1,3 @@
-import { createAuthClient } from "better-auth/react";
-import { twoFactorClient } from "better-auth/client/plugins";
 import { supabaseFacade } from "@/lib/supabase-auth-client";
 
 const provider = import.meta.env.VITE_QXLAYER_AUTH_PROVIDER;
@@ -17,17 +15,7 @@ if (provider === "supabase" && environment !== "staging" && !supabaseDevelopment
 }
 /** Explicitly isolated Supabase provider; Production remains prohibited. */
 export const supabaseAuth = provider === "supabase" && (environment === "staging" || supabaseDevelopmentAuth);
-/** Better Auth only. */
-export const betterAuthOwned = provider === "owned";
-/** Custom (non-Clerk) auth screens: Better Auth or Supabase. */
-export const ownedAuth = betterAuthOwned || supabaseAuth;
-if (betterAuthOwned && environment === "production") {
-  throw new Error("Project-owned authentication is not approved for Production.");
-}
-const betterAuthClient = createAuthClient({
-  baseURL: window.location.origin,
-  basePath: `${import.meta.env.BASE_URL.replace(/\/$/, "")}/api/auth`,
-  plugins: [twoFactorClient()],
-});
-/** Same call shape either way; Supabase mode implements only the methods the auth screens use. */
-export const authClient = (supabaseAuth ? supabaseFacade : betterAuthClient) as unknown as typeof betterAuthClient;
+/** Retained name for the shared account UI, now exclusively Supabase. */
+export const ownedAuth = supabaseAuth;
+if (!supabaseAuth) throw new Error("Supabase authentication is required. Legacy authentication is retired; Production migration approval is required before publishing.");
+export const authClient = supabaseFacade;

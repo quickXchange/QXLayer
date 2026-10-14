@@ -1,11 +1,8 @@
-import { Fragment, lazy, Suspense, useEffect, useRef, type ComponentType, type ReactNode } from 'react';
-import { ClerkProvider, SignIn, SignUp, useClerk as useLegacyClerk } from '@clerk/react';
-import { Show, useClerk } from '@/lib/auth';
+import { lazy, Suspense, useEffect, useRef, type ComponentType, type ReactNode } from 'react';
+import { Show, useAccountAuth } from '@/lib/auth';
 import { authClient, ownedAuth, supabaseAuth } from '@/lib/owned-auth-client';
 import { registerSupabaseQueryClient } from '@/lib/supabase-auth-client';
 import { StagingAuthHistorySync } from '@/components/auth/staging-auth-navigation';
-import { publishableKeyFromHost } from '@clerk/react/internal';
-import { shadcn } from '@clerk/themes';
 import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { Redirect, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import { useGetCurrentPrincipal, getGetCurrentPrincipalQueryKey, useGetDemoSession, getGetDemoSessionQueryKey, endDemoSession } from '@workspace/api-client-react';
@@ -22,7 +19,6 @@ import Home from '@/pages/home';
 const DemoAdmin = lazy(() => import('@/pages/demo-admin'));
 const CustomerShell = lazy(() => import('@/components/app/customer-shell').then(m => ({ default: m.CustomerShell })));
 import { RoutePrefetch } from '@/components/app/route-prefetch';
-import { ExternalStagingAuthBridge } from '@/components/app/external-staging-auth';
 import { useAdminPanels } from '@/lib/customer';
 const AccountDashboard = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountDashboard })));
 const AccountOrders = lazy(() => import('@/pages/account').then(m => ({ default: m.AccountOrders })));
@@ -53,19 +49,14 @@ const PlanDetail = lazy(() => import('@/pages/plan-detail'));
 const Addons = lazy(() => import('@/pages/addons'));
 const LandingProducts = lazy(() => import('@/pages/landing-products'));
 const CatalogPreview = lazy(() => import('@/pages/catalog-preview'));
-import { QXLAYER_LIGHT_LOGO_URL, VYNOX_DARK_LOGO_URL } from '@/lib/brand';
-import { PLATFORM_SITE } from '@/lib/platform-site';
-import { useSiteTheme } from '@site/hooks/use-site-theme';
 import { BrandLogo } from '@/components/brand-logo';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
 import { resetAccountQueries } from '@/lib/auth-query-transition';
 import { setRequestTimeout } from '@workspace/api-client-react';
-import { ClerkLoadBoundary, ClerkReadiness } from '@/components/auth/clerk-load-boundary';
 
 const externalStaging = import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true" &&
     import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "staging";
 if (externalStaging) setRequestTimeout(20000);
-const ClerkStartupBoundary = externalStaging ? ClerkLoadBoundary : Fragment;
 
 const queryClient = new QueryClient({ defaultOptions: { queries: {
   retry: externalStaging ? false : 1,
@@ -73,91 +64,8 @@ const queryClient = new QueryClient({ defaultOptions: { queries: {
   refetchOnWindowFocus: false,
 } } });
 
-const clerkPubKey = ownedAuth ? undefined : import.meta.env.VITE_EXTERNAL_DEPLOYMENT === "true"
-  ? import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-  : publishableKeyFromHost(window.location.hostname, import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
-const clerkProxyUrl = import.meta.env.VITE_CLERK_PROXY_URL;
-if (!ownedAuth && import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "staging" &&
-    (!clerkPubKey?.startsWith("pk_test_") || clerkProxyUrl)) {
-  throw new Error("Staging requires Development Clerk authentication without a Production proxy.");
-}
 registerSupabaseQueryClient(queryClient);
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
-
-function stripBase(path: string): string {
-  return basePath && path.startsWith(basePath) ? path.slice(basePath.length) || '/' : path;
-}
-
-if (!ownedAuth && !clerkPubKey) throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY in .env file');
-
-const clerkAppearance = {
-  theme: shadcn,
-  cssLayerName: 'clerk',
-  options: { logoPlacement: 'inside' as const, logoLinkUrl: basePath || '/', logoImageUrl: new URL(QXLAYER_LIGHT_LOGO_URL, window.location.origin).href },
-  // Resolve from the mounted theme, including body-portaled provider controls.
-  variables: {
-    colorPrimary: 'hsl(var(--primary))', colorForeground: 'hsl(var(--foreground))', colorMutedForeground: 'hsl(var(--muted-foreground))', colorDanger: 'hsl(var(--destructive))',
-    colorBackground: 'hsl(var(--card))', colorInput: 'hsl(var(--popover))', colorInputForeground: 'hsl(var(--foreground))', colorNeutral: 'hsl(var(--foreground))',
-    fontFamily: "'Space Grotesk', sans-serif", borderRadius: '0.75rem',
-  },
-  elements: {
-    rootBox: 'w-full flex justify-center',
-    logoImage: '!h-auto !w-[180px] !max-w-full !object-contain',
-    cardBox: 'bg-card border border-border rounded-xl w-[440px] max-w-full overflow-hidden shadow-[0_30px_80px_-40px_var(--s-glow)]',
-    card: '!shadow-none !border-0 !bg-transparent !rounded-none',
-    footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
-    headerTitle: 'text-foreground text-2xl',
-    headerSubtitle: 'text-muted-foreground',
-    socialButtonsBlockButtonText: 'text-foreground',
-    formFieldLabel: 'text-foreground',
-    footerActionLink: 'text-[var(--s-accent-ink)] font-medium',
-    footerActionText: 'text-muted-foreground',
-    dividerText: 'text-muted-foreground',
-    identityPreviewEditButton: 'text-[var(--s-accent-ink)]',
-    formFieldSuccessText: 'text-[var(--s-accent-ink)]',
-    alertText: 'text-foreground',
-    formButtonPrimary: 'bg-primary hover:opacity-90 text-primary-foreground',
-    formFieldInput: 'border-input bg-popover text-foreground',
-  },
-};
-
-/** Hides the provider-generated header/logo (it may carry the instance's application name); inputs, legal and security UI stay. */
-const hiddenProviderHeader = { elements: { header: '!hidden', logoBox: '!hidden' } };
-
-const localization = {
-  signIn: { start: { title: 'Sign in to VYNOX LAYER', subtitle: 'Your VYNOX LAYER account' } },
-  signUp: { start: { title: 'Create a VYNOX LAYER account', subtitle: 'Configure and request your White Label Exchange' } },
-};
-
-function AuthFrame({ children, title, subtitle }: { children: ReactNode; title: string; subtitle: string }) {
-  return <ConsoleThemeScope><div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 px-4 py-8">
-    <div className="flex flex-col items-center gap-1 text-center">
-      <BrandLogo size={80} />
-      <h1 className="text-2xl text-foreground">{title}</h1>
-      <p className="text-sm text-muted-foreground">{subtitle}</p>
-    </div>
-    {children}
-  </div></ConsoleThemeScope>;
-}
-const SignInPage = () => <AuthFrame title={localization.signIn.start.title} subtitle={localization.signIn.start.subtitle}><SignIn appearance={hiddenProviderHeader} routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} fallbackRedirectUrl={`${basePath}/admin`} /></AuthFrame>;
-const SignUpPage = () => <AuthFrame title={localization.signUp.start.title} subtitle={localization.signUp.start.subtitle}><SignUp appearance={hiddenProviderHeader} routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} fallbackRedirectUrl={`${basePath}/account`} /></AuthFrame>;
-
-function ClerkQueryClientCacheInvalidator() {
-  const { addListener } = useLegacyClerk();
-  const qc = useQueryClient();
-  const prev = useRef<string | null | undefined>(undefined);
-  useEffect(() => {
-    return addListener(({ user }) => {
-      const id = user?.id ?? null;
-      if (prev.current !== undefined && prev.current !== id) {
-        if (externalStaging) void resetAccountQueries(qc);
-        else qc.clear();
-      }
-      prev.current = id;
-    });
-  }, [addListener, qc]);
-  return null;
-}
 
 function OwnedCacheInvalidator() {
   const qc = useQueryClient();
@@ -179,7 +87,7 @@ function HomeRedirect() {
 function PrincipalGate({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: query => externalStaging && query.state.error ? false : 10000 } });
-  const { signOut } = useClerk();
+  const { signOut } = useAccountAuth();
   const qc = useQueryClient();
   let demoTab = false;
   try { demoTab = sessionStorage.getItem('qx-isolated-demo') === 'read-only'; } catch { /* no demo intent */ }
@@ -272,16 +180,12 @@ const OwnedReset = lazy(() => import('@/pages/reset-password'));
 const OwnedVerify = lazy(() => import('@/pages/verify-email'));
 const OwnedTwoFactor = lazy(() => import('@/pages/two-factor'));
 const OwnedSecurity = lazy(() => import('@/pages/account-security'));
-const OwnedMigrate = lazy(() => import('@/pages/migrate-account'));
-const OwnedLink = lazy(() => import('@/pages/link-existing'));
 
 function AppRoutes() {
   return (
   <Switch>
               <Route path="/" component={HomeRedirect} />
               <Route path="/demo/admin" component={DemoAdmin} />
-              {!ownedAuth && <Route path="/sign-in/*?" component={SignInPage} />}
-              {!ownedAuth && <Route path="/sign-up/*?" component={SignUpPage} />}
               {ownedAuth && <Route path="/sign-in" component={OwnedSignIn} />}
               {ownedAuth && <Route path="/sign-up" component={OwnedSignUp} />}
               {ownedAuth && <Route path="/forgot-password" component={OwnedForgot} />}
@@ -289,8 +193,6 @@ function AppRoutes() {
               {ownedAuth && <Route path="/verify-email" component={OwnedVerify} />}
               {ownedAuth && <Route path="/two-factor" component={OwnedTwoFactor} />}
               {ownedAuth && <Route path="/account/security" component={OwnedSecurity} />}
-              {ownedAuth && (!supabaseAuth || import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === 'development') && <Route path="/migrate-account" component={OwnedMigrate} />}
-              {ownedAuth && <Route path="/account/link-existing" component={OwnedLink} />}
               <Route path="/account" component={rAcc} />
               <Route path="/account/orders" component={rOrd} />
               <Route path="/account/orders/:orderId" component={rOrdD} />
@@ -324,37 +226,6 @@ function AppRoutes() {
   );
 }
 
-function ClerkProviderWithRoutes() {
-  const [, setLocation] = useLocation();
-  const { dark } = useSiteTheme(PLATFORM_SITE);
-  return (
-    <ClerkStartupBoundary><ClerkProvider
-      publishableKey={clerkPubKey!}
-      proxyUrl={clerkProxyUrl}
-      appearance={{ ...clerkAppearance, options: { ...clerkAppearance.options,
-        logoImageUrl: new URL(dark ? VYNOX_DARK_LOGO_URL : QXLAYER_LIGHT_LOGO_URL, window.location.origin).href } }}
-      signInUrl={`${basePath}/sign-in`}
-      signUpUrl={`${basePath}/sign-up`}
-      localization={localization}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
-    >
-      {externalStaging && <ClerkReadiness />}
-      <ExternalStagingAuthBridge>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <ClerkQueryClientCacheInvalidator />
-          <RoutedErrorBoundary>
-            <AppRoutes />
-          </RoutedErrorBoundary>
-          <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
-      </ExternalStagingAuthBridge>
-    </ClerkProvider></ClerkStartupBoundary>
-  );
-}
-
 function OwnedProviderWithRoutes() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -372,7 +243,7 @@ function OwnedProviderWithRoutes() {
 function App() {
   return (
     <WouterRouter base={basePath}>
-      {ownedAuth ? <OwnedProviderWithRoutes /> : <ClerkProviderWithRoutes />}
+      <OwnedProviderWithRoutes />
     </WouterRouter>
   );
 }

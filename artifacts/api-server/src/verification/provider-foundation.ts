@@ -3,7 +3,6 @@ import { randomUUID } from "node:crypto";
 import { readFile, writeFile, mkdir, unlink } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pool } from "@workspace/db";
-import { clerkClient } from "@clerk/express";
 import { resolvePrincipal } from "../modules/authentication/service";
 import { prepareCustomerFixtures, cleanCustomerFixtures } from "./customer-fixtures";
 import { saveProviderDefinition } from "../modules/providers/catalog";
@@ -24,6 +23,8 @@ const definition: ProviderDefinitionInput = {
   credentialSchema: [{ key: "apiKey", label: "API key schema only", type: "secret", required: true }],
 };
 async function cleanup(m: any) {
+  if (m.qaUserIds?.length || m.qaOwnerId)
+    throw Error("Legacy identity fixtures require a separately reviewed provider cleanup; authentication SDK is retired.");
   // Explicit QA identifiers only; do not delete existing provider/customer records.
   for (const id of m.providerIds ?? []) {
     const outside = await pool.query("SELECT id FROM provider_assignments WHERE provider_id=$1 AND NOT(tenant_id=ANY($2::uuid[]))", [id, m.tenants.map((t: any) => t.id)]);
@@ -38,10 +39,6 @@ async function cleanup(m: any) {
   if (m.qaOwnerId) assert.ok(realQaUsers.includes(m.qaOwnerId), "QA owner must be an explicitly recorded generated test identity.");
   assert.ok(!realQaUsers.includes("user_3KF0i38mD09exoEm6cdBCLFQQRL"), "Permanent owner is never a QA identity.");
   await cleanCustomerFixtures(m.tenants.map((t: any) => t.id), m.planId, [...m.actors, ...realQaUsers]);
-  for (const id of realQaUsers) {
-    try { await clerkClient.users.deleteUser(id); }
-    catch (error: any) { if (error.status !== 404) throw error; }
-  }
 }
 let manifest: any;
 try {

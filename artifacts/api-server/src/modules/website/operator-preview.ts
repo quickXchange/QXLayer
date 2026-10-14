@@ -1,11 +1,7 @@
-import { getAuth } from "@clerk/express";
 import type { Request } from "express";
 import { resolvePrincipal, requireSuperAdmin } from "../authentication/service";
 import { signProof, readProof } from "../../lib/scoped-proof";
 import { HttpError } from "../../lib/errors";
-import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
-import { ownedAuthentication } from "../owned-auth/config";
-import { ownedBusinessId, ownedSession } from "../owned-auth/service";
 import { supabaseAuthEnabled } from "../supabase-auth/config";
 import { sessionCookie, readSession, businessId, hasVerifiedFactor } from "../supabase-auth/session";
 
@@ -36,14 +32,7 @@ export async function authorizedWebsitePreview(req: Request, slug: string): Prom
     requireSuperAdmin(await resolvePrincipal(actorId));
     return grant;
   }
-  const own = ownedAuthentication() ? await ownedSession(req) : null;
-  const nativeId = ownedAuthentication() ? null : getAuth(req).userId;
-  const actorId = own && own.user.twoFactorEnabled ? await ownedBusinessId(own.user.id) : nativeId ? applicationUserId(nativeId) : null;
-  const grant = verifyPreview(cookie, slug, actorId);
-  if (!grant) throw new HttpError(401, "Sign in as the authorized operator and reopen this private preview.");
-  // Revocation is immediate: the signed cookie is NOT sufficient authority.
-  requireSuperAdmin(await resolvePrincipal(actorId!));
-  return grant;
+  throw new HttpError(401, "Sign in with operator MFA and reopen this private preview.");
 }
 export function previewBrandingUrl(url: string | null | undefined, slug: string, preview?: WebsitePreview) {
   return preview && url?.startsWith(`/api/public/sites/${slug}/branding/`) ? `${url}?preview=1` : url;

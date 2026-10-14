@@ -1,17 +1,15 @@
 import express, { type Express, type ErrorRequestHandler } from "express";
 import pinoHttp from "pino-http";
-import { clerkMiddleware } from "@clerk/express";
-import { publishableKeyFromHost } from "@clerk/shared/keys";
 import { ZodError } from "zod";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { HttpError } from "./lib/errors";
-import { CLERK_PROXY_PATH, clerkProxyMiddleware, getClerkProxyHost } from "./middlewares/clerkProxyMiddleware";
 import { createAccessGate } from "../../../lib/production-access-gate/index.mjs";
-import { toNodeHandler } from "better-auth/node";
-import { ownedAuthentication } from "./modules/owned-auth/config";
-import { ownedAuthServer } from "./modules/owned-auth/service";
-import { mailReady } from "./modules/owned-auth/mail";
+import { supabaseAuthConfiguration, supabaseDefaultProvider } from "./modules/supabase-auth/config";
+
+// No silent fallback to a retired provider, including in a future published build.
+if (!supabaseDefaultProvider()) throw new Error("Supabase Auth must be explicitly configured. Legacy authentication is retired; Production migration approval is required before publishing.");
+supabaseAuthConfiguration();
 
 const app: Express = express();
 
@@ -37,31 +35,14 @@ app.use(
   }),
 );
 app.disable("x-powered-by");
-// Before body parsing, Clerk, proxying and application routes.
+// Before body parsing and application routes.
 app.use(createAccessGate({ basePath: "/api", healthPath: "/api/healthz",
   deliveredSite: async slug => (await import("./modules/website/service")).deliveredPublicSite(slug) }));
-app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
-if (ownedAuthentication()) {
-  // Better Auth must receive the untouched stream before Express body parsing.
-  app.all("/api/auth/*splat", (req, res) => {
-    if (!mailReady() && ["/api/auth/sign-up/email", "/api/auth/request-password-reset",
-      "/api/auth/send-verification-email"].includes(req.path.replace(/\/+$/, ""))) {
-      res.status(503).json({ code: "MAIL_UNAVAILABLE", message: "Verification and recovery require a configured mail sender." });
-      return;
-    }
-    return toNodeHandler(ownedAuthServer())(req, res);
-  });
-}
+app.use(["/api/auth", "/api/owned-auth", "/api/__clerk"], (_req, res) => {
+  res.status(410).json({ error: "Legacy authentication is retired. Use Supabase Auth." });
+});
 app.use(express.json({ limit: "128kb" }));
 app.use(express.urlencoded({ extended: true, limit: "128kb" }));
-if (!ownedAuthentication()) app.use(clerkMiddleware((req) => ({
-  publishableKey: process.env.QXLAYER_DATABASE_PROVIDER === "supabase"
-    ? process.env.CLERK_PUBLISHABLE_KEY
-    : publishableKeyFromHost(getClerkProxyHost(req) ?? "", process.env.CLERK_PUBLISHABLE_KEY),
-  ...(process.env.QXLAYER_DATABASE_PROVIDER === "supabase" ? {
-    authorizedParties: (process.env.CLERK_AUTHORIZED_PARTIES ?? "").split(",").map(s => s.trim()).filter(Boolean),
-  } : {}),
-})));
 
 app.use("/api", router);
 const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {

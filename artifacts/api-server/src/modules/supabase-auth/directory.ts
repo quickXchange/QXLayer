@@ -1,6 +1,4 @@
-import { clerkClient } from "@clerk/express";
 import { pool } from "@workspace/db";
-import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
 import { supabaseAuthConfiguration, supabaseBusinessId } from "./config";
 import { HttpError } from "../../lib/errors";
 
@@ -14,8 +12,8 @@ interface DirectoryUser {
   banned: boolean;
   locked: boolean;
 }
-/** Supabase trial operators can see both directories without modifying Clerk. */
-export async function combinedStagingDirectory(): Promise<DirectoryUser[]> {
+/** Preserve linked business IDs; never query or modify retired provider accounts. */
+export async function supabaseDirectory(): Promise<DirectoryUser[]> {
   const cfg = supabaseAuthConfiguration();
   const users: DirectoryUser[] = [];
   for (let page = 1; page <= 100; page++) {
@@ -34,21 +32,6 @@ export async function combinedStagingDirectory(): Promise<DirectoryUser[]> {
       createdAt: Date.parse(u.created_at), banned: !!u.banned_until && Date.parse(u.banned_until) > Date.now(), locked: false });
     if (body.users.length < 100) break;
     if (page === 100) throw new HttpError(503, "Staging account directory exceeds the bounded scan.");
-  }
-  const ids = new Set(users.map(u => u.id));
-  for (let offset = 0; offset < 10000; offset += 100) {
-    const page = await clerkClient.users.getUserList({ limit: 100, offset, orderBy: "+created_at" });
-    for (const u of page.data) {
-      const id = applicationUserId(u.id);
-      if (id && !ids.has(id)) {
-        users.push({ id, firstName: u.firstName, lastName: u.lastName,
-          primaryEmailAddressId: u.primaryEmailAddressId, emailAddresses: u.emailAddresses,
-          createdAt: u.createdAt, banned: u.banned, locked: u.locked });
-        ids.add(id);
-      }
-    }
-    if (page.data.length < 100) break;
-    if (offset === 9900) throw new HttpError(503, "Legacy account directory exceeds the bounded scan.");
   }
   return users.sort((a, b) => a.createdAt - b.createdAt);
 }

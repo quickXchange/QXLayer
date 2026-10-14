@@ -14,3 +14,9 @@ Upstream recovery-code endpoint source does not establish usable recovery-code e
 **Why:** The Development provider's enrollment probe returned `mfa_recovery_codes_enroll_not_enabled`, and the scoped Auth configuration exposed no corresponding supported setting.
 
 **How to apply:** Re-evaluate deployed capability before replacing the Development-only recovery mechanism with a native one. Never enable undocumented flags or alter protected Staging to test it.
+
+A password-recovery link does not supply sufficient assurance to change the password of an account with verified TOTP. Complete its existing authenticator challenge within the recovery context, while retaining recovery-only authorization.
+
+**Why:** The pinned Development provider returns `insufficient_aal` when updating an MFA-enabled account's password using the AAL1 recovery session.
+
+**How to apply:** Keep recovery sessions denied business/Admin access even after MFA elevation. Require the current factor before password reset, preserve the recovery expiry, and verify that password reset does not remove TOTP. Test with a disposable MFA-enabled identity, not just an account without 2FA.

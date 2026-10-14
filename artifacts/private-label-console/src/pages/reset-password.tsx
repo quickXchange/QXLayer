@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
-import { verifyRecoveryLink } from '@/lib/supabase-auth-client';
+import { verifyRecoveryLink, supabaseMfa, useSupabaseSessionState } from '@/lib/supabase-auth-client';
 import { A, AuthFrame, ErrorLine, Field, Form, SuccessLine, Submit, authErrorText, MIN_PASSWORD, MAX_PASSWORD } from '@/components/auth/auth-ui';
 
 // Read once at module load so the token can be scrubbed from the address bar immediately.
@@ -11,6 +11,9 @@ const initialBadLink = initial.get('error') === 'INVALID_TOKEN' || !initialToken
 
 export default function ResetPasswordPage() {
   const qc = useQueryClient();
+  const { session } = useSupabaseSessionState();
+  const needsMfa = !!session?.recovery && !!session.user?.twoFactorEnabled;
+  const [code, setCode] = useState('');
   const token = useRef(initialToken);
   // Better Auth keeps its token for the reset call; Supabase must verify first.
   const [gate, setGate] = useState<'checking' | 'ready' | 'invalid'>(initialBadLink ? 'invalid' : supabaseAuth ? 'checking' : 'ready');
@@ -27,11 +30,16 @@ export default function ResetPasswordPage() {
     setErr('');
     if (pw.length < MIN_PASSWORD || pw.length > MAX_PASSWORD) { setErr(`Use ${MIN_PASSWORD} to ${MAX_PASSWORD} characters.`); return; }
     if (pw !== confirm) { setErr('The passwords do not match.'); return; }
+    if (needsMfa && !/^[0-9]{6}$/.test(code)) { setErr('Enter the 6-digit code from your existing authenticator.'); return; }
     setBusy(true);
     try {
-      const r = await authClient.resetPassword({ newPassword: pw, token: token.current });
+      if (needsMfa) {
+        const verification = await supabaseMfa.verify(code);
+        if (verification.error) { setErr(authErrorText(verification.error)); return; }
+      }
+      const r = await authClient.resetPassword({ newPassword: pw });
       if (r.error) { setErr(authErrorText(r.error)); return; }
-      qc.clear(); setPw(''); setConfirm(''); setDone(true);
+      qc.clear(); setPw(''); setConfirm(''); setCode(''); setDone(true);
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (
@@ -42,8 +50,9 @@ export default function ResetPasswordPage() {
         <Form onSubmit={submit}>
           <Field id="new-password" label="New password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint={supabaseAuth ? `${MIN_PASSWORD} to ${MAX_PASSWORD} characters.` : undefined} />
           <Field id="confirm-password" label="Confirm new password" type="password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
+           {needsMfa && <Field id="reset-authenticator-code" label="Existing authenticator code" value={code} onChange={setCode} autoComplete="one-time-code" inputMode="numeric" maxLength={6} hint="Password recovery does not remove two-factor authentication." />}
           <ErrorLine>{err}</ErrorLine>
-          <Submit id="button-reset" busy={busy} disabled={!pw}>Update password</Submit>
+           <Submit id="button-reset" busy={busy} disabled={!pw || (needsMfa && code.length !== 6)}>Update password</Submit>
         </Form>)}
     </AuthFrame>
   );

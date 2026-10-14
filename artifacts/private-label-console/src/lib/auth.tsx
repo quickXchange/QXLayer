@@ -1,7 +1,6 @@
 import type { ComponentType, ReactNode } from 'react';
-import { useAuth as useClerkAuth, useClerk as useClerkLegacy, UserProfile as ClerkUserProfile } from '@clerk/react';
 import { authClient, ownedAuth } from '@/lib/owned-auth-client';
-import { SecurityPanel } from '@/components/auth/security-panel';
+import { SupabaseSecurityPanel } from '@/components/auth/supabase-security-panel';
 
 type SignOutOptions = { redirectUrl?: string };
 export { ownedAuth };
@@ -13,14 +12,12 @@ async function ownedSignOut(opts?: SignOutOptions) {
   const to = opts?.redirectUrl && opts.redirectUrl !== '/' ? opts.redirectUrl : '';
   window.location.assign(to || base);
 }
-function useOwnedClerk() { return { signOut: ownedSignOut }; }
+function useAccountSignOut() { return { signOut: ownedSignOut }; }
 function useOwnedAuth() { return { getToken: async (): Promise<string | null> => null }; }
 
 /** Selected once at module load, so hook order never changes. */
-export const useClerk: () => { signOut: (o?: SignOutOptions) => Promise<void> } =
-  ownedAuth ? useOwnedClerk : (useClerkLegacy as unknown as () => { signOut: (o?: SignOutOptions) => Promise<void> });
-export const useAuth: () => { getToken: () => Promise<string | null> } =
-  ownedAuth ? useOwnedAuth : (useClerkAuth as unknown as () => { getToken: () => Promise<string | null> });
+export const useAccountAuth = useAccountSignOut;
+export const useAuth = useOwnedAuth;
 
 function OwnedShow({ when, children }: { when: 'signed-in' | 'signed-out'; children?: ReactNode }) {
   const s = authClient.useSession();
@@ -28,11 +25,7 @@ function OwnedShow({ when, children }: { when: 'signed-in' | 'signed-out'; child
   const signedIn = !!s.data?.user;
   return (when === 'signed-in') === signedIn ? <>{children}</> : null;
 }
-function LegacyShow(props: { when: 'signed-in' | 'signed-out'; children?: ReactNode }) {
-  return <ClerkShow {...props} />;
-}
-import { Show as ClerkShow } from '@clerk/react';
-export const Show: ComponentType<{ when: 'signed-in' | 'signed-out'; children?: ReactNode }> = ownedAuth ? OwnedShow : LegacyShow;
+export const Show: ComponentType<{ when: 'signed-in' | 'signed-out'; children?: ReactNode }> = OwnedShow;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const UserProfile: ComponentType<any> = ownedAuth ? SecurityPanel : ClerkUserProfile;
+export const UserProfile: ComponentType<any> = SupabaseSecurityPanel;

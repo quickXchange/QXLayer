@@ -5,6 +5,12 @@ description: Isolated Development Supabase migration, verified Staging preservat
 
 The user wants a full authentication system from their side, integrated with this project, instead of Clerk.
 
+For Development source, the user now explicitly requests removing Clerk and unused Better Auth dependencies while keeping Supabase Auth and preserving Super Admin access, MFA, users, roles, sessions and business data. This supersedes earlier instructions to retain Clerk **in Development source only**. Staging and Production must remain unchanged, and no deploy or Republish is authorized.
+
+**Why:** The user explicitly requested Development cleanup after their Supabase migration and required a Production-compatibility audit before declaring Republish safe.
+
+**How to apply:** Keep stored legacy business identifiers and proof-based links; never rename identifiers or delete legacy accounts/tables as dependency cleanup. Do not treat a successful production-mode compile as authorization or evidence that Production logins will work. Require separate Production migration approval and native account-continuity evidence.
+
 **Why:** The user explicitly requested project-owned authentication rather than independent ownership of another Clerk application.
 
 **How to apply:** Treat future authentication work as a migration to authentication operated in the project's infrastructure, not as another Clerk ownership or branding exercise. Preserve existing business identities, permanent owner authorization and tenant assignments. Existing external-migration Production safety boundaries still apply until explicitly superseded.

@@ -1,12 +1,10 @@
 import { createHmac } from "node:crypto";
-import { pool, withDatabase } from "@workspace/db";
+import { pool } from "@workspace/db";
 import { z } from "zod";
 import type { Request, Response } from "express";
-import { clerkClient, getAuth } from "@clerk/express";
-import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
 import { HttpError } from "../../lib/errors";
 import { authRequest, type SupabaseTokens } from "./provider";
-import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret } from "./config";
+import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 import { establishSession, needSession, publicUser, hasVerifiedFactor, reauthenticate, readSession,
   revokeLocalSession, updateSession, type AuthSession } from "./session";
 import { generateRecoveryCodes, recoverAuthenticator, requireDevelopmentRecovery } from "./development-recovery";
@@ -27,7 +25,7 @@ export const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("mfa-verify"), code: z.string().regex(/^[0-9]{6}$/), factorId: factorId.optional() }).strict(),
   z.object({ action: z.literal("mfa-remove"), currentPassword: z.string().min(1).max(128), factorId,
     code: z.string().regex(/^[0-9]{6}$/) }).strict(),
-  z.object({ action: z.literal("link-existing") }).strict(),
+   z.object({ action: z.literal("link-existing") }).strict(),
   z.object({ action: z.literal("mfa-recovery-generate"), currentPassword: z.string().min(1).max(128),
     code: z.string().regex(/^[0-9]{6}$/), confirmReplace: z.literal(true) }).strict(),
   z.object({ action: z.literal("mfa-recover"), currentPassword: z.string().min(1).max(128),
@@ -60,38 +58,6 @@ async function logoutAll(s: AuthSession, req: Request, res: Response) {
   await pool.query("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1", [s.user.id]);
   await revokeLocalSession(req, res);
   await authRequest("/logout?scope=global", { method: "POST", accessToken: s.payload.accessToken });
-}
-async function linkExisting(req: Request, s: AuthSession) {
-  if (Date.now() - s.payload.created > 600000 || (hasVerifiedFactor(s.user) && !s.aal2))
-    throw new HttpError(401, "Sign in again and complete MFA before linking.");
-  const legacy = getAuth(req);
-  if (!legacy.userId || !legacy.sessionId) throw new HttpError(401, "Fresh proof of your existing Clerk account is required.");
-  const [session, user] = await Promise.all([clerkClient.sessions.getSession(legacy.sessionId), clerkClient.users.getUser(legacy.userId)]);
-  const business = applicationUserId(legacy.userId);
-  const created = Number(session.createdAt);
-  if (!business || session.status !== "active" || session.userId !== legacy.userId || !Number.isFinite(created) ||
-      created > Date.now() + 60000 || Date.now() - created > 600000 ||
-      !user.emailAddresses.some(e => e.id === user.primaryEmailAddressId && e.verification?.status === "verified"))
-    throw new HttpError(403, "A fresh verified legacy account and approved Staging binding are required.");
-  const standalone = supabaseBusinessId(s.user.id);
-  const used = await withDatabase({ actorId: standalone }, async c => c.query(`SELECT EXISTS(
-    SELECT 1 FROM public.white_label_requests WHERE customer_user_id=$1)
-    OR EXISTS(SELECT 1 FROM public.tenant_memberships WHERE clerk_user_id=$1)
-    OR EXISTS(SELECT 1 FROM public.platform_admins WHERE clerk_user_id=$1) AS used`, [standalone]));
-  if (used.rows[0].used) throw new HttpError(409, "This account already has business records; operator review is required.");
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [standalone]);
-    const existing = await client.query(`SELECT subject FROM vynox_supabase_auth.identity_links
-      WHERE subject=$1 OR business_id=$2`, [s.user.id, business]);
-    if (existing.rowCount) throw new HttpError(409, "An existing identity link cannot be replaced.");
-    await client.query("INSERT INTO vynox_supabase_auth.identity_links(subject,business_id,proof_subject) VALUES($1,$2,$3)",
-      [s.user.id, business, legacy.userId]);
-    await client.query("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1", [s.user.id]);
-    await client.query("COMMIT");
-  } catch (e) { await client.query("ROLLBACK"); throw e; }
-  finally { client.release(); }
 }
 export async function performAction(raw: unknown, req: Request, res: Response) {
   const a = input.parse(raw);
@@ -146,6 +112,8 @@ export async function performAction(raw: unknown, req: Request, res: Response) {
       const s = await needSession(req, true);
       if (!s.payload.recovery || Date.now() - s.payload.created > 15 * 60000)
         throw new HttpError(401, "Open a fresh password recovery link.");
+      if (hasVerifiedFactor(s.user) && !s.aal2)
+        throw new HttpError(428, "MFA_REQUIRED: Verify your existing authenticator before resetting your password.");
       await authRequest("/user", { method: "PUT", accessToken: s.payload.accessToken, body: { password: a.password } });
       await logoutAll(s, req, res);
       return { ok: true };
@@ -173,7 +141,11 @@ export async function performAction(raw: unknown, req: Request, res: Response) {
       return { ok: true, factorId: factor.id, qrCode: factor.totp.qr_code, secret: factor.totp.secret, totpUri: factor.totp.uri };
     }
     case "mfa-verify": {
-      const s = await needSession(req);
+      // A recovered account may elevate assurance only within its recovery-only
+      // session. updateSession preserves recovery=true; business access stays denied.
+      const s = await needSession(req, true);
+      if (s.payload.recovery && Date.now() - s.payload.created > 15 * 60000)
+        throw new HttpError(401, "Open a fresh password recovery link.");
       await totp(s, a.code, a.factorId);
       return { ok: true };
     }
@@ -187,10 +159,8 @@ export async function performAction(raw: unknown, req: Request, res: Response) {
       return { ok: true };
     }
     case "link-existing": {
-      const s = await needSession(req);
-      await linkExisting(req, s);
-      await revokeLocalSession(req, res);
-      return { ok: true, linked: true };
+      // Existing proof-based links are retained. Never replace legacy proof with email matching.
+      throw new HttpError(410, "Legacy account migration is retired. Existing links remain valid; unmigrated accounts require a separately approved ownership review.");
     }
   }
 }
