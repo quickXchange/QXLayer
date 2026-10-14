@@ -45,3 +45,4 @@
 - [Auth query observers](auth-query-observers.md) — cache eviction can strand active loading observers; preserve session observers and reset account data on confirmed identity changes.
 - [Supabase MFA assurance](supabase-mfa-session-assurance.md) — verifying MFA in another context can invalidate pending-MFA sessions; probe deployed recovery-code capability, not upstream source.
 - [Browser candidate modules](browser-candidate-module-identity.md) — asset overrides need one canonical entry URL or lazy chunks can instantiate React twice.
+- [Security scanner runtime](security-scanner-runtime.md) — isolate scanner scratch storage; managed and direct Pro authorization differ; stream large privacy reports.

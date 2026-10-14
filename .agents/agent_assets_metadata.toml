@@ -1036,3 +1036,17 @@ mtime_ms = 1791671990759
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/bd816b93-ff90-4158-ba46-4d25c27cce1d/59be2018-3b54-4c6e-add8-57a670e3579a"
 storage_version_token = "1791672100249047"
 content_type = "text/html"
+
+[[outputs]]
+id = "kYxgrBAcCMJSTVPNSQVPj"
+uri = "file://deploy/PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md"
+type = "text"
+title = "Production Supabase migration plan"
+description = "Read-only plan preserving identities, roles, sessions and business data. No deployment or Production changes authorized."
+logical_id = "e67d10c4-6887-4685-bfd2-4e9e7f6309ff"
+content_hash = "sha256:644edde2f1520e4eecaeec83df1843a1357c5c72b5c7d10ac15072e6e4e979b5"
+size = 10468
+mtime_ms = 1791999794951
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/e67d10c4-6887-4685-bfd2-4e9e7f6309ff/6f3646c3-ec1d-4aeb-8153-930f5d3acadd"
+storage_version_token = "1792001100552976"
+content_type = "text/markdown"

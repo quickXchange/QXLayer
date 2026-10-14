@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "export NODE_ENV=development && pnpm run build && pnpm run start",
+    "dev": "node ../../scripts/development-runtime.mjs pnpm run dev:server",
+    "dev:server": "export NODE_ENV=development && pnpm run build && pnpm run start",
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -19,7 +20,7 @@
     "samples:plans:dev": "tsx src/verification/sample-sites.ts"
   },
   "dependencies": {
-    "@google-cloud/storage": "^8.2.0",
+    "@google-cloud/storage": "^8.4.0",
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/i18n": "workspace:*",

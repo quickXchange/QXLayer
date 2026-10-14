@@ -34,11 +34,12 @@ router.post("/tenants/:tenantId/domain-hosting", async (req, res) => {
 router.get("/tenants/:tenantId/website-preview/open", async (req, res) => {
   const { tenantId } = GetTenantParams.parse(req.params);
   const preview = await openTenantWebsitePreview(principalFrom(res), tenantId);
+  const slug = encodeURIComponent(preview.slug);
   res.set({ "Cache-Control": "private, no-store", "Referrer-Policy": "no-referrer" });
   res.cookie(PREVIEW_COOKIE, preview.token, { httpOnly: true, sameSite: "strict",
     secure: process.env.NODE_ENV === "production" || req.secure, maxAge: PREVIEW_TTL,
-    path: `/api/public/sites/${preview.slug}` });
-  res.redirect(303, `/private-label-website/${preview.slug}?preview=1`);
+    path: `/api/public/sites/${slug}` });
+  res.redirect(303, `/private-label-website/${slug}?preview=1`);
 });
 router.get("/tenants/:tenantId/website-preview", async (req, res) => {
   const { tenantId } = GetTenantParams.parse(req.params);

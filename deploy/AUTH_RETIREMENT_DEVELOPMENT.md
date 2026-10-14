@@ -28,9 +28,10 @@ rotated encrypted session envelopes. It does not bypass or recreate sessions.
 ## Verification and limitations
 
 - Workspace TypeScript checks pass.
-- API, console and website production-mode compilation passes. Compilation is
+- API, console, website and mockup sandbox production-mode compilation passes. Compilation is
   **not** evidence that Production authentication can start or serve users.
-- 46 authentication/security regression tests pass.
+- All 374 tests across 78 test files pass, using the Node test asset loader for
+  Vite-managed image imports. Workspace typechecking passes.
 - Existing release-contract/business regression suites pass; the separate new
   authentication release-hold test confirms Republish is blocked.
 - Native Development HTTP tests passed signup, rejection of unverified login,
@@ -45,10 +46,41 @@ rotated encrypted session envelopes. It does not bypass or recreate sessions.
 - Native testing found and fixed password reset for MFA-enabled accounts:
   an existing authenticator must elevate the recovery session before updating
   the password. Even after MFA, a recovery session cannot enter business routes.
-- Automated browser testing failed twice with internal infrastructure errors.
-  Fresh private-window Owner login/MFA/Admin UI acceptance after this cleanup,
-  and browser confirmation of the revised reset form, remain unverified. Owner
-  credentials, sessions and factors were not used for impersonation or testing.
+- Development browser testing now passes native customer login, account access,
+  rejection from Admin, reload/new-tab persistence, TOTP enrollment, MFA-required
+  login, pending-MFA isolation, post-MFA reload persistence, logout and back
+  navigation without stale account content. Only a disposable non-admin was
+  used; it was removed afterward and preservation readback passed again.
+- Fresh private-window **Owner** login/MFA/Admin UI acceptance remains unverified.
+  It requires genuine private Owner participation. Owner credentials, sessions
+  and factors were not used for impersonation or modified for testing.
+
+## Security follow-up
+
+- Final managed dependency audit: **0 critical, 0 high, 0 moderate, 0 low**.
+  Storage SDK 8.4 is a supported same-major update; its vulnerable UUID dependency
+  is gone. Unused typography plugins were removed, eliminating the old selector
+  parser. Native Node file discovery replaced mockup fast-glob; regression tests
+  preserve hidden/private-file exclusion and add/remove discovery.
+- HoundDog 3.11 full core privacy scan completed successfully from workspace-local
+  scratch/cache/home directories, without severity filtering or AI review.
+  The initial critical Telegram bearer-token Web Storage flow was fixed with
+  memory-only credentials and removal of old persisted tokens. A fresh scan has
+  **0 flagged dataflows**. Telegram initData is still server-verified on reload.
+- Managed full static scan now completes: **10 medium findings, no high or
+  critical findings**. Raw warnings remain visible; they are not silently
+  suppressed. Five concern protocol/checksum SHA-1, two signed-cookie/proxy
+  heuristics, two redirect heuristics and one synthetic URL-credential fixture.
+  The fixed same-origin preview paths now encode slugs; the Preview verification
+  proxy refuses off-origin redirects. Further disposition of these warnings
+  remains part of release review; zero dependency/privacy findings is not a
+  claim that every static warning is cleared.
+- The direct community-engine diagnostic is incomplete because supplied rules
+  require Pro operators. The direct Pro binary requires its own login. Neither
+  diagnostic substitutes for the later successful **managed** static scan.
+- All four Development workflows are running after restarts. Their Development
+  launchers keep temporary/compiler caches on the workspace volume to avoid the
+  system temporary-directory quota. Production start commands are unchanged.
 
 ## Read-only Production compatibility audit
 
@@ -80,23 +112,23 @@ No automatic migration, database copy, startup DDL or Production changes were ma
 1. Production provider, schema, identity-link and session migration is not
    approved or complete. Existing Production logins cannot safely consume this
    Development-only source release.
-2. The Development legacy directory contains 42 accounts, while Development has
-   one proof-linked Supabase identity. The legacy accounts are untouched, but
-   they must be reviewed individually for continuity before claiming every
-   legacy user can sign in without the retired migration path. No automatic
-   email matching, duplicate Owner creation or account deletion is permitted.
-3. Post-cleanup signed-in browser coverage and fresh Owner/Admin acceptance are
-   incomplete because the browser-testing infrastructure failed.
-4. Dependency audit still reports two high findings (`braces` 3.0.3 and `uuid`
-   9.0.1) and one moderate finding (`postcss-selector-parser` 6.0.10).
-   `proxy-addr` and `source-map-js` were updated to compatible fixed patches;
-   the final dependency scan reports zero critical findings. Remaining
-   build-tool/storage reachability is bounded, not an upstream fix. Do not
-   force unsupported major overrides merely to clear a scanner.
-5. An initial static scan completed with ten medium findings needing review,
-   including TOTP/protocol SHA-1 and session/redirect heuristics. The final
-   static-scan attempt failed with a filesystem quota error; the privacy scanner
-   failed twice. A clean final full-scan result is therefore unavailable.
+2. The completed read-only legacy audit confirms **42 accounts: 1 proof-linked,
+   41 unlinked, including 5 with business references and 1 with tenant roles**.
+   Full directory fingerprints match before and after the audit. There were
+   zero account/role writes and no email-based ownership matching. Audit
+   completion is not migration completion. Unlinked accounts need a separately
+   approved continuity path; apparently unused accounts must not be deleted.
+3. Genuine private Owner login → MFA → Admin Panel → reload/new-tab persistence
+   still needs Owner participation. Customer browser coverage does not replace it.
+4. The 10 medium static warnings remain explicitly recorded for release review;
+   they are not erased merely because dependency and privacy findings are zero.
+
+The separately prepared migration plan is
+`deploy/PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md`. It covers a fresh authorized
+Production inventory, independent provider/configuration, additive schema and
+restore rehearsal, exact-proof account continuity, session transition, native
+acceptance, controlled cutover and rollback preserving new business activity.
+It executes none of those Production operations.
 
 Staging, Production, external providers' official identities, DNS and published
 deployments were not modified. No deployment or Republish was attempted.

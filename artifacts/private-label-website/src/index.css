@@ -6,7 +6,6 @@
 @import './styles/site-sections.css';
 @import './styles/site-showcase.css';
 @import './styles/site-instrument.css';
-@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 

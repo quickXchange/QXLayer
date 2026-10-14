@@ -47,7 +47,7 @@ async function scenario(aal: string, run: (req: Request, res: Response, writes: 
     return new globalThis.Response(JSON.stringify(user));
   });
   const req = { headers: { cookie: `${SESSION_COOKIE}=${"a".repeat(43)}` }, method: "GET", get() { return undefined; },
-    socket: { remoteAddress: "127.0.0.1" } } as Request;
+    socket: { remoteAddress: "127.0.0.1" } } as unknown as Request;
   const res = { clearCookie() {} } as unknown as Response;
   try { await run(req, res, writes, () => codec.open<{ recovery: boolean }>(envelope)); }
   finally {

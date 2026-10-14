@@ -45,5 +45,5 @@ test("Quickex credentials stay isolated in concurrent tenant contexts and never 
 });
 test("Quickex cannot create a real external financial order", () => {
   assert.throws(() => createQuickexOrder({ fromCurrency: "BTC", fromNetwork: "BTC", toCurrency: "ETH", toNetwork: "ETH",
-    amount: 1, destinationAddress: "fictional", email: "fixture@example.invalid" }), /disabled in QXLayer Sandbox/);
+    amount: 1, destinationAddress: "fictional", email: "fixture@example.invalid" }), /disabled in VYNOX LAYER Sandbox/);
 });

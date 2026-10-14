@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
 const require = createRequire(import.meta.url);
 // The retired proxy no longer pulls its parser dependencies into the API.
 for (const path of ["../../package.json", "../../../private-label-console/package.json"]) {
@@ -11,11 +10,15 @@ for (const path of ["../../package.json", "../../../private-label-console/packag
 }
 const storageRequire = createRequire(require.resolve("@google-cloud/storage"));
 const authRequire = createRequire(storageRequire.resolve("google-auth-library"));
-const chain = [storageRequire, authRequire, createRequire(authRequire.resolve("gcp-metadata")),
-  createRequire(authRequire.resolve("gtoken"))];
-const entries = chain.map(r => r.resolve("gaxios"));
+const entries = [storageRequire, authRequire, createRequire(authRequire.resolve("gcp-metadata"))]
+  .map(r => r.resolve("gaxios"));
 assert.equal(new Set(entries).size, 1, "Reassess additional storage HTTP client versions.");
-const source = await readFile(new URL("./gaxios.js", pathToFileURL(entries[0])), "utf8");
-assert.deepEqual([...source.matchAll(/\buuid_1\.(v\d+)\b/g)].map(m => m[1]), ["v4"],
-  "Reassess use of affected UUID methods.");
-console.log("PASS: retired authentication dependencies absent; storage HTTP clients use the reviewed UUID v4 path.");
+const lock = await readFile(new URL("../../../../pnpm-lock.yaml", import.meta.url), "utf8");
+assert(!/^\s{2}(?:uuid@9\.|braces@3\.0\.3|postcss-selector-parser@6\.)/m.test(lock),
+  "A previously vulnerable dependency re-entered the workspace.");
+const { Storage } = require("@google-cloud/storage");
+const storage = new Storage({ projectId: "synthetic-contract-only" });
+const file = storage.bucket("synthetic-contract-only").file("synthetic-contract-only");
+for (const method of ["getMetadata", "download", "delete", "getSignedUrl", "createReadStream", "createWriteStream"])
+  assert.equal(typeof file[method], "function", `Storage API contract changed: ${method}`);
+console.log("PASS: retired auth and vulnerable dependency versions absent; supported storage API contracts preserved.");

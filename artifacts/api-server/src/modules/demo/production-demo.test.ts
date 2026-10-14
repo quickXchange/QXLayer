@@ -30,12 +30,20 @@ test("Production preview binds authentication, tenant, expiry and purpose; fails
 });
 
 test("Production-mode demo HTTP: all actions, snapshots, tracking and admin sections; no DB access, privilege or persistence", async () => {
-  const env = { NODE_ENV: process.env.NODE_ENV, SESSION_SECRET: process.env.SESSION_SECRET };
+  const env = { NODE_ENV: process.env.NODE_ENV, SESSION_SECRET: process.env.SESSION_SECRET,
+    QXLAYER_AUTH_PROVIDER: process.env.QXLAYER_AUTH_PROVIDER,
+    QXLAYER_DEVELOPMENT_SUPABASE_AUTH_TRIAL_ENABLED: process.env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_TRIAL_ENABLED,
+    QXLAYER_SUPABASE_AUTH_TRIAL_ENABLED: process.env.QXLAYER_SUPABASE_AUTH_TRIAL_ENABLED };
   const connect = pool.connect;
   let dbAttempts = 0;
   // Fail the test if any demo request reaches database-backed application services.
   pool.connect = (() => { dbAttempts++; throw new Error("Demo touched the database"); }) as typeof pool.connect;
   process.env.NODE_ENV = "production";
+  // Isolate the public demo test from the workspace's Development-only auth.
+  // This test does not activate a Production authentication provider.
+  process.env.QXLAYER_AUTH_PROVIDER = "disabled";
+  process.env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_TRIAL_ENABLED = "false";
+  process.env.QXLAYER_SUPABASE_AUTH_TRIAL_ENABLED = "false";
   process.env.SESSION_SECRET = randomBytes(32).toString("hex");
   const app = express();
   app.use(express.json());

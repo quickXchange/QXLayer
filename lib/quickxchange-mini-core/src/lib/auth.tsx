@@ -70,8 +70,13 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [sessionToken, setSessionToken] = useState<string | null>(() => sessionStorage.getItem('tg_session_token'));
+  // Bearer credentials are memory-only. Telegram initData is verified again on reload.
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [user, setUser] = useState<any | null>(null);
+  useEffect(() => {
+    // Remove credentials persisted by older clients without deleting unrelated data.
+    sessionStorage.removeItem('tg_session_token');
+  }, []);
   const [supportUrl, setSupportUrl] = useState<string | null>(null);
   const [linkedAccount, setLinkedAccount] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -133,7 +138,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session.user);
         setSupportUrl(session.supportUrl || null);
         setLinkedAccount(session.linkedAccount || null);
-        sessionStorage.setItem('tg_session_token', session.token);
       } catch (err) {
         if (!mounted) return;
         console.error('Failed to create session', err);

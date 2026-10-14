@@ -192,7 +192,12 @@ try {
       const cookies = upstream.headers.getSetCookie();
       if (cookies.length) res.setHeader("Set-Cookie", cookies);
       const location = upstream.headers.get("location");
-      if (location) res.setHeader("location", location.replace(receipt.url, ""));
+      if (location) {
+        const destination = new URL(location, receipt.url);
+        if (destination.origin !== receipt.url)
+          throw new Error("Verification transport refuses redirects outside the pinned Preview origin.");
+        res.setHeader("location", destination.pathname + destination.search + destination.hash);
+      }
       res.end(Buffer.from(await upstream.arrayBuffer()));
     } catch { res.writeHead(502); res.end("Preview verification proxy request failed."); }
   });
