@@ -1,296 +1,158 @@
-# Production Supabase authentication migration plan — approval required
+# Production Supabase Auth: administration-only preparation
 
-Status: **plan only**. No Staging/Production change, migration, account operation,
-deployment, DNS change or Republish is authorized by this document. Keep
-`scripts/release/authentication-compatibility.mjs` blocking release.
+**Status: plan only; NO GO for Production changes or Republish.**
 
-## Authorized read-only Production inventory
+## Scope clarified by the user
 
-Progressive preparation is now selected, with no execution authorized.
-[`PRODUCTION_AUTH_MANUAL_EVIDENCE.md`](PRODUCTION_AUTH_MANUAL_EVIDENCE.md)
-specifies the exact missing proofs, safe manual steps and the first user action.
-`production-auth-preparation.json` is inert and its offline checker cannot grant
-deployment authority. Do not request or upload Clerk's raw credential-bearing
-CSV export to satisfy a directory-evidence gap.
+VYNOX LAYER has **no real customers yet**. All customer accounts created so far
+are test accounts. This supersedes earlier requirements to migrate every
+customer/test account or provide a general progressive customer-migration bridge.
 
-The user subsequently authorized a read-only Production inventory and preparation,
-but no modifications, migration, deployment or Republish. Current findings and
-the complete account/backup/rollback approval checklist are in
-[`PRODUCTION_AUTH_READONLY_INVENTORY.md`](PRODUCTION_AUTH_READONLY_INVENTORY.md).
-Managed Production has 40 business tables, one active legacy-ID Admin and no
-local Supabase application-support schema. Public auth probes returned 403.
-Clerk is consistent with observed configuration, not conclusively verified as
-the running provider. The user has now observed **2 users** in **Replit Cloud →
-Users & Auth → Production**; this is a user-confirmed count, not an independently
-retrieved native directory. Their exact native IDs/records remain unavailable
-to the current read tools. The 42 audited accounts are Development. Phase 1 is
-therefore partially evidenced, not complete or approved for account operations.
+- Preserve the original Super Admin identity, canonical business ID, MFA,
+  permissions and all business data.
+- Identify and protect any other accounts genuinely required for platform
+  administration. Until classification is certain, leave an account unchanged.
+- Do not migrate other test accounts unnecessarily. Exclusion from Supabase
+  migration does **not** authorize deletion, disabling, unlinking or data removal.
+- Keep Development's 42 audited accounts separate from Production.
+- No cleanup proposal before backup and restore/record verification.
+- Every Production change, account deletion or Republish still requires explicit
+  user approval. Keep the authentication release hold intact.
 
-## Two Production authentication users — focused linkage evidence
+## What is already known — do not repeat the completed audits
 
-The user explicitly authorized read-only inspection and preservation of both
-Production users. No additional permission to read their records is needed;
-the remaining obstacle is access to their exact native identifiers, not
-authorization. Do not request a new API key, raw export or broader permission.
+- The user observed **2 users** in Cloud → Users & Auth → Production.
+  Their native IDs have not been independently retrieved.
+- Managed Production has one active legacy-ID Super Admin. The focused read-only
+  linkage check found its full-row fingerprint unchanged from the inventory.
+- There are no tenant memberships, customer requests, attachment owners, event
+  authors, customer notification reads or audit-actor references in that managed
+  snapshot. Do not infer “one Owner plus one customer” from a two-user count.
+- Managed Production has 40 business tables and no local Supabase application
+  identity/session support schema. Retain all existing business records.
+- Active deployed provider/release and actual runtime database binding remain
+  unconfirmed. Stored Clerk credentials and an inventoried database are not
+  conclusive evidence of the running configuration.
 
-A focused managed-Production SELECT at **2026-10-14 22:49:45 UTC**, protected by
-`transaction_read_only=on`, inspected the seven current typed identity-reference
-columns rather than repeating the completed schema/data audit:
-
-| Business reference | Rows | Finding |
-|---|---:|---|
-| `platform_admins.clerk_user_id` | 1 | Active original Super Admin; full-row SHA-256 matches the earlier inventory. No ID/active-state/data drift in this record. |
-| `tenant_memberships.clerk_user_id` | 0 | No stored client-admin/staff assignment to match. |
-| `white_label_requests.customer_user_id` | 0 | No customer request ownership to match. |
-| `white_label_attachments.owner_user_id` | 0 | No attachment ownership to match. |
-| `white_label_events.author_user_id` | 0 | No event authorship to match. |
-| `customer_notification_reads.customer_user_id` | 0 | No notification-read ownership to match. |
-| `audit_events.actor_id` | 0 | No audit-actor reference to match. |
-
-**Neither authentication record has been independently retrieved or classified.**
-The two-user count cannot identify the Owner. At most one of two distinct native
-IDs can equal the stored Super Admin ID, and **neither may match**. Do not assume
-“one Owner plus one customer”, select an Owner by email, reassign the existing
-Admin record, or grant a role to resolve an apparent mismatch.
-
-| Production authentication record | Native ID | Super Admin link | Customer linkage | Preservation |
-|---|---|---|---|---|
-| UI record 1 — provisional label only | Awaiting native ID | Unresolved | No typed customer/tenant references exist in inspected managed snapshot | Keep account, ID, methods, factors and state unchanged |
-| UI record 2 — provisional label only | Awaiting native ID | Unresolved | No typed customer/tenant references exist in inspected managed snapshot | Same; no deletion or invented assignment |
-
-These labels are not a native-ID ledger. An unreferenced authentication user is
-not disposable and may have ordinary authenticated-customer access without a
-tenant/request row. The actual deployed database target remains unconfirmed, so
-absence in this managed snapshot is not a universal statement about an
-unverified external target.
-
-Next: obtain only each native user ID from its existing Production user-details
-view. Compare those IDs exactly (or their deterministic SHA-256 values) against
-the preserved business identifiers; never by email or display name. Record each
-result as Owner-linked, business-referenced, or unreferenced in this snapshot,
-with the actual Production issuer/instance. Native methods/MFA/locked state still
-need their own read-only metadata; a user ID alone does not prove account custody
-or authorize identity linking.
-
-Protected, credential-free evidence:
+Read-only evidence remains in `PRODUCTION_AUTH_READONLY_INVENTORY.md` and ignored
 `generated-artifacts/auth-security/production-two-user-business-references.json`.
-It contains counts, native-ID hashes and row fingerprints, not raw native IDs,
-emails, account exports, tokens or secrets. The inert preparation JSON now records
-the user-reported count 2 and explicitly leaves per-account inspection blocked.
+Fingerprints are comparison evidence, **not restorable backups**.
 
-Preserve both Production users and all existing canonical business IDs, roles,
-permissions and data. Keep all 42 Development users outside Production scope.
-No Production/Staging account, configuration, role, session or data changes,
-deletions, provider provisioning, credential revocation or Republish occurred.
+## Safest path — six bounded steps
 
-## Evidence and limits
+### 1. Identify protected administration accounts
 
-Development status update, 2026-10-14: the user confirmed the Super Admin login
-issue is resolved and genuine Development sign-in succeeded. Read-only checks
-preserve the original Owner/TOTP, roles/configuration and both historical
-sessions, with one additional unexpired Owner session. The completed security
-review and per-account audit closure are in
-`docs/authentication-security-review.md`. This updates Development evidence only;
-it neither inventories nor accepts Production.
+Match the existing Production Super Admin's exact native ID to its unchanged
+`platform_admins.clerk_user_id`. Check whether any other existing identity has
+an actual platform-administration assignment. Do not infer ownership from an
+email, display name, account creation date or provider metadata.
 
-The read-only Development audit paginated all 42 legacy Clerk accounts and
-confirmed an identical directory fingerprint before and after the audit:
+Maintain only a small protected-administrator manifest: original native ID,
+canonical business ID, existing role/permissions, MFA/locked state and whether
+the account is required for administration. If neither visible user matches the
+stored Owner, stop and resolve that mismatch without granting or rewriting roles.
+A complete customer migration ledger is not required.
 
-| Development finding | Accounts |
-|---|---:|
-| Legacy directory total | 42 |
-| Exact proof-linked Supabase identities | 1 |
-| Not proof-linked | 41 |
-| Unlinked with public business references | 5 |
-| Unlinked with tenant-role assignments | 1 |
-| Original active Super Admin | 1 |
+Confirm the deployed release/provider and database target using the already
+documented read-only access steps. Do not rerun the full schema audit or assume
+the current workspace is the deployed release.
 
-No account, factor, role or business record was modified by the audit. It did not
-match identities by email, label apparently unused accounts disposable, or decide
-that unreferenced accounts may be discarded. Per-account pseudonymous results
-are in ignored `generated-artifacts/auth-security/legacy-audit.json`; no email
-addresses, native IDs or credentials are included in that report.
+### 2. Back up and verify before any Production operation
 
-**These are Development accounts, not a Production migration inventory.** Clerk
-Development and Production directories must not be assumed identical. The prior
-Production read-only audit found one original active legacy-ID Super Admin and
-no Supabase application identity-links, sessions or recovery-codes tables.
-Production ingress denied direct auth readback, so its active provider/version
-is not independently confirmed. The subsequent authorized read-only inventory
-updates this evidence in the report above without changing Production.
+After approval of backup custody/target, create an authenticated encrypted backup
+of the actual Production business database, relevant files/configuration and
+available authentication records through an authorized owner-controlled route.
+Do not upload raw Clerk exports: they can contain password hashes.
 
-## Non-negotiable invariants
+Restore into an approved isolated target with mail/webhook/payment execution
+disabled. Verify row counts/fingerprints, identifiers, original Admin state,
+permissions, raw constraints, sequences and private file availability. Preserve
+the old provider, original MFA and recovery capability; a user-list export alone
+does not back up working credentials or factors.
 
-- Keep all existing business IDs, users, roles, tenant memberships, permissions,
-  customer/order assignments, files, private object keys and commercial data.
-- An existing `clerk_user_id` is a canonical business identifier; do not rename,
-  regenerate or replace it merely because authentication changes.
-- Preserve the original active Owner record. Do not create another Owner,
-  assign ownership by email, use an admin-generated recovery link as proof of
-  account custody, or impersonate an existing account.
-- Preserve Staging and QuickXchange provider projects, identities and credentials.
-- Never copy Development/Staging secrets, factor secrets, test identities or
-  encrypted application sessions into Production.
-- Keep authentication and financial execution separate; this plan authorizes no
-  trading, payments, provider execution or customer delivery.
+No backup export or restore has been executed by this preparation. No cleanup
+is currently proposed. Verification must precede any later cleanup proposal;
+each proposed deletion would then need its own exact scope and explicit approval.
 
-## Phase 1 — approved read-only Production inventory
+### 3. Prepare an independent Supabase Production configuration
 
-Before any implementation/cutover approval:
+Prepare a dedicated Production-only Auth project; create/configure it only after
+approval. Never reuse Development or Staging projects, credentials or data.
+Keep the existing business database; authentication replacement is not database
+relocation.
 
-1. Read-only inspection of the actual Production directory, deployed
-   provider/build metadata and business database is already authorized.
-   Obtain the missing native-ID records through an available authorized
-   read-only surface; do not confuse missing tool access with missing approval.
-2. Paginate the Production directory completely and capture access-controlled
-   immutable fingerprints, not only a total count. Record verified sign-in
-   methods, blocked/locked state, current MFA and active membership references.
-3. Compare provider IDs against every business identity reference, not just
-   customers or active tenant admins. Include audit-actor references and owners.
-4. Inventory schema, sequences, indexes, CHECK/FK/unique constraints, RLS/ACLs,
-   recovery-code/event semantics, sessions and current grants.
-5. Create an explicit continuity decision for every account. Unassigned users
-   still require a login-continuity policy. No automatic account deletion,
-   abandonment, email matching or duplicate-account creation is allowed.
-6. Record the actual available sign-in methods, not just password/social flags.
-   Development has one retained account with neither flag; email OTP/link or
-   passkey capability must be established rather than assuming the account can
-   be discarded or assigned a new password. Preserve blocked/locked states and
-   use a reviewed recovery policy for accounts that cannot supply normal proof.
+Pin the Production project/issuer and canonical HTTPS origin, server-only keys,
+independent session encryption, scoped SMTP, exact redirects, secure cookies and
+password/MFA/abuse policies. The passive `production-auth-preparation.json`
+records pending evidence, not executable settings.
 
-Deliver a reviewed account matrix and migration acceptance checklist. Sensitive
-exports must be encrypted in approved storage, never committed to Git or printed.
+Current runtime code deliberately rejects Production Supabase activation.
+Prepare and verify explicit Production support without bypassing those guards
+or publishing the current Development-only implementation.
 
-## Phase 2 — separately approved Production provider preparation
+### 4. Preserve and verify only protected administrators
 
-Provision/configure a dedicated Production Supabase Auth project only after
-approval. Pin its project reference and canonical HTTPS auth origin, verified
-TLS, server-only API key, SMTP sender, allowed redirects and independent session
-encryption key. Use separate scoped setup/runtime capabilities.
+Use fresh proof of the original identity, including its actual existing MFA,
+and genuine native Supabase authentication. Link the new native UUID to the
+**same existing business ID**; do not replace that ID, create a second Owner
+record or rewrite roles/permissions.
 
-No Production environment may select the Development or Staging project. Do not
-weaken existing guards by labelling Production as Staging. Provider activation
-requires explicit reviewed Production support, not a copied environment flag.
+Keep the original MFA and Clerk credentials untouched. Do not assume a TOTP
+secret is transferable. If exact factor transfer is unsupported, pause for the
+Owner's explicit approval of parallel Supabase factor enrollment, prove the new
+factor, and retain the original factor/provider for rollback. No silent reset,
+factor removal, imported session or substitute Owner is acceptable.
 
-Verify real delivered email confirmation/recovery through controlled native
-flows, SMTP quotas, MFA availability, password policy, abuse limits, callback
-validation and cookie configuration. Provider-admin test tokens are not inbox
-delivery or Owner acceptance evidence.
+There is no need for mass account import, dormant-customer recovery campaigns,
+all-test-user acceptance or a permanent dual-provider customer bridge. Leave
+unneeded test accounts in their existing provider, unchanged. Native Supabase
+sessions are separate: document the protected administrators' planned
+reauthentication rather than trying to convert Clerk cookies.
 
-## Phase 3 — additive database preparation and restore rehearsal
+### 5. Verify readiness and obtain separate Republish approval
 
-Use a reviewed, versioned, idempotent migration to add only the required
-Supabase identity-link/session/recovery structures and least-privilege grants.
-Preserve all current business tables and their identifiers. Enforce unique
-subject/business binding and subject-scoped recovery/session access; do not
-replace business authorization with provider metadata.
+Before execution, require:
 
-For Replit's managed Production database, implement/test source-schema additions
-in Development and use only the reviewed native Publish diff after separate
-approval. Do not create or execute a custom Production schema migration script,
-startup DDL or schema-push deploy hook. If the actual runtime target is proven
-external, revise the plan for its documented migration mechanism before execution.
+- Correct deployed/runtime targets and the protected-administrator manifest.
+- Verified encrypted backup/isolated restore and rollback procedure.
+- Reviewed Production-capable implementation and complete supported additive
+  schema diff; no unrelated or destructive change.
+- Genuine protected-administrator password/MFA/Admin access, exact identity and
+  permission preservation, session refresh/logout, denial of non-admin and
+  recovery/pending-MFA sessions, and appropriate security checks.
+- An agreed short cutover window, administrator reauthentication and rollback
+  behavior. Do not open new registrations during the window; a temporary pause,
+  if needed, is itself a separately approved Production change.
 
-Rehearse against an approved isolated Production-like snapshot, with provider
-connections disabled and credentials independent. Preserve raw schema/data
-captures and verify row fingerprints, raw constraints, sequence ownership,
-roles, RLS and ACLs. Validate backups by a full authenticated restore. An empty
-schema diff is not proof of constraint parity.
+For the managed Replit database, schema changes use the reviewed native Publish
+flow only after approval; no custom Production DDL, startup repair or schema-push
+hook. If the verified runtime target is external, revise the mechanism first.
 
-No destructive migration, startup DDL, truncate, reset, Development database
-copy, or business-ID rewrite is permitted.
+Only after these gates pass request **explicit final Republish approval**.
+Do not remove `scripts/release/authentication-compatibility.mjs` protection merely
+to make a build succeed. Native Production checks occur in the approved window;
+a workspace pass alone cannot establish Production acceptance.
 
-## Phase 4 — account continuity before fallback retirement
+### 6. Retain a simple, non-destructive rollback
 
-Choose and approve a bounded transition design **before** implementation:
+Keep the immutable previous Clerk-capable release, original provider/credentials,
+MFA and business data available. Roll back code/provider selection, not business
+history. Do not restore an old database over new activity or delete additive
+identity links to make rollback look clean.
 
-- Retain the current published Clerk login/session path during the transition.
-  Do not publish the current Development-only release as a transition bridge.
-- Build a separately reviewed, issuer/origin-pinned legacy-proof bridge, or an
-  approved provider-supported migration flow. Its purpose is account custody,
-  not general anonymous account creation or permanent Clerk dependency.
-- Current Development legacy proof/enrollment endpoints return 410. They are not
-  an available migration bridge. Any temporary bridge needs separate approval
-  and isolated tests: fresh issuer/audience/authorized-origin proof, native MFA
-  where required, CSRF/state/nonce binding, bounded lifetime, single-use replay
-  protection, atomic unique links, auditability and no caller-selected role.
-  Do not re-enable a general Clerk fallback in this Development release.
-- Existing users prove control of the exact legacy identity and their verified
-  new identity. Any existing Owner additionally requires the approved fresh
-  native Owner/MFA proof. Email similarity is never sufficient.
-- Create the identity link atomically, preserving the old business ID. Refuse
-  conflicting subjects, duplicate business IDs and privilege changes. Retry
-  without duplicate accounts or role writes.
-- Do not assume Clerk password hashes or existing TOTP secrets are exportable.
-  If unavailable, use explicit user-controlled new password/factor enrollment
-  after authenticated custody proof. Bulk factor resets, silent password resets,
-  automatic email confirmation and unsolicited migration email campaigns are
-  not authorized.
-- Preserve current Clerk sessions until a reviewed transition boundary. Existing
-  encrypted sessions cannot simply be interpreted as Supabase sessions. Document
-  any unavoidable reauthentication, expiry and rollback effects before approval.
+Avoid new registrations during the approved window. If any new Supabase-only
+identity or business activity exists, it must remain accessible and preserved
+through an explicitly reviewed recovery path; an old Clerk release cannot
+authenticate a new Supabase-only user.
 
-The 41 unlinked Development accounts cannot be treated as migrated. Their five
-business-linked accounts and the tenant-role account are priority cases, not
-the only accounts entitled to continuity. A separate Production matrix is
-required before deciding when any legacy fallback can be retired.
+Cleanup and legacy-provider retirement are optional later work, never release
+prerequisites and never automatic consequences of migration.
 
-## Phase 5 — native acceptance and failure testing
+## Immediate next prerequisite
 
-Use disposable, unprivileged fixtures for automated tests; never a substitute
-Owner or injected Owner cookie. Require genuine private Owner participation for
-native Owner login → TOTP → Admin Panel acceptance.
+Identify the original Production Super Admin's native user ID and confirm any
+other genuinely required platform administrator. No whole-customer migration
+inventory or test-account import is needed.
 
-Cover:
-
-- Signup, real verification receipt/consumption, password login, incorrect
-  password, unverified/blocked/locked users and confirmation timing.
-- TOTP setup/challenge/wrong codes, pending-MFA denial, recovery-code behavior,
-  trusted assurance readback and MFA retained after password recovery.
-- Recovery-only sessions denied business/Admin routes before and after MFA.
-- Refresh, reload, multiple tabs, expiry, provider outage, cookie persistence,
-  logout, back/BFCache and revoked sessions; fail closed without stale account
-  data or cross-account query caches.
-- Original Owner access; client-admin/staff permissions; customer access;
-  tenant isolation; non-admin denial; all delivered customer assignments.
-- Cookies with Secure/HttpOnly/SameSite, CSRF/origin/redirect controls, independent
-  encryption keys, token/log redaction and no bearer tokens in Web Storage.
-- Typechecks, all unit/regression suites, production-mode builds, dependency,
-  static and privacy scans; explicitly disposition scanner errors/findings.
-
-## Phase 6 — cutover approval and controlled release
-
-Do not remove the release hold until the actual Production inventory,
-provider/configuration/schema readiness, account continuity, restore rehearsal,
-security review and native Owner acceptance are approved. Then request separate
-deployment/Republish approval. A successful compile or removal of the assertion
-is never deployment permission.
-
-If approved, use an explicit maintenance/transition window, verified immutable
-release, rollback checkpoint and controlled rollout. Read back the actual live
-build, provider, schema constraints and native Owner/customer behavior before
-declaring success. No DNS changes are needed merely to replace authentication.
-
-## Rollback and abort conditions
-
-Abort for any changed/missing business fingerprint, broken original Owner
-binding, missing verified factor, role drift, cross-tenant access, conflicting
-identity link, recovery-session privilege leak, unexpected provider project,
-unavailable restore, or failed critical native acceptance.
-
-Keep the previous published build/provider and additive schema available
-through the agreed transition. Rollback must preserve new business activity and
-new identity links; never restore an old full database over current orders.
-Document how accounts created after cutover authenticate after rollback before
-approving the cutover. Retire old credentials/accounts only with later explicit
-authorization and demonstrated continuity for every in-scope account.
-
-## Current release decision
-
-**NO GO.** This document prepares the migration but executes none of it. The
-Production provider/schema transition and per-account continuity are not yet
-approved or implemented. Genuine Development Owner sign-in has now been confirmed
-by the user, and native TOTP/binding preservation and historical session
-continuity passed read-only checks. This does not replace Production-specific
-Owner/MFA/Admin, reload/new-tab, recovery and rollback acceptance. Owner browser
-persistence was not independently re-observed during this resumption.
+No Production or Staging account, configuration, role, factor, session, schema,
+data, DNS or deployment was modified by this plan. No account was deleted.

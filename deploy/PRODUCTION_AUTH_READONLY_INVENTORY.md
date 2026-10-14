@@ -2,6 +2,16 @@
 
 ## Decision
 
+**Current scope supersedes the historical all-account continuity proposal:**
+the user clarified that VYNOX LAYER has no real customers and all customer
+accounts are tests. Prepare migration only for the original Super Admin and
+other proven required platform administrators. Unneeded test accounts need no
+Supabase migration; leave them unchanged. No cleanup proposal until backup and
+restore/record verification, and no deletion or Production change without
+explicit approval. The simplified current plan is
+`PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md`; inventory facts below remain valid
+as captured, not as fresh queries.
+
 **NO GO for Republish or account migration.** This is a read-only inventory and
 procedure, not authorization to execute a migration. No Production/Staging
 configuration, account, role, factor, session, schema, row, DNS or deployment was
@@ -42,11 +52,11 @@ Required evidence before proceeding:
 
 1. Read-only identification of the immutable deployed release, effective auth
    selector, pinned issuer/project and actual business-database target.
-2. The exact native records/IDs of the **2 users the user subsequently observed**
-   in Replit Cloud → Users & Auth → Production, through its managed read-only
-   administration surface. The count is user-confirmed; native record retrieval
-   and per-account mapping remain pending. Do not substitute the workspace's
-   test-key directory or request a raw credential-bearing export.
+2. Identify the original Production Super Admin and any other required
+   administrator among the **2 users the user subsequently observed** through
+   the managed read-only administration surface. The count is user-confirmed;
+   protected-administrator mapping remains pending. Do not substitute the
+   workspace's test-key directory or request a raw credential-bearing export.
 3. Native owner/browser acceptance later, under separate migration approval.
 
 The available read tools did not expose a Production Clerk directory credential
@@ -134,7 +144,7 @@ and the subsequent independent shell GET observations of six HTTP 403 results.
 The data inventory contains exact counts and SHA-256 row fingerprints for all
 40 tables. These are baselines, **not restorable backups**.
 
-## 3. Safe paths covering all 42 audited legacy accounts
+## 3. Historical Development account audit — not Production migration scope
 
 **The 42-account roster is Development, not verified Production.** The user
 subsequently confirmed **2 users** in Replit Cloud → Users & Auth → Production.
@@ -145,14 +155,16 @@ merely because they are in the earlier audit.
 
 The focused subsequent Production linkage readback and two-user preservation
 matrix are in
-[`PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md`](PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md#two-production-authentication-users--focused-linkage-evidence).
+[`PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md`](PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md#what-is-already-known--do-not-repeat-the-completed-audits).
 It found one unchanged active Super Admin reference and no tenant/customer/actor
 references in the seven typed identity-reference columns. Which, if either, of
 the two Production users matches that Admin remains unresolved without their
 native IDs. Do not infer “one Owner and one customer”.
 
-The existing complete pseudonymous audit is retained. Every one of its 42
-accounts has a conditional continuity path:
+The existing complete pseudonymous audit is retained as historical evidence.
+Its conditional paths below are **not a requirement or authorization to migrate
+test accounts**. Only independently identified required Production
+administrators belong in the current migration scope:
 
 | Cohort | Accounts | Proposed path — no execution |
 |---|---:|---|
@@ -162,14 +174,20 @@ accounts has a conditional continuity path:
 | Remaining password-enabled, unlinked accounts with no discovered business references | 36 | Same proof-based user-controlled transition. Preserve every account, including inactive/unreferenced users. No deletion, forced new identity, automatic email merge or invented assignments. |
 | **Total** | **42** | **All have prepared paths; none were migrated.** |
 
-Create the equivalent protected per-ID matrix for the authoritative Production
-roster before provisioning or cutover. For each account record: actual issuer/
+Create a small protected per-ID matrix only for required Production
+administrators before provisioning or cutover. For each protected account record: actual issuer/
 environment, immutable native ID, preserved business ID, existing role and
 permissions, blocked/locked state, supported sign-in/MFA methods, business
 references, target subject if proven, collision checks and acceptance evidence.
 Pseudonymous aliases alone are not an executable native-ID mapping.
 
-### Recommended transition design, subject to approval
+### Historical progressive design — not a required customer bridge
+
+The following exact-proof safeguards remain relevant to protected
+administrators, but a general customer bridge, complete test-user migration and
+dormant-test-user recovery are not required. Prefer a bounded administrator-only
+cutover with explicit reauthentication and rollback, as specified in the current
+simplified plan. Leave excluded accounts and their existing provider unchanged.
 
 Keep the existing published Clerk authentication/session path during a bounded
 transition. Build a separately reviewed Production-capable transitional release;
@@ -195,9 +213,9 @@ old credentials/factors until verified continuity and explicit retirement
 approval. Never silently reset or disable the existing factor. Preserve locked/
 banned state rather than enabling an account as a migration side effect.
 
-Dormant/unreachable accounts need an approved exact-custody recovery path and
-continued legacy access; they cannot be dropped to reach an artificial migration
-completion percentage.
+Dormant/unreachable **required administrators** need an approved exact-custody
+recovery path. Unneeded customer/test accounts need no migration or recovery
+campaign; exclusion does not authorize deletion or disabling.
 
 ## 4. Backup and restore procedure — prepare only
 
@@ -260,7 +278,7 @@ Approve rollback **before** starting a transition:
 - Do not revoke old sessions or delete links/providers/secrets to force rollback
   or make a fingerprint comparison appear clean.
 
-Required acceptance ledger for **every Production account**:
+Required acceptance ledger for **each protected Production administrator**:
 
 1. Existing account and exact issuer verified; native target proof is genuine.
 2. Business ID, role, permissions, blocked/locked status and every reference
@@ -284,14 +302,14 @@ acceptance.
 | Decision | Recommendation / approval boundary |
 |---|---|
 | Authoritative Production directory and runtime evidence | Obtain a read-only managed Production directory export and immutable deployed provider/database evidence. Do not replace managed keys, disable access controls or treat test keys as live. |
-| Scope of the 42 accounts | Confirm Production membership from its own roster. Any deliberate promotion of Development-only accounts/data is a separate migration scope requiring approval. |
+| Account scope | All customer accounts are tests. Migrate only the original Super Admin and other required Production administrators. Do not promote Development users, import tests unnecessarily or delete excluded accounts. |
 | Business database location | Keep the existing managed business database for this auth-only migration unless runtime evidence or explicit approval establishes another target. Do not bundle a database relocation. |
-| Continuity strategy | Prefer progressive exact-proof migration with a bounded dual-session transition; a bulk import is acceptable only after export capability, custody and conflict safety are proven and approved. |
+| Continuity strategy | Prefer bounded administrator-only exact-proof migration and reauthentication with a previous-release rollback; no bulk test import or general customer bridge is required. |
 | Credentials, MFA and unreachable users | Approve provider-supported transfer or parallel user-controlled native enrollment, plus dormant-account recovery and the old-provider retirement criteria. No silent resets. |
 | Independent Production provider/configuration | Approve provisioning, scoped capabilities, SMTP/real delivery, password/MFA/abuse rules, origins, cookie/key custody and least privilege. No Development/Staging credential reuse. |
 | Backup/restore custody | Approve encrypted export/storage, authorized operator, isolated restore target and retention. Fingerprints alone are not a backup. |
 | Cutover and rollback policy | Approve old-session expiry handling, registration policy, dual-provider rollback behavior, acceptance ledger, maintenance window and abort thresholds. |
-| Final release | Require a fully reviewed supported schema diff, security sign-off, restorable backup, every-account continuity, native Production acceptance and a **separate explicit Republish approval**. |
+| Final release | Require a fully reviewed supported schema diff, security sign-off, restorable backup, protected-administrator continuity, native Production acceptance and a **separate explicit Republish approval**. |
 
 The authentication release hold remains untouched. Prior Development evidence
 (412 passing tests, no dependency/privacy findings, nine reviewed medium static

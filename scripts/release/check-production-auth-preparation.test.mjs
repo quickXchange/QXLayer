@@ -9,7 +9,7 @@ test("current preparation stays inert and explicitly reports missing Production 
   assert.equal(r.status, "EVIDENCE_MISSING");
   assert.deepEqual(r.errors, []);
   assert(r.missing.includes("evidence.runtimeBusinessDatabaseBinding"));
-  assert(r.missing.includes("continuity.productionDirectory.completePerIdManifestEvidence"));
+  assert(r.missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
   assert.equal(r.deploymentAuthorized, false);
 });
 test("Development/Staging projects and directories cannot be promoted by a draft", () => {
@@ -30,7 +30,7 @@ test("mutation authorization and weakened continuity are rejected", () => {
 });
 test("a total count, invalid counts and credential-like values cannot satisfy safe preparation", () => {
   const p = draft(); p.continuity.productionDirectory.totalUsers = 42;
-  assert(check(p).missing.includes("continuity.productionDirectory.completePerIdManifestEvidence"));
+  assert(check(p).missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
   p.continuity.productionDirectory.totalUsers = -1; assert(check(p).errors.length);
   p.target.productionProjectRef = "not-a-project"; assert(check(p).errors.length);
   p.target.smtpConfigurationEvidence = "sb_secret_synthetic_do_not_use"; assert(check(p).errors.length);
@@ -39,11 +39,28 @@ test("complete-looking references still cannot grant migration or deployment aut
   const p = draft(); p.target.productionProjectRef = "abcdefghijklmnopqrst";
   p.continuity.productionDirectory.totalUsers = 1;
   p.continuity.productionDirectory.instanceIdentifier = "synthetic-production-instance";
-  p.continuity.productionDirectory.completePerIdManifestEvidence = "synthetic-review-reference";
+  p.continuity.productionDirectory.protectedAdministrationManifestEvidence = "synthetic-review-reference";
   for (const key of Object.keys(p.target).filter(k => k.endsWith("Evidence")))
     p.target[key] = "synthetic-review-reference";
   for (const key of Object.keys(p.evidence)) p.evidence[key] = "synthetic-review-reference";
   const r = check(p);
   assert.equal(r.status, "REFERENCES_LISTED_NOT_VERIFIED");
   assert.equal(r.deploymentAuthorized, false);
+});
+test("test accounts do not require migration and cleanup never becomes implicit", () => {
+  const p = draft();
+  assert.equal(p.continuity.strategy, "PROTECTED_ADMINISTRATORS_ONLY");
+  assert.equal(p.continuity.migrateUnneededTestAccounts, false);
+  assert(!check(p).missing.some(key => /allProductionAccounts|completePerIdManifest/.test(key)));
+  p.continuity.migrateUnneededTestAccounts = true;
+  assert(check(p).errors.length);
+  const unsafeCleanup = draft();
+  unsafeCleanup.continuity.cleanupRequiresVerifiedBackupAndExplicitApproval = false;
+  assert(check(unsafeCleanup).errors.length);
+  const unsafeMfa = draft();
+  unsafeMfa.continuity.preserveOriginalSuperAdminMfa = false;
+  assert(check(unsafeMfa).errors.length);
+  const silentReenrollment = draft();
+  silentReenrollment.continuity.factorReenrollmentRequiresExplicitApproval = false;
+  assert(check(silentReenrollment).errors.length);
 });

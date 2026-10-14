@@ -40,7 +40,7 @@
 - [Restored schema equivalence](restored-schema-equivalence.md) — preserve raw captures and restored data; accept only reviewed, typed constant-default equivalences.
 - [Staging owner access](staging-owner-access-policy.md) — original owner password via explicit Staging verifier; independent signing and native-form verification, no Replit password changes.
 - [Public pricing policy](public-pricing-policy.md) — pricing rules are public-read-only; preserve administrative writes and other tenant boundaries.
-- [Project-owned authentication](project-owned-authentication.md) — user wants integrated, self-operated authentication instead of another Clerk application.
+- [Project-owned authentication](project-owned-authentication.md) — Production migration protects required administrators only; all existing customer accounts are tests, not mandatory imports.
 - [Supabase Staging Auth](supabase-staging-auth-boundary.md) — parallel trial preserves Clerk; opaque server keys require pinned-origin capability checks, not JWT assumptions.
 - [Auth query observers](auth-query-observers.md) — cache eviction can strand active loading observers; preserve session observers and reset account data on confirmed identity changes.
 - [Supabase MFA assurance](supabase-mfa-session-assurance.md) — verifying MFA in another context can invalidate pending-MFA sessions; probe deployed recovery-code capability, not upstream source.

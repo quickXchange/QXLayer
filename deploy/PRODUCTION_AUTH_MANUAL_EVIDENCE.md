@@ -1,10 +1,13 @@
-# Production progressive Auth migration: manual evidence and inert preparation
+# Production administration-only Auth preparation: manual evidence
 
 ## Current boundary
 
 Reuse the completed Production schema inventory and Development 42-account
-audit; do not rerun them. The safest progressive strategy is selected for
-preparation, not approved for execution. Production/Staging data, configurations,
+audit; do not rerun them. The user clarified that there are no real customers;
+all existing customer accounts are tests. Prepare continuity only for the
+original Super Admin and any other required platform administrators. Do not
+migrate unneeded test users or build a general customer-migration bridge.
+Preparation is not approval for execution. Production/Staging data, configurations,
 accounts, credentials and sessions remain unchanged. Do not create a project,
 rotate/revoke Clerk keys, enable Supabase, change DNS, run an import or Republish.
 
@@ -12,36 +15,35 @@ The three missing proofs below must be collected independently. They are not
 interchangeable: a Users page identifies a directory, not the app's running
 provider; a Database page identifies a database, not the app's effective target.
 
-## A. Production Clerk directory — first user action
+## A. Identify the protected Production administrators
 
 **Count step completed by the user:** 2 users observed in Replit Cloud →
 Users & Auth → Production. Do not ask for the count again. The next input is
-the **native user ID from each of those two existing records**, not an email,
-new key or raw export. The original count-collection steps below are retained
-as reference; proceed directly to existing user details.
+the **original Super Admin's native user ID**, plus any other account genuinely
+required for platform administration—not a complete test-user export.
 
 1. Open this VYNOX LAYER project in Replit, then open **Auth**.
 2. Select **Production** in its environment selector. Do not use Development
    or create/connect a new Clerk application.
-3. Open the **Users** view. Record the displayed Production total, including any
-   separate filtered/total distinction. Clear only list filters if necessary,
-   not account status. If no total is displayed, report “total not displayed”;
-   do not infer a total from one page.
+3. Open **Users**, then the original Super Admin's existing record. Copy its
+   native **User ID**, without editing the record or revealing credentials.
 4. If the pane lacks the required details, use Replit's authorized managed
    **Production Clerk dashboard** access. Verify Production in that dashboard,
    then open **Users**. Replit management readback currently allows this route.
    Do not sign up for an unrelated external Clerk application.
-5. Send only: selected environment, total user count, and the non-secret
-   application/instance identifier if visibly available. A cropped screenshot
-   is acceptable only after hiding emails, names, avatars and user rows.
+5. Send only the protected administrator's native ID and the non-secret
+   Production application/instance identifier if visible. Identify any other
+   account needed for platform administration. Do not infer this from an email
+   or give a test user an administrative role.
 6. If the route is unavailable, report the exact unavailable control/error.
    Do not change permissions, keys, pricing, provider settings or access controls
    to make it work.
 
-This establishes environment/count evidence only. Complete directory
-reconciliation subsequently requires the full Production native-ID roster,
-all pages and blocked/locked/method/MFA status, tied to the same instance and
-capture date. IDs are retained in protected evidence, not public reports.
+This establishes identification evidence only. Match protected administrators
+exactly to existing business IDs and roles, and record their actual MFA and
+locked state in protected evidence. Customer/test-user migration records and
+all-test-account acceptance are not prerequisites. Do not delete or disable an
+excluded test account; cleanup requires verified backup and separate approval.
 The 42 Development identities remain separate regardless of Production count.
 
 ### Export safety — do not upload a raw CSV
@@ -141,12 +143,13 @@ Prepared boundaries:
 - Preserve every canonical business ID and authorization record. Supabase's
   native UUID is an explicitly linked subject, not a replacement business ID.
   Never link by email, grant a substitute Owner or change locked/banned state.
-- Keep valid Clerk sessions/credentials during the progressive transition.
-  Native sessions require native proof; recovery/pending-MFA sessions stay
-  denied Admin/business access. No old session replay or bulk logout.
-- A complete Production roster, atomic/replay-safe exact-proof linking,
+- Keep the original Clerk credentials, MFA and previous release for rollback.
+  Plan protected-administrator reauthentication in a bounded cutover, not a
+  general customer-session bridge. Native sessions require native proof;
+  recovery/pending-MFA sessions stay denied Admin/business access.
+- A protected-administrator manifest, atomic/replay-safe exact-proof linking,
   supported additive schema diff, authenticated backup/isolated restore,
-  rollback retaining new users/orders, native Owner/customer acceptance and
+  rollback retaining new users/orders, native protected-administrator acceptance and
   security sign-off remain required before separate release approval.
 
 ## Offline checks and limits
@@ -167,10 +170,10 @@ prove an artifact exists or that its native evidence is valid.
 
 ## Send this first
 
-**The user has already confirmed 2 Production users. Open each of those existing
-records in Cloud → Users & Auth → Production and copy only its native User ID.
-Send the two IDs, not emails, passwords, keys, tokens, cookie/connection values
-or a raw export. Do not edit either record.**
+**Identify the original Production Super Admin's native User ID and any other
+genuinely required platform administrator. Do not inventory or migrate all
+customer/test identities. Do not send passwords, keys, tokens, cookie/connection
+values or a raw export, and do not edit any record.**
 
 If that managed route is unavailable, send the exact access error instead.
 This is the next evidence step, not approval for account migration, configuration

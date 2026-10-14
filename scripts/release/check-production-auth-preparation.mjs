@@ -7,7 +7,7 @@ export function checkProductionAuthPreparation(plan) {
   const errors = [], missing = [];
   const require = (condition, message) => { if (!condition) errors.push(message); };
   require(plan?.schemaVersion === 1 && plan?.mode === "PREPARATION_ONLY", "Preparation-only schema required.");
-  const permissions = ["productionChanges", "stagingChanges", "provisionProject", "migrateAccounts", "revokeClerk", "republish"];
+  const permissions = ["productionChanges", "stagingChanges", "provisionProject", "migrateAccounts", "deleteAccounts", "revokeClerk", "republish"];
   require(permissions.every(key => plan?.authorization?.[key] === false) &&
     Object.keys(plan?.authorization ?? {}).every(key => permissions.includes(key)),
     "Every mutation/deployment authorization must remain false; unknown authorizations are rejected.");
@@ -17,11 +17,16 @@ export function checkProductionAuthPreparation(plan) {
   require(t?.businessDatabasePolicy === "PRESERVE_EXISTING_VERIFY_RUNTIME_TARGET", "Preserve and verify the existing business database.");
   require(t?.serverKeySecretName === "QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY" &&
     t?.sessionKeySecretName === "QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET", "Independent proposed Production secret references required.");
-  require(c?.strategy === "PROGRESSIVE_EXACT_PROOF" &&
+  require(c?.strategy === "PROTECTED_ADMINISTRATORS_ONLY" &&
+    c?.customerAccountsAreTestData === true &&
+    c?.migrateUnneededTestAccounts === false &&
+    c?.cleanupRequiresVerifiedBackupAndExplicitApproval === true &&
     c?.preserveBusinessIdsRolesPermissionsData === true &&
+    c?.preserveOriginalSuperAdminMfa === true &&
+    c?.factorReenrollmentRequiresExplicitApproval === true &&
     c?.preserveExistingClerkSessionsAndCredentials === true &&
     c?.excludeDevelopmentAndStagingAccounts === true && c?.matchByEmail === false,
-    "Exact-proof continuity and all preservation/environment boundaries are mandatory.");
+    "Protect required administrators without importing unneeded test accounts; preservation and cleanup approval boundaries are mandatory.");
   require(c?.productionDirectory?.environment === "production", "A Development/Staging roster cannot stand in for Production.");
   const count = c?.productionDirectory?.totalUsers;
   require(count === null || (Number.isSafeInteger(count) && count >= 0), "Production count must be unknown or a nonnegative integer.");
@@ -35,14 +40,14 @@ export function checkProductionAuthPreparation(plan) {
   for (const key of ["smtpConfigurationEvidence", "redirectAllowlistEvidence",
     "passwordMfaAbusePolicyEvidence", "independentKeyCustodyEvidence"])
     if (typeof t?.[key] !== "string" || !t[key].trim()) missing.push(`target.${key}`);
-  for (const key of ["instanceIdentifier", "completePerIdManifestEvidence"])
+  for (const key of ["instanceIdentifier", "protectedAdministrationManifestEvidence"])
     if (typeof c?.productionDirectory?.[key] !== "string" || !c.productionDirectory[key].trim())
       missing.push(`continuity.productionDirectory.${key}`);
   if (count === null) missing.push("continuity.productionDirectory.totalUsers");
   for (const key of ["immutableDeployedReleaseAndEffectiveAuthProvider", "runtimeBusinessDatabaseBinding",
     "productionCapableTransitionImplementation", "reviewedSupportedAdditiveSchemaDiff",
     "authenticatedBackupAndIsolatedRestore", "rollbackPreservingNewUsersAndBusinessActivity",
-    "allProductionAccountsContinuityAccepted", "nativeProductionOwnerMfaAdminAndSessionsAccepted", "securitySignOff"])
+    "protectedAdministratorsContinuityAccepted", "nativeProductionOwnerMfaAdminAndSessionsAccepted", "securitySignOff"])
     if (typeof plan?.evidence?.[key] !== "string" || !plan.evidence[key].trim()) missing.push(`evidence.${key}`);
   return { status: errors.length ? "INVALID_DRAFT" : missing.length ? "EVIDENCE_MISSING" : "REFERENCES_LISTED_NOT_VERIFIED",
     errors, missing, deploymentAuthorized: false,

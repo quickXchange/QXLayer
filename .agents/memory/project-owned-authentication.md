@@ -1,18 +1,26 @@
 ---
 name: Project-owned authentication
-description: Isolated Development Supabase migration, verified Staging preservation, and proof-based owner continuity.
+description: Administrator-only Production migration scope, test-customer status, and isolated Development/Staging preservation.
 ---
 
-The user selected the safest progressive Production authentication migration
-**preparation**, not execution. Preserve Production and Staging, all existing
-accounts/data/roles/configuration and Clerk credentials; do not provision,
-migrate accounts, revoke credentials, deploy or Republish.
+VYNOX LAYER has no real customers yet. All customer accounts created so far are
+test accounts. Prepare Production migration only for the original Super Admin
+and other genuinely required platform administrators; do not migrate test users
+unnecessarily. Preserve the original identity, MFA, business IDs, permissions
+and business data. Back up and verify records before proposing cleanup; do not
+delete accounts or change Production without explicit approval.
 
-**Why:** The user explicitly selected progressive preparation while retaining
-these approval boundaries.
+**Why:** The user explicitly clarified the product's customer status and
+requested the simplest safe path to Supabase Auth and Republish, rather than
+unnecessary all-account migration complexity.
 
-**How to apply:** Reuse completed audits. Obtain missing Production-specific
-evidence without promoting Development-only users. Clerk's standard CSV export
+**How to apply:** A protected-administrator manifest replaces an all-test-user
+migration ledger; no mass import or general customer bridge is required.
+Excluding a test account from migration does not authorize deleting or disabling
+it. Reuse completed audits and do not promote Development-only users.
+Keep Staging and Production unchanged while preparing; provider provisioning,
+credential retirement and Republish still need separate approval.
+Clerk's standard CSV export
 can include password hashes: request minimal non-secret directory evidence
 first, never a raw export upload, and require separately reviewed custody and
 field-whitelisting before a full roster handoff.
