@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "mode": "PREPARATION_ONLY",
+  "authorization": {
+    "productionChanges": false,
+    "stagingChanges": false,
+    "provisionProject": false,
+    "migrateAccounts": false,
+    "revokeClerk": false,
+    "republish": false
+  },
+  "target": {
+    "environment": "production",
+    "canonicalOrigin": "https://www.quicklychan.xyz",
+    "productionProjectRef": null,
+    "businessDatabasePolicy": "PRESERVE_EXISTING_VERIFY_RUNTIME_TARGET",
+    "serverKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY",
+    "sessionKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET",
+    "secretNamesStatus": "PROPOSED_INTERFACE_NOT_SUPPORTED_BY_CURRENT_RUNTIME",
+    "smtpConfigurationEvidence": null,
+    "redirectAllowlistEvidence": null,
+    "passwordMfaAbusePolicyEvidence": null,
+    "independentKeyCustodyEvidence": null
+  },
+  "continuity": {
+    "strategy": "PROGRESSIVE_EXACT_PROOF",
+    "preserveBusinessIdsRolesPermissionsData": true,
+    "preserveExistingClerkSessionsAndCredentials": true,
+    "excludeDevelopmentAndStagingAccounts": true,
+    "matchByEmail": false,
+    "productionDirectory": {
+      "environment": "production",
+      "instanceIdentifier": null,
+      "totalUsers": null,
+      "completePerIdManifestEvidence": null
+    }
+  },
+  "evidence": {
+    "immutableDeployedReleaseAndEffectiveAuthProvider": null,
+    "runtimeBusinessDatabaseBinding": null,
+    "productionCapableTransitionImplementation": null,
+    "reviewedSupportedAdditiveSchemaDiff": null,
+    "authenticatedBackupAndIsolatedRestore": null,
+    "rollbackPreservingNewUsersAndBusinessActivity": null,
+    "allProductionAccountsContinuityAccepted": null,
+    "nativeProductionOwnerMfaAdminAndSessionsAccepted": null,
+    "securitySignOff": null
+  }
+}

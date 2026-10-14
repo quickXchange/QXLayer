@@ -6,6 +6,13 @@ deployment, DNS change or Republish is authorized by this document. Keep
 
 ## Authorized read-only Production inventory
 
+Progressive preparation is now selected, with no execution authorized.
+[`PRODUCTION_AUTH_MANUAL_EVIDENCE.md`](PRODUCTION_AUTH_MANUAL_EVIDENCE.md)
+specifies the exact missing proofs, safe manual steps and the first user action.
+`production-auth-preparation.json` is inert and its offline checker cannot grant
+deployment authority. Do not request or upload Clerk's raw credential-bearing
+CSV export to satisfy a directory-evidence gap.
+
 The user subsequently authorized a read-only Production inventory and preparation,
 but no modifications, migration, deployment or Republish. Current findings and
 the complete account/backup/rollback approval checklist are in

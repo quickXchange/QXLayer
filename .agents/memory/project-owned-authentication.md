@@ -3,6 +3,20 @@ name: Project-owned authentication
 description: Isolated Development Supabase migration, verified Staging preservation, and proof-based owner continuity.
 ---
 
+The user selected the safest progressive Production authentication migration
+**preparation**, not execution. Preserve Production and Staging, all existing
+accounts/data/roles/configuration and Clerk credentials; do not provision,
+migrate accounts, revoke credentials, deploy or Republish.
+
+**Why:** The user explicitly selected progressive preparation while retaining
+these approval boundaries.
+
+**How to apply:** Reuse completed audits. Obtain missing Production-specific
+evidence without promoting Development-only users. Clerk's standard CSV export
+can include password hashes: request minimal non-secret directory evidence
+first, never a raw export upload, and require separately reviewed custody and
+field-whitelisting before a full roster handoff.
+
 The user wants a full authentication system from their side, integrated with this project, instead of Clerk.
 
 For Development source, the user now explicitly requests removing Clerk and unused Better Auth dependencies while keeping Supabase Auth and preserving Super Admin access, MFA, users, roles, sessions and business data. This supersedes earlier instructions to retain Clerk **in Development source only**. Staging and Production must remain unchanged, and no deploy or Republish is authorized.

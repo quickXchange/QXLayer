@@ -1064,3 +1064,17 @@ mtime_ms = 1792017177683
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/f419c6d6-ead0-406a-99d0-d7907c225e89/38a53240-93b0-495f-8436-44ebadaba658"
 storage_version_token = "1792017212859228"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "5-i6rnKG01OKDC_YOU4N_"
+uri = "file://deploy/PRODUCTION_AUTH_MANUAL_EVIDENCE.md"
+type = "text"
+title = "Production Auth: exact evidence and manual steps"
+description = "Safe Production directory, running-provider and database-binding checks; inert Supabase configuration draft; the first action to take without changing any environment."
+logical_id = "ef15c2f8-ad16-489d-bcbc-c9af085ff609"
+content_hash = "sha256:eaf93ac44974f3d630987cffdb5190575543ac49ff255efa6187d2981127c4df"
+size = 10488
+mtime_ms = 1792017644567
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/ef15c2f8-ad16-489d-bcbc-c9af085ff609/ad6e7dcc-8dc5-419f-bcf8-19f75d81b54a"
+storage_version_token = "1792017734800323"
+content_type = "text/markdown"
