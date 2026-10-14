@@ -37,11 +37,17 @@ try {
     await writeFile(path, JSON.stringify(baseline), { flag: "wx", mode: 0o600 });
     await pool.query(await readFile(new URL("../../../../deploy/migrations/005-supabase-auth-replit-development.sql", import.meta.url), "utf8"));
     console.log(JSON.stringify({ prepared: true, preservedPublicTables: Object.keys(baseline).length, existingActiveSuperAdmins: 1 }));
+  } else if (process.argv[2] === "recovery-prepare") {
+    const baseline = JSON.parse(await readFile(path, "utf8"));
+    if (JSON.stringify(await fingerprints()) !== JSON.stringify(baseline))
+      throw new Error("Business preservation readback failed; recovery schema changes are blocked.");
+    await pool.query(await readFile(new URL("../../../../deploy/migrations/006-development-mfa-recovery.sql", import.meta.url), "utf8"));
+    console.log(JSON.stringify({ developmentRecoverySchemaPrepared: true, preservedPublicTables: Object.keys(baseline).length }));
   } else if (process.argv[2] === "verify") {
     const baseline = JSON.parse(await readFile(path, "utf8"));
     const after = await fingerprints();
     const same = JSON.stringify(after) === JSON.stringify(baseline);
     console.log(JSON.stringify({ publicDataUnchanged: same, tables: Object.keys(after).length }));
     if (!same) process.exitCode = 1;
-  } else throw new Error("Use prepare or verify.");
+  } else throw new Error("Use prepare, recovery-prepare or verify.");
 } finally { await pool.end(); }

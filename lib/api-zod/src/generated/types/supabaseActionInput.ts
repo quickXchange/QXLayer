@@ -26,5 +26,12 @@ export interface SupabaseActionInput {
   tokenType?: SupabaseActionInputTokenType;
   /** @pattern ^[0-9]{6}$ */
   code?: string;
+  /**
+     * @minLength 32
+     * @maxLength 64
+     */
+  recoveryCode?: string;
+  confirmReplace?: boolean;
+  confirmReset?: boolean;
   factorId?: string;
 }

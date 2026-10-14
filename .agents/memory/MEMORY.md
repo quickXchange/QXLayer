@@ -43,4 +43,5 @@
 - [Project-owned authentication](project-owned-authentication.md) — user wants integrated, self-operated authentication instead of another Clerk application.
 - [Supabase Staging Auth](supabase-staging-auth-boundary.md) — parallel trial preserves Clerk; opaque server keys require pinned-origin capability checks, not JWT assumptions.
 - [Auth query observers](auth-query-observers.md) — cache eviction can strand active loading observers; preserve session observers and reset account data on confirmed identity changes.
+- [Supabase MFA assurance](supabase-mfa-session-assurance.md) — verifying MFA in another context can invalidate pending-MFA sessions; probe deployed recovery-code capability, not upstream source.
 - [Browser candidate modules](browser-candidate-module-identity.md) — asset overrides need one canonical entry URL or lazy chunks can instantiate React twice.

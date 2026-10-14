@@ -6,7 +6,7 @@ export interface SupabaseUser {
   email?: string;
   email_confirmed_at?: string | null;
   user_metadata?: { name?: string };
-  factors?: { id: string; factor_type: string; status: string }[];
+  factors?: { id: string; factor_type: string; status: string; friendly_name?: string }[];
 }
 export interface SupabaseTokens {
   access_token: string;

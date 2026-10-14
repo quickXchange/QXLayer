@@ -9,6 +9,8 @@ import type { SupabasePublicUser } from './supabasePublicUser';
 
 export interface SupabaseActionResult {
   ok: boolean;
+  /** Development-only plaintext codes returned once after fresh password and TOTP proof. */
+  recoveryCodes?: string[];
   mfaRequired?: boolean;
   user?: SupabasePublicUser;
   factorId?: string;

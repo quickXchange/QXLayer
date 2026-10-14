@@ -22,4 +22,6 @@ export const SupabaseActionInputAction = {
   'mfa-verify': 'mfa-verify',
   'mfa-remove': 'mfa-remove',
   'link-existing': 'link-existing',
+  'mfa-recovery-generate': 'mfa-recovery-generate',
+  'mfa-recover': 'mfa-recover',
 } as const;

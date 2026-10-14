@@ -30,7 +30,7 @@ function toError(e: unknown): FacadeError {
 }
 
 /** Actions that change who (or at what assurance level) the browser is. Clear user caches, then fetch a fresh session. */
-const IDENTITY_ACTIONS = new Set<SupabaseActionInput["action"]>(["signup", "login", "logout", "verify", "reset-password", "change-password", "mfa-verify", "mfa-remove", "link-existing"]);
+const IDENTITY_ACTIONS = new Set<SupabaseActionInput["action"]>(["signup", "login", "logout", "verify", "reset-password", "change-password", "mfa-verify", "mfa-remove", "link-existing", "mfa-recover"]);
 
 export async function refreshSupabaseSession(clear: boolean): Promise<SupabaseSession | null> {
   const qc = queryClient; if (!qc) return null;
@@ -102,6 +102,10 @@ export const supabaseFacade = {
 /** Recovery link: exchange the token_hash for a recovery-only cookie before any reset is allowed. */
 export const verifyRecoveryLink = (token: string) => act({ action: "verify", token, tokenType: "recovery" });
 export const supabaseMfa = {
+  generateRecoveryCodes: (currentPassword: string, code: string) =>
+    act({ action: "mfa-recovery-generate", currentPassword, code, confirmReplace: true }),
+  recover: (currentPassword: string, recoveryCode: string) =>
+    act({ action: "mfa-recover", currentPassword, recoveryCode, confirmReset: true }),
   enroll: (currentPassword: string) => act({ action: "mfa-enroll", currentPassword }),
   verify: (code: string, factorId?: string) => act({ action: "mfa-verify", code, factorId }),
   remove: (i: { currentPassword: string; factorId: string; code: string }) => act({ action: "mfa-remove", ...i }),

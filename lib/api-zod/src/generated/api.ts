@@ -15,6 +15,10 @@ export const GetSupabaseAuthStatusResponse = zod.object({
 })
 
 
+export const getSupabaseAuthSessionResponseRecoveryCodesRemainingMin = 0;
+
+
+
 export const GetSupabaseAuthSessionResponse = zod.object({
   "user": zod.union([zod.object({
   "id": zod.string(),
@@ -26,6 +30,7 @@ export const GetSupabaseAuthSessionResponse = zod.object({
 }),zod.null()]),
   "mfaRequired": zod.boolean(),
   "recovery": zod.boolean(),
+  "recoveryCodesRemaining": zod.number().int().min(getSupabaseAuthSessionResponseRecoveryCodesRemainingMin).optional().describe('Development-only unused recovery codes, visible only after MFA.'),
   "existingAccountLinked": zod.boolean().optional().describe('Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs.')
 })
 
@@ -41,10 +46,13 @@ export const performSupabaseAuthActionBodyCurrentPasswordMax = 128;
 export const performSupabaseAuthActionBodyTokenMax = 2048;
 
 export const performSupabaseAuthActionBodyCodeRegExp = new RegExp('^[0-9]{6}$');
+export const performSupabaseAuthActionBodyRecoveryCodeMin = 32;
+export const performSupabaseAuthActionBodyRecoveryCodeMax = 64;
+
 
 
 export const PerformSupabaseAuthActionBody = zod.object({
-  "action": zod.enum(['signup', 'login', 'logout', 'recover', 'resend', 'verify', 'reset-password', 'change-password', 'mfa-enroll', 'mfa-verify', 'mfa-remove', 'link-existing']),
+  "action": zod.enum(['signup', 'login', 'logout', 'recover', 'resend', 'verify', 'reset-password', 'change-password', 'mfa-enroll', 'mfa-verify', 'mfa-remove', 'link-existing', 'mfa-recovery-generate', 'mfa-recover']),
   "email": zod.string().email().max(performSupabaseAuthActionBodyEmailMax).optional(),
   "name": zod.string().min(1).max(performSupabaseAuthActionBodyNameMax).optional(),
   "password": zod.string().max(performSupabaseAuthActionBodyPasswordMax).optional(),
@@ -52,11 +60,15 @@ export const PerformSupabaseAuthActionBody = zod.object({
   "token": zod.string().max(performSupabaseAuthActionBodyTokenMax).optional(),
   "tokenType": zod.enum(['signup', 'recovery']).optional(),
   "code": zod.string().regex(performSupabaseAuthActionBodyCodeRegExp).optional(),
+  "recoveryCode": zod.string().min(performSupabaseAuthActionBodyRecoveryCodeMin).max(performSupabaseAuthActionBodyRecoveryCodeMax).optional(),
+  "confirmReplace": zod.boolean().optional(),
+  "confirmReset": zod.boolean().optional(),
   "factorId": zod.string().uuid().optional()
 })
 
 export const PerformSupabaseAuthActionResponse = zod.object({
   "ok": zod.boolean(),
+  "recoveryCodes": zod.array(zod.string()).optional().describe('Development-only plaintext codes returned once after fresh password and TOTP proof.'),
   "mfaRequired": zod.boolean().optional(),
   "user": zod.object({
   "id": zod.string(),

@@ -76,6 +76,10 @@ components:
             - {type: "null"}
         mfaRequired: {type: boolean}
         recovery: {type: boolean}
+        recoveryCodesRemaining:
+          type: integer
+          minimum: 0
+          description: Development-only unused recovery codes, visible only after MFA.
         existingAccountLinked:
           type: boolean
           description: Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs.
@@ -86,7 +90,7 @@ components:
       properties:
         action:
           type: string
-          enum: [signup, login, logout, recover, resend, verify, reset-password, change-password, mfa-enroll, mfa-verify, mfa-remove, link-existing]
+          enum: [signup, login, logout, recover, resend, verify, reset-password, change-password, mfa-enroll, mfa-verify, mfa-remove, link-existing, mfa-recovery-generate, mfa-recover]
         email: {type: string, format: email, maxLength: 254}
         name: {type: string, minLength: 1, maxLength: 120}
         password: {type: string, maxLength: 128}
@@ -94,6 +98,9 @@ components:
         token: {type: string, maxLength: 2048}
         tokenType: {type: string, enum: [signup, recovery]}
         code: {type: string, pattern: '^[0-9]{6}$'}
+        recoveryCode: {type: string, minLength: 32, maxLength: 64}
+        confirmReplace: {type: boolean}
+        confirmReset: {type: boolean}
         factorId: {type: string, format: uuid}
     SupabaseActionResult:
       type: object
@@ -101,6 +108,10 @@ components:
       required: [ok]
       properties:
         ok: {type: boolean}
+        recoveryCodes:
+          type: array
+          items: {type: string}
+          description: Development-only plaintext codes returned once after fresh password and TOTP proof.
         mfaRequired: {type: boolean}
         user: {$ref: "#/components/schemas/SupabasePublicUser"}
         factorId: {type: string}

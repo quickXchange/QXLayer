@@ -6,9 +6,10 @@ import { clerkClient, getAuth } from "@clerk/express";
 import { applicationUserId } from "../../../../../lib/external-clerk/index.mjs";
 import { HttpError } from "../../lib/errors";
 import { authRequest, type SupabaseTokens } from "./provider";
-import { supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret } from "./config";
+import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret } from "./config";
 import { establishSession, needSession, publicUser, hasVerifiedFactor, reauthenticate, readSession,
   revokeLocalSession, updateSession, type AuthSession } from "./session";
+import { generateRecoveryCodes, recoverAuthenticator, requireDevelopmentRecovery } from "./development-recovery";
 
 const password = z.string().min(12, "Use at least 12 characters.").max(128);
 const email = z.string().email().max(254).transform(v => v.trim().toLowerCase());
@@ -27,11 +28,15 @@ export const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("mfa-remove"), currentPassword: z.string().min(1).max(128), factorId,
     code: z.string().regex(/^[0-9]{6}$/) }).strict(),
   z.object({ action: z.literal("link-existing") }).strict(),
+  z.object({ action: z.literal("mfa-recovery-generate"), currentPassword: z.string().min(1).max(128),
+    code: z.string().regex(/^[0-9]{6}$/), confirmReplace: z.literal(true) }).strict(),
+  z.object({ action: z.literal("mfa-recover"), currentPassword: z.string().min(1).max(128),
+    recoveryCode: z.string().min(32).max(64), confirmReset: z.literal(true) }).strict(),
 ]);
 export async function limitAction(req: Request, action: string, account = "") {
   const secret = supabaseSessionSecret();
   const key = createHmac("sha256", secret).update(`${req.socket.remoteAddress}\0${action}\0${account}`).digest("hex");
-  const maximum = ["login", "signup", "recover", "resend"].includes(action) ? 5 : 15;
+  const maximum = ["login", "signup", "recover", "resend", "mfa-recover", "mfa-recovery-generate"].includes(action) ? 5 : 15;
   const result = await pool.query(`INSERT INTO vynox_supabase_auth.rate_limits(key,hits,reset_at)
     VALUES($1,1,now()+interval '1 minute') ON CONFLICT(key) DO UPDATE SET
     hits=CASE WHEN vynox_supabase_auth.rate_limits.reset_at<now() THEN 1 ELSE vynox_supabase_auth.rate_limits.hits+1 END,
@@ -90,11 +95,24 @@ async function linkExisting(req: Request, s: AuthSession) {
 }
 export async function performAction(raw: unknown, req: Request, res: Response) {
   const a = input.parse(raw);
+  if (a.action === "mfa-recover" || a.action === "mfa-recovery-generate") requireDevelopmentRecovery();
   await limitAction(req, a.action, "email" in a ? a.email : "");
   const cfg = supabaseAuthConfiguration();
   if (["signup", "recover", "resend"].includes(a.action) && !cfg.mailReady)
     throw new HttpError(503, "Verification and recovery email delivery is not configured.");
   switch (a.action) {
+    case "mfa-recovery-generate": {
+      const s = await needSession(req);
+      if (!s.aal2 || s.payload.recovery) throw new HttpError(403, "Complete MFA before generating recovery codes.");
+      await reauthenticate(s, a.currentPassword);
+      await totp(s, a.code);
+      return { ok: true, recoveryCodes: await generateRecoveryCodes(s) };
+    }
+    case "mfa-recover": {
+      const s = await needSession(req);
+      await recoverAuthenticator(s, a.currentPassword, a.recoveryCode, req, res);
+      return { ok: true };
+    }
     case "signup":
       await authRequest("/signup", { method: "POST", body: { email: a.email, password: a.password, data: { name: a.name } } });
       return { ok: true };
@@ -144,6 +162,12 @@ export async function performAction(raw: unknown, req: Request, res: Response) {
       const s = await needSession(req);
       await reauthenticate(s, a.currentPassword);
       if (hasVerifiedFactor(s.user) && !s.aal2) throw new HttpError(403, "Verify the existing authenticator first.");
+      // A cancelled Development setup may leave a provider draft with the same unique name.
+      // Remove only this validated account's unverified app drafts; never a verified factor.
+      if (developmentSupabaseAuth()) for (const draft of s.user.factors ?? []) {
+        if (draft.factor_type === "totp" && draft.status === "unverified" && draft.friendly_name === "VYNOX LAYER")
+          await authRequest(`/factors/${draft.id}`, { method: "DELETE", accessToken: s.payload.accessToken });
+      }
       const factor = await authRequest<{ id: string; totp: { qr_code: string; secret: string; uri: string } }>("/factors",
         { method: "POST", accessToken: s.payload.accessToken, body: { factor_type: "totp", friendly_name: "VYNOX LAYER", issuer: "VYNOX LAYER" } });
       return { ok: true, factorId: factor.id, qrCode: factor.totp.qr_code, secret: factor.totp.secret, totpUri: factor.totp.uri };

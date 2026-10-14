@@ -3,6 +3,8 @@ import { Link } from 'wouter';
 import QRCode from 'react-qr-code';
 import { Link2, ShieldCheck } from 'lucide-react';
 import { authClient } from '@/lib/owned-auth-client';
+import { supabaseDevelopmentAuth } from '@/lib/owned-auth-client';
+import { DevelopmentRecoveryCodes } from './development-recovery-codes';
 import { supabaseMfa, refreshSupabaseSession, useSupabaseSessionState } from '@/lib/supabase-auth-client';
 import { Button } from '@/components/ui/button';
 import { ErrorLine, Field, Form, SuccessLine, Submit, authErrorText, MIN_PASSWORD, MAX_PASSWORD } from '@/components/auth/auth-ui';
@@ -119,6 +121,7 @@ export function SupabaseSecurityPanel() {
       <div><p className="text-xs uppercase tracking-widest text-copper">Signed in as</p><p className="font-display text-3xl" data-testid="text-account-email">{user.email}</p>{user.name && <p className="text-sm text-muted-foreground" data-testid="text-account-name">{user.name}</p>}</div>
       <Section id="password" title="Password" desc="Use 12 to 128 characters."><PasswordForm /></Section>
       <Section id="two-factor" title="Two-factor authentication" desc="Authenticator app (TOTP). Required for super administrator access."><TwoFactor enabled={!!user.twoFactorEnabled} /></Section>
+      {supabaseDevelopmentAuth && <Section id="recovery-codes" title="Authenticator recovery codes" desc="Development only. Prepare these before losing your authenticator."><DevelopmentRecoveryCodes /></Section>}
       <Section id="migration" title="Link an existing VYNOX LAYER account" desc="Your existing IDs and access are preserved. Linking needs a separate proof-approved step and is never matched by email address.">
         <Button asChild variant="outline"><Link href="/account/link-existing" data-testid="link-existing-account"><Link2 className="mr-2 h-4 w-4" />Link existing account</Link></Button>
       </Section>

@@ -11,6 +11,11 @@ export interface SupabaseSession {
   user: SupabasePublicUser | null;
   mfaRequired: boolean;
   recovery: boolean;
+  /**
+     * Development-only unused recovery codes, visible only after MFA.
+     * @minimum 0
+     */
+  recoveryCodesRemaining?: number;
   /** Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs. */
   existingAccountLinked?: boolean;
 }

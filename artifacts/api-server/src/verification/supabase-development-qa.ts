@@ -28,6 +28,8 @@ async function cleanup(scope: Scope) {
   if (scope.subject) {
     await provider(`/${scope.subject}`, "DELETE");
     await pool.query("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1", [scope.subject]);
+    await pool.query("DELETE FROM vynox_supabase_auth.recovery_codes WHERE subject=$1", [scope.subject]);
+    await pool.query("DELETE FROM vynox_supabase_auth.recovery_events WHERE subject=$1", [scope.subject]);
     await pool.query("DELETE FROM vynox_supabase_auth.identity_links WHERE subject=$1 AND business_id=$2",
       [scope.subject, `supabase:${scope.subject}`]);
   }

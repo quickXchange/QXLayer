@@ -2233,6 +2233,11 @@ export interface SupabaseSession {
   user: SupabasePublicUser | null;
   mfaRequired: boolean;
   recovery: boolean;
+  /**
+     * Development-only unused recovery codes, visible only after MFA.
+     * @minimum 0
+     */
+  recoveryCodesRemaining?: number;
   /** Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs. */
   existingAccountLinked?: boolean;
 }
@@ -2253,6 +2258,8 @@ export const SupabaseActionInputAction = {
   'mfa-verify': 'mfa-verify',
   'mfa-remove': 'mfa-remove',
   'link-existing': 'link-existing',
+  'mfa-recovery-generate': 'mfa-recovery-generate',
+  'mfa-recover': 'mfa-recover',
 } as const;
 
 export type SupabaseActionInputTokenType = typeof SupabaseActionInputTokenType[keyof typeof SupabaseActionInputTokenType];
@@ -2281,11 +2288,20 @@ export interface SupabaseActionInput {
   tokenType?: SupabaseActionInputTokenType;
   /** @pattern ^[0-9]{6}$ */
   code?: string;
+  /**
+     * @minLength 32
+     * @maxLength 64
+     */
+  recoveryCode?: string;
+  confirmReplace?: boolean;
+  confirmReset?: boolean;
   factorId?: string;
 }
 
 export interface SupabaseActionResult {
   ok: boolean;
+  /** Development-only plaintext codes returned once after fresh password and TOTP proof. */
+  recoveryCodes?: string[];
   mfaRequired?: boolean;
   user?: SupabasePublicUser;
   factorId?: string;

@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { GetSupabaseAuthStatusResponse, GetSupabaseAuthSessionResponse,
   PerformSupabaseAuthActionBody, PerformSupabaseAuthActionResponse } from "@workspace/api-zod";
-import { supabaseAuthEnabled, supabaseAuthConfiguration } from "../modules/supabase-auth/config";
+import { developmentSupabaseAuth, supabaseAuthEnabled, supabaseAuthConfiguration } from "../modules/supabase-auth/config";
 import { readSession, publicUser, hasVerifiedFactor, assertAuthOrigin, hasExistingAccountLink } from "../modules/supabase-auth/session";
 import { performAction } from "../modules/supabase-auth/actions";
+import { recoveryCodeCount } from "../modules/supabase-auth/development-recovery";
 
 const router = Router();
 router.use("/supabase-auth", (_req, res, next) => {
@@ -24,6 +25,8 @@ router.get("/supabase-auth/session", async (req, res): Promise<void> => {
   res.json(GetSupabaseAuthSessionResponse.parse({ user: s ? publicUser(s.user) : null,
     mfaRequired: !!s && !s.payload.recovery && hasVerifiedFactor(s.user) && !s.aal2,
     recovery: s?.payload.recovery ?? false,
+    ...(developmentSupabaseAuth() && s && s.aal2 && !s.payload.recovery
+      ? { recoveryCodesRemaining: await recoveryCodeCount(s) } : {}),
     existingAccountLinked: !!s && !s.payload.recovery && await hasExistingAccountLink(s.user.id) }));
 });
 router.post("/supabase-auth/action", async (req, res): Promise<void> => {
