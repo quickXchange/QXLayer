@@ -65,8 +65,10 @@ export async function updateSession(s: AuthSession, tokens: SupabaseTokens) {
   s.payload = { ...payload(tokens, s.payload.recovery), created: s.payload.created,
     ...(s.payload.emailPrimary ? { emailPrimary: true, emailPrimaryTotpVerified: s.payload.emailPrimaryTotpVerified === true } : {}) };
   s.user = tokens.user;
-  await pool.query("UPDATE vynox_supabase_auth.sessions SET envelope=$2 WHERE digest=$1",
+  const updated = await pool.query("UPDATE vynox_supabase_auth.sessions SET envelope=$2 WHERE digest=$1",
     [s.digest, codec().seal(s.payload)]);
+  if (developmentSupabaseAuth() && updated.rowCount === 0)
+    throw new HttpError(401, "Your pending sign-in session is no longer available. Sign in again before entering a new code.");
 }
 export async function readSession(req: Request): Promise<AuthSession | null> {
   const value = sessionCookie(req);

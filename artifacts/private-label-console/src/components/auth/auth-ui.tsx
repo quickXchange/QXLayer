@@ -45,6 +45,7 @@ export function authErrorText(e: AuthErr): string {
   if (code === 'INVALID_PASSWORD') return 'The password you entered is incorrect.';
   if (code === 'INVALID_TWO_FACTOR_COOKIE') return 'Your sign-in step expired. Sign in again.';
   if (code === 'INVALID_CODE' || code === 'INVALID_BACKUP_CODE') return 'That code is not valid.';
+  if (code === 'EMAIL_LOGIN_RESTART') return (e.message ?? 'Request a new sign-in code in this browser tab.').replace(/^EMAIL_LOGIN_RESTART:\s*/, '');
   if (e.status === 429) return supabaseDevelopmentAuth
     ? typeof e.retryAfterSeconds === 'number' && Number.isFinite(e.retryAfterSeconds) && e.retryAfterSeconds > 0
       ? `Please wait ${Math.ceil(e.retryAfterSeconds)} seconds before trying again.`

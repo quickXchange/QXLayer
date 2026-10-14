@@ -33,6 +33,7 @@ function SignInForm() {
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   const submit = async () => {
+    if (busy) return;
     setBusy(true); setErr(''); setSent(''); setNeedsVerify(false);
     try {
       if (emailMethod) {
@@ -40,6 +41,7 @@ function SignInForm() {
         const r = await authClient.signIn.verifyEmailCode(email.trim(), code);
         if (r.error) {
           setErr(authErrorText(r.error));
+          if (r.error.code === 'EMAIL_LOGIN_RESTART') setCode('');
           if (r.error.status === 429) verifyWait.start(r.error.retryAfterSeconds ?? 60);
           return;
         }

@@ -1,5 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { resetAccountQueries } from "./auth-query-transition";
+import { authActionSessionError } from "./auth-action-session";
 import {
   getGetSupabaseAuthSessionQueryKey,
   getSupabaseAuthSession,
@@ -48,6 +49,10 @@ async function act(input: SupabaseActionInput): Promise<Result<SupabaseActionRes
     if (!data.ok) return { data: null, error: { message: "The request was not accepted." } };
     const session = await refreshSupabaseSession(IDENTITY_ACTIONS.has(input.action));
     if (!session) return { data: null, error: { message: "Your request was accepted, but your session could not be confirmed. Check your connection and reload before continuing." } };
+    if (import.meta.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT === "development") {
+      const message = authActionSessionError(input, session);
+      if (message) return { data: null, error: { code: "AUTH_SESSION_NOT_CONFIRMED", message } };
+    }
     return { data, error: null };
   } catch (e) {
     return { data: null, error: toError(e) };

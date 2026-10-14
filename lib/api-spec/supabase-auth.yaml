@@ -78,6 +78,9 @@ components:
         emailMfaAvailable:
           type: boolean
           description: Development only; server-confirmed Super Admin with verified Gmail and existing TOTP. Never inferred from browser metadata.
+        emailMfaChallengeExpiresAt:
+          type: integer
+          description: Development only; expiry in epoch milliseconds of this browser session's usable email MFA challenge. No code or proof is exposed.
         recovery: {type: boolean}
         recoveryCodesRemaining:
           type: integer

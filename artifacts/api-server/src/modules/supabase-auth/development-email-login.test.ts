@@ -163,6 +163,19 @@ test("five-minute expiry, browser/email binding, tampered cookies and used codes
     assert(!f.cookies.has(SESSION_COOKIE));
   });
 });
+test("missing and expired browser challenges explain restarting rather than blaming a fresh code", async () => {
+  await scenario(async f => {
+    await assert.rejects(verifyEmailLogin("synthetic@gmail.com", "246810", f.req, f.res),
+      { status: 400, message: /EMAIL_LOGIN_RESTART:.*not available in this browser/ });
+    assert(!f.requests.some(p => p.endsWith("/verify")));
+    await sendEmailLogin("synthetic@gmail.com", f.req, f.res);
+    f.advance(300000);
+    await assert.rejects(verifyEmailLogin("synthetic@gmail.com", "246810", f.req, f.res),
+      { status: 400, message: /EMAIL_LOGIN_RESTART:.*five-minute.*expired/ });
+    assert(!f.requests.some(p => p.endsWith("/verify")));
+    assert(!f.cookies.has(SESSION_COOKIE));
+  });
+});
 test("wrong-code attempts persist and the sixth attempt cannot redeem even the correct code", async () => {
   await scenario(async f => {
     await sendEmailLogin("synthetic@gmail.com", f.req, f.res);

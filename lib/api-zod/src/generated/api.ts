@@ -30,6 +30,7 @@ export const GetSupabaseAuthSessionResponse = zod.object({
 }),zod.null()]),
   "mfaRequired": zod.boolean(),
   "emailMfaAvailable": zod.boolean().optional().describe('Development only; server-confirmed Super Admin with verified Gmail and existing TOTP. Never inferred from browser metadata.'),
+  "emailMfaChallengeExpiresAt": zod.number().int().optional().describe('Development only; expiry in epoch milliseconds of this browser session\'s usable email MFA challenge. No code or proof is exposed.'),
   "recovery": zod.boolean(),
   "recoveryCodesRemaining": zod.number().int().min(getSupabaseAuthSessionResponseRecoveryCodesRemainingMin).optional().describe('Development-only unused recovery codes, visible only after MFA.'),
   "existingAccountLinked": zod.boolean().optional().describe('Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs.')

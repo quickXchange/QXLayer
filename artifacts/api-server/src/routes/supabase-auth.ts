@@ -5,7 +5,7 @@ import { developmentSupabaseAuth, supabaseAuthEnabled, supabaseAuthConfiguration
 import { readSession, publicUser, hasVerifiedFactor, assertAuthOrigin, hasExistingAccountLink } from "../modules/supabase-auth/session";
 import { performAction } from "../modules/supabase-auth/actions";
 import { recoveryCodeCount } from "../modules/supabase-auth/development-recovery";
-import { applicationMfaSatisfied, emailMfaEligible } from "../modules/supabase-auth/development-email-mfa";
+import { applicationMfaSatisfied, emailMfaEligible, emailChallengeExpiresAt } from "../modules/supabase-auth/development-email-mfa";
 
 const router = Router();
 router.use("/supabase-auth", (_req, res, next) => {
@@ -25,9 +25,11 @@ router.get("/supabase-auth/session", async (req, res): Promise<void> => {
   const s = await readSession(req);
   const mfaRequired = !!s && !s.payload.recovery && (hasVerifiedFactor(s.user) || !!s.payload.emailPrimary) &&
     !await applicationMfaSatisfied(s);
+  const emailMfaAvailable = mfaRequired && !!s && await emailMfaEligible(s);
   res.json(GetSupabaseAuthSessionResponse.parse({ user: s ? publicUser(s.user) : null,
     mfaRequired,
-    emailMfaAvailable: mfaRequired && !!s && await emailMfaEligible(s),
+    emailMfaAvailable,
+    ...(emailMfaAvailable && s ? { emailMfaChallengeExpiresAt: emailChallengeExpiresAt(s) } : {}),
     recovery: s?.payload.recovery ?? false,
     ...(developmentSupabaseAuth() && s && s.aal2 && !s.payload.recovery
       ? { recoveryCodesRemaining: await recoveryCodeCount(s) } : {}),

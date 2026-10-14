@@ -1,8 +1,8 @@
 import test, { mock } from "node:test";
 import assert from "node:assert/strict";
 import { pool } from "@workspace/db";
-import { sessionCodec } from "./crypto";
-import { applicationMfaSatisfied, emailMfaEligible, sendEmailChallenge, verifyEmailChallenge } from "./development-email-mfa";
+import { sessionCodec, cookieDigest } from "./crypto";
+import { applicationMfaSatisfied, emailMfaEligible, sendEmailChallenge, verifyEmailChallenge, emailChallengeExpiresAt } from "./development-email-mfa";
 import { input, performAction } from "./actions";
 import { readSession, SESSION_COOKIE, type AuthSession, type Payload } from "./session";
 import type { Request } from "express";
@@ -24,7 +24,7 @@ async function fixture(run: (f: {
   mock.timers.enable({ apis: ["Date"], now: Date.now() });
   const codec = sessionCodec(process.env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET!);
   const accessToken = `fixture.${Buffer.from('{"aal":"aal1"}').toString("base64url")}.fixture`;
-  const s: AuthSession = { digest: "synthetic-session-digest", aal2: false,
+  const s: AuthSession = { digest: cookieDigest("a".repeat(43)), aal2: false,
     user: { id: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", email: "synthetic@gmail.com",
       email_confirmed_at: "2026-01-01", factors: [{ id: "11111111-2222-3333-4444-555555555555", status: "verified", factor_type: "totp" }] },
     payload: { subject: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee", accessToken, refreshToken: "synthetic-refresh",
@@ -120,6 +120,41 @@ test("single-use email code elevates only app assurance and never disables TOTP"
     await assert.rejects(verifyEmailChallenge(f.s, f.code()), { status: 400 });
     f.eligible(false); assert.equal(await applicationMfaSatisfied(f.s), false);
     f.eligible(true); f.s.user.email = "other@gmail.com"; assert.equal(await applicationMfaSatisfied(f.s), false);
+  });
+});
+test("an active browser email challenge survives reload without resending or replacing its code", async () => {
+  await fixture(async f => {
+    await sendEmailChallenge(f.s);
+    const original = f.payload().emailChallenge!;
+    const req = { headers: { cookie: `${SESSION_COOKIE}=${"a".repeat(43)}` } } as Request;
+    const reloaded = await readSession(req);
+    assert(reloaded);
+    assert.equal(emailChallengeExpiresAt(reloaded), original.expires);
+    assert.equal(f.sent(), 1);
+    await verifyEmailChallenge(reloaded, f.code());
+    const verified = await readSession(req);
+    assert(verified);
+    assert(await applicationMfaSatisfied(verified));
+    assert.equal(emailChallengeExpiresAt(verified), undefined);
+    assert.equal(f.sent(), 1);
+  });
+});
+test("email challenge status never restores an expired, exhausted, foreign or inappropriate proof", async () => {
+  await fixture(async f => {
+    await sendEmailChallenge(f.s);
+    f.s.payload = f.payload();
+    const original = structuredClone(f.s.payload);
+    for (const change of [
+      () => { f.s.payload.emailChallenge!.attempts = 5; },
+      () => { f.s.payload.emailChallenge!.expires = Date.now(); },
+      () => { f.s.payload.emailChallenge!.recipient = "other@gmail.com"; },
+      () => { f.s.payload.recovery = true; },
+      () => { f.s.payload.emailPrimary = true; },
+      () => { f.s.aal2 = true; },
+    ]) {
+      f.s.payload = structuredClone(original); f.s.aal2 = false;
+      change(); assert.equal(emailChallengeExpiresAt(f.s), undefined);
+    }
   });
 });
 test("expiry, five wrong attempts and subject-wide send rate limits fail closed", async () => {

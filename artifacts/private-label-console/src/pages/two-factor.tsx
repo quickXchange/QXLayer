@@ -11,28 +11,39 @@ export default function TwoFactorPage() {
   const [lost, setLost] = useState(false); const [pw, setPw] = useState(''); const [confirmReset, setConfirmReset] = useState(false);
   const { session } = useSupabaseSessionState();
   const [emailMethod, setEmailMethod] = useState(false);
-  const [sent, setSent] = useState(false);
   const [retryAt, setRetryAt] = useState(0);
-  const [seconds, setSeconds] = useState(0);
+  const [now, setNow] = useState(Date.now);
   const emailAvailable = supabaseDevelopmentAuth && !!session?.emailMfaAvailable;
+  const codeExpires = session?.emailMfaChallengeExpiresAt ?? 0;
+  const codeSeconds = Math.max(0, Math.ceil((codeExpires - now) / 1000));
+  const sent = emailAvailable && codeSeconds > 0;
+  // Restoring an active challenge also restores its original 60-second resend
+  // cooldown. Reloading must neither force a replacement nor bypass a limit.
+  const seconds = Math.max(0, Math.ceil((Math.max(retryAt, codeExpires - 240000) - now) / 1000));
   useEffect(() => {
-    const tick = () => setSeconds(Math.max(0, Math.ceil((retryAt - Date.now()) / 1000)));
+    const tick = () => setNow(Date.now());
     tick(); const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
-  }, [retryAt]);
-  useEffect(() => { if (!emailAvailable) { setEmailMethod(false); setSent(false); } }, [emailAvailable]);
+  }, []);
+  useEffect(() => { if (!emailAvailable) setEmailMethod(false); }, [emailAvailable]);
   const sendEmail = async () => {
+    if (busy || seconds > 0) return;
     setBusy(true); setErr('');
     try {
       const r = await supabaseMfa.sendEmailCode();
       if (r.error) { setErr(authErrorText(r.error)); return; }
-      setSent(true); setCode(''); setRetryAt(Date.now() + 60000);
+      setCode(''); setRetryAt(Date.now() + 60000);
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   useEffect(() => () => setCode(''), []);
   const submit = async () => {
+    if (busy) return;
     setBusy(true); setErr('');
     try {
+      if (!session?.user) {
+        setErr('Your pending sign-in session is no longer available. Sign in again before entering a new code.');
+        return;
+      }
       const c = code.replace(/\s/g, '');
       const r = emailMethod ? await supabaseMfa.verifyEmailCode(c) : await supabaseMfa.verify(c);
       if (r.error) { setErr(authErrorText(r.error)); return; }
@@ -58,9 +69,10 @@ export default function TwoFactorPage() {
         <ErrorLine>{err}</ErrorLine>
         <Submit id="button-recover-authenticator" busy={busy} disabled={!pw || !code || !confirmReset}>Reset lost authenticator and sign out</Submit>
       </Form> : <Form onSubmit={submit}>
+        {supabaseDevelopmentAuth && !emailMethod && <p className="text-sm text-muted-foreground">Use the current Google Authenticator code for this account, not a Gmail code. If you already used a code, wait for the next one. Keep your phone's date and time set automatically.</p>}
         {emailMethod && <>
           <p className="text-sm text-muted-foreground">The code is single-use and expires in 5 minutes. Google Authenticator stays enabled.</p>
-          {sent && <p role="status" className="text-sm">Code sent to your verified Gmail address. Check your inbox.</p>}
+          {sent && <p role="status" className="text-sm">An active code was sent to your verified Gmail address. It expires in {codeSeconds}s. Use the latest email; you do not need to resend after reloading.</p>}
           <button type="button" data-testid="button-send-email-code" disabled={busy || seconds > 0} className="text-sm font-medium hover:underline" onClick={() => void sendEmail()}>
             {seconds > 0 ? `Resend available in ${seconds}s` : sent ? 'Resend email code' : 'Send email code'}
           </button>

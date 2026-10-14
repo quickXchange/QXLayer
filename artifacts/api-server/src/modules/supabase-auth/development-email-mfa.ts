@@ -9,6 +9,15 @@ import type { SupabaseUser } from "./provider";
 export const EMAIL_CODE_LIFETIME = 5 * 60_000;
 export const EMAIL_CODE_ATTEMPTS = 5;
 
+/** Reload-safe public state for this exact pending session; never return the hash or nonce. */
+export function emailChallengeExpiresAt(s: AuthSession): number | undefined {
+  const c = s.payload.emailChallenge;
+  if (!developmentSupabaseAuth() || s.payload.recovery || s.payload.emailPrimary || s.aal2 ||
+      !c || c.recipient !== s.user.email?.toLowerCase() ||
+      c.expires <= Date.now() || c.attempts >= EMAIL_CODE_ATTEMPTS) return undefined;
+  return c.expires;
+}
+
 /** Provider-verified mailbox + actual business authorization, never email-based ownership. */
 export async function emailMfaEligible(s: AuthSession): Promise<boolean> {
   if (s.payload.recovery || s.payload.emailPrimary) return false;

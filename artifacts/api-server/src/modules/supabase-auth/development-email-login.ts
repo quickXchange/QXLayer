@@ -13,6 +13,7 @@ export const EMAIL_LOGIN_COOKIE = "__Host-vynox_dev_email_login";
 const lifetime = 5 * 60000;
 interface Challenge { purpose: "email-login"; subject: string; emailHash: string; nonce: string; expires: number }
 const invalid = () => new HttpError(400, "The code is invalid, expired or already used. Request a new code in this browser.");
+const restart = (reason: string) => new HttpError(400, `EMAIL_LOGIN_RESTART: ${reason} Request a new sign-in code in this browser tab.`);
 function requireDevelopment() {
   if (!developmentSupabaseAuth()) throw new HttpError(404, "Development authentication method unavailable.");
   if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === "0")
@@ -69,10 +70,12 @@ export async function verifyEmailLogin(email: string, code: string, req: Request
   const value = req.headers.cookie?.split(";").map(x => x.trim()).find(x => x.startsWith(`${EMAIL_LOGIN_COOKIE}=`))
     ?.slice(EMAIL_LOGIN_COOKIE.length + 1);
   let p: Challenge;
+  if (!value) throw restart("The code request is not available in this browser.");
   if (value && value.length > 1024) throw invalid();
-  try { p = sessionCodec(supabaseSessionSecret()).open<Challenge>(value ?? ""); } catch { throw invalid(); }
-  if (p.purpose !== "email-login" || !p.nonce || p.expires <= Date.now() ||
+  try { p = sessionCodec(supabaseSessionSecret()).open<Challenge>(value); } catch { throw restart("The code request can no longer be verified."); }
+  if (p.purpose !== "email-login" || !p.nonce ||
       p.emailHash !== privateAuthKey("email-login-address", email) || !/^[0-9]{6}$/.test(code)) throw invalid();
+  if (p.expires <= Date.now()) throw restart("The five-minute sign-in code request has expired.");
   await developmentLimit("email-login-verify", email, 900, 20);
   // Resolve authority before holding the challenge lock; do not exhaust the pool
   // with nested authority queries while parallel verifiers wait for this row.
@@ -84,7 +87,7 @@ export async function verifyEmailLogin(email: string, code: string, req: Request
     await c.query("BEGIN");
     const state = await c.query(`UPDATE vynox_supabase_auth.rate_limits SET hits=hits+1
       WHERE key=$1 AND reset_at>now() AND hits<5 RETURNING hits`, [challengeKey(p)]);
-    if (!state.rowCount) throw invalid();
+    if (!state.rowCount) throw restart("The code request is expired, already used or has reached its attempt limit.");
     try {
       if (!user || user.id !== p.subject) throw invalid();
       tokens = await authRequest<SupabaseTokens>("/verify", { method: "POST", body: { email, token: code, type: "email" } });

@@ -12,6 +12,8 @@ export interface SupabaseSession {
   mfaRequired: boolean;
   /** Development only; server-confirmed Super Admin with verified Gmail and existing TOTP. Never inferred from browser metadata. */
   emailMfaAvailable?: boolean;
+  /** Development only; expiry in epoch milliseconds of this browser session's usable email MFA challenge. No code or proof is exposed. */
+  emailMfaChallengeExpiresAt?: number;
   recovery: boolean;
   /**
      * Development-only unused recovery codes, visible only after MFA.
