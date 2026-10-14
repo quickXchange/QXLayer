@@ -7,11 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
-import { supabaseAuth } from '@/lib/owned-auth-client';
+import { supabaseAuth, supabaseDevelopmentAuth } from '@/lib/owned-auth-client';
+import { DEVELOPMENT_PASSWORD_HINT, newPasswordError } from '@/lib/password-policy';
 
 /** Minimum length for newly chosen passwords. Sign-in never restricts length. */
-export const MIN_PASSWORD = supabaseAuth ? 12 : 8;
+export const MIN_PASSWORD = supabaseDevelopmentAuth ? 10 : supabaseAuth ? 12 : 8;
 export const MAX_PASSWORD = 128;
+export const PASSWORD_HINT = supabaseDevelopmentAuth ? DEVELOPMENT_PASSWORD_HINT : '12 to 128 characters.';
+export const validateNewPassword = (value: string) => newPasswordError(value, supabaseDevelopmentAuth);
 
 export type OwnedStatus = { enabled: boolean; mailReady: boolean };
 

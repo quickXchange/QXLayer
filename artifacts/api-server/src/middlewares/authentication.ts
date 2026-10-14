@@ -4,6 +4,7 @@ import { demoPrincipal, assertDemoRequest } from "../modules/demo/session";
 import { HttpError } from "../lib/errors";
 import { supabaseAuthEnabled, supabaseDefaultProvider, supabaseAuthConfiguration } from "../modules/supabase-auth/config";
 import { sessionCookie, readSession, businessId, hasVerifiedFactor, assertAuthOrigin } from "../modules/supabase-auth/session";
+import { applicationMfaSatisfied } from "../modules/supabase-auth/development-email-mfa";
 
 export const requireAuthentication: RequestHandler = async (req, res, next): Promise<void> => {
   const demo = await demoPrincipal(req);
@@ -17,10 +18,11 @@ export const requireAuthentication: RequestHandler = async (req, res, next): Pro
     if (!["GET", "HEAD", "OPTIONS"].includes(req.method)) assertAuthOrigin(req);
     const s = await readSession(req);
     if (!s || s.payload.recovery) throw new HttpError(401, "Sign-in required.");
-    if (hasVerifiedFactor(s.user) && !s.aal2) throw new HttpError(428, "MFA_REQUIRED: Complete two-factor verification.");
+    const mfaSatisfied = await applicationMfaSatisfied(s);
+    if (hasVerifiedFactor(s.user) && !mfaSatisfied) throw new HttpError(428, "MFA_REQUIRED: Complete two-factor verification.");
     const principal = await resolvePrincipal(await businessId(s.user.id));
     principal.authenticationProvider = "supabase";
-    if (principal.role === "super_admin" && (!hasVerifiedFactor(s.user) || !s.aal2))
+    if (principal.role === "super_admin" && (!hasVerifiedFactor(s.user) || !mfaSatisfied))
       throw new HttpError(428, "MFA_REQUIRED: Enable and verify two-factor authentication in Account Security.");
     res.locals.principal = principal;
     next();

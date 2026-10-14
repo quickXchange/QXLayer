@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
 import { verifyRecoveryLink, supabaseMfa, useSupabaseSessionState } from '@/lib/supabase-auth-client';
-import { A, AuthFrame, ErrorLine, Field, Form, SuccessLine, Submit, authErrorText, MIN_PASSWORD, MAX_PASSWORD } from '@/components/auth/auth-ui';
+import { A, AuthFrame, ErrorLine, Field, Form, SuccessLine, Submit, authErrorText, PASSWORD_HINT, validateNewPassword } from '@/components/auth/auth-ui';
 
 // Read once at module load so the token can be scrubbed from the address bar immediately.
 const initial = new URLSearchParams(window.location.search);
@@ -28,7 +28,8 @@ export default function ResetPasswordPage() {
   }, []);
   const submit = async () => {
     setErr('');
-    if (pw.length < MIN_PASSWORD || pw.length > MAX_PASSWORD) { setErr(`Use ${MIN_PASSWORD} to ${MAX_PASSWORD} characters.`); return; }
+    const passwordError = validateNewPassword(pw);
+    if (passwordError) { setErr(passwordError); return; }
     if (pw !== confirm) { setErr('The passwords do not match.'); return; }
     if (needsMfa && !/^[0-9]{6}$/.test(code)) { setErr('Enter the 6-digit code from your existing authenticator.'); return; }
     setBusy(true);
@@ -48,7 +49,7 @@ export default function ResetPasswordPage() {
         : gate === 'invalid' ? <><ErrorLine>This reset link is invalid or has expired.</ErrorLine><A id="link-request-new" href="/forgot-password">Request a new link</A></>
         : done ? <SuccessLine>{supabaseAuth ? 'Password updated. You can sign in now.' : 'Password updated. All other sessions were signed out. You can sign in now.'}</SuccessLine> : (
         <Form onSubmit={submit}>
-          <Field id="new-password" label="New password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint={supabaseAuth ? `${MIN_PASSWORD} to ${MAX_PASSWORD} characters.` : undefined} />
+          <Field id="new-password" label="New password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint={PASSWORD_HINT} />
           <Field id="confirm-password" label="Confirm new password" type="password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
            {needsMfa && <Field id="reset-authenticator-code" label="Existing authenticator code" value={code} onChange={setCode} autoComplete="one-time-code" inputMode="numeric" maxLength={6} hint="Password recovery does not remove two-factor authentication." />}
           <ErrorLine>{err}</ErrorLine>

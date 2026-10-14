@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
+import { Link } from 'wouter';
 import { ShieldCheck } from 'lucide-react';
 import { authClient } from '@/lib/owned-auth-client';
 import { supabaseDevelopmentAuth } from '@/lib/owned-auth-client';
 import { DevelopmentRecoveryCodes } from './development-recovery-codes';
 import { supabaseMfa, refreshSupabaseSession, useSupabaseSessionState } from '@/lib/supabase-auth-client';
 import { Button } from '@/components/ui/button';
-import { ErrorLine, Field, Form, SuccessLine, Submit, authErrorText, MIN_PASSWORD, MAX_PASSWORD } from '@/components/auth/auth-ui';
+import { ErrorLine, Field, Form, SuccessLine, Submit, authErrorText, PASSWORD_HINT, validateNewPassword } from '@/components/auth/auth-ui';
 
 function Section({ title, desc, children, id }: { title: string; desc?: string; children: React.ReactNode; id: string }) {
   return (
@@ -24,7 +25,8 @@ function PasswordForm() {
   useEffect(() => () => { setCur(''); setPw(''); setConfirm(''); }, []);
   const save = async () => {
     setErr(''); setOk('');
-    if (pw.length < MIN_PASSWORD || pw.length > MAX_PASSWORD) { setErr(`Use ${MIN_PASSWORD} to ${MAX_PASSWORD} characters.`); return; }
+    const passwordError = validateNewPassword(pw);
+    if (passwordError) { setErr(passwordError); return; }
     if (pw !== confirm) { setErr('The passwords do not match.'); return; }
     setBusy(true);
     try {
@@ -35,7 +37,7 @@ function PasswordForm() {
   };
   return <Form onSubmit={save}>
     <Field id="current-password" label="Current password" type="password" value={cur} onChange={setCur} autoComplete="current-password" />
-    <Field id="change-new-password" label="New password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint={`${MIN_PASSWORD} to ${MAX_PASSWORD} characters.`} />
+    <Field id="change-new-password" label="New password" type="password" value={pw} onChange={setPw} autoComplete="new-password" hint={PASSWORD_HINT} />
     <Field id="change-confirm-password" label="Confirm new password" type="password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
     <ErrorLine>{err}</ErrorLine><SuccessLine>{ok}</SuccessLine>
     <Submit id="button-change-password" busy={busy} disabled={!cur || !pw}>Change password</Submit>
@@ -118,7 +120,10 @@ export function SupabaseSecurityPanel() {
   return (
     <div className="space-y-5" data-testid="panel-security">
       <div><p className="text-xs uppercase tracking-widest text-copper">Signed in as</p><p className="font-display text-3xl" data-testid="text-account-email">{user.email}</p>{user.name && <p className="text-sm text-muted-foreground" data-testid="text-account-name">{user.name}</p>}</div>
-      <Section id="password" title="Password" desc="Use 12 to 128 characters."><PasswordForm /></Section>
+      {supabaseDevelopmentAuth && user.twoFactorEnabled && <p className="text-sm text-muted-foreground">
+        If you signed in with an email code, <Link href="/two-factor" className="font-medium underline" data-testid="link-verify-authenticator">verify Google Authenticator</Link> before changing your password or authenticator. Email sign-in does not disable your existing MFA.
+      </p>}
+      <Section id="password" title="Password" desc={PASSWORD_HINT}><PasswordForm /></Section>
       <Section id="two-factor" title="Two-factor authentication" desc="Authenticator app (TOTP). Required for super administrator access."><TwoFactor enabled={!!user.twoFactorEnabled} /></Section>
       {supabaseDevelopmentAuth && <Section id="recovery-codes" title="Authenticator recovery codes" desc="Development only. Prepare these before losing your authenticator."><DevelopmentRecoveryCodes /></Section>}
     </div>

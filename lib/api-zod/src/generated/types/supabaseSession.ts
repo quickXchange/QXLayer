@@ -10,6 +10,8 @@ import type { SupabasePublicUser } from './supabasePublicUser';
 export interface SupabaseSession {
   user: SupabasePublicUser | null;
   mfaRequired: boolean;
+  /** Development only; server-confirmed Super Admin with verified Gmail and existing TOTP. Never inferred from browser metadata. */
+  emailMfaAvailable?: boolean;
   recovery: boolean;
   /**
      * Development-only unused recovery codes, visible only after MFA.

@@ -20,6 +20,8 @@ export const SupabaseActionInputAction = {
   'change-password': 'change-password',
   'mfa-enroll': 'mfa-enroll',
   'mfa-verify': 'mfa-verify',
+  'mfa-email-send': 'mfa-email-send',
+  'mfa-email-verify': 'mfa-email-verify',
   'mfa-remove': 'mfa-remove',
   'link-existing': 'link-existing',
   'mfa-recovery-generate': 'mfa-recovery-generate',

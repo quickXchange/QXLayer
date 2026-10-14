@@ -58,7 +58,7 @@ async function scenario(aal: string, run: (req: Request, res: Response, writes: 
 }
 test("a recovery email never bypasses an existing authenticator during password reset", async () => {
   await scenario("aal1", async (req, res, writes) => {
-    await assert.rejects(performAction({ action: "reset-password", password: "Synthetic-new-password" }, req, res),
+    await assert.rejects(performAction({ action: "reset-password", password: "Synthetic-new-password1" }, req, res),
       (e: unknown) => (e as { status: number }).status === 428);
     assert(!writes.includes("provider-password-update"));
   });
@@ -73,7 +73,7 @@ test("MFA can elevate recovery assurance but never grants business or Admin acce
 });
 test("MFA-verified recovery changes only the password and revokes all subject sessions", async () => {
   await scenario("aal2", async (req, res, writes) => {
-    await performAction({ action: "reset-password", password: "Synthetic-new-password" }, req, res);
+    await performAction({ action: "reset-password", password: "Synthetic-new-password1" }, req, res);
     assert(writes.includes("provider-password-update"));
     assert(writes.some(sql => sql.includes("DELETE FROM vynox_supabase_auth.sessions WHERE subject=$1")));
     assert(writes.every(sql => !/identity_links|platform_admins|tenant_memberships/.test(sql)));

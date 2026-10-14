@@ -61,7 +61,8 @@ if (process.argv[2] === "cleanup") {
   const scope: Scope = { email: requested ?? `dev-auth-${randomUUID().slice(0, 12)}@example.test`,
     name: `Disposable Development QA ${randomUUID()}`, startedAt: new Date().toISOString() };
   await writeFile(path, JSON.stringify(scope), { flag: "wx", mode: 0o600 });
-  const password = randomBytes(32).toString("base64url");
+  const password = process.env.QXLAYER_DEVELOPMENT_AUTH_QA_PASSWORD_LENGTH === "10"
+    ? `Aa1${randomBytes(8).toString("base64url").slice(0, 7)}` : randomBytes(32).toString("base64url");
   if (!requested) {
     const user = await provider<{ id: string }>("", "POST", { email: scope.email, password, email_confirm: true,
       user_metadata: { name: scope.name }, app_metadata: { qa: "development-auth-verification" } });

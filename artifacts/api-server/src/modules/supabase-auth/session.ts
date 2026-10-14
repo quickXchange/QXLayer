@@ -7,13 +7,15 @@ import { authRequest, type SupabaseTokens, type SupabaseUser } from "./provider"
 import { supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret, developmentSupabaseAuth } from "./config";
 
 export const SESSION_COOKIE = developmentSupabaseAuth() ? "__Host-vynox_dev_sb" : "__Host-vynox_sb";
-interface Payload {
+export interface Payload {
   accessToken: string;
   refreshToken: string;
   subject: string;
   tokenExpires: number;
   recovery: boolean;
   created: number;
+  emailChallenge?: { hash: string; nonce: string; recipient: string; expires: number; attempts: number };
+  emailMfa?: { recipient: string; factorId: string; expires: number };
 }
 export interface AuthSession {
   digest: string;
@@ -81,7 +83,7 @@ export async function readSession(req: Request): Promise<AuthSession | null> {
       const tokens = await authRequest<SupabaseTokens>("/token?grant_type=refresh_token",
         { method: "POST", body: { refresh_token: p.refreshToken } });
       if (tokens.user.id !== p.subject) throw new HttpError(401, "Session identity changed.");
-      p = { ...payload(tokens, p.recovery), created: p.created };
+      p = { ...p, ...payload(tokens, p.recovery), created: p.created };
       await client.query("UPDATE vynox_supabase_auth.sessions SET envelope=$2 WHERE digest=$1", [digest, codec().seal(p)]);
     }
     const user = await authRequest<SupabaseUser>("/user", { accessToken: p.accessToken });

@@ -75,6 +75,9 @@ components:
             - {$ref: "#/components/schemas/SupabasePublicUser"}
             - {type: "null"}
         mfaRequired: {type: boolean}
+        emailMfaAvailable:
+          type: boolean
+          description: Development only; server-confirmed Super Admin with verified Gmail and existing TOTP. Never inferred from browser metadata.
         recovery: {type: boolean}
         recoveryCodesRemaining:
           type: integer
@@ -90,7 +93,7 @@ components:
       properties:
         action:
           type: string
-          enum: [signup, login, logout, recover, resend, verify, reset-password, change-password, mfa-enroll, mfa-verify, mfa-remove, link-existing, mfa-recovery-generate, mfa-recover]
+          enum: [signup, login, logout, recover, resend, verify, reset-password, change-password, mfa-enroll, mfa-verify, mfa-email-send, mfa-email-verify, mfa-remove, link-existing, mfa-recovery-generate, mfa-recover]
         email: {type: string, format: email, maxLength: 254}
         name: {type: string, minLength: 1, maxLength: 120}
         password: {type: string, maxLength: 128}

@@ -28,7 +28,7 @@ const mode = process.argv[2];
 if (!["configure", "verify", "smtp-check"].includes(mode)) throw Error("Use configure, verify or smtp-check.");
 const before = await config();
 if (before.site_url !== origin || before.mailer_autoconfirm !== false ||
-    before.password_min_length < 12 || !before.mfa_totp_enroll_enabled || !before.mfa_totp_verify_enabled)
+    before.password_min_length < 10 || !before.mfa_totp_enroll_enabled || !before.mfa_totp_verify_enabled)
   throw Error("Existing Development authentication safety settings differ; review required.");
 const expected = {
   smtp_host: "smtp.resend.com", smtp_port: "465", smtp_user: "resend",

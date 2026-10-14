@@ -18,19 +18,62 @@ Preservation readback after disposable QA cleanup confirmed:
 
 - all 42 original public business-table fingerprints match;
 - all captured retired-authentication table fingerprints match;
-- existing Supabase identity links and original session digests/subjects match;
+- existing Supabase identity links match and the original session digest/subject
+  remains present;
 - the original single active Owner binding and verified TOTP factor remain;
 - the disposable Supabase QA identity, sessions and cleanup manifest are removed.
 
 The auth-preservation snapshot excludes rate-limit counters and legitimately
 rotated encrypted session envelopes. It does not bypass or recreate sessions.
 
+The latest cleanup readback reports one additional session belonging to the
+original Owner. The original singleton session hash still matches exactly; all
+non-session table fingerprints, Owner binding and TOTP factor fingerprints match.
+The strict historical total-count comparison flags this addition. Neither the
+baseline nor either Owner session was overwritten or deleted to clear that flag.
+
+## Development email MFA and password policy
+
+- The sign-in MFA screen has **Another Method** only when the server confirms
+  an active Super Admin, verified `gmail.com` address and existing verified TOTP.
+  Account ownership comes from the preserved subject/business binding and actual
+  authorization, never email similarity or caller-selected metadata.
+- Six-digit email codes expire five minutes after issuance, are single-use,
+  session/account/recipient-bound and stored only as HMAC digests within encrypted
+  pending-session envelopes. Mail goes only to the provider-verified recipient.
+- Account limits: one send/minute, five sends/hour, five attempts/code, and twenty
+  verification attempts/fifteen minutes. Existing request/IP limits also apply.
+  Row locks serialize consumption; resends invalidate old challenges; failed
+  delivery cannot elevate assurance. Insecure TLS is refused.
+- Email supplies application sign-in assurance, **not provider AAL2**. Existing
+  Google Authenticator remains enrolled and available. Password reset/change,
+  authenticator removal/enrollment and recovery-code generation retain their
+  existing native authenticator requirements; recovery-only sessions remain
+  denied business/Admin access.
+- Signup, reset and change share Development validation: at least ten characters
+  with uppercase, lowercase and numbers; symbols optional; the existing upper
+  bound is unchanged. Existing login passwords are not retroactively validated.
+- The pinned Development provider's password minimum and required character sets
+  were updated and read back. Every other provider configuration field matched.
+  Staging rules/configuration were not changed.
+- Native disposable browser coverage passed ten-character signup, verification,
+  password change, old-password rejection, TOTP enrollment/login, wrong-code
+  rejection, reset requiring retained TOTP, reload/new-tab persistence, customer
+  access, Admin denial and logout/back isolation. Exact fixture cleanup completed.
+- Email MFA security/consumption and transport behavior passed isolated backend
+  tests with synthetic authorization. Its UI passed browser network-mocked
+  switching/send/countdown/wrong-code/success coverage. **Real Super Admin Gmail
+  receipt and native Owner email-code acceptance were not performed.** Mocked
+  transport and provider-generated links are not inbox-delivery evidence.
+- No live role was granted, no Owner cookie was injected, no existing factor was
+  disabled, and no Staging/Production or deployment operation was performed.
+
 ## Verification and limitations
 
 - Workspace TypeScript checks pass.
 - API, console, website and mockup sandbox production-mode compilation passes. Compilation is
   **not** evidence that Production authentication can start or serve users.
-- All 374 tests across 78 test files pass, using the Node test asset loader for
+- All 385 tests pass, using the Node test asset loader for
   Vite-managed image imports. Workspace typechecking passes.
 - Existing release-contract/business regression suites pass; the separate new
   authentication release-hold test confirms Republish is blocked.
@@ -69,7 +112,7 @@ rotated encrypted session envelopes. It does not bypass or recreate sessions.
   **0 flagged dataflows**. Telegram initData is still server-verified on reload.
 - Managed full static scan now completes: **10 medium findings, no high or
   critical findings**. Raw warnings remain visible; they are not silently
-  suppressed. Five concern protocol/checksum SHA-1, two signed-cookie/proxy
+  suppressed. Five concern protocol/checksum weak-hash heuristics, two signed-cookie/proxy
   heuristics, two redirect heuristics and one synthetic URL-credential fixture.
   The fixed same-origin preview paths now encode slugs; the Preview verification
   proxy refuses off-origin redirects. Further disposition of these warnings

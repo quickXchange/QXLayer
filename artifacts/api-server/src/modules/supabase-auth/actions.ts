@@ -8,8 +8,15 @@ import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecr
 import { establishSession, needSession, publicUser, hasVerifiedFactor, reauthenticate, readSession,
   revokeLocalSession, updateSession, type AuthSession } from "./session";
 import { generateRecoveryCodes, recoverAuthenticator, requireDevelopmentRecovery } from "./development-recovery";
+import { sendEmailChallenge, verifyEmailChallenge } from "./development-email-mfa";
 
-const password = z.string().min(12, "Use at least 12 characters.").max(128);
+const password = z.string().max(128).superRefine((value, ctx) => {
+  const dev = developmentSupabaseAuth();
+  if (value.length < (dev ? 10 : 12) || (dev && !/[A-Z]/.test(value)))
+    ctx.addIssue({ code: "custom", message: dev ? "Use at least 10 characters, including uppercase, lowercase and numbers." : "Use at least 12 characters." });
+  else if (dev && (!/[a-z]/.test(value) || !/[0-9]/.test(value)))
+    ctx.addIssue({ code: "custom", message: "Include uppercase letters, lowercase letters and numbers." });
+});
 const email = z.string().email().max(254).transform(v => v.trim().toLowerCase());
 const factorId = z.string().uuid();
 export const input = z.discriminatedUnion("action", [
@@ -23,6 +30,8 @@ export const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("change-password"), currentPassword: z.string().min(1).max(128), password }).strict(),
   z.object({ action: z.literal("mfa-enroll"), currentPassword: z.string().min(1).max(128) }).strict(),
   z.object({ action: z.literal("mfa-verify"), code: z.string().regex(/^[0-9]{6}$/), factorId: factorId.optional() }).strict(),
+  z.object({ action: z.literal("mfa-email-send") }).strict(),
+  z.object({ action: z.literal("mfa-email-verify"), code: z.string().regex(/^[0-9]{6}$/) }).strict(),
   z.object({ action: z.literal("mfa-remove"), currentPassword: z.string().min(1).max(128), factorId,
     code: z.string().regex(/^[0-9]{6}$/) }).strict(),
    z.object({ action: z.literal("link-existing") }).strict(),
@@ -67,6 +76,12 @@ export async function performAction(raw: unknown, req: Request, res: Response) {
   if (["signup", "recover", "resend"].includes(a.action) && !cfg.mailReady)
     throw new HttpError(503, "Verification and recovery email delivery is not configured.");
   switch (a.action) {
+    case "mfa-email-send":
+      await sendEmailChallenge(await needSession(req));
+      return { ok: true };
+    case "mfa-email-verify":
+      await verifyEmailChallenge(await needSession(req), a.code);
+      return { ok: true };
     case "mfa-recovery-generate": {
       const s = await needSession(req);
       if (!s.aal2 || s.payload.recovery) throw new HttpError(403, "Complete MFA before generating recovery codes.");

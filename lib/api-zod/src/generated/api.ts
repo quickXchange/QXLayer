@@ -29,6 +29,7 @@ export const GetSupabaseAuthSessionResponse = zod.object({
   "totpFactorId": zod.string().nullish()
 }),zod.null()]),
   "mfaRequired": zod.boolean(),
+  "emailMfaAvailable": zod.boolean().optional().describe('Development only; server-confirmed Super Admin with verified Gmail and existing TOTP. Never inferred from browser metadata.'),
   "recovery": zod.boolean(),
   "recoveryCodesRemaining": zod.number().int().min(getSupabaseAuthSessionResponseRecoveryCodesRemainingMin).optional().describe('Development-only unused recovery codes, visible only after MFA.'),
   "existingAccountLinked": zod.boolean().optional().describe('Whether this authenticated subject already has an explicit identity link. Does not grant access or expose preserved IDs.')
@@ -52,7 +53,7 @@ export const performSupabaseAuthActionBodyRecoveryCodeMax = 64;
 
 
 export const PerformSupabaseAuthActionBody = zod.object({
-  "action": zod.enum(['signup', 'login', 'logout', 'recover', 'resend', 'verify', 'reset-password', 'change-password', 'mfa-enroll', 'mfa-verify', 'mfa-remove', 'link-existing', 'mfa-recovery-generate', 'mfa-recover']),
+  "action": zod.enum(['signup', 'login', 'logout', 'recover', 'resend', 'verify', 'reset-password', 'change-password', 'mfa-enroll', 'mfa-verify', 'mfa-email-send', 'mfa-email-verify', 'mfa-remove', 'link-existing', 'mfa-recovery-generate', 'mfa-recover']),
   "email": zod.string().email().max(performSupabaseAuthActionBodyEmailMax).optional(),
   "name": zod.string().min(1).max(performSupabaseAuthActionBodyNameMax).optional(),
   "password": zod.string().max(performSupabaseAuthActionBodyPasswordMax).optional(),

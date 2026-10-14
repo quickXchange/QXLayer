@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { authClient } from '@/lib/owned-auth-client';
-import { A, AuthFrame, ErrorLine, Field, Form, MailNotice, SuccessLine, Submit, authErrorText, useOwnedStatus, MIN_PASSWORD, MAX_PASSWORD } from '@/components/auth/auth-ui';
+import { A, AuthFrame, ErrorLine, Field, Form, MailNotice, SuccessLine, Submit, authErrorText, useOwnedStatus, PASSWORD_HINT, validateNewPassword } from '@/components/auth/auth-ui';
 
 export default function SignUpPage() {
   const { status, failed } = useOwnedStatus();
@@ -8,7 +8,8 @@ export default function SignUpPage() {
   const [busy, setBusy] = useState(false); const [err, setErr] = useState(''); const [done, setDone] = useState(false);
   const submit = async () => {
     setErr('');
-    if (password.length < MIN_PASSWORD || password.length > MAX_PASSWORD) { setErr(`Use ${MIN_PASSWORD} to ${MAX_PASSWORD} characters for your password.`); return; }
+    const passwordError = validateNewPassword(password);
+    if (passwordError) { setErr(passwordError); return; }
     if (password !== confirm) { setErr('The passwords do not match.'); return; }
     setBusy(true);
     try {
@@ -24,7 +25,7 @@ export default function SignUpPage() {
         <Form onSubmit={submit}>
           <Field id="name" label="Full name" value={name} onChange={setName} autoComplete="name" />
           <Field id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
-          <Field id="password" label="Password" type="password" value={password} onChange={setPassword} autoComplete="new-password" hint={`${MIN_PASSWORD} to ${MAX_PASSWORD} characters.`} />
+          <Field id="password" label="Password" type="password" value={password} onChange={setPassword} autoComplete="new-password" hint={PASSWORD_HINT} />
           <Field id="confirm" label="Confirm password" type="password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
           <ErrorLine>{err}</ErrorLine>
           <Submit id="button-sign-up" busy={busy} disabled={!name || !email || !password}>Create account</Submit>

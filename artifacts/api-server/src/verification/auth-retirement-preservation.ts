@@ -54,7 +54,14 @@ try {
       originalLinkedOwnerVerified: true, ownerTotpVerified: true }));
   } else if (process.argv[2] === "verify") {
     const previous = JSON.parse(await readFile(path, "utf8"));
-    if (JSON.stringify(previous) !== JSON.stringify(current)) throw Error("Authentication/data preservation differs; review before proceeding.");
+    if (JSON.stringify(previous) !== JSON.stringify(current)) {
+      const keys = new Set([...Object.keys(previous.data), ...Object.keys(current.data)]);
+      const differences = [...keys].filter(k => JSON.stringify(previous.data[k]) !== JSON.stringify(current.data[k]));
+      throw Error(JSON.stringify({ preservationDiff: differences.map(table => ({
+        table, beforeCount: previous.data[table]?.count, afterCount: current.data[table]?.count,
+      })), originalOwnerBindingUnchanged: previous.ownerBinding === current.ownerBinding,
+        originalOwnerFactorsUnchanged: previous.ownerFactors === current.ownerFactors }));
+    }
     console.log(JSON.stringify({ businessAndRetiredAuthTablesUnchanged: true,
       identityLinksAndExistingSessionsUnchanged: true, originalOwnerBindingAndTotpUnchanged: true }));
   } else throw Error("Use prepare or verify.");
