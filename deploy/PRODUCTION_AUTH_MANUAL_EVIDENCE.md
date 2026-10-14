@@ -2,6 +2,14 @@
 
 ## Current boundary
 
+The user cannot access the technical release/provider/database-binding details
+and has requested agent-led read-only inspection. The steps below remain a
+reference for an authorized read-only evidence source, not a request for the
+user to supply inaccessible details. Current available deployment metadata,
+logs and gated public reads do not expose those three proofs; see
+`PRODUCTION_AUTH_BACKUP_READINESS.md`. Do not unlock protection or change
+Production merely to obtain them.
+
 Reuse the completed Production schema inventory and Development 42-account
 audit; do not rerun them. The user clarified that there are no real customers;
 all existing customer accounts are tests. Prepare continuity only for the

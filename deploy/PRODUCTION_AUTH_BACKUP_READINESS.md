@@ -90,6 +90,20 @@ durable recovery.
 
 ### New read-only verification
 
+Latest follow-through: the user cannot access the technical running-release
+details and requested agent-led, read-only inspection instead. Fresh deployment
+metadata still exposes no release ID; both production health URLs return 200
+without release headers. Unfiltered and filtered deployment-log reads returned
+no logs. Root/sign-in/auth-status GETs return the existing access gate's 403;
+it was not unlocked. Non-secret Production selector inspection returned no
+requested values, which does not attest their absence in the running release.
+The project reports managed Clerk, not proof of the running provider. Release,
+active provider and runtime database host therefore remain unverified.
+Sanitized evidence:
+`generated-artifacts/auth-security/production-runtime-binding-readonly-20261015.json`.
+The user left backup destination selection **undecided** and independent
+passphrase custody **unsure**. Neither grants capture/upload/restore approval.
+
 - The dedicated pinned export connection is reachable: PostgreSQL **16.15**,
   database `neondb`, transaction read-only, one active Admin and the exact
   unchanged original Admin row fingerprint. Client TLS **1.3**, verified

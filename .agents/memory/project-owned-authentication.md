@@ -148,3 +148,15 @@ The user confirmed native Development verification-email receipt and successful 
 **Why:** Inbox receipt and private link completion require recipient participation; SMTP configuration and provider request acceptance alone cannot establish those outcomes.
 
 **How to apply:** Treat the integrated Development email flows as user-accepted, not merely SMTP-tested. Preserve the independent Development mail setup and the separate Staging/Production approval boundary.
+
+During Production Auth preparation, identify the live release, active provider
+and database binding through agent-led read-only configuration/log inspection,
+not repeated requests for the user to obtain technical details.
+
+**Why:** The user stated they do not have access to those technical details and
+explicitly requested read-only agent inspection with no Production changes.
+
+**How to apply:** Exhaust available read-only metadata and logs. If the interfaces
+do not expose a proof, report the exact limitation without substituting workspace
+settings, configured Clerk, a healthy endpoint or a matching database snapshot.
+Do not unlock access protection or alter Production to add diagnostics.
