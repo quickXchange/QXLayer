@@ -9,7 +9,7 @@ test("current preparation stays inert and explicitly reports missing Production 
   assert.equal(r.status, "EVIDENCE_MISSING");
   assert.deepEqual(r.errors, []);
   assert(r.missing.includes("evidence.runtimeBusinessDatabaseBinding"));
-  assert(r.missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
+  assert(!r.missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
   assert.equal(r.deploymentAuthorized, false);
 });
 test("Development/Staging projects and directories cannot be promoted by a draft", () => {
@@ -30,6 +30,7 @@ test("mutation authorization and weakened continuity are rejected", () => {
 });
 test("a total count, invalid counts and credential-like values cannot satisfy safe preparation", () => {
   const p = draft(); p.continuity.productionDirectory.totalUsers = 42;
+  p.continuity.productionDirectory.protectedAdministrationManifestEvidence = null;
   assert(check(p).missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
   p.continuity.productionDirectory.totalUsers = -1; assert(check(p).errors.length);
   p.target.productionProjectRef = "not-a-project"; assert(check(p).errors.length);
@@ -64,16 +65,18 @@ test("test accounts do not require migration and cleanup never becomes implicit"
   silentReenrollment.continuity.factorReenrollmentRequiresExplicitApproval = false;
   assert(check(silentReenrollment).errors.length);
 });
-test("successful synthetic encryption checks are not a verified real backup or Owner match", () => {
+test("confirmed directory identity and synthetic encryption do not prove native MFA or real backup", () => {
   const p = draft();
   assert.equal(p.backupPreparation.configuredKeySyntheticChecksPassed, 10);
   assert.equal(p.backupPreparation.authenticatedStreamingSyntheticChecksPassed, 10);
   assert.equal(p.backupPreparation.productionExportExecuted, false);
   assert.equal(p.backupPreparation.realBackupAndRestoreVerified, false);
-  assert.equal(p.continuity.productionDirectory.productionDirectoryMatchVerified, false);
+  assert.equal(p.continuity.productionDirectory.productionDirectoryMatchVerified, true);
+  assert.equal(p.continuity.productionDirectory.nativeMfaAndCustodyAccepted, false);
   const result = check(p);
   assert.equal(result.status, "EVIDENCE_MISSING");
   assert(result.missing.includes("evidence.authenticatedBackupAndIsolatedRestore"));
-  assert(result.missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
+  assert(!result.missing.includes("continuity.productionDirectory.protectedAdministrationManifestEvidence"));
+  assert(result.missing.includes("evidence.nativeProductionOwnerMfaAdminAndSessionsAccepted"));
   assert.equal(result.deploymentAuthorized, false);
 });

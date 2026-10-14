@@ -8,10 +8,11 @@ The only Production operation was a focused read-only SELECT of the existing
 `platform_admins` records. It returned one active original Admin and the same
 full-row fingerprint as the completed inventory.
 
-The exact stored legacy native ID is now known. This identifies the business
-authorization record, **not yet its presence in the Production Auth directory**.
-Only a Production user-details record bearing that exact ID is needed to
-resolve this match. No email matching, second Owner or test-account migration.
+The exact stored legacy native ID is now known. The user subsequently confirmed
+on 2026-10-15 that this exact ID is present in the Production Auth user-details
+view. The business-to-directory match is therefore **user-confirmed**, not
+independently retrieved by the agent. No further Owner-ID proof is needed now.
+No email matching, second Owner or test-account migration.
 Native MFA/custody must still be proved by the genuine administrator before any
 future link/cutover; a matching ID alone is not authentication.
 
@@ -86,15 +87,15 @@ durable recovery.
 
 ## Remaining genuine prerequisites
 
-1. **Identity:** confirm the exact stored Super Admin ID is present in the
-   Production Auth user-details view. The user need not send both test-user
-   records, a directory export, password or MFA code.
-2. **Running source:** immutable deployed provider/release and effective business
+The identity/directory-match prerequisite is resolved by the user's exact-ID
+confirmation. Native MFA/custody acceptance remains a later protected-Admin gate.
+
+1. **Running source:** immutable deployed provider/release and effective business
    database binding remain unavailable through the exposed metadata. The fresh
    deployment response confirms only a successful public autoscale publication
    and the existing hosts, not these runtime details. Existing manual read-only
    steps are in `PRODUCTION_AUTH_MANUAL_EVIDENCE.md`.
-3. **Recoverability/custody:** verify the authorized independent private
+2. **Recoverability/custody:** verify the authorized independent private
    ciphertext destination, independently retained key and isolated restore
    target before calling a real backup usable. No secret value is requested.
 

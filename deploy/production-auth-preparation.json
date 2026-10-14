@@ -39,10 +39,12 @@
       "instanceIdentifier": null,
       "totalUsers": 2,
       "totalUsersEvidence": "USER_CONFIRMED_REPLIT_CLOUD_USERS_AUTH_PRODUCTION",
-      "nativeRecordInspectionStatus": "STORED_ADMIN_ID_READ_DIRECTORY_MATCH_STILL_PENDING",
+      "nativeRecordInspectionStatus": "USER_CONFIRMED_EXACT_STORED_ADMIN_ID_IN_PRODUCTION",
       "originalAdminBusinessRowUnchanged": true,
-      "productionDirectoryMatchVerified": false,
-      "protectedAdministrationManifestEvidence": null
+      "productionDirectoryMatchVerified": true,
+      "productionDirectoryMatchEvidenceSource": "USER_CONFIRMED_PRODUCTION_USER_DETAILS_2026_10_15",
+      "nativeMfaAndCustodyAccepted": false,
+      "protectedAdministrationManifestEvidence": "generated-artifacts/auth-security/protected-production-administrator-manifest.json"
     }
   },
   "backupPreparation": {

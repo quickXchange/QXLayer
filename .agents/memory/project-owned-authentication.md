@@ -25,6 +25,18 @@ can include password hashes: request minimal non-secret directory evidence
 first, never a raw export upload, and require separately reviewed custody and
 field-whitelisting before a full roster handoff.
 
+The user confirmed on 2026-10-15 that the exact native ID stored on the original
+active Super Admin business row appears in the Production Auth user-details
+view. This resolves the Owner's business-to-directory identification, not native
+MFA/custody, runtime database binding or Supabase acceptance.
+
+**Why:** The user explicitly confirmed the exact-ID Production record match.
+
+**How to apply:** Do not ask for the Owner ID or both test-user records again
+unless contradictory evidence arises. Preserve the original Owner and factor;
+retain user-confirmed provenance rather than claiming an agent directory export
+or successful native authentication.
+
 The user wants a full authentication system from their side, integrated with this project, instead of Clerk.
 
 For Development source, the user now explicitly requests removing Clerk and unused Better Auth dependencies while keeping Supabase Auth and preserving Super Admin access, MFA, users, roles, sessions and business data. This supersedes earlier instructions to retain Clerk **in Development source only**. Staging and Production must remain unchanged, and no deploy or Republish is authorized.

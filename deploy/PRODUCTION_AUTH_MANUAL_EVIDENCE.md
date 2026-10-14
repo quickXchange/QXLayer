@@ -17,16 +17,11 @@ provider; a Database page identifies a database, not the app's effective target.
 
 ## A. Identify the protected Production administrators
 
-**Count step completed by the user:** 2 users observed in Replit Cloud →
-Users & Auth → Production. Do not ask for the count again. The next input is
-the **original Super Admin's native user ID**, plus any other account genuinely
-required for platform administration—not a complete test-user export.
-
-Update: the focused read-only database check has retrieved the original Admin's
-exact stored ID. The remaining evidence is **a Production user-details record
-with that exact ID**, not another copy of the count, a new email, or both test-user
-records. If it is absent from the two Production identities, stop; do not create
-another Owner, grant privileges or alter the existing business ID.
+**Completed by the user:** 2 Production users observed, followed on 2026-10-15 by
+confirmation that one Production user-details record has the exact stored
+original Super Admin ID. No further count or Owner-ID proof is needed now.
+This is user-confirmed directory identification, not native MFA/custody or
+Supabase acceptance. The reference steps below must not become a repeat request.
 
 1. Open this VYNOX LAYER project in Replit, then open **Auth**.
 2. Select **Production** in its environment selector. Do not use Development
@@ -176,10 +171,10 @@ prove an artifact exists or that its native evidence is valid.
 
 ## Send this first
 
-**Identify the original Production Super Admin's native User ID and any other
-genuinely required platform administrator. Do not inventory or migrate all
-customer/test identities. Do not send passwords, keys, tokens, cookie/connection
-values or a raw export, and do not edit any record.**
+**The Owner-ID match is already confirmed. The next evidence is the actual
+deployed release/provider and business-database binding (sections B/C), followed
+by independent backup-copy/key-recovery custody. Do not send secret values,
+connection URLs, session material or test-account exports.**
 
 If that managed route is unavailable, send the exact access error instead.
 This is the next evidence step, not approval for account migration, configuration

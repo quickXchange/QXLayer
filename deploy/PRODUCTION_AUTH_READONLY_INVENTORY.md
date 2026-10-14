@@ -12,6 +12,13 @@ explicit approval. The simplified current plan is
 `PRODUCTION_SUPABASE_AUTH_MIGRATION_PLAN.md`; inventory facts below remain valid
 as captured, not as fresh queries.
 
+**Subsequent identity confirmation, 2026-10-15:** the user confirmed that the
+exact native ID on the unchanged original active Super Admin row is present in
+Production Auth. The Owner's business-to-directory match is resolved by this
+user-confirmed evidence; historical “identity unresolved” observations below
+describe the earlier capture. Native MFA/custody, deployed target binding and
+Supabase acceptance are not established by this confirmation.
+
 **NO GO for Republish or account migration.** This is a read-only inventory and
 procedure, not authorization to execute a migration. No Production/Staging
 configuration, account, role, factor, session, schema, row, DNS or deployment was

@@ -22,7 +22,10 @@ customer/test account or provide a general progressive customer-migration bridge
 ## What is already known — do not repeat the completed audits
 
 - The user observed **2 users** in Cloud → Users & Auth → Production.
-  Their native IDs have not been independently retrieved.
+  On 2026-10-15 the user confirmed that one Production user-details record has
+  the **exact native ID stored on the original active Super Admin business row**.
+  This resolves the identity/directory match using user-confirmed read-only
+  evidence, not an agent directory export or native authentication test.
 - Managed Production has one active legacy-ID Super Admin. The focused read-only
   linkage check found its full-row fingerprint unchanged from the inventory.
 - There are no tenant memberships, customer requests, attachment owners, event
@@ -150,18 +153,25 @@ prerequisites and never automatic consequences of migration.
 
 ## Immediate next prerequisite
 
-The focused 2026-10-15 read-only check has now retrieved the exact stored Super
-Admin ID; its original active business record is unchanged. **Confirm only that
-this exact ID appears in Production Auth**, and identify any other genuinely
-required administrator if one exists. Do not ask for both test-user records,
-assume directory membership, or interpret an ID match as native MFA/custody proof.
+The focused read-only check retrieved the exact stored Super Admin ID and
+confirmed its original active business record unchanged. The user subsequently
+confirmed that exact ID is present in Production Auth on 2026-10-15.
+**The original Super Admin's Production identity is identified; do not request
+this proof again.** The protected manifest records the evidence source and
+retains the original ID/role without creating or linking an account.
+
+There is one active Admin in the managed baseline and no evidence of another
+required platform administrator. Do not migrate the other visible identity
+merely because it exists; leave it unchanged. Native MFA/custody, session/Admin
+acceptance, the actual deployed target and Supabase linking remain unverified.
 
 Encrypted backup preparation is in
 [`PRODUCTION_AUTH_BACKUP_READINESS.md`](PRODUCTION_AUTH_BACKUP_READINESS.md).
 The existing configured-key encryption and authenticated recovery tools passed
 20 synthetic-only checks. No real backup, export, restore or remote Storage write
 was performed. The actual runtime source and independent recovery custody still
-need confirmation before capture/restore can be considered ready.
+need confirmation before capture/restore can be considered ready. These are the
+next evidence blockers, not a request for further Owner-ID proof or test records.
 
 No whole-customer migration inventory, mass import, new backup service or general
 customer bridge is needed. Source-schema/runtime support and native protected-
