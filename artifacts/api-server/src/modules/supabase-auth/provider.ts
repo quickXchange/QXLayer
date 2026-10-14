@@ -1,4 +1,4 @@
-import { supabaseAuthConfiguration } from "./config";
+import { supabaseAuthConfiguration, developmentSupabaseAuth } from "./config";
 import { HttpError } from "../../lib/errors";
 
 export interface SupabaseUser {
@@ -22,7 +22,7 @@ export async function authRequest<T>(path: string, options: {
   accessToken?: string;
 } = {}, transport: typeof fetch = fetch): Promise<T> {
   const cfg = supabaseAuthConfiguration();
-  if (!/^\/(?:(?:token|signup|recover|resend|verify|user|logout)(?:\?[a-zA-Z0-9_=&-]+)?|factors(?:\/[a-f0-9-]+(?:\/(?:challenge|verify))?)?)$/.test(path))
+  if (!/^\/(?:(?:token|otp|signup|recover|resend|verify|user|logout)(?:\?[a-zA-Z0-9_=&-]+)?|factors(?:\/[a-f0-9-]+(?:\/(?:challenge|verify))?)?)$/.test(path))
     throw new Error("Unsupported Supabase authentication endpoint.");
   let response: Response;
   try {
@@ -42,9 +42,21 @@ export async function authRequest<T>(path: string, options: {
   }
   if (!response.ok) {
     // Provider errors can echo private inputs. Never log them or forward raw bodies.
-    const error = await response.json().catch(() => ({})) as { error_code?: string };
+    const error = await response.json().catch(() => ({})) as { error_code?: string; msg?: string; message?: string };
     const code = error.error_code;
-    if (response.status === 429) throw new HttpError(429, "Too many attempts. Wait before trying again.");
+    if (response.status === 429) {
+      if (!developmentSupabaseAuth()) throw new HttpError(429, "Too many attempts. Wait before trying again.");
+      const header = response.headers.get("retry-after");
+      const message = error.msg ?? error.message ?? "";
+      const frequency = message.length < 300 && /^For security purposes, you can only request this after ([0-9]+) seconds?\.$/.exec(message);
+      // Never forward the provider body: select a known reason and safe numeric delay only.
+      const delay = header && /^[0-9]+$/.test(header) ? Number(header) : frequency ? Number(frequency[1]) : 60;
+      const floor = /^\/(?:recover|otp|resend|signup)$/.test(path) ? 60 : 1;
+      const retry = Math.max(floor, Math.min(3600, delay));
+      if (frequency)
+        throw new HttpError(429, `An email was recently requested for this address. Wait ${retry} seconds before requesting another.`, retry);
+      throw new HttpError(429, `Email or verification requests are temporarily limited. Wait ${retry} seconds before retrying.`, retry);
+    }
     if (code === "email_not_confirmed") throw new HttpError(403, "EMAIL_NOT_VERIFIED: Verify your email before signing in.");
     if (code === "invalid_credentials") throw new HttpError(401, "Email or password is incorrect.");
     if (code === "otp_expired" || code === "flow_state_expired")

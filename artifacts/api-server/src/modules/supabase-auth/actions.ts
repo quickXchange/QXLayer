@@ -6,9 +6,11 @@ import { HttpError } from "../../lib/errors";
 import { authRequest, type SupabaseTokens } from "./provider";
 import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 import { establishSession, needSession, publicUser, hasVerifiedFactor, reauthenticate, readSession,
-  revokeLocalSession, updateSession, type AuthSession } from "./session";
+  revokeLocalSession, updateSession, sessionCookie, type AuthSession } from "./session";
 import { generateRecoveryCodes, recoverAuthenticator, requireDevelopmentRecovery } from "./development-recovery";
 import { sendEmailChallenge, verifyEmailChallenge } from "./development-email-mfa";
+import { sendEmailLogin, verifyEmailLogin } from "./development-email-login";
+import { developmentLimit, developmentMailCooldown } from "./development-auth-limits";
 
 const password = z.string().max(128).superRefine((value, ctx) => {
   const dev = developmentSupabaseAuth();
@@ -22,6 +24,8 @@ const factorId = z.string().uuid();
 export const input = z.discriminatedUnion("action", [
   z.object({ action: z.literal("signup"), name: z.string().trim().min(1).max(120), email, password }).strict(),
   z.object({ action: z.literal("login"), email, password: z.string().min(1).max(128) }).strict(),
+  z.object({ action: z.literal("login-email-send"), email }).strict(),
+  z.object({ action: z.literal("login-email-verify"), email, code: z.string().regex(/^[0-9]{6}$/) }).strict(),
   z.object({ action: z.literal("logout") }).strict(),
   z.object({ action: z.literal("recover"), email }).strict(),
   z.object({ action: z.literal("resend"), email }).strict(),
@@ -42,14 +46,28 @@ export const input = z.discriminatedUnion("action", [
 ]);
 export async function limitAction(req: Request, action: string, account = "") {
   const secret = supabaseSessionSecret();
+  if (developmentSupabaseAuth()) {
+    await developmentLimit(`ingress/${action}`, req.socket.remoteAddress ?? "unknown", 60, 60);
+    if (account) await developmentLimit(`account/${action}`, account, 60, 5);
+    else account = sessionCookie(req) ?? "anonymous";
+    if (action === "recover") {
+      await developmentMailCooldown(account);
+      await developmentLimit("recovery-send-hour", account, 3600, 3);
+    }
+  }
   const key = createHmac("sha256", secret).update(`${req.socket.remoteAddress}\0${action}\0${account}`).digest("hex");
   const maximum = ["login", "signup", "recover", "resend", "mfa-recover", "mfa-recovery-generate"].includes(action) ? 5 : 15;
   const result = await pool.query(`INSERT INTO vynox_supabase_auth.rate_limits(key,hits,reset_at)
     VALUES($1,1,now()+interval '1 minute') ON CONFLICT(key) DO UPDATE SET
     hits=CASE WHEN vynox_supabase_auth.rate_limits.reset_at<now() THEN 1 ELSE vynox_supabase_auth.rate_limits.hits+1 END,
     reset_at=CASE WHEN vynox_supabase_auth.rate_limits.reset_at<now() THEN now()+interval '1 minute'
-      ELSE vynox_supabase_auth.rate_limits.reset_at END RETURNING hits`, [key]);
-  if (result.rows[0].hits > maximum) throw new HttpError(429, "Too many attempts. Wait a minute before retrying.");
+      ELSE vynox_supabase_auth.rate_limits.reset_at END
+      RETURNING hits,GREATEST(1,ceil(extract(epoch FROM(reset_at-now()))))::int AS retry_after`, [key]);
+  if (result.rows[0].hits > maximum) {
+    if (!developmentSupabaseAuth()) throw new HttpError(429, "Too many attempts. Wait a minute before retrying.");
+    const wait = Number(result.rows[0].retry_after) || 60;
+    throw new HttpError(429, `Please wait ${wait} seconds before trying again.`, wait);
+  }
 }
 async function totp(s: AuthSession, code: string, requested?: string) {
   const owned = s.user.factors?.find(f => f.factor_type === "totp" &&
@@ -59,6 +77,7 @@ async function totp(s: AuthSession, code: string, requested?: string) {
     { method: "POST", accessToken: s.payload.accessToken });
   const tokens = await authRequest<SupabaseTokens>(`/factors/${owned.id}/verify`,
     { method: "POST", accessToken: s.payload.accessToken, body: { challenge_id: challenge.id, code } });
+  if (s.payload.emailPrimary) s.payload.emailPrimaryTotpVerified = true;
   await updateSession(s, tokens);
   return tokens;
 }
@@ -70,12 +89,20 @@ async function logoutAll(s: AuthSession, req: Request, res: Response) {
 }
 export async function performAction(raw: unknown, req: Request, res: Response) {
   const a = input.parse(raw);
+  if (["login-email-send", "login-email-verify"].includes(a.action) && !developmentSupabaseAuth())
+    throw new HttpError(404, "Development authentication method unavailable.");
   if (a.action === "mfa-recover" || a.action === "mfa-recovery-generate") requireDevelopmentRecovery();
   await limitAction(req, a.action, "email" in a ? a.email : "");
   const cfg = supabaseAuthConfiguration();
   if (["signup", "recover", "resend"].includes(a.action) && !cfg.mailReady)
     throw new HttpError(503, "Verification and recovery email delivery is not configured.");
   switch (a.action) {
+    case "login-email-send":
+      await sendEmailLogin(a.email, req, res);
+      return { ok: true };
+    case "login-email-verify":
+      await verifyEmailLogin(a.email, a.code, req, res);
+      return { ok: true, mfaRequired: true };
     case "mfa-email-send":
       await sendEmailChallenge(await needSession(req));
       return { ok: true };

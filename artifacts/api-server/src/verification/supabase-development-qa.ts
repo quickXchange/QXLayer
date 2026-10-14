@@ -63,7 +63,7 @@ if (process.argv[2] === "cleanup") {
   await writeFile(path, JSON.stringify(scope), { flag: "wx", mode: 0o600 });
   const password = process.env.QXLAYER_DEVELOPMENT_AUTH_QA_PASSWORD_LENGTH === "10"
     ? `Aa1${randomBytes(8).toString("base64url").slice(0, 7)}` : randomBytes(32).toString("base64url");
-  if (!requested) {
+  if (!requested || process.argv.includes("--confirmed-fixture")) {
     const user = await provider<{ id: string }>("", "POST", { email: scope.email, password, email_confirm: true,
       user_metadata: { name: scope.name }, app_metadata: { qa: "development-auth-verification" } });
     scope.subject = user.id;
@@ -76,7 +76,7 @@ if (process.argv[2] === "cleanup") {
     try {
       if (req.method === "GET" && req.url === "/fixture") {
         res.end(JSON.stringify({ email: scope.email, password, name: scope.name, subject: scope.subject }));
-      } else if (req.method === "POST" && ["/adopt", "/verification-link", "/recovery-link"].includes(req.url ?? "")) {
+      } else if (req.method === "POST" && ["/adopt", "/verification-link", "/recovery-link", "/native-email-otp-check"].includes(req.url ?? "")) {
         const list = await provider<{ users: { id: string; email?: string; created_at: string; user_metadata?: { name?: string } }[] }>("?page=1&per_page=100");
         const matches = list.users.filter(u => u.email === scope.email && u.user_metadata?.name === scope.name &&
           Date.parse(u.created_at) >= Date.parse(scope.startedAt!) - 5000);
@@ -84,16 +84,48 @@ if (process.argv[2] === "cleanup") {
         scope.subject = matches[0].id;
         await writeFile(path, JSON.stringify(scope), { mode: 0o600 });
         if (req.url === "/adopt") { res.end(JSON.stringify({ adopted: true })); return; }
+        if (req.url === "/native-email-otp-check") {
+          const sent = await fetch(`${cfg.providerOrigin}/auth/v1/otp`, {
+            method: "POST", redirect: "error", signal: AbortSignal.timeout(15000),
+            headers: { apikey: cfg.apiKey, "Content-Type": "application/json" },
+            body: JSON.stringify({ email: scope.email, create_user: false }),
+          });
+          if (!sent.ok) throw Error("Disposable native OTP mail request failed.");
+        }
         // Token issuance is for bounded browser testing, not proof of inbox delivery.
         // The actual signup/recover forms still exercise the native mail requests.
         const r = await fetch(`${cfg.providerOrigin}/auth/v1/admin/generate_link`, {
           method: "POST", headers: { apikey: cfg.apiKey, "Content-Type": "application/json" },
           redirect: "error", signal: AbortSignal.timeout(15000),
-          body: JSON.stringify({ type: req.url === "/verification-link" ? "signup" : "recovery",
+          body: JSON.stringify({ type: req.url === "/native-email-otp-check" ? "magiclink" : req.url === "/verification-link" ? "signup" : "recovery",
             email: scope.email, ...(req.url === "/verification-link" ? { password } : {}) }),
         });
         if (!r.ok) throw Error("Disposable link issuance failed.");
-        const result = await r.json() as { hashed_token?: string; properties?: { hashed_token?: string } };
+        const result = await r.json() as { hashed_token?: string; email_otp?: string; properties?: { hashed_token?: string; email_otp?: string } };
+        if (req.url === "/native-email-otp-check") {
+          const code = result.email_otp ?? result.properties?.email_otp;
+          if (!code || !/^[0-9]{6}$/.test(code)) throw Error("Unexpected disposable OTP length.");
+          const verify = () => fetch(`${cfg.providerOrigin}/auth/v1/verify`, {
+            method: "POST", redirect: "error", signal: AbortSignal.timeout(15000),
+            headers: { apikey: cfg.apiKey, "Content-Type": "application/json" },
+            body: JSON.stringify({ email: scope.email, token: code, type: "email" }),
+          });
+          const first = await verify();
+          if (!first.ok) throw Error("Disposable native email OTP verification failed.");
+          const tokens = await first.json() as { access_token: string; user: { id: string } };
+          const claims = JSON.parse(Buffer.from(tokens.access_token.split(".")[1], "base64url").toString());
+          if (tokens.user?.id !== scope.subject || claims.aal !== "aal1") throw Error("Disposable OTP assurance differs.");
+          const replay = await verify();
+          if (replay.ok || ![400, 403].includes(replay.status)) throw Error("Disposable OTP replay not rejected.");
+          const logout = await fetch(`${cfg.providerOrigin}/auth/v1/logout?scope=local`, {
+            method: "POST", redirect: "error", signal: AbortSignal.timeout(15000),
+            headers: { apikey: cfg.apiKey, Authorization: `Bearer ${tokens.access_token}` },
+          });
+          if (!logout.ok) throw Error("Disposable native OTP session cleanup failed.");
+          res.end(JSON.stringify({ nativeOtpMailRequestAccepted: true, nativeOtpLengthSix: true,
+            nativeOtpSingleUse: true, nativeOtpAssuranceAal1: true }));
+          return;
+        }
         const token = result.hashed_token ?? result.properties?.hashed_token;
         if (!token) throw Error("Disposable test token missing.");
         res.end(JSON.stringify({ url: `${cfg.origin}/${req.url === "/verification-link" ? "verify-email" : "reset-password"}?token_hash=${encodeURIComponent(token)}&type=${req.url === "/verification-link" ? "signup" : "recovery"}` }));

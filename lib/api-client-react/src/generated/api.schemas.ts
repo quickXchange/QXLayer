@@ -2250,6 +2250,8 @@ export type SupabaseActionInputAction = typeof SupabaseActionInputAction[keyof t
 export const SupabaseActionInputAction = {
   signup: 'signup',
   login: 'login',
+  'login-email-send': 'login-email-send',
+  'login-email-verify': 'login-email-verify',
   logout: 'logout',
   recover: 'recover',
   resend: 'resend',

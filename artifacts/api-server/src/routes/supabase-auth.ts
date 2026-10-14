@@ -23,7 +23,8 @@ router.use("/supabase-auth", (_req, res, next) => {
 });
 router.get("/supabase-auth/session", async (req, res): Promise<void> => {
   const s = await readSession(req);
-  const mfaRequired = !!s && !s.payload.recovery && hasVerifiedFactor(s.user) && !await applicationMfaSatisfied(s);
+  const mfaRequired = !!s && !s.payload.recovery && (hasVerifiedFactor(s.user) || !!s.payload.emailPrimary) &&
+    !await applicationMfaSatisfied(s);
   res.json(GetSupabaseAuthSessionResponse.parse({ user: s ? publicUser(s.user) : null,
     mfaRequired,
     emailMfaAvailable: mfaRequired && !!s && await emailMfaEligible(s),

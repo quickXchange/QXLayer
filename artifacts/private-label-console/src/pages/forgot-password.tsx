@@ -1,15 +1,21 @@
 import { useState } from 'react';
-import { authClient } from '@/lib/owned-auth-client';
+import { authClient, supabaseDevelopmentAuth } from '@/lib/owned-auth-client';
 import { A, AuthFrame, ErrorLine, Field, Form, MailNotice, SuccessLine, Submit, authErrorText, useOwnedStatus } from '@/components/auth/auth-ui';
+import { useAuthCooldown } from '@/components/auth/use-auth-cooldown';
 
 export default function ForgotPasswordPage() {
   const { status, failed } = useOwnedStatus();
   const [email, setEmail] = useState(''); const [busy, setBusy] = useState(false); const [err, setErr] = useState(''); const [sent, setSent] = useState(false);
+  const cooldown = useAuthCooldown();
   const submit = async () => {
+    if (busy || cooldown.remaining) return;
     setBusy(true); setErr('');
     try {
       const r = await authClient.requestPasswordReset({ email: email.trim() });
-      if (r.error) setErr(authErrorText(r.error)); else setSent(true);
+      if (r.error) {
+        setErr(authErrorText(r.error));
+        if (supabaseDevelopmentAuth && r.error.status === 429) cooldown.start(r.error.retryAfterSeconds ?? 60);
+      } else { setSent(true); if (supabaseDevelopmentAuth) cooldown.start(60); }
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (
@@ -19,7 +25,9 @@ export default function ForgotPasswordPage() {
         <Form onSubmit={submit}>
           <Field id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
           <ErrorLine>{err}</ErrorLine>
-          <Submit id="button-send-reset" busy={busy} disabled={!email}>Send reset link</Submit>
+          <Submit id="button-send-reset" busy={busy} disabled={!email || cooldown.remaining > 0}>
+            {cooldown.remaining ? `Try again in ${cooldown.remaining}s` : 'Send reset link'}
+          </Submit>
         </Form>)}
     </AuthFrame>
   );

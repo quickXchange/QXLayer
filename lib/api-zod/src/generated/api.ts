@@ -53,7 +53,7 @@ export const performSupabaseAuthActionBodyRecoveryCodeMax = 64;
 
 
 export const PerformSupabaseAuthActionBody = zod.object({
-  "action": zod.enum(['signup', 'login', 'logout', 'recover', 'resend', 'verify', 'reset-password', 'change-password', 'mfa-enroll', 'mfa-verify', 'mfa-email-send', 'mfa-email-verify', 'mfa-remove', 'link-existing', 'mfa-recovery-generate', 'mfa-recover']),
+  "action": zod.enum(['signup', 'login', 'login-email-send', 'login-email-verify', 'logout', 'recover', 'resend', 'verify', 'reset-password', 'change-password', 'mfa-enroll', 'mfa-verify', 'mfa-email-send', 'mfa-email-verify', 'mfa-remove', 'link-existing', 'mfa-recovery-generate', 'mfa-recover']),
   "email": zod.string().email().max(performSupabaseAuthActionBodyEmailMax).optional(),
   "name": zod.string().min(1).max(performSupabaseAuthActionBodyNameMax).optional(),
   "password": zod.string().max(performSupabaseAuthActionBodyPasswordMax).optional(),

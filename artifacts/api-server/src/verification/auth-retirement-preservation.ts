@@ -6,7 +6,9 @@ if (process.env.NODE_ENV !== "development" || !developmentSupabaseAuth() ||
     new URL(process.env.DATABASE_URL ?? "").hostname !== process.env.PGHOST)
   throw Error("Existing isolated Development database required.");
 const cfg = supabaseAuthConfiguration();
-const path = new URL("../../../../.local/auth-retirement-preservation.json", import.meta.url);
+const path = new URL(process.argv.includes("--login-email")
+  ? "../../../../.local/development-email-login-preservation.json"
+  : "../../../../.local/auth-retirement-preservation.json", import.meta.url);
 const hash = (v: unknown) => createHash("sha256").update(JSON.stringify(v)).digest("hex");
 async function snapshot() {
   const client = await pool.connect();

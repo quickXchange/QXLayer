@@ -93,7 +93,7 @@ components:
       properties:
         action:
           type: string
-          enum: [signup, login, logout, recover, resend, verify, reset-password, change-password, mfa-enroll, mfa-verify, mfa-email-send, mfa-email-verify, mfa-remove, link-existing, mfa-recovery-generate, mfa-recover]
+          enum: [signup, login, login-email-send, login-email-verify, logout, recover, resend, verify, reset-password, change-password, mfa-enroll, mfa-verify, mfa-email-send, mfa-email-verify, mfa-remove, link-existing, mfa-recovery-generate, mfa-recover]
         email: {type: string, format: email, maxLength: 254}
         name: {type: string, minLength: 1, maxLength: 120}
         password: {type: string, maxLength: 128}

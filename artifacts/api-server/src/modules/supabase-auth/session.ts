@@ -14,6 +14,8 @@ export interface Payload {
   tokenExpires: number;
   recovery: boolean;
   created: number;
+  emailPrimary?: boolean;
+  emailPrimaryTotpVerified?: boolean;
   emailChallenge?: { hash: string; nonce: string; recipient: string; expires: number; attempts: number };
   emailMfa?: { recipient: string; factorId: string; expires: number };
 }
@@ -47,11 +49,12 @@ export async function revokeLocalSession(req: Request, res: Response) {
   clearSessionCookie(res);
   if (value) await pool.query("DELETE FROM vynox_supabase_auth.sessions WHERE digest=$1", [cookieDigest(value)]);
 }
-export async function establishSession(req: Request, res: Response, tokens: SupabaseTokens, recovery = false) {
+export async function establishSession(req: Request, res: Response, tokens: SupabaseTokens, recovery = false, emailPrimary = false) {
   if (!tokens.access_token || !tokens.refresh_token || !tokens.user?.id)
     throw new HttpError(503, "Authentication provider returned an incomplete session.");
   const value = randomBytes(32).toString("base64url");
   const p = payload(tokens, recovery);
+  if (emailPrimary) p.emailPrimary = true;
   await revokeLocalSession(req, res);
   await pool.query(`INSERT INTO vynox_supabase_auth.sessions(digest,subject,envelope,expires_at)
     VALUES($1,$2,$3,now()+interval '7 days')`, [cookieDigest(value), p.subject, codec().seal(p)]);
@@ -59,7 +62,8 @@ export async function establishSession(req: Request, res: Response, tokens: Supa
 }
 export async function updateSession(s: AuthSession, tokens: SupabaseTokens) {
   if (tokens.user.id !== s.payload.subject) throw new HttpError(401, "Session identity changed.");
-  s.payload = { ...payload(tokens, s.payload.recovery), created: s.payload.created };
+  s.payload = { ...payload(tokens, s.payload.recovery), created: s.payload.created,
+    ...(s.payload.emailPrimary ? { emailPrimary: true, emailPrimaryTotpVerified: s.payload.emailPrimaryTotpVerified === true } : {}) };
   s.user = tokens.user;
   await pool.query("UPDATE vynox_supabase_auth.sessions SET envelope=$2 WHERE digest=$1",
     [s.digest, codec().seal(s.payload)]);
@@ -91,7 +95,8 @@ export async function readSession(req: Request): Promise<AuthSession | null> {
     // The JWT is examined only AFTER /user validates it with the pinned provider.
     const claims = JSON.parse(Buffer.from(p.accessToken.split(".")[1], "base64url").toString()) as { aal?: string };
     await client.query("COMMIT");
-    return { digest, payload: p, user, aal2: claims.aal === "aal2" };
+    return { digest, payload: p, user,
+      aal2: claims.aal === "aal2" && (!p.emailPrimary || p.emailPrimaryTotpVerified === true) };
   } catch (error) {
     await client.query("ROLLBACK");
     if (error instanceof HttpError && [400, 401, 403].includes(error.status)) {

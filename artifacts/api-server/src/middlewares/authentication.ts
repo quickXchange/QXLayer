@@ -19,7 +19,8 @@ export const requireAuthentication: RequestHandler = async (req, res, next): Pro
     const s = await readSession(req);
     if (!s || s.payload.recovery) throw new HttpError(401, "Sign-in required.");
     const mfaSatisfied = await applicationMfaSatisfied(s);
-    if (hasVerifiedFactor(s.user) && !mfaSatisfied) throw new HttpError(428, "MFA_REQUIRED: Complete two-factor verification.");
+    if ((hasVerifiedFactor(s.user) || s.payload.emailPrimary) && !mfaSatisfied)
+      throw new HttpError(428, "MFA_REQUIRED: Complete two-factor verification.");
     const principal = await resolvePrincipal(await businessId(s.user.id));
     principal.authenticationProvider = "supabase";
     if (principal.role === "super_admin" && (!hasVerifiedFactor(s.user) || !mfaSatisfied))

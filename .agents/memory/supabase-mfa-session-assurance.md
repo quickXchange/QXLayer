@@ -21,18 +21,18 @@ A password-recovery link does not supply sufficient assurance to change the pass
 
 **How to apply:** Keep recovery sessions denied business/Admin access even after MFA elevation. Require the current factor before password reset, preserve the recovery expiry, and verify that password reset does not remove TOTP. Test with a disposable MFA-enabled identity, not just an account without 2FA.
 
-The user authorized a Development-only email sign-in alternative for Super Admins
-at their verified Gmail address: six-digit codes, five-minute expiry, single use,
-rate and attempt limits. Google Authenticator must stay enrolled. New Development
+The user authorized a Development-only email sign-in alternative on the login page for Super Admins
+at their verified Gmail address: six-digit codes replacing the password, five-minute expiry, single use,
+rate and attempt limits. Google Authenticator must remain an additional mandatory step after this email first factor. New Development
 passwords require at least ten characters with uppercase, lowercase and numbers;
 special characters are not required.
 
 **Why:** The user requested these authentication rules while prohibiting Staging,
 Production, deployment and Republish changes.
 
-**How to apply:** Email-code verification can supply bounded application assurance,
-not native Supabase AAL2. Do not forge an AAL2 token or use provider-admin password
-updates to bypass it. Password recovery/changes and authenticator mutations retain
-native TOTP requirements. Test email-code logic with synthetic authorization and
+**How to apply:** Native email OTP establishes AAL1, not native Supabase AAL2. Never reuse
+an email first factor as email-MFA assurance or forge AAL2. Require a fresh native
+authenticator verification before email-primary business access. Password recovery/changes and authenticator mutations retain
+native TOTP requirements. Test privileged email-code logic with synthetic authorization and
 disposable identities; do not grant a substitute Owner or claim mailbox receipt
 from mocked delivery.

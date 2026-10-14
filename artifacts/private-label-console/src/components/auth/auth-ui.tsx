@@ -35,7 +35,7 @@ export function useOwnedStatus() {
   return { status, failed };
 }
 
-type AuthErr = { code?: string; message?: string; status?: number } | null | undefined;
+type AuthErr = { code?: string; message?: string; status?: number; retryAfterSeconds?: number } | null | undefined;
 export function authErrorText(e: AuthErr): string {
   if (!e) return 'Something went wrong. Please try again.';
   const code = e.code ?? '';
@@ -45,7 +45,11 @@ export function authErrorText(e: AuthErr): string {
   if (code === 'INVALID_PASSWORD') return 'The password you entered is incorrect.';
   if (code === 'INVALID_TWO_FACTOR_COOKIE') return 'Your sign-in step expired. Sign in again.';
   if (code === 'INVALID_CODE' || code === 'INVALID_BACKUP_CODE') return 'That code is not valid.';
-  if (e.status === 429) return 'Too many attempts. Wait a moment and try again.';
+  if (e.status === 429) return supabaseDevelopmentAuth
+    ? typeof e.retryAfterSeconds === 'number' && Number.isFinite(e.retryAfterSeconds) && e.retryAfterSeconds > 0
+      ? `Please wait ${Math.ceil(e.retryAfterSeconds)} seconds before trying again.`
+      : e.message || 'Please wait 60 seconds before trying again.'
+    : 'Too many attempts. Wait a moment and try again.';
   return e.message || 'Request failed. Please try again.';
 }
 export const isMailUnavailable = (e: AuthErr) => !!e && (e.code === 'MAIL_UNAVAILABLE' || /MAIL_UNAVAILABLE/.test(e.message ?? ''));

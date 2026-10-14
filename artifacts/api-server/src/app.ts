@@ -56,8 +56,10 @@ const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
     res.status(400).json({ error: "Invalid input.", details: error.issues.map((i: { path: unknown; message: string }) => ({ path: i.path, message: i.message })) }); return;
   }
   if (error instanceof HttpError) {
+    if (error.retryAfterSeconds) res.setHeader("Retry-After", String(error.retryAfterSeconds));
     const authCode = req.path.startsWith("/api/supabase-auth") ? error.message.match(/^([A-Z_]+):/)?.[1] : undefined;
-    res.status(error.status).json({ error: error.message, ...(authCode ? { code: authCode } : {}) }); return;
+    res.status(error.status).json({ error: error.message, ...(authCode ? { code: authCode } : {}),
+      ...(error.retryAfterSeconds ? { retryAfterSeconds: error.retryAfterSeconds } : {}) }); return;
   }
   if (req.path.startsWith("/api/supabase-auth")) {
     // Auth SQL/network errors must never expose token envelopes or credential parameters.

@@ -4,24 +4,30 @@ import { HttpError } from "../../lib/errors";
 import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 import { sessionCodec } from "./crypto";
 import { businessId, hasVerifiedFactor, type AuthSession, type Payload } from "./session";
+import type { SupabaseUser } from "./provider";
 
 export const EMAIL_CODE_LIFETIME = 5 * 60_000;
 export const EMAIL_CODE_ATTEMPTS = 5;
 
 /** Provider-verified mailbox + actual business authorization, never email-based ownership. */
 export async function emailMfaEligible(s: AuthSession): Promise<boolean> {
-  if (!developmentSupabaseAuth() || s.payload.recovery || !s.user.email_confirmed_at ||
-      !/^[^@\s]+@gmail\.com$/i.test(s.user.email ?? "") || !hasVerifiedFactor(s.user)) return false;
+  if (s.payload.recovery || s.payload.emailPrimary) return false;
+  return verifiedGmailSuperAdmin(s.user);
+}
+export async function verifiedGmailSuperAdmin(user: SupabaseUser): Promise<boolean> {
+  if (!developmentSupabaseAuth() || !user.email_confirmed_at ||
+      !/^[^@\s]+@gmail\.com$/i.test(user.email ?? "") || !hasVerifiedFactor(user)) return false;
   supabaseAuthConfiguration(); // Enforce pinned project/origin/runtime before any operation.
   const result = await pool.query(
     "SELECT EXISTS(SELECT 1 FROM public.platform_admins WHERE clerk_user_id=$1 AND active=true) AS eligible",
-    [await businessId(s.user.id)]);
+    [await businessId(user.id)]);
   return result.rows[0]?.eligible === true;
 }
 
 /** App-only assurance. Never forge a provider AAL2 token or use this for factor/password mutation. */
 export async function applicationMfaSatisfied(s: AuthSession): Promise<boolean> {
   if (s.aal2) return true;
+  if (s.payload.emailPrimary) return false; // An email first factor cannot also satisfy the second factor.
   const proof = s.payload.emailMfa;
   return !!proof && proof.expires > Date.now() && proof.recipient === s.user.email?.toLowerCase() &&
     !!s.user.factors?.some(f => f.id === proof.factorId && f.status === "verified" && f.factor_type === "totp") &&
