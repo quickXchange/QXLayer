@@ -21,6 +21,12 @@ The user authorizes migrating Replit Development from Better Auth to Supabase Au
 
 **How to apply:** This extends the prior Staging-only implementation approval to isolated Development, not to a shared provider project or a Production cutover. Do not bypass existing guards by labelling Development as Staging, reuse Staging credentials, or activate an unconfigured provider.
 
+For new Development Supabase provisioning, separate organization-level project-creation authorization from Development-project-only setup authorization. The creation token must have no existing project-level permissions; runtime authentication uses an independent Development server key and session secret.
+
+**Why:** Creating a new project requires organization-level capability, but that must not authorize changing verified Staging, Production or other projects.
+
+**How to apply:** Restrict subsequent Auth Config and Project Settings writes to the newly created Development project. A verified Free plan permits the approved free-project creation attempt, not a paid upgrade or an additional billable instance.
+
 The user designates their newly verified VYNOX LAYER Staging account as official. Link it through fresh proof of the existing Staging owner account without changing or removing existing owner permissions; configure MFA afterward.
 
 **Why:** The user explicitly identified the account as official and requested this order of operations.
