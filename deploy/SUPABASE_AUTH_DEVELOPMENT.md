@@ -75,3 +75,18 @@ When configuring this Development project's Auth settings:
 
 SMTP secret readback is opaque. Plaintext equality or a direct SMTP-only test is
 not evidence that the integrated Supabase email flows work.
+
+For native mail acceptance, the guarded `supabase-development-mail-qa.mjs`
+helper checks that the controlled recipient is unused, tracks the exact disposable
+identity in an ignored private manifest, and requests native signup and recovery
+emails without logging credentials or links. Open both links in a private browser
+window so the recovery cookie does not replace an Owner session. Do not resend
+blindly after an ambiguous send; the provider has a limited email quota.
+
+After the recipient completes verification, password reset and app sign-in,
+`supabase-development-mail-cleanup.ts` checks provider and app-session evidence,
+refuses accounts with business records or identity links, removes only the tracked
+fixture, and confirms Owner identity, MFA and session preservation. Verify the
+original business-table fingerprints too. Only then enable the Development-only
+mail-readiness setting and verify `/api/supabase-auth/status` after restarting the
+API. None of these steps authorizes a Staging/Production change or deployment.

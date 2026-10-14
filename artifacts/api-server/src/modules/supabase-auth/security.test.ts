@@ -67,6 +67,14 @@ test("Development uses only its pinned project and independent credentials", () 
   assert.equal(cfg.origin, development.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL);
   assert.equal(cfg.mailReady, false);
 });
+test("Development email readiness is explicit and isolated from Staging", () => {
+  assert.equal(supabaseAuthConfiguration({ ...development,
+    QXLAYER_SUPABASE_AUTH_MAIL_READY: "true" }).mailReady, false);
+  assert.equal(supabaseAuthConfiguration({ ...development,
+    QXLAYER_DEVELOPMENT_SUPABASE_AUTH_MAIL_READY: "true" }).mailReady, true);
+  assert.equal(supabaseAuthConfiguration({ ...env,
+    QXLAYER_DEVELOPMENT_SUPABASE_AUTH_MAIL_READY: "true" }).mailReady, false);
+});
 test("Development refuses production builds, external business databases and missing runtime identity", () => {
   for (const patch of [{ NODE_ENV: "production" }, { QXLAYER_DATABASE_PROVIDER: "supabase" },
     { REPLIT_DEV_DOMAIN: "" }, { QXLAYER_EXTERNAL_ENVIRONMENT: "production" }])

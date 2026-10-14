@@ -86,3 +86,9 @@ Treat Supabase SMTP secret readback as opaque. Saved configuration and a success
 **Why:** The management API's SMTP secret readback differed from the submitted credential without a recognizable masking marker. A direct SMTP test bypasses Supabase Auth and cannot establish signup, recovery or MFA notification behavior.
 
 **How to apply:** Never log or retransmit the opaque readback as a credential, and do not rewrite a password merely because plaintext equality fails. Keep integrated authentication mail readiness unconfirmed until approved Supabase-generated flows pass. Distinguish simulated Resend delivery from real inbox receipt, and do not create test Auth identities under a no-database-change restriction.
+
+The user confirmed native Development verification-email receipt and successful verification, followed by recovery-email receipt, password reset and sign-in through a disposable non-admin account.
+
+**Why:** Inbox receipt and private link completion require recipient participation; SMTP configuration and provider request acceptance alone cannot establish those outcomes.
+
+**How to apply:** Treat the integrated Development email flows as user-accepted, not merely SMTP-tested. Preserve the independent Development mail setup and the separate Staging/Production approval boundary.
