@@ -5,7 +5,10 @@ import { prepareFreeProduction, STAGING, DEVELOPMENT, PRODUCTION_NAME } from "./
 function fixture({ failure = false, ambiguous = false, paid = false } = {}) {
   const ref = "prod0123456789abcdef", org = "organizationabcdefgh";
   const env = { QXLAYER_FREE_PRODUCTION_SETUP_APPROVED: "true",
+    QXLAYER_STAGING_PAUSE_APPROVED: "true",
+    QXLAYER_PRODUCTION_PROJECT_CREATION_APPROVED: "true",
     QXLAYER_PRODUCTION_SUPABASE_PROVISIONING_DB_PASSWORD: "synthetic-only-password".repeat(2),
+    QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET: "synthetic-independent-session-key".repeat(2),
     QXLAYER_DEVELOPMENT_SUPABASE_ORGANIZATION_SLUG: org };
   const preservation = { ref: STAGING, environment: "staging", snapshotVerified: true,
     tlsVerified: true, protectedAdministrator: { protected_admin_links_with_verified_totp: 1 },
@@ -44,6 +47,30 @@ test("unverified preservation and paid plans refuse resource changes", async () 
   const paid = fixture({ paid: true }); await assert.rejects(prepareFreeProduction(paid));
   assert(paid.calls.every(c => c.method === "GET"));
 });
+test("general preparation approval and saved secrets do not authorize pause or creation", async () => {
+  for (const key of ["QXLAYER_STAGING_PAUSE_APPROVED", "QXLAYER_PRODUCTION_PROJECT_CREATION_APPROVED"]) {
+    for (const value of [undefined, "false"]) {
+      const f = fixture(); f.env[key] = value;
+      await assert.rejects(prepareFreeProduction(f));
+      assert.equal(f.calls.length, 0); assert.equal(f.states.length, 0);
+    }
+  }
+});
+test("missing or reused session keys stop before provider calls", async () => {
+  for (const patch of [
+    { QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET: undefined },
+    { QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET: "too-short" },
+    { QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET: "synthetic-only-password".repeat(2) },
+    ...["SESSION_SECRET", "QXLAYER_SUPABASE_AUTH_SESSION_SECRET",
+      "QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET"].map(key => ({
+      [key]: "synthetic-independent-session-key".repeat(2),
+    })),
+  ]) {
+    const f = fixture(); Object.assign(f.env, patch);
+    await assert.rejects(prepareFreeProduction(f));
+    assert.equal(f.calls.length, 0); assert.equal(f.states.length, 0);
+  }
+});
 test("stale/future preservation and malformed credential metadata fail closed without leaking input", async () => {
   for (const offset of [-86400001, 60000]) {
     const f = fixture(); f.preservation.capturedAt = new Date(Date.now() + offset).toISOString();
@@ -63,6 +90,7 @@ test("approved flow pauses only Staging and creates one empty Free independent p
   assert.equal(state.liveChangesApproved, false); assert.equal(state.migrateAccountsApproved, false);
   assert.equal(state.republishApproved, false);
   assert(!JSON.stringify(f.states).includes(f.env.QXLAYER_PRODUCTION_SUPABASE_PROVISIONING_DB_PASSWORD));
+  assert(!JSON.stringify(f.states).includes(f.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET));
 });
 test("confirmed failed creation requests Staging resume, never deletes or changes Development", async () => {
   const f = fixture({ failure: true }); await assert.rejects(prepareFreeProduction(f));

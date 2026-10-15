@@ -11,8 +11,17 @@ const STATE_PATH = ".local/free-production-provisioning.json";
 // edits existing settings, deletes projects, upgrades billing or publishes.
 export async function prepareFreeProduction({ env, preservation, request, save, sleep = ms => new Promise(r => setTimeout(r, ms)) }) {
   assert(env.QXLAYER_FREE_PRODUCTION_SETUP_APPROVED === "true", "Explicit Free resource preparation approval required.");
+  assert(env.QXLAYER_STAGING_PAUSE_APPROVED === "true", "Separate current Staging pause approval required; saved secrets do not authorize downtime.");
+  assert(env.QXLAYER_PRODUCTION_PROJECT_CREATION_APPROVED === "true", "Separate empty Production project creation approval required.");
   const password = env.QXLAYER_PRODUCTION_SUPABASE_PROVISIONING_DB_PASSWORD;
   assert(typeof password === "string" && password.length >= 32, "Independent Production database password required in Secrets BEFORE pausing Staging.");
+  const sessionKey = env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET;
+  assert(typeof sessionKey === "string" && sessionKey.length >= 32,
+    "Independent Production session key required BEFORE pausing Staging.");
+  assert(sessionKey !== password &&
+    ![env.SESSION_SECRET, env.QXLAYER_SUPABASE_AUTH_SESSION_SECRET,
+      env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET].includes(sessionKey),
+    "Production session key must differ from the database password and existing session keys.");
   assert(password !== env.QXLAYER_DEVELOPMENT_SUPABASE_PROVISIONING_DB_PASSWORD,
     "Development password reuse is forbidden.");
   if (env.QXLAYER_SUPABASE_DATABASE_URL) {

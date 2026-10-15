@@ -150,3 +150,18 @@ No pause has been executed yet: independent Production provisioning credentials
 must be present first, avoiding an unnecessary Staging outage while setup is
 blocked. After Production occupies the slot, resuming Staging requires another
 available Free slot or separately approved paid capacity.
+
+### Current secrets-only preparation boundary
+
+The later user instruction withholds Staging pause and Live/Republish approval.
+Secret presence does not renew the earlier pause/create approval. Independent
+Publishing copies are user-confirmed, not independently attested by the secure
+existence interface, which includes Shared entries in its Production view.
+Both Shared entries now exist; missing-secret availability is no longer the
+reported blocker. Approval and a secure isolated execution context remain gates.
+See `deploy/PRODUCTION_SECRET_SCOPE.md` for the dependency assessment, safe
+Shared-copy removal and the separate provisioning-context limitation.
+
+The local provisioning guard now requires distinct current pause and creation
+approvals and both independent credentials before provider calls. No provider
+operation or provisioning-state write was performed for this preparation.

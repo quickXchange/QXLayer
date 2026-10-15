@@ -41,6 +41,7 @@
 - [Staging owner access](staging-owner-access-policy.md) — original owner password via explicit Staging verifier; independent signing and native-form verification, no Replit password changes.
 - [Public pricing policy](public-pricing-policy.md) — pricing rules are public-read-only; preserve administrative writes and other tenant boundaries.
 - [Project-owned authentication](project-owned-authentication.md) — Production migration protects required administrators only; all existing customer accounts are tests, not mandatory imports.
+- [Production secret scope](production-secret-scope.md) — Production existence checks include Shared entries; distinguish user-confirmed Publishing storage from independent proof.
 - [Supabase scoped inventory](supabase-scoped-inventory.md) — global listing 403 can coexist with authorized organization GETs; try the pinned organization before widening credentials.
 - [Supabase Staging Auth](supabase-staging-auth-boundary.md) — parallel trial preserves Clerk; opaque server keys require pinned-origin capability checks, not JWT assumptions.
 - [Auth query observers](auth-query-observers.md) — cache eviction can strand active loading observers; preserve session observers and reset account data on confirmed identity changes.
