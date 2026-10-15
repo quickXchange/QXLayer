@@ -48,6 +48,13 @@ proof even when no business activation was authorized.
 readiness. Do not resume paused projects or borrow Development credentials to
 make a held deployment pass. Approved startup must retain the real guards.
 
+Render service-level variables override linked environment-group values.
+**Why:** The group reported startup unapproved while an older service-level
+approval remained true, so group-only verification did not enforce the hold.
+**How to apply:** Reconcile both layers before deployment and validate their
+effective merged values; update individual non-secret controls without replacing
+the complete variable list or touching unrelated credentials.
+
 ## Earlier staging configuration authorization
 
 Connecting Vercel, adding a Render credential and verifying hosting configuration

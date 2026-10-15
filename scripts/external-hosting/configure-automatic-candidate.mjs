@@ -71,6 +71,16 @@ const update = await fetch(serviceUrl, { method: "PATCH", headers: rh,
     serviceDetails: { envSpecificDetails: { startCommand: "node scripts/external-hosting/start-api.mjs" } } }),
   signal: AbortSignal.timeout(30000) });
 assert(update.ok, `Render source configuration HTTP ${update.status}`);
+for (const [key, value] of Object.entries({
+  QXLAYER_EXTERNAL_STARTUP_APPROVED: "false", QXLAYER_EXTERNAL_ENVIRONMENT: "staging",
+  QXLAYER_HEALTH_MONITOR_ENABLED: "false", QXLAYER_HEALTH_MONITOR_MODE: "disabled",
+  PRODUCTION_ACCESS_GATE_ENABLED: "true",
+})) {
+  const result = await fetch(`${serviceUrl}/env-vars/${key}`, {
+    method: "PUT", headers: rh, body: JSON.stringify({ value }), signal: AbortSignal.timeout(30000),
+  });
+  assert(result.ok, "Candidate service-level hold configuration failed");
+}
 const after = await (await fetch(serviceUrl, { headers: rh })).json();
 assert.equal(after.branch, "main");
 assert.equal(after.autoDeploy, "no"); // CI controls ordering/checks and exact SHA.

@@ -5,12 +5,16 @@ const get = async path => {
   assert(r.ok, `Candidate boundary unavailable: HTTP ${r.status}`);
   return r.json();
 };
-const [api, worker, group] = await Promise.all([
+const [api, worker, group, variables] = await Promise.all([
   get("services/srv-db5b47qjnfac739s374g"),
   get("services/srv-db5b48o473hc73ah56d0"),
   get("env-groups/evg-db5ate8473hc73agdon0"),
+  get("services/srv-db5b47qjnfac739s374g/env-vars?limit=100"),
 ]);
-const env = Object.fromEntries(group.envVars.map(e => [e.key, e.value]));
+// Service-level values override linked groups on Render.
+assert(variables.length < 100, "Paginated service configuration needs explicit reconciliation");
+const env = Object.fromEntries([...group.envVars, ...variables.map(e => e.envVar)]
+  .map(e => [e.key, e.value]));
 assert.equal(api.repo, "https://github.com/quickXchange/VYNOX-LAYER");
 assert.equal(api.branch, "main");
 assert.equal(api.serviceDetails.plan, "starter");
