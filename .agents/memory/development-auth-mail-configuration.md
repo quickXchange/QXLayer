@@ -1,6 +1,6 @@
 ---
-name: Development Auth email configuration
-description: Native shared mailbox cooldowns and management API override-flag mirrors.
+name: Supabase Auth email configuration
+description: SMTP prerequisites, native shared mailbox cooldowns and management override-flag mirrors.
 ---
 
 Native Supabase magic-link OTP and password recovery share a mailbox send-frequency limit. A recovery request immediately after a login OTP can legitimately fail despite spare project-wide email quota. Keep this protection and mirror the shared cooldown in the application.
@@ -25,3 +25,16 @@ actual inbox receipt and redemption of the originally sent code remain untested.
 delivered-code/inbox verification separately. Do not fetch a replacement native
 token during a test that claims to verify the original email's code. Keep all
 test tokens and codes in memory and out of logs.
+
+On a fresh Supabase project, prepare core security policy separately from custom
+email templates until custom SMTP is configured.
+
+**Why:** Native core policy writes succeeded, while template writes returned an
+SMTP-related HTTP 400 before custom SMTP existed. A combined request prevented
+otherwise valid security settings from being applied.
+
+**How to apply:** Read the native SMTP readiness indicators, defer only template
+changes when SMTP is absent, and preserve all other security checks. Configure an
+independent environment-specific send-only credential before applying templates.
+Template readiness, SMTP authentication and actual inbox delivery are separate
+proofs; do not relax security or reuse another environment's key to pass setup.

@@ -194,3 +194,33 @@ management integration was found.
 proposal and write boundaries. Configure only after reading the native baseline
 with the newly scoped token. No accounts, factors, mail credentials, Auth
 configuration or Live settings were changed during this readback.
+
+### New-project Auth core prepared
+
+The separately scoped setup token reads the pinned Production project and Auth
+Config. Core policy is now natively read back: exact canonical HTTPS site and
+verification/recovery redirect URLs, public signup disabled while preparation is
+incomplete, email confirmation required, ten-character uppercase/lowercase/digit
+password policy, TOTP enrollment/verification enabled and six-digit email OTP.
+Phone-factor and anonymous-login defaults remain disabled. No users, factors or
+business records were created, migrated or modified.
+
+Supabase rejected the combined template update with HTTP 400. A bounded
+separation confirmed the core patch succeeds while custom template writes fail
+with an SMTP-related response on this SMTP-unconfigured project. The guarded
+helper now prepares core policy independently and defers all custom templates
+until custom SMTP exists. Native core readback succeeded and unrelated settings
+were preserved. Eight helper tests passed, including scope, secret-field,
+SMTP-prerequisite, idempotency and readback-drift boundaries.
+
+Remaining operational credentials are not silently substituted. The existing
+Resend connection's read-only domain lookup returned 400; its API-key connection,
+domains and existing keys were not changed. An independent Production-only
+domain-restricted Sending Access key is needed for the new project's SMTP.
+The Supabase setup token's API-key metadata GET returned 403; native runtime-key
+custody and owner verification remain separate gates, not completed acceptance.
+
+Evidence: `generated-artifacts/auth-security/production-auth-config-readback.json`.
+SMTP, custom templates, inbox delivery and native Production Owner/MFA/Admin
+acceptance remain unverified. No Production application runtime was activated,
+no Live configuration was modified and no Republish occurred.

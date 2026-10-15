@@ -12,7 +12,10 @@
     "developmentStatus": "ACTIVE_HEALTHY",
     "stagingStatus": "INACTIVE",
     "organizationInventoryCount": 3,
-    "creationTokenAuthConfigReadStatus": 403
+    "creationTokenAuthConfigReadStatus": 403,
+    "setupTokenAuthConfigReadStatus": 200,
+    "setupTokenApiKeyMetadataReadStatus": 403,
+    "nativeCoreReadbackEvidence": "generated-artifacts/auth-security/production-auth-config-readback.json"
   },
   "proposedAuthConfig": {
     "site_url": "https://www.quicklychan.xyz",
@@ -43,5 +46,5 @@
     "republish": false,
     "reuseDevelopmentOrStagingSmtpKeys": false
   },
-  "status": "DRAFT_NOT_APPLIED_PROJECT_SCOPED_SETUP_AUTHORIZATION_REQUIRED"
+  "status": "CORE_PREPARED_CUSTOM_SMTP_REQUIRED"
 }
