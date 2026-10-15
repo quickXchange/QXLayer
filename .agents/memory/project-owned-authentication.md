@@ -198,3 +198,16 @@ supported free alternatives, or a brief minimum-cost explanation if none fits.
 **How to apply:** Treat paid resources as unapproved. Do not silently pause a
 working environment or change organization ownership/roles to obtain free
 capacity. Explain any availability tradeoff before seeking a separate approval.
+
+The user subsequently approved temporarily pausing the VYNOX Staging Supabase
+project (never deleting it) to create an independent Production project using
+the freed Free slot. Keep Development fully operational. Verify preservation
+and pause/resume conditions first; preserve original Super Admin, MFA,
+permissions and all business data. Live changes, live-account migration and
+Republish still require separate final approval.
+
+**Why:** The user explicitly approved this zero-cost availability tradeoff.
+
+**How to apply:** Prepare all required creation inputs before taking Staging
+offline. Keep paid resources unapproved. Do not assume Staging can resume while
+Development and the new Production project occupy both active Free slots.

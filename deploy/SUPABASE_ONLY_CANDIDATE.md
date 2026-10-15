@@ -124,3 +124,29 @@ Sources:
 - https://supabase.com/docs/guides/platform/billing-faq
 - https://supabase.com/docs/guides/platform/manage-your-usage/branching
 - https://supabase.com/docs/guides/platform/free-project-pausing
+
+### Approved temporary Staging pause
+
+The user subsequently approved pausing Staging only (not deleting it) and creating
+an empty, independent Production project in the released Free slot. Development,
+Live, existing accounts, MFA and all data remain protected; no cutover or
+Republish is authorized.
+
+Pre-pause read-only evidence captured 74 table fingerprints, verified all 42
+business tables unchanged, and confirmed the existing protected Staging
+administrator is still linked to its verified native TOTP factor. TLS used the
+retained verified Staging CA, with hostname verification enabled. Provider backup
+listing is not authorized by the retained tokens; an independently restored
+backup is NOT claimed. Supabase documents same-project data/configuration
+restoration within one year after pause.
+
+The guarded Free provisioning sequence checks preservation, independent password
+availability, the Free plan and healthy Development before pausing. It records
+durable progress, refuses duplicate provisioning, never migrates accounts and
+reconciles ambiguous creation before attempting Staging recovery. New synthetic
+tests cover its safety boundaries.
+
+No pause has been executed yet: independent Production provisioning credentials
+must be present first, avoiding an unnecessary Staging outage while setup is
+blocked. After Production occupies the slot, resuming Staging requires another
+available Free slot or separately approved paid capacity.

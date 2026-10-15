@@ -29,4 +29,7 @@ configuration issue, not justification to weaken TLS or replace credentials.
 
 **How to apply:** Keep source and target CA decisions separate. Unexpected
 certificate rotation requires review, not automatic acceptance of an endpoint's
-untrusted presented certificate.
+untrusted presented certificate. A missing workspace CA file does not imply
+missing approved trust: the verified target CA may already be retained in its
+approved deployment configuration. Reuse that CA without logging any other
+configuration values instead of weakening TLS or requesting replacement credentials.
