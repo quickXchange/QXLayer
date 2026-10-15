@@ -50,3 +50,4 @@
 - [Auth mail prerequisites](development-auth-mail-configuration.md) — SMTP precedes custom templates; OTP/recovery share cooldowns; override mirrors are booleans.
 - [Browser candidate modules](browser-candidate-module-identity.md) — asset overrides need one canonical entry URL or lazy chunks can instantiate React twice.
 - [Security scanner runtime](security-scanner-runtime.md) — isolate scanner scratch storage; managed and direct Pro authorization differ; stream large privacy reports.
+- [Native Publish planner loss](native-publish-planner-loss.md) — correct database metadata can be lost by the native planner; local Drizzle fixes are not platform fixes.

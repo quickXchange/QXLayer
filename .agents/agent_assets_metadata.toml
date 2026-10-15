@@ -1092,3 +1092,17 @@ mtime_ms = 1792020414795
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/1841b786-92c5-40ba-bba8-fe0e6e8b7974/60a01edb-034d-49ea-91a8-b945707b0a94"
 storage_version_token = "1792020450988079"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "Eq84lVB6N4cymRHJZ8BAi"
+uri = "file://generated-artifacts/native-publish-investigation/native-publish-support-report.html"
+type = "html"
+title = "Native Publish — support request and evidence"
+description = "Exact ticket text, downloadable evidence JSON, all 134 statement checks and an isolated reproduction. Native Publish remains blocked; no Live changes."
+logical_id = "d3904332-bfc0-4c7c-a057-10305700ca39"
+content_hash = "sha256:975b9cd0b6f4092fe7226b4b77ccfa87385074f62c331d01aa0371dde6f5a919"
+size = 492891
+mtime_ms = 1792059799683
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d3904332-bfc0-4c7c-a057-10305700ca39/75701cd7-1101-48ad-b9e8-1f77bf003a1c"
+storage_version_token = "1792059848093412"
+content_type = "text/html"
