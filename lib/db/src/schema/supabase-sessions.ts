@@ -3,7 +3,9 @@ import { check, integer, pgSchema, primaryKey, text, timestamp, uuid } from "dri
 
 // Existing application-owned support schema. Provider users/factors stay in Supabase.
 // Declaration only: no startup DDL, identity import or publish-time custom migration.
-const auth = pgSchema("vynox_supabase_auth");
+// Export the namespace itself so Drizzle emits CREATE SCHEMA before its tables.
+export const supabaseAuthSchema = pgSchema("vynox_supabase_auth");
+const auth = supabaseAuthSchema;
 export const supabaseIdentityLinks = auth.table("identity_links", {
   subject: uuid("subject").primaryKey(),
   businessId: text("business_id").notNull().unique("identity_links_business_id_key"),

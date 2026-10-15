@@ -48,7 +48,7 @@
     }
   },
   "backupPreparation": {
-    "status": "ENCRYPTION_VERIFIED_SOURCE_AND_RECOVERY_CUSTODY_PENDING",
+    "status": "DESIGNATED_BUSINESS_SOURCE_RESTORE_VERIFIED_LIVE_BINDING_AND_CUSTODY_PENDING",
     "procedure": "deploy/PRODUCTION_AUTH_BACKUP_READINESS.md",
     "syntheticEvidence": "generated-artifacts/auth-security/production-backup-crypto-preparation-20261015.json",
     "configuredKeySyntheticChecksPassed": 10,
@@ -66,12 +66,23 @@
     "stagingStorageWritesApproved": false,
     "independentDurableReceivingCopyVerified": false,
     "outsideReplitKeyRecoveryVerified": false,
-    "isolatedLocalPostgresCandidate": "PostgreSQL 16.15; disposable owned 0700 cluster; Unix socket only",
+    "isolatedLocalPostgresCandidate": "PostgreSQL 17.6; disposable owned 0700 cluster; Unix socket only",
     "syntheticLocalRestoreVerified": true,
     "approvedIsolatedRestoreTargetVerified": false,
     "productionExportExecuted": false,
     "productionRestoreExecuted": false,
-    "realBackupAndRestoreVerified": false
+    "realBackupAndRestoreVerified": false,
+    "designatedBusinessSourceCaptureExecuted": true,
+    "designatedBusinessSourceRealDataRestoreVerified": true,
+    "designatedBusinessSourceOriginalAdminRestored": true,
+    "designatedBusinessSourceWholeArchiveHashMatched": true,
+    "designatedBusinessSourceEvidence": "generated-artifacts/auth-security/production-business-backup-restore.json",
+    "encryptedRecoveryCatalogEvidence": "generated-artifacts/auth-security/production-recovery-catalog.json",
+    "encryptedRecoveryCatalogVerified": true,
+    "durableRecoveryToolkit": "scripts/recovery",
+    "localRestoreRetryWithoutSourceCredentialsVerified": true,
+    "productionBackupFullyAccepted": false,
+    "legacyProviderMfaBackupIncluded": false
   },
   "evidence": {
     "immutableDeployedReleaseAndEffectiveAuthProvider": null,

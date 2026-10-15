@@ -1,6 +1,36 @@
 # Production administration-only Auth: backup readiness
 
-## Prepared safely on 2026-10-15
+## Latest designated-source backup and local restore
+
+A later authorized read-only preparation run captured the designated business
+database into the existing reviewed AES-GCM envelope and restored it into a
+disposable PostgreSQL 17.6 cluster, owned 0700, Unix socket only, without inherited
+provider credentials. Whole-envelope authentication, the complete original
+plaintext archive hash and the original active administrator identity passed.
+The plaintext cluster was stopped and removed; ciphertext remains private
+outside the repository. No source writes, account operations or publishing ran.
+
+Evidence: `generated-artifacts/auth-security/production-business-backup-restore.json`.
+Procedure and guarded tools: `PRODUCTION_RELEASE_ACCEPTANCE.md`.
+
+The separate read-only catalog supplement is also encrypted and fully
+authenticated: referenced roles without passwords, membership closure,
+schema/relation/function/default ACLs and RLS. Evidence:
+`generated-artifacts/auth-security/production-recovery-catalog.json`.
+It is recovery material, not proof that native ACLs were applied in a restore.
+Both ciphertext receipts include SHA-256 for independent receiving-copy checks.
+The reviewed crypto modules are now retained byte-for-byte in `scripts/recovery/`;
+integrity tests confirm the original reviewed hashes. A retained business-archive
+restore also passed with export URL/hostname credentials removed from its process.
+
+This is a verified **designated business-source snapshot and local restore**,
+not yet an accepted complete Production backup: actual running-release/database
+binding, independent receiving-copy/key recovery and external-provider MFA custody
+remain unverified. Owner/database ACL recovery is not claimed by the portable
+no-owner/no-ACL business dump. The historical statements below describe earlier
+preparation and are superseded only for this specific capture/local-restore scope.
+
+## Historical preparation on 2026-10-15 — before real capture
 
 No Production/Staging writes, schema changes, account/factor/session changes,
 provider provisioning, real-data export/restore, cleanup or publishing occurred.

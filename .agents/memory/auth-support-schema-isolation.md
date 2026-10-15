@@ -14,3 +14,14 @@ public and blocked authenticated account reads. The native browser test caught i
 explicitly constrain an inventory to its intended schema. Keep all public
 business tables covered. Never fix such a mismatch by disabling readiness/RLS,
 weakening policy checks or widening tenant-role grants to Auth session storage.
+
+Validate private Auth DDL against a fresh empty PostgreSQL instance, not only an
+already-initialized Development database.
+
+**Why:** Qualified private table declarations can be generated successfully
+while the namespace creation is omitted. An existing namespace hides this
+first-install failure; metadata and TypeScript checks alone do not catch it.
+
+**How to apply:** Export namespace declarations alongside their tables and
+require a clean first-apply rehearsal with private-table access-denial checks
+before accepting generated schema as release-ready.

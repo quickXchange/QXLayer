@@ -118,3 +118,14 @@ restore approval.
 
 **How to apply:** Keep recovery GET-only, retain original encrypted bytes and
 receipt evidence without recapture, and end after the verification report.
+
+For an approved business capture followed by a failed disposable local restore,
+reuse the authenticated retained ciphertext for repair/retry instead of
+re-exporting the database.
+
+**Why:** Another export observes a later database state and adds avoidable source
+reads while debugging an unrelated local restore problem.
+
+**How to apply:** Retain a capture receipt with the complete plaintext hash;
+local retry must not connect to the source or require its credentials. Preserve
+the reviewed recovery tools as durable source, not only ignored generated output.
