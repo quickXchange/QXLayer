@@ -173,3 +173,24 @@ recent and is reused without repeating the audit. A hidden-input interactive
 runner supplies credentials only to the one approved provisioning process, with
 no Shared reinstatement, credential file or shell-argument exposure. Execution
 still awaits that unavoidable private input; no pause or creation is claimed.
+
+### Independent Production project verified
+
+The owner completed the private execution. Saved provisioning state reached
+`FREE_PROJECT_CREATED_AUTH_NOT_ACTIVATED`. Fresh organization-scoped GET evidence
+confirms the independent Production project `qcgvhlphalxqzzsxqjhi` is
+`ACTIVE_HEALTHY`, Development remains `ACTIVE_HEALTHY`, and Staging is `INACTIVE`.
+There are three retained projects, with only Development and Production active.
+The actual target reference is now recorded in the preparation-only draft;
+release/cutover authorization is still false and no Live runtime binding changed.
+
+The organization creation token receives HTTP 403 for this new project's Auth
+Config. It cannot configure Auth. A separate fine-grained setup token scoped
+ONLY to this Production project is required; do not reuse Staging/Development
+tokens or request Legacy account-wide authorization. No matching Supabase
+management integration was found.
+
+`deploy/production-supabase-auth-bootstrap.json` records the unapplied policy
+proposal and write boundaries. Configure only after reading the native baseline
+with the newly scoped token. No accounts, factors, mail credentials, Auth
+configuration or Live settings were changed during this readback.

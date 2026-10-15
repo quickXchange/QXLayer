@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "mode": "NEW_ISOLATED_PROJECT_PREPARATION_ONLY",
+  "organization": "cvgreqeceunmyluagnud",
+  "projectRef": "qcgvhlphalxqzzsxqjhi",
+  "projectName": "VYNOX-LAYER-PRODUCTION",
+  "forbiddenProjectRefs": ["muvedavhbpgpdrrnjrih", "nktstksmfpcsjnjbeqsk"],
+  "setupTokenSecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SETUP_TOKEN",
+  "readback": {
+    "savedPhase": "FREE_PROJECT_CREATED_AUTH_NOT_ACTIVATED",
+    "productionStatus": "ACTIVE_HEALTHY",
+    "developmentStatus": "ACTIVE_HEALTHY",
+    "stagingStatus": "INACTIVE",
+    "organizationInventoryCount": 3,
+    "creationTokenAuthConfigReadStatus": 403
+  },
+  "proposedAuthConfig": {
+    "site_url": "https://www.quicklychan.xyz",
+    "uri_allow_list": "https://www.quicklychan.xyz/verify-email,https://www.quicklychan.xyz/reset-password",
+    "disable_signup": true,
+    "mailer_autoconfirm": false,
+    "password_min_length": 10,
+    "password_required_characters": "abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789",
+    "mfa_totp_enroll_enabled": true,
+    "mfa_totp_verify_enabled": true,
+    "mailer_otp_length": 6
+  },
+  "applicationControls": {
+    "mandatoryExistingTotpAfterEmailFirstFactor": true,
+    "emailChallengeExpirySeconds": 300,
+    "nativeProductionOwnerAcceptanceVerified": false
+  },
+  "executionConstraints": {
+    "readNativeBaselineBeforeAnyPatch": true,
+    "validateSupportedFieldsBeforeAnyPatch": true,
+    "pinSavedReferenceAndOrganizationBeforeAnyPatch": true,
+    "preserveUnrelatedAuthSettings": true,
+    "logOnlyAllowlistedNonSecretReadback": true,
+    "createOrMigrateAccounts": false,
+    "changeLiveApplication": false,
+    "changeDevelopmentOrStagingSettings": false,
+    "activateProductionRuntime": false,
+    "republish": false,
+    "reuseDevelopmentOrStagingSmtpKeys": false
+  },
+  "status": "DRAFT_NOT_APPLIED_PROJECT_SCOPED_SETUP_AUTHORIZATION_REQUIRED"
+}

@@ -13,7 +13,7 @@
   "target": {
     "environment": "production",
     "canonicalOrigin": "https://www.quicklychan.xyz",
-    "productionProjectRef": null,
+    "productionProjectRef": "qcgvhlphalxqzzsxqjhi",
     "businessDatabasePolicy": "PRESERVE_EXISTING_VERIFY_RUNTIME_TARGET",
     "serverKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY",
     "sessionKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET",

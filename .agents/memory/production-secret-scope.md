@@ -44,3 +44,13 @@ read-only replay with owner-supplied inputs despite healthy provider metadata.
 **How to apply:** Report verified resource state separately from failure
 uncertainty. Save only static check codes, not raw errors or credentials; make
 recovery checks read-only and require fresh approval for resource execution.
+
+The user confirmed successful private hidden-input provisioning while retaining
+permanent Production-only Publishing copies.
+
+**Why:** The user reported successful execution, independently reconciled through
+provider metadata; copying runtime credentials back into Shared was unnecessary.
+
+**How to apply:** Keep this credential-custody boundary for subsequent operations.
+Use a separate narrowly scoped preparation token when management access is
+needed; do not treat an organization creation token as project-settings authority.
