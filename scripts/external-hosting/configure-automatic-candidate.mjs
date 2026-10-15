@@ -67,7 +67,9 @@ assert.equal(before.repo, `https://github.com/${repo}`);
 assert.equal(before.serviceDetails.plan, "starter");
 assert.equal(before.suspended, "not_suspended");
 const update = await fetch(serviceUrl, { method: "PATCH", headers: rh,
-  body: JSON.stringify({ branch: "main", autoDeploy: "no" }), signal: AbortSignal.timeout(30000) });
+  body: JSON.stringify({ branch: "main", autoDeploy: "no",
+    serviceDetails: { envSpecificDetails: { startCommand: "node scripts/external-hosting/start-api.mjs" } } }),
+  signal: AbortSignal.timeout(30000) });
 assert(update.ok, `Render source configuration HTTP ${update.status}`);
 const after = await (await fetch(serviceUrl, { headers: rh })).json();
 assert.equal(after.branch, "main");

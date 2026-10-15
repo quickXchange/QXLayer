@@ -9,7 +9,7 @@ services:
     numInstances: 1
     autoDeployTrigger: "off"
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @workspace/api-server run build
-    startCommand: node artifacts/api-server/dist/index.mjs
+    startCommand: node scripts/external-hosting/start-api.mjs
     healthCheckPath: /api/healthz
     envVars:
       - fromGroup: qxlayer-external

@@ -3,18 +3,50 @@ name: External preparation authorization
 description: External migration authorization history, isolated staging creation, paid-resource notice, and the Production/cutover hold.
 ---
 
-## Current publication and deployment hold
+## Current external architecture and implementation authorization
 
-Do not publish or deploy without the user's approval, including Staging.
-Keep Production and all other projects completely isolated and unchanged.
+The user requires Replit for Development only, GitHub for synchronization,
+Vercel for the Production frontends, Render for the Production API, and Supabase
+for the Production database and authentication. GitHub Sync/Push must trigger
+automatic external deployments without Replit Republish.
 
-**Why:** The user explicitly imposed this hold while authorizing the remaining
-Staging-only owner linking, MFA and Super Admin verification.
+**Why:** The user explicitly changed the goal to completing external hosting
+and permanently stopping use of Replit for Production hosting.
 
-**How to apply:** This supersedes earlier automatic Staging redeployment
-authorization below. Local fixes and read-only verification may continue, but
-ask for approval before deploying any fix. Passing authentication tests is not
-permission to publish, deploy or cut over.
+**How to apply:** Reuse existing configurations and implement/test safe external
+candidate deployments autonomously. This supersedes the earlier no-Staging-
+deployment hold. Do not modify current Live, switch DNS, delete data, perform
+final Production cutover or incur unapproved additional costs. Those boundaries
+remain; ask only for genuinely missing credentials or essential approvals.
+
+## External migration baseline
+
+Compare a prepared migration against the actual external baseline/target, not
+against the native Replit Live diff. Qualify DDL destinations and account for a
+security baseline clearing search_path before later migration files.
+
+**Why:** The external baseline already contained public tables that were still
+missing from Replit Live. Treating the native plan as an external delta duplicated
+them. A cleared search_path rejects unqualified creation, while pg_catalog-first
+search_path directs unqualified creation into the system namespace.
+
+**How to apply:** Reconcile restore/ledger state before execution, keep schema
+lookup transaction-local, use explicit destination schemas, and rehearse the
+complete baseline-plus-delta in a disposable database before any hosted change.
+
+## Held candidate startup
+
+An unapproved external candidate must avoid application imports entirely, not
+merely check approval after importing the server. Its liveness must explicitly
+report held/not-ready and reject every business request.
+
+**Why:** Application imports can access the database before the entrypoint's
+startup assertion. Paused Staging then prevents a protected code-deployment
+proof even when no business activation was authorized.
+
+**How to apply:** Keep held process liveness distinct from database/Auth
+readiness. Do not resume paused projects or borrow Development credentials to
+make a held deployment pass. Approved startup must retain the real guards.
 
 ## Earlier staging configuration authorization
 

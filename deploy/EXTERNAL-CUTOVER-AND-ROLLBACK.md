@@ -23,6 +23,14 @@ avoid racing/duplicating the coordinated CI deployment.
 This is **candidate automation**, not proof of Production readiness. Its mandatory
 startup hold and Preview-only assertion must not be removed prematurely.
 
+The candidate launcher does not import application/database modules while
+Staging startup is unapproved. `/api/healthz` reports `status: held`, `ready:
+false`; every business/Auth route returns 503. This is process liveness only,
+not database/Auth readiness. It neither resumes paused Staging nor substitutes
+Development credentials. Approved startup retains the normal application guards.
+The candidate CI token expires after 90 days; rotate it in the encrypted GitHub
+environment before expiry. Do not regenerate unrelated migration credentials.
+
 ## Database migration, independent of native Replit Publish
 
 Reuse the existing checksum/advisory-lock/transaction-based external migration

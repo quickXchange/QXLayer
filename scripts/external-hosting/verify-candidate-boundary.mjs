@@ -14,6 +14,7 @@ const env = Object.fromEntries(group.envVars.map(e => [e.key, e.value]));
 assert.equal(api.repo, "https://github.com/quickXchange/VYNOX-LAYER");
 assert.equal(api.branch, "main");
 assert.equal(api.serviceDetails.plan, "starter");
+assert.equal(api.serviceDetails.envSpecificDetails.startCommand, "node scripts/external-hosting/start-api.mjs");
 assert.equal(api.environmentId, group.environmentId);
 assert.equal(worker.suspended, "suspended");
 assert.equal(env.QXLAYER_EXTERNAL_STARTUP_APPROVED, "false");
