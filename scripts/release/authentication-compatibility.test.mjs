@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { verifyAuthenticationCompatibility } from "./authentication-compatibility.mjs";
 import { createHash } from "node:crypto";
 test("authentication retirement blocks Republish independently of runtime environment flags", () => {
-  assert.throws(() => verifyAuthenticationCompatibility(), /REPUBLISH BLOCKED/);
+  // Test the approval boundary without making unit success depend on whether a
+  // future operator-reviewed real cutover record has legitimately been approved.
+  assert.throws(() => verifyAuthenticationCompatibility({
+    schemaVersion: 1, mode: "PREPARATION_ONLY", approvedByUser: false,
+  }, () => assert.fail("Unapproved preparation must not read release evidence")), /REPUBLISH BLOCKED/);
 });
 
 const fixture = () => {

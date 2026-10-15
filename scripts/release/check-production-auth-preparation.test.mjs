@@ -21,6 +21,18 @@ test("Development/Staging projects and directories cannot be promoted by a draft
     assert(check(p).errors.length);
   }
 });
+test("canonical alphanumeric project references match the runtime contract without granting authority", () => {
+  const p = draft(); p.target.productionProjectRef = "prod0123456789abcdef";
+  const r = check(p);
+  assert.deepEqual(r.errors, []);
+  assert(!r.missing.includes("target.productionProjectRef"));
+  assert.equal(r.status, "EVIDENCE_MISSING");
+  assert.equal(r.deploymentAuthorized, false);
+  for (const ref of ["Prod0123456789abcdef", "prod0123456789abcdef/", "prod0123456789abcde"]) {
+    p.target.productionProjectRef = ref;
+    assert(check(p).errors.length);
+  }
+});
 test("mutation authorization and weakened continuity are rejected", () => {
   for (const key of Object.keys(draft().authorization)) {
     const p = draft(); p.authorization[key] = true; assert(check(p).errors.length);

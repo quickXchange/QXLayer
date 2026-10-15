@@ -73,3 +73,27 @@
 
 No Production/Staging environment, active Clerk configuration, account, factor,
 schema or deployment was changed. No real backup/export/restore was performed.
+
+## Production capacity decision
+
+The existing organization-scoped provisioning credential allowed read-only
+organization/project inventory even though account-wide listing was forbidden.
+The VYNOX organization is Free and contains exactly the two healthy pinned
+Development and Staging projects; neither is a spare Production target.
+Sanitized evidence: `generated-artifacts/auth-security/supabase-production-capacity-readonly.json`.
+
+Supabase's two-free-project limit applies across organizations in which the user
+is Owner/Administrator. Creating another Free organization is not a safe quota
+workaround. Do not pause either working project, repurpose its identity store or
+upgrade its organization to obtain capacity.
+
+The isolated alternative is a separate Production-only Pro organization with one
+Micro project, currently starting at US$25/month before taxes, usage or add-ons.
+This is a proposal, not approval or provisioning. Keep spend cap enabled, paid
+add-ons disabled and obtain billing approval before creating any paid resources.
+No plan upgrade, project creation, account migration or activation was performed.
+
+The standard release test command now includes the Auth approval/preparation,
+provider/session/MFA and public-versus-private schema-isolation regression suites
+through `pnpm auth:test`. Existing native browser and owner acceptance results are
+reused; new synthetic checks must never substitute for Production acceptance.

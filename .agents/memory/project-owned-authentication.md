@@ -173,14 +173,16 @@ do not expose a proof, report the exact limitation without substituting workspac
 settings, configured Clerk, a healthy endpoint or a matching database snapshot.
 Do not unlock access protection or alter Production to add diagnostics.
 
-For the Production migration, guide the user one required action at a time,
-starting with the isolated Production Supabase configuration. Reuse completed
-work and do not repeat previous audits. Preserve the original Super Admin, MFA,
-all business data and existing settings; do not modify Live, migrate accounts
-or Republish without explicit approval.
+For the Production migration, continue the entire safe preparation workflow
+autonomously, reusing completed work, reports, checkpoints and verified
+configurations without repeating audits. Preserve the original Super Admin, MFA,
+all business data and existing settings; do not modify Live, migrate accounts,
+perform cutover or Republish without explicit final approval. Do not upgrade paid
+plans or incur additional charges without approval.
 
-**Why:** The user explicitly requested this step-by-step continuation workflow.
+**Why:** The user superseded the step-by-step workflow with an autonomous request,
+while retaining explicit Production, account-migration and spending boundaries.
 
-**How to apply:** Ask only for the next missing operator action, not a batch of
-credentials, configuration steps or approvals. Keep preparation distinct from
-activation and account migration.
+**How to apply:** Ask only for genuinely unavoidable credentials, billing
+decisions or Production authorization. Do not repeatedly seek permission for
+safe Development work. Keep preparation distinct from activation and migration.

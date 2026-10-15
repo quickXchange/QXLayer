@@ -32,7 +32,7 @@ export function checkProductionAuthPreparation(plan) {
   require(count === null || (Number.isSafeInteger(count) && count >= 0), "Production count must be unknown or a nonnegative integer.");
   const ref = t?.productionProjectRef;
   if (ref === null) missing.push("target.productionProjectRef");
-  else require(typeof ref === "string" && /^[a-z]{20}$/.test(ref) &&
+  else require(typeof ref === "string" && /^[a-z0-9]{20}$/.test(ref) &&
     !["nktstksmfpcsjnjbeqsk", "muvedavhbpgpdrrnjrih"].includes(ref),
     "Production project must be valid and distinct from pinned Development/Staging projects.");
   require(!/(?:sb_secret_|sk_live_|sk_test_)[A-Za-z0-9_-]+|\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\./.test(JSON.stringify(plan)),
