@@ -27,9 +27,11 @@ startup hold and Preview-only assertion must not be removed prematurely.
 
 Reuse the existing checksum/advisory-lock/transaction-based external migration
 toolkit. Do not run drizzle push, build/startup DDL or native Publish.
-`production-candidate/0004_latest-schema-PREPARED.sql` adds the two missing
-public tables, all current guarded policy expressions, all 42 FORCE flags, and
-the five private Auth support tables. It contains no account or business rows.
+The external baseline already contains 42 public tables, including the two
+missing from Replit Live. `production-candidate/0004_latest-schema-PREPARED.sql`
+reconciles all current guarded policy expressions and all 42 FORCE flags, and
+adds the five private Auth support tables without duplicating baseline tables.
+It contains no account or business rows.
 The manifest pins its source comparison and checksum. It is intentionally not
 registered in the executable baseline manifest until target reconciliation.
 

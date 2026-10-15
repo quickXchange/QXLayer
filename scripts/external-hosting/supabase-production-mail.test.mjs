@@ -7,7 +7,10 @@ import { PRODUCTION_REF, MAIL_TEMPLATES } from "./supabase-production-auth-prepa
 const key = "re_synthetic_noncredential_value_12345";
 function fixture() {
   const plan = JSON.parse(readFileSync("deploy/production-supabase-auth-bootstrap.json", "utf8"));
-  const state = JSON.parse(readFileSync(".local/free-production-provisioning.json", "utf8"));
+  // Unit tests must not depend on ignored, operator-owned provisioning state.
+  const state = { phase: "FREE_PROJECT_CREATED_AUTH_NOT_ACTIVATED",
+    productionProjectRef: PRODUCTION_REF, organization: plan.organization,
+    liveChangesApproved: false, migrateAccountsApproved: false, republishApproved: false };
   let cfg = { ...plan.proposedAuthConfig,
     ...Object.fromEntries(Object.keys(MAIL_TEMPLATES).map(k => [k, "default"])),
     ...Object.fromEntries(Object.keys(SMTP_POLICY).map(k => [k, null])),

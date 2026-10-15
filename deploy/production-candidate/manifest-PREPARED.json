@@ -2,7 +2,7 @@
   "status": "PREPARED_NOT_EXECUTED",
   "projectRef": "qcgvhlphalxqzzsxqjhi",
   "file": "0004_latest-schema-PREPARED.sql",
-  "sha256": "bb1b181b6a618f53b04f5110b7968416746e25ced74b0800d5e43ffb69a1e613",
+  "sha256": "569b6e072f87f1d581f51a0b6396817108f71e4e7f29183cffee3a5b7b828514",
   "dependsOn": [
     "0001_application_schema.sql",
     "0002_runtime_security.sql",
@@ -13,6 +13,8 @@
   "privateTables": 5,
   "privateColumns": 20,
   "privateConstraints": 11,
+  "publicBaselineTables": 42,
+  "additionalPublicTables": 0,
   "policyScope": "qxlayer_runtime only (narrower than Development PUBLIC)",
   "sourceNativePlanHash": "5aa16ff9608d09f6c9491e3b31f32d5df702fc8833525a5ecc6656e8b6bb443e",
   "copiesAccounts": false,

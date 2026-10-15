@@ -16,10 +16,22 @@ assert.equal(dev.authColumns.length, 20);
 const quote = id => `"${id.replaceAll('"', '""')}"`;
 const publicTable = name => `public.${quote(name)}`;
 const schema = "vynox_supabase_auth";
-const newTables = new Set(["tenant_integrations", "tenant_telegram_receipts"]);
-const ddl = native.statementsToExecute.filter(s =>
-  /^CREATE TABLE|^ALTER TABLE .* ADD CONSTRAINT|^CREATE UNIQUE INDEX/.test(s));
-assert.equal(ddl.length, 8);
+const baseline = await readFile("deploy/migrations/0001_application_schema.sql", "utf8");
+const baselineTables = new Set([...baseline.matchAll(/^CREATE TABLE public\.([a-z_0-9]+)/gmi)].map(m => m[1]));
+assert(baselineTables.size >= 40, "Unrecognized reviewed baseline");
+// Replit Live's missing tables are already present in the external baseline.
+// Diff against the actual external baseline, not against the Replit Live plan.
+const newTables = new Set(["tenant_integrations", "tenant_telegram_receipts"].filter(t => !baselineTables.has(t)));
+const nativeDdl = native.statementsToExecute.filter(s =>
+  /^CREATE TABLE|^ALTER TABLE .* ADD CONSTRAINT|^CREATE UNIQUE INDEX/.test(s))
+  .map(s => s.replace(/^(CREATE TABLE|ALTER TABLE) "([^"]+)"/, '$1 public."$2"')
+    .replace(/ ON "([^"]+)"/, ' ON public."$1"'));
+assert.equal(nativeDdl.length, 8);
+const ddl = nativeDdl.filter(s => {
+  const name = /^(?:CREATE TABLE|ALTER TABLE) public\."([^"]+)"/.exec(s)?.[1] ??
+    / ON public\."([^"]+)"/.exec(s)?.[1];
+  return newTables.has(name);
+});
 const inventory = verification.statementInventory.filter(i => ["create_table", "constraint", "index"].includes(i.kind));
 assert(inventory.every(i => i.kind === "create_table"
   ? i.exactColumnCount && i.primaryKeysMatch && i.columns.every(c => c.present && c.typeMatches && c.notNullMatches && c.defaultMatches) && i.checks.every(c => c.matches)
@@ -29,6 +41,9 @@ const lines = [
   "-- Requires reviewed baseline migrations and a pinned isolated Supabase target.",
   "-- Target project: qcgvhlphalxqzzsxqjhi. Execute atomically with advisory lock.",
   "DO $$ BEGIN IF current_setting('qxlayer.external_migration_authorized',true) IS DISTINCT FROM 'yes' THEN RAISE EXCEPTION 'Guarded external migration runner required'; END IF; END $$;",
+  // The previous private-auth migration intentionally clears search_path.
+  // Set it transaction-locally for catalog predicates containing public names.
+  "SET LOCAL search_path = pg_catalog, public;",
   ...ddl,
 ];
 for (const name of newTables) {
@@ -72,6 +87,7 @@ await writeFile(`${out}/manifest-PREPARED.json`, JSON.stringify({
   file: "0004_latest-schema-PREPARED.sql", sha256: createHash("sha256").update(sql).digest("hex"),
   dependsOn: ["0001_application_schema.sql", "0002_runtime_security.sql", "0003_owned_auth.sql"],
   publicPolicies: 84, forcedRlsTables: 42, privateTables: 5, privateColumns: 20, privateConstraints: 11,
+  publicBaselineTables: baselineTables.size, additionalPublicTables: newTables.size,
   policyScope: "qxlayer_runtime only (narrower than Development PUBLIC)",
   sourceNativePlanHash: verification.nativePlanSha256,
   copiesAccounts: false, copiesData: false, startupDdl: false, liveChanged: false,

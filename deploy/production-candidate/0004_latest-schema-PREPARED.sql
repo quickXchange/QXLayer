@@ -2,45 +2,7 @@
 -- Requires reviewed baseline migrations and a pinned isolated Supabase target.
 -- Target project: qcgvhlphalxqzzsxqjhi. Execute atomically with advisory lock.
 DO $$ BEGIN IF current_setting('qxlayer.external_migration_authorized',true) IS DISTINCT FROM 'yes' THEN RAISE EXCEPTION 'Guarded external migration runner required'; END IF; END $$;
-CREATE TABLE "tenant_telegram_receipts" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"tenant_id" uuid NOT NULL,
-	"integration_id" uuid NOT NULL,
-	"update_id" bigint NOT NULL,
-	"payload_hash" text NOT NULL,
-	"state" text DEFAULT 'claimed' NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"completed_at" timestamp with time zone
-);
-
-CREATE TABLE "tenant_integrations" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"tenant_id" uuid NOT NULL,
-	"provider_key" text NOT NULL,
-	"environment" text DEFAULT 'sandbox' NOT NULL,
-	"credential_management" text DEFAULT 'super_admin' NOT NULL,
-	"enabled" boolean DEFAULT false NOT NULL,
-	"settings" jsonb DEFAULT '{}'::jsonb NOT NULL,
-	"encrypted_credentials" jsonb,
-	"credential_identity" text,
-	"revision" bigint DEFAULT 0 NOT NULL,
-	"last_nonce" bigint DEFAULT 0 NOT NULL,
-	"health" jsonb DEFAULT '{"state":"not_configured"}'::jsonb NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "tenant_integration_management" CHECK (credential_management = ANY (ARRAY['super_admin'::text, 'customer'::text, 'both'::text])),
-	CONSTRAINT "tenant_integration_sandbox" CHECK (environment = 'sandbox'::text)
-);
-
-ALTER TABLE "tenant_telegram_receipts" ADD CONSTRAINT "tenant_telegram_receipts_integration_id_fkey" FOREIGN KEY ("integration_id") REFERENCES "public"."tenant_integrations"("id") ON DELETE no action ON UPDATE no action;
-ALTER TABLE "tenant_telegram_receipts" ADD CONSTRAINT "tenant_telegram_receipts_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE no action ON UPDATE no action;
-ALTER TABLE "tenant_integrations" ADD CONSTRAINT "tenant_integrations_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE no action ON UPDATE no action;
-CREATE UNIQUE INDEX "tenant_telegram_update_identity" ON "tenant_telegram_receipts" USING btree ("integration_id","update_id");
-CREATE UNIQUE INDEX "tenant_integration_independent_credentials" ON "tenant_integrations" USING btree ("provider_key","credential_identity");
-CREATE UNIQUE INDEX "tenant_integration_scope" ON "tenant_integrations" USING btree ("tenant_id","provider_key","environment");
-REVOKE ALL ON public."tenant_integrations" FROM PUBLIC, anon, authenticated;
-GRANT SELECT,INSERT,UPDATE,DELETE ON public."tenant_integrations" TO qxlayer_runtime;
-REVOKE ALL ON public."tenant_telegram_receipts" FROM PUBLIC, anon, authenticated;
-GRANT SELECT,INSERT,UPDATE,DELETE ON public."tenant_telegram_receipts" TO qxlayer_runtime;
+SET LOCAL search_path = pg_catalog, public;
 ALTER POLICY "qx_read" ON public."addon_entitlements" TO qxlayer_runtime USING (true);
 ALTER POLICY "qx_write" ON public."addon_entitlements" TO qxlayer_runtime USING (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))) WITH CHECK (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text)));
 ALTER POLICY "qx_read" ON public."addons" TO qxlayer_runtime USING (true);
@@ -149,12 +111,12 @@ ALTER POLICY "qx_read" ON public."tenant_entitlement_overrides" TO qxlayer_runti
            FROM tenant_domains
           WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text)))))))))));
 ALTER POLICY "qx_write" ON public."tenant_entitlement_overrides" TO qxlayer_runtime USING ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))) WITH CHECK ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text)));
-CREATE POLICY "qx_read" ON public."tenant_integrations" AS PERMISSIVE FOR SELECT TO qxlayer_runtime USING (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id
+ALTER POLICY "qx_read" ON public."tenant_integrations" TO qxlayer_runtime USING (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id
    FROM tenants
   WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id
            FROM tenant_domains
           WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text)))))))))));
-CREATE POLICY "qx_write" ON public."tenant_integrations" AS PERMISSIVE FOR ALL TO qxlayer_runtime USING ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))) WITH CHECK ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text)));
+ALTER POLICY "qx_write" ON public."tenant_integrations" TO qxlayer_runtime USING ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))) WITH CHECK ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text)));
 ALTER POLICY "qx_read" ON public."tenant_memberships" TO qxlayer_runtime USING (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (clerk_user_id = COALESCE(current_setting('app.actor_id'::text, true), ''::text)))));
 ALTER POLICY "qx_write" ON public."tenant_memberships" TO qxlayer_runtime USING ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text) AND (COALESCE(current_setting('app.can_manage_staff'::text, true), ''::text) = 'true'::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))) WITH CHECK ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text) AND (COALESCE(current_setting('app.can_manage_staff'::text, true), ''::text) = 'true'::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text)));
 ALTER POLICY "qx_read" ON public."tenant_modules" TO qxlayer_runtime USING (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id
@@ -181,12 +143,12 @@ ALTER POLICY "qx_read" ON public."tenant_subscriptions" TO qxlayer_runtime USING
            FROM tenant_domains
           WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text)))))))))));
 ALTER POLICY "qx_write" ON public."tenant_subscriptions" TO qxlayer_runtime USING ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))) WITH CHECK ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text)));
-CREATE POLICY "qx_read" ON public."tenant_telegram_receipts" AS PERMISSIVE FOR SELECT TO qxlayer_runtime USING (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id
+ALTER POLICY "qx_read" ON public."tenant_telegram_receipts" TO qxlayer_runtime USING (((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text)) OR ((COALESCE(current_setting('app.tenant_id'::text, true), ''::text) = ''::text) AND (tenant_id IN ( SELECT tenants.id
    FROM tenants
   WHERE (((COALESCE(current_setting('app.public_slug'::text, true), ''::text) <> ''::text) AND (tenants.slug = COALESCE(current_setting('app.public_slug'::text, true), ''::text))) OR ((COALESCE(current_setting('app.public_domain'::text, true), ''::text) <> ''::text) AND (tenants.id IN ( SELECT tenant_domains.tenant_id
            FROM tenant_domains
           WHERE ((tenant_domains.domain = COALESCE(current_setting('app.public_domain'::text, true), ''::text)) AND (tenant_domains.status = 'verified'::text)))))))))));
-CREATE POLICY "qx_write" ON public."tenant_telegram_receipts" AS PERMISSIVE FOR ALL TO qxlayer_runtime USING ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (EXISTS ( SELECT 1
+ALTER POLICY "qx_write" ON public."tenant_telegram_receipts" TO qxlayer_runtime USING ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (EXISTS ( SELECT 1
    FROM tenant_integrations i
   WHERE ((i.id = tenant_telegram_receipts.integration_id) AND (i.tenant_id = tenant_telegram_receipts.tenant_id)))) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))) WITH CHECK ((((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) OR (((tenant_id)::text = COALESCE(current_setting('app.tenant_id'::text, true), ''::text)) AND (COALESCE(current_setting('app.tenant_id'::text, true), ''::text) <> ''::text))) AND (EXISTS ( SELECT 1
    FROM tenant_integrations i
