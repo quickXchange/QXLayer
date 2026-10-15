@@ -214,3 +214,12 @@ authorize Live changes, live-account migration or Republish. Prepare required
 creation inputs before any approved outage; secret presence alone never grants
 permission. Keep paid resources unapproved. Do not assume Staging can resume
 while Development and Production occupy both active Free slots.
+
+After a stopped provisioning attempt, the user requires read-only investigation
+and fresh confirmation before any rerun, Staging pause, Live change or Republish.
+
+**Why:** The user explicitly limited recovery after the command stopped.
+
+**How to apply:** Reconcile provider state through GET requests, never infer an
+outcome from a swallowed exception. Keep diagnostic runs non-mutating and require
+renewed confirmation before any execution.

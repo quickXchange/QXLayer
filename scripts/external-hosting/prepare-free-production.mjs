@@ -9,7 +9,7 @@ const STATE_PATH = ".local/free-production-provisioning.json";
 
 // Resource preparation only. Never activates the application, migrates users,
 // edits existing settings, deletes projects, upgrades billing or publishes.
-export async function prepareFreeProduction({ env, preservation, request, save, sleep = ms => new Promise(r => setTimeout(r, ms)) }) {
+export async function prepareFreeProduction({ env, preservation, request, save, dryRun = false, sleep = ms => new Promise(r => setTimeout(r, ms)) }) {
   assert(env.QXLAYER_FREE_PRODUCTION_SETUP_APPROVED === "true", "Explicit Free resource preparation approval required.");
   assert(env.QXLAYER_STAGING_PAUSE_APPROVED === "true", "Separate current Staging pause approval required; saved secrets do not authorize downtime.");
   assert(env.QXLAYER_PRODUCTION_PROJECT_CREATION_APPROVED === "true", "Separate empty Production project creation approval required.");
@@ -54,6 +54,7 @@ export async function prepareFreeProduction({ env, preservation, request, save, 
   assert(!initial.some(p => p.name === PRODUCTION_NAME), "A Production candidate already exists; reuse its saved state, never create a duplicate.");
   assert(initial.length === 2 && initial.every(p => [STAGING, DEVELOPMENT].includes(p.ref)) &&
     initial.find(p => p.ref === STAGING)?.status === "ACTIVE_HEALTHY", "Only the two approved existing projects may occupy this organization.");
+  if (dryRun) return { phase: "READ_ONLY_PRECHECKS_PASSED", productionProjectRef: null };
   const state = { mode: "FREE_RESOURCE_PREPARATION", organization: org, staging: STAGING,
     development: DEVELOPMENT, pauseApproved: true, createEmptyFreeProjectApproved: true,
     liveChangesApproved: false, migrateAccountsApproved: false, republishApproved: false,
@@ -105,13 +106,14 @@ export async function prepareFreeProduction({ env, preservation, request, save, 
   }
 }
 
-export async function runFreeProductionCli(env = process.env) {
+export async function runFreeProductionCli(env = process.env, { dryRun = false } = {}) {
   // No state is overwritten and no credential is read from a file. Resume any
   // prior partial operation through its saved state instead of re-running.
   try { await readFile(STATE_PATH); throw Error("Existing provisioning state requires reconciliation; automatic duplicate execution refused."); }
   catch (e) { if (e.code !== "ENOENT") throw e; }
   const preservation = JSON.parse(await readFile("generated-artifacts/auth-security/staging-pre-pause-data-preservation.json", "utf8"));
   const request = async (scope, method, path, body) => {
+    assert(!dryRun || method === "GET", "Read-only diagnostic mode forbids provider mutations.");
     const permitted = scope === "staging"
       ? path === `/projects/${STAGING}` && method === "GET" ||
         [`/projects/${STAGING}/pause`, `/projects/${STAGING}/restore`].includes(path) && method === "POST"
@@ -132,12 +134,13 @@ export async function runFreeProductionCli(env = process.env) {
     return response.json();
   };
   const save = async state => {
+    assert(!dryRun, "Read-only diagnostic mode forbids provisioning state writes.");
     await mkdir(".local", { recursive: true });
     await writeFile(STATE_PATH, JSON.stringify(state, null, 2) + "\n", { mode: 0o600 });
   };
-  const state = await prepareFreeProduction({ env, preservation, request, save });
+  const state = await prepareFreeProduction({ env, preservation, request, save, dryRun });
   console.log(JSON.stringify({ phase: state.phase, productionProjectRef: state.productionProjectRef,
-    stagingPaused: true, developmentHealthy: true, billingPlan: "free", liveModified: false,
+    stagingPaused: !dryRun, developmentHealthy: true, billingPlan: "free", liveModified: false,
     accountsMigrated: false, authActivated: false, republished: false }));
   return state;
 }

@@ -113,3 +113,10 @@ test("ambiguous pause retains intent and never proceeds to project creation", as
   assert.equal(f.states.at(-1).phase, "STAGING_PAUSE_INTENT");
   assert(!f.calls.some(c => c.path === "/projects" && c.method === "POST"));
 });
+test("read-only checks validate private inputs and inventory without any resource operation or state write", async () => {
+  const f = fixture();
+  const result = await prepareFreeProduction({ ...f, dryRun: true });
+  assert.equal(result.phase, "READ_ONLY_PRECHECKS_PASSED");
+  assert.equal(f.states.length, 0);
+  assert(f.calls.every(c => c.method === "GET"));
+});

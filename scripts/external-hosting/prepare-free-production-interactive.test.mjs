@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { PassThrough } from "node:stream";
-import { readHiddenSecret, runInteractiveProductionSetup } from "./prepare-free-production-interactive.mjs";
+import { readHiddenSecret, runInteractiveProductionSetup, safeFailureCode } from "./prepare-free-production-interactive.mjs";
 
 const dbKey = "QXLAYER_PRODUCTION_SUPABASE_PROVISIONING_DB_PASSWORD";
 const sessionKey = "QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET";
@@ -50,7 +50,8 @@ test("both values stay in private process scope and are released after setup", a
   const result = await runInteractiveProductionSetup({
     ...tty, env,
     prompt: async () => ++prompts === 1 ? syntheticDb : syntheticSession,
-    run: async scoped => {
+    run: async (scoped, options) => {
+      assert.equal(options.dryRun, true);
       privateEnv = scoped;
       assert.equal(scoped[dbKey], syntheticDb);
       assert.equal(scoped[sessionKey], syntheticSession);
@@ -79,4 +80,12 @@ test("input cancellation prevents setup and failure releases credential referenc
   }));
   assert.equal(privateEnv[dbKey], undefined);
   assert.equal(privateEnv[sessionKey], undefined);
+});
+test("failure diagnostics identify only allowlisted checks and never echo arbitrary sensitive content", () => {
+  assert.equal(safeFailureCode(Error("Pinned VYNOX organization required.")), "ORGANIZATION_METADATA_MISSING_OR_INVALID");
+  assert.equal(safeFailureCode(Error("Scoped organization operation failed (403).")), "PROVIDER_ORGANIZATION_HTTP_403");
+  const failure = Object.assign(Error(syntheticDb), { input: syntheticSession, cause: { password: syntheticDb } });
+  assert.equal(safeFailureCode(failure), "UNCLASSIFIED_FAILURE_DETAILS_SUPPRESSED");
+  assert(!safeFailureCode(failure).includes(syntheticDb));
+  assert.equal(safeFailureCode(Error("__proto__")), "UNCLASSIFIED_FAILURE_DETAILS_SUPPRESSED");
 });

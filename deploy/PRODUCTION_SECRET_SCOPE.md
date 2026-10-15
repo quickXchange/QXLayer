@@ -45,7 +45,9 @@ The user renewed Staging-pause and independent Free project-creation approval
 after confirming separate Publishing copies and removing Shared copies.
 Workspace existence checks confirm both Shared entries are absent, but cannot
 independently attest the Publishing store. Live changes, migration and Republish
-remain blocked. General setup approval and secret presence are insufficient
+remain blocked. Following a stopped attempt, the user now requires fresh
+confirmation before rerunning execution or pausing Staging. Only read-only
+investigation is authorized. General setup approval and secret presence are insufficient
 without the corresponding explicit user approval. The command requires
 separate current Staging-pause and project-creation approval flags, as well as
 both independent credentials, before any provider request or progress write.
@@ -61,10 +63,15 @@ occupied Free slot without the separately approved Staging pause.
 Shared deletion is complete. Do not re-add the values to Shared or republish.
 Production-only Publishing secrets cannot be read by workspace provisioning.
 
-Run this command once in a private workspace Shell:
+The previous wrapper suppressed its error without retaining a safe failure
+code. No provisioning state exists. Read-only provider checks confirmed Staging
+and Development ACTIVE_HEALTHY, exactly two projects and no Production candidate.
+The exact historical failure cannot be recovered from the missing diagnostic.
+
+Run this read-only check once in a private workspace Shell:
 
 ```sh
-node scripts/external-hosting/prepare-free-production-interactive.mjs
+node scripts/external-hosting/prepare-free-production-interactive.mjs --check
 ```
 
 Enter the two already-saved values from your private vault when prompted. Input
@@ -75,15 +82,16 @@ for independence and is not sent to Supabase project creation. Credentials live
 in process memory transiently; JavaScript cannot guarantee immutable-string
 erasure. Only sanitized status and non-secret progress state are persisted.
 
-The command intentionally performs the approved Staging pause and creates one
-independent Free project. It does not activate Production Auth, migrate accounts,
-change Live, or publish. Before pause, the existing runner checks the recent
-preservation evidence, Free plan and healthy Development. On failure, do not
-blindly rerun: have Agent inspect the saved provisioning state.
+The check validates the private inputs and GET-only provider preconditions.
+It does not pause, create, restore, activate, migrate, change Live or publish.
+The request layer independently rejects non-GET operations in diagnostic mode;
+no provisioning progress state can be written. On failure, only an allowlisted
+code is saved in `.local/free-production-diagnostic.json`, never raw exceptions,
+stacks, response bodies or credential values.
 
-After it finishes, Agent can use the saved non-secret project reference to
-continue. Newly project-scoped setup authorization may still be essential;
-organization creation permission is not existing/new project-settings permission.
+Interactive execution is read-only by default. Actual provisioning requires the
+separate `--execute-approved` argument AND fresh owner confirmation. A successful
+check does not grant that approval.
 
 References:
 - https://docs.replit.com/core-concepts/project-editor/app-setup/secrets

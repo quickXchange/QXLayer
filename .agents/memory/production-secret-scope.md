@@ -34,3 +34,13 @@ explicitly approved private execution context or hidden terminal input from the
 owner's saved vault. Never echo inputs, embed values in command arguments, log
 exceptions containing values, or persist them as credential files. Temporary
 process memory is not guaranteed to be securely erased by JavaScript.
+
+Retain allowlisted, non-sensitive failure codes instead of suppressing every
+diagnostic. Never infer the exact historical failure when no cause was retained.
+
+**Why:** A stopped private-input run left no usable failure cause, requiring a
+read-only replay with owner-supplied inputs despite healthy provider metadata.
+
+**How to apply:** Report verified resource state separately from failure
+uncertainty. Save only static check codes, not raw errors or credentials; make
+recovery checks read-only and require fresh approval for resource execution.
