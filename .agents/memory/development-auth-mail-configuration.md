@@ -38,3 +38,14 @@ changes when SMTP is absent, and preserve all other security checks. Configure a
 independent environment-specific send-only credential before applying templates.
 Template readiness, SMTP authentication and actual inbox delivery are separate
 proofs; do not relax security or reuse another environment's key to pass setup.
+
+Resend management denial with `restricted_api_key` confirms a sending-only key,
+not its exact domain restriction.
+
+**Why:** A restricted key cannot list management-domain metadata. Successful SMTP
+sender acceptance proves the selected domain is permitted, but does not prove all
+other domains are forbidden.
+
+**How to apply:** Keep send-only permission, approved sender acceptance and
+single-domain restriction evidence separate. Do not label a denied management
+lookup or an accepted envelope as independent proof of single-domain scope.

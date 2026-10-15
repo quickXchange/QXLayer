@@ -224,3 +224,39 @@ Evidence: `generated-artifacts/auth-security/production-auth-config-readback.jso
 SMTP, custom templates, inbox delivery and native Production Owner/MFA/Admin
 acceptance remain unverified. No Production application runtime was activated,
 no Live configuration was modified and no Republish occurred.
+
+### Independent Production SMTP and templates prepared
+
+The owner supplied the requested separate Production Resend sending key through
+the secure Secrets flow. Its management-domain lookup was explicitly denied with
+the provider's restricted-key classification, confirming send-only access.
+Direct SMTP authentication and the `production-auth@quicklychan.xyz` sender
+envelope succeeded over verified TLS. The transaction used RSET/QUIT, never DATA;
+no email was sent and no native Auth identity was created.
+
+Only the pinned new Production project's SMTP fields and bounded 30-message/hour
+quota were configured. Canonical origin, signup hold, confirmation requirement,
+password rules, TOTP and all unrelated settings were preserved. Supabase's opaque
+SMTP secret readback was checked only for persistence, never compared as
+plaintext or retransmitted.
+
+After SMTP existed, the independent Auth helper applied all three subjects and
+confirmation/recovery/login-code templates. Native readback verified their exact
+contents, corresponding boolean override flags and the unchanged core policy.
+There are no pending core/template fields. Evidence:
+`generated-artifacts/auth-security/production-smtp-readback.json` and
+`generated-artifacts/auth-security/production-auth-config-readback.json`.
+
+Send-only access and permission to send from the approved domain do not
+independently prove the key is restricted to that single domain; its restriction
+was requested from the owner and remains explicitly distinguished in evidence.
+SMTP acceptance is not Supabase-generated inbox delivery. Runtime server-key
+custody, native Owner/MFA/Admin acceptance, real recovery backup/restore and final
+cutover authorization remain unresolved gates. No Live, Development, Staging,
+DNS, shared Resend connection or existing account changes were performed.
+
+The temporary workspace SMTP setup copy is no longer needed for configuration
+readback. Retain its independent private backup before removing that workspace
+copy; the separate credential stored in Supabase Auth remains the SMTP runtime
+credential. Do not remove Supabase's saved credential or Publishing-only runtime
+secrets as workspace cleanup.

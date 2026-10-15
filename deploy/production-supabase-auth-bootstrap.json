@@ -15,7 +15,12 @@
     "creationTokenAuthConfigReadStatus": 403,
     "setupTokenAuthConfigReadStatus": 200,
     "setupTokenApiKeyMetadataReadStatus": 403,
-    "nativeCoreReadbackEvidence": "generated-artifacts/auth-security/production-auth-config-readback.json"
+    "nativeCoreReadbackEvidence": "generated-artifacts/auth-security/production-auth-config-readback.json",
+    "smtpReadbackEvidence": "generated-artifacts/auth-security/production-smtp-readback.json",
+    "smtpSendOnlyPermissionConfirmed": true,
+    "smtpTlsEnvelopeVerified": true,
+    "smtpMessageSent": false,
+    "nativeEmailDeliveryVerified": false
   },
   "proposedAuthConfig": {
     "site_url": "https://www.quicklychan.xyz",
@@ -46,5 +51,5 @@
     "republish": false,
     "reuseDevelopmentOrStagingSmtpKeys": false
   },
-  "status": "CORE_PREPARED_CUSTOM_SMTP_REQUIRED"
+  "status": "CORE_AND_TEMPLATES_PREPARED_DELIVERY_UNVERIFIED"
 }

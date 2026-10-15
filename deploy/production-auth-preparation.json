@@ -18,7 +18,7 @@
     "serverKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY",
     "sessionKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET",
     "secretNamesStatus": "SUPPORTED_INTERFACE_INACTIVE_UNTIL_APPROVED_CUTOVER",
-    "smtpConfigurationEvidence": null,
+    "smtpConfigurationEvidence": "generated-artifacts/auth-security/production-smtp-readback.json",
     "redirectAllowlistEvidence": "generated-artifacts/auth-security/production-auth-config-readback.json",
     "passwordMfaAbusePolicyEvidence": "generated-artifacts/auth-security/production-auth-config-readback.json",
     "independentKeyCustodyEvidence": null
