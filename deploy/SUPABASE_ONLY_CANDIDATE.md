@@ -97,3 +97,30 @@ The standard release test command now includes the Auth approval/preparation,
 provider/session/MFA and public-versus-private schema-isolation regression suites
 through `pnpm auth:test`. Existing native browser and owner acceptance results are
 reused; new synthetic checks must never substitute for Production acceptance.
+
+### Free alternatives reviewed
+
+The paid proposal was not approved. No purchase or provider change is authorized.
+The existing organization has one member with the Owner role; its two active
+Free projects therefore consume the Owner's two-project allowance.
+
+- Another Free organization does not increase that Owner's allowance. The
+  billing FAQ's new-organization workaround concerns a different Owner/Admin
+  member exhausting their quota; it does not increase one's own quota.
+- Preview/persistent branching is not a $0 workaround: branch compute is billed
+  and is not covered by the spend cap.
+- Extra schemas or shared Auth in either existing project violate the required
+  independent Production identity/data isolation.
+- Pausing one non-Production project could free a slot without deleting it, but
+  would make that environment's authentication unavailable. That changes the
+  current requirement to retain both working environments and needs separate
+  approval. The documented pause/restore retention window must also be respected.
+
+There is no supported third simultaneously active, independently isolated
+hosted Free project under the current account/availability constraints.
+No project was created, paused, transferred or modified.
+
+Sources:
+- https://supabase.com/docs/guides/platform/billing-faq
+- https://supabase.com/docs/guides/platform/manage-your-usage/branching
+- https://supabase.com/docs/guides/platform/free-project-pausing

@@ -186,3 +186,15 @@ while retaining explicit Production, account-migration and spending boundaries.
 **How to apply:** Ask only for genuinely unavoidable credentials, billing
 decisions or Production authorization. Do not repeatedly seek permission for
 safe Development work. Keep preparation distinct from activation and migration.
+
+The user declined additional spending for this migration and requested a safe
+$0/month isolated Production solution under the existing Supabase account.
+Do not mix Production data with Development or Staging, downgrade security,
+purchase, modify Live or Republish without approval.
+
+**Why:** The user declined the paid infrastructure proposal and asked for
+supported free alternatives, or a brief minimum-cost explanation if none fits.
+
+**How to apply:** Treat paid resources as unapproved. Do not silently pause a
+working environment or change organization ownership/roles to obtain free
+capacity. Explain any availability tradeoff before seeking a separate approval.

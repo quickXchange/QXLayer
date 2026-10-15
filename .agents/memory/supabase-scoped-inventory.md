@@ -16,3 +16,16 @@ status; retain only sanitized metadata. Do not grant existing-project writes,
 request a Legacy/account-wide token, or confuse read capability with permission
 to provision, upgrade billing, pause an environment or activate authentication.
 Organization-only inventory also does not prove unused account-wide free quota.
+
+When evaluating Free capacity, check organization Owner/Admin membership as well
+as the plan and active-project count. The documented new-organization workaround
+for another member's exhausted quota does not increase the requesting Owner's
+own allowance.
+
+**Why:** The billing FAQ mentions another Free organization as a workaround in a
+multi-member case; reading that without the member-bound quota context can
+incorrectly suggest a free third project for an Owner already using both slots.
+
+**How to apply:** Keep unrelated members and their identities private; record only
+the role/count metadata needed to establish the capacity constraint. Recheck the
+provider's current policy rather than treating historical quota numbers as fixed.
