@@ -39,11 +39,23 @@ or successful native authentication.
 
 The user wants a full authentication system from their side, integrated with this project, instead of Clerk.
 
-For Development source, the user now explicitly requests removing Clerk and unused Better Auth dependencies while keeping Supabase Auth and preserving Super Admin access, MFA, users, roles, sessions and business data. This supersedes earlier instructions to retain Clerk **in Development source only**. Staging and Production must remain unchanged, and no deploy or Republish is authorized.
+The user authorizes preparing a Supabase-only source candidate for Development,
+Staging and Production, removing Clerk and Better Auth runtime implementations,
+dependencies and obsolete setup tools while preserving the original Super Admin,
+verified MFA, roles, permissions and all business data. The existing Live website
+and active Production Clerk configuration must remain unchanged until the
+replacement is confirmed working and the user explicitly approves cutover.
 
-**Why:** The user explicitly requested Development cleanup after their Supabase migration and required a Production-compatibility audit before declaring Republish safe.
+**Why:** The user expanded the earlier Development-only source cleanup to all
+three environments, while explicitly withholding Production changes and Republish.
 
-**How to apply:** Keep stored legacy business identifiers and proof-based links; never rename identifiers or delete legacy accounts/tables as dependency cleanup. Do not treat a successful production-mode compile as authorization or evidence that Production logins will work. Require separate Production migration approval and native account-continuity evidence.
+**How to apply:** Prepare isolated configuration and verify candidate flows/builds
+autonomously. Keep stored legacy business identifiers and proof-based links;
+never rename identifiers or delete legacy accounts/tables as dependency cleanup.
+Do not treat a production-mode compile or synthetic acceptance as native
+Production evidence. Keep release approval fail-closed, retain the live provider
+and MFA for rollback, and report exact remaining blockers rather than claiming
+DONE or SAFE TO REPUBLISH prematurely.
 
 **Why:** The user explicitly requested project-owned authentication rather than independent ownership of another Clerk application.
 

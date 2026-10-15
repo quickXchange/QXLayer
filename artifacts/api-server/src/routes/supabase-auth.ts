@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { GetSupabaseAuthStatusResponse, GetSupabaseAuthSessionResponse,
   PerformSupabaseAuthActionBody, PerformSupabaseAuthActionResponse } from "@workspace/api-zod";
-import { developmentSupabaseAuth, supabaseAuthEnabled, supabaseAuthConfiguration } from "../modules/supabase-auth/config";
+import { developmentSupabaseAuth, supabaseEmailLoginEnabled, supabaseAuthEnabled, supabaseAuthConfiguration } from "../modules/supabase-auth/config";
 import { readSession, publicUser, hasVerifiedFactor, assertAuthOrigin, hasExistingAccountLink } from "../modules/supabase-auth/session";
 import { performAction } from "../modules/supabase-auth/actions";
 import { recoveryCodeCount } from "../modules/supabase-auth/development-recovery";
@@ -31,7 +31,7 @@ router.get("/supabase-auth/session", async (req, res): Promise<void> => {
     mfaRequired,
     emailMfaAvailable,
     ...(emailMfaAvailable && s ? { emailMfaChallengeExpiresAt: emailChallengeExpiresAt(s) } : {}),
-    ...(developmentSupabaseAuth() ? { emailLoginChallengeExpiresAt: await emailLoginChallengeExpiresAt(req) } : {}),
+    ...(supabaseEmailLoginEnabled() ? { emailLoginChallengeExpiresAt: await emailLoginChallengeExpiresAt(req) } : {}),
     recovery: s?.payload.recovery ?? false,
     ...(developmentSupabaseAuth() && s && s.aal2 && !s.payload.recovery
       ? { recoveryCodesRemaining: await recoveryCodeCount(s) } : {}),

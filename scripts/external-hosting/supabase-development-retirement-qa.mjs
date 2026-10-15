@@ -73,7 +73,7 @@ await action({ action: "mfa-verify", code: await code() });
 await status("/api/me", 200); await status("/api/platform-management", 403);
 await action({ action: "link-existing" }, 410);
 await action({ action: "logout" }); await status("/api/me", 401);
-for (const path of ["/api/auth/get-session", "/api/owned-auth/status", "/api/__clerk/v1/client"]) await status(path, 410);
+for (const path of ["/api/auth/get-session", "/api/owned-auth/status", "/api/__clerk/v1/client"]) await status(path, 404);
 console.log(JSON.stringify({ recoveryRequiresExistingMfa: true, recoveryDeniedBusinessBeforeAndAfterMfa: true,
   passwordResetPassed: true, oldPasswordRejected: true, mfaPreservedAfterPasswordReset: true,
   logoutRevokedAccess: true, retiredEndpointsRejected: true, testTokenIssuanceOnly: true, inboxDeliveryRetested: false,

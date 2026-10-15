@@ -1,4 +1,5 @@
 export * from "./tenant-integrations";
+export * from "./supabase-sessions";
 export * from "./tenant-telegram";
 export * from "./product-config";
 export * from "./white-label-requests";

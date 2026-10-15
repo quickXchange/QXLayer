@@ -21,11 +21,20 @@ A password-recovery link does not supply sufficient assurance to change the pass
 
 **How to apply:** Keep recovery sessions denied business/Admin access even after MFA elevation. Require the current factor before password reset, preserve the recovery expiry, and verify that password reset does not remove TOTP. Test with a disposable MFA-enabled identity, not just an account without 2FA.
 
-The user authorized a Development-only email sign-in alternative on the login page for Super Admins
+The user initially authorized a Development-only email sign-in alternative on the login page for Super Admins
 at their verified Gmail address: six-digit codes replacing the password, five-minute expiry, single use,
 rate and attempt limits. Google Authenticator must remain an additional mandatory step after this email first factor. New Development
 passwords require at least ten characters with uppercase, lowercase and numbers;
 special characters are not required.
+
+The Supabase-only migration request extends preservation of Gmail-code login
+and mandatory Google Authenticator to the candidate for all three environments.
+Native Development acceptance is not native Staging/Production mailbox or MFA
+acceptance; Production activation remains separately approval-gated.
+
+**Why:** The user explicitly requires email login, passwordless Gmail codes,
+Google Authenticator, password reset and sessions to keep working across the
+Supabase-only migration without changing Live before approved cutover.
 
 **Why:** The user requested these authentication rules while prohibiting Staging,
 Production, deployment and Republish changes.

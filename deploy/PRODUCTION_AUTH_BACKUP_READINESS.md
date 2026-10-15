@@ -199,10 +199,11 @@ confirmation. Native MFA/custody acceptance remains a later protected-Admin gate
    synthetic data, but real-backup capture/restore still needs explicit approval.
    No secret value is requested.
 
-Production Supabase project reference, explicit Production-capable code, secure
-configuration, reviewed additive publish diff, protected-Admin native acceptance
-and separate execution/Republish approvals remain release prerequisites.
-The current Development-only runtime guards have not been weakened.
+An isolated Production project, secure live configuration, reviewed additive
+publish diff, verified recovery, protected-Admin native acceptance and separate
+execution/Republish approvals remain release prerequisites. A Production-capable
+source candidate is now implemented and compile-tested without activation; see
+`SUPABASE_ONLY_CANDIDATE.md`. Development isolation remains enforced.
 
 No cleanup is proposed. Verified backup must precede any future cleanup
 proposal, and exact-scope deletion still requires explicit approval.

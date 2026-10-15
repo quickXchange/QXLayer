@@ -10,13 +10,21 @@ if (api.protocol !== "https:" || !api.hostname.endsWith(".onrender.com") ||
     api.pathname !== "/" || api.username || api.password || api.search || api.hash)
   throw new Error("QXLAYER_API_ORIGIN must be the exact Render API HTTPS origin.");
 const authProvider = process.env.QXLAYER_AUTH_PROVIDER;
-if (authProvider !== "supabase" || process.env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
-  throw new Error("External Supabase frontend builds remain Staging-only; Production migration is not approved.");
+if (authProvider !== "supabase" || !["staging", "production"].includes(process.env.QXLAYER_EXTERNAL_ENVIRONMENT))
+  throw new Error("External frontend builds require Supabase and an explicit isolated target.");
+if (process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "production") {
+  const ref = process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF ?? "";
+  if (!/^[a-z0-9]{20}$/.test(ref) || ["nktstksmfpcsjnjbeqsk", "muvedavhbpgpdrrnjrih"].includes(ref) ||
+      process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !== "https://www.quicklychan.xyz")
+    throw new Error("Production frontend builds require isolated Production Auth metadata.");
+}
 for (const [name, base] of [["private-label-console", "/"], ["private-label-website", "/private-label-website/"]]) {
   const result = spawnSync("pnpm", ["--filter", `@workspace/${name}`, "run", "build"], {
     stdio: "inherit", env: { ...process.env, NODE_ENV: "production", PORT: "3000", BASE_PATH: base,
       VITE_EXTERNAL_DEPLOYMENT: "true",
       VITE_QXLAYER_AUTH_PROVIDER: authProvider,
+      VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF: process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF,
+      VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_URL: process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL,
       VITE_QXLAYER_EXTERNAL_ENVIRONMENT: process.env.QXLAYER_EXTERNAL_ENVIRONMENT ?? "production" },
   });
   if (result.status !== 0) throw new Error(`${name} build failed.`);

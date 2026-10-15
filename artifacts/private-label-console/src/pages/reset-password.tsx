@@ -15,12 +15,12 @@ export default function ResetPasswordPage() {
   const needsMfa = !!session?.recovery && !!session.user?.twoFactorEnabled;
   const [code, setCode] = useState('');
   const token = useRef(initialToken);
-  // Better Auth keeps its token for the reset call; Supabase must verify first.
-  const [gate, setGate] = useState<'checking' | 'ready' | 'invalid'>(initialBadLink ? 'invalid' : supabaseAuth ? 'checking' : 'ready');
+  // Recovery is usable only after native Supabase token verification.
+  const [gate, setGate] = useState<'checking' | 'ready' | 'invalid'>(initialBadLink ? 'invalid' : 'checking');
   const [pw, setPw] = useState(''); const [confirm, setConfirm] = useState(''); const [busy, setBusy] = useState(false); const [err, setErr] = useState(''); const [done, setDone] = useState(false);
   const started = useRef(false);
   useEffect(() => {
-    if (!supabaseAuth || initialBadLink || started.current) return;
+    if (initialBadLink || started.current) return;
     started.current = true;
     const t = token.current; token.current = '';
     window.history.replaceState(null, '', `${window.location.pathname}`);

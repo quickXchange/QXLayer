@@ -43,6 +43,7 @@
 - [Project-owned authentication](project-owned-authentication.md) — Production migration protects required administrators only; all existing customer accounts are tests, not mandatory imports.
 - [Supabase Staging Auth](supabase-staging-auth-boundary.md) — parallel trial preserves Clerk; opaque server keys require pinned-origin capability checks, not JWT assumptions.
 - [Auth query observers](auth-query-observers.md) — cache eviction can strand active loading observers; preserve session observers and reset account data on confirmed identity changes.
+- [Auth support isolation](auth-support-schema-isolation.md) — private Auth support tables must not enter public tenant-RLS inventories or inherit tenant-runtime grants.
 - [Supabase MFA assurance](supabase-mfa-session-assurance.md) — verifying MFA in another context can invalidate pending-MFA sessions; probe deployed recovery-code capability, not upstream source.
 - [Development Auth mail](development-auth-mail-configuration.md) — OTP/recovery share a mailbox cooldown; native template override mirrors are booleans, not content strings.
 - [Browser candidate modules](browser-candidate-module-identity.md) — asset overrides need one canonical entry URL or lazy chunks can instantiate React twice.

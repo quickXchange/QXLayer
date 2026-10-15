@@ -89,9 +89,20 @@ independent session encryption, scoped SMTP, exact redirects, secure cookies and
 password/MFA/abuse policies. The passive `production-auth-preparation.json`
 records pending evidence, not executable settings.
 
-Current runtime code deliberately rejects Production Supabase activation.
-Prepare and verify explicit Production support without bypassing those guards
-or publishing the current Development-only implementation.
+The candidate now supports an explicit isolated Production configuration, using
+only `QXLAYER_PRODUCTION_SUPABASE_AUTH_*` settings, the canonical Live origin,
+independent server/session keys, and a dedicated Production session cookie.
+Startup still refuses unapproved cutover, trial flags, Development/Staging project
+reuse and cross-environment secrets. Native frontend builds map only public
+Production metadata; no server key is exposed. No live settings were changed.
+
+The non-executable `production-auth-cutover.json` remains PREPARATION_ONLY,
+unapproved and without a Production project or evidence. Release checks require
+explicit approval and five hash-pinned, operator-reviewed, non-synthetic
+Production evidence reports for the same release/project. This replaces the
+permanent unconditional build failure without authorizing this candidate to
+publish. Evidence hashes pin reviewed reports; they do not independently prove
+the truth of a report or replace native verification.
 
 ### 4. Preserve and verify only protected administrators
 

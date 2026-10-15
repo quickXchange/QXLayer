@@ -17,7 +17,7 @@
     "businessDatabasePolicy": "PRESERVE_EXISTING_VERIFY_RUNTIME_TARGET",
     "serverKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY",
     "sessionKeySecretName": "QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET",
-    "secretNamesStatus": "PROPOSED_INTERFACE_NOT_SUPPORTED_BY_CURRENT_RUNTIME",
+    "secretNamesStatus": "SUPPORTED_INTERFACE_INACTIVE_UNTIL_APPROVED_CUTOVER",
     "smtpConfigurationEvidence": null,
     "redirectAllowlistEvidence": null,
     "passwordMfaAbusePolicyEvidence": null,
@@ -76,7 +76,7 @@
   "evidence": {
     "immutableDeployedReleaseAndEffectiveAuthProvider": null,
     "runtimeBusinessDatabaseBinding": null,
-    "productionCapableTransitionImplementation": null,
+    "productionCapableTransitionImplementation": "artifacts/api-server/src/modules/supabase-auth/production-configuration.test.ts",
     "reviewedSupportedAdditiveSchemaDiff": null,
     "authenticatedBackupAndIsolatedRestore": null,
     "rollbackPreservingNewUsersAndBusinessActivity": null,

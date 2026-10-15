@@ -12,7 +12,7 @@ import {
 } from "@workspace/api-client-react";
 
 /**
- * Better Auth compatible facade over the first-party Supabase Staging session API.
+ * Shared account API over the first-party, environment-scoped Supabase session API.
  * The browser holds only opaque HTTP-only cookies set by the server; no provider
  * token or service key ever reaches this code.
  */

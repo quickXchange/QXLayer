@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "mode": "PREPARATION_ONLY",
+  "approvedByUser": false,
+  "productionProjectRef": null,
+  "runningReleaseId": null,
+  "evidence": {
+    "runtimeBinding": null,
+    "encryptedRecovery": null,
+    "protectedAdministrator": null,
+    "additiveSchema": null,
+    "nativeAcceptance": null
+  }
+}

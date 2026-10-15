@@ -2,6 +2,16 @@
 // Never infer Supabase Auth from the database/storage provider.
 export const STAGING_AUTH_PROJECT = "muvedavhbpgpdrrnjrih";
 export const DEVELOPMENT_AUTH_PROJECT = "nktstksmfpcsjnjbeqsk";
+export const PRODUCTION_AUTH_ORIGIN = "https://www.quicklychan.xyz";
+
+export function productionSupabaseAuth(env = process.env): boolean {
+  return env.QXLAYER_EXTERNAL_ENVIRONMENT === "production" && env.QXLAYER_AUTH_PROVIDER === "supabase";
+}
+
+/** Email first factor is always followed by the existing verified authenticator. */
+export function supabaseEmailLoginEnabled(env = process.env): boolean {
+  return supabaseAuthEnabled(env);
+}
 
 export function developmentSupabaseAuth(env = process.env): boolean {
   return env.QXLAYER_EXTERNAL_ENVIRONMENT === "development" &&
@@ -22,6 +32,13 @@ export function supabaseAuthEnabled(env = process.env): boolean {
   }
   if (env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_TRIAL_ENABLED === "true")
     throw new Error("Development authentication cannot be enabled outside Development.");
+  if (productionSupabaseAuth(env)) {
+    if (env.NODE_ENV !== "production" ||
+        env.QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED !== "true" ||
+        env.QXLAYER_SUPABASE_AUTH_TRIAL_ENABLED === "true")
+      throw new Error("Production Supabase Auth requires explicit approved cutover and a Production runtime, never trial settings.");
+    return true;
+  }
   if (env.QXLAYER_EXTERNAL_ENVIRONMENT !== "staging")
     throw new Error("Supabase authentication trials are Staging-only; Production cutover is not approved.");
   return true;
@@ -29,6 +46,21 @@ export function supabaseAuthEnabled(env = process.env): boolean {
 
 export function supabaseAuthConfiguration(env = process.env) {
   if (!supabaseAuthEnabled(env)) throw new Error("Supabase authentication trial is not enabled.");
+  if (productionSupabaseAuth(env)) {
+    const project = env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF;
+    if (!project || !/^[a-z0-9]{20}$/.test(project) ||
+        [DEVELOPMENT_AUTH_PROJECT, STAGING_AUTH_PROJECT].includes(project))
+      throw new Error("Production requires its own isolated Supabase Auth project.");
+    if (env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !== PRODUCTION_AUTH_ORIGIN)
+      throw new Error("Production authentication must use the exact canonical Live HTTPS origin.");
+    const apiKey = env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY;
+    if (!apiKey?.startsWith("sb_secret_") ||
+        [env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SERVER_KEY, env.QXLAYER_SUPABASE_AUTH_SERVER_KEY].includes(apiKey))
+      throw new Error("Production requires an independent server-only Supabase secret key.");
+    supabaseSessionSecret(env);
+    return { origin: PRODUCTION_AUTH_ORIGIN, providerOrigin: `https://${project}.supabase.co`,
+      apiKey, mailReady: env.QXLAYER_PRODUCTION_SUPABASE_AUTH_MAIL_READY === "true" };
+  }
   if (developmentSupabaseAuth(env)) {
     const origin = new URL(env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL ?? "");
     if (origin.origin !== `https://${env.REPLIT_DEV_DOMAIN}` || origin.pathname !== "/" ||
@@ -61,6 +93,14 @@ export function supabaseAuthConfiguration(env = process.env) {
 }
 
 export function supabaseSessionSecret(env = process.env): string {
+  if (productionSupabaseAuth(env)) {
+    const key = env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET;
+    if (!key || key.length < 32 ||
+        [env.SESSION_SECRET, env.QXLAYER_SUPABASE_AUTH_SESSION_SECRET,
+          env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET].includes(key))
+      throw new Error("Production requires independent session encryption, never a Development/Staging key.");
+    return key;
+  }
   const development = developmentSupabaseAuth(env);
   const key = development ? env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET : env.QXLAYER_SUPABASE_AUTH_SESSION_SECRET;
   if (!key || (development && (key.length < 32 || key === env.QXLAYER_SUPABASE_AUTH_SESSION_SECRET || key === env.SESSION_SECRET)))
@@ -68,7 +108,7 @@ export function supabaseSessionSecret(env = process.env): string {
   return key;
 }
 
-/** Parallel Staging trial cookies never replace the default Clerk provider. */
+/** Supabase is the only runtime provider; configuration never implies activation. */
 export function supabaseDefaultProvider(env = process.env) {
   return env.QXLAYER_AUTH_PROVIDER === "supabase" && supabaseAuthEnabled(env);
 }

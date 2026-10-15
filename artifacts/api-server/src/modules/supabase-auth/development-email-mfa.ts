@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto";
 import { pool } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
-import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
+import { developmentSupabaseAuth, supabaseEmailLoginEnabled, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 import { sessionCodec } from "./crypto";
 import { businessId, hasVerifiedFactor, type AuthSession, type Payload } from "./session";
 import type { SupabaseUser } from "./provider";
@@ -20,11 +20,11 @@ export function emailChallengeExpiresAt(s: AuthSession): number | undefined {
 
 /** Provider-verified mailbox + actual business authorization, never email-based ownership. */
 export async function emailMfaEligible(s: AuthSession): Promise<boolean> {
-  if (s.payload.recovery || s.payload.emailPrimary) return false;
+  if (!developmentSupabaseAuth() || s.payload.recovery || s.payload.emailPrimary) return false;
   return verifiedGmailSuperAdmin(s.user);
 }
 export async function verifiedGmailSuperAdmin(user: SupabaseUser): Promise<boolean> {
-  if (!developmentSupabaseAuth() || !user.email_confirmed_at ||
+  if (!supabaseEmailLoginEnabled() || !user.email_confirmed_at ||
       !/^[^@\s]+@gmail\.com$/i.test(user.email ?? "") || !hasVerifiedFactor(user)) return false;
   supabaseAuthConfiguration(); // Enforce pinned project/origin/runtime before any operation.
   const result = await pool.query(

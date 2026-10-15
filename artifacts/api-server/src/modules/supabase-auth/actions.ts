@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { Request, Response } from "express";
 import { HttpError } from "../../lib/errors";
 import { authRequest, type SupabaseTokens } from "./provider";
-import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
+import { developmentSupabaseAuth, supabaseEmailLoginEnabled, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 import { establishSession, needSession, publicUser, hasVerifiedFactor, reauthenticate, readSession,
   revokeLocalSession, updateSession, sessionCookie, type AuthSession } from "./session";
 import { generateRecoveryCodes, recoverAuthenticator, requireDevelopmentRecovery } from "./development-recovery";
@@ -89,8 +89,8 @@ async function logoutAll(s: AuthSession, req: Request, res: Response) {
 }
 export async function performAction(raw: unknown, req: Request, res: Response) {
   const a = input.parse(raw);
-  if (["login-email-send", "login-email-verify"].includes(a.action) && !developmentSupabaseAuth())
-    throw new HttpError(404, "Development authentication method unavailable.");
+  if (["login-email-send", "login-email-verify"].includes(a.action) && !supabaseEmailLoginEnabled())
+    throw new HttpError(404, "Email authentication method unavailable.");
   if (a.action === "mfa-recover" || a.action === "mfa-recovery-generate") requireDevelopmentRecovery();
   await limitAction(req, a.action, "email" in a ? a.email : "");
   const cfg = supabaseAuthConfiguration();

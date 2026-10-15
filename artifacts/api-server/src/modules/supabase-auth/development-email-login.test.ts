@@ -19,7 +19,7 @@ async function scenario(run: (f: {
   req: Request; res: Response; cookies: Map<string, string>; requests: string[]; options: Record<string, unknown>[];
   payload: () => Payload; advance: (n: number) => void; eligible: (v: boolean) => void;
   mailbox: (email: string, verified: boolean, totp: boolean) => void; providerFailure: (v: boolean) => void;
-}) => Promise<void>) {
+}) => Promise<void>, environment: "development" | "staging" | "production" = "development") {
   const before = { ...process.env };
   Object.assign(process.env, { NODE_ENV: "test", QXLAYER_EXTERNAL_ENVIRONMENT: "development",
     QXLAYER_AUTH_PROVIDER: "supabase", QXLAYER_DATABASE_PROVIDER: "replit",
@@ -29,6 +29,29 @@ async function scenario(run: (f: {
     QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SERVER_KEY: "sb_secret_synthetic",
     QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET: secret,
     QXLAYER_DEVELOPMENT_SUPABASE_AUTH_MAIL_READY: "true" });
+  if (environment === "staging") Object.assign(process.env, {
+    QXLAYER_EXTERNAL_ENVIRONMENT: "staging",
+    QXLAYER_SUPABASE_AUTH_URL: "https://email-login-test.replit.dev",
+    QXLAYER_SUPABASE_AUTH_PROJECT_REF: "muvedavhbpgpdrrnjrih",
+    QXLAYER_SUPABASE_AUTH_SERVER_KEY: "sb_secret_synthetic_staging",
+    QXLAYER_SUPABASE_AUTH_SESSION_SECRET: secret,
+    QXLAYER_SUPABASE_AUTH_MAIL_READY: "true",
+  });
+  if (environment === "production") {
+    delete process.env.QXLAYER_SUPABASE_AUTH_TRIAL_ENABLED;
+    delete process.env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_TRIAL_ENABLED;
+    delete process.env.QXLAYER_SUPABASE_AUTH_SESSION_SECRET;
+    delete process.env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SESSION_SECRET;
+    Object.assign(process.env, {
+      NODE_ENV: "production", QXLAYER_EXTERNAL_ENVIRONMENT: "production",
+      QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED: "true",
+      QXLAYER_PRODUCTION_SUPABASE_AUTH_URL: "https://www.quicklychan.xyz",
+      QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF: "abcdefghijklmnopqrst",
+      QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY: "sb_secret_synthetic_production",
+      QXLAYER_PRODUCTION_SUPABASE_AUTH_SESSION_SECRET: secret,
+      QXLAYER_PRODUCTION_SUPABASE_AUTH_MAIL_READY: "true",
+    });
+  }
   mock.timers.enable({ apis: ["Date"], now: Date.now() });
   const codec = sessionCodec(secret);
   const cookies = new Map<string, string>(), requests: string[] = [], options: Record<string, unknown>[] = [];
@@ -138,6 +161,19 @@ test("email login replaces password but requires fresh native Google Authenticat
     assert(f.requests.every(p => !/password|admin\/generate_link/.test(p)));
   });
 });
+
+for (const environment of ["staging", "production"] as const) {
+  test(`${environment} Gmail first factor preserves roles and requires fresh verified TOTP`, async () => {
+    await scenario(async f => {
+      await sendEmailLogin("synthetic@gmail.com", f.req, f.res);
+      await verifyEmailLogin("synthetic@gmail.com", "246810", f.req, f.res);
+      assert.equal((await readSession(f.req))?.aal2, false);
+      await performAction({ action: "mfa-verify", code: "123456" }, f.req, f.res);
+      assert.equal((await readSession(f.req))?.aal2, true);
+      assert(f.requests.every(p => !/password|admin\/generate_link/.test(p)));
+    }, environment);
+  });
+}
 test("unknown, non-admin, unverified, non-Gmail and missing-TOTP accounts cannot get email login or create accounts", async () => {
   for (const variant of ["unknown", "non-admin", "unverified", "non-Gmail", "missing-TOTP"]) {
     await scenario(async f => {
@@ -257,12 +293,12 @@ test("provider 429 preserves bounded retry guidance rather than swallowing or by
       { status: 429, retryAfterSeconds: 75 });
   });
 });
-test("Development-only gate, exact code shape and role/subject injection protection", async () => {
+test("unconfigured environments fail closed; exact code shape and role/subject injection protection", async () => {
   await scenario(async f => {
     assert(!input.safeParse({ action: "login-email-verify", email: "synthetic@gmail.com", code: "123456", role: "super_admin" }).success);
     assert(!input.safeParse({ action: "login-email-verify", email: "synthetic@gmail.com", code: "12345678" }).success);
     process.env.QXLAYER_EXTERNAL_ENVIRONMENT = "staging";
-    await assert.rejects(performAction({ action: "login-email-send", email: "synthetic@gmail.com" }, f.req, f.res), { status: 404 });
+    await assert.rejects(performAction({ action: "login-email-send", email: "synthetic@gmail.com" }, f.req, f.res));
     assert.equal(f.requests.length, 0);
   });
 });

@@ -6,12 +6,12 @@ let verifyOnce: Promise<{ error?: unknown }> | null = null;
 
 export default function VerifyEmailPage() {
   const params = new URLSearchParams(window.location.search);
-  const tokenRef = useRef((supabaseAuth ? params.get('token_hash') : params.get('token')) ?? null);
+  const tokenRef = useRef(params.get('token_hash') ?? null);
   const token = tokenRef.current;
-  // Better Auth redirects back with verified=1. Supabase never trusts that flag.
-  const verifiedFlag = !supabaseAuth && params.get('verified') === '1'; const urlErr = params.get('error');
+  // Verification is established only by the provider, never a URL success flag.
+  const urlErr = params.get('error');
   const { status, failed } = useOwnedStatus();
-  const [state, setState] = useState<'idle' | 'checking' | 'ok' | 'bad'>(token ? 'checking' : verifiedFlag ? 'ok' : urlErr ? 'bad' : 'idle');
+  const [state, setState] = useState<'idle' | 'checking' | 'ok' | 'bad'>(token ? 'checking' : urlErr ? 'bad' : 'idle');
   const [email, setEmail] = useState(''); const [busy, setBusy] = useState(false); const [err, setErr] = useState(''); const [sent, setSent] = useState(false);
   useEffect(() => {
     if (!token) return;

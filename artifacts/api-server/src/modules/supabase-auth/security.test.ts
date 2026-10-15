@@ -10,7 +10,7 @@ const env = {
   QXLAYER_SUPABASE_AUTH_PROJECT_REF: "muvedavhbpgpdrrnjrih",
   QXLAYER_SUPABASE_AUTH_SERVER_KEY: "synthetic-test-only-key",
 };
-test("Clerk remains the default; storage/database configuration does not activate Supabase Auth", () => {
+test("no legacy provider fallback; storage/database configuration does not activate Supabase Auth", () => {
   assert.equal(supabaseAuthEnabled({ QXLAYER_DATABASE_PROVIDER: "supabase" }), false);
   assert.equal(supabaseAuthEnabled({ QXLAYER_AUTH_PROVIDER: "clerk" }), false);
 });

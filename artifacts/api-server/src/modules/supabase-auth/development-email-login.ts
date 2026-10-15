@@ -2,20 +2,21 @@ import { randomBytes, randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
 import { pool } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
-import { developmentSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
+import { developmentSupabaseAuth, supabaseEmailLoginEnabled, productionSupabaseAuth, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 import { sessionCodec } from "./crypto";
 import { authRequest, type SupabaseUser, type SupabaseTokens } from "./provider";
 import { verifiedGmailSuperAdmin } from "./development-email-mfa";
 import { establishSession } from "./session";
 import { developmentLimit, developmentMailCooldown, privateAuthKey } from "./development-auth-limits";
 
-export const EMAIL_LOGIN_COOKIE = "__Host-vynox_dev_email_login";
+export const EMAIL_LOGIN_COOKIE = developmentSupabaseAuth() ? "__Host-vynox_dev_email_login" :
+  productionSupabaseAuth() ? "__Host-vynox_prod_email_login" : "__Host-vynox_staging_email_login";
 const lifetime = 5 * 60000;
 interface Challenge { purpose: "email-login"; subject: string; emailHash: string; nonce: string; expires: number }
 const invalid = () => new HttpError(400, "The code is invalid, expired or already used. Request a new code in this browser.");
 const restart = (reason: string) => new HttpError(400, `EMAIL_LOGIN_RESTART: ${reason} Request a new sign-in code in this browser tab.`);
 function requireDevelopment() {
-  if (!developmentSupabaseAuth()) throw new HttpError(404, "Development authentication method unavailable.");
+  if (!supabaseEmailLoginEnabled()) throw new HttpError(404, "Email authentication method unavailable.");
   if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === "0")
     throw new HttpError(503, "Secure email verification transport is required.");
   return supabaseAuthConfiguration();
@@ -36,7 +37,7 @@ function browserChallenge(req: Request): Challenge | null {
 
 /** Public cookie readback, not a credential: identical for eligible/unknown accounts. */
 export async function emailLoginChallengeExpiresAt(req: Request): Promise<number | undefined> {
-  if (!developmentSupabaseAuth()) return undefined;
+  if (!supabaseEmailLoginEnabled()) return undefined;
   requireDevelopment();
   const p = browserChallenge(req);
   if (!p || p.expires <= Date.now()) return undefined;
@@ -72,7 +73,7 @@ export async function eligibleEmailLoginUser(email: string): Promise<SupabaseUse
 
 export async function sendEmailLogin(email: string, _req: Request, res: Response) {
   const cfg = requireDevelopment();
-  if (!cfg.mailReady) throw new HttpError(503, "Development email delivery is unavailable.");
+  if (!cfg.mailReady) throw new HttpError(503, "Email delivery is unavailable.");
   await developmentMailCooldown(email);
   await developmentLimit("email-login-send-hour", email, 3600, 5);
   const user = await eligibleEmailLoginUser(email);

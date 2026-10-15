@@ -70,7 +70,7 @@ function SignInForm() {
         <Field id="email" label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
         {emailMethod ? <>
           <p className="text-sm text-muted-foreground">Super Admins only: use your verified Gmail instead of your password. Google Authenticator is still required before Admin access.</p>
-          <p className="text-sm text-muted-foreground">If this preview blocks secure cookies, <a className="font-medium underline" data-testid="link-direct-development-sign-in" href={`${import.meta.env.VITE_QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL}/sign-in`} target="_blank" rel="noopener noreferrer">open Development sign-in in a new tab</a> and request the code there. Keep that tab open for verification.</p>
+          {supabaseDevelopmentAuth && <p className="text-sm text-muted-foreground">If this preview blocks secure cookies, <a className="font-medium underline" data-testid="link-direct-development-sign-in" href={`${import.meta.env.VITE_QXLAYER_DEVELOPMENT_SUPABASE_AUTH_URL}/sign-in`} target="_blank" rel="noopener noreferrer">open Development sign-in in a new tab</a> and request the code there. Keep that tab open for verification.</p>}
           <button type="button" data-testid="button-send-login-code" disabled={busy || !email || resendWait.remaining > 0} className="text-sm font-medium hover:underline" onClick={() => void sendCode()}>
             {resendWait.remaining ? `Send again in ${resendWait.remaining}s` : 'Send email code'}
           </button>
@@ -82,10 +82,10 @@ function SignInForm() {
           {emailMethod ? verifyWait.remaining ? `Try again in ${verifyWait.remaining}s` : 'Verify email code' : 'Sign in'}
         </Submit>
       </Form>
-      {supabaseDevelopmentAuth && <button type="button" data-testid="button-login-another-method" disabled={busy} className="block w-full text-center text-sm font-medium hover:underline"
+      <button type="button" data-testid="button-login-another-method" disabled={busy} className="block w-full text-center text-sm font-medium hover:underline"
         onClick={() => { setEmailMethod(!emailMethod); setPassword(''); setCode(''); setErr(''); setSent(''); setNeedsVerify(false); }}>
         {emailMethod ? 'Use password instead' : 'Another Method'}
-      </button>}
+      </button>
       <p data-testid="text-existing-preserved" className="text-center text-sm text-muted-foreground">Migrated accounts keep their existing IDs and access. If your previous account has not been migrated, request an ownership review; do not create another Owner account.</p>
       <div className="text-center text-sm"><A id="link-forgot" href="/forgot-password">Forgot your password?</A></div>
     </AuthFrame>

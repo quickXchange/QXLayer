@@ -38,9 +38,6 @@ app.disable("x-powered-by");
 // Before body parsing and application routes.
 app.use(createAccessGate({ basePath: "/api", healthPath: "/api/healthz",
   deliveredSite: async slug => (await import("./modules/website/service")).deliveredPublicSite(slug) }));
-app.use(["/api/auth", "/api/owned-auth", "/api/__clerk"], (_req, res) => {
-  res.status(410).json({ error: "Legacy authentication is retired. Use Supabase Auth." });
-});
 app.use(express.json({ limit: "128kb" }));
 app.use(express.urlencoded({ extended: true, limit: "128kb" }));
 

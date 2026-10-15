@@ -22,6 +22,22 @@ if (Number.isNaN(port) || port <= 0) {
 
 const basePath = process.env.BASE_PATH;
 
+// Public metadata only. Native publishing must not silently emit a Development
+// client or require server secrets in the browser. This does not activate Auth.
+if (process.env.QXLAYER_EXTERNAL_ENVIRONMENT === 'production') {
+  const ref = process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF ?? '';
+  if (process.env.QXLAYER_AUTH_PROVIDER !== 'supabase' ||
+      !/^[a-z0-9]{20}$/.test(ref) ||
+      ['nktstksmfpcsjnjbeqsk', 'muvedavhbpgpdrrnjrih'].includes(ref) ||
+      process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !== 'https://www.quicklychan.xyz') {
+    throw new Error('Production build requires isolated Supabase Auth public metadata.');
+  }
+  process.env.VITE_QXLAYER_AUTH_PROVIDER = 'supabase';
+  process.env.VITE_QXLAYER_EXTERNAL_ENVIRONMENT = 'production';
+  process.env.VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF = ref;
+  process.env.VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_URL = process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL;
+}
+
 if (!basePath) {
   throw new Error(
     'BASE_PATH environment variable is required but was not provided.',

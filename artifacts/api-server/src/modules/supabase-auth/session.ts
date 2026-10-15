@@ -4,9 +4,10 @@ import { pool } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { cookieDigest, sessionCodec } from "./crypto";
 import { authRequest, type SupabaseTokens, type SupabaseUser } from "./provider";
-import { supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret, developmentSupabaseAuth } from "./config";
+import { supabaseAuthConfiguration, supabaseBusinessId, supabaseSessionSecret, developmentSupabaseAuth, productionSupabaseAuth } from "./config";
 
-export const SESSION_COOKIE = developmentSupabaseAuth() ? "__Host-vynox_dev_sb" : "__Host-vynox_sb";
+export const SESSION_COOKIE = developmentSupabaseAuth() ? "__Host-vynox_dev_sb" :
+  productionSupabaseAuth() ? "__Host-vynox_prod_sb" : "__Host-vynox_sb";
 export interface Payload {
   accessToken: string;
   refreshToken: string;
