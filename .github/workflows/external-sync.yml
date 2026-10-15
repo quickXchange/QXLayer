@@ -1,0 +1,60 @@
+name: Automatic external candidate deployment
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: external-candidate-main
+  cancel-in-progress: false
+jobs:
+  checks:
+    uses: ./.github/workflows/external-checks.yml
+  candidate:
+    needs: checks
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: vynox-candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - name: Verify candidate cannot activate Live
+        run: node scripts/external-hosting/verify-candidate-boundary.mjs
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      - name: Automatically deploy the pushed API commit
+        run: node scripts/external-hosting/release-render.mjs
+        env:
+          QXLAYER_EXTERNAL_RELEASES_APPROVED: "true"
+          QXLAYER_EXTERNAL_ENVIRONMENT: staging
+          RENDER_API_SERVICE_ID: srv-db5b47qjnfac739s374g
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      - name: Build both preserved frontends
+        run: pnpm run external:build:frontend
+        env:
+          QXLAYER_API_ORIGIN: https://qxlayer-api.onrender.com
+          QXLAYER_AUTH_PROVIDER: supabase
+          QXLAYER_EXTERNAL_ENVIRONMENT: staging
+      - name: Deploy protected Vercel candidate, never Production
+        id: preview
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          mkdir -p .vercel
+          node -e 'require("fs").writeFileSync(".vercel/project.json", JSON.stringify({orgId:"team_eoJE6FCcm9esuqnRTUsmopzy",projectId:"prj_MoGcFUBrfUHrmtRjHqNuYIaUbQcx"}))'
+          url=$(pnpm dlx vercel@63.1.2 deploy --prebuilt --yes --token "$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - name: Verify exact pushed frontend commit and Preview boundary
+        run: node scripts/external-hosting/verify-candidate-preview.mjs
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          CANDIDATE_PREVIEW_URL: ${{ steps.preview.outputs.url }}
+      # Never migrate databases, import accounts/data, enable writes, resume
+      # workers, assign custom domains or use --prod from this candidate job.

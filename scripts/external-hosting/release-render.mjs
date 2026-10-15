@@ -25,7 +25,7 @@ for (const key of keys) {
   const service = await request(`services/${id}`);
   if (service.suspended === "suspended") throw new Error("Suspended services cannot be released without separately approved activation.");
   if (process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging" &&
-      (id !== "srv-db5b47qjnfac739s374g" || service.branch !== "qxlayer-staging" || service.serviceDetails?.plan !== "starter"))
+      (id !== "srv-db5b47qjnfac739s374g" || !["main", "qxlayer-staging"].includes(service.branch) || service.serviceDetails?.plan !== "starter"))
     throw new Error("Only the existing approved Staging API may be released.");
   const deployment = await request(`services/${id}/deploys`,"POST",{ commitId:commit,clearCache:"do_not_clear" });
   if (!/^dep-[a-z0-9]+$/.test(deployment.id ?? "")) throw new Error("Render did not return a deployment identity.");

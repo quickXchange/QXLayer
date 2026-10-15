@@ -1,0 +1,29 @@
+{
+  "status": "PREPARED_NOT_EXECUTED",
+  "projectRef": "qcgvhlphalxqzzsxqjhi",
+  "file": "0004_latest-schema-PREPARED.sql",
+  "sha256": "bb1b181b6a618f53b04f5110b7968416746e25ced74b0800d5e43ffb69a1e613",
+  "dependsOn": [
+    "0001_application_schema.sql",
+    "0002_runtime_security.sql",
+    "0003_owned_auth.sql"
+  ],
+  "publicPolicies": 84,
+  "forcedRlsTables": 42,
+  "privateTables": 5,
+  "privateColumns": 20,
+  "privateConstraints": 11,
+  "policyScope": "qxlayer_runtime only (narrower than Development PUBLIC)",
+  "sourceNativePlanHash": "5aa16ff9608d09f6c9491e3b31f32d5df702fc8833525a5ecc6656e8b6bb443e",
+  "copiesAccounts": false,
+  "copiesData": false,
+  "startupDdl": false,
+  "liveChanged": false,
+  "blockers": [
+    "Pinned Production database credential",
+    "Production server key",
+    "Fresh source catalog comparison before execution",
+    "Restore/baseline ledger reconciliation",
+    "Protected administrator/MFA continuity approval and native acceptance"
+  ]
+}

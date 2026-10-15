@@ -45,5 +45,7 @@ jobs:
         run: pnpm run external:build:frontend
         env:
           QXLAYER_API_ORIGIN: https://qxlayer-ci-placeholder.onrender.com
+          QXLAYER_AUTH_PROVIDER: supabase
+          QXLAYER_EXTERNAL_ENVIRONMENT: staging
           VITE_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS5pbnZhbGlkJA
           VITE_CLERK_PROXY_URL: https://qxlayer-ci.example.invalid/api/__clerk
