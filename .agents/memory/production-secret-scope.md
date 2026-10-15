@@ -10,6 +10,8 @@ entries in Development and Production results.
 **Why:** Shared entries returned identical positive results across all three
 views even after the user independently saved Publishing copies. The interface
 cannot attest the separately stored Publishing entries or compare their values.
+After Shared removal, all three views returned absence despite user-confirmed
+Publishing copies; do not interpret that as proof the Publishing copies vanished.
 
 **How to apply:** Report agent-verified Shared existence separately from
 user-confirmed Publishing storage. Verify names with values hidden in Publishing
@@ -19,3 +21,16 @@ saved Publishing copies, but can remove credentials needed by workspace-only
 preparation commands. Assess dependencies first and never republish to inspect
 credentials. The documented variable-deletion callback is for non-secrets;
 use the workspace Secrets UI for manual secret removal.
+
+Keep permanent Production credential storage isolated. Unavailability to the
+workspace does not authorize restoring Shared copies or changing Live to obtain
+access.
+
+**Why:** The user deliberately saved Publishing-only copies and removed Shared
+copies before renewing isolated Production provisioning approval.
+
+**How to apply:** When provisioning cannot access Publishing secrets, use an
+explicitly approved private execution context or hidden terminal input from the
+owner's saved vault. Never echo inputs, embed values in command arguments, log
+exceptions containing values, or persist them as credential files. Temporary
+process memory is not guaranteed to be securely erased by JavaScript.

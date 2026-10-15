@@ -208,9 +208,9 @@ Republish still require separate final approval.
 
 **Why:** The user explicitly approved this zero-cost availability tradeoff.
 
-**How to apply:** The user's later secrets-preparation instructions withhold
-Staging-pause approval again. Continue safe preparation, but require renewed
-explicit approval before pausing or running the dependent project-creation flow;
-stored credentials do not renew an earlier approval. Prepare required inputs
-before any approved outage. Keep paid resources unapproved. Do not assume Staging
-can resume while Development and Production occupy both active Free slots.
+**How to apply:** The user explicitly renewed Staging-pause and independent Free
+project-creation approval after removing Shared secret copies. This does not
+authorize Live changes, live-account migration or Republish. Prepare required
+creation inputs before any approved outage; secret presence alone never grants
+permission. Keep paid resources unapproved. Do not assume Staging can resume
+while Development and Production occupy both active Free slots.

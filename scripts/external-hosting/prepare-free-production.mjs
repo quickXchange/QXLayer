@@ -59,6 +59,7 @@ export async function prepareFreeProduction({ env, preservation, request, save, 
     liveChangesApproved: false, migrateAccountsApproved: false, republishApproved: false,
     phase: "PRECHECKS_PASSED", productionProjectRef: null, dataPreservationEvidence: "generated-artifacts/auth-security/staging-pre-pause-data-preservation.json" };
   await save(state);
+  state.phase = "STAGING_PAUSE_INTENT"; await save(state);
   await request("staging", "POST", `/projects/${STAGING}/pause`);
   state.phase = "STAGING_PAUSE_REQUESTED"; state.pauseRequestedAt = new Date().toISOString(); await save(state);
   let paused = false;
@@ -104,12 +105,11 @@ export async function prepareFreeProduction({ env, preservation, request, save, 
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+export async function runFreeProductionCli(env = process.env) {
   // No state is overwritten and no credential is read from a file. Resume any
   // prior partial operation through its saved state instead of re-running.
   try { await readFile(STATE_PATH); throw Error("Existing provisioning state requires reconciliation; automatic duplicate execution refused."); }
   catch (e) { if (e.code !== "ENOENT") throw e; }
-  const env = process.env;
   const preservation = JSON.parse(await readFile("generated-artifacts/auth-security/staging-pre-pause-data-preservation.json", "utf8"));
   const request = async (scope, method, path, body) => {
     const permitted = scope === "staging"
@@ -126,6 +126,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     });
     // Provider responses/errors may contain secrets: never log raw bodies.
     assert(response.ok, `Scoped ${scope} operation failed (${response.status}).`);
+    // Pause/restore responses need not contain JSON; status polling verifies
+    // the outcome. Do not mistake an empty successful response for failure.
+    if (scope === "staging" && method === "POST") return {};
     return response.json();
   };
   const save = async state => {
@@ -136,4 +139,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   console.log(JSON.stringify({ phase: state.phase, productionProjectRef: state.productionProjectRef,
     stagingPaused: true, developmentHealthy: true, billingPlan: "free", liveModified: false,
     accountsMigrated: false, authActivated: false, republished: false }));
+  return state;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await runFreeProductionCli();
 }

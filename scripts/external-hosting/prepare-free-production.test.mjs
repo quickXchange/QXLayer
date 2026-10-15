@@ -102,3 +102,14 @@ test("ambiguous creation discovers the existing candidate instead of resuming a 
   assert.equal(f.states.at(-1).phase, "CANDIDATE_EXISTS_REVIEW_REQUIRED");
   assert(!f.calls.some(c => c.path.endsWith("/restore")));
 });
+test("ambiguous pause retains intent and never proceeds to project creation", async () => {
+  const f = fixture(), request = f.request;
+  f.request = async (...args) => {
+    const result = await request(...args);
+    if (args[2].endsWith("/pause")) throw Error("synthetic ambiguous pause");
+    return result;
+  };
+  await assert.rejects(prepareFreeProduction(f));
+  assert.equal(f.states.at(-1).phase, "STAGING_PAUSE_INTENT");
+  assert(!f.calls.some(c => c.path === "/projects" && c.method === "POST"));
+});

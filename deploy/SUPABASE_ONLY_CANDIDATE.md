@@ -165,3 +165,11 @@ Shared-copy removal and the separate provisioning-context limitation.
 The local provisioning guard now requires distinct current pause and creation
 approvals and both independent credentials before provider calls. No provider
 operation or provisioning-state write was performed for this preparation.
+
+The user subsequently renewed pause/create approval after removing Shared copies.
+Workspace absence is verified; Publishing storage remains user-confirmed, not
+independently readable by the agent. The retained preservation snapshot is still
+recent and is reused without repeating the audit. A hidden-input interactive
+runner supplies credentials only to the one approved provisioning process, with
+no Shared reinstatement, credential file or shell-argument exposure. Execution
+still awaits that unavoidable private input; no pause or creation is claimed.
