@@ -42,6 +42,19 @@ Keep credentials in memory, wait for a bounded successful access probe, then
 let the browser follow genuine same-origin redirects. Revocation and existing
 protection readback remain required. This does not verify Clerk login.
 
+When temporary access creation is authorized for routing checks, prefer
+short-lived, deployment-scoped access over a persistent project-wide automation
+credential. Revoke it in cleanup and confirm the deployment's access entry was
+removed while project protection remains unchanged.
+
+**Why:** Routing-only verification does not justify enduring access to every
+protected Preview. Deployment-scoped access was sufficient to verify genuine
+same-origin API proxy responses without changing application authentication.
+
+**How to apply:** Follow the native same-origin cookie/redirect handshake. Do not
+restart every request with the share parameter: its cleanup redirect can repeat
+indefinitely rather than reaching the API. Keep credentials/cookies in memory.
+
 ## Immutable Preview origin rollover
 
 An older protected Staging Preview can still render and accept its genuine
