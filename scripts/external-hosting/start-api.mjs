@@ -8,6 +8,15 @@ export function startupMode(env) {
   assert(["staging", "production"].includes(mode), "Explicit external environment required");
   if (env.QXLAYER_EXTERNAL_CANDIDATE === "true") {
     assert.equal(mode, "production", "Production candidate must be explicit");
+    if (env.QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED === "true") {
+      assert.equal(env.QXLAYER_EXTERNAL_STARTUP_APPROVED, "true");
+      assert.equal(env.QXLAYER_PRODUCTION_SCHEMA_VERIFIED, "true");
+      assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED, "false");
+      assert.equal(env.QXLAYER_PLATFORM_URL, "https://qxlayer-acceptance-vynox3.vercel.app");
+      assert.equal(env.PRODUCTION_ACCESS_GATE_ENABLED, "true");
+      assert.equal(env.QXLAYER_DATABASE_PROVIDER, "supabase");
+      return "approved";
+    }
     assert.equal(env.QXLAYER_EXTERNAL_STARTUP_APPROVED, "false", "Candidate cannot activate business routes");
     return "held";
   }

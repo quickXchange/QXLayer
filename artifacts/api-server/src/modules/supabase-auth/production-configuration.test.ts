@@ -46,3 +46,15 @@ test("Production never inherits other environments' mail readiness", () => {
   assert.equal(supabaseAuthConfiguration({ ...production,
     QXLAYER_PRODUCTION_SUPABASE_AUTH_MAIL_READY: "true" }).mailReady, true);
 });
+
+test("isolated acceptance allows only its pinned protected origin without approving Live cutover", () => {
+  const acceptance = { ...production, QXLAYER_EXTERNAL_CANDIDATE: "true",
+    QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED: "true",
+    QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED: "false",
+    QXLAYER_PRODUCTION_SUPABASE_AUTH_URL: "https://qxlayer-acceptance-vynox3.vercel.app" };
+  assert.equal(supabaseAuthConfiguration(acceptance).origin, acceptance.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL);
+  for (const patch of [{ QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED: "false" },
+    { QXLAYER_EXTERNAL_CANDIDATE: "false" },
+    { QXLAYER_PRODUCTION_SUPABASE_AUTH_URL: "https://www.quicklychan.xyz" }])
+    assert.throws(() => supabaseAuthConfiguration({ ...acceptance, ...patch }));
+});

@@ -1,7 +1,7 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 import { startIntegrationHealthMonitor } from "./modules/integrations/monitor";
-import { pool, withDatabase } from "@workspace/db";
+import { pool, authSupportPool, withDatabase } from "@workspace/db";
 import { assertExternalEnvironment } from "./lib/external-environment";
 
 assertExternalEnvironment();
@@ -38,6 +38,7 @@ async function shutdown() {
   closing = true;
   setTimeout(() => process.exit(1), 20_000).unref();
   await Promise.all([new Promise<void>(resolve => server.close(() => resolve())), stop()]);
+  if (authSupportPool !== pool) await authSupportPool.end();
   await pool.end(); process.exit(0);
 }
 process.once("SIGTERM", () => void shutdown());

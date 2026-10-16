@@ -26,16 +26,22 @@ assert.equal(api.serviceDetails.plan, "starter");
 assert.equal(api.serviceDetails.envSpecificDetails.startCommand, "node scripts/external-hosting/start-api.mjs");
 assert.equal(api.environmentId, group.environmentId);
 assert.equal(worker.suspended, "suspended");
-assert.equal(env.QXLAYER_EXTERNAL_STARTUP_APPROVED, "false");
+const acceptance = env.QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED === "true";
+assert.equal(env.QXLAYER_EXTERNAL_STARTUP_APPROVED, acceptance ? "true" : "false");
 const productionOnly = group.id === production.id;
 assert.equal(env.QXLAYER_EXTERNAL_ENVIRONMENT, productionOnly ? "production" : "staging");
 if (productionOnly) {
   assert.equal(env.QXLAYER_EXTERNAL_CANDIDATE, "true");
   assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED, "false");
   assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF, "qcgvhlphalxqzzsxqjhi");
-  assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL, "https://www.quicklychan.xyz");
+  assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL, acceptance ?
+    "https://qxlayer-acceptance-vynox3.vercel.app" : "https://www.quicklychan.xyz");
   assert(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY?.startsWith("sb_secret_"));
-  assert(!env.DATABASE_URL, "Privileged probe URL must not become the application runtime URL");
+  if (env.DATABASE_URL) {
+    assert.equal(decodeURIComponent(new URL(env.DATABASE_URL).username), "qxlayer_app.qcgvhlphalxqzzsxqjhi");
+    assert.equal(decodeURIComponent(new URL(env.QXLAYER_PRODUCTION_AUTH_DATABASE_URL).username), "qxlayer_auth_app.qcgvhlphalxqzzsxqjhi");
+  }
+  if (acceptance) assert.equal(env.QXLAYER_PRODUCTION_SCHEMA_VERIFIED, "true");
   const db = new URL(env.QXLAYER_PRODUCTION_SUPABASE_DATABASE_URL);
   assert(db.hostname === "db.qcgvhlphalxqzzsxqjhi.supabase.co" ||
     (db.hostname.endsWith(".pooler.supabase.com") &&
@@ -52,4 +58,5 @@ if (process.env.GITHUB_ENV)
   await appendFile(process.env.GITHUB_ENV,
     `CANDIDATE_AUTH_ENVIRONMENT=${productionOnly ? "production" : "staging"}\n` +
     `CANDIDATE_SUPABASE_PROJECT_REF=${productionOnly ? "qcgvhlphalxqzzsxqjhi" : ""}\n` +
-    `CANDIDATE_AUTH_ORIGIN=${productionOnly ? "https://www.quicklychan.xyz" : ""}\n`);
+    `CANDIDATE_AUTH_ORIGIN=${productionOnly ? env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL : ""}\n` +
+    `CANDIDATE_ACCEPTANCE_APPROVED=${acceptance ? "true" : "false"}\n`);

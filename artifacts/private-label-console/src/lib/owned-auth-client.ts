@@ -7,7 +7,9 @@ const production = provider === "supabase" && environment === "production";
 if (production && (
     !/^[a-z0-9]{20}$/.test(import.meta.env.VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF ?? "") ||
     ["nktstksmfpcsjnjbeqsk", "muvedavhbpgpdrrnjrih"].includes(import.meta.env.VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF) ||
-    import.meta.env.VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !== "https://www.quicklychan.xyz")) {
+    import.meta.env.VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !==
+      (import.meta.env.VITE_QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED === "true" ?
+        "https://qxlayer-acceptance-vynox3.vercel.app" : "https://www.quicklychan.xyz"))) {
   throw new Error("Production Supabase authentication requires its isolated project and canonical Live origin.");
 }
 if (supabaseDevelopmentAuth && (!import.meta.env.DEV ||

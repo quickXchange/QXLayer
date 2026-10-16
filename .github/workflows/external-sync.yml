@@ -44,6 +44,7 @@ jobs:
           QXLAYER_EXTERNAL_ENVIRONMENT: ${{ env.CANDIDATE_AUTH_ENVIRONMENT }}
           QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF: ${{ env.CANDIDATE_SUPABASE_PROJECT_REF }}
           QXLAYER_PRODUCTION_SUPABASE_AUTH_URL: ${{ env.CANDIDATE_AUTH_ORIGIN }}
+          QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED: ${{ env.CANDIDATE_ACCEPTANCE_APPROVED }}
       - name: Verify held candidate connectivity without enabling business routes
         run: node scripts/external-hosting/verify-candidate-runtime.mjs
         env:
@@ -63,4 +64,11 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           CANDIDATE_PREVIEW_URL: ${{ steps.preview.outputs.url }}
       # Never migrate databases, import accounts/data, enable writes, resume
+      - name: Bind protected acceptance alias only
+        run: node scripts/external-hosting/bind-acceptance-alias.mjs
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          CANDIDATE_PREVIEW_URL: ${{ steps.preview.outputs.url }}
+          CANDIDATE_ACCEPTANCE_APPROVED: ${{ env.CANDIDATE_ACCEPTANCE_APPROVED }}
+      # Never migrate databases, import accounts/data, enable public writes, resume
       # workers, assign custom domains or use --prod from this candidate job.

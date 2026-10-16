@@ -3,6 +3,13 @@
 export const STAGING_AUTH_PROJECT = "muvedavhbpgpdrrnjrih";
 export const DEVELOPMENT_AUTH_PROJECT = "nktstksmfpcsjnjbeqsk";
 export const PRODUCTION_AUTH_ORIGIN = "https://www.quicklychan.xyz";
+export const ACCEPTANCE_AUTH_ORIGIN = "https://qxlayer-acceptance-vynox3.vercel.app";
+export function productionAcceptance(env = process.env) {
+  return env.QXLAYER_EXTERNAL_ENVIRONMENT === "production" &&
+    env.QXLAYER_EXTERNAL_CANDIDATE === "true" &&
+    env.QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED === "true" &&
+    env.QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED === "false";
+}
 
 export function productionSupabaseAuth(env = process.env): boolean {
   return env.QXLAYER_EXTERNAL_ENVIRONMENT === "production" && env.QXLAYER_AUTH_PROVIDER === "supabase";
@@ -34,7 +41,7 @@ export function supabaseAuthEnabled(env = process.env): boolean {
     throw new Error("Development authentication cannot be enabled outside Development.");
   if (productionSupabaseAuth(env)) {
     if (env.NODE_ENV !== "production" ||
-        env.QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED !== "true" ||
+        (env.QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED !== "true" && !productionAcceptance(env)) ||
         env.QXLAYER_SUPABASE_AUTH_TRIAL_ENABLED === "true")
       throw new Error("Production Supabase Auth requires explicit approved cutover and a Production runtime, never trial settings.");
     return true;
@@ -51,14 +58,15 @@ export function supabaseAuthConfiguration(env = process.env) {
     if (!project || !/^[a-z0-9]{20}$/.test(project) ||
         [DEVELOPMENT_AUTH_PROJECT, STAGING_AUTH_PROJECT].includes(project))
       throw new Error("Production requires its own isolated Supabase Auth project.");
-    if (env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !== PRODUCTION_AUTH_ORIGIN)
+    const origin = productionAcceptance(env) ? ACCEPTANCE_AUTH_ORIGIN : PRODUCTION_AUTH_ORIGIN;
+    if (env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !== origin)
       throw new Error("Production authentication must use the exact canonical Live HTTPS origin.");
     const apiKey = env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY;
     if (!apiKey?.startsWith("sb_secret_") ||
         [env.QXLAYER_DEVELOPMENT_SUPABASE_AUTH_SERVER_KEY, env.QXLAYER_SUPABASE_AUTH_SERVER_KEY].includes(apiKey))
       throw new Error("Production requires an independent server-only Supabase secret key.");
     supabaseSessionSecret(env);
-    return { origin: PRODUCTION_AUTH_ORIGIN, providerOrigin: `https://${project}.supabase.co`,
+    return { origin, providerOrigin: `https://${project}.supabase.co`,
       apiKey, mailReady: env.QXLAYER_PRODUCTION_SUPABASE_AUTH_MAIL_READY === "true" };
   }
   if (developmentSupabaseAuth(env)) {

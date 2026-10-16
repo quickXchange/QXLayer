@@ -1,4 +1,4 @@
-import { supabaseAuthConfiguration, supabaseDefaultProvider } from "../modules/supabase-auth/config";
+import { supabaseAuthConfiguration, supabaseDefaultProvider, productionAcceptance } from "../modules/supabase-auth/config";
 
 /** External startup is opt-in; neither Replit runtime nor Production is switched. */
 export function assertExternalEnvironment(env = process.env) {
@@ -8,6 +8,9 @@ export function assertExternalEnvironment(env = process.env) {
     throw new Error("Invalid external environment; authentication selection must be explicit.");
   if (env.QXLAYER_EXTERNAL_STARTUP_APPROVED !== "true")
     throw new Error("External startup is disabled until the isolated target is approved.");
+  if (productionAcceptance(env) && (env.QXLAYER_PRODUCTION_SCHEMA_VERIFIED !== "true" ||
+      !env.QXLAYER_PRODUCTION_AUTH_DATABASE_URL))
+    throw new Error("Protected acceptance requires verified schema and a separate restricted Auth login");
   for (const key of ["SESSION_SECRET", "PRODUCTION_ACCESS_CODE", "QXLAYER_PLATFORM_URL",
     "SUPABASE_STORAGE_URL", "SUPABASE_STORAGE_BUCKET", "SUPABASE_STORAGE_SERVICE_KEY"])
     if (!env[key]) throw new Error(`External configuration missing: ${key}.`);

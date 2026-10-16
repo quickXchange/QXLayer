@@ -15,13 +15,16 @@ if (authProvider !== "supabase" || !["staging", "production"].includes(process.e
 if (process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "production") {
   const ref = process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF ?? "";
   if (!/^[a-z0-9]{20}$/.test(ref) || ["nktstksmfpcsjnjbeqsk", "muvedavhbpgpdrrnjrih"].includes(ref) ||
-      process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !== "https://www.quicklychan.xyz")
+      process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL !==
+        (process.env.QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED === "true" ?
+          "https://qxlayer-acceptance-vynox3.vercel.app" : "https://www.quicklychan.xyz"))
     throw new Error("Production frontend builds require isolated Production Auth metadata.");
 }
 for (const [name, base] of [["private-label-console", "/"], ["private-label-website", "/private-label-website/"]]) {
   const result = spawnSync("pnpm", ["--filter", `@workspace/${name}`, "run", "build"], {
     stdio: "inherit", env: { ...process.env, NODE_ENV: "production", PORT: "3000", BASE_PATH: base,
       VITE_EXTERNAL_DEPLOYMENT: "true",
+      VITE_QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED: process.env.QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED,
       VITE_QXLAYER_AUTH_PROVIDER: authProvider,
       VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF: process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF,
       VITE_QXLAYER_PRODUCTION_SUPABASE_AUTH_URL: process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_URL,

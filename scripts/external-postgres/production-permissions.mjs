@@ -11,6 +11,22 @@ export async function verifyProductionPermissions(appOptions, authOptions) {
   try {
     assert.equal((await app.query("SELECT current_user")).rows[0].current_user, "qxlayer_app");
     assert.equal((await auth.query("SELECT current_user")).rows[0].current_user, "qxlayer_auth_app");
+    const flags = (await auth.query(`SELECT rolsuper,rolbypassrls,rolinherit,rolcreatedb,rolcreaterole,rolreplication
+      FROM pg_roles WHERE rolname=current_user`)).rows[0];
+    for (const enabled of Object.values(flags)) { assert.equal(enabled, false); assertions++; }
+    const support = await auth.query(`SELECT c.relname,c.relrowsecurity,c.relforcerowsecurity,
+      r.rolname<>current_user AS separate_owner,
+      has_table_privilege(current_user,c.oid,'SELECT,INSERT,UPDATE,DELETE') AS allowed,
+      (SELECT count(*)::int FROM pg_policy p WHERE p.polrelid=c.oid AND p.polpermissive AND p.polcmd='*'
+       AND p.polroles=ARRAY[(SELECT oid FROM pg_roles WHERE rolname=current_user)]
+       AND pg_get_expr(p.polqual,p.polrelid)='true'
+       AND pg_get_expr(p.polwithcheck,p.polrelid)='true') AS safe_policy
+      FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_roles r ON r.oid=c.relowner
+      WHERE n.nspname='vynox_supabase_auth' AND c.relkind='r' ORDER BY c.relname`);
+    assert.equal(support.rowCount,5); assertions++;
+    for(const t of support.rows) {
+      assert(t.relrowsecurity && t.relforcerowsecurity && t.separate_owner && t.allowed && t.safe_policy===1); assertions++;
+    }
     for (const { name } of tables) {
       for (const role of ["anon", "authenticated", "service_role", "qxlayer_app", "qxlayer_auth_app"]) {
         const q = await app.query(`SELECT bool_or(has_table_privilege($1,$2,p)) AS allowed

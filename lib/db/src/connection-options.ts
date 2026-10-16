@@ -7,6 +7,8 @@ export function connectionOptions(env = process.env): PoolConfig {
 }
 
 export function authConnectionOptions(env = process.env): PoolConfig {
+  if (env.QXLAYER_DATABASE_PROVIDER !== "supabase")
+    throw new Error("External private Auth support requires the isolated Supabase provider");
   return restrictedConnectionOptions({ ...env, DATABASE_URL: env.QXLAYER_PRODUCTION_AUTH_DATABASE_URL }, "qxlayer_auth_app");
 }
 

@@ -7,11 +7,23 @@ for (let attempt = 0; attempt < 24; attempt++) {
   assert.equal(r.status, 200);
   body = await r.json();
   if (body.commit === process.env.GITHUB_SHA &&
-      (body.environment !== "production" || body.preflightComplete)) break;
+      (body.acceptanceOnly || body.environment !== "production" || body.preflightComplete)) break;
   await new Promise(resolve => setTimeout(resolve, 3000));
 }
 assert.equal(body.environment, process.env.CANDIDATE_EXPECTED_ENVIRONMENT);
 assert.equal(body.commit, process.env.GITHUB_SHA, "Public routing must reach the pushed Render commit, not a draining instance");
+if (body.acceptanceOnly) {
+  assert.equal(body.ready, false);
+  assert.equal(body.publicLiveActivated, false);
+  assert.equal(body.databaseConnected, true);
+  assert.equal(body.privateAuthConnected, true);
+  assert.equal(body.schemaVerified, true);
+  const protectedRoute = await fetch(`${root}/api/orders`, { redirect: "manual" });
+  assert.equal(protectedRoute.status, 200);
+  assert((await protectedRoute.text()).includes("accessCode"), "Business routes must remain behind the private gate");
+  console.log(JSON.stringify({ ...body, protectedGateVerified: true }));
+  process.exit(0);
+}
 assert.equal(body.status, "held");
 assert.equal(body.ready, false);
 assert.equal(body.startupApproved, false);

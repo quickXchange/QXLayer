@@ -59,14 +59,27 @@ async function encryptedSnapshot(ctx, directory) {
   const pgEnv = { PATH: `/nix/store/${tools}/bin`, LANG: "C", LC_ALL: "C",
     PGHOST: ctx.url.hostname, PGPORT: "5432", PGDATABASE: "postgres", PGUSER: decodeURIComponent(ctx.url.username),
     PGPASSWORD: decodeURIComponent(ctx.url.password), PGSSLROOTCERT: caFile, PGSSLMODE: "verify-full",
-    PGCHANNELBINDING: "require", PGCONNECT_TIMEOUT: "20" };
+    // This pinned target's session pooler does not advertise SCRAM-PLUS.
+    // Match its existing Node client's negotiated channel binding; retain
+    // verify-full CA/hostname validation. The Live-source require policy is untouched.
+    PGCHANNELBINDING: "prefer", PGCONNECT_TIMEOUT: "20" };
   const child = spawn(`/nix/store/${tools}/bin/pg_dump`,
     ["-Fc", "--no-password", "--no-owner", "--no-acl", "--schema=public", "--schema=auth",
-      "--schema=vynox_supabase_auth", "--schema=qxlayer_migrations"], { env: pgEnv, stdio: ["ignore", "pipe", "ignore"] });
+      "--schema=vynox_supabase_auth", "--schema=qxlayer_migrations"], { env: pgEnv, stdio: ["ignore", "pipe", "pipe"] });
+  let diagnostic = "";
+  child.stderr.on("data", chunk => { if (diagnostic.length < 12000) diagnostic += chunk.toString(); });
   const exit = once(child, "exit");
   await storageCheck();
   const file = await seal(child.stdout, `isolated-production-before-initialization-${Date.now()}.qxb`, process.env.QXLAYER_BACKUP_PASSPHRASE);
-  assert.equal((await exit)[0], 0, "Encrypted target snapshot capture failed");
+  if ((await exit)[0] !== 0) {
+    await rm(file, { force: true });
+    const code = /channel binding/i.test(diagnostic) ? "BACKUP_CHANNEL_BINDING" :
+      /version mismatch/i.test(diagnostic) ? "BACKUP_VERSION" :
+      /permission denied/i.test(diagnostic) ? "BACKUP_PERMISSION" :
+      /certificate|SSL/i.test(diagnostic) ? "BACKUP_TLS" :
+      /password authentication/i.test(diagnostic) ? "BACKUP_AUTH" : "BACKUP_FAILED";
+    throw Object.assign(Error("Target snapshot failed; provider diagnostics suppressed"), { code });
+  }
   assert((await readFile(file)).length > 100, "Snapshot must contain an encrypted dump");
   return { file, caFile };
 }
