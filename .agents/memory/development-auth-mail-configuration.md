@@ -49,3 +49,14 @@ other domains are forbidden.
 **How to apply:** Keep send-only permission, approved sender acceptance and
 single-domain restriction evidence separate. Do not label a denied management
 lookup or an accepted envelope as independent proof of single-domain scope.
+
+Do not require historical recovery-email timestamps to remain present in native
+admin account readback after a completed password reset.
+
+**Why:** A delivered recovery link and reset succeeded, and the old disposable
+password was rejected, while the account readback omitted `recovery_sent_at`.
+
+**How to apply:** Separate recipient confirmation from credential-behavior
+evidence. For disposable accounts only, an old-password rejection can confirm
+the reset without asking for the recipient's new password. Do not treat an
+omitted historical timestamp as a failed recovery.
