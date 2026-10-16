@@ -19,6 +19,20 @@ deployment hold. Do not modify current Live, switch DNS, delete data, perform
 final Production cutover or incur unapproved additional costs. Those boundaries
 remain; ask only for genuinely missing credentials or essential approvals.
 
+## Production-only candidate connection
+
+Configure Render with isolated Production credentials, remove conflicting
+Staging service overrides, and verify connectivity, required schema,
+authentication, API health and Vercel integration. Keep the candidate held until
+all checks pass. Do not change Live, DNS, RLS or existing business data.
+Ask for only one missing credential at a time.
+
+**Why:** The user explicitly authorized this connection work and these limits.
+
+**How to apply:** Request the database URL securely first, then request the
+server-only Auth key separately when needed. Use read-only connection/schema
+checks; missing schema is not permission to alter RLS or existing business data.
+
 ## External migration baseline
 
 Compare a prepared migration against the actual external baseline/target, not
