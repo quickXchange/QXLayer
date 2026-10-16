@@ -44,8 +44,9 @@ policy change, account creation or data migration happens from the probe.
 
 Reuse the existing checksum/advisory-lock/transaction-based external migration
 toolkit. Do not run drizzle push, build/startup DDL or native Publish.
-The external baseline already contains 42 public tables, including the two
-missing from Replit Live. `production-candidate/0004_latest-schema-PREPARED.sql`
+The prepared baseline defines 42 public tables, including the two missing from
+Replit Live; this does not mean those tables exist in the isolated Production
+target. `production-candidate/0004_latest-schema-PREPARED.sql`
 reconciles all current guarded policy expressions and all 42 FORCE flags, and
 adds the five private Auth support tables without duplicating baseline tables.
 It contains no account or business rows.

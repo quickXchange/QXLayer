@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
+import { createHmac, timingSafeEqual } from "node:crypto";
 const require = createRequire(new URL("../../lib/db/package.json", import.meta.url));
 const { Client } = require("pg");
 export const PRODUCTION_PROJECT = "qcgvhlphalxqzzsxqjhi";
@@ -12,6 +13,11 @@ export function productionProbeConfiguration(env) {
   assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED, "false");
   assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF, PRODUCTION_PROJECT);
   assert(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY?.startsWith("sb_secret_"));
+  const proof = createHmac("sha256", env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY)
+    .update(env.QXLAYER_PRODUCTION_SUPABASE_DATABASE_URL ?? "").digest("hex");
+  assert(/^[a-f0-9]{64}$/.test(env.QXLAYER_PRODUCTION_DATABASE_CREDENTIAL_PROOF ?? ""));
+  assert(timingSafeEqual(Buffer.from(proof), Buffer.from(env.QXLAYER_PRODUCTION_DATABASE_CREDENTIAL_PROOF)),
+    "Provider runtime credential integrity check failed");
   assert(env.DB_TLS_CA_FILE);
   const url = new URL(env.QXLAYER_PRODUCTION_SUPABASE_DATABASE_URL);
   const user = decodeURIComponent(url.username);
@@ -35,6 +41,7 @@ export async function productionCandidatePreflight(env, dependencies = {}) {
   let client;
   try {
     const url = productionProbeConfiguration(env);
+    result.credentialBindingVerified = true;
     const ca = await (dependencies.readFile ?? readFile)(env.DB_TLS_CA_FILE, "utf8");
     const expected = dependencies.expectedTables ??
       JSON.parse(await readFile(new URL("../../deploy/migrations/rls-reference.json", import.meta.url), "utf8")).tables.map(t => t.name);
@@ -69,6 +76,10 @@ export async function productionCandidatePreflight(env, dependencies = {}) {
   } catch (error) {
     // Never expose driver errors, connection strings, hosts, keys or row data.
     result.databaseCheck = /^[A-Z0-9]{5}$/.test(error?.code ?? "") ? error.code : "BLOCKED";
+    if (error?.code === "28P01") result.databaseFailureClass =
+      /SASL|SCRAM|channel.?binding/i.test(error.message) ? "SCRAM_REJECTED" : "PASSWORD_REJECTED";
+    if (client?.connection?.stream?.encrypted)
+      result.tlsVerified = client.connection.stream.authorized === true;
   } finally {
     if (client) {
       await client.query("ROLLBACK").catch(() => {});

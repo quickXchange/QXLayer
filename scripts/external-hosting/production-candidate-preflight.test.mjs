@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHmac } from "node:crypto";
 import { productionCandidatePreflight, productionProbeConfiguration } from "./production-candidate-preflight.mjs";
 const env = {
   QXLAYER_EXTERNAL_ENVIRONMENT: "production", QXLAYER_EXTERNAL_CANDIDATE: "true",
@@ -9,10 +10,13 @@ const env = {
   QXLAYER_PRODUCTION_SUPABASE_DATABASE_URL: "postgresql://postgres.qcgvhlphalxqzzsxqjhi:synthetic@fixture.pooler.supabase.com:5432/postgres",
   DB_EXPECTED_HOST: "fixture.pooler.supabase.com", DB_TLS_CA_FILE: "/fixture/ca",
 };
+env.QXLAYER_PRODUCTION_DATABASE_CREDENTIAL_PROOF = createHmac("sha256",
+  env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY).update(env.QXLAYER_PRODUCTION_SUPABASE_DATABASE_URL).digest("hex");
 test("operator probe cannot enable startup, use other projects or become runtime login", () => {
   productionProbeConfiguration(env);
   for (const change of [{ QXLAYER_EXTERNAL_STARTUP_APPROVED: "true" }, { DATABASE_URL: "anything" },
     { QXLAYER_PRODUCTION_SUPABASE_AUTH_CUTOVER_APPROVED: "true" },
+    { QXLAYER_PRODUCTION_DATABASE_CREDENTIAL_PROOF: "0".repeat(64) },
     { QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF: "muvedavhbpgpdrrnjrih" }])
     assert.throws(() => productionProbeConfiguration({ ...env, ...change }));
 });

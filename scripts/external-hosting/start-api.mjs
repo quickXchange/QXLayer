@@ -17,8 +17,8 @@ export function startupMode(env) {
   return "approved";
 }
 
-// No application/database/Auth imports in held mode. Health means only that the
-// hold process is running, never that schema, Auth or business routes are ready.
+// No application/runtime-pool imports in held mode. A Production candidate may
+// run its separate READ ONLY preflight; liveness never means business readiness.
 export function createHeldCandidateServer({ environment = "staging", checks = {} } = {}) {
   assert(["staging", "production"].includes(environment));
   const server = createServer((req, res) => {
