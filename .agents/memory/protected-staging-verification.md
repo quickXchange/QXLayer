@@ -16,6 +16,16 @@ no-permission-change restriction, ask before creating an automation credential.
 Never disable protection, add public domain exceptions, alter app roles or
 create test memberships to make visual testing pass.
 
+A user-confirmed, signed-in Preview health response is valid manual connectivity
+evidence, but not proof that an agent's temporary share-access handshake worked.
+
+**Why:** The owner loaded frontend API health JSON through genuine Vercel SSO
+while automated deployment-scoped access probes returned HTTP 401.
+
+**How to apply:** Label manual and automated evidence separately. Do not widen
+project access to replace a failed scoped probe, and revoke all temporary grants
+even when verification finishes through the owner's existing session.
+
 Use direct HTTPS browser requests for protected form navigation, with the
 approved automation header attached only to the exact Staging origin.
 
