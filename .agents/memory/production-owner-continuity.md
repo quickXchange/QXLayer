@@ -48,3 +48,14 @@ without a supplied password.
 **How to apply:** Distinguish hash presence from accepted password setup. Require
 the real email recovery/setup flow and user-held MFA; never authenticate as the
 Owner using generated credentials or mark initial setup complete from hash presence.
+
+Keep the Production Google Authenticator entry distinctly named and never replace
+the existing Development/source entry.
+
+**Why:** Isolated projects can use the same issuer and Gmail label. Preserving
+server-side factors alone does not protect the user's original local authenticator
+entry if they replace it while enrolling another environment.
+
+**How to apply:** Use the website's manual setup-key option with the local account
+name “VYNOX LAYER Production” and time-based mode. The key stays between the user's
+own browser and authenticator; never request it or a one-time code in chat.
