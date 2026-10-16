@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { productionReferences, TABLES } from "./synchronize-reference-configuration.mjs";
+import { productionReferences, TABLES, appliedVersionMatches } from "./synchronize-reference-configuration.mjs";
 
 function source() {
   const result = Object.fromEntries(TABLES.map(t => [t, []]));
@@ -27,4 +27,9 @@ test("unexpected commercial prices and tenant data fail closed", () => {
   assert.throws(() => productionReferences(tenant));
   const table = source(); table.platform_admins = [];
   assert.throws(() => productionReferences(table));
+});
+test("an applied package is a no-op, not permission to restore Admin edits or deletions", () => {
+  assert.equal(appliedVersionMatches(undefined, { dataSha256: "reviewed" }), false);
+  assert.equal(appliedVersionMatches({ sha256: "reviewed" }, { dataSha256: "reviewed" }), true);
+  assert.throws(() => appliedVersionMatches({ sha256: "reviewed" }, { dataSha256: "mutated" }));
 });

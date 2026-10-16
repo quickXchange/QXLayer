@@ -16,4 +16,4 @@ const commit = d.meta?.githubCommitSha ?? d.meta?.gitCommitSha;
 assert.equal(commit, process.env.GITHUB_SHA, "Preview must prove the pushed commit");
 console.log(JSON.stringify({ status: "CANDIDATE_READY", commit, url: url.origin, target: d.target ?? "preview", liveChanged: false }));
 if (process.env.GITHUB_STEP_SUMMARY)
-  await appendFile(process.env.GITHUB_STEP_SUMMARY, `\nProtected candidate: ${url.origin}\n\nCommit: ${commit}. Render API released to the same commit. No database migration, DNS change or Live activation.\n`);
+  await appendFile(process.env.GITHUB_STEP_SUMMARY, `\nProtected candidate: ${url.origin}\n\nCommit: ${commit}. Render API released to the same commit. Only reviewed reference additions are permitted; no schema/account migration, DNS change or Live activation.\n`);

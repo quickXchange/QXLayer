@@ -41,7 +41,27 @@ if (productionOnly) {
     assert.equal(decodeURIComponent(new URL(env.DATABASE_URL).username), "qxlayer_app.qcgvhlphalxqzzsxqjhi");
     assert.equal(decodeURIComponent(new URL(env.QXLAYER_PRODUCTION_AUTH_DATABASE_URL).username), "qxlayer_auth_app.qcgvhlphalxqzzsxqjhi");
   }
-  if (acceptance) assert.equal(env.QXLAYER_PRODUCTION_SCHEMA_VERIFIED, "true");
+  if (acceptance) {
+    assert.equal(env.QXLAYER_PRODUCTION_SCHEMA_VERIFIED, "true");
+    assert(env.SESSION_SECRET?.length >= 32, "Application proof signing must be configured");
+    const authOrigin = "https://qcgvhlphalxqzzsxqjhi.supabase.co";
+    assert.equal(env.SUPABASE_STORAGE_URL, authOrigin);
+    assert.equal(env.SUPABASE_STORAGE_BUCKET, "vynox-production-private");
+    const authSettings = await fetch(`${authOrigin}/auth/v1/settings`, {
+      headers: { apikey: env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY,
+        Authorization: `Bearer ${env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY}` },
+      signal: AbortSignal.timeout(20000),
+    });
+    assert(authSettings.ok); const settings = await authSettings.json();
+    assert.equal(settings.disable_signup, false, "Customer registration must be available behind the private gate");
+    assert.equal(settings.mailer_autoconfirm, false, "Customer email verification must remain required");
+    const storage = await fetch(`${authOrigin}/storage/v1/bucket/${env.SUPABASE_STORAGE_BUCKET}`, {
+      headers: { apikey: env.SUPABASE_STORAGE_SERVICE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_STORAGE_SERVICE_KEY}` },
+      signal: AbortSignal.timeout(20000),
+    });
+    assert(storage.ok); assert.equal((await storage.json()).public, false, "Customer uploads must remain private");
+  }
   const db = new URL(env.QXLAYER_PRODUCTION_SUPABASE_DATABASE_URL);
   assert(db.hostname === "db.qcgvhlphalxqzzsxqjhi.supabase.co" ||
     (db.hostname.endsWith(".pooler.supabase.com") &&

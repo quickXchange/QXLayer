@@ -15,6 +15,13 @@ The synchronizer:
 - supports read-only inspection, rollback rehearsal and an explicit apply mode;
 - saves a configuration-only pre-change backup and per-table readback evidence.
 
+Successful versions are recorded in a private migration ledger. Repeated
+deployment of an applied package is a no-op, preserving subsequent operator
+edits **and deletions**. Applied payloads are immutable; use a reviewed higher
+`--version=N` for future additions. A new version still refuses existing-key
+conflicts rather than overwriting Production configuration. The ledger is not
+accessible to application, anonymous or authenticated Data API roles.
+
 The retained Development-only customer provisioning plan and its entitlements
 are excluded. The four other sample plans and one sample add-on are imported as
 **disabled references**, never real commercial offers. Undecided prices remain

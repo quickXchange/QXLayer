@@ -50,15 +50,20 @@ try {
   const applicationSessions = await client.query("SELECT count(*)::int n FROM vynox_supabase_auth.sessions WHERE subject=$1 AND expires_at>now()", [row.subject]);
   await client.query("COMMIT");
   const verifiedFactors = (user.factors ?? []).filter(f => f.factor_type === "totp" && f.status === "verified").length;
+  let userAcceptance;
+  try { userAcceptance = JSON.parse(await readFile(`${folder}/production-owner-user-acceptance.json`)); }
+  catch (error) { if (error.code !== "ENOENT") throw error; }
+  const passwordAccepted = !!userAcceptance?.passwordSetupConfirmed && password.rows[0].configured;
   const report = { originalBusinessIdRoleAndTimestampReadbackVerified: true,
     nativeIdentityAndApprovedEmailReadbackVerified: true, sourceOwnerAccessUnchanged: true,
     sourceVerifiedRecipientTotpFactors: factors.length, nativeSetupMailRecorded: !!user.recovery_sent_at,
     emailOwnershipVerified: !!user.email_confirmed_at, nativePasswordHashPresent: password.rows[0].configured,
-    ownerPasswordSetupAccepted: false,
+    ownerPasswordSetupAccepted: passwordAccepted,
     targetVerifiedTotpFactors: verifiedFactors, nativeAal2Sessions: nativeSessions.rows[0].n,
     applicationUnexpiredSessions: applicationSessions.rows[0].n,
     adminAccessRequiresVerifiedTotpAndAal2: true, publicLiveChanged: false, dnsChanged: false,
-    finalOwnerAcceptanceComplete: false };
+    finalOwnerAcceptanceComplete: passwordAccepted && !!userAcceptance?.adminAccessAndReloadConfirmed &&
+      verifiedFactors > 0 && nativeSessions.rows[0].n > 0 };
   if (process.argv.includes("--resend-password-setup")) {
     const acceptance = JSON.parse(await readFile(`${folder}/production-reset-browser-test.json`));
     assert(acceptance.passed && acceptance.originalOwnerUntouched && acceptance.temporaryAccessRevoked &&
