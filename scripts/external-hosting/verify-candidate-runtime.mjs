@@ -19,8 +19,9 @@ if (body.acceptanceOnly) {
   assert.equal(body.privateAuthConnected, true);
   assert.equal(body.schemaVerified, true);
   const protectedRoute = await fetch(`${root}/api/orders`, { redirect: "manual" });
-  assert.equal(protectedRoute.status, 200);
-  assert((await protectedRoute.text()).includes("accessCode"), "Business routes must remain behind the private gate");
+  assert.equal(protectedRoute.status, 403);
+  assert.equal((await protectedRoute.json()).error, "Production access required.",
+    "Business API routes must remain behind the private gate");
   console.log(JSON.stringify({ ...body, protectedGateVerified: true }));
   process.exit(0);
 }
