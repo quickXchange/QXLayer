@@ -1,3 +1,8 @@
+---
+name: External preparation authorization
+description: External migration authorization history, isolated initialization approval, and the public Live/cutover hold.
+---
+
 ## Approved isolated Production initialization
 
 The user subsequently approved initializing the isolated VYNOX LAYER Production
@@ -13,10 +18,6 @@ Production schema/RLS changes, not the prohibition on public Live/DNS cutover.
 public Live source. This approval covers the bounded initialization and protected
 acceptance workflow, not arbitrary future Production writes, account substitution,
 source-data transfer or public cutover.
----
-name: External preparation authorization
-description: External migration authorization history, isolated staging creation, paid-resource notice, and the Production/cutover hold.
----
 
 ## Current external architecture and implementation authorization
 
