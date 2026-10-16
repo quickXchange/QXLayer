@@ -42,3 +42,13 @@ affect the independent QuickXchange project.
 **How to apply:** Use the native provider, user receipt and narrowly scoped Auth
 readback. Never infer inbox receipt from SMTP acceptance alone, request broad
 mailbox access, or alter the shared Resend connection for this verification.
+
+Temporary Vercel automation bypass revocation must explicitly disable regeneration.
+
+**Why:** Native revocation rejected requests without its required regeneration
+choice. Generating a replacement during cleanup would leave new access active.
+
+**How to apply:** Use `revoke: { secret, regenerate: false }`, then verify the
+temporary entry is absent and SSO settings are unchanged. Keep secret values in
+process memory; durable cleanup inventories hold only the unique note and fixture
+scope, not credentials.
