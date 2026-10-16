@@ -50,6 +50,18 @@ complete baseline-plus-delta in a disposable database before any hosted change.
 
 ## Held candidate startup
 
+Render deployment status `live` can precede the public endpoint's completed
+handover. Pin public HTTP verification to the pushed Git commit and wait for
+that instance's preflight, not merely any completed health response.
+
+**Why:** A completed but failed preflight from a draining older instance was
+returned while the newly deployed instance was still finishing its successful
+connection check.
+
+**How to apply:** Keep exact-commit identity in held health and bound the wait;
+do not accept old healthy responses or immediately reject new deployments based
+on old failed responses.
+
 An unapproved external candidate must avoid application imports entirely, not
 merely check approval after importing the server. Its liveness must explicitly
 report held/not-ready and reject every business request.

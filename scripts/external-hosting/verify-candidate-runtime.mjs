@@ -1,14 +1,17 @@
 import assert from "node:assert/strict";
 const root = "https://qxlayer-api.onrender.com";
 let body;
-for (let attempt = 0; attempt < 12; attempt++) {
+assert(/^[a-f0-9]{40}$/.test(process.env.GITHUB_SHA ?? ""), "Expected pushed commit required");
+for (let attempt = 0; attempt < 24; attempt++) {
   const r = await fetch(`${root}/api/healthz`, { signal: AbortSignal.timeout(15000) });
   assert.equal(r.status, 200);
   body = await r.json();
-  if (body.environment !== "production" || body.preflightComplete) break;
+  if (body.commit === process.env.GITHUB_SHA &&
+      (body.environment !== "production" || body.preflightComplete)) break;
   await new Promise(resolve => setTimeout(resolve, 3000));
 }
 assert.equal(body.environment, process.env.CANDIDATE_EXPECTED_ENVIRONMENT);
+assert.equal(body.commit, process.env.GITHUB_SHA, "Public routing must reach the pushed Render commit, not a draining instance");
 assert.equal(body.status, "held");
 assert.equal(body.ready, false);
 assert.equal(body.startupApproved, false);

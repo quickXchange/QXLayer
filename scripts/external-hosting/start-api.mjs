@@ -19,8 +19,9 @@ export function startupMode(env) {
 
 // No application/runtime-pool imports in held mode. A Production candidate may
 // run its separate READ ONLY preflight; liveness never means business readiness.
-export function createHeldCandidateServer({ environment = "staging", checks = {} } = {}) {
+export function createHeldCandidateServer({ environment = "staging", checks = {}, commit } = {}) {
   assert(["staging", "production"].includes(environment));
+  assert(commit === undefined || /^[a-f0-9]{40}$/.test(commit));
   const server = createServer((req, res) => {
     const health = ["GET", "HEAD"].includes(req.method) &&
       (req.url ?? "").split("?")[0] === "/api/healthz";
@@ -30,7 +31,7 @@ export function createHeldCandidateServer({ environment = "staging", checks = {}
       "X-Content-Type-Options": "nosniff", ...(health ? {} : { "Retry-After": "300" }),
     });
     res.end(req.method === "HEAD" ? undefined : JSON.stringify({
-      ...checks, status: "held", ready: false, environment,
+      ...checks, ...(commit ? { commit } : {}), status: "held", ready: false, environment,
       startupApproved: false, businessRoutesEnabled: false, databaseConnected: false,
       ...(environment === "production" ? { databaseConnected: checks.databaseConnected === true } : {}),
     }));
@@ -48,7 +49,8 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     assert(Number.isInteger(port) && port > 0 && port <= 65535, "Valid PORT required");
     const environment = process.env.QXLAYER_EXTERNAL_ENVIRONMENT;
     const checks = environment === "production" ? { preflightComplete: false } : {};
-    const server = createHeldCandidateServer({ environment, checks }).listen(port, "0.0.0.0", () =>
+    const server = createHeldCandidateServer({ environment, checks,
+      commit: process.env.RENDER_GIT_COMMIT }).listen(port, "0.0.0.0", () =>
       console.info("Candidate process held; business routes disabled."));
     if (environment === "production") {
       const { productionCandidatePreflight } = await import("./production-candidate-preflight.mjs");
