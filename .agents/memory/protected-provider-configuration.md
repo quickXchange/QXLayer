@@ -48,3 +48,12 @@ confirmed every protected setting was unchanged.
 
 **How to apply:** Compare recursively key-sorted structures, verify response
 success before comparison, and keep credential-map contents out of logs.
+
+Do not assume standard Node/browser cancellation globals exist inside the
+execution sandbox, even in impure functions.
+
+**Why:** Its fetch implementation was available while AbortSignal was undefined,
+so a diagnostic failed before making any network request.
+
+**How to apply:** Check cancellation support before using it, or use bounded
+CLI HTTP requests. Distinguish a local runtime exception from provider rejection.

@@ -17,7 +17,7 @@
 - [Production parity policy](production-parity-policy.md) — latest approved releases preserve Production data; new configuration requires safe migration and actual Live verification.
 - [Exchange filter safety](exchange-admin-filter-safety.md) — Payment Methods alone preserves hidden selections; zero matches must not hide filters or Reset.
 - [Exchange visual identity](exchange-visual-catalog-policy.md) — catalog variants are not new records; currency flags are not customer countries; order privacy differs from authorized configuration.
-- [QuickXchange provider reuse](migration-project-roles.md) — use current Replit source, sync outdated GitHub first; adapt into QXLayer without sharing data or credentials.
+- [QuickXchange provider reuse](migration-project-roles.md) — approved verified source-only package; tenant-scoped reuse without sharing business data or credentials.
 - [Preview request security](preview-request-security.md) — sandboxed forms may have opaque origins; Development ingress and direct Production cookie behavior must be distinguished.
 - [Approved Exchange master](master-exchange-template.md) — current NovaX is the approved shared master; preserve its design and use isolated tenant configuration, not frontend copies.
 - [Retained review fixture](retained-provisioning-fixture.md) — keep the Asterlane Development test customer/order/uploads and later tenant until explicit removal; user runs the lifecycle.
