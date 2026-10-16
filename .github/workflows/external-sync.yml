@@ -36,6 +36,11 @@ jobs:
           QXLAYER_EXTERNAL_ENVIRONMENT: staging
           RENDER_API_SERVICE_ID: srv-db5b47qjnfac739s374g
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      - name: Synchronize reviewed global reference additions only
+        if: env.CANDIDATE_AUTH_ENVIRONMENT == 'production' && env.CANDIDATE_ACCEPTANCE_APPROVED == 'true'
+        run: node scripts/external-hosting/synchronize-reference-configuration.mjs --apply-approved-reference
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
       - name: Build both preserved frontends
         run: pnpm run external:build:frontend
         env:
@@ -63,12 +68,12 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           CANDIDATE_PREVIEW_URL: ${{ steps.preview.outputs.url }}
-      # Never migrate databases, import accounts/data, enable writes, resume
+      # Reference additions above are bounded by the reviewed configuration package.
       - name: Bind protected acceptance alias only
         run: node scripts/external-hosting/bind-acceptance-alias.mjs
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           CANDIDATE_PREVIEW_URL: ${{ steps.preview.outputs.url }}
           CANDIDATE_ACCEPTANCE_APPROVED: ${{ env.CANDIDATE_ACCEPTANCE_APPROVED }}
-      # Never migrate databases, import accounts/data, enable public writes, resume
+      # Never migrate schema, import customer/accounts data, enable public writes, resume
       # workers, assign custom domains or use --prod from this candidate job.
