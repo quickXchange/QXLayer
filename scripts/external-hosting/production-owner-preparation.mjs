@@ -3,13 +3,15 @@ import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
 import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { pathToFileURL } from "node:url";
 import { sourceEnvironment } from "../release/production-business-backup.mjs";
 const { Client } = createRequire(new URL("../../lib/db/package.json", import.meta.url))("pg");
 const hash = x => createHash("sha256").update(x).digest("hex");
 const target = "qcgvhlphalxqzzsxqjhi";
 const folder = "generated-artifacts/external-finalization";
 let stage = "original-identity";
-try {
+export async function loadOriginalOwnerAndVerifiedRecipient() {
+  assert.notEqual(process.env.NODE_TLS_REJECT_UNAUTHORIZED, "0", "Verified provider transport required");
   const protectedManifest = JSON.parse(await readFile("generated-artifacts/auth-security/protected-production-administrator-manifest.json"));
   assert.equal(protectedManifest.administrators.length, 1);
   const original = protectedManifest.administrators[0];
@@ -58,6 +60,11 @@ try {
     "Require the confirmed original Gmail identity, never a caller-supplied email");
   const factors = (user.factors ?? []).filter(f => f.factor_type === "totp" && f.status === "verified");
   assert(factors.length > 0, "Existing source authenticator must remain protected");
+  return { owner, user, original, factors, productionIdentityLinkAlreadyProven };
+}
+async function main() {
+  const { owner, user, original, factors, productionIdentityLinkAlreadyProven } =
+    await loadOriginalOwnerAndVerifiedRecipient();
   stage = "target-preservation";
   const headers = { apikey: process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY,
     Authorization: `Bearer ${process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY}` };
@@ -97,7 +104,8 @@ try {
   await mkdir(folder, { recursive: true });
   await writeFile(`${folder}/production-owner-auth-preparation.json`, JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report));
-} catch (error) {
+}
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main().catch(error => {
   console.error(JSON.stringify({ blockedAt: stage, code: error.code ?? "ASSERTION", privateDetailsSuppressed: true }));
   process.exitCode = 1;
-}
+});
