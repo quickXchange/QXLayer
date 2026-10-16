@@ -26,3 +26,15 @@ TLS or change the Live source's required channel binding.
 
 **How to apply:** Keep target and source transport policies separate and report
 negotiated channel binding honestly; never claim it is mandatory on this target.
+
+Provider protection and the application private gate are separate boundaries.
+A non-browser request without `Accept: text/html` can receive the application's
+intended 403 JSON even after Vercel has authorized the request.
+
+**Why:** Approved project automation access issued a provider cookie successfully,
+but non-HTML probes looked blocked; the real browser completed the private gate
+and same-origin API journey. Do not diagnose an application-gate 403 as failed SSO.
+
+**How to apply:** Classify the responding layer, not just the status. Keep bypass
+headers restricted to the exact protected host, keep credentials in memory, and
+revoke temporary access with a readback that preserves SSO and existing bypasses.
