@@ -3,6 +3,23 @@ name: External preparation authorization
 description: External migration authorization history, isolated initialization approval, and the public Live/cutover hold.
 ---
 
+## Protected application parity after Owner acceptance
+
+After confirming Production Owner setup, MFA/Admin login and reload, the user
+authorized synchronizing the latest Development application to protected
+Vercel/Render, safely migrating required global configuration/reference data into
+the isolated Supabase Production target, and testing/fixing the customer
+ordering → provisioning → same-account Admin journey.
+
+**Why:** The user requires complete protected application acceptance before the
+public switch, not merely successful Owner authentication.
+
+**How to apply:** This supersedes earlier prohibitions on the bounded global
+configuration transfer. Preserve the accepted Owner and existing customer data;
+do not import Development test customers or treat sample commercial settings as
+approved offers. Current public Live and DNS must remain unchanged. Protected
+acceptance is not authorization for final cutover or live financial execution.
+
 ## Approved isolated Production initialization
 
 The user subsequently approved initializing the isolated VYNOX LAYER Production
