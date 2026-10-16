@@ -4,6 +4,10 @@ import { once } from "node:events";
 import { startupMode, createHeldCandidateServer } from "./start-api.mjs";
 
 test("only explicitly held Staging can start without application imports", () => {
+  assert.equal(startupMode({ QXLAYER_EXTERNAL_ENVIRONMENT: "production",
+    QXLAYER_EXTERNAL_CANDIDATE: "true", QXLAYER_EXTERNAL_STARTUP_APPROVED: "false" }), "held");
+  assert.throws(() => startupMode({ QXLAYER_EXTERNAL_ENVIRONMENT: "production",
+    QXLAYER_EXTERNAL_CANDIDATE: "true", QXLAYER_EXTERNAL_STARTUP_APPROVED: "true" }));
   assert.equal(startupMode({ QXLAYER_EXTERNAL_ENVIRONMENT: "staging",
     QXLAYER_EXTERNAL_STARTUP_APPROVED: "false" }), "held");
   for (const mode of ["production", undefined, "development"])

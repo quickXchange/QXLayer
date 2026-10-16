@@ -31,6 +31,15 @@ Development credentials. Approved startup retains the normal application guards.
 The candidate CI token expires after 90 days; rotate it in the encrypted GitHub
 environment before expiry. Do not regenerate unrelated migration credentials.
 
+The isolated Production-connected candidate uses a separate Render environment
+group; the old Staging group remains for the suspended worker only. Its explicit
+candidate flag and startup/cutover holds prevent application imports. Startup
+performs a verified-TLS, READ ONLY operator database/catalog probe and native
+Auth GET checks, then closes the database connection. The operator URL is never
+installed as application `DATABASE_URL`. Missing tables, restricted runtime
+roles or private Auth support keep schema readiness false; no initialization,
+policy change, account creation or data migration happens from the probe.
+
 ## Database migration, independent of native Replit Publish
 
 Reuse the existing checksum/advisory-lock/transaction-based external migration

@@ -41,7 +41,13 @@ jobs:
         env:
           QXLAYER_API_ORIGIN: https://qxlayer-api.onrender.com
           QXLAYER_AUTH_PROVIDER: supabase
-          QXLAYER_EXTERNAL_ENVIRONMENT: staging
+          QXLAYER_EXTERNAL_ENVIRONMENT: ${{ env.CANDIDATE_AUTH_ENVIRONMENT }}
+          QXLAYER_PRODUCTION_SUPABASE_AUTH_PROJECT_REF: ${{ env.CANDIDATE_SUPABASE_PROJECT_REF }}
+          QXLAYER_PRODUCTION_SUPABASE_AUTH_URL: ${{ env.CANDIDATE_AUTH_ORIGIN }}
+      - name: Verify held candidate connectivity without enabling business routes
+        run: node scripts/external-hosting/verify-candidate-runtime.mjs
+        env:
+          CANDIDATE_EXPECTED_ENVIRONMENT: ${{ env.CANDIDATE_AUTH_ENVIRONMENT }}
       - name: Deploy protected Vercel candidate, never Production
         id: preview
         env:

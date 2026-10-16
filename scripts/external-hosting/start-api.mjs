@@ -6,6 +6,11 @@ import { fileURLToPath } from "node:url";
 export function startupMode(env) {
   const mode = env.QXLAYER_EXTERNAL_ENVIRONMENT;
   assert(["staging", "production"].includes(mode), "Explicit external environment required");
+  if (env.QXLAYER_EXTERNAL_CANDIDATE === "true") {
+    assert.equal(mode, "production", "Production candidate must be explicit");
+    assert.equal(env.QXLAYER_EXTERNAL_STARTUP_APPROVED, "false", "Candidate cannot activate business routes");
+    return "held";
+  }
   if (mode === "staging" && env.QXLAYER_EXTERNAL_STARTUP_APPROVED === "false") return "held";
   assert.equal(env.QXLAYER_EXTERNAL_STARTUP_APPROVED, "true", "External startup remains unapproved");
   assert.equal(env.QXLAYER_DATABASE_PROVIDER, "supabase", "External database provider must be explicit");
@@ -14,7 +19,8 @@ export function startupMode(env) {
 
 // No application/database/Auth imports in held mode. Health means only that the
 // hold process is running, never that schema, Auth or business routes are ready.
-export function createHeldCandidateServer() {
+export function createHeldCandidateServer({ environment = "staging", checks = {} } = {}) {
+  assert(["staging", "production"].includes(environment));
   const server = createServer((req, res) => {
     const health = ["GET", "HEAD"].includes(req.method) &&
       (req.url ?? "").split("?")[0] === "/api/healthz";
@@ -24,8 +30,9 @@ export function createHeldCandidateServer() {
       "X-Content-Type-Options": "nosniff", ...(health ? {} : { "Retry-After": "300" }),
     });
     res.end(req.method === "HEAD" ? undefined : JSON.stringify({
-      status: "held", ready: false, environment: "staging",
+      ...checks, status: "held", ready: false, environment,
       startupApproved: false, businessRoutesEnabled: false, databaseConnected: false,
+      ...(environment === "production" ? { databaseConnected: checks.databaseConnected === true } : {}),
     }));
   });
   server.requestTimeout = 15000;
@@ -39,8 +46,15 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (startupMode(process.env) === "held") {
     const port = Number(process.env.PORT);
     assert(Number.isInteger(port) && port > 0 && port <= 65535, "Valid PORT required");
-    const server = createHeldCandidateServer().listen(port, "0.0.0.0", () =>
-      console.info("Candidate process held; business routes and database connections disabled."));
+    const environment = process.env.QXLAYER_EXTERNAL_ENVIRONMENT;
+    const checks = environment === "production" ? { preflightComplete: false } : {};
+    const server = createHeldCandidateServer({ environment, checks }).listen(port, "0.0.0.0", () =>
+      console.info("Candidate process held; business routes disabled."));
+    if (environment === "production") {
+      const { productionCandidatePreflight } = await import("./production-candidate-preflight.mjs");
+      Object.assign(checks, await productionCandidatePreflight(process.env));
+      console.info(JSON.stringify({ status: "held", ...checks }));
+    }
     const close = () => {
       server.close(() => process.exit(0));
       setTimeout(() => { server.closeAllConnections(); process.exit(0); }, 2000).unref();

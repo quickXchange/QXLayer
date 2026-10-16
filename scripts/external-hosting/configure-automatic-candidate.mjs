@@ -72,7 +72,7 @@ const update = await fetch(serviceUrl, { method: "PATCH", headers: rh,
   signal: AbortSignal.timeout(30000) });
 assert(update.ok, `Render source configuration HTTP ${update.status}`);
 for (const [key, value] of Object.entries({
-  QXLAYER_EXTERNAL_STARTUP_APPROVED: "false", QXLAYER_EXTERNAL_ENVIRONMENT: "staging",
+  QXLAYER_EXTERNAL_STARTUP_APPROVED: "false",
   QXLAYER_HEALTH_MONITOR_ENABLED: "false", QXLAYER_HEALTH_MONITOR_MODE: "disabled",
   PRODUCTION_ACCESS_GATE_ENABLED: "true",
 })) {
