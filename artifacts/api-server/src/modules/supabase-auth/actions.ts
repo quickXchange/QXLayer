@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { Request, Response } from "express";
 import { HttpError } from "../../lib/errors";
 import { authRequest, type SupabaseTokens } from "./provider";
-import { developmentSupabaseAuth, supabaseEmailLoginEnabled, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
+import { developmentSupabaseAuth, productionSupabaseAuth, supabaseEmailLoginEnabled, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 import { establishSession, needSession, publicUser, hasVerifiedFactor, reauthenticate, readSession,
   revokeLocalSession, updateSession, sessionCookie, type AuthSession } from "./session";
 import { generateRecoveryCodes, recoverAuthenticator, requireDevelopmentRecovery } from "./development-recovery";
@@ -171,14 +171,15 @@ export async function performAction(raw: unknown, req: Request, res: Response) {
       const s = await needSession(req);
       await reauthenticate(s, a.currentPassword);
       if (hasVerifiedFactor(s.user) && !s.aal2) throw new HttpError(403, "Verify the existing authenticator first.");
+      const issuer = productionSupabaseAuth() ? "VYNOX LAYER Production" : "VYNOX LAYER";
       // A cancelled Development setup may leave a provider draft with the same unique name.
       // Remove only this validated account's unverified app drafts; never a verified factor.
-      if (developmentSupabaseAuth()) for (const draft of s.user.factors ?? []) {
-        if (draft.factor_type === "totp" && draft.status === "unverified" && draft.friendly_name === "VYNOX LAYER")
+      if (developmentSupabaseAuth() || productionSupabaseAuth()) for (const draft of s.user.factors ?? []) {
+        if (draft.factor_type === "totp" && draft.status === "unverified" && draft.friendly_name === issuer)
           await authRequest(`/factors/${draft.id}`, { method: "DELETE", accessToken: s.payload.accessToken });
       }
       const factor = await authRequest<{ id: string; totp: { qr_code: string; secret: string; uri: string } }>("/factors",
-        { method: "POST", accessToken: s.payload.accessToken, body: { factor_type: "totp", friendly_name: "VYNOX LAYER", issuer: "VYNOX LAYER" } });
+        { method: "POST", accessToken: s.payload.accessToken, body: { factor_type: "totp", friendly_name: issuer, issuer } });
       return { ok: true, factorId: factor.id, qrCode: factor.totp.qr_code, secret: factor.totp.secret, totpUri: factor.totp.uri };
     }
     case "mfa-verify": {
