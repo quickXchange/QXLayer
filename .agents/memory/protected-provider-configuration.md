@@ -38,3 +38,13 @@ and same-origin API journey. Do not diagnose an application-gate 403 as failed S
 **How to apply:** Classify the responding layer, not just the status. Keep bypass
 headers restricted to the exact protected host, keep credentials in memory, and
 revoke temporary access with a readback that preserves SSO and existing bypasses.
+
+Normalize object-key order before comparing provider protection snapshots across
+the execution sandbox boundary.
+
+**Why:** Sandbox serialization reordered object keys, so plain JSON string
+comparison falsely reported a protection change; normalized per-field comparisons
+confirmed every protected setting was unchanged.
+
+**How to apply:** Compare recursively key-sorted structures, verify response
+success before comparison, and keep credential-map contents out of logs.
