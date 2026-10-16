@@ -57,3 +57,14 @@ so a diagnostic failed before making any network request.
 
 **How to apply:** Check cancellation support before using it, or use bounded
 CLI HTTP requests. Distinguish a local runtime exception from provider rejection.
+
+Provider-vault provisioning approval is candidate-only: keep its key on the
+protected Render API service, not in linked environment groups, Development,
+Replit Shared secrets, or browser configuration. This is not permission to add
+provider credentials, activate financial execution, resume workers, or cut over Live.
+
+**Why:** The user explicitly approved provisioning the candidate-only vault.
+
+**How to apply:** Preserve existing keys rather than rotating them, verify
+unrelated configuration and held-runtime boundaries, and obtain separate scope
+before extending credential provisioning to another environment.
