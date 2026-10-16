@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
@@ -8,19 +8,24 @@ import { Button } from '@/components/ui/button';
 import { errMsg, orderRef, type WlOrder } from '@/lib/wl';
 import { STEPS, initialCfg, stepError, type Cfg } from './configure-state';
 import { ProjectStep, DesignStep } from './step-project-design';
+import { planPeriods } from './plan-bits';
 import { FeaturesStep, PlanStep, AddonsStep } from './step-plan-addons';
 import { RequirementsStep, ReviewStep } from './step-requirements-review';
 
 export function ConfigureExchange() {
   const qc = useQueryClient(); const submit = useSubmitWhiteLabelRequest();
-  const catQ = useGetWhiteLabelCatalog();
+  const catQ = useGetWhiteLabelCatalog({ query: { refetchInterval: 5000, refetchOnWindowFocus: true, staleTime: 0 } as never });
   const cat = catQ;
   const [cfg, setCfg] = useState<Cfg>(initialCfg()); const [step, setStep] = useState(0); const [maxStep, setMax] = useState(0);
   const [busy, setBusy] = useState(0); const [err, setErr] = useState<string | null>(null); const [done, setDone] = useState<WlOrder | null>(null);
   const key = useRef(crypto.randomUUID());
   const set = (p: Partial<Cfg> | ((c: Cfg) => Partial<Cfg>)) => { setErr(null); setCfg((c) => ({ ...c, ...(typeof p === 'function' ? p(c) : p) })); };
   const onBusy = (d: number) => setBusy((b) => b + d);
-  const problem = stepError(step, cfg);
+  const selPlan = cat.data?.plans.find((x) => x.id === cfg.planId); const avail = planPeriods(selPlan);
+  const noPeriods = !!cfg.planId && !cat.isLoading && (!selPlan || avail.length === 0);
+  const periodErr = noPeriods ? 'The selected plan has no billing period available right now. Choose another plan.' : null;
+  useEffect(() => { if (selPlan && avail.length > 0 && !avail.includes(cfg.period)) setCfg((c) => ({ ...c, period: avail[0] })); }, [selPlan, avail.join(','), cfg.period]); // eslint-disable-line react-hooks/exhaustive-deps
+  const problem = stepError(step, cfg) ?? ((step === 3 || step === 6) ? periodErr : null);
   const go = (i: number) => { setStep(i); setMax((m) => Math.max(m, i)); };
   const send = () => {
     setErr(null); const c = cfg; const custom = c.designType === 'custom';
@@ -55,7 +60,7 @@ export function ConfigureExchange() {
       <form onSubmit={(e) => {
         e.preventDefault();
         const submitter = (e.nativeEvent as SubmitEvent).submitter;
-        if (last && submitter?.getAttribute('data-testid') === 'button-submit' && !submit.isPending && busy === 0 &&
+        if (last && submitter?.getAttribute('data-testid') === 'button-submit' && !submit.isPending && busy === 0 && !noPeriods &&
           ![0, 1, 2, 3, 5].some((i) => stepError(i, cfg))) send();
       }} className="max-w-3xl space-y-6">
         <h2 className="font-display text-3xl">{STEPS[step]}</h2>
@@ -72,7 +77,7 @@ export function ConfigureExchange() {
           <Button type="button" variant="ghost" disabled={step === 0 || submit.isPending} onClick={() => go(step - 1)}>Back</Button>
           {problem && <span className="text-sm text-destructive">{problem}</span>}
           <div className="ml-auto">
-            {last ? <Button key="submit-order" type="submit" data-testid="button-submit" disabled={submit.isPending || busy > 0 || [0, 1, 2, 3, 5].some((i) => stepError(i, cfg))}>{submit.isPending ? 'Submitting' : 'Submit White Label Request'}</Button>
+            {last ? <Button key="submit-order" type="submit" data-testid="button-submit" disabled={submit.isPending || busy > 0 || noPeriods || [0, 1, 2, 3, 5].some((i) => stepError(i, cfg))}>{submit.isPending ? 'Submitting' : 'Submit White Label Request'}</Button>
               : <Button key="continue-step" type="button" data-testid="button-next" disabled={!!problem || busy > 0} onClick={() => go(step + 1)}>Continue</Button>}
           </div>
         </div>

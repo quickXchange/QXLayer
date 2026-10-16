@@ -8,6 +8,478 @@
 import * as zod from 'zod';
 
 
+export const GetPhase1CatalogResponse = zod.object({
+  "plans": zod.array(zod.record(zod.string(), zod.unknown())),
+  "addons": zod.array(zod.record(zod.string(), zod.unknown())),
+  "methods": zod.array(zod.record(zod.string(), zod.unknown())),
+  "purchaseAvailable": zod.boolean()
+})
+
+
+export const listPhase1MethodsResponseOneNameMin = 2;
+export const listPhase1MethodsResponseOneNameMax = 100;
+
+export const listPhase1MethodsResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const listPhase1MethodsResponseOneInstructionsMax = 4000;
+
+
+
+export const ListPhase1MethodsResponseItem = zod.object({
+  "name": zod.string().min(listPhase1MethodsResponseOneNameMin).max(listPhase1MethodsResponseOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(listPhase1MethodsResponseOneCurrencyRegExp),
+  "instructions": zod.string().max(listPhase1MethodsResponseOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))
+export const ListPhase1MethodsResponse = zod.array(ListPhase1MethodsResponseItem)
+
+
+export const createPhase1MethodBodyNameMin = 2;
+export const createPhase1MethodBodyNameMax = 100;
+
+export const createPhase1MethodBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const createPhase1MethodBodyInstructionsMax = 4000;
+
+
+
+export const CreatePhase1MethodBody = zod.object({
+  "name": zod.string().min(createPhase1MethodBodyNameMin).max(createPhase1MethodBodyNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(createPhase1MethodBodyCurrencyRegExp),
+  "instructions": zod.string().max(createPhase1MethodBodyInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+})
+
+export const createPhase1MethodResponseOneNameMin = 2;
+export const createPhase1MethodResponseOneNameMax = 100;
+
+export const createPhase1MethodResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const createPhase1MethodResponseOneInstructionsMax = 4000;
+
+
+
+export const CreatePhase1MethodResponse = zod.object({
+  "name": zod.string().min(createPhase1MethodResponseOneNameMin).max(createPhase1MethodResponseOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(createPhase1MethodResponseOneCurrencyRegExp),
+  "instructions": zod.string().max(createPhase1MethodResponseOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))
+
+
+export const UpdatePhase1MethodParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const updatePhase1MethodBodyNameMin = 2;
+export const updatePhase1MethodBodyNameMax = 100;
+
+export const updatePhase1MethodBodyCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updatePhase1MethodBodyInstructionsMax = 4000;
+
+
+
+export const UpdatePhase1MethodBody = zod.object({
+  "name": zod.string().min(updatePhase1MethodBodyNameMin).max(updatePhase1MethodBodyNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(updatePhase1MethodBodyCurrencyRegExp),
+  "instructions": zod.string().max(updatePhase1MethodBodyInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+})
+
+export const updatePhase1MethodResponseOneNameMin = 2;
+export const updatePhase1MethodResponseOneNameMax = 100;
+
+export const updatePhase1MethodResponseOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const updatePhase1MethodResponseOneInstructionsMax = 4000;
+
+
+
+export const UpdatePhase1MethodResponse = zod.object({
+  "name": zod.string().min(updatePhase1MethodResponseOneNameMin).max(updatePhase1MethodResponseOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(updatePhase1MethodResponseOneCurrencyRegExp),
+  "instructions": zod.string().max(updatePhase1MethodResponseOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))
+
+
+export const DeletePhase1MethodParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const DeletePhase1MethodResponse = zod.object({
+  "deleted": zod.boolean()
+})
+
+
+export const GetCustomerOrderBillingParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const getCustomerOrderBillingResponseMethodsItemOneNameMin = 2;
+export const getCustomerOrderBillingResponseMethodsItemOneNameMax = 100;
+
+export const getCustomerOrderBillingResponseMethodsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getCustomerOrderBillingResponseMethodsItemOneInstructionsMax = 4000;
+
+
+
+export const GetCustomerOrderBillingResponse = zod.object({
+  "invoice": zod.union([zod.object({
+  "id": zod.string().uuid(),
+  "orderId": zod.string().uuid(),
+  "amount": zod.string(),
+  "currency": zod.string(),
+  "status": zod.enum(['pending', 'reported', 'paid', 'rejected']),
+  "methodName": zod.string(),
+  "instructions": zod.string(),
+  "reference": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "confirmedAt": zod.coerce.date().nullable()
+}),zod.null()]),
+  "methods": zod.array(zod.object({
+  "name": zod.string().min(getCustomerOrderBillingResponseMethodsItemOneNameMin).max(getCustomerOrderBillingResponseMethodsItemOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(getCustomerOrderBillingResponseMethodsItemOneCurrencyRegExp),
+  "instructions": zod.string().max(getCustomerOrderBillingResponseMethodsItemOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))),
+  "purchasable": zod.boolean(),
+  "blockedReason": zod.string().nullable()
+})
+
+
+export const GetOperatorOrderBillingParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const getOperatorOrderBillingResponseMethodsItemOneNameMin = 2;
+export const getOperatorOrderBillingResponseMethodsItemOneNameMax = 100;
+
+export const getOperatorOrderBillingResponseMethodsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const getOperatorOrderBillingResponseMethodsItemOneInstructionsMax = 4000;
+
+
+
+export const GetOperatorOrderBillingResponse = zod.object({
+  "invoice": zod.union([zod.object({
+  "id": zod.string().uuid(),
+  "orderId": zod.string().uuid(),
+  "amount": zod.string(),
+  "currency": zod.string(),
+  "status": zod.enum(['pending', 'reported', 'paid', 'rejected']),
+  "methodName": zod.string(),
+  "instructions": zod.string(),
+  "reference": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "confirmedAt": zod.coerce.date().nullable()
+}),zod.null()]),
+  "methods": zod.array(zod.object({
+  "name": zod.string().min(getOperatorOrderBillingResponseMethodsItemOneNameMin).max(getOperatorOrderBillingResponseMethodsItemOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(getOperatorOrderBillingResponseMethodsItemOneCurrencyRegExp),
+  "instructions": zod.string().max(getOperatorOrderBillingResponseMethodsItemOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))),
+  "purchasable": zod.boolean(),
+  "blockedReason": zod.string().nullable()
+})
+
+
+export const CreatePlatformInvoiceParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const CreatePlatformInvoiceBody = zod.object({
+  "methodId": zod.string().uuid()
+})
+
+export const createPlatformInvoiceResponseMethodsItemOneNameMin = 2;
+export const createPlatformInvoiceResponseMethodsItemOneNameMax = 100;
+
+export const createPlatformInvoiceResponseMethodsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const createPlatformInvoiceResponseMethodsItemOneInstructionsMax = 4000;
+
+
+
+export const CreatePlatformInvoiceResponse = zod.object({
+  "invoice": zod.union([zod.object({
+  "id": zod.string().uuid(),
+  "orderId": zod.string().uuid(),
+  "amount": zod.string(),
+  "currency": zod.string(),
+  "status": zod.enum(['pending', 'reported', 'paid', 'rejected']),
+  "methodName": zod.string(),
+  "instructions": zod.string(),
+  "reference": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "confirmedAt": zod.coerce.date().nullable()
+}),zod.null()]),
+  "methods": zod.array(zod.object({
+  "name": zod.string().min(createPlatformInvoiceResponseMethodsItemOneNameMin).max(createPlatformInvoiceResponseMethodsItemOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(createPlatformInvoiceResponseMethodsItemOneCurrencyRegExp),
+  "instructions": zod.string().max(createPlatformInvoiceResponseMethodsItemOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))),
+  "purchasable": zod.boolean(),
+  "blockedReason": zod.string().nullable()
+})
+
+
+export const ReportPlatformPaymentParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const reportPlatformPaymentBodyReferenceMin = 3;
+export const reportPlatformPaymentBodyReferenceMax = 200;
+
+
+
+export const ReportPlatformPaymentBody = zod.object({
+  "reference": zod.string().min(reportPlatformPaymentBodyReferenceMin).max(reportPlatformPaymentBodyReferenceMax)
+})
+
+export const reportPlatformPaymentResponseMethodsItemOneNameMin = 2;
+export const reportPlatformPaymentResponseMethodsItemOneNameMax = 100;
+
+export const reportPlatformPaymentResponseMethodsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const reportPlatformPaymentResponseMethodsItemOneInstructionsMax = 4000;
+
+
+
+export const ReportPlatformPaymentResponse = zod.object({
+  "invoice": zod.union([zod.object({
+  "id": zod.string().uuid(),
+  "orderId": zod.string().uuid(),
+  "amount": zod.string(),
+  "currency": zod.string(),
+  "status": zod.enum(['pending', 'reported', 'paid', 'rejected']),
+  "methodName": zod.string(),
+  "instructions": zod.string(),
+  "reference": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "confirmedAt": zod.coerce.date().nullable()
+}),zod.null()]),
+  "methods": zod.array(zod.object({
+  "name": zod.string().min(reportPlatformPaymentResponseMethodsItemOneNameMin).max(reportPlatformPaymentResponseMethodsItemOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(reportPlatformPaymentResponseMethodsItemOneCurrencyRegExp),
+  "instructions": zod.string().max(reportPlatformPaymentResponseMethodsItemOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))),
+  "purchasable": zod.boolean(),
+  "blockedReason": zod.string().nullable()
+})
+
+
+export const ConfirmPlatformPaymentParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const confirmPlatformPaymentBodyReferenceMin = 3;
+export const confirmPlatformPaymentBodyReferenceMax = 200;
+
+export const confirmPlatformPaymentBodyEvidenceMin = 10;
+export const confirmPlatformPaymentBodyEvidenceMax = 2000;
+
+
+
+export const ConfirmPlatformPaymentBody = zod.object({
+  "receivedAmount": zod.string(),
+  "currency": zod.string(),
+  "reference": zod.string().min(confirmPlatformPaymentBodyReferenceMin).max(confirmPlatformPaymentBodyReferenceMax),
+  "evidence": zod.string().min(confirmPlatformPaymentBodyEvidenceMin).max(confirmPlatformPaymentBodyEvidenceMax)
+})
+
+export const confirmPlatformPaymentResponseMethodsItemOneNameMin = 2;
+export const confirmPlatformPaymentResponseMethodsItemOneNameMax = 100;
+
+export const confirmPlatformPaymentResponseMethodsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const confirmPlatformPaymentResponseMethodsItemOneInstructionsMax = 4000;
+
+
+
+export const ConfirmPlatformPaymentResponse = zod.object({
+  "invoice": zod.union([zod.object({
+  "id": zod.string().uuid(),
+  "orderId": zod.string().uuid(),
+  "amount": zod.string(),
+  "currency": zod.string(),
+  "status": zod.enum(['pending', 'reported', 'paid', 'rejected']),
+  "methodName": zod.string(),
+  "instructions": zod.string(),
+  "reference": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "confirmedAt": zod.coerce.date().nullable()
+}),zod.null()]),
+  "methods": zod.array(zod.object({
+  "name": zod.string().min(confirmPlatformPaymentResponseMethodsItemOneNameMin).max(confirmPlatformPaymentResponseMethodsItemOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(confirmPlatformPaymentResponseMethodsItemOneCurrencyRegExp),
+  "instructions": zod.string().max(confirmPlatformPaymentResponseMethodsItemOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))),
+  "purchasable": zod.boolean(),
+  "blockedReason": zod.string().nullable()
+})
+
+
+export const RejectPlatformPaymentParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const rejectPlatformPaymentBodyEvidenceMin = 10;
+export const rejectPlatformPaymentBodyEvidenceMax = 2000;
+
+
+
+export const RejectPlatformPaymentBody = zod.object({
+  "evidence": zod.string().min(rejectPlatformPaymentBodyEvidenceMin).max(rejectPlatformPaymentBodyEvidenceMax)
+})
+
+export const rejectPlatformPaymentResponseMethodsItemOneNameMin = 2;
+export const rejectPlatformPaymentResponseMethodsItemOneNameMax = 100;
+
+export const rejectPlatformPaymentResponseMethodsItemOneCurrencyRegExp = new RegExp('^[A-Z]{3}$');
+export const rejectPlatformPaymentResponseMethodsItemOneInstructionsMax = 4000;
+
+
+
+export const RejectPlatformPaymentResponse = zod.object({
+  "invoice": zod.union([zod.object({
+  "id": zod.string().uuid(),
+  "orderId": zod.string().uuid(),
+  "amount": zod.string(),
+  "currency": zod.string(),
+  "status": zod.enum(['pending', 'reported', 'paid', 'rejected']),
+  "methodName": zod.string(),
+  "instructions": zod.string(),
+  "reference": zod.string(),
+  "createdAt": zod.coerce.date(),
+  "confirmedAt": zod.coerce.date().nullable()
+}),zod.null()]),
+  "methods": zod.array(zod.object({
+  "name": zod.string().min(rejectPlatformPaymentResponseMethodsItemOneNameMin).max(rejectPlatformPaymentResponseMethodsItemOneNameMax),
+  "kind": zod.enum(['bank_transfer', 'manual']),
+  "currency": zod.string().regex(rejectPlatformPaymentResponseMethodsItemOneCurrencyRegExp),
+  "instructions": zod.string().max(rejectPlatformPaymentResponseMethodsItemOneInstructionsMax),
+  "enabled": zod.boolean(),
+  "approved": zod.boolean()
+}).and(zod.object({
+  "id": zod.string().uuid(),
+  "createdAt": zod.coerce.date()
+}))),
+  "purchasable": zod.boolean(),
+  "blockedReason": zod.string().nullable()
+})
+
+
+export const ListPlatformEmailsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "subject": zod.string(),
+  "status": zod.enum(['pending', 'sent', 'failed']),
+  "attempts": zod.number().int(),
+  "lastError": zod.string().nullable(),
+  "createdAt": zod.coerce.date(),
+  "sentAt": zod.coerce.date().nullable()
+})
+export const ListPlatformEmailsResponse = zod.array(ListPlatformEmailsResponseItem)
+
+
+export const RetryPlatformEmailParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const RetryPlatformEmailResponse = zod.object({
+  "queued": zod.boolean()
+})
+
+
+export const ListPlatformPriceProposalsResponseItem = zod.record(zod.string(), zod.unknown())
+export const ListPlatformPriceProposalsResponse = zod.array(ListPlatformPriceProposalsResponseItem)
+
+
+export const ApprovePlatformPriceProposalParams = zod.object({
+  "id": zod.coerce.string().uuid(),
+  "kind": zod.enum(['plan', 'addon'])
+})
+
+export const ApprovePlatformPriceProposalBody = zod.object({
+  "confirmed": zod.literal(true),
+  "expected": zod.object({
+  "monthlyPrice": zod.string(),
+  "yearlyPrice": zod.string(),
+  "setupFee": zod.string(),
+  "currency": zod.string()
+})
+})
+
+export const ApprovePlatformPriceProposalResponse = zod.object({
+  "approved": zod.boolean()
+})
+
+
+export const GetPlatformBillingPeriodsParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const GetPlatformBillingPeriodsResponse = zod.object({
+  "monthly": zod.boolean(),
+  "yearly": zod.boolean()
+})
+
+
+export const UpdatePlatformBillingPeriodsParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const UpdatePlatformBillingPeriodsBody = zod.object({
+  "monthly": zod.boolean(),
+  "yearly": zod.boolean()
+})
+
+export const UpdatePlatformBillingPeriodsResponse = zod.object({
+  "monthly": zod.boolean(),
+  "yearly": zod.boolean()
+})
+
+
 export const GetSupabaseAuthStatusResponse = zod.object({
   "enabled": zod.boolean(),
   "mailReady": zod.boolean(),
@@ -1083,7 +1555,8 @@ export const GetWhiteLabelCatalogResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 }))),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getWhiteLabelCatalogResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -1297,7 +1770,8 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -1335,7 +1809,8 @@ export const GetMyWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getMyWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -1570,7 +2045,8 @@ export const GetWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -1608,7 +2084,8 @@ export const GetWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getWhiteLabelRequestResponseOrderApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -1919,7 +2396,8 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -1957,7 +2435,8 @@ export const ListMyWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listMyWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -2241,7 +2720,8 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(submitWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -2279,7 +2759,8 @@ export const SubmitWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(submitWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -2499,7 +2980,8 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listWhiteLabelRequestsResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -2537,7 +3019,8 @@ export const ListWhiteLabelRequestsResponseItem = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(listWhiteLabelRequestsResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -2784,7 +3267,8 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -2822,7 +3306,8 @@ export const ReviewWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(reviewWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -3050,7 +3535,8 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "requestedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseRequestedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -3088,7 +3574,8 @@ export const ProvisionWhiteLabelRequestResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]).optional(),
   "approvedAddons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(provisionWhiteLabelRequestResponseApprovedAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -5987,7 +6474,8 @@ export const ListPlansResponseItem = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 }))
 export const ListPlansResponse = zod.array(ListPlansResponseItem)
 
@@ -6106,7 +6594,8 @@ export const CreatePlanResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 }))
 
 
@@ -6181,7 +6670,8 @@ export const GetPlanResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 }))
 
 
@@ -6303,7 +6793,8 @@ export const UpdatePlanResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 }))
 
 
@@ -6369,7 +6860,8 @@ export const DuplicatePlanResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 }))
 
 
@@ -6439,7 +6931,8 @@ export const SetPlanStatusResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 }))
 
 
@@ -6775,7 +7268,8 @@ export const GetTenantSubscriptionResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(getTenantSubscriptionResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -6925,7 +7419,8 @@ export const ChangeTenantPlanResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(changeTenantPlanResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -7090,7 +7585,8 @@ export const UpdateSubscriptionCommercialResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(updateSubscriptionCommercialResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -7272,7 +7768,8 @@ export const SetTenantAddonsResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(setTenantAddonsResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -7442,7 +7939,8 @@ export const SetTenantOverridesResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(setTenantOverridesResponseAddonsItemOneMonthlyPriceRegExp).nullish(),
@@ -7598,7 +8096,8 @@ export const SetTenantSuspensionResponse = zod.object({
   "id": zod.string().uuid(),
   "createdAt": zod.coerce.date(),
   "updatedAt": zod.coerce.date(),
-  "pricingConfigured": zod.boolean().optional()
+  "pricingConfigured": zod.boolean().optional(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly'])).optional()
 })),zod.null()]),
   "addons": zod.array(zod.object({
   "monthlyPrice": zod.string().regex(setTenantSuspensionResponseAddonsItemOneMonthlyPriceRegExp).nullish(),

@@ -4,11 +4,12 @@ import { PageHeader, ErrorState, ListSkeleton, EmptyState } from '@/components/a
 import { Button } from '@/components/ui/button';
 import { OrderStatus, OrderSummary, Timeline } from '@/components/customer/order-view';
 import { StageTracker } from '@/components/customer/stage-tracker';
+import { CustomerPayment } from '@/components/commerce/payment-panel';
 import { orderRef } from '@/lib/wl';
 
 export default function AccountOrderDetail() {
   const { orderId = '' } = useParams<{ orderId: string }>();
-  const q = useGetMyWhiteLabelRequest(orderId, { query: { queryKey: getGetMyWhiteLabelRequestQueryKey(orderId), enabled: !!orderId, refetchInterval: 10000, refetchOnWindowFocus: true } });
+  const q = useGetMyWhiteLabelRequest(orderId, { query: { queryKey: getGetMyWhiteLabelRequestQueryKey(orderId), enabled: !!orderId, refetchInterval: 5000, refetchOnWindowFocus: true } });
   const d = q.data;
   if (q.isLoading) return <ListSkeleton rows={4} />;
   if (q.isError || !d) return <ErrorState what="this order" onRetry={() => q.refetch()} />;
@@ -27,7 +28,7 @@ export default function AccountOrderDetail() {
         </div></div>}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] [&>*]:min-w-0">
         <OrderSummary o={o} />
-        <aside className="space-y-4"><div className="rounded-md border bg-card p-5"><h2 className="mb-3 font-mono text-[11px] uppercase tracking-wider text-copper">Status and notes</h2>
+        <aside className="space-y-4"><CustomerPayment orderId={o.id} /><div className="rounded-md border bg-card p-5"><h2 className="mb-3 font-mono text-[11px] uppercase tracking-wider text-copper">Status and notes</h2>
           {customer.length ? <Timeline history={customer} customerUserId={o.customerUserId} /> : <EmptyState title="No updates yet" body="Status updates and notes from our team appear here." />}</div></aside>
       </div>
     </>

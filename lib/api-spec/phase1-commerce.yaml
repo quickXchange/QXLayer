@@ -1,0 +1,261 @@
+paths:
+  /phase1/catalog:
+    get:
+      operationId: getPhase1Catalog
+      responses:
+        '200':
+          description: Approved purchasable offers, never provisional prices.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [plans, addons, methods, purchaseAvailable]
+                properties:
+                  plans: {type: array, items: {type: object, additionalProperties: true}}
+                  addons: {type: array, items: {type: object, additionalProperties: true}}
+                  methods: {type: array, items: {type: object, additionalProperties: true}}
+                  purchaseAvailable: {type: boolean}
+  /operator/phase1/methods:
+    get:
+      operationId: listPhase1Methods
+      responses:
+        '200':
+          description: Operator payment configuration.
+          content:
+            application/json:
+              schema: {type: array, items: {$ref: '#/components/schemas/PlatformPaymentMethod'}}
+    post:
+      operationId: createPhase1Method
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformMethodInput'}}}
+      responses:
+        '201':
+          description: Created method.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformPaymentMethod'}}}
+  /operator/phase1/methods/{id}:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    put:
+      operationId: updatePhase1Method
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformMethodInput'}}}
+      responses:
+        '200':
+          description: Updated method.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformPaymentMethod'}}}
+    delete:
+      operationId: deletePhase1Method
+      responses:
+        '200':
+          description: Deleted unreferenced method; referenced methods must be disabled.
+          content: {application/json: {schema: {type: object, required: [deleted], properties: {deleted: {type: boolean}}}}}
+  /customer/phase1/orders/{id}:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    get:
+      operationId: getCustomerOrderBilling
+      responses:
+        '200':
+          description: Owned order billing.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformOrderBilling'}}}
+  /operator/phase1/orders/{id}:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    get:
+      operationId: getOperatorOrderBilling
+      responses:
+        '200':
+          description: Authenticated operator billing.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformOrderBilling'}}}
+  /customer/phase1/orders/{id}/checkout:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    post:
+      operationId: createPlatformInvoice
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformCheckoutInput'}}}
+      responses:
+        '201':
+          description: Immutable server-priced invoice; same invoice returned on retry.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformOrderBilling'}}}
+  /customer/phase1/orders/{id}/report:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    post:
+      operationId: reportPlatformPayment
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformReferenceInput'}}}
+      responses:
+        '200':
+          description: Customer report is NOT verified payment.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformOrderBilling'}}}
+  /operator/phase1/invoices/{id}/confirm:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    post:
+      operationId: confirmPlatformPayment
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformSettlementInput'}}}
+      responses:
+        '200':
+          description: Operator verifies exact amount and currency against settlement evidence.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformOrderBilling'}}}
+  /operator/phase1/invoices/{id}/reject:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    post:
+      operationId: rejectPlatformPayment
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformRejectionInput'}}}
+      responses:
+        '200':
+          description: Rejected report does not release an order.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformOrderBilling'}}}
+  /operator/phase1/emails:
+    get:
+      operationId: listPlatformEmails
+      responses:
+        '200':
+          description: Durable delivery attempts, without recipient personal data.
+          content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/PlatformEmail'}}}}
+  /operator/phase1/emails/{id}/retry:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    post:
+      operationId: retryPlatformEmail
+      responses:
+        '200':
+          description: Failed message queued with stable provider idempotency key.
+          content: {application/json: {schema: {type: object, required: [queued], properties: {queued: {type: boolean}}}}}
+  /operator/phase1/proposals:
+    get:
+      operationId: listPlatformPriceProposals
+      responses:
+        '200':
+          description: Owner-only provisional EUR prices.
+          content: {application/json: {schema: {type: array, items: {type: object, additionalProperties: true}}}}
+  /operator/phase1/proposals/{kind}/{id}/approve:
+    parameters:
+      - {$ref: '#/components/parameters/Id'}
+      - {in: path, name: kind, required: true, schema: {type: string, enum: [plan, addon]}}
+    post:
+      operationId: approvePlatformPriceProposal
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformApprovalInput'}}}
+      responses:
+        '200':
+          description: Explicit approval of current stored amounts.
+          content: {application/json: {schema: {type: object, required: [approved], properties: {approved: {type: boolean}}}}}
+  /operator/phase1/plans/{id}/periods:
+    parameters: [{$ref: '#/components/parameters/Id'}]
+    get:
+      operationId: getPlatformBillingPeriods
+      responses:
+        '200':
+          description: Enabled plan billing periods.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformBillingPeriods'}}}
+    put:
+      operationId: updatePlatformBillingPeriods
+      requestBody:
+        required: true
+        content: {application/json: {schema: {$ref: '#/components/schemas/PlatformBillingPeriods'}}}
+      responses:
+        '200':
+          description: Saved periods; disabling both blocks purchases.
+          content: {application/json: {schema: {$ref: '#/components/schemas/PlatformBillingPeriods'}}}
+components:
+  parameters:
+    Id: {in: path, name: id, required: true, schema: {type: string, format: uuid}}
+  schemas:
+    PlatformMethodInput:
+      type: object
+      required: [name, kind, currency, instructions, enabled, approved]
+      properties:
+        name: {type: string, minLength: 2, maxLength: 100}
+        kind: {type: string, enum: [bank_transfer, manual]}
+        currency: {type: string, pattern: '^[A-Z]{3}$'}
+        instructions: {type: string, maxLength: 4000}
+        enabled: {type: boolean}
+        approved: {type: boolean}
+    PlatformPaymentMethod:
+      allOf:
+        - {$ref: '#/components/schemas/PlatformMethodInput'}
+        - type: object
+          required: [id, createdAt]
+          properties:
+            id: {type: string, format: uuid}
+            createdAt: {type: string, format: date-time}
+    PlatformInvoice:
+      type: object
+      required: [id, orderId, amount, currency, status, methodName, instructions, reference, createdAt, confirmedAt]
+      properties:
+        id: {type: string, format: uuid}
+        orderId: {type: string, format: uuid}
+        amount: {type: string}
+        currency: {type: string}
+        status: {type: string, enum: [pending, reported, paid, rejected]}
+        methodName: {type: string}
+        instructions: {type: string}
+        reference: {type: string}
+        createdAt: {type: string, format: date-time}
+        confirmedAt: {type: [string, 'null'], format: date-time}
+    PlatformOrderBilling:
+      type: object
+      required: [invoice, methods, purchasable, blockedReason]
+      properties:
+        invoice: {anyOf: [{$ref: '#/components/schemas/PlatformInvoice'}, {type: 'null'}]}
+        methods: {type: array, items: {$ref: '#/components/schemas/PlatformPaymentMethod'}}
+        purchasable: {type: boolean}
+        blockedReason: {type: [string, 'null']}
+    PlatformCheckoutInput:
+      type: object
+      required: [methodId]
+      properties:
+        methodId: {type: string, format: uuid}
+    PlatformReferenceInput:
+      type: object
+      required: [reference]
+      properties:
+        reference: {type: string, minLength: 3, maxLength: 200}
+    PlatformSettlementInput:
+      type: object
+      required: [receivedAmount, currency, reference, evidence]
+      properties:
+        receivedAmount: {type: string}
+        currency: {type: string}
+        reference: {type: string, minLength: 3, maxLength: 200}
+        evidence: {type: string, minLength: 10, maxLength: 2000}
+    PlatformRejectionInput:
+      type: object
+      required: [evidence]
+      properties:
+        evidence: {type: string, minLength: 10, maxLength: 2000}
+    PlatformApprovalInput:
+      type: object
+      required: [confirmed, expected]
+      properties:
+        confirmed: {type: boolean, const: true}
+        expected:
+          type: object
+          required: [monthlyPrice, yearlyPrice, setupFee, currency]
+          properties:
+            monthlyPrice: {type: string}
+            yearlyPrice: {type: string}
+            setupFee: {type: string}
+            currency: {type: string}
+    PlatformBillingPeriods:
+      type: object
+      required: [monthly, yearly]
+      properties:
+        monthly: {type: boolean}
+        yearly: {type: boolean}
+    PlatformEmail:
+      type: object
+      required: [id, subject, status, attempts, lastError, createdAt, sentAt]
+      properties:
+        id: {type: string, format: uuid}
+        subject: {type: string}
+        status: {type: string, enum: [pending, sent, failed]}
+        attempts: {type: integer}
+        lastError: {type: [string, 'null']}
+        createdAt: {type: string, format: date-time}
+        sentAt: {type: [string, 'null'], format: date-time}

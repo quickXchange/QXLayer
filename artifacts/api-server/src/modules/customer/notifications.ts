@@ -1,6 +1,7 @@
 import { withDatabase } from "@workspace/db";
 import type { Principal } from "../authentication/service";
 import { requestContext } from "./order-model";
+import { mailConfigured } from "../commerce/email";
 
 export function customerNotifications(p: Principal) {
   return withDatabase(requestContext(p), async c => {
@@ -15,7 +16,7 @@ export function customerNotifications(p: Principal) {
       JOIN white_label_requests w ON w.id=e.request_id
       WHERE w.customer_user_id=$1 AND e.visibility='customer'
       AND NOT EXISTS(SELECT 1 FROM customer_notification_reads r WHERE r.event_id=e.id AND r.customer_user_id=$1)`, [p.userId]);
-    return { items: result.rows, unreadCount: unread.rows[0].total as number, outboundConnected: false };
+    return { items: result.rows, unreadCount: unread.rows[0].total as number, outboundConnected: mailConfigured() };
   });
 }
 export function markNotificationsRead(p: Principal, ids: string[]) {

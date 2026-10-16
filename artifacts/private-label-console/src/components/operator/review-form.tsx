@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { applyOrderResponse } from '@/lib/order-cache';
 import { useReviewWhiteLabelRequest, useListPlans, useListAddons, type WhiteLabelStatus } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +15,7 @@ const price = /^\d{1,12}(\.\d{1,2})?$/;
 const sel = 'h-10 w-full rounded-md border bg-background px-2 text-sm';
 
 export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
+  const cache = useQueryClient();
   const review = useReviewWhiteLabelRequest(); const plans = useListPlans(); const addons = useListAddons();
   const { toast } = useToast();
   const [status, setStatus] = useState<string>(o.status);
@@ -35,7 +38,7 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
     setPendingSt(st);
   };
   const apply = (st: string) => {
-    review.mutate({ requestId: o.id, data: { status: st as WhiteLabelStatus, monthlyPrice: m === '' ? null : m, setupPrice: s === '' ? null : s, currency: cur.toUpperCase(), operatorNote: '', customizationPrice: cust === '' ? null : cust, approvedPlanId: pid || null, approvedAddonIds: aids, customDesignDecision: dec } }, { onSuccess: () => { setPendingSt(null); toast({ title: 'Order review saved' }); onDone(); }, onError: (e) => { setErr(errMsg(e)); toast({ title: 'Review failed', description: errMsg(e), variant: 'destructive' }); } });
+    review.mutate({ requestId: o.id, data: { status: st as WhiteLabelStatus, monthlyPrice: m === '' ? null : m, setupPrice: s === '' ? null : s, currency: cur.toUpperCase(), operatorNote: '', customizationPrice: cust === '' ? null : cust, approvedPlanId: pid || null, approvedAddonIds: aids, customDesignDecision: dec } }, { onSuccess: async (response) => { applyOrderResponse(cache, o.id, response); setPendingSt(null); await onDone(); toast({ title: 'Order review saved' }); }, onError: (e) => { setErr(errMsg(e)); toast({ title: 'Review failed', description: errMsg(e), variant: 'destructive' }); } });
   };
   if (ro) return <p className="text-sm text-muted-foreground">This order is {statusText(o.status)}. Status and prices are read-only; notes can still be added.</p>;
   if (plans.isLoading || addons.isLoading) return <div role="status" aria-label="Loading review options"><ListSkeleton rows={3} /></div>;

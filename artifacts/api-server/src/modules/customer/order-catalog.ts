@@ -23,7 +23,7 @@ export function whiteLabelCatalog(p: Principal) {
     const ids = await c.query("SELECT id FROM plans WHERE status='enabled' ORDER BY display_order,name,id");
     const candidates = [];
     for (const r of ids.rows) candidates.push(await readPlan(c, r.id));
-    const plans = candidates.filter(p => !(demoEnabled() && p.name === DEMO_PLAN_NAME) && ["website", "crypto_exchange"].every(k => p.entitlements.some(e => e.key === k && e.value === true)));
+    const plans = candidates.filter(p => p.billingPeriods.length && !(demoEnabled() && p.name === DEMO_PLAN_NAME) && ["website", "crypto_exchange"].every(k => p.entitlements.some(e => e.key === k && e.value === true)));
     const ai = await c.query("SELECT id FROM addons WHERE enabled ORDER BY name,id");
     const addons = [];
     for (const r of ai.rows) addons.push(await readAddon(c, r.id));

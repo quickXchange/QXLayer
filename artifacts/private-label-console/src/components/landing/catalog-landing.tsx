@@ -21,7 +21,7 @@ const NAV = [
 export function CatalogLanding({ preview }: { preview?: boolean }) {
   // Shared document tokens also theme catalog dialogs, toast portals and scrollbars.
   useConsoleTheme();
-  const q = useGetPublicProductCatalog({ query: { refetchInterval: 30000, refetchOnWindowFocus: true, staleTime: 15000 } as never });
+  const q = useGetPublicProductCatalog({ query: { refetchInterval: 5000, refetchOnWindowFocus: true, staleTime: 0 } as never });
   const [openKey, setOpenKey] = useState<string | null>(null);
   const items = useMemo(() => [...(q.data ?? [])].sort((a, b) => a.displayOrder - b.displayOrder), [q.data]);
   const open = items.find((p) => p.key === openKey) ?? null;
@@ -34,7 +34,7 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
     <footer className="s-footer relative z-[2] mt-10 border-t" style={{ borderColor: 'var(--s-line)', background: 'var(--s-bg2)' }}>
       <div className="s-wrap flex flex-col gap-1 py-6 text-xs s-muted sm:flex-row sm:justify-between">
         <span className="flex items-center gap-2"><BrandLogo size={24} />VYNOX LAYER · <a href="/private-label-website/novax-live-demo" data-testid="link-live-demo" className="underline">Live Demo (sandbox)</a></span>
-        <span className="s-mono uppercase tracking-widest">Sandbox environment - account requests are not purchases - no live finance</span>
+        <span className="s-mono uppercase tracking-widest">Exchange Sandbox · White Label purchases require approved prices and verified payment</span>
       </div>
     </footer>
   );

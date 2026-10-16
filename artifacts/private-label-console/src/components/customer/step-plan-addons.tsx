@@ -2,7 +2,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ErrorState, ListSkeleton, EmptyState } from '@/components/app/bits';
 import type { Catalog } from '@/lib/wl';
 import { ACTS, type StepProps } from './configure-state';
-import { Entitlements, PriceLine } from './plan-bits';
+import { Entitlements, PriceLine, planPeriods } from './plan-bits';
 
 type Q = { data?: Catalog; isLoading: boolean; isError: boolean; refetch: () => unknown };
 
@@ -17,12 +17,12 @@ export function FeaturesStep({ cfg, set }: StepProps) {
 export function PlanStep({ cfg, set, cat }: StepProps & { cat: Q }) {
   if (cat.isLoading) return <ListSkeleton rows={3} />;
   if (cat.isError || !cat.data) return <ErrorState what="the plan catalog" onRetry={() => cat.refetch()} />;
-  const { plans, definitions } = cat.data;
+  const { plans, definitions } = cat.data; const avail = planPeriods(plans.find((x) => x.id === cfg.planId));
   if (!plans.length) return <EmptyState title="No plans available" body="No Exchange plan is currently open for ordering." />;
   return (
     <div className="space-y-5">
       <div className="inline-flex gap-1 rounded-md border p-1 text-sm" role="group" aria-label="Billing period">
-        {(['monthly', 'yearly'] as const).map((p) => <button type="button" key={p} data-testid={`period-${p}`} aria-pressed={cfg.period === p} onClick={() => set({ period: p })} className={`rounded px-4 py-1 capitalize ${cfg.period === p ? 'bg-primary text-primary-foreground' : ''}`}>{p}</button>)}
+        {(['monthly', 'yearly'] as const).map((p) => <button type="button" key={p} data-testid={`period-${p}`} aria-pressed={cfg.period === p} disabled={!avail.includes(p)} title={avail.includes(p) ? undefined : 'Not available for this plan'} onClick={() => set({ period: p })} className={`rounded px-4 py-1 capitalize ${cfg.period === p ? 'bg-primary text-primary-foreground' : ''} disabled:cursor-not-allowed disabled:opacity-40`}>{p}</button>)}
       </div>
       <div role="radiogroup" aria-label="Plan" className="grid gap-3 md:grid-cols-2">
         {plans.map((p) => (

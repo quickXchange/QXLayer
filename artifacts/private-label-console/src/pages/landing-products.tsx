@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { Pencil, RefreshCw } from 'lucide-react';
 import {
@@ -22,10 +23,11 @@ const PRICE = /^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$/;
 
 const toForm = (p: LandingProduct): Form => ({ visible: p.visible, name: p.name, description: p.description, icon: p.icon, startingPrice: p.startingPrice ?? '', setupFee: p.setupFee ?? '', currency: p.currency, billingPeriod: p.billingPeriod, status: p.status, ctaLabel: p.ctaLabel, displayOrder: String(p.displayOrder) });
 
-function validate(f: Form) {
+function validate(f: Form, managed = false) {
   const e: Partial<Record<keyof Form, string>> = {};
   if (f.name.trim().length < 2 || f.name.length > 100) e.name = 'Name must be 2 to 100 characters.';
   if (f.description.trim().length < 10 || f.description.length > 500) e.description = 'Description must be 10 to 500 characters.';
+  if (managed) return e;
   if (f.startingPrice !== '' && !PRICE.test(f.startingPrice)) e.startingPrice = 'Use a number with up to 2 decimals, or leave empty for pricing on request.';
   if (f.setupFee !== '' && !PRICE.test(f.setupFee)) e.setupFee = 'Use a number with up to 2 decimals, or leave empty.';
   if (!/^[A-Z]{3}$/.test(f.currency)) e.currency = 'Three uppercase letters, for example USD.';
@@ -45,16 +47,15 @@ function EditDialog({ product, onClose }: { product: LandingProduct; onClose: ()
   const [f, setF] = useState<Form>(() => toForm(product));
   const [errs, setErrs] = useState<Partial<Record<keyof Form, string>>>({});
   const [serverErr, setServerErr] = useState<string | null>(null);
-  const m = useUpdateLandingProduct();
+  const m = useUpdateLandingProduct(); const managed = product.key === 'crypto_exchange';
   const set = <K extends keyof Form>(k: K, v: Form[K]) => setF((c) => ({ ...c, [k]: v }));
 
   const save = () => {
-    const e = validate(f); setErrs(e); setServerErr(null);
+    const e = validate(f, managed); setErrs(e); setServerErr(null);
     if (Object.keys(e).length) return;
     const data = {
       visible: f.visible, name: f.name.trim(), description: f.description.trim(), icon: f.icon,
-      startingPrice: f.startingPrice === '' ? null : f.startingPrice, setupFee: f.setupFee === '' ? null : f.setupFee,
-      currency: f.currency, billingPeriod: f.billingPeriod, status: f.status, ctaLabel: f.ctaLabel.trim(), displayOrder: Number(f.displayOrder),
+      ...(managed ? { startingPrice: product.startingPrice, setupFee: product.setupFee, currency: product.currency, billingPeriod: product.billingPeriod } : { startingPrice: f.startingPrice === '' ? null : f.startingPrice, setupFee: f.setupFee === '' ? null : f.setupFee, currency: f.currency, billingPeriod: f.billingPeriod }), status: f.status, ctaLabel: f.ctaLabel.trim(), displayOrder: Number(f.displayOrder),
     } as LandingProductInput;
     m.mutate({ productKey: product.key, data }, {
       onSuccess: () => {
@@ -76,10 +77,11 @@ function EditDialog({ product, onClose }: { product: LandingProduct; onClose: ()
           <Field label="Name" id="lp-name" error={errs.name}><Input id="lp-name" value={f.name} onChange={(e) => set('name', e.target.value)} data-testid="input-name" /></Field>
           <Field label="Icon" id="lp-icon"><Select value={f.icon} onValueChange={(v) => set('icon', v)}><SelectTrigger id="lp-icon" data-testid="select-icon"><SelectValue /></SelectTrigger><SelectContent>{ICON_KEYS.map((k) => <SelectItem key={k} value={k}>{k}</SelectItem>)}</SelectContent></Select></Field>
           <div className="sm:col-span-2"><Field label="Description" id="lp-desc" error={errs.description}><Textarea id="lp-desc" rows={4} value={f.description} onChange={(e) => set('description', e.target.value)} data-testid="input-description" /><p className="text-right text-xs text-muted-foreground">{f.description.length}/500</p></Field></div>
-          <Field label="Starting price (empty = pricing on request)" id="lp-price" error={errs.startingPrice}><Input id="lp-price" inputMode="decimal" value={f.startingPrice} onChange={(e) => set('startingPrice', e.target.value)} data-testid="input-price" /></Field>
-          <Field label="Setup fee (optional)" id="lp-setup" error={errs.setupFee}><Input id="lp-setup" inputMode="decimal" value={f.setupFee} onChange={(e) => set('setupFee', e.target.value)} data-testid="input-setup-fee" /></Field>
-          <Field label="Currency" id="lp-cur" error={errs.currency}><Input id="lp-cur" maxLength={3} value={f.currency} onChange={(e) => set('currency', e.target.value.toUpperCase())} data-testid="input-currency" /></Field>
-          <Field label="Billing period" id="lp-bill"><Select value={f.billingPeriod} onValueChange={(v) => set('billingPeriod', v)}><SelectTrigger id="lp-bill" data-testid="select-billing"><SelectValue /></SelectTrigger><SelectContent>{[['monthly', 'Monthly'], ['yearly', 'Yearly'], ['one_time', 'One-time'], ['on_request', 'On request']].map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent></Select></Field>
+          {managed && <p className="rounded-md border bg-muted/40 p-3 text-sm sm:col-span-2" data-testid="text-price-managed">Managed in Plans. Price, setup fee, currency and billing period for this product come from approved plans. <Link href="/plans" className="text-copper underline">Open Plans</Link></p>}
+          {!managed && <Field label="Starting price (empty = pricing on request)" id="lp-price" error={errs.startingPrice}><Input id="lp-price" inputMode="decimal" value={f.startingPrice} onChange={(e) => set('startingPrice', e.target.value)} data-testid="input-price" /></Field>}
+          {!managed && <Field label="Setup fee (optional)" id="lp-setup" error={errs.setupFee}><Input id="lp-setup" inputMode="decimal" value={f.setupFee} onChange={(e) => set('setupFee', e.target.value)} data-testid="input-setup-fee" /></Field>}
+          {!managed && <Field label="Currency" id="lp-cur" error={errs.currency}><Input id="lp-cur" maxLength={3} value={f.currency} onChange={(e) => set('currency', e.target.value.toUpperCase())} data-testid="input-currency" /></Field>}
+          {!managed && <Field label="Billing period" id="lp-bill"><Select value={f.billingPeriod} onValueChange={(v) => set('billingPeriod', v)}><SelectTrigger id="lp-bill" data-testid="select-billing"><SelectValue /></SelectTrigger><SelectContent>{[['monthly', 'Monthly'], ['yearly', 'Yearly'], ['one_time', 'One-time'], ['on_request', 'On request']].map(([v, l]) => <SelectItem key={v} value={v}>{l}</SelectItem>)}</SelectContent></Select></Field>}
           <Field label="Status" id="lp-status"><Select value={f.status} onValueChange={(v) => set('status', v)}><SelectTrigger id="lp-status" data-testid="select-status"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="available">Available</SelectItem><SelectItem value="coming_soon">Coming soon</SelectItem></SelectContent></Select></Field>
           <Field label="CTA label" id="lp-cta" error={errs.ctaLabel}><Input id="lp-cta" value={f.ctaLabel} onChange={(e) => set('ctaLabel', e.target.value)} data-testid="input-cta" /></Field>
           <Field label="Display order" id="lp-order" error={errs.displayOrder}><Input id="lp-order" inputMode="numeric" value={f.displayOrder} onChange={(e) => set('displayOrder', e.target.value)} data-testid="input-order" /></Field>

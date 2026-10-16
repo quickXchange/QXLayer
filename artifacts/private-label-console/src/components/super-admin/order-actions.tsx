@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { applyOrderResponse } from '@/lib/order-cache';
 import { Link } from 'wouter';
 import { useListTenants, useReviewWhiteLabelRequest, type WhiteLabelStatus } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
@@ -22,6 +24,7 @@ export function orderActions(o: WlOrder): Act[] {
 
 /** Quick lifecycle actions. Same review mutation and payload as the Review form, built from saved order values. */
 export function OrderActions({ o, onDone, onDeliver }: { o: WlOrder; onDone: () => void; onDeliver?: () => void }) {
+  const cache = useQueryClient();
   const m = useReviewWhiteLabelRequest(); const tq = useListTenants(); const { toast } = useToast();
   const tenant = o.tenantId ? (tq.data ?? []).find((t) => t.id === o.tenantId) : undefined;
   const previewOk = !!tenant && ['draft', 'active'].includes(tenant.status) && ['approved', 'in_setup', 'customization', 'ready'].includes(o.status);
@@ -35,7 +38,7 @@ export function OrderActions({ o, onDone, onDeliver }: { o: WlOrder; onDone: () 
       status: act.to as WhiteLabelStatus, monthlyPrice: o.monthlyPrice ?? null, setupPrice: o.setupPrice ?? null, currency: (o.currency ?? 'USD').toUpperCase(), operatorNote: '',
       customizationPrice: o.customizationPrice ?? null, approvedPlanId: (o.approvedPlan?.id ?? o.requestedPlan?.id) || null,
       approvedAddonIds: (o.approvedAddons ?? o.requestedAddons ?? []).map((a) => a.id), customDesignDecision: o.customDesignDecision ?? 'pending',
-    } }, { onSuccess: () => { setAct(null); toast({ title: `${act.label} applied` }); onDone(); }, onError: (e) => { setErr(errMsg(e)); toast({ title: `${act.label} failed`, description: errMsg(e), variant: 'destructive' }); } });
+    } }, { onSuccess: async (response) => { applyOrderResponse(cache, o.id, response); setAct(null); await onDone(); toast({ title: `${act.label} applied` }); }, onError: (e) => { setErr(errMsg(e)); toast({ title: `${act.label} failed`, description: errMsg(e), variant: 'destructive' }); } });
   };
   return (
     <div className="space-y-2" data-testid="order-actions">

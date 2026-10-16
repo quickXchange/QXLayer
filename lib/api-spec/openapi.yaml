@@ -17,6 +17,34 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /phase1/catalog:
+    $ref: './phase1-commerce.yaml#/paths/~1phase1~1catalog'
+  /operator/phase1/methods:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1methods'
+  /operator/phase1/methods/{id}:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1methods~1{id}'
+  /customer/phase1/orders/{id}:
+    $ref: './phase1-commerce.yaml#/paths/~1customer~1phase1~1orders~1{id}'
+  /operator/phase1/orders/{id}:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1orders~1{id}'
+  /customer/phase1/orders/{id}/checkout:
+    $ref: './phase1-commerce.yaml#/paths/~1customer~1phase1~1orders~1{id}~1checkout'
+  /customer/phase1/orders/{id}/report:
+    $ref: './phase1-commerce.yaml#/paths/~1customer~1phase1~1orders~1{id}~1report'
+  /operator/phase1/invoices/{id}/confirm:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1invoices~1{id}~1confirm'
+  /operator/phase1/invoices/{id}/reject:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1invoices~1{id}~1reject'
+  /operator/phase1/emails:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1emails'
+  /operator/phase1/emails/{id}/retry:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1emails~1{id}~1retry'
+  /operator/phase1/proposals:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1proposals'
+  /operator/phase1/proposals/{kind}/{id}/approve:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1proposals~1{kind}~1{id}~1approve'
+  /operator/phase1/plans/{id}/periods:
+    $ref: './phase1-commerce.yaml#/paths/~1operator~1phase1~1plans~1{id}~1periods'
   /supabase-auth/status:
     $ref: './supabase-auth.yaml#/paths/~1supabase-auth~1status'
   /supabase-auth/session:
@@ -2206,6 +2234,7 @@ components:
             createdAt: {type: string, format: date-time}
             updatedAt: {type: string, format: date-time}
             pricingConfigured: {type: boolean}
+            billingPeriods: {type: array, items: {type: string, enum: [monthly, yearly]}}
           required: [id, createdAt, updatedAt]
     PlanStatusInput:
       type: object

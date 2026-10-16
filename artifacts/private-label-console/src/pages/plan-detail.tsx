@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCan } from '@/lib/principal';
 import { useInvalidateCatalog } from '@/lib/invalidate';
+import { PeriodsEditor } from '@/components/commerce/periods-editor';
 import { useToast } from '@/hooks/use-toast';
 
 const MONEY = /^[0-9]+(?:\.[0-9]{1,2})?$/;
@@ -97,6 +98,7 @@ export default function PlanDetail() {
             <Button type="submit" data-testid="button-save-plan" disabled={!!err || create.isPending || update.isPending}>{create.isPending || update.isPending ? 'Saving' : id ? 'Save plan' : 'Create plan'}</Button>
           </div>
         </form>)}
+      {id && plan.data && <div className="mt-6 max-w-3xl"><PeriodsEditor planId={id} plan={plan.data} /></div>}
       <ReviewDialog open={delOpen} onClose={() => setDelOpen(false)} title="delete plan" destructive applyLabel="Delete plan" pending={del.isPending} error={delErr}
         onApply={() => del.mutate({ planId: id }, { onSuccess: () => { setDelOpen(false); qc.removeQueries({ queryKey: getGetPlanQueryKey(id) }); qc.invalidateQueries({ queryKey: getListPlansQueryKey() }); inv(); toast({ title: 'Plan deleted' }); nav('/plans'); }, onError: (e) => setDelErr(`${(e as Error).message}. A plan assigned to a project or referenced by an order cannot be deleted; disable or archive it to stop new offers.`) })}
         rows={[['Plan', f.name], ['Rule', 'Refused if assigned to any project or referenced by any order'], ['Alternative', 'Disable or archive to stop offering it']]} />

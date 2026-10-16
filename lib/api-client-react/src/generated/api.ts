@@ -23,6 +23,7 @@ import type {
   ActivityEvent,
   Addon,
   AddonInput,
+  ApprovePlatformPriceProposal200,
   AssetNetworkCatalog,
   AssetsNetworksInput,
   BrandInput,
@@ -30,6 +31,7 @@ import type {
   CurrentPrincipal,
   CustomerAdminPanel,
   CustomerNotifications,
+  DeletePhase1Method200,
   DemoLaunchInput,
   DemoSession,
   DomainInput,
@@ -53,20 +55,32 @@ import type {
   ExchangeStatusInput,
   ExchangeVisualCatalog,
   GetDomainHostingProof200,
+  GetPhase1Catalog200,
   HealthStatus,
   IntegrationRuntimeBundle,
   LandingProduct,
   LandingProductInput,
   ListExchangeAuditParams,
   ListExchangeOrdersParams,
+  ListPlatformPriceProposals200Item,
   ModuleDefinition,
   MutationStatus,
   NotificationReadInput,
   Plan,
   PlanInput,
   PlanStatusInput,
+  PlatformApprovalInput,
+  PlatformBillingPeriods,
+  PlatformCheckoutInput,
+  PlatformEmail,
   PlatformManagement,
+  PlatformMethodInput,
+  PlatformOrderBilling,
   PlatformOverview,
+  PlatformPaymentMethod,
+  PlatformReferenceInput,
+  PlatformRejectionInput,
+  PlatformSettlementInput,
   ProductConfiguration,
   ProductModule,
   ProviderAssignment,
@@ -84,6 +98,7 @@ import type {
   ResourceCreated,
   ResourceInput,
   ResourceItem,
+  RetryPlatformEmail200,
   SaveTenantIntegrationInput,
   StaffPermissions,
   SubscriptionAddonInput,
@@ -143,6 +158,1304 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetPhase1CatalogUrl = () => {
+
+
+
+
+  return `/api/phase1/catalog`
+}
+
+export const getPhase1Catalog = async ( options?: Parameters<typeof customFetch>[1]): Promise<GetPhase1Catalog200> => {
+
+  return customFetch<GetPhase1Catalog200>(getGetPhase1CatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPhase1CatalogQueryKey = () => {
+    return [
+    `/api/phase1/catalog`
+    ] as const;
+    }
+
+
+export const getGetPhase1CatalogQueryOptions = <TData = Awaited<ReturnType<typeof getPhase1Catalog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPhase1Catalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPhase1CatalogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPhase1Catalog>>> = ({ signal }) => getPhase1Catalog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPhase1Catalog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPhase1CatalogQueryResult = NonNullable<Awaited<ReturnType<typeof getPhase1Catalog>>>
+export type GetPhase1CatalogQueryError = ErrorType<unknown>
+
+
+
+export function useGetPhase1Catalog<TData = Awaited<ReturnType<typeof getPhase1Catalog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPhase1Catalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPhase1CatalogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListPhase1MethodsUrl = () => {
+
+
+
+
+  return `/api/operator/phase1/methods`
+}
+
+export const listPhase1Methods = async ( options?: Parameters<typeof customFetch>[1]): Promise<PlatformPaymentMethod[]> => {
+
+  return customFetch<PlatformPaymentMethod[]>(getListPhase1MethodsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPhase1MethodsQueryKey = () => {
+    return [
+    `/api/operator/phase1/methods`
+    ] as const;
+    }
+
+
+export const getListPhase1MethodsQueryOptions = <TData = Awaited<ReturnType<typeof listPhase1Methods>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPhase1Methods>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPhase1MethodsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPhase1Methods>>> = ({ signal }) => listPhase1Methods({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPhase1Methods>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPhase1MethodsQueryResult = NonNullable<Awaited<ReturnType<typeof listPhase1Methods>>>
+export type ListPhase1MethodsQueryError = ErrorType<unknown>
+
+
+
+export function useListPhase1Methods<TData = Awaited<ReturnType<typeof listPhase1Methods>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPhase1Methods>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPhase1MethodsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreatePhase1MethodUrl = () => {
+
+
+
+
+  return `/api/operator/phase1/methods`
+}
+
+export const createPhase1Method = async (platformMethodInput: PlatformMethodInput, options?: Parameters<typeof customFetch>[1]): Promise<PlatformPaymentMethod> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PlatformPaymentMethod>(getCreatePhase1MethodUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformMethodInput)
+  }
+);}
+
+
+
+
+
+export const getCreatePhase1MethodMutationKey = () => ['createPhase1Method'] as const;
+
+export const getCreatePhase1MethodMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPhase1Method>>, TError,CreatePhase1MethodMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPhase1Method>>, TError,CreatePhase1MethodMutationVariables, TContext> => {
+
+const mutationKey = getCreatePhase1MethodMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPhase1Method>>, CreatePhase1MethodMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  createPhase1Method(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreatePhase1MethodMutationResult = NonNullable<Awaited<ReturnType<typeof createPhase1Method>>>
+    export type CreatePhase1MethodMutationBody = BodyType<PlatformMethodInput>
+    export type CreatePhase1MethodMutationError = ErrorType<unknown>
+    export type CreatePhase1MethodMutationVariables = {data: BodyType<PlatformMethodInput>}
+
+    export const useCreatePhase1Method = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPhase1Method>>, TError,CreatePhase1MethodMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createPhase1Method>>,
+        TError,
+        CreatePhase1MethodMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreatePhase1MethodMutationOptions(options));
+    }
+
+export const getUpdatePhase1MethodUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/methods/${id}`
+}
+
+export const updatePhase1Method = async (id: string,
+    platformMethodInput: PlatformMethodInput, options?: Parameters<typeof customFetch>[1]): Promise<PlatformPaymentMethod> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PlatformPaymentMethod>(getUpdatePhase1MethodUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformMethodInput)
+  }
+);}
+
+
+
+
+
+export const getUpdatePhase1MethodMutationKey = () => ['updatePhase1Method'] as const;
+
+export const getUpdatePhase1MethodMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePhase1Method>>, TError,UpdatePhase1MethodMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePhase1Method>>, TError,UpdatePhase1MethodMutationVariables, TContext> => {
+
+const mutationKey = getUpdatePhase1MethodMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePhase1Method>>, UpdatePhase1MethodMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updatePhase1Method(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePhase1MethodMutationResult = NonNullable<Awaited<ReturnType<typeof updatePhase1Method>>>
+    export type UpdatePhase1MethodMutationBody = BodyType<PlatformMethodInput>
+    export type UpdatePhase1MethodMutationError = ErrorType<unknown>
+    export type UpdatePhase1MethodMutationVariables = {id: string;data: BodyType<PlatformMethodInput>}
+
+    export const useUpdatePhase1Method = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePhase1Method>>, TError,UpdatePhase1MethodMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updatePhase1Method>>,
+        TError,
+        UpdatePhase1MethodMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdatePhase1MethodMutationOptions(options));
+    }
+
+export const getDeletePhase1MethodUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/methods/${id}`
+}
+
+export const deletePhase1Method = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<DeletePhase1Method200> => {
+
+  return customFetch<DeletePhase1Method200>(getDeletePhase1MethodUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeletePhase1MethodMutationKey = () => ['deletePhase1Method'] as const;
+
+export const getDeletePhase1MethodMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePhase1Method>>, TError,DeletePhase1MethodMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePhase1Method>>, TError,DeletePhase1MethodMutationVariables, TContext> => {
+
+const mutationKey = getDeletePhase1MethodMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePhase1Method>>, DeletePhase1MethodMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deletePhase1Method(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePhase1MethodMutationResult = NonNullable<Awaited<ReturnType<typeof deletePhase1Method>>>
+
+    export type DeletePhase1MethodMutationError = ErrorType<unknown>
+    export type DeletePhase1MethodMutationVariables = {id: string}
+
+    export const useDeletePhase1Method = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePhase1Method>>, TError,DeletePhase1MethodMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deletePhase1Method>>,
+        TError,
+        DeletePhase1MethodMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeletePhase1MethodMutationOptions(options));
+    }
+
+export const getGetCustomerOrderBillingUrl = (id: string,) => {
+
+
+
+
+  return `/api/customer/phase1/orders/${id}`
+}
+
+export const getCustomerOrderBilling = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PlatformOrderBilling> => {
+
+  return customFetch<PlatformOrderBilling>(getGetCustomerOrderBillingUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCustomerOrderBillingQueryKey = (id: string,) => {
+    return [
+    `/api/customer/phase1/orders/${id}`
+    ] as const;
+    }
+
+
+export const getGetCustomerOrderBillingQueryOptions = <TData = Awaited<ReturnType<typeof getCustomerOrderBilling>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCustomerOrderBilling>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCustomerOrderBillingQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCustomerOrderBilling>>> = ({ signal }) => getCustomerOrderBilling(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCustomerOrderBilling>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCustomerOrderBillingQueryResult = NonNullable<Awaited<ReturnType<typeof getCustomerOrderBilling>>>
+export type GetCustomerOrderBillingQueryError = ErrorType<unknown>
+
+
+
+export function useGetCustomerOrderBilling<TData = Awaited<ReturnType<typeof getCustomerOrderBilling>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCustomerOrderBilling>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCustomerOrderBillingQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetOperatorOrderBillingUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/orders/${id}`
+}
+
+export const getOperatorOrderBilling = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PlatformOrderBilling> => {
+
+  return customFetch<PlatformOrderBilling>(getGetOperatorOrderBillingUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOperatorOrderBillingQueryKey = (id: string,) => {
+    return [
+    `/api/operator/phase1/orders/${id}`
+    ] as const;
+    }
+
+
+export const getGetOperatorOrderBillingQueryOptions = <TData = Awaited<ReturnType<typeof getOperatorOrderBilling>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOperatorOrderBilling>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOperatorOrderBillingQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOperatorOrderBilling>>> = ({ signal }) => getOperatorOrderBilling(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOperatorOrderBilling>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOperatorOrderBillingQueryResult = NonNullable<Awaited<ReturnType<typeof getOperatorOrderBilling>>>
+export type GetOperatorOrderBillingQueryError = ErrorType<unknown>
+
+
+
+export function useGetOperatorOrderBilling<TData = Awaited<ReturnType<typeof getOperatorOrderBilling>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOperatorOrderBilling>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOperatorOrderBillingQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreatePlatformInvoiceUrl = (id: string,) => {
+
+
+
+
+  return `/api/customer/phase1/orders/${id}/checkout`
+}
+
+export const createPlatformInvoice = async (id: string,
+    platformCheckoutInput: PlatformCheckoutInput, options?: Parameters<typeof customFetch>[1]): Promise<PlatformOrderBilling> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PlatformOrderBilling>(getCreatePlatformInvoiceUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformCheckoutInput)
+  }
+);}
+
+
+
+
+
+export const getCreatePlatformInvoiceMutationKey = () => ['createPlatformInvoice'] as const;
+
+export const getCreatePlatformInvoiceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlatformInvoice>>, TError,CreatePlatformInvoiceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPlatformInvoice>>, TError,CreatePlatformInvoiceMutationVariables, TContext> => {
+
+const mutationKey = getCreatePlatformInvoiceMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPlatformInvoice>>, CreatePlatformInvoiceMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createPlatformInvoice(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreatePlatformInvoiceMutationResult = NonNullable<Awaited<ReturnType<typeof createPlatformInvoice>>>
+    export type CreatePlatformInvoiceMutationBody = BodyType<PlatformCheckoutInput>
+    export type CreatePlatformInvoiceMutationError = ErrorType<unknown>
+    export type CreatePlatformInvoiceMutationVariables = {id: string;data: BodyType<PlatformCheckoutInput>}
+
+    export const useCreatePlatformInvoice = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlatformInvoice>>, TError,CreatePlatformInvoiceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createPlatformInvoice>>,
+        TError,
+        CreatePlatformInvoiceMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCreatePlatformInvoiceMutationOptions(options));
+    }
+
+export const getReportPlatformPaymentUrl = (id: string,) => {
+
+
+
+
+  return `/api/customer/phase1/orders/${id}/report`
+}
+
+export const reportPlatformPayment = async (id: string,
+    platformReferenceInput: PlatformReferenceInput, options?: Parameters<typeof customFetch>[1]): Promise<PlatformOrderBilling> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PlatformOrderBilling>(getReportPlatformPaymentUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformReferenceInput)
+  }
+);}
+
+
+
+
+
+export const getReportPlatformPaymentMutationKey = () => ['reportPlatformPayment'] as const;
+
+export const getReportPlatformPaymentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportPlatformPayment>>, TError,ReportPlatformPaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reportPlatformPayment>>, TError,ReportPlatformPaymentMutationVariables, TContext> => {
+
+const mutationKey = getReportPlatformPaymentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportPlatformPayment>>, ReportPlatformPaymentMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  reportPlatformPayment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReportPlatformPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof reportPlatformPayment>>>
+    export type ReportPlatformPaymentMutationBody = BodyType<PlatformReferenceInput>
+    export type ReportPlatformPaymentMutationError = ErrorType<unknown>
+    export type ReportPlatformPaymentMutationVariables = {id: string;data: BodyType<PlatformReferenceInput>}
+
+    export const useReportPlatformPayment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportPlatformPayment>>, TError,ReportPlatformPaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reportPlatformPayment>>,
+        TError,
+        ReportPlatformPaymentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getReportPlatformPaymentMutationOptions(options));
+    }
+
+export const getConfirmPlatformPaymentUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/invoices/${id}/confirm`
+}
+
+export const confirmPlatformPayment = async (id: string,
+    platformSettlementInput: PlatformSettlementInput, options?: Parameters<typeof customFetch>[1]): Promise<PlatformOrderBilling> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PlatformOrderBilling>(getConfirmPlatformPaymentUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformSettlementInput)
+  }
+);}
+
+
+
+
+
+export const getConfirmPlatformPaymentMutationKey = () => ['confirmPlatformPayment'] as const;
+
+export const getConfirmPlatformPaymentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmPlatformPayment>>, TError,ConfirmPlatformPaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmPlatformPayment>>, TError,ConfirmPlatformPaymentMutationVariables, TContext> => {
+
+const mutationKey = getConfirmPlatformPaymentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmPlatformPayment>>, ConfirmPlatformPaymentMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  confirmPlatformPayment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmPlatformPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof confirmPlatformPayment>>>
+    export type ConfirmPlatformPaymentMutationBody = BodyType<PlatformSettlementInput>
+    export type ConfirmPlatformPaymentMutationError = ErrorType<unknown>
+    export type ConfirmPlatformPaymentMutationVariables = {id: string;data: BodyType<PlatformSettlementInput>}
+
+    export const useConfirmPlatformPayment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmPlatformPayment>>, TError,ConfirmPlatformPaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof confirmPlatformPayment>>,
+        TError,
+        ConfirmPlatformPaymentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getConfirmPlatformPaymentMutationOptions(options));
+    }
+
+export const getRejectPlatformPaymentUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/invoices/${id}/reject`
+}
+
+export const rejectPlatformPayment = async (id: string,
+    platformRejectionInput: PlatformRejectionInput, options?: Parameters<typeof customFetch>[1]): Promise<PlatformOrderBilling> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PlatformOrderBilling>(getRejectPlatformPaymentUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformRejectionInput)
+  }
+);}
+
+
+
+
+
+export const getRejectPlatformPaymentMutationKey = () => ['rejectPlatformPayment'] as const;
+
+export const getRejectPlatformPaymentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectPlatformPayment>>, TError,RejectPlatformPaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectPlatformPayment>>, TError,RejectPlatformPaymentMutationVariables, TContext> => {
+
+const mutationKey = getRejectPlatformPaymentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectPlatformPayment>>, RejectPlatformPaymentMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  rejectPlatformPayment(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RejectPlatformPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof rejectPlatformPayment>>>
+    export type RejectPlatformPaymentMutationBody = BodyType<PlatformRejectionInput>
+    export type RejectPlatformPaymentMutationError = ErrorType<unknown>
+    export type RejectPlatformPaymentMutationVariables = {id: string;data: BodyType<PlatformRejectionInput>}
+
+    export const useRejectPlatformPayment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectPlatformPayment>>, TError,RejectPlatformPaymentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rejectPlatformPayment>>,
+        TError,
+        RejectPlatformPaymentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRejectPlatformPaymentMutationOptions(options));
+    }
+
+export const getListPlatformEmailsUrl = () => {
+
+
+
+
+  return `/api/operator/phase1/emails`
+}
+
+export const listPlatformEmails = async ( options?: Parameters<typeof customFetch>[1]): Promise<PlatformEmail[]> => {
+
+  return customFetch<PlatformEmail[]>(getListPlatformEmailsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPlatformEmailsQueryKey = () => {
+    return [
+    `/api/operator/phase1/emails`
+    ] as const;
+    }
+
+
+export const getListPlatformEmailsQueryOptions = <TData = Awaited<ReturnType<typeof listPlatformEmails>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPlatformEmails>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPlatformEmailsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlatformEmails>>> = ({ signal }) => listPlatformEmails({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPlatformEmails>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPlatformEmailsQueryResult = NonNullable<Awaited<ReturnType<typeof listPlatformEmails>>>
+export type ListPlatformEmailsQueryError = ErrorType<unknown>
+
+
+
+export function useListPlatformEmails<TData = Awaited<ReturnType<typeof listPlatformEmails>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPlatformEmails>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPlatformEmailsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRetryPlatformEmailUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/emails/${id}/retry`
+}
+
+export const retryPlatformEmail = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<RetryPlatformEmail200> => {
+
+  return customFetch<RetryPlatformEmail200>(getRetryPlatformEmailUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRetryPlatformEmailMutationKey = () => ['retryPlatformEmail'] as const;
+
+export const getRetryPlatformEmailMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryPlatformEmail>>, TError,RetryPlatformEmailMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof retryPlatformEmail>>, TError,RetryPlatformEmailMutationVariables, TContext> => {
+
+const mutationKey = getRetryPlatformEmailMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof retryPlatformEmail>>, RetryPlatformEmailMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  retryPlatformEmail(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RetryPlatformEmailMutationResult = NonNullable<Awaited<ReturnType<typeof retryPlatformEmail>>>
+
+    export type RetryPlatformEmailMutationError = ErrorType<unknown>
+    export type RetryPlatformEmailMutationVariables = {id: string}
+
+    export const useRetryPlatformEmail = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof retryPlatformEmail>>, TError,RetryPlatformEmailMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof retryPlatformEmail>>,
+        TError,
+        RetryPlatformEmailMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRetryPlatformEmailMutationOptions(options));
+    }
+
+export const getListPlatformPriceProposalsUrl = () => {
+
+
+
+
+  return `/api/operator/phase1/proposals`
+}
+
+export const listPlatformPriceProposals = async ( options?: Parameters<typeof customFetch>[1]): Promise<ListPlatformPriceProposals200Item[]> => {
+
+  return customFetch<ListPlatformPriceProposals200Item[]>(getListPlatformPriceProposalsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPlatformPriceProposalsQueryKey = () => {
+    return [
+    `/api/operator/phase1/proposals`
+    ] as const;
+    }
+
+
+export const getListPlatformPriceProposalsQueryOptions = <TData = Awaited<ReturnType<typeof listPlatformPriceProposals>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPlatformPriceProposals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPlatformPriceProposalsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlatformPriceProposals>>> = ({ signal }) => listPlatformPriceProposals({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPlatformPriceProposals>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPlatformPriceProposalsQueryResult = NonNullable<Awaited<ReturnType<typeof listPlatformPriceProposals>>>
+export type ListPlatformPriceProposalsQueryError = ErrorType<unknown>
+
+
+
+export function useListPlatformPriceProposals<TData = Awaited<ReturnType<typeof listPlatformPriceProposals>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPlatformPriceProposals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPlatformPriceProposalsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getApprovePlatformPriceProposalUrl = (kind: 'plan' | 'addon',
+    id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/proposals/${kind}/${id}/approve`
+}
+
+export const approvePlatformPriceProposal = async (kind: 'plan' | 'addon',
+    id: string,
+    platformApprovalInput: PlatformApprovalInput, options?: Parameters<typeof customFetch>[1]): Promise<ApprovePlatformPriceProposal200> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ApprovePlatformPriceProposal200>(getApprovePlatformPriceProposalUrl(kind,id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformApprovalInput)
+  }
+);}
+
+
+
+
+
+export const getApprovePlatformPriceProposalMutationKey = () => ['approvePlatformPriceProposal'] as const;
+
+export const getApprovePlatformPriceProposalMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approvePlatformPriceProposal>>, TError,ApprovePlatformPriceProposalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof approvePlatformPriceProposal>>, TError,ApprovePlatformPriceProposalMutationVariables, TContext> => {
+
+const mutationKey = getApprovePlatformPriceProposalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof approvePlatformPriceProposal>>, ApprovePlatformPriceProposalMutationVariables> = (props) => {
+          const {kind,id,data} = props ?? {};
+
+          return  approvePlatformPriceProposal(kind,id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ApprovePlatformPriceProposalMutationResult = NonNullable<Awaited<ReturnType<typeof approvePlatformPriceProposal>>>
+    export type ApprovePlatformPriceProposalMutationBody = BodyType<PlatformApprovalInput>
+    export type ApprovePlatformPriceProposalMutationError = ErrorType<unknown>
+    export type ApprovePlatformPriceProposalMutationVariables = {kind: 'plan' | 'addon';id: string;data: BodyType<PlatformApprovalInput>}
+
+    export const useApprovePlatformPriceProposal = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof approvePlatformPriceProposal>>, TError,ApprovePlatformPriceProposalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof approvePlatformPriceProposal>>,
+        TError,
+        ApprovePlatformPriceProposalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getApprovePlatformPriceProposalMutationOptions(options));
+    }
+
+export const getGetPlatformBillingPeriodsUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/plans/${id}/periods`
+}
+
+export const getPlatformBillingPeriods = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<PlatformBillingPeriods> => {
+
+  return customFetch<PlatformBillingPeriods>(getGetPlatformBillingPeriodsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlatformBillingPeriodsQueryKey = (id: string,) => {
+    return [
+    `/api/operator/phase1/plans/${id}/periods`
+    ] as const;
+    }
+
+
+export const getGetPlatformBillingPeriodsQueryOptions = <TData = Awaited<ReturnType<typeof getPlatformBillingPeriods>>, TError = ErrorType<unknown>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlatformBillingPeriods>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlatformBillingPeriodsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlatformBillingPeriods>>> = ({ signal }) => getPlatformBillingPeriods(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlatformBillingPeriods>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPlatformBillingPeriodsQueryResult = NonNullable<Awaited<ReturnType<typeof getPlatformBillingPeriods>>>
+export type GetPlatformBillingPeriodsQueryError = ErrorType<unknown>
+
+
+
+export function useGetPlatformBillingPeriods<TData = Awaited<ReturnType<typeof getPlatformBillingPeriods>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlatformBillingPeriods>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPlatformBillingPeriodsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdatePlatformBillingPeriodsUrl = (id: string,) => {
+
+
+
+
+  return `/api/operator/phase1/plans/${id}/periods`
+}
+
+export const updatePlatformBillingPeriods = async (id: string,
+    platformBillingPeriods: PlatformBillingPeriods, options?: Parameters<typeof customFetch>[1]): Promise<PlatformBillingPeriods> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<PlatformBillingPeriods>(getUpdatePlatformBillingPeriodsUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(platformBillingPeriods)
+  }
+);}
+
+
+
+
+
+export const getUpdatePlatformBillingPeriodsMutationKey = () => ['updatePlatformBillingPeriods'] as const;
+
+export const getUpdatePlatformBillingPeriodsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlatformBillingPeriods>>, TError,UpdatePlatformBillingPeriodsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlatformBillingPeriods>>, TError,UpdatePlatformBillingPeriodsMutationVariables, TContext> => {
+
+const mutationKey = getUpdatePlatformBillingPeriodsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlatformBillingPeriods>>, UpdatePlatformBillingPeriodsMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updatePlatformBillingPeriods(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePlatformBillingPeriodsMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlatformBillingPeriods>>>
+    export type UpdatePlatformBillingPeriodsMutationBody = BodyType<PlatformBillingPeriods>
+    export type UpdatePlatformBillingPeriodsMutationError = ErrorType<unknown>
+    export type UpdatePlatformBillingPeriodsMutationVariables = {id: string;data: BodyType<PlatformBillingPeriods>}
+
+    export const useUpdatePlatformBillingPeriods = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlatformBillingPeriods>>, TError,UpdatePlatformBillingPeriodsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updatePlatformBillingPeriods>>,
+        TError,
+        UpdatePlatformBillingPeriodsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdatePlatformBillingPeriodsMutationOptions(options));
+    }
 
 export const getGetSupabaseAuthStatusUrl = () => {
 

@@ -12,3 +12,6 @@ export function PriceLine({ x, period }: { x: Plan | PricedAddon; period: string
   const rec = periodPrice(p, period);
   return <p className="font-mono text-xs uppercase tracking-wide text-copper">{rec == null ? 'Requires review' : `${cash(rec, p.currency)} / ${period === 'yearly' ? 'year' : 'month'}`}{hasDiscount(p.discountPercent) && rec != null ? ` (${p.discountPercent}% off recurring)` : ''}{p.setupFee == null ? ' + setup: requires review' : toCents(p.setupFee) > 0n ? ` + ${cash(p.setupFee, p.currency)} setup` : ''}</p>;
 }
+
+/** Enabled billing periods for a plan; servers that omit the field allow both. */
+export const planPeriods = (p?: { billingPeriods?: readonly string[] } | null): ('monthly' | 'yearly')[] => (p?.billingPeriods ? (['monthly', 'yearly'] as const).filter((x) => p.billingPeriods!.includes(x)) : ['monthly', 'yearly']);

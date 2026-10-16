@@ -4,8 +4,8 @@ import type { z } from "zod";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { audit } from "../../lib/audit";
 import { HttpError } from "../../lib/errors";
-import { logger } from "../../lib/logger";
-import { selectPublicCatalog } from "./published-marketing";
+import { discountedRecurring } from "../entitlements/commercial-pricing";
+import { cents } from "../commerce/pricing";
 
 export type LandingProductInput = z.infer<typeof UpdateLandingProductBody>;
 const projection = `key,visible,name,description,icon,starting_price AS "startingPrice",
@@ -14,18 +14,26 @@ const projection = `key,visible,name,description,icon,starting_price AS "startin
   CASE WHEN key='crypto_exchange' THEN 'sandbox_only' ELSE 'planned' END AS readiness`;
 
 // Explicit public projection; execution readiness is server-owned, never marketing-editable.
-let reportedPublishedMarketing = false;
 export function publicProductCatalog() {
   return withDatabase({ actorId: "public:product-catalog" }, async (client) => {
     const products = (await client.query(`SELECT ${projection} FROM landing_products WHERE visible=true ORDER BY display_order,key`)).rows;
-    const hasStoredProducts = products.length > 0 || (await client.query<{ configured: boolean }>(
-      "SELECT EXISTS(SELECT 1 FROM landing_products) AS configured")).rows[0]?.configured === true;
-    const catalog = selectPublicCatalog(products, hasStoredProducts, process.env.NODE_ENV === "production");
-    if (catalog.source === "published-marketing" && !reportedPublishedMarketing) {
-      logger.warn({ event: "published_marketing_catalog", source: catalog.source },
-        "Production catalog has no records; serving published public marketing content without database writes.");
-      reportedPublishedMarketing = true;
+    // Marketing remains database-owned; no hardcoded commercial fallback.
+    const configured = await client.query(`SELECT p.monthly_price::text,p.yearly_price::text,p.setup_fee::text,p.discount_percent::text,p.currency,
+      coalesce(s.monthly,true) monthly,coalesce(s.yearly,true) yearly
+      FROM plans p LEFT JOIN qxlayer_commerce.offer_settings s ON s.plan_id=p.id
+      WHERE p.status='enabled' AND p.pricing_configured AND p.currency='EUR'
+      AND coalesce(s.monthly OR s.yearly,true)
+      AND EXISTS(SELECT 1 FROM plan_entitlements e WHERE e.plan_id=p.id AND e.key='website' AND e.value='true')
+      AND EXISTS(SELECT 1 FROM plan_entitlements e WHERE e.plan_id=p.id AND e.key='crypto_exchange' AND e.value='true')`);
+    const offers = configured.rows.map(p => ({ ...p, price: discountedRecurring(p.monthly ? p.monthly_price : p.yearly_price, p.discount_percent), period: p.monthly ? "monthly" : "yearly" }))
+      .sort((a,b) => BigInt(a.price.replace(".", "")) < BigInt(b.price.replace(".", "")) ? -1 :
+        BigInt(a.price.replace(".", "")) > BigInt(b.price.replace(".", "")) ? 1 : 0);
+    for (const product of products) if (product.key === "crypto_exchange") {
+      const offer = offers[0];
+      product.startingPrice = offer?.price ?? null; product.setupFee = offer?.setup_fee ?? null;
+      product.currency = offer?.currency ?? "EUR"; product.billingPeriod = offer?.period ?? "on_request";
     }
+    const catalog = { source: "database" as const, products };
     return catalog;
   });
 }
@@ -52,6 +60,10 @@ export function saveProduct(principal: Principal, key: string, input: LandingPro
   return withDatabase(contextFor(principal, undefined, true), async (client) => {
     await client.query("SELECT key FROM landing_products WHERE key=$1 FOR UPDATE", [key]);
     const before = await readProduct(client, key);
+    const samePrice = (a: string | null, b: string | null) => a == null || b == null ? a == null && b == null : cents(a) === cents(b);
+    if (key === "crypto_exchange" && (!samePrice(parsed.startingPrice, before.startingPrice) ||
+      !samePrice(parsed.setupFee, before.setupFee) || parsed.currency !== before.currency || parsed.billingPeriod !== before.billingPeriod))
+      throw new HttpError(409, "Exchange prices, currency and billing periods are managed in Plans, not independent marketing fields.");
     await client.query(`UPDATE landing_products SET visible=$2,name=$3,description=$4,icon=$5,
       starting_price=$6,setup_fee=$7,currency=$8,billing_period=$9,status=$10,
       cta_label=$11,display_order=$12 WHERE key=$1`,

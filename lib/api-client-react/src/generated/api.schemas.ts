@@ -521,11 +521,20 @@ export interface PlanInput {
   entitlements: EntitlementEntry[];
 }
 
+export type PlanBillingPeriodsItem = typeof PlanBillingPeriodsItem[keyof typeof PlanBillingPeriodsItem];
+
+
+export const PlanBillingPeriodsItem = {
+  monthly: 'monthly',
+  yearly: 'yearly',
+} as const;
+
 export type Plan = PlanInput & {
   id: string;
   createdAt: string;
   updatedAt: string;
   pricingConfigured?: boolean;
+  billingPeriods?: PlanBillingPeriodsItem[];
 };
 
 export interface AddonInput {
@@ -2206,6 +2215,139 @@ export interface CapabilityStatus {
   message: string;
 }
 
+export type PlatformMethodInputKind = typeof PlatformMethodInputKind[keyof typeof PlatformMethodInputKind];
+
+
+export const PlatformMethodInputKind = {
+  bank_transfer: 'bank_transfer',
+  manual: 'manual',
+} as const;
+
+export interface PlatformMethodInput {
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  name: string;
+  kind: PlatformMethodInputKind;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  /** @maxLength 4000 */
+  instructions: string;
+  enabled: boolean;
+  approved: boolean;
+}
+
+export type PlatformPaymentMethod = PlatformMethodInput & {
+  id: string;
+  createdAt: string;
+};
+
+export type PlatformInvoiceStatus = typeof PlatformInvoiceStatus[keyof typeof PlatformInvoiceStatus];
+
+
+export const PlatformInvoiceStatus = {
+  pending: 'pending',
+  reported: 'reported',
+  paid: 'paid',
+  rejected: 'rejected',
+} as const;
+
+export interface PlatformInvoice {
+  id: string;
+  orderId: string;
+  amount: string;
+  currency: string;
+  status: PlatformInvoiceStatus;
+  methodName: string;
+  instructions: string;
+  reference: string;
+  createdAt: string;
+  /** @nullable */
+  confirmedAt: string | null;
+}
+
+export interface PlatformOrderBilling {
+  invoice: PlatformInvoice | null;
+  methods: PlatformPaymentMethod[];
+  purchasable: boolean;
+  /** @nullable */
+  blockedReason: string | null;
+}
+
+export interface PlatformCheckoutInput {
+  methodId: string;
+}
+
+export interface PlatformReferenceInput {
+  /**
+     * @minLength 3
+     * @maxLength 200
+     */
+  reference: string;
+}
+
+export interface PlatformSettlementInput {
+  receivedAmount: string;
+  currency: string;
+  /**
+     * @minLength 3
+     * @maxLength 200
+     */
+  reference: string;
+  /**
+     * @minLength 10
+     * @maxLength 2000
+     */
+  evidence: string;
+}
+
+export interface PlatformRejectionInput {
+  /**
+     * @minLength 10
+     * @maxLength 2000
+     */
+  evidence: string;
+}
+
+export type PlatformApprovalInputExpected = {
+  monthlyPrice: string;
+  yearlyPrice: string;
+  setupFee: string;
+  currency: string;
+};
+
+export interface PlatformApprovalInput {
+  confirmed: true;
+  expected: PlatformApprovalInputExpected;
+}
+
+export interface PlatformBillingPeriods {
+  monthly: boolean;
+  yearly: boolean;
+}
+
+export type PlatformEmailStatus = typeof PlatformEmailStatus[keyof typeof PlatformEmailStatus];
+
+
+export const PlatformEmailStatus = {
+  pending: 'pending',
+  sent: 'sent',
+  failed: 'failed',
+} as const;
+
+export interface PlatformEmail {
+  id: string;
+  subject: string;
+  status: PlatformEmailStatus;
+  attempts: number;
+  /** @nullable */
+  lastError: string | null;
+  createdAt: string;
+  /** @nullable */
+  sentAt: string | null;
+}
+
 export type SupabaseAuthStatusProvider = typeof SupabaseAuthStatusProvider[keyof typeof SupabaseAuthStatusProvider];
 
 
@@ -2448,6 +2590,33 @@ export interface TestTenantIntegrationInput {
      */
   reason: string;
 }
+
+export type GetPhase1Catalog200PlansItem = { [key: string]: unknown };
+
+export type GetPhase1Catalog200AddonsItem = { [key: string]: unknown };
+
+export type GetPhase1Catalog200MethodsItem = { [key: string]: unknown };
+
+export type GetPhase1Catalog200 = {
+  plans: GetPhase1Catalog200PlansItem[];
+  addons: GetPhase1Catalog200AddonsItem[];
+  methods: GetPhase1Catalog200MethodsItem[];
+  purchaseAvailable: boolean;
+};
+
+export type DeletePhase1Method200 = {
+  deleted: boolean;
+};
+
+export type RetryPlatformEmail200 = {
+  queued: boolean;
+};
+
+export type ListPlatformPriceProposals200Item = { [key: string]: unknown };
+
+export type ApprovePlatformPriceProposal200 = {
+  approved: boolean;
+};
 
 export type RegisterTenantTelegramWebhook200 = {
   registered: boolean;

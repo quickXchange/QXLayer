@@ -62,5 +62,10 @@ export async function orderView(c: DatabaseClient, row: Record<string, any>) {
 }
 export async function event(c: DatabaseClient, p: Principal, id: string, kind: "note" | "status", message: string, visibility: "customer" | "internal" = "customer", status: string | null = null) {
   const r = await c.query(`INSERT INTO white_label_events (request_id,kind,author_user_id,visibility,message,status) VALUES ($1,$2,$3,$4,$5,$6) RETURNING ${eventColumns}`, [id, kind, p.userId, visibility, message, status]);
+  // Fresh unique event ID: avoid ON CONFLICT, which also checks private SELECT
+  // policies and would deny an otherwise valid customer-only INSERT.
+  if (visibility === "customer") await c.query(`INSERT INTO qxlayer_commerce.email_outbox(event_id,order_id,customer_user_id,subject,message)
+    SELECT $1,id,customer_user_id,'VYNOX LAYER order WL-'||lpad(order_number::text,6,'0'), $3 FROM white_label_requests WHERE id=$2`,
+    [r.rows[0].id, id, message]);
   return r.rows[0];
 }

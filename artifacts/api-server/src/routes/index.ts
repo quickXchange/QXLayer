@@ -12,6 +12,7 @@ import exchangeRouter from "./exchange";
 import providerFoundationRouter from "./provider-foundation";
 import integrationsRouter from "./integrations";
 import customerRouter from "./customer";
+import commerceRouter from "./phase1-commerce";
 import orderFilesRouter from "./order-files";
 import supabaseAuthRouter from "./supabase-auth";
 import { requireAuthentication, principalFrom } from "../middlewares/authentication";
@@ -29,6 +30,7 @@ router.use(landingCatalogRouter);
 router.use(websiteRouter);
 router.use(websiteDiagnosticsRouter);
 router.use(customerRouter);
+router.use(commerceRouter);
 router.use(orderFilesRouter);
 router.use("/tenants/:tenantId", requireAuthentication, async (req, res, next) => {
   await assertDeliveredExchangeAccess(principalFrom(res), GetTenantParams.parse(req.params).tenantId);

@@ -11,7 +11,7 @@ export type PlanInput = z.infer<typeof CreatePlanBody>;
 export type AddonInput = z.infer<typeof CreateAddonBody>;
 export type Entry = PlanInput["entitlements"][number];
 export interface Definition { key: string; label: string; kind: "feature" | "limit"; valueType: "boolean" | "integer" | "decimal"; }
-async function catalogLock(client: DatabaseClient, key: string, exclusive: boolean) {
+export async function catalogLock(client: DatabaseClient, key: string, exclusive: boolean) {
   // Advisory locking coordinates catalog readers without requiring write access
   // from client admins. Advisory locks coordinate versions without write access.
   await client.query(exclusive
@@ -44,11 +44,13 @@ export async function readPlan(client: DatabaseClient, id: string) {
   const p = r.rows[0];
   if (!p) throw new HttpError(404, "Plan not found.");
   const e = await client.query("SELECT key,value FROM plan_entitlements WHERE plan_id=$1 ORDER BY key", [id]);
+  const period = (await client.query("SELECT monthly,yearly FROM qxlayer_commerce.offer_settings WHERE plan_id=$1", [id])).rows[0];
   return {
     id: p.id as string, name: p.name as string, description: p.description as string,
     monthlyPrice: p.pricing_configured ? p.monthly_price as string : null, yearlyPrice: p.pricing_configured ? p.yearly_price as string : null,
     setupFee: p.pricing_configured ? p.setup_fee as string : null, pricingConfigured: p.pricing_configured as boolean,
     discountPercent: p.discount_percent as string, currency: p.currency as string, billingLabel: p.billing_label as string,
+    billingPeriods: [(!period || period.monthly) && "monthly", (!period || period.yearly) && "yearly"].filter(Boolean) as ("monthly" | "yearly")[],
     displayOrder: p.display_order as number, status: p.status as "enabled" | "disabled" | "archived",
     entitlements: e.rows as Entry[], createdAt: p.created_at as Date, updatedAt: p.updated_at as Date,
   };

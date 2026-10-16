@@ -5,6 +5,7 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { PlanBillingPeriodsItem } from './planBillingPeriodsItem';
 import type { PlanInput } from './planInput';
 
 export type Plan = PlanInput & {
@@ -12,4 +13,5 @@ export type Plan = PlanInput & {
   createdAt: Date;
   updatedAt: Date;
   pricingConfigured?: boolean;
+  billingPeriods?: PlanBillingPeriodsItem[];
 };

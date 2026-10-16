@@ -24,7 +24,7 @@ export function ProvisioningProgress({ requestId, closed, onDone }: { requestId:
     onSuccess: (r) => {
       qc.setQueryData(key, r); qc.invalidateQueries({ queryKey: key });
       qc.invalidateQueries({ queryKey: getGetWhiteLabelRequestQueryKey(requestId) }); qc.invalidateQueries({ queryKey: getListWhiteLabelRequestsQueryKey() });
-      qc.invalidateQueries(); inv(d.tenantId ?? undefined); onDone?.();
+      inv(d.tenantId ?? undefined); onDone?.();
       toast({ title: 'Provisioning retried' });
     },
     onError: (e) => toast({ title: 'Retry failed', description: errMsg(e), variant: 'destructive' }),
