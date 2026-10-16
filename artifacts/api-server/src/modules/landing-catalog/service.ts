@@ -6,6 +6,7 @@ import { audit } from "../../lib/audit";
 import { HttpError } from "../../lib/errors";
 import { discountedRecurring } from "../entitlements/commercial-pricing";
 import { cents } from "../commerce/pricing";
+import { publishedOffers } from "../commerce/pricing-publication";
 
 export type LandingProductInput = z.infer<typeof UpdateLandingProductBody>;
 const projection = `key,visible,name,description,icon,starting_price AS "startingPrice",
@@ -18,15 +19,10 @@ export function publicProductCatalog() {
   return withDatabase({ actorId: "public:product-catalog" }, async (client) => {
     const products = (await client.query(`SELECT ${projection} FROM landing_products WHERE visible=true ORDER BY display_order,key`)).rows;
     // Marketing remains database-owned; no hardcoded commercial fallback.
-    const configured = await client.query(`SELECT p.monthly_price::text,p.yearly_price::text,p.setup_fee::text,p.discount_percent::text,p.currency,
-      coalesce(s.monthly,true) monthly,coalesce(s.yearly,true) yearly
-      FROM plans p LEFT JOIN qxlayer_commerce.offer_settings s ON s.plan_id=p.id
-      WHERE p.status='enabled' AND p.pricing_configured AND p.currency='EUR'
-      AND coalesce(s.monthly OR s.yearly,true)
-      AND EXISTS(SELECT 1 FROM plan_entitlements e WHERE e.plan_id=p.id AND e.key='website' AND e.value='true')
-      AND EXISTS(SELECT 1 FROM plan_entitlements e WHERE e.plan_id=p.id AND e.key='crypto_exchange' AND e.value='true')`);
-    const offers = configured.rows.map(p => ({ ...p, price: discountedRecurring(p.monthly ? p.monthly_price : p.yearly_price, p.discount_percent), period: p.monthly ? "monthly" : "yearly" }))
-      .sort((a,b) => BigInt(a.price.replace(".", "")) < BigInt(b.price.replace(".", "")) ? -1 :
+    const published = await publishedOffers(client);
+    const configured = published.plans.filter((p: any) => p.currency === "EUR").map((p: any) => ({monthly_price:p.monthlyPrice,yearly_price:p.yearlyPrice,setup_fee:p.setupFee,discount_percent:p.discountPercent,currency:p.currency,monthly:p.billingPeriods.includes("monthly")}));
+    const offers = configured.map((p: any) => ({ ...p, price: discountedRecurring(p.monthly ? p.monthly_price : p.yearly_price, p.discount_percent), period: p.monthly ? "monthly" : "yearly" }))
+      .sort((a: any,b: any) => BigInt(a.price.replace(".", "")) < BigInt(b.price.replace(".", "")) ? -1 :
         BigInt(a.price.replace(".", "")) > BigInt(b.price.replace(".", "")) ? 1 : 0);
     for (const product of products) if (product.key === "crypto_exchange") {
       const offer = offers[0];

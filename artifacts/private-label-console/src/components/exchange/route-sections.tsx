@@ -16,14 +16,19 @@ import type { ExchangeRoute, ExchangePaymentMethod } from '@workspace/api-client
 
 const ACTIONS: [string, string][] = [['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy (fiat to crypto)'], ['sell', 'Sell (crypto to fiat)']];
 
-function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action']; mode: 'routes' | 'pricing' }) {
+function RouteManager({ d, locked, action, mode, allowed }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action']; mode: 'routes' | 'pricing'; allowed?: string[] }) {
+  if (allowed && allowed.length === 0) return <p className="rounded-md border p-4 text-sm text-muted-foreground" role="alert" data-testid="text-no-actions">No exchange actions are included in your plan.</p>;
+  return <RouteManagerInner d={d} locked={locked} action={action} mode={mode} allowed={allowed} />;
+}
+function RouteManagerInner({ d, locked, action, mode, allowed }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action']; mode: 'routes' | 'pricing'; allowed?: string[] }) {
+  const ACTS = allowed ? ACTIONS.filter(([k]) => allowed.includes(k)) : ACTIONS;
   const { toast } = useToast(); const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
   const s = d.draft!; const fiat = fiatId(s); const idr = useIdentityResolver(s, d.catalog);
   const [q, setQ] = useState(''); const [fa, setFa] = useState('all'); const [fs, setFs] = useState('all'); const [nf, setNf] = useState('all');
   const netOf = (id: string) => d.catalog.find((c) => c.assetNetworkId === id)?.networkId;
   const netName = (id: string) => d.catalog.find((c) => c.assetNetworkId === id)?.networkName ?? (id.startsWith('fiat:') ? 'Fiat' : id);
   const label = (id: string) => (id.startsWith('fiat:') ? id.slice(5) : d.catalog.find((c) => c.assetNetworkId === id)?.symbol ?? id);
-  const scoped = s.routes.filter((r) => !action || r.action === action);
+  const scoped = s.routes.filter((r) => (!action || r.action === action) && (!allowed || allowed.includes(r.action)));
   const filtered = scoped.filter((r) => (nf === 'all' || [r.source, r.destination].some((e) => netOf(e) === nf)) && (fa === 'all' || r.action === fa) && (fs === 'all' || (fs === 'on') === r.enabled) && `${label(r.source)} ${label(r.destination)} ${r.action}`.toLowerCase().includes(q.trim().toLowerCase()));
   const resetF = () => { setQ(''); setFa('all'); setFs('all'); setNf('all'); };
   const pg = usePaged(filtered, `${q}|${fa}|${fs}|${nf}`); const rows = pg.pageRows;
@@ -40,7 +45,7 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
   const pms = s.paymentMethods.filter((p) => p.currency === s.fiatCurrency);
   const add = () => {
     const c0 = d.catalog[0]?.assetNetworkId; const c1 = d.catalog[1]?.assetNetworkId ?? c0; if (!c0) return;
-    const a = action ?? 'swap';
+    const a = (action ?? (allowed?.[0] ?? 'swap')) as ExchangeRoute['action'];
     const r: ExchangeRoute = { id: crypto.randomUUID(), source: a === 'buy' ? fiat : c0, destination: a === 'sell' ? fiat : (c1 ?? c0), action: a, enabled: false, rate: '', minimum: '0', maximum: '', fixedFee: '0', feeBps: 0, spreadBps: 0, paymentMethodIds: [] };
     d.patch({ routes: [...s.routes, r] }); setEdit(r);
   };
@@ -74,7 +79,7 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
         <>
           <FilterBar noun="routes" search={q} onSearch={setQ} placeholder="Search symbol or action" shown={filtered.length} total={scoped.length} onReset={resetF} active={q !== '' || fa !== 'all' || fs !== 'all' || nf !== 'all'}>
             <div className="w-44"><Pick testid="select-route-network-filter" bounded value={nf} onChange={setNf} options={[['all', 'Any network'], ...[...new Map(d.catalog.map((c) => [c.networkId, c.networkName])).entries()]]} /></div>
-            {!action && <div className="w-36"><Pick testid="select-route-action-filter" value={fa} onChange={setFa} options={[['all', 'Any action'], ...ACTIONS]} /></div>}
+            {!action && <div className="w-36"><Pick testid="select-route-action-filter" value={fa} onChange={setFa} options={[['all', 'Any action'], ...ACTS]} /></div>}
             <div className="w-36"><Pick testid="select-route-status-filter" value={fs} onChange={setFs} options={[['all', 'Any status'], ['on', 'Enabled'], ['off', 'Disabled']]} /></div>
           </FilterBar>
           <BulkBar sel={sel} noun="routes" locked={locked} testid="routes">
@@ -104,7 +109,7 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
           <div className="rounded-md border bg-muted/30 p-3" data-testid="route-preview">{pair(f)}{methodChips(f) && <div className="mt-2">{methodChips(f)}</div>}</div>
           {mode === 'routes' && <>
             <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled<Switch checked={f.enabled} onCheckedChange={(v) => set({ enabled: v })} /></div>
-            <Field label="Action"><Pick disabled={action !== undefined} value={f.action} onChange={(v) => set(changeAction(f, v as ExchangeRoute['action']))} options={ACTIONS} /></Field>
+            <Field label="Action"><Pick disabled={action !== undefined} value={f.action} onChange={(v) => set(changeAction(f, v as ExchangeRoute['action']))} options={ACTS} /></Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Source"><Pick disabled={f.action === 'buy'} value={f.source} onChange={(v) => set({ source: v })} options={f.action === 'buy' ? [[fiat, `${s.fiatCurrency} (fiat)`]] : endpoints.filter(([v]) => v !== fiat)} /></Field>
               <Field label="Destination"><Pick disabled={f.action === 'sell'} value={f.destination} onChange={(v) => set({ destination: v })} options={f.action === 'sell' ? [[fiat, `${s.fiatCurrency} (fiat)`]] : endpoints.filter(([v]) => v !== fiat)} /></Field>
@@ -128,8 +133,8 @@ function RouteManager({ d, locked, action, mode }: { d: ExchangeDraft; locked: b
   );
 }
 
-export function RoutesPanel({ d, locked, action }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action'] }) { return <RouteManager d={d} locked={locked} action={action} mode="routes" />; }
-export function PricingPanel({ d, locked }: { d: ExchangeDraft; locked: boolean }) { return <RouteManager d={d} locked={locked} mode="pricing" />; }
+export function RoutesPanel({ d, locked, action, allowed }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action']; allowed?: string[] }) { return <RouteManager d={d} locked={locked} action={action} mode="routes" allowed={allowed} />; }
+export function PricingPanel({ d, locked, allowed }: { d: ExchangeDraft; locked: boolean; allowed?: string[] }) { return <RouteManager d={d} locked={locked} mode="pricing" allowed={allowed} />; }
 
 type PM = ExchangePaymentMethod;
 const TYPES: [string, string][] = [['manual', 'Manual'], ['bank', 'Bank'], ['card', 'Card']];

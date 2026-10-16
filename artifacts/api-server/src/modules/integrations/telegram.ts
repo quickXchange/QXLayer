@@ -3,7 +3,8 @@ import { withDatabase } from "@workspace/db";
 import { z } from "zod/v4";
 import { HttpError } from "../../lib/errors";
 import { audit } from "../../lib/audit";
-import type { Principal } from "../authentication/service";
+import { requireSuperAdmin, type Principal } from "../authentication/service";
+import { requireFeature, resolveEntitlements } from "../entitlements/resolver";
 import { getPublicSite, publicTenantId } from "../website/service";
 import { accessible } from "./service";
 import { mayManageSecrets } from "./input";
@@ -29,8 +30,11 @@ export async function miniLanguages(slug: string, code?: string) {
 const actions = ["swap", "buy", "sell", "convert", "tracking"];
 export async function publicMiniConfig(slug: string) {
   const tenantId = await publicTenantId(slug);
-  const row = await withDatabase({ actorId: "telegram-mini", tenantId }, async c =>
-    (await c.query("SELECT enabled,settings FROM tenant_integrations WHERE tenant_id=$1 AND provider_key='telegram_mini_app'", [tenantId])).rows[0]);
+  const row = await withDatabase({ actorId: "telegram-mini", tenantId }, async c => {
+    const e = await resolveEntitlements(c, tenantId);
+    requireFeature(e, "telegram_bot"); requireFeature(e, "telegram_mini_app");
+    return (await c.query("SELECT enabled,settings FROM tenant_integrations WHERE tenant_id=$1 AND provider_key='telegram_mini_app'", [tenantId])).rows[0];
+  });
   if (!row?.enabled) throw new HttpError(404, "Telegram Mini App is not available.");
   const site = await getPublicSite(slug), s = row.settings;
   if (!("brandName" in site)) throw new HttpError(503, "Tenant website configuration is unavailable.");
@@ -55,6 +59,7 @@ export async function telegramCall(token: string, method: string, body: Record<s
   return data.result;
 }
 export async function registerWebhook(p: Principal, tenantId: string, raw: unknown) {
+  requireSuperAdmin(p);
   z.object({ reason: z.string().trim().min(2).max(500) }).strict().parse(raw);
   const ctx = await accessible(p, tenantId, true);
   const snapshot = await withDatabase(ctx, async c => {
@@ -90,8 +95,12 @@ export async function receiveTelegramUpdate(slug: string, suppliedSecret: string
   if (typeof suppliedSecret !== "string" || !/^[a-f0-9]{64}$/.test(suppliedSecret))
     throw new HttpError(403, "Telegram webhook authentication required.");
   const tenantId = await publicTenantId(slug);
-  const row = await withDatabase({ actorId: "telegram-webhook", tenantId }, async c =>
-    (await c.query("SELECT * FROM tenant_integrations WHERE tenant_id=$1 AND provider_key='telegram_bot'", [tenantId])).rows[0]);
+  const row = await withDatabase({ actorId: "telegram-webhook", tenantId }, async c => {
+    const e=await resolveEntitlements(c,tenantId);
+    requireFeature(e, "telegram_bot");
+    const connection=(await c.query("SELECT * FROM tenant_integrations WHERE tenant_id=$1 AND provider_key='telegram_bot'", [tenantId])).rows[0];
+    return connection ? {...connection,miniAppIncluded:e.features.telegram_mini_app===true} : undefined;
+  });
   if (!row?.enabled || !row.encrypted_credentials) throw new HttpError(404, "Telegram Bot is not available.");
   const secret = open({ tenantId, providerKey: "telegram_bot", environment: "sandbox" }, row.encrypted_credentials);
   const expected = Buffer.from(webhookProof({ tenantId, providerKey: "telegram_bot", environment: "sandbox" }, secret)), actual = Buffer.from(suppliedSecret);
@@ -103,6 +112,7 @@ export async function receiveTelegramUpdate(slug: string, suppliedSecret: string
   const claimed = await withDatabase({ actorId: "telegram-webhook", tenantId, canWrite: true }, async c => {
     const t = await c.query("SELECT status FROM tenants WHERE id=$1 FOR UPDATE", [tenantId]);
     if (t.rows[0]?.status !== "active") throw new HttpError(404, "Channel is not available.");
+    requireFeature(await resolveEntitlements(c,tenantId),"telegram_bot");
     const r = await c.query(`INSERT INTO tenant_telegram_receipts(tenant_id,integration_id,update_id,payload_hash)
       VALUES($1,$2,$3,$4) ON CONFLICT(integration_id,update_id) DO NOTHING RETURNING id`, [tenantId, row.id, data.update_id, digest]);
     if (!r.rowCount) {
@@ -121,10 +131,11 @@ export async function receiveTelegramUpdate(slug: string, suppliedSecret: string
       const chosen = actions.includes(requested) ? menu.filter((a: string) => a === requested) : menu;
       const site = await getPublicSite(slug);
       if (!("features" in site)) throw new HttpError(503, "Tenant website configuration is unavailable.");
-      const mini = await publicMiniConfig(slug);
-      const buttons = chosen.filter((a: string) => mini.menu.includes(a) && (a === "tracking" || site.features?.[a])).map((a: string) =>
+      const mini = row.miniAppIncluded ? await publicMiniConfig(slug) : null;
+      const websiteUrl=new URL(row.settings.miniAppUrl);websiteUrl.pathname=websiteUrl.pathname.replace(/\/telegram\/?$/,"");
+      const buttons = chosen.filter((a: string) => (!mini || mini.menu.includes(a)) && (a === "tracking" || site.features?.[a])).map((a: string) =>
         [{ text: a === "tracking" ? "Track order" : a[0].toUpperCase() + a.slice(1),
-          web_app: { url: `${row.settings.miniAppUrl}#${a}` } }]);
+          ...(mini ? {web_app:{url:`${row.settings.miniAppUrl}#${a}`}} : {url:`${websiteUrl.toString()}#${a}`}) }]);
       await telegramCall(secret.botToken, "sendMessage", { chat_id: data.message.chat.id,
         text: buttons.length ? `${site.brandName} — Sandbox Exchange. No real funds are accepted. Open a feature below. Private tracking requires your order tracking token.`
           : "This feature is disabled for this tenant.", reply_markup: { inline_keyboard: buttons } });

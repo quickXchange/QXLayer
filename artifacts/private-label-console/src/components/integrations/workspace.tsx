@@ -66,13 +66,13 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
   // Adopt server revisions only while the form is clean, so polling never clobbers edits.
   useEffect(() => { if (!dirty.current) setF(fromConn(conn)); }, [conn]);
 
+  const telegram = k.toLowerCase().includes('telegram');
   const vault = bundle.vaultAvailable;
   // Effective mode: Super Admin acts on the selected (unsaved) mode, customers on the saved one.
   const mode = isSuper ? f.mgmt : conn?.credentialManagement ?? 'super_admin';
-  const modeAllows = isSuper ? mode === 'super_admin' || mode === 'both' : (mode === 'customer' || mode === 'both') && !!conn?.canManageCredentials;
-  const canCreds = !readOnly && !!conn && modeAllows && vault;
-  const canWrite = !readOnly && !!canConfigure && (isSuper || !!conn);
-  const telegram = k.toLowerCase().includes('telegram');
+  const modeAllows = isSuper ? mode === 'super_admin' || mode === 'both' : mode === 'customer' && (conn ? !!conn.canManageCredentials : !telegram);
+  const canCreds = !readOnly && (isSuper ? !!conn : true) && modeAllows && vault;
+  const canWrite = !readOnly && !!canConfigure && (isSuper || !!conn || !telegram);
   const mine = useMemo(() => bundle.assetNetworks, [bundle.assetNetworks]);
   const health = (conn?.health ?? {}) as Record<string, unknown>;
   const hState = str(health.state) || (conn ? 'unknown' : 'unconfigured');
@@ -88,6 +88,11 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
   };
   const settings = () => {
     const s: Record<string, unknown> = {};
+    if (!isSuper) {
+      if (telegram) { for (const key of ['logoUrl', 'primaryColor', 'backgroundColor'] as const) if (f[key].trim()) s[key] = f[key].trim(); s.menu = f.menu; }
+      else if (conn) s.customerActivation = f.customerActivation;
+      return s;
+    }
     if (def.manualFallback) s.manualFallback = f.manualFallback;
     s.healthMonitoring = f.healthMonitoring;
     s.customerActivation = f.customerActivation;
@@ -109,7 +114,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
     setMsg(null);
     const data: Parameters<typeof save.mutate>[0]['data'] = {
       enabled: isSuper ? f.enabled : conn?.enabled ?? false, settings: settings(), reason: reason.trim(),
-      ...(isSuper ? { credentialManagement: f.mgmt as 'super_admin' | 'customer' | 'both' } : {}),
+      ...(isSuper ? { credentialManagement: f.mgmt as 'super_admin' | 'customer' | 'both' } : !conn ? { credentialManagement: 'customer' as const } : {}),
       ...(canCreds && secretsFilled.length ? { secrets: Object.fromEntries(secretsFilled) } : {}),
       ...(canCreds && clear ? { clearCredentials: true } : {}),
     };
@@ -154,13 +159,13 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
         </div>
       </header>
 
-      <dl className="mt-3 grid gap-2 rounded border bg-muted/30 p-3 text-sm sm:grid-cols-3" data-testid={`health-${k}`}>
+      {isSuper && <dl className="mt-3 grid gap-2 rounded border bg-muted/30 p-3 text-sm sm:grid-cols-3" data-testid={`health-${k}`}>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Last checked</dt><dd>{when(health.checkedAt)}</dd></div>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Latency</dt><dd>{typeof health.latencyMs === 'number' ? `${health.latencyMs} ms` : 'Not measured'}</dd></div>
         {['alchemy', 'rpc'].includes(k) && <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Observed network head</dt><dd>{str(health.head) || 'Not observed'}{health.chainId != null && <span className="block text-xs">Chain {str(health.chainId)}</span>}</dd></div>}
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Message</dt><dd className="[overflow-wrap:anywhere]" data-testid={`text-health-message-${k}`}>{hMessage || 'None recorded'}{hCode && <span className="block font-mono text-xs text-muted-foreground" data-testid={`text-health-code-${k}`}>{hCode}</span>}</dd></div>
         {hState === 'ready' && <p className="text-xs text-muted-foreground sm:col-span-3" data-testid={`note-ready-${k}`}>Configuration ready means the settings are complete. It is not an external connection.</p>}
-      </dl>
+      </dl>}
 
       <fieldset className="mt-4 space-y-4" disabled={dis}>
         <legend className="sr-only">{def.name} settings</legend>
@@ -175,7 +180,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
                 {MGMT.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select></label>
           </div>
-        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? `Enablement and credential policy are set by VYNOX LAYER (${conn.credentialManagement.replace('_', ' ')}).` : 'Not authorized yet. VYNOX LAYER must authorize this integration first.'}</p>}
+        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? 'Availability of this service is managed by VYNOX LAYER under your plan.' : 'Not authorized yet. VYNOX LAYER must authorize this integration first.'}</p>}
 
         {isSuper && <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
           <span>Allow customer to activate this authorized integration</span>
@@ -185,7 +190,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
           <span>Activate authorized integration</span>
           <Switch checked={f.enabled} onCheckedChange={v => upd({ enabled: v })} data-testid={`switch-customer-enabled-${k}`} />
         </label>}
-        {['1forge', 'whitebit', 'quickex'].includes(k) && <div className="rounded border p-3 text-sm">
+        {isSuper && ['1forge', 'whitebit', 'quickex'].includes(k) && <div className="rounded border p-3 text-sm">
           <p className="font-medium">Sandbox pricing assignment</p>
           <p className="text-xs text-muted-foreground">Read-only rates; no trades, deposits or withdrawals. Select only one provider per action and assign both route asset/networks below.</p>
           <div className="mt-2 flex flex-wrap gap-4">{(k === 'quickex' ? ['convert'] : ['swap', 'convert', 'buy', 'sell']).map(action => <label key={action} className="flex items-center gap-2">
@@ -194,19 +199,19 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
               data-testid={`pricing-${k}-${action}`} />{action}
           </label>)}</div>
         </div>}
-        {def.manualFallback && (
+        {isSuper && def.manualFallback && (
           <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
             <span><span className="block font-medium">Manual fallback</span><span className="text-xs text-muted-foreground">Use the configured manual Sandbox rate when read-only provider pricing fails. Quotes explicitly disclose the fallback.</span></span>
             <Switch checked={f.manualFallback} onCheckedChange={(v) => upd({ manualFallback: v })} data-testid={`switch-fallback-${k}`} aria-label="Manual fallback" />
           </label>
         )}
 
-        <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
+        {isSuper && <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
           <span><span className="block font-medium">Health monitoring (opt-in)</span><span className="text-xs text-muted-foreground">Runs read-only checks every five minutes. Off by default. Checks never move funds or execute financial operations.</span></span>
           <Switch checked={f.healthMonitoring} onCheckedChange={(v) => upd({ healthMonitoring: v })} data-testid={`switch-monitoring-${k}`} aria-label="Health monitoring" />
-        </label>
+        </label>}
 
-        {!telegram && (
+        {isSuper && !telegram && (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <label className="block text-sm"><span className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Adapter kind</span>
               <select className="h-9 w-full rounded-md border bg-background px-2" value={f.adapterKind} onChange={(e) => upd({ adapterKind: e.target.value })} data-testid={`select-adapter-${k}`}>
@@ -222,9 +227,9 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
           <div className="space-y-3 rounded border p-3">
             <p className="font-mono text-[11px] uppercase tracking-wider text-copper">Telegram branding and features</p>
             <div className="grid gap-3 sm:grid-cols-2">
-              <TextField id={`bot-${k}`} label="Bot username" value={f.botUsername} onChange={(v) => upd({ botUsername: v })} placeholder="my_exchange_bot" />
-              <TextField id={`webhook-${k}`} label="Webhook URL" type="url" value={f.webhookUrl} onChange={(v) => upd({ webhookUrl: v })} />
-              <TextField id={`mini-${k}`} label="Mini app URL" type="url" value={f.miniAppUrl} onChange={(v) => upd({ miniAppUrl: v })} />
+              {isSuper && <TextField id={`bot-${k}`} label="Bot username" value={f.botUsername} onChange={(v) => upd({ botUsername: v })} placeholder="my_exchange_bot" />}
+              {isSuper && <TextField id={`webhook-${k}`} label="Webhook URL" type="url" value={f.webhookUrl} onChange={(v) => upd({ webhookUrl: v })} />}
+              {isSuper && <TextField id={`mini-${k}`} label="Mini app URL" type="url" value={f.miniAppUrl} onChange={(v) => upd({ miniAppUrl: v })} />}
               <TextField id={`logo-${k}`} label="Logo URL" type="url" value={f.logoUrl} onChange={(v) => upd({ logoUrl: v })} />
               <TextField id={`primary-${k}`} label="Primary color" value={f.primaryColor} onChange={(v) => upd({ primaryColor: v })} placeholder="#12423f" />
               <TextField id={`bg-${k}`} label="Background color" value={f.backgroundColor} onChange={(v) => upd({ backgroundColor: v })} placeholder="#fbf8f2" />
@@ -238,7 +243,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
           </div>
         )}
 
-        <div>
+        {isSuper && <div>
           <p className="mb-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Asset and network assignments</p>
           {mine.length === 0 ? <p className="text-sm text-muted-foreground" data-testid={`text-no-assets-${k}`}>This tenant has no enabled asset networks to assign.</p> : (
             <div role="group" aria-label="Assignments" className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -247,12 +252,12 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
                   <input type="checkbox" disabled={!isSuper} checked={f.assignments.includes(v)} onChange={() => upd({ assignments: toggle(f.assignments, v) })} data-testid={`check-assign-${k}-${a.assetId}-${a.networkId}`} />
                   <span>{a.symbol} on {a.networkName}</span></label>); })}
             </div>)}
-        </div>
+        </div>}
 
-        <div className="rounded border border-dashed p-3">
+        {(isSuper || !telegram) ? <div className="rounded border border-dashed p-3">
           <p className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-muted-foreground"><KeyRound className="h-3.5 w-3.5" aria-hidden />Credentials (write-only)</p>
           {!vault && <p className="mt-2 flex gap-2 rounded bg-amber-500/10 p-2 text-sm" role="status" data-testid={`notice-vault-${k}`}><ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />The credential vault is not available on this server, so credentials cannot be saved. Configuration above can still be saved.</p>}
-          {vault && !conn && <p className="mt-2 text-sm text-muted-foreground">Save an authorized configuration before adding credentials.</p>}
+          {vault && !conn && isSuper && <p className="mt-2 text-sm text-muted-foreground">Save an authorized configuration before adding credentials.</p>}
           {vault && conn && !modeAllows && <p className="mt-2 text-sm text-muted-foreground" data-testid={`notice-nocreds-${k}`}>Credentials are not managed by you under the selected management mode, or you lack permission.</p>}
           <p className="mt-2 text-sm" data-testid={`text-creds-${k}`}>{conn?.credentialsConfigured ? 'Credentials are stored. Values are never shown.' : 'No credentials stored.'}</p>
           {def.secretFields.length > 0 && (
@@ -264,16 +269,16 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
               ))}
             </div>)}
           {canCreds && <label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={clear} onChange={(e) => { dirty.current = true; onDirty(k, true); setClear(e.target.checked); }} data-testid={`check-clear-${k}`} />Clear stored credentials on save</label>}
-        </div>
+        </div> : <p className="rounded border border-dashed p-3 text-sm text-muted-foreground" data-testid={`notice-central-creds-${k}`}>Telegram credentials are managed centrally by VYNOX LAYER.</p>}
       </fieldset>
 
       {!readOnly && (
         <div className="mt-4 flex flex-wrap items-end gap-3">
           <label className="min-w-[14rem] flex-1 text-sm" htmlFor={`reason-${k}`}><span className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Reason (audited, 3+ characters)</span>
             <Input id={`reason-${k}`} data-testid={`input-reason-${k}`} value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} /></label>
-          <Button onClick={onSave} disabled={!canWrite || !reasonOk || save.isPending} data-testid={`button-save-${k}`}>{save.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Save</Button>
-          <Button variant="outline" onClick={onTest} disabled={!canWrite || !conn || !reasonOk || test.isPending || save.isPending} data-testid={`button-test-${k}`}>{test.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Test connection</Button>
-          {isBot && <Button variant="outline" onClick={onWebhook} disabled={!canWebhook} title={canWebhook ? undefined : 'Requires a saved, enabled bot, no unsaved edits, a reason, and permission to manage credentials.'} data-testid="button-apply-webhook">{webhook.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Apply webhook</Button>}
+          <Button onClick={onSave} disabled={!canWrite || (!isSuper && !telegram && !canCreds) || !reasonOk || save.isPending} data-testid={`button-save-${k}`}>{save.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Save</Button>
+          <Button variant="outline" onClick={onTest} disabled={!canWrite || !conn || (!isSuper && (telegram || !canCreds)) || !reasonOk || test.isPending || save.isPending} data-testid={`button-test-${k}`}>{test.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Test connection</Button>
+          {isBot && isSuper && <Button variant="outline" onClick={onWebhook} disabled={!canWebhook} title={canWebhook ? undefined : 'Requires a saved, enabled bot, no unsaved edits, a reason, and permission to manage credentials.'} data-testid="button-apply-webhook">{webhook.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Apply webhook</Button>}
         </div>)}
       {!readOnly && !canConfigure && <p className="mt-3 text-sm text-muted-foreground" data-testid={`notice-noperm-${k}`}>Saving and testing require the configuration.manage permission for this tenant.</p>}
       {readOnly && <p className="mt-3 text-sm text-muted-foreground">Read-only demo. Changes are disabled.</p>}
@@ -292,7 +297,7 @@ export function IntegrationsWorkspace({ tenantId }: { tenantId: string }) {
   // Tenant-specific grant only: no role-wide shortcut.
   const m = p.memberships?.find((x) => x.tenantId === tenantId);
   const canConfigure = isSuper || (!!m && (m.role === 'client_admin' || m.permissions.includes('configuration.manage')) && (m.role !== 'staff' || m.permissions.includes('configuration.manage')));
-  const b = q.data;
+  const b = q.data && !isSuper ? { ...q.data, definitions: q.data.definitions.filter((d) => /quickex|whitebit|telegram/.test(d.key)) } : q.data;
   if (q.isLoading) return <ListSkeleton />;
   if (!b) return <ErrorState what="integrations" onRetry={() => q.refetch()} />;
   return (
@@ -303,7 +308,7 @@ export function IntegrationsWorkspace({ tenantId }: { tenantId: string }) {
           <Pill>{b.sandboxOnly ? 'Sandbox only' : 'Not sandbox only'}</Pill>
           <Pill>{b.executionEnabled ? 'Execution flag on' : 'Financial execution disabled'}</Pill>
           <Pill tone={b.vaultAvailable ? 'ok' : 'warn'}>{b.vaultAvailable ? 'Vault available' : 'Vault unavailable'}</Pill>
-          <span className="font-mono text-xs text-muted-foreground" data-testid="text-source-commit">build {b.sourceCommit.slice(0, 8)}</span>
+          {isSuper && <span className="font-mono text-xs text-muted-foreground" data-testid="text-source-commit">build {b.sourceCommit.slice(0, 8)}</span>}
           {dirtyKeys.current.size > 0 && <span className="text-xs text-muted-foreground" data-testid="text-unsaved">Unsaved edits are kept during refresh.</span>}
         </div>
       </Panel>

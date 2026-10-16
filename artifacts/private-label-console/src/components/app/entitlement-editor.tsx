@@ -23,6 +23,13 @@ export function entError(defs: EntitlementDefinition[], m: EntMap): string {
   return '';
 }
 
+const GROUPS: [string, RegExp][] = [['Provider access: Quickex', /^quickex/], ['Provider access: WhiteBIT', /^whitebit/], ['Telegram', /^telegram/], ['Infrastructure', /rpc|node|monitor/]];
+export const groupOf = (k: string) => GROUPS.find(([, r]) => r.test(k))?.[0] ?? 'General';
+export const groupOrder = ['General', ...GROUPS.map(([g]) => g)];
+export function groupDefs(defs: EntitlementDefinition[]) {
+  return groupOrder.map((g) => [g, defs.filter((d) => groupOf(d.key) === g)] as const).filter(([, l]) => l.length > 0);
+}
+
 export function EntitlementEditor({ defs, value, onChange, disabled, limitHint }: { defs: EntitlementDefinition[]; value: EntMap; onChange: (m: EntMap) => void; disabled?: boolean; limitHint?: string }) {
   const features = defs.filter((d) => d.kind === 'feature');
   const limits = defs.filter((d) => d.kind === 'limit');
@@ -33,11 +40,13 @@ export function EntitlementEditor({ defs, value, onChange, disabled, limitHint }
         <p className="mb-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Features</p>
         <div className="divide-y rounded-md border">
           {features.length === 0 && <p className="p-3 text-sm text-muted-foreground">No feature definitions.</p>}
-          {features.map((d) => (
+          {groupDefs(features).map(([g, list]) => (<div key={g}>
+            <p className="bg-muted/40 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-copper" data-testid={`group-ent-${g}`}>{g}</p>
+            <div className="divide-y">{list.map((d) => (
             <div key={d.key} className="flex items-center justify-between gap-3 p-3">
               <div><p className="text-sm">{d.label}</p><p className="font-mono text-[10px] text-muted-foreground">{d.key}</p></div>
               <Switch data-testid={`switch-ent-${d.key}`} disabled={disabled} checked={value[d.key] === true} onCheckedChange={(v) => set(d.key, v)} />
-            </div>))}
+            </div>))}</div></div>))}
         </div>
       </div>
       <div>
@@ -75,7 +84,7 @@ export function OverridesEditor({ defs, rows, onChange, disabled }: { defs: Enti
       {!disabled && (
         <div className="flex gap-2">
           <Select value={pick} onValueChange={setPick}><SelectTrigger data-testid="select-override-key" className="w-72"><SelectValue placeholder="Add override for..." /></SelectTrigger>
-            <SelectContent>{avail.map((d) => <SelectItem key={d.key} value={d.key}>{d.label}</SelectItem>)}</SelectContent></Select>
+            <SelectContent>{avail.map((d) => <SelectItem key={d.key} value={d.key}>{groupOf(d.key) === 'General' ? d.label : `${groupOf(d.key)} - ${d.label}`}</SelectItem>)}</SelectContent></Select>
           <Button type="button" variant="outline" disabled={!pick} onClick={add} data-testid="button-add-override">Add</Button>
         </div>)}
     </div>

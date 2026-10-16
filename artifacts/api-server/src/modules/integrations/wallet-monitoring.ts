@@ -1,6 +1,6 @@
 import { withDatabase } from "@workspace/db";
 import { ScanExchangeWalletBody, type ExchangeWallet, type ExchangeCatalogAsset, type ExchangeAssetSettings, type ExchangeWalletScan } from "@workspace/api-zod";
-import { contextFor, type Principal } from "../authentication/service";
+import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { resolveEntitlements, requireFeature } from "../entitlements/resolver";
 import { HttpError } from "../../lib/errors";
 import { audit } from "../../lib/audit";
@@ -72,6 +72,7 @@ export async function observeWallet(scope: WalletScanScope, adapter: BlockchainM
     confirmationsRequired: settings.confirmationsRequired ?? 12, observations, sandboxOnly: true, executionEnabled: false };
 }
 export async function scanWallet(p: Principal, tenantId: string, walletId: string, input: unknown) {
+  requireSuperAdmin(p);
   const body = ScanExchangeWalletBody.parse(input);
   // Same configuration permission as wallet management, with an explicit tenant fence.
   const ctx = contextFor(p, tenantId, true, "configuration.manage");

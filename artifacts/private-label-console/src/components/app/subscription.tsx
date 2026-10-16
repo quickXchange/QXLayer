@@ -17,7 +17,7 @@ import { Section } from './sections';
 import { OverridesEditor, overrideError } from './entitlement-editor';
 
 export function useSubscription(tenantId: string) {
-  return useGetTenantSubscription(tenantId, { query: { enabled: !!tenantId, queryKey: getGetTenantSubscriptionQueryKey(tenantId) } });
+  return useGetTenantSubscription(tenantId, { query: { enabled: !!tenantId, queryKey: getGetTenantSubscriptionQueryKey(tenantId), staleTime: 10000, refetchInterval: 30000, refetchOnWindowFocus: true } });
 }
 
 export function hasFeature(sub: SubscriptionView | undefined, ...needles: string[]) {

@@ -5,6 +5,8 @@ import { PageHeader, ErrorState, ListSkeleton } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
 import { IntegrationsWorkspace } from '@/components/integrations/workspace';
 import { usePrincipal } from '@/lib/principal';
+import { useSubscription } from '@/components/app/subscription';
+import { sectionGate } from '@/lib/feature-gate';
 
 export default function Integrations() {
   const q = useGetIntegrationRuntime({ query: { queryKey: getGetIntegrationRuntimeQueryKey(), refetchInterval: 30000 } });
@@ -31,12 +33,16 @@ export default function Integrations() {
 export function TenantIntegrations() {
   const { id = '' } = useParams<{ id: string }>();
   const p = usePrincipal();
+  const isSuper = p.role === 'super_admin';
+  const subQ = useSubscription(isSuper ? '' : id);
+  const gate = sectionGate('integrations', subQ.data?.features ?? {}, isSuper);
+  const body = isSuper ? <IntegrationsWorkspace tenantId={id} /> : subQ.isLoading ? <ListSkeleton /> : !subQ.data ? <ErrorState what="your plan" onRetry={() => subQ.refetch()} /> : gate.allowed ? <IntegrationsWorkspace tenantId={id} /> : <p className="rounded-md border p-6 text-sm text-muted-foreground" role="alert" data-testid="text-section-denied">{gate.reason}</p>;
   return (
     <>
       <PageHeader eyebrow="Admin Panel" title="Integrations">
         {!p.demo && <Button asChild variant="outline" data-testid="link-back-admin"><Link href={`/clients/${id}/exchange`}>Back to Admin Panel</Link></Button>}
       </PageHeader>
-      <IntegrationsWorkspace tenantId={id} />
+      {body}
     </>
   );
 }

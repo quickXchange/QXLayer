@@ -5,6 +5,7 @@ import type { LandingProduct } from '@workspace/api-client-react';
 import { Section, SectionHead } from '@site/components/sections/common';
 import { Reveal } from '@site/components/reveal';
 import { ProductIcon } from './icons';
+import { PublishedPlans } from './published-plans';
 import { ProductShowcaseList } from './product-showcase';
 import { billingLabel, priceText, readinessNote, setupText, statusLabel } from '@/lib/landing';
 
@@ -112,6 +113,7 @@ export function PlatformCatalog({ items, loading, error, onRetry, open, setOpen 
           )}
         </div>
       </Section>
+      <PublishedPlans />
       <Section id="ecosystem" tint>
         <SectionHead eyebrow="One platform" title="Build your crypto ecosystem" body="A conceptual map of the product areas under a single platform. Availability and readiness of each product is stated in the catalog." />
         <div className="relative mt-12">

@@ -108,12 +108,12 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
   return [...new Set(e.filter(Boolean))];
 }
 
-export function useExchangeDraft(tenantId: string): ExchangeDraft {
+export function useExchangeDraft(tenantId: string, enabled = true): ExchangeDraft {
   const qc = useQueryClient();
   const inv = useInvalidateTenant();
   const { toast } = useToast();
   const key = getGetExchangeConfigurationQueryKey(tenantId);
-  const q = useGetExchangeConfiguration(tenantId, { query: { queryKey: key } });
+  const q = useGetExchangeConfiguration(tenantId, { query: { queryKey: key, enabled: enabled && !!tenantId } });
   const m = useSaveExchangeConfiguration();
   const [draft, setDraft] = useState<ExchangeSettings | null>(null);
   const [saved, setSaved] = useState('');

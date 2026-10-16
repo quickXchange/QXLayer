@@ -15,6 +15,7 @@ import { statusesForOrderView } from "./order-views";
 import { paymentInstructionsSnapshot } from "./payment-snapshot";
 import { assertTelegramTransaction } from "../../modules/integrations/channel";
 import { applyPricing, sandboxPricing, assertPricingSnapshot, type PricingSnapshot } from "./provider-pricing";
+import { customerExchangeConfiguration, mergeCustomerExchangeConfiguration } from "./customer-configuration";
 
 const hash = (v: string) => createHash("sha256").update(v).digest("hex");
 function sign(v: string) {
@@ -53,7 +54,11 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
     if (input) await lockTenant(client, tenantId);
     const e = await resolveEntitlements(client, tenantId);
     const result = await readExchange(client, tenantId);
+    if (principal.role !== "super_admin") requireFeature(e, "crypto_exchange");
     if (input) {
+      if (principal.role !== "super_admin") {
+        input = mergeCustomerExchangeConfiguration(input, result.configuration, e);
+      }
       requireFeature(e, "crypto_exchange");
       const s = validateExchange(input, e, result.catalog);
       const previousIds = result.configuration.paymentMethods.map(m => m.id);
@@ -99,7 +104,8 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
       result.configuration = s;
     }
     const legacy = await client.query("SELECT exchange_enabled FROM tenant_configuration WHERE tenant_id=$1", [tenantId]);
-    return { ...result, effectiveEnabled: result.configuration.enabled && legacy.rows[0]?.exchange_enabled === true && e.features.crypto_exchange === true && e.features.website === true && e.tenantStatus === "active" && e.status === "active" && !e.overLimit };
+    return { ...result, providerCatalog: principal.role === "super_admin" ? result.providerCatalog : [],
+      configuration: principal.role === "super_admin" ? result.configuration : customerExchangeConfiguration(result.configuration,e), effectiveEnabled: result.configuration.enabled && legacy.rows[0]?.exchange_enabled === true && e.features.crypto_exchange === true && e.features.website === true && e.tenantStatus === "active" && e.status === "active" && !e.overLimit };
   });
 }
 export async function publicExchange(slug: string, preview?: WebsitePreview) {
@@ -171,7 +177,7 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
     }
     const { configuration: s, catalog } = await readExchange(client, tenantId);
     const request = verify(input.quoteToken, tenantId, s, e.plan!.currency);
-    await assertPricingSnapshot(client, tenantId, request.pricing, request.action);
+    await assertPricingSnapshot(client, tenantId, request.pricing, request.action, e);
     if (channel) await assertTelegramTransaction(client, tenantId, request.action);
     guard(e, request.action);
     const { quote, volume, paymentMethod } = calculateQuote(applyPricing(s, request.pricing), catalog, request);

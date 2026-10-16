@@ -5,10 +5,18 @@ import { publicOffers, methods, saveMethod, deleteMethod, orderBilling, checkout
 import { emailStatus, retryEmail, startCommerceMail } from "../modules/commerce/email";
 import { requireSuperAdmin } from "../modules/authentication/service";
 import { proposals, approveProposal, periods } from "../modules/commerce/offers";
+import { pricingPublication } from "../modules/commerce/pricing-publication";
 
 const router = Router();
 const uuid = z.string().uuid().transform(value => value.toLowerCase());
 router.get("/phase1/catalog", async (_req, res) => { res.json(await publicOffers()); });
+router.get("/commerce/pricing-publication", requireAuthentication, async (_req, res) => {
+  res.set("Cache-Control","no-store"); res.json(await pricingPublication(principalFrom(res)));
+});
+router.post("/commerce/pricing-publication", requireAuthentication, sameOriginMutation, async (req, res) => {
+  const body = z.object({expectedRevision:z.string().regex(/^[a-f0-9]{64}$/),expectedPublishedRevision:z.string().regex(/^[a-f0-9]{64}$/).nullable(),reason:z.string().trim().min(3).max(500)}).strict().parse(req.body);
+  res.json(await pricingPublication(principalFrom(res),body));
+});
 router.use(["/operator/phase1", "/customer/phase1"], requireAuthentication);
 router.use("/operator/phase1", (_req, res, next) => { requireSuperAdmin(principalFrom(res)); next(); });
 router.get("/operator/phase1/methods", async (_req, res) => { res.json(await methods(principalFrom(res))); });

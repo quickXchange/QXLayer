@@ -7,6 +7,7 @@ import { Chips, DataList, Pager, Pill, ReviewDialog, SearchBox, usePaged, type C
 import { usePlatform, unassignedProjects, usage } from '@/components/super-admin/platform';
 import { useCan } from '@/lib/principal';
 import { useInvalidateCatalog } from '@/lib/invalidate';
+import { PricingPublicationPanel } from '@/components/commerce/pricing-publication-panel';
 import { MethodsPanel } from '@/components/commerce/methods-panel';
 import { ProposalsPanel } from '@/components/commerce/proposals-panel';
 import { EmailsPanel } from '@/components/commerce/emails-panel';
@@ -54,6 +55,7 @@ export default function Plans() {
           <DataList id="plan" rows={pg.rows} cols={cols} rowKey={(p) => p.id} emptyTitle="No plans" emptyBody="Create a plan to start provisioning clients." />
           {list.length > 0 && <Pager id="plans" p={pg} />}
         </div>)}
+      <div className="mt-8"><PricingPublicationPanel /></div>
       <div className="mt-8 grid gap-4 lg:grid-cols-2 [&>*]:min-w-0"><MethodsPanel /><EmailsPanel /></div>
       <div className="mt-4"><ProposalsPanel /></div>
       <ReviewDialog open={!!pend} onClose={() => setPend(null)} title={pend ? `${pend.kind === 'duplicate' ? 'duplicate' : pend.kind} plan` : ''} pending={dup.isPending || st.isPending} error={err} destructive={pend?.kind === 'archived'} onApply={apply}

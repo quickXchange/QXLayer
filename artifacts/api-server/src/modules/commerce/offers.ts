@@ -4,6 +4,7 @@ import { requestContext } from "../customer/order-model";
 import { HttpError } from "../../lib/errors";
 import { audit } from "../../lib/audit";
 import { catalogLock } from "../entitlements/catalog";
+import { freezePricingBeforeEdit } from "./pricing-publication";
 const planIds = ["a4000000-0000-4000-8000-000000000001", "a4000000-0000-4000-8000-000000000002", "a4000000-0000-4000-8000-000000000003"];
 const addonIds = ["a4000000-0000-4000-8000-000000000101", "a4000000-0000-4000-8000-000000000102"];
 export function proposals(p: Principal) {
@@ -16,6 +17,7 @@ export function approveProposal(p: Principal, kind: "plan" | "addon", id: string
   requireSuperAdmin(p);
   if (!(kind === "plan" ? planIds : addonIds).includes(id)) throw new HttpError(404, "Default proposal not found.");
   return withDatabase(requestContext(p, true), async c => {
+    await freezePricingBeforeEdit(c);
     const result = kind === "plan" ?
       await c.query("UPDATE plans SET pricing_configured=true,status='enabled',updated_at=now() WHERE id=$1 AND NOT pricing_configured AND monthly_price=$2 AND yearly_price=$3 AND setup_fee=$4 AND currency=$5 RETURNING id", [id, expected.monthlyPrice, expected.yearlyPrice, expected.setupFee, expected.currency]) :
       await c.query("UPDATE addons SET pricing_configured=true,pricing_confirmed=true,enabled=true WHERE id=$1 AND NOT pricing_confirmed AND monthly_price=$2 AND yearly_price=$3 AND setup_fee=$4 AND currency=$5 RETURNING id", [id, expected.monthlyPrice, expected.yearlyPrice, expected.setupFee, expected.currency]);
@@ -27,6 +29,7 @@ export function approveProposal(p: Principal, kind: "plan" | "addon", id: string
 export function periods(p: Principal, id: string, input?: { monthly: boolean; yearly: boolean }) {
   requireSuperAdmin(p);
   return withDatabase(requestContext(p, !!input), async c => {
+    if (input) await freezePricingBeforeEdit(c);
     await catalogLock(c, `plan:${id}`, !!input);
     if (!(await c.query("SELECT id FROM plans WHERE id=$1", [id])).rowCount) throw new HttpError(404, "Plan not found.");
     if (input) {

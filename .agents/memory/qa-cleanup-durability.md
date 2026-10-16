@@ -37,3 +37,14 @@ protection.
 For helpers with asynchronous cleanup, send SIGTERM to the actual Node process
 and wait for its cleanup result before forcibly stopping its background task.
 The generic stop action can end the process before its provider calls complete.
+
+Do not assume an identity/request QA cleanup helper covers commercial catalog
+fixtures. Tenant-only cleanup does not include global catalog children or
+dependencies in approved private schemas.
+
+**Why:** Reusing a narrower helper for plan/add-on tests repeatedly hit restrictive
+foreign keys and rolled back identity cleanup, leaving privileged test accounts active.
+
+**How to apply:** Check the live dependency graph across the explicitly approved
+schemas before cleanup. Delete only the tracked fixture children before their
+parents, then verify provider identity removal and database absence separately.

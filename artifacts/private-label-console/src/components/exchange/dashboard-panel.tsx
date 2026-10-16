@@ -8,7 +8,7 @@ import { useGetExchangeConfiguration, getGetExchangeConfigurationQueryKey } from
 import { OrderStatus } from './order-status';
 import { MetricCard } from '@/components/app/metrics';
 
-export function DashboardPanel({ tenantId }: { tenantId: string }) {
+export function DashboardPanel({ tenantId, isSuper = true, features = {} }: { tenantId: string; isSuper?: boolean; features?: Record<string, unknown> }) {
   const q = useGetExchangeDashboard(tenantId, { query: { queryKey: getGetExchangeDashboardQueryKey(tenantId) } });
   const aq = useListExchangeAudit(tenantId, { page: 1 }, { query: { queryKey: getListExchangeAuditQueryKey(tenantId, { page: 1 }) } });
   const cfg = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
@@ -26,7 +26,7 @@ export function DashboardPanel({ tenantId }: { tenantId: string }) {
         {stats.map(([l, v]) => <MetricCard key={l} label={l} value={v} id={`stat-exchange-${l.toLowerCase()}`} />)}
       </div>
       <section><h2 className="font-display mb-2 text-2xl">Quick actions</h2>
-        <div className="flex flex-wrap gap-2">{[['orders', 'Review orders'], ['assets', 'Manage assets'], ['payment-methods', 'Payment methods'], ['pricing', 'Pricing & fees'], ['providers', 'Providers'], ['branding', 'Branding']].map(([k, l]) => <Link key={k} href={`${base}/${k}`} data-testid={`link-quick-${k}`} className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted">{l}</Link>)}</div></section>
+        <div className="flex flex-wrap gap-2">{[['orders', 'Review orders'], ['assets', 'Manage assets'], ['payment-methods', 'Payment methods'], ['pricing', 'Pricing & fees'], ...(isSuper ? [['providers', 'Providers']] : []), ...(!isSuper && ['quickex', 'whitebit', 'telegram_bot', 'telegram_mini_app'].some((k) => features[k] === true) ? [['../integrations', 'Integrations']] : []), ['branding', 'Branding']].map(([k, l]) => <Link key={k} href={k === "../integrations" ? `${base.replace(/\/exchange$/, "")}/integrations` : `${base}/${k}`} data-testid={`link-quick-${k.replace("../", "")}`} className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted">{l}</Link>)}</div></section>
       <section><h2 className="font-display mb-2 text-2xl">Input volume by asset</h2>
         {d.volume.length === 0 ? <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">No volume yet. Units are never summed across assets.</p> : (
           <div className="grid gap-px overflow-hidden rounded-md border bg-border md:grid-cols-4">{d.volume.map((v) => <div key={v.symbol} className="bg-card p-4" data-testid={`volume-${v.symbol}`}><p className="font-mono text-xs text-copper">{v.symbol}</p><p className="mt-1 break-all font-mono text-sm">{v.amount}</p></div>)}</div>)}

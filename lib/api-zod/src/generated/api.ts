@@ -8754,3 +8754,40 @@ export const GetPublicCapabilityResponse = zod.object({
 })
 
 
+/**
+ * @summary Preview unpublished commercial pricing (Super Admin only)
+ */
+export const GetPricingPublicationResponse = zod.object({
+  "draftRevision": zod.string(),
+  "publishedRevision": zod.string().nullable(),
+  "publishedAt": zod.string().nullable(),
+  "draft": zod.record(zod.string(), zod.unknown()),
+  "published": zod.record(zod.string(), zod.unknown()).nullable()
+})
+
+
+/**
+ * @summary Explicitly publish the reviewed pricing revision (Super Admin only)
+ */
+export const publishPricingPublicationBodyExpectedRevisionRegExp = new RegExp('^[a-f0-9]{64}$');
+export const publishPricingPublicationBodyExpectedPublishedRevisionRegExp = new RegExp('^[a-f0-9]{64}$');
+export const publishPricingPublicationBodyReasonMin = 3;
+export const publishPricingPublicationBodyReasonMax = 500;
+
+
+
+export const PublishPricingPublicationBody = zod.object({
+  "expectedRevision": zod.string().regex(publishPricingPublicationBodyExpectedRevisionRegExp),
+  "expectedPublishedRevision": zod.string().regex(publishPricingPublicationBodyExpectedPublishedRevisionRegExp).nullable(),
+  "reason": zod.string().min(publishPricingPublicationBodyReasonMin).max(publishPricingPublicationBodyReasonMax)
+})
+
+export const PublishPricingPublicationResponse = zod.object({
+  "draftRevision": zod.string(),
+  "publishedRevision": zod.string().nullable(),
+  "publishedAt": zod.string().nullable(),
+  "draft": zod.record(zod.string(), zod.unknown()),
+  "published": zod.record(zod.string(), zod.unknown()).nullable()
+})
+
+

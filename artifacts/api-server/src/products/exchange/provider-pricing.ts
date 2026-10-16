@@ -1,6 +1,7 @@
 import type { DatabaseClient } from "@workspace/db";
 import type { ExchangeSettings, ExchangeQuoteInput, ExchangeCatalogAsset } from "@workspace/api-zod";
 import { HttpError } from "../../lib/errors";
+import { resolveEntitlements, requireFeature } from "../../modules/entitlements/resolver";
 import { open } from "../../modules/integrations/vault";
 import { providerRate, positiveRate } from "../../modules/integrations/pricing-adapters";
 import { decimal } from "../../modules/entitlements/decimal";
@@ -28,6 +29,7 @@ export async function sandboxPricing(c: DatabaseClient, tenantId: string, input:
   if (!rows.rowCount) return undefined;
   if (rows.rowCount !== 1) throw new HttpError(409, "Super Admin must assign exactly one pricing provider to this action.");
   const row = rows.rows[0];
+  if (["quickex","whitebit"].includes(row.provider_key)) requireFeature(await resolveEntitlements(c,tenantId), row.provider_key);
   if (!row.enabled) throw new HttpError(409, "The assigned pricing provider is disabled.");
   const source = catalog.find(a => a.assetNetworkId === input.source);
   const destination = catalog.find(a => a.assetNetworkId === input.destination);
@@ -62,7 +64,10 @@ export async function sandboxPricing(c: DatabaseClient, tenantId: string, input:
   }
   return snapshot;
 }
-export async function assertPricingSnapshot(c: DatabaseClient, tenantId: string, snapshot: PricingSnapshot | undefined, action: string) {
+export async function assertPricingSnapshot(c: DatabaseClient, tenantId: string, snapshot: PricingSnapshot | undefined, action: string, effective?: {status:string;features:Record<string,boolean>}) {
+  if (snapshot && ["quickex","whitebit"].includes(snapshot.providerKey) &&
+    (!effective || effective.status !== "active" || !effective.features.crypto_exchange || !effective.features[snapshot.providerKey]))
+    throw new HttpError(403,"This pricing provider is no longer included in the tenant's plan.");
   if (snapshot?.providerKey === "manual_rule") return;
   if (!snapshot) {
     const changed = await c.query(`SELECT 1 FROM tenant_integrations WHERE tenant_id=$1

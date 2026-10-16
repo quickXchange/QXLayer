@@ -34,7 +34,9 @@ test("manual and provider quotes reject changed authorization before creating an
   await assertPricingSnapshot(c([]), "tenant-a", undefined, "swap");
   await assert.rejects(assertPricingSnapshot(c([{ provider_key: "whitebit" }]), "tenant-a", undefined, "swap"));
   const snapshot = { providerKey: "whitebit", revision: 3, routeId: "route-a", rate: "2", manualFallback: false };
-  await assertPricingSnapshot(c([{ enabled: true, revision: 3 }]), "tenant-a", snapshot, "swap");
-  await assert.rejects(assertPricingSnapshot(c([{ enabled: true, revision: 4 }]), "tenant-a", snapshot, "swap"));
-  await assert.rejects(assertPricingSnapshot(c([{ enabled: false, revision: 3 }]), "tenant-a", snapshot, "swap"));
+  const grants = {status:"active",features:{crypto_exchange:true,whitebit:true}};
+  await assertPricingSnapshot(c([{ enabled: true, revision: 3 }]), "tenant-a", snapshot, "swap", grants);
+  await assert.rejects(assertPricingSnapshot(c([{ enabled: true, revision: 4 }]), "tenant-a", snapshot, "swap", grants));
+  await assert.rejects(assertPricingSnapshot(c([{ enabled: false, revision: 3 }]), "tenant-a", snapshot, "swap", grants));
+  await assert.rejects(assertPricingSnapshot(c([{ enabled: true, revision: 3 }]), "tenant-a", snapshot, "swap", {...grants,features:{crypto_exchange:true,whitebit:false}}));
 });

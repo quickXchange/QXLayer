@@ -6,6 +6,7 @@ import { audit } from "../../lib/audit";
 import { contextFor, requireSuperAdmin, type Principal } from "../authentication/service";
 import { isInteger, normalizeDecimal } from "./decimal";
 import { discountBasisPoints, pricingTriple } from "./commercial-pricing";
+import { freezePricingBeforeEdit } from "../commerce/pricing-publication";
 
 export type PlanInput = z.infer<typeof CreatePlanBody>;
 export type AddonInput = z.infer<typeof CreateAddonBody>;
@@ -94,6 +95,7 @@ export function listAddons(principal: Principal) {
   });
 }
 async function writePlan(client: DatabaseClient, input: PlanInput, id?: string) {
+  if (!id && input.currency !== "EUR") throw new HttpError(400, "New plans must be priced in EUR.");
   if (input.name.trim().length < 2) throw new HttpError(400, "Plan name must contain at least two non-whitespace characters.");
   const entries = await validateEntries(client, input.entitlements);
   const configured = pricingTriple([input.monthlyPrice, input.yearlyPrice, input.setupFee]);
@@ -111,6 +113,7 @@ async function writePlan(client: DatabaseClient, input: PlanInput, id?: string) 
 export function savePlan(principal: Principal, input: PlanInput, id?: string) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    await freezePricingBeforeEdit(client);
     if (id) { await catalogLock(client, `plan:${id}`, true); await client.query("SELECT id FROM plans WHERE id=$1 FOR UPDATE", [id]); }
     const before = id ? await readPlan(client, id) : null;
     const after = await writePlan(client, input, id);
@@ -121,6 +124,7 @@ export function savePlan(principal: Principal, input: PlanInput, id?: string) {
 export function duplicatePlan(principal: Principal, id: string) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    await freezePricingBeforeEdit(client);
     const source = await readPlan(client, id);
     const after = await writePlan(client, { ...source, name: `${source.name.slice(0, 110)} copy`, status: "disabled" });
     await audit(client, principal, null, "plan.duplicated", `Duplicated plan ${source.name}`, { sourceId: id, after });
@@ -130,6 +134,7 @@ export function duplicatePlan(principal: Principal, id: string) {
 export function changePlanStatus(principal: Principal, id: string, status: PlanInput["status"]) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    await freezePricingBeforeEdit(client);
     await catalogLock(client, `plan:${id}`, true);
     await client.query("SELECT id FROM plans WHERE id=$1 FOR UPDATE", [id]);
     const before = await readPlan(client, id);
@@ -141,8 +146,10 @@ export function changePlanStatus(principal: Principal, id: string, status: PlanI
 }
 export function saveAddon(principal: Principal, input: AddonInput, id?: string) {
   requireSuperAdmin(principal);
+  if (!id && input.currency !== "EUR") throw new HttpError(400, "New add-ons must be priced in EUR.");
   if (input.name.trim().length < 2) throw new HttpError(400, "Add-on name must contain at least two non-whitespace characters.");
   return withDatabase(contextFor(principal, undefined, true), async (client) => {
+    await freezePricingBeforeEdit(client);
     if (id) { await catalogLock(client, `addon:${id}`, true); await client.query("SELECT id FROM addons WHERE id=$1 FOR UPDATE", [id]); }
     const before = id ? await readAddon(client, id) : null;
     const entries = await validateEntries(client, input.entitlements);
@@ -172,6 +179,7 @@ export function saveAddon(principal: Principal, input: AddonInput, id?: string) 
 export function deleteCatalogRecord(principal: Principal, id: string, kind: "plan" | "addon") {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal, undefined, true), async client => {
+    await freezePricingBeforeEdit(client);
     await catalogLock(client, `${kind}:${id}`, true);
     const before = kind === "plan" ? await readPlan(client, id) : await readAddon(client, id);
     const refs = kind === "plan"

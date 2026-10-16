@@ -5,6 +5,7 @@ import { definitions, readAddon, readPlan, validateEntries, type Entry } from ".
 import { decimal, decimalString } from "./decimal";
 import { applyDependencies, readRegistry } from "../product-registry/service";
 import { recurringEstimate } from "./commercial-pricing";
+import { applyServiceDependencies } from "./service-policy";
 
 export function currentPeriod(now = new Date()) { return now.toISOString().slice(0, 7); }
 export async function lockTenant(client: DatabaseClient, tenantId: string) {
@@ -52,6 +53,7 @@ export async function resolveEntitlements(client: DatabaseClient, tenantId: stri
   }
   const registry = await readRegistry(client);
   applyDependencies(features, sources, registry);
+  applyServiceDependencies(features, sources);
   const resource = await client.query(
     `SELECT
       (SELECT count(DISTINCT c.asset_id) FROM tenant_asset_networks t JOIN asset_network_catalog c ON c.id=t.asset_network_id WHERE t.tenant_id=$1)::text AS max_supported_assets,

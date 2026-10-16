@@ -64,3 +64,15 @@ independent projects with protected credentials and data.
 copy. Keep copied code tenant-scoped and credentials independently configured.
 Do not infer authorization for deposits, trades, withdrawals, automatic financial
 execution or Heleket from approval of provider configuration and monitoring.
+
+Super Admin exclusively controls RPC, nodes, monitoring, master credentials and
+global configuration, even when a customer plan advertises infrastructure features.
+Customer Quickex/WhiteBIT credentials require independent service and own-credential
+plan permissions; a customer must never inherit master credentials.
+
+**Why:** The user explicitly separated centrally controlled infrastructure from
+the services and independent credentials customers may receive through plans.
+
+**How to apply:** Preserve this boundary across add-ons, tenant overrides and
+upgrades/downgrades. Permission to configure a service is not permission to activate
+financial execution or broaden vault provisioning to another environment.

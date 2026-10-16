@@ -28,7 +28,7 @@ export function AddonEditor({ addon, onDone }: { addon: Addon | null; onDone: ()
   const x: Partial<Addon> = addon ?? {};
   const [mp, setMp] = useState(x.monthlyPrice ?? ''); const [yp, setYp] = useState(x.yearlyPrice ?? ''); const [sf, setSf] = useState(x.setupFee ?? ''); const [dp, setDp] = useState(x.discountPercent ?? '0');
   const [cfg, setCfg] = useState(addon ? (addon.pricingConfigured ?? (addon.monthlyPrice != null && addon.yearlyPrice != null && addon.setupFee != null)) : false);
-  const del = useDeleteAddon(); const [delOpen, setDelOpen] = useState(false); const [delErr, setDelErr] = useState<string | null>(null); const [cur, setCur] = useState(x.currency ?? 'USD');
+  const del = useDeleteAddon(); const [delOpen, setDelOpen] = useState(false); const [delErr, setDelErr] = useState<string | null>(null); const [cur, setCur] = useState(x.currency ?? 'EUR');
   const [enabled, setEnabled] = useState(addon?.enabled ?? true);
   const [ent, setEnt] = useState<EntMap>(addon ? toMap(addon.entitlements) : {});
   const d = defs.data ?? [];
@@ -52,7 +52,7 @@ export function AddonEditor({ addon, onDone }: { addon: Addon | null; onDone: ()
           <div className="space-y-1.5"><Label htmlFor="ad-y">Yearly price</Label><Input id="ad-y" data-testid="input-addon-yearly" disabled={!cfg} placeholder={cfg ? '0.00' : 'Not configured'} value={yp} onChange={(e) => setYp(e.target.value)} /></div>
           <div className="space-y-1.5"><Label htmlFor="ad-s">Setup fee</Label><Input id="ad-s" data-testid="input-addon-setup" disabled={!cfg} placeholder={cfg ? '0.00' : 'Not configured'} value={sf} onChange={(e) => setSf(e.target.value)} /></div>
           <div className="space-y-1.5"><Label htmlFor="ad-d">Discount % (recurring)</Label><Input id="ad-d" data-testid="input-addon-discount" inputMode="decimal" value={dp} onChange={(e) => setDp(e.target.value)} /></div>
-          <div className="space-y-1.5"><Label>Currency</Label><Input data-testid="input-addon-currency" maxLength={3} value={cur} onChange={(e) => setCur(e.target.value.toUpperCase())} /></div>
+          <div className="space-y-1.5"><Label>Currency</Label><Input data-testid="input-addon-currency" readOnly={!addon} title={!addon ? 'New add-ons are priced in EUR' : undefined} maxLength={3} value={cur} onChange={(e) => setCur(e.target.value.toUpperCase())} /></div>
         </div>
         <div className="space-y-1.5 md:col-span-2"><Label>Description</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} /></div>
       </div>

@@ -1201,6 +1201,37 @@ paths:
       parameters: [{name: slug, in: path, required: true, schema: {type: string}}, {name: feature, in: path, required: true, schema: {type: string}}]
       responses:
         "200": {description: Enabled foundation entry point; no product execution, content: {application/json: {schema: {$ref: "#/components/schemas/CapabilityStatus"}}}}
+  /commerce/pricing-publication:
+    get:
+      operationId: getPricingPublication
+      tags: [commerce]
+      summary: Preview unpublished commercial pricing (Super Admin only)
+      responses:
+        "200":
+          description: Current public snapshot and editable catalog preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricingPublication'
+    post:
+      operationId: publishPricingPublication
+      tags: [commerce]
+      summary: Explicitly publish the reviewed pricing revision (Super Admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PricingPublicationInput'
+      responses:
+        "200":
+          description: Published pricing snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PricingPublication'
+        "409":
+          description: Draft or published revision changed; refresh and review again
 components:
   parameters:
     PlanId: {name: planId, in: path, required: true, schema: {type: string, format: uuid}}
@@ -1213,6 +1244,22 @@ components:
         type: string
         format: uuid
   schemas:
+    PricingPublicationInput:
+      type: object
+      required: [expectedRevision, expectedPublishedRevision, reason]
+      properties:
+        expectedRevision: {type: string, pattern: '^[a-f0-9]{64}$'}
+        expectedPublishedRevision: {type: [string, "null"], pattern: '^[a-f0-9]{64}$'}
+        reason: {type: string, minLength: 3, maxLength: 500}
+    PricingPublication:
+      type: object
+      required: [draftRevision, publishedRevision, publishedAt, draft, published]
+      properties:
+        draftRevision: {type: string}
+        publishedRevision: {type: [string, "null"]}
+        publishedAt: {type: [string, "null"]}
+        draft: {type: object, additionalProperties: true}
+        published: {type: [object, "null"], additionalProperties: true}
     WebsiteErrorDiagnostic:
       type: object
       additionalProperties: false

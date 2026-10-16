@@ -1,7 +1,7 @@
 /** Declarative built-in manifests. Extending the catalog never changes tenant architecture. */
 export const coreRegistry = [
   { key: "crypto_exchange", name: "Exchange", category: "Financial", lifecycle: "sandbox_only", sandboxAvailable: true, requiresAssetNetworks: true,
-    features: ["swap", "convert", "buy", "sell"].map((key) => ({ key, label: key === "buy" ? "Buy (Buy/Sell)" : key === "sell" ? "Sell (Buy/Sell)" : key, dependsOn: ["crypto_exchange"] })) },
+    features: ["swap", "convert", "buy", "sell", "quickex", "whitebit", "quickex_customer_credentials", "whitebit_customer_credentials"].map((key) => ({ key, label: key === "buy" ? "Buy (Buy/Sell)" : key === "sell" ? "Sell (Buy/Sell)" : key.replaceAll("_"," "), dependsOn: ["crypto_exchange"] })) },
   { key: "website", name: "Tenant Website", category: "Core", lifecycle: "core_ready", sandboxAvailable: true, requiresAssetNetworks: false, features: [] },
   { key: "merchant_api", name: "API Credentials & Webhooks", category: "Core", lifecycle: "sandbox_only", sandboxAvailable: false, requiresAssetNetworks: false,
     features: ["api_keys", "webhooks"].map((key) => ({ key, label: key, dependsOn: ["merchant_api"] })) },

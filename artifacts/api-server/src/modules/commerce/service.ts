@@ -1,4 +1,5 @@
 import { withDatabase, type DatabaseClient } from "@workspace/db";
+import { publishedOffers } from "./pricing-publication";
 import { z } from "zod";
 import { requireSuperAdmin, type Principal } from "../authentication/service";
 import { requestContext, event } from "../customer/order-model";
@@ -64,7 +65,7 @@ async function billing(c: DatabaseClient, row: any) {
 async function livePricing(c: DatabaseClient, row: any) {
   const quoted = row.status === "quote_ready" ? row.approved_configuration : null;
   const selection = await catalogSelection(c, quoted?.plan?.id ?? row.configuration.requestedPlanId,
-    quoted?.addons?.map((a: { id: string }) => a.id) ?? row.configuration.requestedAddonIds ?? []);
+    quoted?.addons?.map((a: { id: string }) => a.id) ?? row.configuration.requestedAddonIds ?? [],!!quoted);
   const quotation = row.status === "quote_ready" ? { status: row.status, monthlyPrice: row.monthly_price, setupPrice: row.setup_price,
     customizationPrice: row.customization_price, customDesignDecision: row.custom_design_decision, currency: row.currency } : undefined;
   return { selection, price: invoicePricing({ ...row.configuration, catalogSnapshot: selection }, quotation) };
@@ -148,14 +149,9 @@ export async function assertPaid(c: DatabaseClient, orderId: string, quotation?:
   }
 }
 export async function publicOffers() {
-  const p = { userId: "public:phase1-catalog", role: "unassigned", memberships: [] } as unknown as Principal;
-  const catalog = await whiteLabelCatalog(p);
-  const settings = await withDatabase({ actorId: p.userId }, async c => (await c.query("SELECT plan_id,monthly,yearly FROM qxlayer_commerce.offer_settings")).rows);
-  const plans = catalog.plans.filter(v => v.pricingConfigured).map(v => {
-    const s = settings.find(s => s.plan_id === v.id);
-    return { ...v, billingPeriods: [(!s || s.monthly) && "monthly", (!s || s.yearly) && "yearly"].filter(Boolean) };
-  }).filter(v => v.billingPeriods.length);
-  const addons = catalog.addons.filter(v => v.pricingConfigured);
-  const available = await withDatabase({ actorId: p.userId }, async c => (await c.query("SELECT id,name,kind,currency FROM qxlayer_commerce.methods WHERE enabled AND approved ORDER BY name,id")).rows);
-  return { plans, addons, methods: available, purchaseAvailable: plans.some(plan => available.some(m => m.currency === plan.currency)) };
+  return withDatabase({actorId:"public:published-offers"}, async c => {
+    const offer = await publishedOffers(c);
+    const methods = (await c.query("SELECT id,name,kind,currency FROM qxlayer_commerce.methods WHERE enabled AND approved ORDER BY name,id")).rows;
+    return { ...offer, methods, purchaseAvailable: offer.plans.some((p: any) => methods.some(m => m.currency === p.currency)) };
+  });
 }

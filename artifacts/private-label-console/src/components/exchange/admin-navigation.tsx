@@ -1,5 +1,6 @@
 import { useEffect, useState, type ElementType } from 'react';
 import { Link } from 'wouter';
+import { hiddenForCustomer, hasIntegrationGrant } from '@/lib/feature-gate';
 import { ArrowLeftRight, Boxes, ChevronDown, Globe, LayoutGrid, Plug, Settings, Users } from 'lucide-react';
 
 type SectionLink = [string, string];
@@ -12,7 +13,8 @@ const groups: Group[] = [
   { label: 'Management', icon: Settings, sections: [['staff', 'Staff & Permissions'], ['audit', 'Activity / Audit'], ['settings', 'Settings']] },
 ];
 
-function NavigationGroup({ group, root, section, showWebsite }: { group: Group; root: string; section: string; showWebsite: boolean }) {
+type Gate = { isSuper: boolean; features: Record<string, unknown> };
+function NavigationGroup({ group, root, section, showWebsite, gate }: { group: Group; root: string; section: string; showWebsite: boolean; gate: Gate }) {
   const active = group.sections.some(([key]) => key === section);
   const [open, setOpen] = useState(active || group.label === 'Orders' || group.label === 'Exchange');
   useEffect(() => { if (active) setOpen(true); }, [active, section]);
@@ -25,7 +27,7 @@ function NavigationGroup({ group, root, section, showWebsite }: { group: Group; 
         <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${open ? '' : '-rotate-90'}`} />
       </button>
       <div id={groupId} hidden={!open} className="ml-4">
-        {group.sections.filter(([key]) => key !== 'website' || showWebsite).map(([key, label]) => (
+        {group.sections.filter(([key]) => (key !== 'website' || showWebsite) && (gate.isSuper || !hiddenForCustomer(key, gate.features))).map(([key, label]) => (
           <Link key={key} href={`${root}/${key}`} className="qx-navlink" aria-current={section === key ? 'page' : undefined}
             data-testid={`link-exchange-${key}`}>
             <span>{label}</span>
@@ -36,17 +38,19 @@ function NavigationGroup({ group, root, section, showWebsite }: { group: Group; 
   );
 }
 
-export function ExchangeAdminNavigation({ root, section, showWebsite }: { root: string; section: string; showWebsite: boolean }) {
+export function ExchangeAdminNavigation({ root, section, showWebsite, isSuper = true, features = {} }: { root: string; section: string; showWebsite: boolean; isSuper?: boolean; features?: Record<string, unknown> }) {
+  const gate: Gate = { isSuper, features };
   return (
     <div className="flex flex-col gap-1" data-testid="nav-exchange-sidebar">
       <Link href={root} className="qx-navlink" aria-current={section === '' ? 'page' : undefined} data-testid="link-exchange-overview">
         <LayoutGrid className="h-4 w-4 shrink-0" /><span>Overview</span>
       </Link>
-      {groups.slice(0, 2).map(group => <NavigationGroup key={group.label} {...{ group, root, section, showWebsite }} />)}
+      {groups.slice(0, 2).map(group => <NavigationGroup key={group.label} {...{ group, root, section, showWebsite, gate }} />)}
       <Link href={`${root}/customers`} className="qx-navlink" aria-current={section === 'customers' ? 'page' : undefined} data-testid="link-exchange-customers">
         <Users className="h-4 w-4 shrink-0" /><span>Customers</span>
       </Link>
-      {groups.slice(2).map(group => <NavigationGroup key={group.label} {...{ group, root, section, showWebsite }} />)}
+      {!isSuper && hasIntegrationGrant(features) && <Link href={`${root.replace(/\/exchange$/, '')}/integrations`} className="qx-navlink" data-testid="link-exchange-integrations"><Plug className="h-4 w-4 shrink-0" /><span>Integrations</span></Link>}
+      {groups.slice(2).filter(group => isSuper || group.label !== 'Integrations').map(group => <NavigationGroup key={group.label} {...{ group, root, section, showWebsite, gate }} />)}
     </div>
   );
 }

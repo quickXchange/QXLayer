@@ -5,6 +5,39 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+export interface PricingPublicationInput {
+  /** @pattern ^[a-f0-9]{64}$ */
+  expectedRevision: string;
+  /**
+     * @nullable
+     * @pattern ^[a-f0-9]{64}$
+     */
+  expectedPublishedRevision: string | null;
+  /**
+     * @minLength 3
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export type PricingPublicationDraft = { [key: string]: unknown };
+
+/**
+ * @nullable
+ */
+export type PricingPublicationPublished = { [key: string]: unknown } | null;
+
+export interface PricingPublication {
+  draftRevision: string;
+  /** @nullable */
+  publishedRevision: string | null;
+  /** @nullable */
+  publishedAt: string | null;
+  draft: PricingPublicationDraft;
+  /** @nullable */
+  published: PricingPublicationPublished;
+}
+
 export type WebsiteErrorDiagnosticCategory = typeof WebsiteErrorDiagnosticCategory[keyof typeof WebsiteErrorDiagnosticCategory];
 
 
