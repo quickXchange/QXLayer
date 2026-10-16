@@ -13,6 +13,9 @@ take precedence over a stale recovery cookie, including one for another account.
 **Why:** The Owner reported an expired setup link after native email verification
 and a recovery session already existed. Automatic redemption plus URL scrubbing
 made subsequent navigation look like expiry instead of resuming recovery.
+The user subsequently confirmed “Setup complete; Admin Panel works after reload”
+with the explicit-continuation flow. Preserve this accepted recovery behavior;
+that confirmation is not authorization for public Live cutover or DNS changes.
 
 **How to apply:** Keep the explicit Continue step, genuine server-established
 cookies, single-use provider validation, and recovery-only business restrictions.
