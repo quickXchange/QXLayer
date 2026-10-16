@@ -1,4 +1,4 @@
-import { pool } from "@workspace/db";
+import { authSupportPool as pool } from "@workspace/db";
 import { supabaseAuthConfiguration, supabaseBusinessId } from "./config";
 import { HttpError } from "../../lib/errors";
 

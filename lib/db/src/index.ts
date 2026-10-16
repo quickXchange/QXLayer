@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import * as schema from "./schema";
-import { connectionOptions } from "./connection-options";
+import { connectionOptions, authConnectionOptions } from "./connection-options";
 
 const { Pool } = pg;
 
@@ -12,6 +12,9 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const pool = new Pool(connectionOptions());
+// Private session/identity support never uses the business-data login externally.
+export const authSupportPool = process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "production" &&
+  process.env.QXLAYER_AUTH_PROVIDER === "supabase" ? new Pool(authConnectionOptions()) : pool;
 export const db = drizzle(pool, { schema });
 
 export * from "./schema";

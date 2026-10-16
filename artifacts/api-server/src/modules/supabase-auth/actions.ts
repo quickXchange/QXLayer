@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { pool } from "@workspace/db";
+import { authSupportPool as pool } from "@workspace/db";
 import { z } from "zod";
 import type { Request, Response } from "express";
 import { HttpError } from "../../lib/errors";

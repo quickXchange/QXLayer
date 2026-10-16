@@ -1,5 +1,5 @@
 import { createHmac } from "node:crypto";
-import { pool } from "@workspace/db";
+import { authSupportPool as pool } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { supabaseEmailLoginEnabled, supabaseAuthConfiguration, supabaseSessionSecret } from "./config";
 

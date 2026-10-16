@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { Request, Response } from "express";
-import { pool } from "@workspace/db";
+import { authSupportPool as pool } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { cookieDigest, sessionCodec } from "./crypto";
 import { authRequest, type SupabaseTokens, type SupabaseUser } from "./provider";

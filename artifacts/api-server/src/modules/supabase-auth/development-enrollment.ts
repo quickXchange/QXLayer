@@ -1,4 +1,4 @@
-import { pool } from "@workspace/db";
+import { authSupportPool as pool } from "@workspace/db";
 import type { Request, Response } from "express";
 import { HttpError } from "../../lib/errors";
 import { developmentSupabaseAuth, supabaseAuthConfiguration } from "./config";

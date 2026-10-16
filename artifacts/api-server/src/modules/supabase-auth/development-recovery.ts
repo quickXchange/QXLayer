@@ -1,6 +1,6 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
-import { pool } from "@workspace/db";
+import { authSupportPool as pool } from "@workspace/db";
 import { HttpError } from "../../lib/errors";
 import { developmentSupabaseAuth, supabaseAuthConfiguration } from "./config";
 import { authRequest, type SupabaseUser } from "./provider";

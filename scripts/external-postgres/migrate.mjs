@@ -31,10 +31,17 @@ export function targetConfiguration(env) {
 export async function migrate(env = process.env) {
   const options = targetConfiguration(env);
   if (options.caFile) {
-    options.ssl = { rejectUnauthorized: true, ca: await readFile(options.caFile, "utf8") };
+    options.ssl = { rejectUnauthorized: true, ca: await readFile(options.caFile, "utf8"),
+      servername: new URL(options.connectionString).hostname };
+    options.enableChannelBinding = true;
+    options.connectionTimeoutMillis = 15000;
     delete options.caFile;
   }
-  const dir = new URL("../../deploy/migrations/", import.meta.url);
+  const production = env.QXLAYER_EXTERNAL_ENVIRONMENT === "production";
+  if (production && (env.SUPABASE_PROJECT_REF !== "qcgvhlphalxqzzsxqjhi" ||
+      env.VYNOX_PRODUCTION_INITIALIZATION_APPROVED !== "true"))
+    throw new Error("Explicit isolated Production initialization approval required");
+  const dir = new URL(production ? "../../deploy/production-candidate/" : "../../deploy/migrations/", import.meta.url);
   const manifest = JSON.parse(await readFile(new URL("manifest.json", dir), "utf8"));
   // Verify the entire ordered manifest before any connection or DDL.
   const migrations = [];
@@ -42,7 +49,11 @@ export async function migrate(env = process.env) {
   for (const entry of manifest) {
     if (!/^\d{4}_[a-z_]+\.sql$/.test(entry.file) || entry.file <= previous)
       throw new Error("Invalid/unsorted migration manifest.");
-    const sql = await readFile(new URL(entry.file, dir), "utf8");
+    if (entry.source && (!production || ![
+      "../migrations/0001_application_schema.sql", "../migrations/0002_runtime_security.sql",
+      "0004_latest-schema-PREPARED.sql", "0005_auth_runtime.sql"].includes(entry.source)))
+      throw new Error("Unreviewed Production migration source");
+    const sql = await readFile(new URL(entry.source ?? entry.file, dir), "utf8");
     if (createHash("sha256").update(sql).digest("hex") !== entry.sha256)
       throw new Error("Migration checksum mismatch.");
     migrations.push({ ...entry, sql }); previous = entry.file;

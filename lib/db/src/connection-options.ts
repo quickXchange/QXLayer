@@ -3,6 +3,14 @@ import type { PoolConfig } from "pg";
 
 /** Replit defaults stay unchanged. External mode must be explicit and pinned. */
 export function connectionOptions(env = process.env): PoolConfig {
+  return restrictedConnectionOptions(env, "qxlayer_app");
+}
+
+export function authConnectionOptions(env = process.env): PoolConfig {
+  return restrictedConnectionOptions({ ...env, DATABASE_URL: env.QXLAYER_PRODUCTION_AUTH_DATABASE_URL }, "qxlayer_auth_app");
+}
+
+function restrictedConnectionOptions(env: NodeJS.ProcessEnv, login: "qxlayer_app" | "qxlayer_auth_app"): PoolConfig {
   if (!env.DATABASE_URL) throw new Error("DATABASE_URL is required.");
   if (!env.QXLAYER_DATABASE_PROVIDER || env.QXLAYER_DATABASE_PROVIDER === "replit")
     return { connectionString: env.DATABASE_URL };
@@ -12,7 +20,7 @@ export function connectionOptions(env = process.env): PoolConfig {
   catch { throw new Error("External database connection URL is invalid; credentials are not logged."); }
   if (!env.DB_EXPECTED_HOST || url.hostname !== env.DB_EXPECTED_HOST ||
       !/^(?:db\.[a-z0-9]+\.supabase\.co|[a-z0-9.-]+\.pooler\.supabase\.com)$/.test(url.hostname) ||
-      !/^qxlayer_app(?:\.[a-z0-9]+)?$/.test(decodeURIComponent(url.username)) ||
+      !(new RegExp(`^${login}(?:\\.[a-z0-9]+)?$`)).test(decodeURIComponent(url.username)) ||
       url.pathname !== "/postgres" || !["", "5432"].includes(url.port))
     throw new Error("External runtime requires the pinned Supabase direct/session connection and restricted application login.");
   if (!env.DB_TLS_CA_FILE) throw new Error("DB_TLS_CA_FILE is required for verified external TLS.");

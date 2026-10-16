@@ -3,8 +3,12 @@ import { readFile } from "node:fs/promises";
 import { readSchema, canonicalSchema } from "./schema-reference.mjs";
 
 /** Read-only schema/security readback, never repairs or silently accepts drift. */
-export async function verifyTarget(client) {
+export async function verifyTarget(client, { policyRole = "PUBLIC" } = {}) {
   const expected = JSON.parse(await readFile(new URL("../../deploy/migrations/rls-reference.json", import.meta.url), "utf8"));
+  if (policyRole === "qxlayer_runtime") {
+    // Approved public pricing rules are read-only public configuration, not tenant secrets.
+    expected.tables.find(t => t.name === "pricing_rules").policies.find(p => p.name === "qx_read").using = "true";
+  }
   const schema = JSON.parse(await readFile(new URL("../../deploy/migrations/schema-reference.json", import.meta.url), "utf8"));
   assert.deepEqual(canonicalSchema(await readSchema(client)), canonicalSchema(schema),
     "Actual columns, reviewed constant defaults, constraints and indexes must match.");
@@ -16,9 +20,11 @@ export async function verifyTarget(client) {
     FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
     WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname`);
   assert.deepEqual(actual.rows, expected.tables, "Exact tables, RLS/FORCE and all predicates must match.");
-  const targets = await client.query(`SELECT bool_and(polpermissive AND polroles=ARRAY[0::oid]) AS safe
+  assert(["PUBLIC", "qxlayer_runtime"].includes(policyRole));
+  const targets = await client.query(`SELECT bool_and(polpermissive AND polroles=ARRAY[
+    CASE WHEN $1='PUBLIC' THEN 0::oid ELSE (SELECT oid FROM pg_roles WHERE rolname=$1) END]) AS safe
     FROM pg_policy p JOIN pg_class c ON c.oid=p.polrelid JOIN pg_namespace n ON n.oid=c.relnamespace
-    WHERE n.nspname='public'`);
+    WHERE n.nspname='public'`, [policyRole]);
   assert.equal(targets.rows[0]?.safe,true,"Policy role targets/permissiveness must match the source.");
   const roles = await client.query(`SELECT rolname,rolsuper,rolbypassrls,rolinherit,rolcreatedb,rolcreaterole,rolreplication
     FROM pg_roles WHERE rolname IN ('qxlayer_app','qxlayer_runtime') ORDER BY rolname`);
