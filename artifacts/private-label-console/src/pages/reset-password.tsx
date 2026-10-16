@@ -1,11 +1,9 @@
 import { useRef, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { authClient, supabaseAuth } from '@/lib/owned-auth-client';
 import { verifyRecoveryLink, supabaseMfa, useSupabaseSessionState } from '@/lib/supabase-auth-client';
 import { A, AuthFrame, ErrorLine, Field, Form, SuccessLine, Submit, authErrorText, PASSWORD_HINT, validateNewPassword } from '@/components/auth/auth-ui';
 
 export default function ResetPasswordPage() {
-  const qc = useQueryClient();
   const { session } = useSupabaseSessionState();
   const needsMfa = !!session?.recovery && !!session.user?.twoFactorEnabled;
   const [code, setCode] = useState('');
@@ -46,7 +44,9 @@ export default function ResetPasswordPage() {
       }
       const r = await authClient.resetPassword({ newPassword: pw });
       if (r.error) { setErr(authErrorText(r.error)); return; }
-      qc.clear(); setPw(''); setConfirm(''); setCode(''); setDone(true);
+      // The auth client already updates identity-bound queries in place.
+      // Clearing active observers here can strand the next login on its loader.
+      setPw(''); setConfirm(''); setCode(''); setDone(true);
     } catch (e) { setErr(authErrorText(e as Error)); } finally { setBusy(false); }
   };
   return (

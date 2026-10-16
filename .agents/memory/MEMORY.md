@@ -53,3 +53,4 @@
 - [Native Publish planner loss](native-publish-planner-loss.md) — correct database metadata can be lost by the native planner; local Drizzle fixes are not platform fixes.
 - [Protected provider configuration](protected-provider-configuration.md) — preserve Sensitive env types and Preview scope; target pooler backup authentication differs from Live.
 - [Production Owner continuity](production-owner-continuity.md) — preserve the original Production identity; verified Development Gmail is not automatic migration authority.
+- [Recovery token custody](production-recovery-custody.md) — explicit redemption, protected redirect preservation, recovery-cookie resume and native mail evidence.

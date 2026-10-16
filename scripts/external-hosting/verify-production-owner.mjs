@@ -59,6 +59,37 @@ try {
     applicationUnexpiredSessions: applicationSessions.rows[0].n,
     adminAccessRequiresVerifiedTotpAndAal2: true, publicLiveChanged: false, dnsChanged: false,
     finalOwnerAcceptanceComplete: false };
+  if (process.argv.includes("--resend-password-setup")) {
+    const acceptance = JSON.parse(await readFile(`${folder}/production-reset-browser-test.json`));
+    assert(acceptance.passed && acceptance.originalOwnerUntouched && acceptance.temporaryAccessRevoked &&
+      acceptance.fixtureCleaned, "Complete protected browser acceptance and cleanup first");
+    const health = await fetch("https://qxlayer-api.onrender.com/api/healthz");
+    assert(health.ok); const running = await health.json();
+    assert.equal(running.commit, acceptance.commit);
+    assert(running.acceptanceOnly && !running.publicLiveActivated);
+    const configResponse = await fetch(`https://api.supabase.com/v1/projects/${project}/config/auth`,
+      { headers: { Authorization: `Bearer ${process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SETUP_TOKEN}` } });
+    assert(configResponse.ok);const config=await configResponse.json();
+    assert.equal(config.site_url,origin);assert.equal(config.mailer_otp_exp,3600);
+    assert(config.mailer_templates_recovery_content.includes("Continue to password setup"));
+    assert.equal(env.QXLAYER_PRODUCTION_SUPABASE_AUTH_MAIL_READY,"true");
+    const fresh = await fetch(`https://${project}.supabase.co/auth/v1/recover`, { method:"POST",
+      headers:{apikey:process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY,
+        Authorization:`Bearer ${process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY}`,"Content-Type":"application/json"},
+      body:JSON.stringify({email:recipient.email}),redirect:"error",signal:AbortSignal.timeout(25000) });
+    assert(fresh.ok,`Fresh native setup mail HTTP ${fresh.status}`);
+    const sentRead = await fetch(`https://${project}.supabase.co/auth/v1/admin/users/${row.subject}`,
+      {headers:{apikey:process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY,
+        Authorization:`Bearer ${process.env.QXLAYER_PRODUCTION_SUPABASE_AUTH_SERVER_KEY}`}});
+    assert(sentRead.ok);const sentUser=await sentRead.json();
+    assert(new Date(sentUser.recovery_sent_at)>new Date(user.recovery_sent_at));
+    report.freshNativeSingleUseSetupEmailSent=true;
+    report.freshNativeRecoverySentAt=sentUser.recovery_sent_at;
+    report.freshLinkLifetimeSeconds=3600;
+    report.ownerTokenReadGeneratedOrRedeemedByOperator=false;
+    migrated.latestPasswordSetupSentAt=sentUser.recovery_sent_at;
+    await writeFile(`${folder}/production-owner-migration.json`,JSON.stringify(migrated,null,2),{mode:0o600});
+  }
   if (process.argv.includes("--send-access-instructions")) {
     assert(!migrated.accessInstructionsSent, "Instructions already sent; never resend shared gate credentials automatically");
     assert(!user.email_confirmed_at && !verifiedFactors, "Existing enrolled Owner requires read-only handling");

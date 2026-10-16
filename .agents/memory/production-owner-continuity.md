@@ -56,6 +56,7 @@ the existing Development/source entry.
 server-side factors alone does not protect the user's original local authenticator
 entry if they replace it while enrolling another environment.
 
-**How to apply:** Use the website's manual setup-key option with the local account
-name “VYNOX LAYER Production” and time-based mode. The key stays between the user's
-own browser and authenticator; never request it or a one-time code in chat.
+**How to apply:** Use a distinct Production issuer/account label. If an older QR
+would replace an existing entry, use the manual setup-key option with local name
+“VYNOX LAYER Production” and time-based mode. The key stays between the user's own
+browser and authenticator; never request it or a one-time code in chat.
