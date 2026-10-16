@@ -13,6 +13,7 @@ import { DashboardPanel } from '@/components/exchange/dashboard-panel';
 import { OrdersPanel } from '@/components/exchange/orders-panel';
 import { AssetsPanel, NetworksPanel } from '@/components/exchange/catalog-sections';
 import { RoutesPanel, PaymentMethodsPanel, PricingPanel } from '@/components/exchange/route-sections';
+import { WalletAddressesPanel } from '@/components/exchange/wallet-addresses-panel';
 import { SettingsPanel } from '@/components/exchange/settings-panel';
 import { TenantProviderPanel } from '@/components/providers/tenant-panel';
 import { CustomersPanel } from '@/components/exchange/customers-panel';
@@ -22,8 +23,8 @@ import { ExchangeAdminNavigation } from '@/components/exchange/admin-navigation'
 import { PreviewIntegrations } from '@/components/exchange/preview-integrations';
 import { useConsoleNavigation } from '@/components/app/console-frame';
 
-const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
-const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'settings'];
+const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['wallets', 'Wallet Addresses'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
+const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'wallets', 'settings'];
 
 export default function Exchange() {
   const setNavigation = useConsoleNavigation();
@@ -66,6 +67,7 @@ export default function Exchange() {
   else if (sec === 'domain') body = <div className="space-y-6"><Guide title="Domain" note="Custom domain and ownership verification." links={[['branding', 'Branding'], ['website', 'Website settings']]} root={root} /><DomainSection tenant={t} readOnly={ro('domains.manage')} /><DomainOwnershipSection tenant={t} readOnly={ro('domains.manage')} /></div>;
   else if (sec === 'payment-methods') body = <PaymentMethodsPanel d={d} locked={cfgLocked} />;
   else if (sec === 'pricing') body = <PricingPanel d={d} locked={cfgLocked} />;
+  else if (sec === 'wallets') body = <WalletAddressesPanel d={d} locked={cfgLocked} tenantId={id} />;
   else if (sec === 'settings') body = <SettingsPanel tenantId={id} d={d} locked={cfgLocked} canManageSub={can.manageSubscription} features={F} />;
   else if (sec === 'branding') body = <div className="space-y-6"><Guide title="Branding" note="Logo, favicon, brand name, colors and appearance (dark and light mode)." links={[['website', 'Website settings'], ['domain', 'Domain']]} root={root} /><BrandSection tenant={t} readOnly={ro('branding.manage')} /></div>;
   else if (sec === 'website') body = <div className="space-y-6"><Guide title="Website settings" note="Public site content and presentation." links={[['branding', 'Branding'], ['domain', 'Domain']]} root={root} /><WebsiteSection tenant={t} readOnly={ro('branding.manage')} /></div>;

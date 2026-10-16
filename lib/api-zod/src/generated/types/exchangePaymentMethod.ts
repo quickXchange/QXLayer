@@ -15,6 +15,11 @@ export interface ExchangePaymentMethod {
      * @maxLength 80
      */
   label: string;
+  /**
+     * Optional sandbox payment instructions, frozen on order creation; never include credentials
+     * @maxLength 2000
+     */
+  instructions?: string;
   enabled: boolean;
   currency: ExchangePaymentMethodCurrency;
   buy: boolean;

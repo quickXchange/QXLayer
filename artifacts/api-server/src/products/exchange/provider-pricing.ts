@@ -4,6 +4,7 @@ import { HttpError } from "../../lib/errors";
 import { open } from "../../modules/integrations/vault";
 import { providerRate, positiveRate } from "../../modules/integrations/pricing-adapters";
 import { decimal } from "../../modules/entitlements/decimal";
+import { selectPricingRule } from "./pricing-rules";
 
 export interface PricingSnapshot { providerKey: string; revision: number; routeId: string; rate: string; manualFallback: boolean }
 export function applyPricing(settings: ExchangeSettings, snapshot?: PricingSnapshot): ExchangeSettings {
@@ -18,6 +19,10 @@ export async function sandboxPricing(c: DatabaseClient, tenantId: string, input:
   if (!route) throw new HttpError(400, "No enabled route exists for this pair.");
   const amount = decimal(input.amount);
   if (amount <= 0n || amount < decimal(route.minimum) || amount > decimal(route.maximum)) throw new HttpError(400, "Amount is outside this route's limits.");
+  const rule = selectPricingRule(settings, input);
+  // An explicitly configured manual override never requires an external call.
+  // The signed quote binds the entire tenant configuration, including this rule.
+  if (rule?.rate !== undefined) return { providerKey: "manual_rule", revision: 0, routeId: route.id, rate: rule.rate, manualFallback: false };
   const rows = await c.query(`SELECT * FROM tenant_integrations WHERE tenant_id=$1
     AND provider_key IN ('1forge','whitebit','quickex') AND settings->'quoteActions' ? $2`, [tenantId, input.action]);
   if (!rows.rowCount) return undefined;
@@ -58,6 +63,7 @@ export async function sandboxPricing(c: DatabaseClient, tenantId: string, input:
   return snapshot;
 }
 export async function assertPricingSnapshot(c: DatabaseClient, tenantId: string, snapshot: PricingSnapshot | undefined, action: string) {
+  if (snapshot?.providerKey === "manual_rule") return;
   if (!snapshot) {
     const changed = await c.query(`SELECT 1 FROM tenant_integrations WHERE tenant_id=$1
       AND provider_key IN ('1forge','whitebit','quickex') AND settings->'quoteActions' ? $2`, [tenantId, action]);

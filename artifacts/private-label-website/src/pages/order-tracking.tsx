@@ -8,6 +8,11 @@ export default function OrderTracking() {
   const { slug = '', orderId = '' } = useParams<{ slug: string; orderId: string }>();
   const [token, setToken] = useState(() => window.location.hash.slice(1));
   const [entry, setEntry] = useState(token);
+  const [copyStatus, setCopyStatus] = useState('');
+  const copy = async (value: string) => {
+    try { await navigator.clipboard.writeText(value); setCopyStatus('Instructions copied.'); }
+    catch { setCopyStatus('Copy unavailable. Select and copy the instructions manually.'); }
+  };
   useEffect(() => {
     const sync = () => { const next = window.location.hash.slice(1); setToken(next); setEntry(next); };
     sync();
@@ -39,6 +44,8 @@ export default function OrderTracking() {
         {q.data.pricingSource && <p className="s-muted text-sm">Sandbox pricing source: {q.data.pricingSource.replace(':manual_fallback', ' — manual fallback')}</p>}
         {q.data.destinationFee && <p className="s-muted text-sm">Destination fees: {q.data.destinationFee} {q.data.destinationSymbol} (network and/or payment-method charges, included in output)</p>}
         {q.data.paymentMethod && <p className="s-muted text-sm">Configured method: {q.data.paymentMethod} (not charged)</p>}
+        {q.data.paymentInstructions && <div className="rounded-xl border p-4 text-sm" style={{ borderColor: 'var(--s-line)' }}><p className="mb-2 font-semibold">Recorded sandbox payment instructions</p><p className="whitespace-pre-wrap break-words">{q.data.paymentInstructions}</p><button type="button" className="s-btn mt-3" onClick={() => copy(q.data!.paymentInstructions!)}>Copy instructions</button></div>}
+        {copyStatus && <p role="status" className="s-muted text-xs">{copyStatus}</p>}
         <ol className="space-y-3 border-t pt-4" style={{ borderColor: 'var(--s-line)' }}>{q.data.history.map((event, i) => <li key={i} className="text-sm"><p className="capitalize">{event.status} · {new Date(event.at).toLocaleString()}</p><p className="s-muted mt-1">{event.note}</p></li>)}</ol>
         <button type="button" className="s-btn" onClick={() => q.refetch()}>Refresh status</button>
         <p className="s-muted text-xs">Every status is simulated. This order has no deposit address, wallet, blockchain transaction or payment.</p>

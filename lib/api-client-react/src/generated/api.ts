@@ -54,6 +54,8 @@ import type {
   ExchangeSettings,
   ExchangeStatusInput,
   ExchangeVisualCatalog,
+  ExchangeWalletScan,
+  ExchangeWalletScanInput,
   GetDomainHostingProof200,
   GetPhase1Catalog200,
   HealthStatus,
@@ -158,6 +160,91 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getScanExchangeWalletUrl = (tenantId: string,
+    walletId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/wallets/${walletId}/scan`
+}
+
+export const scanExchangeWallet = async (tenantId: string,
+    walletId: string,
+    exchangeWalletScanInput: ExchangeWalletScanInput, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeWalletScan> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ExchangeWalletScan>(getScanExchangeWalletUrl(tenantId,walletId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeWalletScanInput)
+  }
+);}
+
+
+
+
+
+export const getScanExchangeWalletMutationKey = () => ['scanExchangeWallet'] as const;
+
+export const getScanExchangeWalletMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scanExchangeWallet>>, TError,ScanExchangeWalletMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof scanExchangeWallet>>, TError,ScanExchangeWalletMutationVariables, TContext> => {
+
+const mutationKey = getScanExchangeWalletMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof scanExchangeWallet>>, ScanExchangeWalletMutationVariables> = (props) => {
+          const {tenantId,walletId,data} = props ?? {};
+
+          return  scanExchangeWallet(tenantId,walletId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ScanExchangeWalletMutationResult = NonNullable<Awaited<ReturnType<typeof scanExchangeWallet>>>
+    export type ScanExchangeWalletMutationBody = BodyType<ExchangeWalletScanInput>
+    export type ScanExchangeWalletMutationError = ErrorType<unknown>
+    export type ScanExchangeWalletMutationVariables = {tenantId: string;walletId: string;data: BodyType<ExchangeWalletScanInput>}
+
+    export const useScanExchangeWallet = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof scanExchangeWallet>>, TError,ScanExchangeWalletMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof scanExchangeWallet>>,
+        TError,
+        ScanExchangeWalletMutationVariables,
+        TContext
+      > => {
+      return useMutation(getScanExchangeWalletMutationOptions(options));
+    }
 
 export const getGetPhase1CatalogUrl = () => {
 

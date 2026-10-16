@@ -216,7 +216,8 @@ function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId:
               <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
                 <Row l="Payment method" v={o.paymentMethod ? <span className="flex items-center gap-2"><VisualImg url={pmId?.logoUrl} label={pmId?.label ?? o.paymentMethod} kind="payment-method" generic={pmId?.generic} size={24} />{o.paymentMethod}</span> : 'None'} />
                 <Row l="Account or card details" v={<span className="text-muted-foreground">Not collected</span>} />
-                <Row l="Payment details" v={<span className="text-muted-foreground" data-testid="text-payment-not-collected">Not collected in this sandbox.</span>} />
+                <Row l="Payment details" v={o.paymentInstructions ? <span className="space-y-2"><span className="block whitespace-pre-wrap break-words" data-testid="text-order-payment-instructions">{o.paymentInstructions}</span><Copy value={o.paymentInstructions} label="Payment instructions" /></span> : <span className="text-muted-foreground" data-testid="text-payment-not-collected">No instructions recorded for this sandbox order.</span>} />
+                {o.pricingRuleId && <Row l="Pricing rule" v={<span className="break-all font-mono text-xs">{o.pricingRuleId}</span>} />}
               </div>
             </Panel>
             <Panel title="Customer and order">

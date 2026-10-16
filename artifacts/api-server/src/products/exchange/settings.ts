@@ -7,6 +7,8 @@ import { requireFeature, type EffectiveEntitlements } from "../../modules/entitl
 import { safeHttps } from "../../modules/website/settings";
 import { containsCredential, PROVIDER_CATALOG } from "./providers";
 import { isImportedVisualUrl } from "./visual-assets";
+import { validatePricingRules } from "./pricing-rules";
+import { validateWallets } from "./wallets";
 
 function safeExchangeLogo(value: string | null) {
   if (value && isImportedVisualUrl(value)) return;
@@ -43,6 +45,9 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
   unique(s.routes.map(r => r.id), "route identifiers");
   unique(s.routes.map(r => `${r.action}:${r.source}:${r.destination}`), "routes for an action and pair");
   unique(s.paymentMethods.map(m => m.id), "payment methods");
+  validatePricingRules(s);
+  validateWallets(s, catalog);
+  for (const rule of s.pricingRules ?? []) if (rule.enabled) requireFeature(e, rule.action);
   unique((s.providers ?? []).map(p => p.providerId), "providers");
   for (const p of s.providers ?? []) {
     if (!PROVIDER_CATALOG.some(c => c.id === p.providerId)) throw new HttpError(400, "Unknown provider catalog entry.");

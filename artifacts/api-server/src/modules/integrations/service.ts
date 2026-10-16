@@ -71,7 +71,7 @@ export async function saveIntegration(p: Principal, tenantId: string, key: strin
       throw new HttpError(403, "Only Super Admin can change authorization, assignments or credential policy. Customer activation requires explicit permission.");
     if ((body.settings.quoteActions?.length ?? 0) && !["1forge", "whitebit", "quickex"].includes(key))
       throw new HttpError(400, "This integration is not a pricing provider.");
-    if (key === "quickex" && body.settings.quoteActions?.includes("swap"))
+    if (key === "quickex" && body.settings.quoteActions?.some(action => action !== "convert"))
       throw new HttpError(400, "Quickex pricing is assigned to Convert only.");
     if (body.settings.quoteActions?.length) {
       const overlap = await c.query(`SELECT provider_key FROM tenant_integrations WHERE tenant_id=$1 AND provider_key<>$2

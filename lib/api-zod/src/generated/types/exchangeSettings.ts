@@ -9,10 +9,12 @@ import type { ExchangeAction } from './exchangeAction';
 import type { ExchangeAssetSettings } from './exchangeAssetSettings';
 import type { ExchangeNetworkSettings } from './exchangeNetworkSettings';
 import type { ExchangePaymentMethod } from './exchangePaymentMethod';
+import type { ExchangePricingRule } from './exchangePricingRule';
 import type { ExchangeProviderConfiguration } from './exchangeProviderConfiguration';
 import type { ExchangeRoute } from './exchangeRoute';
 import type { ExchangeSettingsActions } from './exchangeSettingsActions';
 import type { ExchangeSettingsFiatCurrency } from './exchangeSettingsFiatCurrency';
+import type { ExchangeWallet } from './exchangeWallet';
 
 export interface ExchangeSettings {
   enabled: boolean;
@@ -29,6 +31,10 @@ export interface ExchangeSettings {
   networks: ExchangeNetworkSettings[];
   /** @maxItems 100 */
   routes: ExchangeRoute[];
+  /** @maxItems 100 */
+  pricingRules?: ExchangePricingRule[];
+  /** @maxItems 100 */
+  wallets?: ExchangeWallet[];
   /** @maxItems 30 */
   paymentMethods: ExchangePaymentMethod[];
   /** @maxItems 20 */

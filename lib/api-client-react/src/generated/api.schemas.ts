@@ -948,6 +948,129 @@ export interface ExchangeRoute {
   providerId?: string;
 }
 
+export interface ExchangePricingRule {
+  id: string;
+  action: ExchangeAction;
+  /**
+     * Tenant asset-network ID, fiat endpoint, or * for Any
+     * @minLength 1
+     * @maxLength 80
+     */
+  source: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  destination: string;
+  paymentMethodId?: string;
+  enabled: boolean;
+  /**
+     * @minimum 0
+     * @maximum 1000
+     */
+  priority: number;
+  /**
+     * Optional explicit manual rate; omission preserves the route/provider base rate
+     * @pattern ^\d{1,18}(\.\d{1,18})?$
+     */
+  rate?: string;
+  /**
+     * @minimum 0
+     * @maximum 5000
+     */
+  feeBps: number;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  fixedFee: string;
+  /**
+     * @minimum 0
+     * @maximum 5000
+     */
+  spreadBps: number;
+}
+
+export interface ExchangeWalletScanInput {
+  /**
+     * @minLength 2
+     * @maxLength 500
+     */
+  reason: string;
+}
+
+export interface ExchangeWalletObservation {
+  eventId: string;
+  transactionHash: string;
+  amount: string;
+  blockOrSlot: string;
+  confirmations: number;
+  canonical: boolean;
+  successful: boolean;
+  confirmed: boolean;
+}
+
+export interface ExchangeWalletScan {
+  walletId: string;
+  observedAt: string;
+  from: string;
+  to: string;
+  confirmationsRequired: number;
+  observations: ExchangeWalletObservation[];
+  sandboxOnly: boolean;
+  executionEnabled: boolean;
+}
+
+export type ExchangeWalletAdapterKind = typeof ExchangeWalletAdapterKind[keyof typeof ExchangeWalletAdapterKind];
+
+
+export const ExchangeWalletAdapterKind = {
+  evm: 'evm',
+  bitcoin: 'bitcoin',
+  tron: 'tron',
+  solana: 'solana',
+} as const;
+
+export type ExchangeWalletKind = typeof ExchangeWalletKind[keyof typeof ExchangeWalletKind];
+
+
+export const ExchangeWalletKind = {
+  native: 'native',
+  token: 'token',
+} as const;
+
+export type ExchangeWalletProviderKey = typeof ExchangeWalletProviderKey[keyof typeof ExchangeWalletProviderKey];
+
+
+export const ExchangeWalletProviderKey = {
+  rpc: 'rpc',
+  alchemy: 'alchemy',
+} as const;
+
+export interface ExchangeWallet {
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  assetNetworkId: string;
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  address: string;
+  /** @maxLength 120 */
+  memo?: string;
+  enabled: boolean;
+  adapterKind: ExchangeWalletAdapterKind;
+  kind: ExchangeWalletKind;
+  /** @maxLength 160 */
+  contractOrMint?: string;
+  providerKey: ExchangeWalletProviderKey;
+}
+
 export type ExchangePaymentMethodCurrency = typeof ExchangePaymentMethodCurrency[keyof typeof ExchangePaymentMethodCurrency];
 
 
@@ -973,6 +1096,11 @@ export interface ExchangePaymentMethod {
      * @maxLength 80
      */
   label: string;
+  /**
+     * Optional sandbox payment instructions, frozen on order creation; never include credentials
+     * @maxLength 2000
+     */
+  instructions?: string;
   enabled: boolean;
   currency: ExchangePaymentMethodCurrency;
   buy: boolean;
@@ -1067,6 +1195,10 @@ export interface ExchangeSettings {
   networks: ExchangeNetworkSettings[];
   /** @maxItems 100 */
   routes: ExchangeRoute[];
+  /** @maxItems 100 */
+  pricingRules?: ExchangePricingRule[];
+  /** @maxItems 100 */
+  wallets?: ExchangeWallet[];
   /** @maxItems 30 */
   paymentMethods: ExchangePaymentMethod[];
   /** @maxItems 20 */
@@ -1127,6 +1259,11 @@ export interface ExchangeQuote {
   sandboxOnly: true;
   /** Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution. */
   pricingSource?: string;
+  /**
+     * Matched tenant pricing rule; null for unchanged route pricing
+     * @nullable
+     */
+  pricingRuleId?: string | null;
 }
 
 export interface ExchangeOrderInput {
@@ -1182,6 +1319,8 @@ export interface ExchangeOrder {
   status: string;
   /** Immutable pricing source retained from the signed Sandbox quote. */
   pricingSource?: string;
+  /** @nullable */
+  pricingRuleId?: string | null;
   action: ExchangeAction;
   source: string;
   destination: string;
@@ -1200,6 +1339,11 @@ export interface ExchangeOrder {
      * @nullable
      */
   paymentMethodId?: string | null;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  paymentInstructions?: string | null;
   createdAt: string;
   history: ExchangeOrderEvent[];
   updatedAt?: string;

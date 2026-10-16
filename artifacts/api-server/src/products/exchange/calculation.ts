@@ -1,14 +1,18 @@
 import type { ExchangeSettings, ExchangeCatalogAsset, ExchangeQuoteInput, ExchangeQuote } from "@workspace/api-zod";
 import { HttpError } from "../../lib/errors";
 import { decimal, decimalString } from "../../modules/entitlements/decimal";
+import { selectPricingRule } from "./pricing-rules";
 
 const SCALE = 10n ** 18n;
 const BPS = 10000n;
 /** Integer-only fixed-point math. Output always rounds down to asset precision. */
 export function calculateQuote(s: ExchangeSettings, catalog: ExchangeCatalogAsset[], input: ExchangeQuoteInput) {
   if (!s.enabled || !s.actions[input.action]) throw new HttpError(409, "This exchange action is paused.");
-  const route = s.routes.find(r => r.enabled && r.action === input.action && r.source === input.source && r.destination === input.destination);
-  if (!route) throw new HttpError(400, "No enabled route exists for this action and asset/network pair.");
+  const configuredRoute = s.routes.find(r => r.enabled && r.action === input.action && r.source === input.source && r.destination === input.destination);
+  if (!configuredRoute) throw new HttpError(400, "No enabled route exists for this action and asset/network pair.");
+  const pricingRule = selectPricingRule(s, input);
+  const route = pricingRule ? { ...configuredRoute, feeBps: pricingRule.feeBps, fixedFee: pricingRule.fixedFee,
+    spreadBps: pricingRule.spreadBps, rate: pricingRule.rate ?? configuredRoute.rate } : configuredRoute;
   const amount = decimal(input.amount);
   if (amount <= 0n || amount < decimal(route.minimum) || amount > decimal(route.maximum)) throw new HttpError(400, `Amount must be between ${route.minimum} and ${route.maximum}.`);
   const endpoint = (id: string) => {
@@ -59,6 +63,7 @@ export function calculateQuote(s: ExchangeSettings, catalog: ExchangeCatalogAsse
     rate: decimalString(effectiveRate), fee: decimalString(fee),
     destinationFee: decimalString(destination.networkFee + sellFee),
     minimum: route.minimum, maximum: route.maximum, spreadBps: route.spreadBps, sandboxOnly: true,
+    pricingRuleId: pricingRule?.id ?? null,
   };
-  return { quote, volume: decimalString(volume), paymentMethod };
+  return { quote, volume: decimalString(volume), paymentMethod, pricingRuleId: pricingRule?.id ?? null };
 }

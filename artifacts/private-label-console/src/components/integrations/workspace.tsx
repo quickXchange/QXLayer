@@ -188,7 +188,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
         {['1forge', 'whitebit', 'quickex'].includes(k) && <div className="rounded border p-3 text-sm">
           <p className="font-medium">Sandbox pricing assignment</p>
           <p className="text-xs text-muted-foreground">Read-only rates; no trades, deposits or withdrawals. Select only one provider per action and assign both route asset/networks below.</p>
-          <div className="mt-2 flex gap-4">{(k === 'quickex' ? ['convert'] : ['swap', 'convert']).map(action => <label key={action} className="flex items-center gap-2">
+          <div className="mt-2 flex flex-wrap gap-4">{(k === 'quickex' ? ['convert'] : ['swap', 'convert', 'buy', 'sell']).map(action => <label key={action} className="flex items-center gap-2">
             <input type="checkbox" disabled={!isSuper} checked={f.quoteActions.includes(action)}
               onChange={e => upd({ quoteActions: e.target.checked ? [...f.quoteActions, action] : f.quoteActions.filter(a => a !== action) })}
               data-testid={`pricing-${k}-${action}`} />{action}

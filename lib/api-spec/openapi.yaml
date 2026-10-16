@@ -17,6 +17,23 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /tenants/{tenantId}/exchange/wallets/{walletId}/scan:
+    post:
+      operationId: scanExchangeWallet
+      parameters:
+        - {in: path, name: tenantId, required: true, schema: {type: string, format: uuid}}
+        - {in: path, name: walletId, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeWalletScanInput"}
+      responses:
+        "200":
+          description: Read-only bounded blockchain observations; never financial settlement
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/ExchangeWalletScan"}
   /phase1/catalog:
     $ref: './phase1-commerce.yaml#/paths/~1phase1~1catalog'
   /operator/phase1/methods:
@@ -1611,12 +1628,71 @@ components:
         spreadBps: {type: integer, minimum: 0, maximum: 5000}
         paymentMethodIds: {type: array, maxItems: 30, items: {type: string, format: uuid}}
         providerId: {type: string, maxLength: 80}
+    ExchangePricingRule:
+      type: object
+      required: [id, action, source, destination, enabled, priority, feeBps, fixedFee, spreadBps]
+      properties:
+        id: {type: string, format: uuid}
+        action: {$ref: "#/components/schemas/ExchangeAction"}
+        source: {type: string, minLength: 1, maxLength: 80, description: "Tenant asset-network ID, fiat endpoint, or * for Any"}
+        destination: {type: string, minLength: 1, maxLength: 80}
+        paymentMethodId: {type: string, format: uuid}
+        enabled: {type: boolean}
+        priority: {type: integer, minimum: 0, maximum: 1000}
+        rate: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$', description: "Optional explicit manual rate; omission preserves the route/provider base rate"}
+        feeBps: {type: integer, minimum: 0, maximum: 5000}
+        fixedFee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        spreadBps: {type: integer, minimum: 0, maximum: 5000}
+    ExchangeWalletScanInput:
+      type: object
+      required: [reason]
+      properties:
+        reason: {type: string, minLength: 2, maxLength: 500}
+    ExchangeWalletObservation:
+      type: object
+      required: [eventId, transactionHash, amount, blockOrSlot, confirmations, canonical, successful, confirmed]
+      properties:
+        eventId: {type: string}
+        transactionHash: {type: string}
+        amount: {type: string}
+        blockOrSlot: {type: string}
+        confirmations: {type: integer}
+        canonical: {type: boolean}
+        successful: {type: boolean}
+        confirmed: {type: boolean}
+    ExchangeWalletScan:
+      type: object
+      required: [walletId, observedAt, from, to, confirmationsRequired, observations, sandboxOnly, executionEnabled]
+      properties:
+        walletId: {type: string, format: uuid}
+        observedAt: {type: string, format: date-time}
+        from: {type: string}
+        to: {type: string}
+        confirmationsRequired: {type: integer}
+        observations: {type: array, items: {$ref: "#/components/schemas/ExchangeWalletObservation"}}
+        sandboxOnly: {type: boolean}
+        executionEnabled: {type: boolean}
+    ExchangeWallet:
+      type: object
+      required: [id, label, assetNetworkId, address, enabled, adapterKind, kind, providerKey]
+      properties:
+        id: {type: string, format: uuid}
+        label: {type: string, minLength: 1, maxLength: 80}
+        assetNetworkId: {type: string, minLength: 1, maxLength: 80}
+        address: {type: string, minLength: 1, maxLength: 160}
+        memo: {type: string, maxLength: 120}
+        enabled: {type: boolean}
+        adapterKind: {type: string, enum: [evm, bitcoin, tron, solana]}
+        kind: {type: string, enum: [native, token]}
+        contractOrMint: {type: string, maxLength: 160}
+        providerKey: {type: string, enum: [rpc, alchemy]}
     ExchangePaymentMethod:
       type: object
       required: [id, label, enabled, currency, buy, sell]
       properties:
         id: {type: string, format: uuid}
         label: {type: string, minLength: 2, maxLength: 80}
+        instructions: {type: string, maxLength: 2000, description: "Optional sandbox payment instructions, frozen on order creation; never include credentials"}
         enabled: {type: boolean}
         currency: {type: string, enum: [USD, EUR, GBP]}
         buy: {type: boolean}
@@ -1670,6 +1746,8 @@ components:
         assets: {type: array, maxItems: 100, items: {$ref: "#/components/schemas/ExchangeAssetSettings"}}
         networks: {type: array, maxItems: 200, items: {$ref: "#/components/schemas/ExchangeNetworkSettings"}}
         routes: {type: array, maxItems: 100, items: {$ref: "#/components/schemas/ExchangeRoute"}}
+        pricingRules: {type: array, maxItems: 100, items: {$ref: "#/components/schemas/ExchangePricingRule"}}
+        wallets: {type: array, maxItems: 100, items: {$ref: "#/components/schemas/ExchangeWallet"}}
         paymentMethods: {type: array, maxItems: 30, items: {$ref: "#/components/schemas/ExchangePaymentMethod"}}
         providers: {type: array, maxItems: 20, items: {$ref: "#/components/schemas/ExchangeProviderConfiguration"}}
     ExchangeCatalogAsset:
@@ -1722,6 +1800,7 @@ components:
         spreadBps: {type: integer}
         sandboxOnly: {type: boolean, const: true}
         pricingSource: {type: string, description: "Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution."}
+        pricingRuleId: {type: ["string", "null"], format: uuid, description: "Matched tenant pricing rule; null for unchanged route pricing"}
     ExchangeOrderInput:
       type: object
       required: [quoteToken, idempotencyKey]
@@ -1752,6 +1831,7 @@ components:
         id: {type: string, format: uuid}
         status: {type: string}
         pricingSource: {type: string, description: "Immutable pricing source retained from the signed Sandbox quote."}
+        pricingRuleId: {type: ["string", "null"], format: uuid}
         action: {$ref: "#/components/schemas/ExchangeAction"}
         source: {type: string}
         destination: {type: string}
@@ -1765,6 +1845,7 @@ components:
         spreadBps: {type: integer}
         paymentMethod: {type: ["string", "null"]}
         paymentMethodId: {type: ["string", "null"], description: "Stable configured payment identity. Older orders may have only a historical label."}
+        paymentInstructions: {type: ["string", "null"], maxLength: 2000}
         createdAt: {type: string, format: date-time}
         history: {type: array, items: {$ref: "#/components/schemas/ExchangeOrderEvent"}}
         updatedAt: {type: string, format: date-time}

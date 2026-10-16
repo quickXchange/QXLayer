@@ -40,6 +40,7 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
   });
   s.paymentMethods.forEach((p) => {
     if (!p.label.trim()) e.push('Every payment method needs a label');
+    if ((p.instructions?.length ?? 0) > 2000) e.push(`${p.label || 'Payment method'}: instructions are limited to 2000 characters`);
     if (p.logoUrl && !isAllowedLogo(p.logoUrl)) e.push(`${p.label || 'Payment method'}: logo must be an HTTPS URL or a supplied catalog logo`);
     if (p.minimum !== undefined && !isDec(p.minimum)) e.push(`${p.label || 'Payment method'}: minimum must be a decimal string`);
     if (p.maximum != null && (!isDec(p.maximum) || (isDec(p.minimum ?? '0') && gtDec(p.minimum ?? '0', p.maximum)))) e.push(`${p.label || 'Payment method'}: maximum must be a decimal not below the minimum`);
@@ -69,6 +70,37 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[]): 
   });
   (s.providers ?? []).forEach((p) => {
     if (p.endpoint) { let ok = false; try { const u = new URL(p.endpoint); ok = u.protocol === 'https:' && !u.username && !u.password && !u.search && !u.hash; } catch { ok = false; } if (!ok) e.push(`${p.label || p.providerId}: endpoint must be a public HTTPS URL without credentials, query or fragment`); }
+  });
+  const rules = s.pricingRules ?? [];
+  if (new Set(rules.map(r => r.id)).size !== rules.length) e.push('Pricing rule identifiers must be unique');
+  const ruleEndpoint = (id: string) => id === '*' || id === fiat || s.networks.some(n => n.assetNetworkId === id);
+  const specificity = (r: typeof rules[number]) => Number(r.source !== '*') + Number(r.destination !== '*') + Number(Boolean(r.paymentMethodId));
+  rules.forEach((r, i) => {
+    const nm = `Pricing rule ${i + 1}`;
+    if (!ruleEndpoint(r.source) || !ruleEndpoint(r.destination)) e.push(`${nm}: select tenant endpoints or Any`);
+    if (r.source === r.destination && r.source !== '*') e.push(`${nm}: select distinct endpoints or Any`);
+    if (r.rate !== undefined && !isPos(r.rate)) e.push(`${nm}: manual rate must be positive or left blank`);
+    if (!isDec(r.fixedFee) || !isInt(r.feeBps, 5000) || !isInt(r.spreadBps, 5000) || !isInt(r.priority, 1000)) e.push(`${nm}: check fees, spread and priority`);
+    if (r.paymentMethodId && (!['buy', 'sell'].includes(r.action) || !s.paymentMethods.some(p => p.id === r.paymentMethodId && p[r.action as 'buy' | 'sell']))) e.push(`${nm}: select a payment method supporting this action`);
+    if ((r.action === 'buy' && ((r.source !== '*' && r.source !== fiat) || r.destination === fiat)) ||
+        (r.action === 'sell' && ((r.destination !== '*' && r.destination !== fiat) || r.source === fiat)) ||
+        (['swap', 'convert'].includes(r.action) && (r.source === fiat || r.destination === fiat))) e.push(`${nm}: endpoints do not fit its action`);
+    rules.slice(i + 1).forEach(other => {
+      const compatible = (a: string, b: string) => a === '*' || b === '*' || a === b;
+      if (r.enabled && other.enabled && r.action === other.action && r.priority === other.priority &&
+          specificity(r) === specificity(other) && compatible(r.source, other.source) && compatible(r.destination, other.destination) &&
+          (!r.paymentMethodId || !other.paymentMethodId || r.paymentMethodId === other.paymentMethodId))
+        e.push(`${nm}: overlapping enabled rules need different priorities`);
+    });
+  });
+  const wallets = s.wallets ?? [];
+  if (new Set(wallets.map(w => w.id)).size !== wallets.length) e.push('Wallet identifiers must be unique');
+  wallets.forEach((w, i) => {
+    const nm = `Wallet ${i + 1}`;
+    if (!w.label.trim() || !w.address.trim() || w.label.length > 80 || w.address.length > 160) e.push(`${nm}: enter a label and a public address within the supported limits`);
+    if (!s.networks.some(n => n.assetNetworkId === w.assetNetworkId) || !cat.has(w.assetNetworkId)) e.push(`${nm}: select a tenant asset/network`);
+    if (w.kind === 'token' && (w.adapterKind === 'bitcoin' || !w.contractOrMint?.trim())) e.push(`${nm}: token wallets require a supported adapter and explicit contract or mint`);
+    if (w.kind === 'native' && w.contractOrMint) e.push(`${nm}: native wallets must not contain a token contract or mint`);
   });
   if (s.enabled && !s.actions[s.defaultAction]) e.push('Default action must be an enabled action when the exchange is enabled');
   if (s.publicNote.length > 1000) e.push('Public note is limited to 1000 characters');

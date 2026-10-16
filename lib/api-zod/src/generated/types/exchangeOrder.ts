@@ -13,6 +13,8 @@ export interface ExchangeOrder {
   status: string;
   /** Immutable pricing source retained from the signed Sandbox quote. */
   pricingSource?: string;
+  /** @nullable */
+  pricingRuleId?: string | null;
   action: ExchangeAction;
   source: string;
   destination: string;
@@ -31,6 +33,11 @@ export interface ExchangeOrder {
      * @nullable
      */
   paymentMethodId?: string | null;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  paymentInstructions?: string | null;
   createdAt: Date;
   history: ExchangeOrderEvent[];
   updatedAt?: Date;

@@ -25,7 +25,7 @@ export function projectPublicExchangeConfiguration(s: ExchangeSettings, catalog:
     enabled, defaultAction: s.defaultAction, actions, assets,
     routes: s.routes.filter(r => r.enabled && actions.includes(r.action) && endpointEnabled(r.source) && endpointEnabled(r.destination)),
     // Never expose administrator-only reserve metadata.
-    paymentMethods: s.paymentMethods.filter(m => m.enabled).map(({ reserve: _reserve, ...method }) => method),
+    paymentMethods: s.paymentMethods.filter(m => m.enabled).map(({ reserve: _reserve, instructions: _instructions, ...method }) => method),
     fiatCurrency: s.fiatCurrency, publicNote: s.publicNote,
   };
 }

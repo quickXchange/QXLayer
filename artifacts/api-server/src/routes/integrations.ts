@@ -3,10 +3,15 @@ import { z } from "zod/v4";
 import { principalFrom, requireAuthentication, sameOriginMutation } from "../middlewares/authentication";
 import { integrationBundle, saveIntegration, testIntegration } from "../modules/integrations/service";
 import { miniLanguages, publicMiniConfig, receiveTelegramUpdate, registerWebhook } from "../modules/integrations/telegram";
+import { scanWallet } from "../modules/integrations/wallet-monitoring";
 const router = Router();
 router.use(["/integrations/runtime", "/tenants/:tenantId/integrations"], requireAuthentication, sameOriginMutation,
   (_req, res, next) => { res.set("Cache-Control", "no-store"); next(); });
 const params = z.object({ tenantId: z.uuid(), providerKey: z.string() });
+router.post("/tenants/:tenantId/exchange/wallets/:walletId/scan", requireAuthentication, sameOriginMutation, async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(await scanWallet(principalFrom(res), z.uuid().parse(req.params.tenantId), z.uuid().parse(req.params.walletId), req.body));
+});
 router.get("/integrations/runtime", async (_req, res) => res.json(await integrationBundle(principalFrom(res))));
 router.get("/tenants/:tenantId/integrations", async (req, res) => res.json(await integrationBundle(principalFrom(res), z.uuid().parse(req.params.tenantId))));
 router.put("/tenants/:tenantId/integrations/:providerKey", async (req, res) => {

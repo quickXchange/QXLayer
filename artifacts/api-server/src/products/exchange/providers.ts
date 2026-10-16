@@ -6,8 +6,8 @@ import type { ExchangeProvider } from "@workspace/api-zod";
  */
 export const PROVIDER_CATALOG: ExchangeProvider[] = [
   { id: "manual", name: "Manual / Sandbox", category: "Sandbox pricing", status: "sandbox", functional: true, credentialSupport: false, capabilities: ["swap", "convert", "buy", "sell", "infrastructure"] },
-  { id: "whitebit", name: "WhiteBIT", category: "Read-only Sandbox pricing", status: "sandbox", functional: true, credentialSupport: true, capabilities: ["swap", "convert"] },
-  { id: "1forge", name: "1Forge", category: "Read-only reference rates", status: "sandbox", functional: true, credentialSupport: true, capabilities: ["swap", "convert"] },
+  { id: "whitebit", name: "WhiteBIT", category: "Read-only Sandbox pricing", status: "sandbox", functional: true, credentialSupport: true, capabilities: ["swap", "convert", "buy", "sell"] },
+  { id: "1forge", name: "1Forge", category: "Read-only reference rates", status: "sandbox", functional: true, credentialSupport: true, capabilities: ["swap", "convert", "buy", "sell"] },
   { id: "quickex", name: "Quickex", category: "Read-only Sandbox Convert quotes", status: "sandbox", functional: true, credentialSupport: true, capabilities: ["convert"] },
   { id: "changenow", name: "ChangeNOW", category: "Exchange", status: "configuration_only", functional: false, credentialSupport: false, capabilities: ["swap", "convert"] },
   { id: "quickx", name: "QuickX", category: "Exchange", status: "configuration_only", functional: false, credentialSupport: false, capabilities: ["swap", "convert"] },

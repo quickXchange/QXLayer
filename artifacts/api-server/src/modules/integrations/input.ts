@@ -6,7 +6,7 @@ export const settingsSchema = z.object({
   manualFallback: z.boolean().optional(),
   healthMonitoring: z.boolean().optional(),
   customerActivation: z.boolean().optional(),
-  quoteActions: z.array(z.enum(["swap", "convert"])).max(2).optional(),
+  quoteActions: z.array(z.enum(["swap", "convert", "buy", "sell"])).max(4).optional(),
   adapterKind: z.enum(["evm", "tron", "solana", "bitcoin"]).optional(),
   chainId: z.string().max(100).optional(),
   confirmationsRequired: z.number().int().min(1).max(10000).optional(),

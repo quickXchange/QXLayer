@@ -27,4 +27,9 @@ export interface ExchangeQuote {
   sandboxOnly: true;
   /** Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution. */
   pricingSource?: string;
+  /**
+     * Matched tenant pricing rule; null for unchanged route pricing
+     * @nullable
+     */
+  pricingRuleId?: string | null;
 }

@@ -12,6 +12,7 @@ import { ACTIONS, emptySettings, readExchange, validateExchange } from "./settin
 import { calculateQuote } from "./calculation";
 import { publicExchangeConfiguration } from "./public-configuration";
 import { statusesForOrderView } from "./order-views";
+import { paymentInstructionsSnapshot } from "./payment-snapshot";
 import { assertTelegramTransaction } from "../../modules/integrations/channel";
 import { applyPricing, sandboxPricing, assertPricingSnapshot, type PricingSnapshot } from "./provider-pricing";
 
@@ -82,7 +83,7 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
       await client.query("UPDATE tenant_configuration SET exchange_enabled=$2 WHERE tenant_id=$1", [tenantId, s.enabled]);
       await client.query("UPDATE tenants SET completed_steps=CASE WHEN 'configuration'=ANY(completed_steps) THEN completed_steps ELSE array_append(completed_steps,'configuration') END,updated_at=now() WHERE id=$1", [tenantId]);
       await audit(client, principal, tenantId, "exchange.configuration.saved", "Updated White Label Exchange sandbox settings", { routes: s.routes.length, enabled: s.enabled });
-      for (const key of ["assets", "networks", "routes", "paymentMethods", "providers"] as const) {
+      for (const key of ["assets", "networks", "routes", "paymentMethods", "providers", "pricingRules", "wallets"] as const) {
         const before = (result.configuration[key] ?? []) as unknown as Record<string, unknown>[], after = (s[key] ?? []) as unknown as Record<string, unknown>[];
         if (JSON.stringify(before) !== JSON.stringify(after)) {
           const identify = (v: Record<string, unknown>) => v.id ?? v.assetId ?? v.assetNetworkId ?? v.providerId;
@@ -139,6 +140,7 @@ type StoredRequest = ReturnType<typeof calculateQuote>["quote"] & {
   product: "crypto_exchange"; quoteHash: string; idempotencyHash: string;
   paymentMethod: string | null; paymentMethodId?: string | null; volume: string; history: { status: string; at: string; note: string }[];
   pricingSource?: string;
+  paymentInstructions?: string | null;
 };
 interface OrderRow { id: string; status: string; request: StoredRequest; created_at: Date }
 function serializeOrder(row: OrderRow): ExchangeOrder {
@@ -146,9 +148,10 @@ function serializeOrder(row: OrderRow): ExchangeOrder {
   return { id: row.id, status: row.status, action: r.action, source: r.source, destination: r.destination,
     sourceSymbol: r.sourceSymbol, destinationSymbol: r.destinationSymbol, inputAmount: r.inputAmount,
     outputAmount: r.outputAmount, rate: r.rate, fee: r.fee, destinationFee: r.destinationFee ?? "0", spreadBps: r.spreadBps,
-    paymentMethod: r.paymentMethod, paymentMethodId: r.paymentMethodId ?? null, createdAt: row.created_at,
+    paymentMethod: r.paymentMethod, paymentMethodId: r.paymentMethodId ?? null, paymentInstructions: r.paymentInstructions ?? null, createdAt: row.created_at,
     updatedAt: new Date(r.history.at(-1)?.at ?? row.created_at), customerName: null, customerEmail: null,
-    history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true, pricingSource: r.pricingSource ?? "manual" };
+    history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true, pricingSource: r.pricingSource ?? "manual",
+    pricingRuleId: r.pricingRuleId ?? null };
 }
 async function orderRow(client: DatabaseClient, tenantId: string, id: string, lock = false) {
   const r = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE tenant_id=$1 AND id=$2 AND request->>'product'='crypto_exchange'${lock ? " FOR UPDATE" : ""}`, [tenantId, id]);
@@ -175,6 +178,7 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
     await consumeMonthlyUsage(client, tenantId, "crypto_exchange", volume);
     const id = randomUUID();
     const stored: StoredRequest = { ...quote, product: "crypto_exchange", paymentMethod, paymentMethodId: request.paymentMethodId ?? null, volume,
+      paymentInstructions: paymentInstructionsSnapshot(s, request),
       pricingSource: request.pricing ? (request.pricing.manualFallback ? `${request.pricing.providerKey}:manual_fallback` : request.pricing.providerKey) : "manual",
       quoteHash: hash(input.quoteToken), idempotencyHash: hash(input.idempotencyKey),
       history: [{ status: "pending", at: new Date().toISOString(), note: "Sandbox order created. No funds, wallets, deposit addresses or payments exist." }] };
