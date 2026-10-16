@@ -36,8 +36,16 @@ app.use(
 );
 app.disable("x-powered-by");
 // Before body parsing and application routes.
-app.use(createAccessGate({ basePath: "/api", healthPath: "/api/healthz",
-  deliveredSite: async slug => (await import("./modules/website/service")).deliveredPublicSite(slug) }));
+const accessGate = createAccessGate({ basePath: "/api", healthPath: "/api/healthz",
+  deliveredSite: async slug => (await import("./modules/website/service")).deliveredPublicSite(slug) });
+app.use((req, res, next) => {
+  // This path was already public liveness. Let the API's explicit safe handler
+  // prove the protected candidate's real pools instead of returning gate liveness.
+  if (req.path === "/api/healthz" && ["GET", "HEAD"].includes(req.method)) {
+    res.setHeader("Cache-Control", "no-store"); return next();
+  }
+  return accessGate(req, res, next);
+});
 app.use(express.json({ limit: "128kb" }));
 app.use(express.urlencoded({ extended: true, limit: "128kb" }));
 

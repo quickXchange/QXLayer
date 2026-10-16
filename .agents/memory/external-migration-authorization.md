@@ -1,3 +1,18 @@
+## Approved isolated Production initialization
+
+The user subsequently approved initializing the isolated VYNOX LAYER Production
+Supabase with 42 application tables, private Auth support, restricted runtime
+roles and tenant-isolated RLS through version-controlled migrations, including
+permission tests and fixes. Current public Live must remain unchanged until
+acceptance.
+
+**Why:** The user explicitly superseded the earlier prohibition on isolated
+Production schema/RLS changes, not the prohibition on public Live/DNS cutover.
+
+**How to apply:** Distinguish the isolated Production target from the current
+public Live source. This approval covers the bounded initialization and protected
+acceptance workflow, not arbitrary future Production writes, account substitution,
+source-data transfer or public cutover.
 ---
 name: External preparation authorization
 description: External migration authorization history, isolated staging creation, paid-resource notice, and the Production/cutover hold.
