@@ -30,7 +30,7 @@ const NotProvisioned = lazy(() => import('@/pages/account').then(m => ({ default
 const WhiteLabelRequests = lazy(() => import('@/pages/white-label-requests'));
 const WhiteLabelOrder = lazy(() => import('@/pages/white-label-order'));
 const AccountOrderDetail = lazy(() => import('@/pages/account-order'));
-import { useParams } from 'wouter';
+import { Link, useParams } from 'wouter';
 const Admin = lazy(() => import('@/pages/admin'));
 const Clients = lazy(() => import('@/pages/clients'));
 const ClientNew = lazy(() => import('@/pages/client-new'));
@@ -88,7 +88,9 @@ function HomeRedirect() {
 
 function PrincipalGate({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: query => externalStaging && query.state.error ? false : 10000 } });
+  const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(),
+    retry: (count, error) => ![401, 403, 428].includes((error as { status?: number }).status ?? 0) && count < 1,
+    refetchInterval: query => externalStaging && query.state.error ? false : 10000 } });
   const { signOut } = useAccountAuth();
   const qc = useQueryClient();
   let demoTab = false;
@@ -100,9 +102,9 @@ function PrincipalGate({ children }: { children: ReactNode }) {
       window.location.assign(import.meta.env.BASE_URL);
     }
   };
-  if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div></ConsoleThemeScope>;
-  if (demoTab && q.data && !q.data.demo) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   if ((q.error as { status?: number } | null)?.status === 428) return <Redirect to="/account/security" replace={supabaseAuth} />;
+  if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" />{supabaseAuth && <Link href="/account/security" className="inline-block text-sm underline" data-testid="link-pending-security">Account security and two-factor setup</Link>}</div></ConsoleThemeScope>;
+  if (demoTab && q.data && !q.data.demo) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   if (q.isError || !q.data) {
     return (
       <ConsoleThemeScope><div className="grid min-h-[100dvh] place-items-center px-5 text-center">

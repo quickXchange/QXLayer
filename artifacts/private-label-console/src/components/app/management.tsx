@@ -61,6 +61,7 @@ export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; r
           onSuccess: (r) => { qc.setQueryData(getGetDomainVerificationQueryKey(tenant.id), r); qc.invalidateQueries({ queryKey: getGetDomainVerificationQueryKey(tenant.id) }); inv(tenant.id); toast({ title: r.status === 'verified' ? 'Domain verified' : 'TXT record not found yet', description: r.status === 'verified' ? undefined : 'DNS changes can take time to propagate.' }); },
           onError: (e) => toast({ title: 'Verification failed', description: (e as Error).message, variant: 'destructive' }),
         })}>{m.isPending ? 'Checking DNS' : 'Check DNS record'}</Button></div>}>
+      {m.isError && <p role="alert" className="rounded border border-destructive/40 p-3 text-sm text-destructive" data-testid="text-dns-verification-error">{(m.error as { data?: { error?: string }; message?: string })?.data?.error ?? (m.error as Error)?.message ?? 'DNS ownership could not be verified. Check the TXT record and allow DNS propagation, then retry.'}</p>}
       {q.isLoading ? <Skeleton className="h-24" /> : q.isError || !d ? <ErrorState what="domain verification" onRetry={() => q.refetch()} /> : d.status === 'unconfigured' ? (
         <p className="text-sm text-muted-foreground" data-testid="text-domain-unconfigured">No domain is saved for this client. Save a domain above to receive a verification record.</p>
       ) : (

@@ -40,6 +40,7 @@ function Detail({ id, requestId }: { id: string; requestId: string | null }) {
           </div>
           <p className="text-xs text-muted-foreground">TXT ownership, provider registration and HTTPS are separate. Ownership never implies HTTPS.</p>
           <DnsRecordList d={d} />
+          {verify.isError && <p role="alert" className="text-sm text-destructive [overflow-wrap:anywhere]" data-testid="text-op-dns-error">{(verify.error as { data?: { error?: string }; message?: string })?.data?.error ?? (verify.error as Error)?.message ?? 'DNS ownership could not be verified. Check the TXT record and propagation before retrying.'}</p>}
           {d.providerError && <p role="alert" className="text-sm text-destructive [overflow-wrap:anywhere]">Provider: {d.providerError}</p>}
           {d.hostingError && <p role="alert" className="text-sm text-destructive [overflow-wrap:anywhere]">Hosting: {d.hostingError}</p>}
           {d.providerCheckedAt && <p className="text-xs text-muted-foreground">Provider checked {new Date(d.providerCheckedAt).toLocaleString()}</p>}
