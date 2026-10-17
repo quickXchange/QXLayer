@@ -113,7 +113,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
   const onSave = () => {
     setMsg(null);
     const data: Parameters<typeof save.mutate>[0]['data'] = {
-      enabled: isSuper ? f.enabled : conn?.enabled ?? false, settings: settings(), reason: reason.trim(),
+      enabled: isSuper || (conn && f.customerActivation) ? f.enabled : conn?.enabled ?? false, settings: settings(), reason: reason.trim(),
       ...(isSuper ? { credentialManagement: f.mgmt as 'super_admin' | 'customer' | 'both' } : !conn ? { credentialManagement: 'customer' as const } : {}),
       ...(canCreds && secretsFilled.length ? { secrets: Object.fromEntries(secretsFilled) } : {}),
       ...(canCreds && clear ? { clearCredentials: true } : {}),
@@ -159,7 +159,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
         </div>
       </header>
 
-      {isSuper && <dl className="mt-3 grid gap-2 rounded border bg-muted/30 p-3 text-sm sm:grid-cols-3" data-testid={`health-${k}`}>
+      {(isSuper || (['quickex', 'whitebit'].includes(k) && !!conn?.canManageCredentials)) && <dl className="mt-3 grid gap-2 rounded border bg-muted/30 p-3 text-sm sm:grid-cols-3" data-testid={`health-${k}`}>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Last checked</dt><dd>{when(health.checkedAt)}</dd></div>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Latency</dt><dd>{typeof health.latencyMs === 'number' ? `${health.latencyMs} ms` : 'Not measured'}</dd></div>
         {['alchemy', 'rpc'].includes(k) && <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Observed network head</dt><dd>{str(health.head) || 'Not observed'}{health.chainId != null && <span className="block text-xs">Chain {str(health.chainId)}</span>}</dd></div>}
@@ -180,7 +180,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
                 {MGMT.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select></label>
           </div>
-        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? 'Availability of this service is managed by VYNOX LAYER under your plan.' : 'Not authorized yet. VYNOX LAYER must authorize this integration first.'}</p>}
+        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? 'Availability of this service is managed by VYNOX LAYER under your plan.' : def.secretFields.length ? 'Your plan permits customer-owned credentials. Save a connection below. Saving does not enable financial execution.' : 'Not authorized yet. VYNOX LAYER must authorize this integration first.'}</p>}
 
         {isSuper && <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
           <span>Allow customer to activate this authorized integration</span>
