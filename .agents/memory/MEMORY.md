@@ -20,7 +20,7 @@
 - [QuickXchange provider reuse](migration-project-roles.md) — approved verified source-only package; tenant-scoped reuse without sharing business data or credentials.
 - [Preview request security](preview-request-security.md) — sandboxed forms may have opaque origins; Development ingress and direct Production cookie behavior must be distinguished.
 - [Approved Exchange master](master-exchange-template.md) — current NovaX is the approved shared master; preserve its design and use isolated tenant configuration, not frontend copies.
-- [Retained review fixture](retained-provisioning-fixture.md) — keep the Asterlane Development test customer/order/uploads and later tenant until explicit removal; user runs the lifecycle.
+- [Retained customer demos](retained-provisioning-fixture.md) — preserve Asterlane Development and separate Solara protected external Sandbox demo; no custom domain required for Solara.
 - [Setup website previews](setup-website-preview-policy.md) — shared website previews require live operator authority, tenant isolation and no activation, delivery or mutation.
 - [Development runtime detection](development-runtime-detection.md) — REPLIT_ENVIRONMENT can say production in the workspace; use the service’s explicit run mode for preview guards.
 - [Provider foundation safety](provider-foundation-safety.md) — catalog/configuration is not connectivity; real adapters, vaults, webhooks and idempotent execution require separate approval.
@@ -57,3 +57,4 @@
 - [Private commerce RLS](private-outbox-rls.md) — conflict and row-lock clauses can require policies beyond an ordinary insert or read.
 - [Supabase Storage missing objects](supabase-storage-not-found.md) — authenticated object-info may use HTTP 400 with structured statusCode 404; never treat all 400s as missing.
 - [Customer public wallets](customer-public-wallets.md) — customer public addresses are independent of Super Admin RPC monitoring and never activate deposits.
+- [PDF download evidence](browser-pdf-download-evidence.md) — empty CDP captures can be false failures; verify the actual saved native Download before changing working invoice code.
