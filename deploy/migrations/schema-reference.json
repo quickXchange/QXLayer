@@ -23,45 +23,10 @@
     },
     {
       "table_name": "addons",
-      "name": "currency",
-      "type": "text",
-      "required": true,
-      "default_value": "'USD'::text"
-    },
-    {
-      "table_name": "addons",
-      "name": "description",
-      "type": "text",
-      "required": true,
-      "default_value": "''::text"
-    },
-    {
-      "table_name": "addons",
-      "name": "discount_percent",
-      "type": "numeric(5,2)",
-      "required": true,
-      "default_value": "'0'::numeric"
-    },
-    {
-      "table_name": "addons",
-      "name": "enabled",
-      "type": "boolean",
-      "required": true,
-      "default_value": "true"
-    },
-    {
-      "table_name": "addons",
       "name": "id",
       "type": "uuid",
       "required": true,
       "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "addons",
-      "name": "monthly_price",
-      "type": "numeric(22,2)",
-      "required": true,
-      "default_value": "0"
     },
     {
       "table_name": "addons",
@@ -72,21 +37,21 @@
     },
     {
       "table_name": "addons",
-      "name": "pricing_configured",
-      "type": "boolean",
+      "name": "description",
+      "type": "text",
       "required": true,
-      "default_value": "false"
+      "default_value": "''::text"
     },
     {
       "table_name": "addons",
-      "name": "pricing_confirmed",
+      "name": "enabled",
       "type": "boolean",
       "required": true,
-      "default_value": "false"
+      "default_value": "true"
     },
     {
       "table_name": "addons",
-      "name": "setup_fee",
+      "name": "monthly_price",
       "type": "numeric(22,2)",
       "required": true,
       "default_value": "0"
@@ -99,11 +64,39 @@
       "default_value": "0"
     },
     {
-      "table_name": "api_keys",
-      "name": "environment",
+      "table_name": "addons",
+      "name": "setup_fee",
+      "type": "numeric(22,2)",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "addons",
+      "name": "currency",
       "type": "text",
       "required": true,
-      "default_value": "'sandbox'::text"
+      "default_value": "'USD'::text"
+    },
+    {
+      "table_name": "addons",
+      "name": "pricing_configured",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "addons",
+      "name": "discount_percent",
+      "type": "numeric(5,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "addons",
+      "name": "pricing_confirmed",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
     },
     {
       "table_name": "api_keys",
@@ -114,8 +107,8 @@
     },
     {
       "table_name": "api_keys",
-      "name": "key_hash",
-      "type": "text",
+      "name": "tenant_id",
+      "type": "uuid",
       "required": true,
       "default_value": null
     },
@@ -128,9 +121,9 @@
     },
     {
       "table_name": "api_keys",
-      "name": "revoked_at",
-      "type": "timestamp with time zone",
-      "required": false,
+      "name": "key_hash",
+      "type": "text",
+      "required": true,
       "default_value": null
     },
     {
@@ -142,14 +135,28 @@
     },
     {
       "table_name": "api_keys",
-      "name": "tenant_id",
-      "type": "uuid",
+      "name": "environment",
+      "type": "text",
       "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "api_keys",
+      "name": "revoked_at",
+      "type": "timestamp with time zone",
+      "required": false,
       "default_value": null
     },
     {
       "table_name": "asset_catalog",
       "name": "id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "asset_catalog",
+      "name": "symbol",
       "type": "text",
       "required": true,
       "default_value": null
@@ -162,8 +169,8 @@
       "default_value": null
     },
     {
-      "table_name": "asset_catalog",
-      "name": "symbol",
+      "table_name": "asset_network_catalog",
+      "name": "id",
       "type": "text",
       "required": true,
       "default_value": null
@@ -177,13 +184,6 @@
     },
     {
       "table_name": "asset_network_catalog",
-      "name": "id",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "asset_network_catalog",
       "name": "network_id",
       "type": "text",
       "required": true,
@@ -191,21 +191,21 @@
     },
     {
       "table_name": "audit_events",
-      "name": "actor_id",
-      "type": "text",
+      "name": "id",
+      "type": "uuid",
       "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "audit_events",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": false,
       "default_value": null
     },
     {
       "table_name": "audit_events",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "audit_events",
-      "name": "description",
+      "name": "actor_id",
       "type": "text",
       "required": true,
       "default_value": null
@@ -219,10 +219,17 @@
     },
     {
       "table_name": "audit_events",
-      "name": "id",
-      "type": "uuid",
+      "name": "description",
+      "type": "text",
       "required": true,
-      "default_value": "gen_random_uuid()"
+      "default_value": null
+    },
+    {
+      "table_name": "audit_events",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
     },
     {
       "table_name": "audit_events",
@@ -232,10 +239,24 @@
       "default_value": "'{}'::jsonb"
     },
     {
-      "table_name": "audit_events",
+      "table_name": "blockchain_provider_configs",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "blockchain_provider_configs",
       "name": "tenant_id",
       "type": "uuid",
-      "required": false,
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "blockchain_provider_configs",
+      "name": "network_id",
+      "type": "text",
+      "required": true,
       "default_value": null
     },
     {
@@ -247,27 +268,6 @@
     },
     {
       "table_name": "blockchain_provider_configs",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
-    },
-    {
-      "table_name": "blockchain_provider_configs",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "blockchain_provider_configs",
-      "name": "network_id",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "blockchain_provider_configs",
       "name": "priority",
       "type": "text",
       "required": true,
@@ -275,10 +275,10 @@
     },
     {
       "table_name": "blockchain_provider_configs",
-      "name": "tenant_id",
-      "type": "uuid",
+      "name": "environment",
+      "type": "text",
       "required": true,
-      "default_value": null
+      "default_value": "'sandbox'::text"
     },
     {
       "table_name": "customer_notification_reads",
@@ -310,14 +310,14 @@
     },
     {
       "table_name": "entitlement_definitions",
-      "name": "kind",
+      "name": "label",
       "type": "text",
       "required": true,
       "default_value": null
     },
     {
       "table_name": "entitlement_definitions",
-      "name": "label",
+      "name": "kind",
       "type": "text",
       "required": true,
       "default_value": null
@@ -331,24 +331,17 @@
     },
     {
       "table_name": "exchange_orders",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "exchange_orders",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
-    },
-    {
-      "table_name": "exchange_orders",
       "name": "id",
       "type": "uuid",
       "required": true,
       "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
     },
     {
       "table_name": "exchange_orders",
@@ -359,13 +352,6 @@
     },
     {
       "table_name": "exchange_orders",
-      "name": "request",
-      "type": "jsonb",
-      "required": true,
-      "default_value": "'{}'::jsonb"
-    },
-    {
-      "table_name": "exchange_orders",
       "name": "status",
       "type": "text",
       "required": true,
@@ -373,8 +359,36 @@
     },
     {
       "table_name": "exchange_orders",
-      "name": "tenant_id",
-      "type": "uuid",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "request",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "exchange_orders",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "global_exchange_catalog",
+      "name": "kind",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "global_exchange_catalog",
+      "name": "id",
+      "type": "text",
       "required": true,
       "default_value": null
     },
@@ -387,17 +401,17 @@
     },
     {
       "table_name": "global_exchange_catalog",
-      "name": "id",
+      "name": "name",
       "type": "text",
       "required": true,
       "default_value": null
     },
     {
       "table_name": "global_exchange_catalog",
-      "name": "kind",
+      "name": "status",
       "type": "text",
       "required": true,
-      "default_value": null
+      "default_value": "'catalog_only'::text"
     },
     {
       "table_name": "global_exchange_catalog",
@@ -415,31 +429,10 @@
     },
     {
       "table_name": "global_exchange_catalog",
-      "name": "name",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "global_exchange_catalog",
       "name": "revision",
       "type": "integer",
       "required": true,
       "default_value": "1"
-    },
-    {
-      "table_name": "global_exchange_catalog",
-      "name": "status",
-      "type": "text",
-      "required": true,
-      "default_value": "'catalog_only'::text"
-    },
-    {
-      "table_name": "global_exchange_catalog_links",
-      "name": "enabled",
-      "type": "boolean",
-      "required": true,
-      "default_value": "false"
     },
     {
       "table_name": "global_exchange_catalog_links",
@@ -457,14 +450,14 @@
     },
     {
       "table_name": "global_exchange_catalog_links",
-      "name": "metadata",
-      "type": "jsonb",
+      "name": "source_id",
+      "type": "text",
       "required": true,
-      "default_value": "'{}'::jsonb"
+      "default_value": null
     },
     {
       "table_name": "global_exchange_catalog_links",
-      "name": "source_id",
+      "name": "target_id",
       "type": "text",
       "required": true,
       "default_value": null
@@ -478,17 +471,17 @@
     },
     {
       "table_name": "global_exchange_catalog_links",
-      "name": "target_id",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "global_exchange_catalog_links",
       "name": "target_kind",
       "type": "text",
       "required": false,
       "default_value": "\nCASE\n    WHEN (kind = 'asset_network'::text) THEN 'networks'::text\n    ELSE 'currencies'::text\nEND"
+    },
+    {
+      "table_name": "global_exchange_catalog_links",
+      "name": "enabled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
     },
     {
       "table_name": "global_exchange_catalog_links",
@@ -498,46 +491,11 @@
       "default_value": "false"
     },
     {
-      "table_name": "landing_products",
-      "name": "billing_period",
-      "type": "text",
+      "table_name": "global_exchange_catalog_links",
+      "name": "metadata",
+      "type": "jsonb",
       "required": true,
-      "default_value": "'on_request'::text"
-    },
-    {
-      "table_name": "landing_products",
-      "name": "cta_label",
-      "type": "text",
-      "required": true,
-      "default_value": "'Learn More'::text"
-    },
-    {
-      "table_name": "landing_products",
-      "name": "currency",
-      "type": "text",
-      "required": true,
-      "default_value": "'USD'::text"
-    },
-    {
-      "table_name": "landing_products",
-      "name": "description",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "landing_products",
-      "name": "display_order",
-      "type": "integer",
-      "required": true,
-      "default_value": "0"
-    },
-    {
-      "table_name": "landing_products",
-      "name": "icon",
-      "type": "text",
-      "required": true,
-      "default_value": null
+      "default_value": "'{}'::jsonb"
     },
     {
       "table_name": "landing_products",
@@ -548,6 +506,13 @@
     },
     {
       "table_name": "landing_products",
+      "name": "visible",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "landing_products",
       "name": "name",
       "type": "text",
       "required": true,
@@ -555,9 +520,16 @@
     },
     {
       "table_name": "landing_products",
-      "name": "setup_fee",
-      "type": "numeric(12,2)",
-      "required": false,
+      "name": "description",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "icon",
+      "type": "text",
+      "required": true,
       "default_value": null
     },
     {
@@ -569,6 +541,27 @@
     },
     {
       "table_name": "landing_products",
+      "name": "setup_fee",
+      "type": "numeric(12,2)",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "landing_products",
+      "name": "currency",
+      "type": "text",
+      "required": true,
+      "default_value": "'USD'::text"
+    },
+    {
+      "table_name": "landing_products",
+      "name": "billing_period",
+      "type": "text",
+      "required": true,
+      "default_value": "'on_request'::text"
+    },
+    {
+      "table_name": "landing_products",
       "name": "status",
       "type": "text",
       "required": true,
@@ -576,31 +569,17 @@
     },
     {
       "table_name": "landing_products",
-      "name": "visible",
-      "type": "boolean",
-      "required": true,
-      "default_value": "true"
-    },
-    {
-      "table_name": "module_catalog",
-      "name": "category",
+      "name": "cta_label",
       "type": "text",
       "required": true,
-      "default_value": null
+      "default_value": "'Learn More'::text"
     },
     {
-      "table_name": "module_catalog",
-      "name": "definition",
-      "type": "jsonb",
+      "table_name": "landing_products",
+      "name": "display_order",
+      "type": "integer",
       "required": true,
-      "default_value": "'{}'::jsonb"
-    },
-    {
-      "table_name": "module_catalog",
-      "name": "description",
-      "type": "text",
-      "required": true,
-      "default_value": null
+      "default_value": "0"
     },
     {
       "table_name": "module_catalog",
@@ -618,10 +597,31 @@
     },
     {
       "table_name": "module_catalog",
+      "name": "description",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "category",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "module_catalog",
       "name": "sandbox_available",
       "type": "boolean",
       "required": true,
       "default_value": "true"
+    },
+    {
+      "table_name": "module_catalog",
+      "name": "definition",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
     },
     {
       "table_name": "network_catalog",
@@ -646,24 +646,24 @@
     },
     {
       "table_name": "notification_events",
-      "name": "channel",
-      "type": "text",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "notification_events",
+      "name": "tenant_id",
+      "type": "uuid",
       "required": true,
       "default_value": null
     },
     {
       "table_name": "notification_events",
-      "name": "environment",
+      "name": "channel",
       "type": "text",
       "required": true,
-      "default_value": "'sandbox'::text"
-    },
-    {
-      "table_name": "notification_events",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
+      "default_value": null
     },
     {
       "table_name": "notification_events",
@@ -681,6 +681,20 @@
     },
     {
       "table_name": "notification_events",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "payment_invoices",
       "name": "tenant_id",
       "type": "uuid",
       "required": true,
@@ -695,31 +709,10 @@
     },
     {
       "table_name": "payment_invoices",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "payment_invoices",
       "name": "currency",
       "type": "text",
       "required": true,
       "default_value": null
-    },
-    {
-      "table_name": "payment_invoices",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
-    },
-    {
-      "table_name": "payment_invoices",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
     },
     {
       "table_name": "payment_invoices",
@@ -730,7 +723,21 @@
     },
     {
       "table_name": "payment_invoices",
-      "name": "tenant_id",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "payment_invoices",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "plan_entitlements",
+      "name": "plan_id",
       "type": "uuid",
       "required": true,
       "default_value": null
@@ -744,13 +751,6 @@
     },
     {
       "table_name": "plan_entitlements",
-      "name": "plan_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "plan_entitlements",
       "name": "value",
       "type": "jsonb",
       "required": true,
@@ -758,24 +758,17 @@
     },
     {
       "table_name": "plans",
-      "name": "billing_label",
-      "type": "text",
+      "name": "id",
+      "type": "uuid",
       "required": true,
-      "default_value": "''::text"
+      "default_value": "gen_random_uuid()"
     },
     {
       "table_name": "plans",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "plans",
-      "name": "currency",
+      "name": "name",
       "type": "text",
       "required": true,
-      "default_value": "'USD'::text"
+      "default_value": null
     },
     {
       "table_name": "plans",
@@ -786,27 +779,6 @@
     },
     {
       "table_name": "plans",
-      "name": "discount_percent",
-      "type": "numeric(5,2)",
-      "required": true,
-      "default_value": "'0'::numeric"
-    },
-    {
-      "table_name": "plans",
-      "name": "display_order",
-      "type": "integer",
-      "required": true,
-      "default_value": "0"
-    },
-    {
-      "table_name": "plans",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "plans",
       "name": "monthly_price",
       "type": "numeric(22,2)",
       "required": true,
@@ -814,17 +786,10 @@
     },
     {
       "table_name": "plans",
-      "name": "name",
-      "type": "text",
+      "name": "yearly_price",
+      "type": "numeric(22,2)",
       "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "plans",
-      "name": "pricing_configured",
-      "type": "boolean",
-      "required": true,
-      "default_value": "false"
+      "default_value": "'0'::numeric"
     },
     {
       "table_name": "plans",
@@ -835,10 +800,38 @@
     },
     {
       "table_name": "plans",
+      "name": "currency",
+      "type": "text",
+      "required": true,
+      "default_value": "'USD'::text"
+    },
+    {
+      "table_name": "plans",
+      "name": "billing_label",
+      "type": "text",
+      "required": true,
+      "default_value": "''::text"
+    },
+    {
+      "table_name": "plans",
+      "name": "display_order",
+      "type": "integer",
+      "required": true,
+      "default_value": "0"
+    },
+    {
+      "table_name": "plans",
       "name": "status",
       "type": "text",
       "required": true,
       "default_value": "'disabled'::text"
+    },
+    {
+      "table_name": "plans",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
     },
     {
       "table_name": "plans",
@@ -849,17 +842,17 @@
     },
     {
       "table_name": "plans",
-      "name": "yearly_price",
-      "type": "numeric(22,2)",
-      "required": true,
-      "default_value": "'0'::numeric"
-    },
-    {
-      "table_name": "platform_admins",
-      "name": "active",
+      "name": "pricing_configured",
       "type": "boolean",
       "required": true,
-      "default_value": "true"
+      "default_value": "false"
+    },
+    {
+      "table_name": "plans",
+      "name": "discount_percent",
+      "type": "numeric(5,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
     },
     {
       "table_name": "platform_admins",
@@ -870,24 +863,17 @@
     },
     {
       "table_name": "platform_admins",
+      "name": "active",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
+    },
+    {
+      "table_name": "platform_admins",
       "name": "created_at",
       "type": "timestamp with time zone",
       "required": true,
       "default_value": "now()"
-    },
-    {
-      "table_name": "pricing_rules",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
-    },
-    {
-      "table_name": "pricing_rules",
-      "name": "fee_bps",
-      "type": "numeric(10,2)",
-      "required": true,
-      "default_value": "'0'::numeric"
     },
     {
       "table_name": "pricing_rules",
@@ -898,6 +884,13 @@
     },
     {
       "table_name": "pricing_rules",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "pricing_rules",
       "name": "name",
       "type": "text",
       "required": true,
@@ -905,6 +898,27 @@
     },
     {
       "table_name": "pricing_rules",
+      "name": "fee_bps",
+      "type": "numeric(10,2)",
+      "required": true,
+      "default_value": "'0'::numeric"
+    },
+    {
+      "table_name": "pricing_rules",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "provider_assignments",
       "name": "tenant_id",
       "type": "uuid",
       "required": true,
@@ -912,7 +926,21 @@
     },
     {
       "table_name": "provider_assignments",
+      "name": "provider_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_assignments",
       "name": "capability",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_assignments",
+      "name": "environment",
       "type": "text",
       "required": true,
       "default_value": null
@@ -933,34 +961,6 @@
     },
     {
       "table_name": "provider_assignments",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "provider_assignments",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "provider_assignments",
-      "name": "provider_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "provider_assignments",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "provider_assignments",
       "name": "updated_at",
       "type": "timestamp with time zone",
       "required": true,
@@ -968,10 +968,10 @@
     },
     {
       "table_name": "provider_catalog",
-      "name": "created_at",
-      "type": "timestamp with time zone",
+      "name": "id",
+      "type": "uuid",
       "required": true,
-      "default_value": "now()"
+      "default_value": "gen_random_uuid()"
     },
     {
       "table_name": "provider_catalog",
@@ -982,10 +982,10 @@
     },
     {
       "table_name": "provider_catalog",
-      "name": "id",
-      "type": "uuid",
+      "name": "created_at",
+      "type": "timestamp with time zone",
       "required": true,
-      "default_value": "gen_random_uuid()"
+      "default_value": "now()"
     },
     {
       "table_name": "provider_catalog",
@@ -993,6 +993,34 @@
       "type": "timestamp with time zone",
       "required": true,
       "default_value": "now()"
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "scope",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "provider_policies",
+      "name": "resource_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
     },
     {
       "table_name": "provider_policies",
@@ -1010,38 +1038,17 @@
     },
     {
       "table_name": "provider_policies",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "provider_policies",
-      "name": "resource_id",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "provider_policies",
-      "name": "scope",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "provider_policies",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "provider_policies",
       "name": "updated_at",
       "type": "timestamp with time zone",
       "required": true,
       "default_value": "now()"
+    },
+    {
+      "table_name": "tenant_addons",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
     },
     {
       "table_name": "tenant_addons",
@@ -1051,7 +1058,7 @@
       "default_value": null
     },
     {
-      "table_name": "tenant_addons",
+      "table_name": "tenant_asset_networks",
       "name": "tenant_id",
       "type": "uuid",
       "required": true,
@@ -1065,7 +1072,7 @@
       "default_value": null
     },
     {
-      "table_name": "tenant_asset_networks",
+      "table_name": "tenant_branding",
       "name": "tenant_id",
       "type": "uuid",
       "required": true,
@@ -1073,24 +1080,10 @@
     },
     {
       "table_name": "tenant_branding",
-      "name": "accent_color",
-      "type": "text",
-      "required": true,
-      "default_value": "'#14B8A6'::text"
-    },
-    {
-      "table_name": "tenant_branding",
       "name": "brand_name",
       "type": "text",
       "required": true,
       "default_value": null
-    },
-    {
-      "table_name": "tenant_branding",
-      "name": "default_language",
-      "type": "text",
-      "required": true,
-      "default_value": "'en'::text"
     },
     {
       "table_name": "tenant_branding",
@@ -1108,17 +1101,10 @@
     },
     {
       "table_name": "tenant_branding",
-      "name": "supported_languages",
-      "type": "text[]",
+      "name": "accent_color",
+      "type": "text",
       "required": true,
-      "default_value": "ARRAY['en'::text]"
-    },
-    {
-      "table_name": "tenant_branding",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
+      "default_value": "'#14B8A6'::text"
     },
     {
       "table_name": "tenant_branding",
@@ -1129,6 +1115,20 @@
     },
     {
       "table_name": "tenant_branding",
+      "name": "default_language",
+      "type": "text",
+      "required": true,
+      "default_value": "'en'::text"
+    },
+    {
+      "table_name": "tenant_branding",
+      "name": "supported_languages",
+      "type": "text[]",
+      "required": true,
+      "default_value": "ARRAY['en'::text]"
+    },
+    {
+      "table_name": "tenant_branding",
       "name": "website_settings",
       "type": "jsonb",
       "required": true,
@@ -1136,10 +1136,10 @@
     },
     {
       "table_name": "tenant_configuration",
-      "name": "allow_guest_checkout",
-      "type": "boolean",
+      "name": "tenant_id",
+      "type": "uuid",
       "required": true,
-      "default_value": "false"
+      "default_value": null
     },
     {
       "table_name": "tenant_configuration",
@@ -1164,6 +1164,13 @@
     },
     {
       "table_name": "tenant_configuration",
+      "name": "allow_guest_checkout",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_domains",
       "name": "tenant_id",
       "type": "uuid",
       "required": true,
@@ -1185,13 +1192,6 @@
     },
     {
       "table_name": "tenant_domains",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_domains",
       "name": "verification_token",
       "type": "text",
       "required": false,
@@ -1206,22 +1206,15 @@
     },
     {
       "table_name": "tenant_entitlement_overrides",
-      "name": "key",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_entitlement_overrides",
-      "name": "reason",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_entitlement_overrides",
       "name": "tenant_id",
       "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_entitlement_overrides",
+      "name": "key",
+      "type": "text",
       "required": true,
       "default_value": null
     },
@@ -1233,11 +1226,39 @@
       "default_value": null
     },
     {
-      "table_name": "tenant_integrations",
-      "name": "credential_identity",
+      "table_name": "tenant_entitlement_overrides",
+      "name": "reason",
       "type": "text",
-      "required": false,
+      "required": true,
       "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "provider_key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_integrations",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
     },
     {
       "table_name": "tenant_integrations",
@@ -1255,6 +1276,13 @@
     },
     {
       "table_name": "tenant_integrations",
+      "name": "settings",
+      "type": "jsonb",
+      "required": true,
+      "default_value": "'{}'::jsonb"
+    },
+    {
+      "table_name": "tenant_integrations",
       "name": "encrypted_credentials",
       "type": "jsonb",
       "required": false,
@@ -1262,37 +1290,9 @@
     },
     {
       "table_name": "tenant_integrations",
-      "name": "environment",
+      "name": "credential_identity",
       "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
-    },
-    {
-      "table_name": "tenant_integrations",
-      "name": "health",
-      "type": "jsonb",
-      "required": true,
-      "default_value": "'{\"state\": \"not_configured\"}'::jsonb"
-    },
-    {
-      "table_name": "tenant_integrations",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "tenant_integrations",
-      "name": "last_nonce",
-      "type": "bigint",
-      "required": true,
-      "default_value": "0"
-    },
-    {
-      "table_name": "tenant_integrations",
-      "name": "provider_key",
-      "type": "text",
-      "required": true,
+      "required": false,
       "default_value": null
     },
     {
@@ -1304,17 +1304,17 @@
     },
     {
       "table_name": "tenant_integrations",
-      "name": "settings",
-      "type": "jsonb",
+      "name": "last_nonce",
+      "type": "bigint",
       "required": true,
-      "default_value": "'{}'::jsonb"
+      "default_value": "0"
     },
     {
       "table_name": "tenant_integrations",
-      "name": "tenant_id",
-      "type": "uuid",
+      "name": "health",
+      "type": "jsonb",
       "required": true,
-      "default_value": null
+      "default_value": "'{\"state\": \"not_configured\"}'::jsonb"
     },
     {
       "table_name": "tenant_integrations",
@@ -1325,10 +1325,10 @@
     },
     {
       "table_name": "tenant_memberships",
-      "name": "active",
-      "type": "boolean",
+      "name": "tenant_id",
+      "type": "uuid",
       "required": true,
-      "default_value": "true"
+      "default_value": null
     },
     {
       "table_name": "tenant_memberships",
@@ -1336,6 +1336,20 @@
       "type": "text",
       "required": true,
       "default_value": null
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "role",
+      "type": "text",
+      "required": true,
+      "default_value": "'client_admin'::text"
+    },
+    {
+      "table_name": "tenant_memberships",
+      "name": "active",
+      "type": "boolean",
+      "required": true,
+      "default_value": "true"
     },
     {
       "table_name": "tenant_memberships",
@@ -1359,16 +1373,16 @@
       "default_value": "'{}'::text[]"
     },
     {
-      "table_name": "tenant_memberships",
-      "name": "role",
-      "type": "text",
-      "required": true,
-      "default_value": "'client_admin'::text"
-    },
-    {
-      "table_name": "tenant_memberships",
+      "table_name": "tenant_modules",
       "name": "tenant_id",
       "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_modules",
+      "name": "module_key",
+      "type": "text",
       "required": true,
       "default_value": null
     },
@@ -1381,31 +1395,10 @@
     },
     {
       "table_name": "tenant_modules",
-      "name": "module_key",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_modules",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_modules",
       "name": "updated_at",
       "type": "timestamp with time zone",
       "required": true,
       "default_value": "now()"
-    },
-    {
-      "table_name": "tenant_payment_methods",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
     },
     {
       "table_name": "tenant_payment_methods",
@@ -1416,6 +1409,13 @@
     },
     {
       "table_name": "tenant_payment_methods",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_payment_methods",
       "name": "label",
       "type": "text",
       "required": true,
@@ -1423,8 +1423,22 @@
     },
     {
       "table_name": "tenant_payment_methods",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "tenant_product_configuration",
       "name": "tenant_id",
       "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_product_configuration",
+      "name": "module_key",
+      "type": "text",
       "required": true,
       "default_value": null
     },
@@ -1437,20 +1451,41 @@
     },
     {
       "table_name": "tenant_product_configuration",
-      "name": "module_key",
-      "type": "text",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
       "required": true,
-      "default_value": null
+      "default_value": "now()"
     },
     {
-      "table_name": "tenant_product_configuration",
+      "table_name": "tenant_subscriptions",
       "name": "tenant_id",
       "type": "uuid",
       "required": true,
       "default_value": null
     },
     {
-      "table_name": "tenant_product_configuration",
+      "table_name": "tenant_subscriptions",
+      "name": "plan_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "status",
+      "type": "text",
+      "required": true,
+      "default_value": "'active'::text"
+    },
+    {
+      "table_name": "tenant_subscriptions",
+      "name": "resume_status",
+      "type": "text",
+      "required": true,
+      "default_value": "'draft'::text"
+    },
+    {
+      "table_name": "tenant_subscriptions",
       "name": "updated_at",
       "type": "timestamp with time zone",
       "required": true,
@@ -1465,13 +1500,6 @@
     },
     {
       "table_name": "tenant_subscriptions",
-      "name": "cancelled",
-      "type": "boolean",
-      "required": true,
-      "default_value": "false"
-    },
-    {
-      "table_name": "tenant_subscriptions",
       "name": "discount_percent",
       "type": "numeric(5,2)",
       "required": true,
@@ -1479,59 +1507,17 @@
     },
     {
       "table_name": "tenant_subscriptions",
+      "name": "cancelled",
+      "type": "boolean",
+      "required": true,
+      "default_value": "false"
+    },
+    {
+      "table_name": "tenant_subscriptions",
       "name": "operator_note",
       "type": "text",
       "required": true,
       "default_value": "''::text"
-    },
-    {
-      "table_name": "tenant_subscriptions",
-      "name": "plan_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_subscriptions",
-      "name": "resume_status",
-      "type": "text",
-      "required": true,
-      "default_value": "'draft'::text"
-    },
-    {
-      "table_name": "tenant_subscriptions",
-      "name": "status",
-      "type": "text",
-      "required": true,
-      "default_value": "'active'::text"
-    },
-    {
-      "table_name": "tenant_subscriptions",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_subscriptions",
-      "name": "updated_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "tenant_telegram_receipts",
-      "name": "completed_at",
-      "type": "timestamp with time zone",
-      "required": false,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_telegram_receipts",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
     },
     {
       "table_name": "tenant_telegram_receipts",
@@ -1542,8 +1528,22 @@
     },
     {
       "table_name": "tenant_telegram_receipts",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
       "name": "integration_id",
       "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_telegram_receipts",
+      "name": "update_id",
+      "type": "bigint",
       "required": true,
       "default_value": null
     },
@@ -1563,15 +1563,22 @@
     },
     {
       "table_name": "tenant_telegram_receipts",
-      "name": "tenant_id",
-      "type": "uuid",
+      "name": "created_at",
+      "type": "timestamp with time zone",
       "required": true,
-      "default_value": null
+      "default_value": "now()"
     },
     {
       "table_name": "tenant_telegram_receipts",
-      "name": "update_id",
-      "type": "bigint",
+      "name": "completed_at",
+      "type": "timestamp with time zone",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "tenant_usage_counters",
+      "name": "tenant_id",
+      "type": "uuid",
       "required": true,
       "default_value": null
     },
@@ -1591,38 +1598,10 @@
     },
     {
       "table_name": "tenant_usage_counters",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "tenant_usage_counters",
       "name": "used",
       "type": "numeric(36,18)",
       "required": true,
       "default_value": "'0'::numeric"
-    },
-    {
-      "table_name": "tenants",
-      "name": "completed_steps",
-      "type": "text[]",
-      "required": true,
-      "default_value": "'{}'::text[]"
-    },
-    {
-      "table_name": "tenants",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "tenants",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
     },
     {
       "table_name": "tenants",
@@ -1654,24 +1633,31 @@
     },
     {
       "table_name": "tenants",
-      "name": "updated_at",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "tenants",
+      "name": "completed_steps",
+      "type": "text[]",
+      "required": true,
+      "default_value": "'{}'::text[]"
+    },
+    {
+      "table_name": "tenants",
+      "name": "created_at",
       "type": "timestamp with time zone",
       "required": true,
       "default_value": "now()"
     },
     {
-      "table_name": "wallet_configurations",
-      "name": "asset_network_id",
-      "type": "text",
+      "table_name": "tenants",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
       "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "wallet_configurations",
-      "name": "environment",
-      "type": "text",
-      "required": true,
-      "default_value": "'sandbox'::text"
+      "default_value": "now()"
     },
     {
       "table_name": "wallet_configurations",
@@ -1682,6 +1668,20 @@
     },
     {
       "table_name": "wallet_configurations",
+      "name": "tenant_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "wallet_configurations",
+      "name": "asset_network_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "wallet_configurations",
       "name": "strategy",
       "type": "text",
       "required": true,
@@ -1689,8 +1689,29 @@
     },
     {
       "table_name": "wallet_configurations",
+      "name": "environment",
+      "type": "text",
+      "required": true,
+      "default_value": "'sandbox'::text"
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "webhook_endpoints",
       "name": "tenant_id",
       "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "webhook_endpoints",
+      "name": "url",
+      "type": "text",
       "required": true,
       "default_value": null
     },
@@ -1710,71 +1731,15 @@
     },
     {
       "table_name": "webhook_endpoints",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "webhook_endpoints",
       "name": "label",
       "type": "text",
       "required": true,
       "default_value": "'Webhook'::text"
     },
     {
-      "table_name": "webhook_endpoints",
-      "name": "tenant_id",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "webhook_endpoints",
-      "name": "url",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_attachments",
-      "name": "category",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_attachments",
-      "name": "content_type",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_attachments",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "white_label_attachments",
-      "name": "file_name",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
       "table_name": "white_label_attachments",
       "name": "id",
       "type": "uuid",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_attachments",
-      "name": "object_key",
-      "type": "text",
       "required": true,
       "default_value": null
     },
@@ -1794,8 +1759,64 @@
     },
     {
       "table_name": "white_label_attachments",
+      "name": "object_key",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "file_name",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "content_type",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
       "name": "size",
       "type": "integer",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "category",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_attachments",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "request_id",
+      "type": "uuid",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_events",
+      "name": "kind",
+      "type": "text",
       "required": true,
       "default_value": null
     },
@@ -1808,36 +1829,15 @@
     },
     {
       "table_name": "white_label_events",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "white_label_events",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "white_label_events",
-      "name": "kind",
+      "name": "visibility",
       "type": "text",
       "required": true,
-      "default_value": null
+      "default_value": "'customer'::text"
     },
     {
       "table_name": "white_label_events",
       "name": "message",
       "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_events",
-      "name": "request_id",
-      "type": "uuid",
       "required": true,
       "default_value": null
     },
@@ -1850,16 +1850,30 @@
     },
     {
       "table_name": "white_label_events",
-      "name": "visibility",
-      "type": "text",
+      "name": "created_at",
+      "type": "timestamp with time zone",
       "required": true,
-      "default_value": "'customer'::text"
+      "default_value": "now()"
     },
     {
       "table_name": "white_label_requests",
-      "name": "approved_configuration",
-      "type": "jsonb",
-      "required": false,
+      "name": "id",
+      "type": "uuid",
+      "required": true,
+      "default_value": "gen_random_uuid()"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "customer_user_id",
+      "type": "text",
+      "required": true,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "idempotency_key",
+      "type": "uuid",
+      "required": true,
       "default_value": null
     },
     {
@@ -1871,56 +1885,28 @@
     },
     {
       "table_name": "white_label_requests",
-      "name": "created_at",
-      "type": "timestamp with time zone",
-      "required": true,
-      "default_value": "now()"
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "currency",
-      "type": "text",
-      "required": false,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "custom_design_decision",
+      "name": "status",
       "type": "text",
       "required": true,
-      "default_value": "'pending'::text"
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "customer_user_id",
-      "type": "text",
-      "required": true,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "customization_price",
-      "type": "text",
-      "required": false,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "id",
-      "type": "uuid",
-      "required": true,
-      "default_value": "gen_random_uuid()"
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "idempotency_key",
-      "type": "uuid",
-      "required": true,
-      "default_value": null
+      "default_value": "'new'::text"
     },
     {
       "table_name": "white_label_requests",
       "name": "monthly_price",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "setup_price",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "currency",
       "type": "text",
       "required": false,
       "default_value": null
@@ -1934,27 +1920,6 @@
     },
     {
       "table_name": "white_label_requests",
-      "name": "order_number",
-      "type": "integer",
-      "required": true,
-      "default_value": "nextval('white_label_requests_order_number_seq'::regclass)"
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "setup_price",
-      "type": "text",
-      "required": false,
-      "default_value": null
-    },
-    {
-      "table_name": "white_label_requests",
-      "name": "status",
-      "type": "text",
-      "required": true,
-      "default_value": "'new'::text"
-    },
-    {
-      "table_name": "white_label_requests",
       "name": "tenant_id",
       "type": "uuid",
       "required": false,
@@ -1962,10 +1927,45 @@
     },
     {
       "table_name": "white_label_requests",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "required": true,
+      "default_value": "now()"
+    },
+    {
+      "table_name": "white_label_requests",
       "name": "updated_at",
       "type": "timestamp with time zone",
       "required": true,
       "default_value": "now()"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "order_number",
+      "type": "integer",
+      "required": true,
+      "default_value": "nextval('white_label_requests_order_number_seq'::regclass)"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "customization_price",
+      "type": "text",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "custom_design_decision",
+      "type": "text",
+      "required": true,
+      "default_value": "'pending'::text"
+    },
+    {
+      "table_name": "white_label_requests",
+      "name": "approved_configuration",
+      "type": "jsonb",
+      "required": false,
+      "default_value": null
     }
   ],
   "constraints": [

@@ -17,9 +17,11 @@ try {
  rls.tables=[...rls.tables.filter(t=>!names.includes(t.name)),...metadata].sort((a,b)=>a.name.localeCompare(b.name));
  await writeFile("deploy/migrations/rls-reference.json",JSON.stringify(rls,null,2)+"\n");
  const current=await readSchema(pool),reference=JSON.parse(await readFile("deploy/migrations/schema-reference.json","utf8"));
- for(const k of ["columns","constraints","indexes"])
+ for(const k of ["columns","constraints","indexes"]) {
+  const order=new Map(current[k].map((r,i)=>[r.table_name+"\0"+r.name,i]));
   reference[k]=[...reference[k].filter(r=>!names.includes(r.table_name)),...current[k].filter(r=>names.includes(r.table_name))]
-   .sort((a,b)=>a.table_name.localeCompare(b.table_name)||a.name.localeCompare(b.name));
+   .sort((a,b)=>(order.get(a.table_name+"\0"+a.name)??1e9)-(order.get(b.table_name+"\0"+b.name)??1e9));
+ }
  await writeFile("deploy/migrations/schema-reference.json",JSON.stringify(reference,null,2)+"\n");
  const file="0007_global_exchange_catalog.sql",sha256=createHash("sha256").update(await readFile("deploy/migrations/"+file)).digest("hex");
  for(const dir of ["migrations","production-candidate"]) {
