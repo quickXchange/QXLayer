@@ -171,7 +171,7 @@ export function activateTenant(principal: Principal, tenantId: string) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal, tenantId, true), async (client) => {
     // Lock in request -> tenant order, matching review/manual delivery.
-    const linked = await client.query("SELECT id FROM white_label_requests WHERE tenant_id=$1 FOR UPDATE", [tenantId]);
+    await client.query("SELECT id FROM white_label_requests WHERE tenant_id=$1 FOR UPDATE", [tenantId]);
     await client.query("SELECT id FROM tenants WHERE id = $1 FOR UPDATE", [tenantId]);
     const effective = await resolveEntitlements(client, tenantId);
     assertOperational(effective);
@@ -184,10 +184,8 @@ export function activateTenant(principal: Principal, tenantId: string) {
       completed_steps=CASE WHEN $2 AND NOT 'exchange_provisioned'=ANY(completed_steps)
         THEN array_append(completed_steps,'exchange_provisioned') ELSE completed_steps END WHERE id=$1`, [tenantId, exchangeReady]);
     await audit(client, principal, tenantId, "tenant.sandbox_activated", "Activated configuration in sandbox only; no domain or financial execution launched");
-    if (linked.rowCount) {
-      const { deliverLinkedRequest } = await import("../customer/service");
-      await deliverLinkedRequest(client, principal, linked.rows[0].id, tenantId);
-    }
+    // Sandbox activation is independent of delivery. Access stays withheld until
+    // the Super Admin explicitly delivers the reviewed Ready request.
     return readTenant(client, tenantId);
   });
 }

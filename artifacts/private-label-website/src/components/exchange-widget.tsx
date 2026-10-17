@@ -61,6 +61,10 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
   const [submitting, setSubmitting] = useState(false);
   const [paymentMethodId, setPaymentMethodId] = useState('');
   const [created, setCreated] = useState<ExchangeOrderCreated | null>(null);
+  const [share, setShare] = useState(false);
+  const [cName, setCName] = useState('');
+  const [cEmail, setCEmail] = useState('');
+  const [consent, setConsent] = useState(false);
   const [refreshQuote, setRefreshQuote] = useState(0);
   const idempotency = useRef(crypto.randomUUID());
   const revision = useRef(0);
@@ -177,12 +181,15 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
     if (amount === '' || Number(amount) <= 0) { setStatus(null); return; }
     if (presentation) { setStatus('Sandbox preview only. No order was created and nothing was sent.'); return; }
     if (!quote || new Date(quote.expiresAt).getTime() <= Date.now()) { setStatus('Request a valid sandbox quote before creating an order.'); return; }
+    const nm = cName.trim(), em = cEmail.trim();
+    const withContact = share && consent && nm.length > 0 && nm.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em) && em.length <= 254;
+    if (share && (nm || em) && !withContact) { setStatus('To share contact details, enter your name, a valid email and tick the permission box. Or turn sharing off to order anonymously.'); return; }
     setSubmitting(true);
     try {
       // Preserve an attempted request across uncertain network responses. A retry
       // must not create another order merely because an automatic quote refreshed.
       attemptedOrder.current ??= { quoteToken: quote.token, idempotencyKey: idempotency.current };
-      const result = await createSandboxOrder(site.tenantSlug, attemptedOrder.current);
+      const result = await createSandboxOrder(site.tenantSlug, { ...attemptedOrder.current, ...(withContact ? { customerName: nm, customerEmail: em, contactConsent: true } : {}) });
       attemptedOrder.current = null;
       setCreated(result); setQuote(null);
       try { sessionStorage.setItem(`exchange-order:${site.tenantSlug}`, JSON.stringify(result)); } catch { /* The tracking link still works without browser storage. */ }
@@ -233,6 +240,14 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
           {!presentation && !inactive && amount && !quote && !quoting && <button type="button" className="s-link mt-2 text-xs" onClick={() => setRefreshQuote(n => n + 1)} data-testid="button-refresh-quote">Request fresh sandbox quote</button>}
         </dl>
       )}
+      {!presentation && <details className="mt-4 text-xs" open={share} onToggle={(e) => setShare((e.currentTarget as HTMLDetailsElement).open)} data-testid="details-contact">
+        <summary className="s-link cursor-pointer">Add contact details (optional)</summary>
+        <div className="mt-2 space-y-2">
+          <label className="s-muted block">Name<input className="mt-1 w-full rounded-lg border bg-transparent p-2" maxLength={120} autoComplete="name" value={cName} onChange={(e) => setCName(e.target.value)} data-testid="input-contact-name" /></label>
+          <label className="s-muted block">Email<input type="email" className="mt-1 w-full rounded-lg border bg-transparent p-2" maxLength={254} autoComplete="email" value={cEmail} onChange={(e) => setCEmail(e.target.value)} data-testid="input-contact-email" /></label>
+          <label className="flex items-start gap-2"><input type="checkbox" className="mt-0.5" checked={consent} onChange={(e) => setConsent(e.target.checked)} data-testid="checkbox-contact-consent" /><span className="s-muted">I give permission for this exchange to store my name and email with this order. This is not marketing consent and no email is promised.</span></label>
+        </div>
+      </details>}
       <button type="submit" className="s-btn s-btn-primary s-cta-xl mt-5 w-full" disabled={inactive || noAssets || insufficient || submitting || (!presentation && (!quote || quoting))} data-testid="button-exchange-cta">{submitting ? 'Creating sandbox order…' : presentation ? 'Preview order (sandbox)' : 'Create order (sandbox)'}</button>
       {!presentation && config?.publicNote && <p className="s-muted mt-3 text-xs">{config.publicNote}</p>}
       <div role="status" aria-live="polite" className="mt-3 min-h-[1.25rem]">

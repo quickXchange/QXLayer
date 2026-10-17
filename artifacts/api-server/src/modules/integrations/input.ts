@@ -40,6 +40,13 @@ export function mayManageSecrets(role: string, mode: string) {
 export function validateSecrets(providerKey: string, values: Record<string, string>) {
   const d = definition(providerKey);
   if (Object.keys(values).some(k => !(d.secretFields as readonly string[]).includes(k))) throw new HttpError(400, "Unknown credential field.");
+  if (["quickex", "whitebit"].includes(providerKey)) {
+    for (const key of ["apiKey", "secretKey"]) {
+      const value = values[key];
+      if (!value || !value.trim() || value !== value.trim() || /[\s\u0000-\u001f\u007f]/.test(value) || value.length > 4096)
+        throw new HttpError(400, `${d.name}: provide both API key and secret without spaces or control characters. Existing credentials were not changed.`);
+    }
+  }
 }
 export function safeProviderEndpoint(value: string) {
   const u = new URL(value);

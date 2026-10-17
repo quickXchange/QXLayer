@@ -9,7 +9,7 @@ const settings={actions:{swap:true,buy:true,convert:false,sell:false},
   wallets:[{id:"master-wallet"}],providers:[{providerId:"central-rpc"}]} as unknown as ExchangeSettings;
 test("customer Exchange reads exclude monitoring and ungranted action configuration",()=>{
   const view=customerExchangeConfiguration(settings,grants);
-  assert.equal(view.wallets,undefined);
+  assert.deepEqual(view.wallets,[]);
   assert.deepEqual(view.providers,[]);
   assert.deepEqual(view.actions,{swap:true,buy:false,convert:false,sell:false});
   assert.deepEqual(view.routes.map(r=>r.id),["allowed"]);
@@ -29,4 +29,16 @@ test("customer cannot inject an ungranted action, route, rule or infrastructure 
     {...view,wallets:settings.wallets},
     {...view,providers:settings.providers},
   ])assert.throws(()=>mergeCustomerExchangeConfiguration(input,settings,grants),(e:any)=>e.status===403);
+});
+test("customers manage only public-address records and cannot replace monitoring IDs", () => {
+  const own = { id: "customer-wallet", purpose: "customer", providerKey: "rpc" };
+  const existing = { ...settings, wallets: [...settings.wallets!, own] } as ExchangeSettings;
+  const view = customerExchangeConfiguration(existing, grants);
+  assert.deepEqual(view.wallets, [own]);
+  assert.deepEqual(mergeCustomerExchangeConfiguration(view, existing, grants).wallets, [own, settings.wallets![0]]);
+  const edited = { ...own, label: "Customer address" };
+  assert.deepEqual(mergeCustomerExchangeConfiguration({ ...view, wallets: [edited] } as ExchangeSettings, existing, grants).wallets,
+    [edited, settings.wallets![0]]);
+  assert.throws(() => mergeCustomerExchangeConfiguration({ ...view, wallets: [{ ...own, id: "master-wallet" }] } as ExchangeSettings, existing, grants));
+  assert.throws(() => mergeCustomerExchangeConfiguration({ ...view, wallets: [{ ...own, providerKey: "alchemy" }] } as ExchangeSettings, existing, grants));
 });

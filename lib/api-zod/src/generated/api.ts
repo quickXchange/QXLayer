@@ -3844,6 +3844,7 @@ export const GetExchangeConfigurationResponse = zod.object({
   "spreadBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin).max(getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax)
 })).max(getExchangeConfigurationResponseConfigurationPricingRulesMax).optional(),
   "wallets": zod.array(zod.object({
+  "purpose": zod.enum(['customer', 'monitoring']).optional().describe('Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records.'),
   "id": zod.string().uuid(),
   "label": zod.string().min(1).max(getExchangeConfigurationResponseConfigurationWalletsItemLabelMax),
   "assetNetworkId": zod.string().min(1).max(getExchangeConfigurationResponseConfigurationWalletsItemAssetNetworkIdMax),
@@ -4068,6 +4069,7 @@ export const SaveExchangeConfigurationBody = zod.object({
   "spreadBps": zod.number().int().min(saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMin).max(saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMax)
 })).max(saveExchangeConfigurationBodyPricingRulesMax).optional(),
   "wallets": zod.array(zod.object({
+  "purpose": zod.enum(['customer', 'monitoring']).optional().describe('Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records.'),
   "id": zod.string().uuid(),
   "label": zod.string().min(1).max(saveExchangeConfigurationBodyWalletsItemLabelMax),
   "assetNetworkId": zod.string().min(1).max(saveExchangeConfigurationBodyWalletsItemAssetNetworkIdMax),
@@ -4268,6 +4270,7 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "spreadBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin).max(saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax)
 })).max(saveExchangeConfigurationResponseConfigurationPricingRulesMax).optional(),
   "wallets": zod.array(zod.object({
+  "purpose": zod.enum(['customer', 'monitoring']).optional().describe('Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records.'),
   "id": zod.string().uuid(),
   "label": zod.string().min(1).max(saveExchangeConfigurationResponseConfigurationWalletsItemLabelMax),
   "assetNetworkId": zod.string().min(1).max(saveExchangeConfigurationResponseConfigurationWalletsItemAssetNetworkIdMax),
@@ -4332,6 +4335,7 @@ export const listExchangeOrdersQuerySearchMax = 100;
 
 export const listExchangeOrdersQueryFromRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
 export const listExchangeOrdersQueryToRegExp = new RegExp('^\\d{4}-\\d{2}-\\d{2}$');
+export const listExchangeOrdersQueryCustomerRegExp = new RegExp('^(anonymous|[a-f0-9]{64})$');
 
 
 
@@ -4342,7 +4346,7 @@ export const ListExchangeOrdersQueryParams = zod.object({
   "action": zod.coerce.string().optional(),
   "from": zod.coerce.string().regex(listExchangeOrdersQueryFromRegExp).optional(),
   "to": zod.coerce.string().regex(listExchangeOrdersQueryToRegExp).optional(),
-  "customer": zod.enum(['anonymous']).optional(),
+  "customer": zod.coerce.string().regex(listExchangeOrdersQueryCustomerRegExp).optional(),
   "page": zod.coerce.number().int().min(1).optional()
 })
 
@@ -4541,13 +4545,18 @@ export const ListExchangeCustomersParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
 
+export const listExchangeCustomersResponseNotesMax = 2000;
+
+
+
 export const ListExchangeCustomersResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
   "email": zod.string().nullable(),
   "orders": zod.number().int(),
   "lastActivity": zod.coerce.date(),
-  "status": zod.enum(['unidentified'])
+  "status": zod.enum(['unidentified', 'contact', 'archived']),
+  "notes": zod.string().max(listExchangeCustomersResponseNotesMax).optional()
 })
 export const ListExchangeCustomersResponse = zod.array(ListExchangeCustomersResponseItem)
 
@@ -4687,12 +4696,19 @@ export const CreateSandboxOrderParams = zod.object({
   "slug": zod.coerce.string()
 })
 
+export const createSandboxOrderBodyCustomerNameMax = 120;
+
+export const createSandboxOrderBodyCustomerEmailMax = 254;
+
 export const createSandboxOrderBodyQuoteTokenMin = 40;
 export const createSandboxOrderBodyQuoteTokenMax = 12000;
 
 
 
 export const CreateSandboxOrderBody = zod.object({
+  "customerName": zod.string().min(1).max(createSandboxOrderBodyCustomerNameMax).optional(),
+  "customerEmail": zod.string().email().max(createSandboxOrderBodyCustomerEmailMax).optional(),
+  "contactConsent": zod.boolean().optional().describe('Must be true when optional contact details are supplied. Does not opt in to marketing.'),
   "quoteToken": zod.string().min(createSandboxOrderBodyQuoteTokenMin).max(createSandboxOrderBodyQuoteTokenMax),
   "idempotencyKey": zod.string().uuid()
 })
@@ -4783,6 +4799,98 @@ export const TrackSandboxOrderResponse = zod.object({
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
   "sandboxOnly": zod.literal(true)
+})
+
+
+export const DownloadSandboxOrderInvoiceParams = zod.object({
+  "slug": zod.coerce.string(),
+  "orderId": zod.coerce.string().uuid()
+})
+
+export const downloadSandboxOrderInvoiceHeaderTrackingTokenMin = 32;
+export const downloadSandboxOrderInvoiceHeaderTrackingTokenMax = 200;
+
+
+
+export const DownloadSandboxOrderInvoiceHeader = zod.object({
+  "trackingToken": zod.string().min(downloadSandboxOrderInvoiceHeaderTrackingTokenMin).max(downloadSandboxOrderInvoiceHeaderTrackingTokenMax)
+})
+
+export const DownloadSandboxOrderInvoiceResponse = zod.unknown()
+
+
+export const updateExchangeCustomerPathCustomerIdRegExp = new RegExp('^[a-f0-9]{64}$');
+
+
+export const UpdateExchangeCustomerParams = zod.object({
+  "tenantId": zod.coerce.string().uuid(),
+  "customerId": zod.coerce.string().regex(updateExchangeCustomerPathCustomerIdRegExp)
+})
+
+export const updateExchangeCustomerBodyNameMax = 120;
+
+export const updateExchangeCustomerBodyNotesMax = 2000;
+
+
+
+export const UpdateExchangeCustomerBody = zod.object({
+  "name": zod.string().min(1).max(updateExchangeCustomerBodyNameMax),
+  "notes": zod.string().max(updateExchangeCustomerBodyNotesMax),
+  "archived": zod.boolean()
+})
+
+export const UpdateExchangeCustomerResponse = zod.object({
+  "ok": zod.boolean()
+})
+
+
+export const GetExchangeNotificationsParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const GetExchangeNotificationsResponse = zod.object({
+  "preferences": zod.object({
+  "orderCreated": zod.boolean(),
+  "orderStatusChanged": zod.boolean(),
+  "markAllRead": zod.boolean().optional()
+}),
+  "readThrough": zod.coerce.date().nullable(),
+  "events": zod.array(zod.object({
+  "id": zod.string(),
+  "eventType": zod.string(),
+  "actorId": zod.string().optional(),
+  "description": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+export const SaveExchangeNotificationPreferencesParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const SaveExchangeNotificationPreferencesBody = zod.object({
+  "orderCreated": zod.boolean(),
+  "orderStatusChanged": zod.boolean(),
+  "markAllRead": zod.boolean().optional()
+})
+
+export const SaveExchangeNotificationPreferencesResponse = zod.object({
+  "preferences": zod.object({
+  "orderCreated": zod.boolean(),
+  "orderStatusChanged": zod.boolean(),
+  "markAllRead": zod.boolean().optional()
+}),
+  "readThrough": zod.coerce.date().nullable(),
+  "events": zod.array(zod.object({
+  "id": zod.string(),
+  "eventType": zod.string(),
+  "actorId": zod.string().optional(),
+  "description": zod.string(),
+  "tenantId": zod.string().uuid().nullable(),
+  "createdAt": zod.coerce.date()
+}))
 })
 
 
@@ -6142,6 +6250,53 @@ export const SetStaffPermissionsResponse = zod.object({
 })
 
 
+export const ListCustomerDomainsResponseItem = zod.object({
+  "tenantId": zod.string().uuid(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "tenantStatus": zod.string(),
+  "domain": zod.string().nullable(),
+  "status": zod.string(),
+  "deliveryStatus": zod.string(),
+  "requestId": zod.string().uuid().nullable()
+})
+export const ListCustomerDomainsResponse = zod.array(ListCustomerDomainsResponseItem)
+
+
+export const ManageTenantDomainHostingParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const ManageTenantDomainHostingBody = zod.object({
+  "action": zod.enum(['register', 'refresh'])
+})
+
+export const ManageTenantDomainHostingResponse = zod.object({
+  "domain": zod.string().nullable(),
+  "status": zod.enum(['unconfigured', 'unverified', 'verified']),
+  "txtName": zod.string().nullable(),
+  "txtValue": zod.string().nullable(),
+  "hostingConnected": zod.boolean(),
+  "httpsReady": zod.boolean().optional(),
+  "hostingCheckedAt": zod.coerce.date().nullish(),
+  "hostingError": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
+})
+
+
 export const GetDomainVerificationParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
@@ -6156,7 +6311,19 @@ export const GetDomainVerificationResponse = zod.object({
   "hostingCheckedAt": zod.coerce.date().nullish(),
   "hostingError": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
-  "instructions": zod.array(zod.string()).optional()
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
 })
 
 
@@ -6174,7 +6341,19 @@ export const VerifyTenantDomainResponse = zod.object({
   "hostingCheckedAt": zod.coerce.date().nullish(),
   "hostingError": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
-  "instructions": zod.array(zod.string()).optional()
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
 })
 
 
@@ -6192,7 +6371,19 @@ export const CheckTenantDomainHostingResponse = zod.object({
   "hostingCheckedAt": zod.coerce.date().nullish(),
   "hostingError": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
-  "instructions": zod.array(zod.string()).optional()
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
 })
 
 
@@ -6218,6 +6409,12 @@ export const resolvePublicDomainPathHostnameMax = 253;
 export const ResolvePublicDomainParams = zod.object({
   "hostname": zod.coerce.string().max(resolvePublicDomainPathHostnameMax)
 })
+
+export const resolvePublicDomainResponseWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const resolvePublicDomainResponseWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const resolvePublicDomainResponseWebsiteSettingsReviewLinksMax = 6;
 
 export const resolvePublicDomainResponseWebsiteSettingsNavigationItemLabelMax = 60;
 
@@ -6273,6 +6470,10 @@ export const ResolvePublicDomainResponse = zod.object({
   "domain": zod.string().nullable(),
   "sandboxOnly": zod.boolean(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(resolvePublicDomainResponseWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(resolvePublicDomainResponseWebsiteSettingsReviewLinksItemUrlMax)
+})).max(resolvePublicDomainResponseWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(resolvePublicDomainResponseWebsiteSettingsNavigationItemLabelMax),
@@ -6482,6 +6683,12 @@ export const createTenantResponseOneEnabledModulesItemMax = 64;
 
 
 export const createTenantResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const createTenantResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const createTenantResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const createTenantResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const createTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const createTenantResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -6552,6 +6759,10 @@ export const CreateTenantResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(createTenantResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(createTenantResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(createTenantResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(createTenantResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -6597,6 +6808,12 @@ export const getTenantResponseOneEnabledModulesItemMax = 64;
 
 
 export const getTenantResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getTenantResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const getTenantResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const getTenantResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const getTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const getTenantResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -6667,6 +6884,10 @@ export const GetTenantResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(getTenantResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(getTenantResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(getTenantResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(getTenantResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -6737,6 +6958,12 @@ export const updateTenantBrandResponseOneEnabledModulesItemMax = 64;
 
 
 export const updateTenantBrandResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantBrandResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const updateTenantBrandResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const updateTenantBrandResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const updateTenantBrandResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -6807,6 +7034,10 @@ export const UpdateTenantBrandResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantBrandResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(updateTenantBrandResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(updateTenantBrandResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(updateTenantBrandResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -6860,6 +7091,12 @@ export const updateTenantDomainResponseOneEnabledModulesItemMax = 64;
 
 
 export const updateTenantDomainResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantDomainResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const updateTenantDomainResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const updateTenantDomainResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const updateTenantDomainResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -6930,6 +7167,10 @@ export const UpdateTenantDomainResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantDomainResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(updateTenantDomainResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(updateTenantDomainResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(updateTenantDomainResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -6985,6 +7226,12 @@ export const updateTenantModulesResponseOneEnabledModulesItemMax = 64;
 
 
 export const updateTenantModulesResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantModulesResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const updateTenantModulesResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const updateTenantModulesResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const updateTenantModulesResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -7055,6 +7302,10 @@ export const UpdateTenantModulesResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantModulesResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(updateTenantModulesResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(updateTenantModulesResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(updateTenantModulesResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -7104,6 +7355,12 @@ export const updateTenantAssetsNetworksResponseOneEnabledModulesItemMax = 64;
 
 
 export const updateTenantAssetsNetworksResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -7174,6 +7431,10 @@ export const UpdateTenantAssetsNetworksResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(updateTenantAssetsNetworksResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -7226,6 +7487,12 @@ export const updateTenantConfigurationResponseOneEnabledModulesItemMax = 64;
 
 
 export const updateTenantConfigurationResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantConfigurationResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const updateTenantConfigurationResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const updateTenantConfigurationResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const updateTenantConfigurationResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -7296,6 +7563,10 @@ export const UpdateTenantConfigurationResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantConfigurationResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(updateTenantConfigurationResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(updateTenantConfigurationResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(updateTenantConfigurationResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -7341,6 +7612,12 @@ export const activateTenantResponseOneEnabledModulesItemMax = 64;
 
 
 export const activateTenantResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const activateTenantResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const activateTenantResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const activateTenantResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const activateTenantResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const activateTenantResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -7411,6 +7688,10 @@ export const ActivateTenantResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(activateTenantResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(activateTenantResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(activateTenantResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(activateTenantResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -9179,6 +9460,12 @@ export const UpdateTenantWebsiteSettingsParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
 
+export const updateTenantWebsiteSettingsBodyReviewLinksItemLabelMax = 80;
+
+export const updateTenantWebsiteSettingsBodyReviewLinksItemUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsBodyReviewLinksMax = 6;
+
 export const updateTenantWebsiteSettingsBodyNavigationItemLabelMax = 60;
 
 export const updateTenantWebsiteSettingsBodyNavigationMax = 12;
@@ -9224,6 +9511,10 @@ export const updateTenantWebsiteSettingsBodyTermsContentMax = 20000;
 
 
 export const UpdateTenantWebsiteSettingsBody = zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantWebsiteSettingsBodyReviewLinksItemLabelMax),
+  "url": zod.string().max(updateTenantWebsiteSettingsBodyReviewLinksItemUrlMax)
+})).max(updateTenantWebsiteSettingsBodyReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(updateTenantWebsiteSettingsBodyNavigationItemLabelMax),
@@ -9260,6 +9551,12 @@ export const updateTenantWebsiteSettingsResponseOneEnabledModulesItemMax = 64;
 
 
 export const updateTenantWebsiteSettingsResponseOneEnabledModulesItemRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsReviewLinksMax = 6;
+
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationMax = 12;
@@ -9330,6 +9627,10 @@ export const UpdateTenantWebsiteSettingsResponse = zod.object({
   "configurationComplete": zod.boolean(),
   "activationBlockers": zod.array(zod.string()).optional(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsReviewLinksItemUrlMax)
+})).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(updateTenantWebsiteSettingsResponseTwoWebsiteSettingsNavigationItemLabelMax),
@@ -9434,6 +9735,12 @@ export const GetPublicSiteParams = zod.object({
   "slug": zod.coerce.string().regex(getPublicSitePathSlugRegExp)
 })
 
+export const getPublicSiteResponseWebsiteSettingsReviewLinksItemLabelMax = 80;
+
+export const getPublicSiteResponseWebsiteSettingsReviewLinksItemUrlMax = 2048;
+
+export const getPublicSiteResponseWebsiteSettingsReviewLinksMax = 6;
+
 export const getPublicSiteResponseWebsiteSettingsNavigationItemLabelMax = 60;
 
 export const getPublicSiteResponseWebsiteSettingsNavigationMax = 12;
@@ -9488,6 +9795,10 @@ export const GetPublicSiteResponse = zod.object({
   "domain": zod.string().nullable(),
   "sandboxOnly": zod.boolean(),
   "websiteSettings": zod.object({
+  "reviewLinks": zod.array(zod.object({
+  "label": zod.string().min(1).max(getPublicSiteResponseWebsiteSettingsReviewLinksItemLabelMax),
+  "url": zod.string().max(getPublicSiteResponseWebsiteSettingsReviewLinksItemUrlMax)
+})).max(getPublicSiteResponseWebsiteSettingsReviewLinksMax).optional(),
   "navigation": zod.array(zod.object({
   "key": zod.enum(['exchange', 'payments', 'telegram', 'how', 'developers', 'about', 'faq']),
   "label": zod.string().min(1).max(getPublicSiteResponseWebsiteSettingsNavigationItemLabelMax),

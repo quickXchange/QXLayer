@@ -25,6 +25,7 @@ export async function prepareCustomerFixtures(admin: Principal, suffix = randomU
   if (!source) throw new Error("The existing Exchange sandbox demonstration is required for these isolated development fixtures.");
   const base = (await exchangeConfiguration(admin, source.id)).configuration;
   const pf = planFixture(`Customer workflow verification ${suffix}`, { website: true, crypto_exchange: true, swap: true, convert: true, buy: true, sell: true, merchant_api: true, api_keys: true });
+  pf.currency = "EUR";
   pf.entitlements = pf.entitlements.map(e => typeof e.value === "boolean" ? e : { ...e, value: "1000000" });
   const plan = await savePlan(admin, pf);
   const tenants = [];
@@ -37,8 +38,10 @@ export async function prepareCustomerFixtures(admin: Principal, suffix = randomU
   return { tenants, planId: plan.id, base };
 }
 export async function cleanCustomerFixtures(tenantIds: string[], planId: string, actors: string[]) {
+  await pool.query("DELETE FROM qxlayer_commerce.email_outbox WHERE customer_user_id=ANY($1::text[])", [actors]);
+  await pool.query("DELETE FROM qxlayer_commerce.invoices WHERE customer_user_id=ANY($1::text[])", [actors]);
   await pool.query("DELETE FROM white_label_requests WHERE customer_user_id=ANY($1::text[]) OR tenant_id=ANY($2::uuid[])", [actors, tenantIds]);
-  for (const table of ["exchange_orders", "pricing_rules", "audit_events", "tenant_usage_counters", "tenant_payment_methods", "tenant_product_configuration", "tenant_entitlement_overrides", "tenant_subscriptions", "tenant_memberships", "tenant_asset_networks", "tenant_configuration", "tenant_branding", "tenant_domains"]) await pool.query(`DELETE FROM ${table} WHERE tenant_id=ANY($1::uuid[])`, [tenantIds]);
+  for (const table of ["tenant_telegram_receipts", "tenant_integrations", "exchange_orders", "pricing_rules", "audit_events", "tenant_usage_counters", "tenant_payment_methods", "tenant_product_configuration", "tenant_entitlement_overrides", "tenant_subscriptions", "tenant_memberships", "tenant_asset_networks", "tenant_configuration", "tenant_branding", "tenant_domains"]) await pool.query(`DELETE FROM ${table} WHERE tenant_id=ANY($1::uuid[])`, [tenantIds]);
   await pool.query("DELETE FROM tenants WHERE id=ANY($1::uuid[])", [tenantIds]);
   await pool.query("DELETE FROM plan_entitlements WHERE plan_id=$1", [planId]);
   await pool.query("DELETE FROM plans WHERE id=$1", [planId]);

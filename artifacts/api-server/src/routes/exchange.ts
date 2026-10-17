@@ -21,6 +21,12 @@ import { HttpError } from "../lib/errors";
 import { visualCatalog, visualFile } from "../products/exchange/visual-assets";
 import { authorizedWebsitePreview } from "../modules/website/operator-preview";
 import { assertMiniAction } from "../modules/integrations/telegram";
+import { sandboxInvoice } from "../products/exchange/invoice";
+import { notifications, updateCustomer } from "../products/exchange/customer-management";
+import {
+  UpdateExchangeCustomerParams, UpdateExchangeCustomerBody, UpdateExchangeCustomerResponse,
+  GetExchangeNotificationsResponse, SaveExchangeNotificationPreferencesBody,
+} from "@workspace/api-zod";
 
 const router = Router();
 router.get("/exchange/visual-catalog", (_req, res) => {
@@ -75,6 +81,13 @@ router.get("/public/sites/:slug/exchange/orders/:orderId", async (req, res) => {
   const { slug, orderId } = TrackSandboxOrderParams.parse(req.params);
   res.json(TrackSandboxOrderResponse.parse(await trackOrder(slug, orderId, req.get("trackingToken") ?? "")));
 });
+router.get("/public/sites/:slug/exchange/orders/:orderId/invoice", async (req, res) => {
+  const { slug, orderId } = TrackSandboxOrderParams.parse(req.params);
+  const bytes = await sandboxInvoice(slug, orderId, req.get("trackingToken") ?? "");
+  res.set({ "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="sandbox-invoice-${orderId}.pdf"`,
+    "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" });
+  res.send(Buffer.from(bytes));
+});
 router.use("/tenants/:tenantId/exchange", requireAuthentication, sameOriginMutation, (_req, res, next) => { res.set("Cache-Control", "no-store"); next(); });
 router.get("/tenants/:tenantId/exchange", async (req, res) => res.json(GetExchangeConfigurationResponse.parse(await exchangeConfiguration(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId))));
 router.put("/tenants/:tenantId/exchange", async (req, res) => {
@@ -84,6 +97,16 @@ router.put("/tenants/:tenantId/exchange", async (req, res) => {
 });
 router.get("/tenants/:tenantId/exchange/dashboard", async (req, res) => res.json(GetExchangeDashboardResponse.parse(await exchangeDashboard(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId))));
 router.get("/tenants/:tenantId/exchange/customers", async (req, res) => res.json(ListExchangeCustomersResponse.parse(await exchangeCustomers(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId))));
+router.patch("/tenants/:tenantId/exchange/customers/:customerId", async (req, res) => {
+  const { tenantId, customerId } = UpdateExchangeCustomerParams.parse(req.params);
+  res.json(UpdateExchangeCustomerResponse.parse(await updateCustomer(principalFrom(res), tenantId, customerId, UpdateExchangeCustomerBody.parse(req.body))));
+});
+router.get("/tenants/:tenantId/exchange/notifications", async (req, res) => {
+  res.json(GetExchangeNotificationsResponse.parse(await notifications(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId)));
+});
+router.put("/tenants/:tenantId/exchange/notifications", async (req, res) => {
+  res.json(GetExchangeNotificationsResponse.parse(await notifications(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId, SaveExchangeNotificationPreferencesBody.parse(req.body))));
+});
 router.get("/tenants/:tenantId/exchange/audit", async (req, res) => res.json(ListExchangeAuditResponse.parse(await exchangeAudit(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId, ListExchangeAuditQueryParams.parse(req.query).page))));
 router.get("/tenants/:tenantId/exchange/orders", async (req, res) => res.json(ListExchangeOrdersResponse.parse(await tenantOrders(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId, ListExchangeOrdersQueryParams.parse(req.query)))));
 router.get("/tenants/:tenantId/exchange/orders/:orderId", async (req, res) => {

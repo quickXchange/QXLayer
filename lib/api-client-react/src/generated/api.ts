@@ -30,10 +30,12 @@ import type {
   CapabilityStatus,
   CurrentPrincipal,
   CustomerAdminPanel,
+  CustomerDomain,
   CustomerNotifications,
   DeletePhase1Method200,
   DemoLaunchInput,
   DemoSession,
+  DomainHostingAction,
   DomainInput,
   DomainVerification,
   EntitlementDefinition,
@@ -41,8 +43,11 @@ import type {
   ExchangeAuditList,
   ExchangeConfiguration,
   ExchangeCustomer,
+  ExchangeCustomerUpdate,
   ExchangeDashboard,
   ExchangeDeliveryInput,
+  ExchangeNotificationInbox,
+  ExchangeNotificationPreferences,
   ExchangeOrder,
   ExchangeOrderCreated,
   ExchangeOrderInput,
@@ -5213,6 +5218,321 @@ export function useTrackSandboxOrder<TData = Awaited<ReturnType<typeof trackSand
 
 
 
+export const getDownloadSandboxOrderInvoiceUrl = (slug: string,
+    orderId: string,) => {
+
+
+
+
+  return `/api/public/sites/${slug}/exchange/orders/${orderId}/invoice`
+}
+
+export const downloadSandboxOrderInvoice = async (slug: string,
+    orderId: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getDownloadSandboxOrderInvoiceUrl(slug,orderId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getDownloadSandboxOrderInvoiceQueryKey = (slug: string,
+    orderId: string,) => {
+    return [
+    `/api/public/sites/${slug}/exchange/orders/${orderId}/invoice`
+    ] as const;
+    }
+
+
+export const getDownloadSandboxOrderInvoiceQueryOptions = <TData = Awaited<ReturnType<typeof downloadSandboxOrderInvoice>>, TError = ErrorType<unknown>>(slug: string,
+    orderId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadSandboxOrderInvoice>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDownloadSandboxOrderInvoiceQueryKey(slug,orderId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof downloadSandboxOrderInvoice>>> = ({ signal }) => downloadSandboxOrderInvoice(slug,orderId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: slug !== null && slug !== undefined && orderId !== null && orderId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof downloadSandboxOrderInvoice>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type DownloadSandboxOrderInvoiceQueryResult = NonNullable<Awaited<ReturnType<typeof downloadSandboxOrderInvoice>>>
+export type DownloadSandboxOrderInvoiceQueryError = ErrorType<unknown>
+
+
+
+export function useDownloadSandboxOrderInvoice<TData = Awaited<ReturnType<typeof downloadSandboxOrderInvoice>>, TError = ErrorType<unknown>>(
+ slug: string,
+    orderId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof downloadSandboxOrderInvoice>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getDownloadSandboxOrderInvoiceQueryOptions(slug,orderId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getUpdateExchangeCustomerUrl = (tenantId: string,
+    customerId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/customers/${customerId}`
+}
+
+export const updateExchangeCustomer = async (tenantId: string,
+    customerId: string,
+    exchangeCustomerUpdate: ExchangeCustomerUpdate, options?: Parameters<typeof customFetch>[1]): Promise<MutationStatus> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<MutationStatus>(getUpdateExchangeCustomerUrl(tenantId,customerId),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeCustomerUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateExchangeCustomerMutationKey = () => ['updateExchangeCustomer'] as const;
+
+export const getUpdateExchangeCustomerMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExchangeCustomer>>, TError,UpdateExchangeCustomerMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateExchangeCustomer>>, TError,UpdateExchangeCustomerMutationVariables, TContext> => {
+
+const mutationKey = getUpdateExchangeCustomerMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateExchangeCustomer>>, UpdateExchangeCustomerMutationVariables> = (props) => {
+          const {tenantId,customerId,data} = props ?? {};
+
+          return  updateExchangeCustomer(tenantId,customerId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateExchangeCustomerMutationResult = NonNullable<Awaited<ReturnType<typeof updateExchangeCustomer>>>
+    export type UpdateExchangeCustomerMutationBody = BodyType<ExchangeCustomerUpdate>
+    export type UpdateExchangeCustomerMutationError = ErrorType<unknown>
+    export type UpdateExchangeCustomerMutationVariables = {tenantId: string;customerId: string;data: BodyType<ExchangeCustomerUpdate>}
+
+    export const useUpdateExchangeCustomer = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateExchangeCustomer>>, TError,UpdateExchangeCustomerMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateExchangeCustomer>>,
+        TError,
+        UpdateExchangeCustomerMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateExchangeCustomerMutationOptions(options));
+    }
+
+export const getGetExchangeNotificationsUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/notifications`
+}
+
+export const getExchangeNotifications = async (tenantId: string, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeNotificationInbox> => {
+
+  return customFetch<ExchangeNotificationInbox>(getGetExchangeNotificationsUrl(tenantId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetExchangeNotificationsQueryKey = (tenantId: string,) => {
+    return [
+    `/api/tenants/${tenantId}/exchange/notifications`
+    ] as const;
+    }
+
+
+export const getGetExchangeNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof getExchangeNotifications>>, TError = ErrorType<unknown>>(tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetExchangeNotificationsQueryKey(tenantId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getExchangeNotifications>>> = ({ signal }) => getExchangeNotifications(tenantId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: tenantId !== null && tenantId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getExchangeNotifications>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetExchangeNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof getExchangeNotifications>>>
+export type GetExchangeNotificationsQueryError = ErrorType<unknown>
+
+
+
+export function useGetExchangeNotifications<TData = Awaited<ReturnType<typeof getExchangeNotifications>>, TError = ErrorType<unknown>>(
+ tenantId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getExchangeNotifications>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetExchangeNotificationsQueryOptions(tenantId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSaveExchangeNotificationPreferencesUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/exchange/notifications`
+}
+
+export const saveExchangeNotificationPreferences = async (tenantId: string,
+    exchangeNotificationPreferences: ExchangeNotificationPreferences, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeNotificationInbox> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ExchangeNotificationInbox>(getSaveExchangeNotificationPreferencesUrl(tenantId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(exchangeNotificationPreferences)
+  }
+);}
+
+
+
+
+
+export const getSaveExchangeNotificationPreferencesMutationKey = () => ['saveExchangeNotificationPreferences'] as const;
+
+export const getSaveExchangeNotificationPreferencesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveExchangeNotificationPreferences>>, TError,SaveExchangeNotificationPreferencesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveExchangeNotificationPreferences>>, TError,SaveExchangeNotificationPreferencesMutationVariables, TContext> => {
+
+const mutationKey = getSaveExchangeNotificationPreferencesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveExchangeNotificationPreferences>>, SaveExchangeNotificationPreferencesMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  saveExchangeNotificationPreferences(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveExchangeNotificationPreferencesMutationResult = NonNullable<Awaited<ReturnType<typeof saveExchangeNotificationPreferences>>>
+    export type SaveExchangeNotificationPreferencesMutationBody = BodyType<ExchangeNotificationPreferences>
+    export type SaveExchangeNotificationPreferencesMutationError = ErrorType<unknown>
+    export type SaveExchangeNotificationPreferencesMutationVariables = {tenantId: string;data: BodyType<ExchangeNotificationPreferences>}
+
+    export const useSaveExchangeNotificationPreferences = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveExchangeNotificationPreferences>>, TError,SaveExchangeNotificationPreferencesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof saveExchangeNotificationPreferences>>,
+        TError,
+        SaveExchangeNotificationPreferencesMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSaveExchangeNotificationPreferencesMutationOptions(options));
+    }
+
 export const getGetPublicProductCatalogUrl = () => {
 
 
@@ -6299,6 +6619,160 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSetStaffPermissionsMutationOptions(options));
+    }
+
+export const getListCustomerDomainsUrl = () => {
+
+
+
+
+  return `/api/operator/customer-domains`
+}
+
+export const listCustomerDomains = async ( options?: Parameters<typeof customFetch>[1]): Promise<CustomerDomain[]> => {
+
+  return customFetch<CustomerDomain[]>(getListCustomerDomainsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCustomerDomainsQueryKey = () => {
+    return [
+    `/api/operator/customer-domains`
+    ] as const;
+    }
+
+
+export const getListCustomerDomainsQueryOptions = <TData = Awaited<ReturnType<typeof listCustomerDomains>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCustomerDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCustomerDomainsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCustomerDomains>>> = ({ signal }) => listCustomerDomains({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCustomerDomains>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCustomerDomainsQueryResult = NonNullable<Awaited<ReturnType<typeof listCustomerDomains>>>
+export type ListCustomerDomainsQueryError = ErrorType<unknown>
+
+
+
+export function useListCustomerDomains<TData = Awaited<ReturnType<typeof listCustomerDomains>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCustomerDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCustomerDomainsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getManageTenantDomainHostingUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/domain-hosting-provider`
+}
+
+export const manageTenantDomainHosting = async (tenantId: string,
+    domainHostingAction: DomainHostingAction, options?: Parameters<typeof customFetch>[1]): Promise<DomainVerification> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<DomainVerification>(getManageTenantDomainHostingUrl(tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(domainHostingAction)
+  }
+);}
+
+
+
+
+
+export const getManageTenantDomainHostingMutationKey = () => ['manageTenantDomainHosting'] as const;
+
+export const getManageTenantDomainHostingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof manageTenantDomainHosting>>, TError,ManageTenantDomainHostingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof manageTenantDomainHosting>>, TError,ManageTenantDomainHostingMutationVariables, TContext> => {
+
+const mutationKey = getManageTenantDomainHostingMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof manageTenantDomainHosting>>, ManageTenantDomainHostingMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  manageTenantDomainHosting(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ManageTenantDomainHostingMutationResult = NonNullable<Awaited<ReturnType<typeof manageTenantDomainHosting>>>
+    export type ManageTenantDomainHostingMutationBody = BodyType<DomainHostingAction>
+    export type ManageTenantDomainHostingMutationError = ErrorType<unknown>
+    export type ManageTenantDomainHostingMutationVariables = {tenantId: string;data: BodyType<DomainHostingAction>}
+
+    export const useManageTenantDomainHosting = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof manageTenantDomainHosting>>, TError,ManageTenantDomainHostingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof manageTenantDomainHosting>>,
+        TError,
+        ManageTenantDomainHostingMutationVariables,
+        TContext
+      > => {
+      return useMutation(getManageTenantDomainHostingMutationOptions(options));
     }
 
 export const getGetDomainVerificationUrl = (tenantId: string,) => {

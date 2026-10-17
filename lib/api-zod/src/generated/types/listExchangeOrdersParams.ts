@@ -5,7 +5,6 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
-import type { ListExchangeOrdersCustomer } from './listExchangeOrdersCustomer';
 import type { ListExchangeOrdersView } from './listExchangeOrdersView';
 
 export type ListExchangeOrdersParams = {
@@ -27,7 +26,10 @@ from?: string;
  * @pattern ^\d{4}-\d{2}-\d{2}$
  */
 to?: string;
-customer?: ListExchangeOrdersCustomer;
+/**
+ * @pattern ^(anonymous|[a-f0-9]{64})$
+ */
+customer?: string;
 /**
  * @minimum 1
  */

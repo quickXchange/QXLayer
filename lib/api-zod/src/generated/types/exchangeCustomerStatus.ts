@@ -11,4 +11,6 @@ export type ExchangeCustomerStatus = typeof ExchangeCustomerStatus[keyof typeof 
 
 export const ExchangeCustomerStatus = {
   unidentified: 'unidentified',
+  contact: 'contact',
+  archived: 'archived',
 } as const;

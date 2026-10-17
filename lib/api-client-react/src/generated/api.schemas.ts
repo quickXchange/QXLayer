@@ -1051,6 +1051,17 @@ export interface ExchangeWalletScan {
   executionEnabled: boolean;
 }
 
+/**
+ * Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records.
+ */
+export type ExchangeWalletPurpose = typeof ExchangeWalletPurpose[keyof typeof ExchangeWalletPurpose];
+
+
+export const ExchangeWalletPurpose = {
+  customer: 'customer',
+  monitoring: 'monitoring',
+} as const;
+
 export type ExchangeWalletAdapterKind = typeof ExchangeWalletAdapterKind[keyof typeof ExchangeWalletAdapterKind];
 
 
@@ -1078,6 +1089,8 @@ export const ExchangeWalletProviderKey = {
 } as const;
 
 export interface ExchangeWallet {
+  /** Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records. */
+  purpose?: ExchangeWalletPurpose;
   id: string;
   /**
      * @minLength 1
@@ -1301,6 +1314,15 @@ export interface ExchangeQuote {
 
 export interface ExchangeOrderInput {
   /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  customerName?: string;
+  /** @maxLength 254 */
+  customerEmail?: string;
+  /** Must be true when optional contact details are supplied. Does not opt in to marketing. */
+  contactConsent?: boolean;
+  /**
      * @minLength 40
      * @maxLength 12000
      */
@@ -1392,6 +1414,8 @@ export type ExchangeCustomerStatus = typeof ExchangeCustomerStatus[keyof typeof 
 
 export const ExchangeCustomerStatus = {
   unidentified: 'unidentified',
+  contact: 'contact',
+  archived: 'archived',
 } as const;
 
 export interface ExchangeCustomer {
@@ -1402,6 +1426,32 @@ export interface ExchangeCustomer {
   orders: number;
   lastActivity: string;
   status: ExchangeCustomerStatus;
+  /** @maxLength 2000 */
+  notes?: string;
+}
+
+export interface ExchangeCustomerUpdate {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  name: string;
+  /** @maxLength 2000 */
+  notes: string;
+  archived: boolean;
+}
+
+export interface ExchangeNotificationPreferences {
+  orderCreated: boolean;
+  orderStatusChanged: boolean;
+  markAllRead?: boolean;
+}
+
+export interface ExchangeNotificationInbox {
+  preferences: ExchangeNotificationPreferences;
+  /** @nullable */
+  readThrough: string | null;
+  events: ActivityEvent[];
 }
 
 export interface ExchangeOrderCreated {
@@ -1941,6 +1991,38 @@ export interface StaffPermissions {
   permissions: StaffPermissionsPermissionsItem[];
 }
 
+export type DomainHostingActionAction = typeof DomainHostingActionAction[keyof typeof DomainHostingActionAction];
+
+
+export const DomainHostingActionAction = {
+  register: 'register',
+  refresh: 'refresh',
+} as const;
+
+export interface DomainHostingAction {
+  action: DomainHostingActionAction;
+}
+
+export interface CustomerDomain {
+  tenantId: string;
+  name: string;
+  slug: string;
+  tenantStatus: string;
+  /** @nullable */
+  domain: string | null;
+  status: string;
+  deliveryStatus: string;
+  /** @nullable */
+  requestId: string | null;
+}
+
+export interface DomainDnsRecord {
+  type: string;
+  name: string;
+  value: string;
+  purpose: string;
+}
+
 export type DomainVerificationStatus = typeof DomainVerificationStatus[keyof typeof DomainVerificationStatus];
 
 
@@ -1948,6 +2030,14 @@ export const DomainVerificationStatus = {
   unconfigured: 'unconfigured',
   unverified: 'unverified',
   verified: 'verified',
+} as const;
+
+export type DomainVerificationHostingProvider = typeof DomainVerificationHostingProvider[keyof typeof DomainVerificationHostingProvider];
+
+
+export const DomainVerificationHostingProvider = {
+  vercel: 'vercel',
+  replit: 'replit',
 } as const;
 
 export interface DomainVerification {
@@ -1967,6 +2057,15 @@ export interface DomainVerification {
   /** @nullable */
   websiteUrl?: string | null;
   instructions?: string[];
+  hostingProvider?: DomainVerificationHostingProvider;
+  providerManagementAvailable?: boolean;
+  providerRegistered?: boolean;
+  providerVerified?: boolean;
+  /** @nullable */
+  providerCheckedAt?: string | null;
+  /** @nullable */
+  providerError?: string | null;
+  dnsRecords?: DomainDnsRecord[];
 }
 
 export type WhiteLabelProvisioningStepState = typeof WhiteLabelProvisioningStepState[keyof typeof WhiteLabelProvisioningStepState];
@@ -2214,6 +2313,16 @@ export const TenantThemeMode = {
   system: 'system',
 } as const;
 
+export interface SiteLink {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  label: string;
+  /** @maxLength 2048 */
+  url: string;
+}
+
 export type WebsiteSettingsNavigationItemKey = typeof WebsiteSettingsNavigationItemKey[keyof typeof WebsiteSettingsNavigationItemKey];
 
 
@@ -2283,16 +2392,6 @@ export const WebsiteSettingsFontKey = {
   'space-grotesk': 'space-grotesk',
 } as const;
 
-export interface SiteLink {
-  /**
-     * @minLength 1
-     * @maxLength 80
-     */
-  label: string;
-  /** @maxLength 2048 */
-  url: string;
-}
-
 export type WebsiteSettingsNavigationItem = {
   key: WebsiteSettingsNavigationItemKey;
   /**
@@ -2304,6 +2403,8 @@ export type WebsiteSettingsNavigationItem = {
 };
 
 export interface WebsiteSettings {
+  /** @maxItems 6 */
+  reviewLinks?: SiteLink[];
   /** @maxItems 12 */
   navigation?: WebsiteSettingsNavigationItem[];
   /** @pattern ^#[0-9A-Fa-f]{6}$ */
@@ -3028,7 +3129,10 @@ from?: string;
  * @pattern ^\d{4}-\d{2}-\d{2}$
  */
 to?: string;
-customer?: ListExchangeOrdersCustomer;
+/**
+ * @pattern ^(anonymous|[a-f0-9]{64})$
+ */
+customer?: string;
 /**
  * @minimum 1
  */
@@ -3041,13 +3145,6 @@ export type ListExchangeOrdersView = typeof ListExchangeOrdersView[keyof typeof 
 export const ListExchangeOrdersView = {
   active: 'active',
   archived: 'archived',
-} as const;
-
-export type ListExchangeOrdersCustomer = typeof ListExchangeOrdersCustomer[keyof typeof ListExchangeOrdersCustomer];
-
-
-export const ListExchangeOrdersCustomer = {
-  anonymous: 'anonymous',
 } as const;
 
 export type GetDomainHostingProof200 = {

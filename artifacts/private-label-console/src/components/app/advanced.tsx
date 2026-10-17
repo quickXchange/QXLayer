@@ -41,11 +41,14 @@ export function WebsiteSection({ tenant, readOnly, onSaved, saveLabel }: { tenan
   const set = <K extends keyof WebsiteSettings>(k: K, v: WebsiteSettings[K]) => setF((s) => ({ ...s, [k]: v }));
   const nul = (v: string) => (v.trim() === '' ? null : v.trim());
   const err = !HEX.test(f.secondaryColor) ? 'Secondary color must be #RRGGBB' : f.heroTitle.trim().length < 2 ? 'Hero title needs 2+ characters'
+    : (f.reviewLinks ?? []).some((l) => !l.label.trim() || !/^https:\/\/\S+$/.test(l.url.trim())) ? 'Review links need a label and an https URL' : (f.reviewLinks ?? []).length > 6 ? 'At most 6 review links'
     : f.socialLinks.some((l) => !l.label.trim() || !/^https?:\/\//.test(l.url)) ? 'Social links need a label and an http(s) URL' : f.socialLinks.length > 12 ? 'At most 12 social links' : nav.some((x) => !x.label.trim() || x.label.length > 60) ? 'Navigation labels need 1 to 60 characters' : '';
   const links = f.socialLinks;
+  const rl = f.reviewLinks ?? [];
+  const setRl = (i: number, p: Partial<SiteLink>) => set('reviewLinks', rl.map((l, j) => (j === i ? { ...l, ...p } : l)));
   const setLink = (i: number, p: Partial<SiteLink>) => set('socialLinks', links.map((l, j) => (j === i ? { ...l, ...p } : l)));
   return (
-    <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { ...f, heroTitle: f.heroTitle.trim(), ...(navTouched ? { navigation: nav.map((x) => ({ ...x, label: x.label.trim() })) } : {}) } }, { onSuccess: () => { inv(tenant.id); toast({ title: 'Website settings saved' }); onSaved?.(); }, onError: (er) => toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }) }); }}>
+    <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { ...f, heroTitle: f.heroTitle.trim(), reviewLinks: (f.reviewLinks ?? []).map((l) => ({ label: l.label.trim(), url: l.url.trim() })), ...(navTouched ? { navigation: nav.map((x) => ({ ...x, label: x.label.trim() })) } : {}) } }, { onSuccess: () => { inv(tenant.id); toast({ title: 'Website settings saved' }); onSaved?.(); }, onError: (er) => toast({ title: 'Save failed', description: (er as Error).message, variant: 'destructive' }) }); }}>
       <Section n="06" title="Website" note="Advanced settings for the shared branded site. Custom domains stay unverified and are never served."
         footer={<>{err && !readOnly && <span role="alert" className="mr-auto text-sm text-destructive">{err}</span>}{readOnly ? <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only</span> : <Button data-testid="button-save-website" disabled={!!err || m.isPending}>{m.isPending ? 'Saving' : saveLabel ?? 'Save website'}</Button>}</>}>
         <fieldset disabled={readOnly} className="grid gap-4 md:grid-cols-2">
@@ -67,6 +70,12 @@ export function WebsiteSection({ tenant, readOnly, onSaved, saveLabel }: { tenan
               <div key={i} className="flex gap-2"><Input placeholder="Label" className="w-40" value={l.label} onChange={(e) => setLink(i, { label: e.target.value })} /><Input placeholder="https://" value={l.url} onChange={(e) => setLink(i, { url: e.target.value })} />
                 <Button type="button" variant="ghost" onClick={() => set('socialLinks', links.filter((_, j) => j !== i))}>Remove</Button></div>))}
             {!readOnly && links.length < 12 && <Button type="button" variant="outline" size="sm" data-testid="button-add-link" onClick={() => set('socialLinks', [...links, { label: '', url: '' }])}>Add link</Button>}</div>
+          <div className="space-y-2 md:col-span-2"><Label>Review links</Label>
+            <p className="text-xs text-muted-foreground">Shown only on completed orders. External HTTPS links, up to 6. Removing all links clears them.</p>
+            {rl.map((l, i) => (
+              <div key={i} className="flex gap-2" data-testid={`row-review-link-${i}`}><Input placeholder="Label" className="w-40" value={l.label} onChange={(e) => setRl(i, { label: e.target.value })} /><Input placeholder="https://" value={l.url} onChange={(e) => setRl(i, { url: e.target.value })} />
+                <Button type="button" variant="ghost" onClick={() => set('reviewLinks', rl.filter((_, j) => j !== i))}>Remove</Button></div>))}
+            {!readOnly && rl.length < 6 && <Button type="button" variant="outline" size="sm" data-testid="button-add-review-link" onClick={() => set('reviewLinks', [...rl, { label: '', url: '' }])}>Add review link</Button>}</div>
           <div className="space-y-2 md:col-span-2"><Label>Navigation</Label>
             <p className="text-xs text-muted-foreground">Order, rename or hide links. Only links the client is entitled to appear on the site; hiding never grants access.</p>
             {nav.map((x, i) => (

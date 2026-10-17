@@ -31,9 +31,14 @@ export function Delivery({ o, onDone }: { o: WlOrder; onDone: () => void }) {
   if (o.status === 'delivered' && o.tenantId) return <Link href={`/clients/${o.tenantId}`} className="text-sm text-copper underline">Delivered project details</Link>;
   if (!['approved', 'in_setup', 'customization', 'ready'].includes(o.status)) return <p className="text-sm text-muted-foreground">{['rejected', 'cancelled'].includes(o.status) ? 'This order is closed. Delivery is not available.' : 'Delivery is available after the order is approved.'}</p>;
   if (o.tenantId) return <div className="space-y-2 text-sm">
+    <Button data-testid="button-deliver-linked" size="sm" disabled={o.status !== 'ready' || prov.isPending} title={o.status === 'ready' ? undefined : 'Mark the order Ready first'} onClick={() => { setErr(null); setRev(true); }}>{prov.isPending ? 'Delivering' : 'Deliver to customer'}</Button>
+    {err && !rev && <p role="alert" className="text-destructive">{err}</p>}
+    <ReviewDialog open={rev} onClose={() => setRev(false)} title="deliver order" pending={prov.isPending} error={err} applyLabel="Deliver to customer"
+      onApply={() => { setErr(null); prov.mutate({ requestId: o.id, data: { tenantId: o.tenantId! } }, { onSuccess: () => { setRev(false); toast({ title: 'Delivered to customer' }); onDone(); }, onError: (e) => { setErr(errMsg(e)); toast({ title: 'Delivery failed', description: errMsg(e), variant: 'destructive' }); } }); }}
+      rows={[['Order', o.projectName], ['Effect', 'Grants the customer access to the Ready project']]} />
     <p>Sandbox draft prepared and linked automatically. Customer access has not been granted.</p>
-    <Link href={`/clients/${o.tenantId}`} className="text-copper underline" data-testid="link-prepared-exchange">Finish Exchange setup and activate sandbox</Link>
-    <p className="text-muted-foreground">{o.design?.type === 'custom' ? 'Finish the approved design and mark this order Ready. When the Exchange is also active, delivery happens automatically.' : 'Activation delivers the configured Exchange to the customer’s existing account automatically.'}</p>
+    <Link href={`/clients/${o.tenantId}`} className="text-copper underline" data-testid="link-prepared-exchange">Open project: Activate Sandbox, then Mark Ready</Link>
+    <p className="text-muted-foreground">Three separate steps: Activate Sandbox (does not deliver), Mark Ready (does not deliver), then Deliver, which is only available once the order is Ready and sends access to the customer’s account.</p>
   </div>;
   if (tenants.isLoading) return <div role="status" aria-label="Loading prepared projects"><ListSkeleton rows={2} /></div>;
   if (tenants.isError) return <ErrorState what="prepared projects" onRetry={() => tenants.refetch()} />;
@@ -43,7 +48,7 @@ export function Delivery({ o, onDone }: { o: WlOrder; onDone: () => void }) {
       <div className="flex flex-wrap gap-3 text-sm text-copper"><Link href="/clients/new" className="underline" data-testid="link-prepare-new">Prepare new client</Link>{ready.map((t) => <Link key={t.id} href={`/clients/${t.id}`} className="underline">{t.brandName}</Link>)}</div>
       <div className="flex flex-col gap-3">
         <label className="block min-w-0 flex-1 text-sm">Prepared project<select data-testid="select-tenant" value={tid} onChange={(e) => setTid(e.target.value)} className="block h-10 w-full min-w-0 rounded-md border bg-background px-2 text-sm"><option value="">Select project</option>{ready.map((t) => <option key={t.id} value={t.id}>{t.brandName} ({t.slug})</option>)}</select></label>
-        <Button data-testid="button-deliver" disabled={!tid || prov.isPending} onClick={() => { setErr(null); setRev(true); }}>{prov.isPending ? 'Delivering' : 'Deliver to customer'}</Button>
+        <Button data-testid="button-deliver" disabled={!tid || o.status !== 'ready' || prov.isPending} title={o.status === 'ready' ? undefined : 'Mark the order Ready first'} onClick={() => { setErr(null); setRev(true); }}>{prov.isPending ? 'Delivering' : 'Deliver to customer'}</Button>
       </div>
       {err && !rev && <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">{err}</p>}
       <ReviewDialog open={rev} onClose={() => setRev(false)} title="deliver legacy order" pending={prov.isPending} error={err} applyLabel="Deliver to customer"

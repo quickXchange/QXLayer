@@ -377,7 +377,7 @@ paths:
         - {name: action, in: query, schema: {type: string}}
         - {name: from, in: query, schema: {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}}
         - {name: to, in: query, schema: {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}}
-        - {name: customer, in: query, schema: {type: string, enum: [anonymous]}}
+        - {name: customer, in: query, schema: {type: string, pattern: '^(anonymous|[a-f0-9]{64})$'}}
         - {name: page, in: query, schema: {type: integer, minimum: 1}}
       responses:
         "200": {description: Paginated sandbox orders, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrderList"}}}}
@@ -452,6 +452,50 @@ paths:
         - {name: trackingToken, in: header, required: true, schema: {type: string, minLength: 32, maxLength: 200}}
       responses:
         "200": {description: Capability-protected order tracking, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrder"}}}}
+  /public/sites/{slug}/exchange/orders/{orderId}/invoice:
+    get:
+      operationId: downloadSandboxOrderInvoice
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+        - {name: orderId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: trackingToken, in: header, required: true, schema: {type: string, minLength: 32, maxLength: 200}}
+      responses:
+        "200":
+          description: Tenant-branded simulated invoice protected by the private tracking capability. Not proof of payment.
+          content:
+            application/pdf:
+              schema: {type: string, format: binary}
+  /tenants/{tenantId}/exchange/customers/{customerId}:
+    patch:
+      operationId: updateExchangeCustomer
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: customerId, in: path, required: true, schema: {type: string, pattern: '^[a-f0-9]{64}$'}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeCustomerUpdate"}
+      responses:
+        "200": {description: Updated tenant-local customer notes, content: {application/json: {schema: {$ref: "#/components/schemas/MutationStatus"}}}}
+  /tenants/{tenantId}/exchange/notifications:
+    get:
+      operationId: getExchangeNotifications
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        "200": {description: Persisted in-app order notifications; no outbound delivery, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeNotificationInbox"}}}}
+    put:
+      operationId: saveExchangeNotificationPreferences
+      parameters:
+        - {name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeNotificationPreferences"}
+      responses:
+        "200": {description: Persisted shared tenant inbox preferences, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeNotificationInbox"}}}}
   /public/product-catalog:
     get:
       operationId: getPublicProductCatalog
@@ -637,6 +681,34 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/MutationStatus"}
+  /operator/customer-domains:
+    get:
+      operationId: listCustomerDomains
+      tags: [domains]
+      responses:
+        "200":
+          description: Super Admin tenant domain and delivery inventory
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: "#/components/schemas/CustomerDomain"}
+  /tenants/{tenantId}/domain-hosting-provider:
+    post:
+      operationId: manageTenantDomainHosting
+      tags: [domains]
+      parameters: [{name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/DomainHostingAction"}
+      responses:
+        "200":
+          description: Protected hosting registration status; no DNS records are changed
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/DomainVerification"}
   /tenants/{tenantId}/domain-verification:
     get:
       operationId: getDomainVerification
@@ -1733,6 +1805,7 @@ components:
       type: object
       required: [id, label, assetNetworkId, address, enabled, adapterKind, kind, providerKey]
       properties:
+        purpose: {type: string, enum: [customer, monitoring], description: "Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records."}
         id: {type: string, format: uuid}
         label: {type: string, minLength: 1, maxLength: 80}
         assetNetworkId: {type: string, minLength: 1, maxLength: 80}
@@ -1862,6 +1935,9 @@ components:
       type: object
       required: [quoteToken, idempotencyKey]
       properties:
+        customerName: {type: string, minLength: 1, maxLength: 120}
+        customerEmail: {type: string, format: email, maxLength: 254}
+        contactConsent: {type: boolean, description: "Must be true when optional contact details are supplied. Does not opt in to marketing."}
         quoteToken: {type: string, minLength: 40, maxLength: 12000}
         idempotencyKey: {type: string, format: uuid}
     ExchangeStatusInput:
@@ -1918,7 +1994,29 @@ components:
         email: {type: ["string", "null"]}
         orders: {type: integer}
         lastActivity: {type: string, format: date-time}
-        status: {type: string, enum: [unidentified]}
+        status: {type: string, enum: [unidentified, contact, archived]}
+        notes: {type: string, maxLength: 2000}
+    ExchangeCustomerUpdate:
+      type: object
+      required: [name, notes, archived]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 120}
+        notes: {type: string, maxLength: 2000}
+        archived: {type: boolean}
+    ExchangeNotificationPreferences:
+      type: object
+      required: [orderCreated, orderStatusChanged]
+      properties:
+        orderCreated: {type: boolean}
+        orderStatusChanged: {type: boolean}
+        markAllRead: {type: boolean}
+    ExchangeNotificationInbox:
+      type: object
+      required: [preferences, readThrough, events]
+      properties:
+        preferences: {$ref: "#/components/schemas/ExchangeNotificationPreferences"}
+        readThrough: {type: ["string", "null"], format: date-time}
+        events: {type: array, items: {$ref: "#/components/schemas/ActivityEvent"}}
     ExchangeOrderCreated:
       type: object
       required: [order, trackingToken]
@@ -2207,6 +2305,31 @@ components:
           maxItems: 4
           items: {type: string, enum: [branding.manage, domains.manage, configuration.manage, resources.manage]}
       required: [permissions]
+    DomainHostingAction:
+      type: object
+      required: [action]
+      properties:
+        action: {type: string, enum: [register, refresh]}
+    CustomerDomain:
+      type: object
+      required: [tenantId, name, slug, tenantStatus, domain, status, deliveryStatus, requestId]
+      properties:
+        tenantId: {type: string, format: uuid}
+        name: {type: string}
+        slug: {type: string}
+        tenantStatus: {type: string}
+        domain: {type: ["string", "null"]}
+        status: {type: string}
+        deliveryStatus: {type: string}
+        requestId: {type: ["string", "null"], format: uuid}
+    DomainDnsRecord:
+      type: object
+      required: [type, name, value, purpose]
+      properties:
+        type: {type: string}
+        name: {type: string}
+        value: {type: string}
+        purpose: {type: string}
     DomainVerification:
       type: object
       properties:
@@ -2220,6 +2343,13 @@ components:
         hostingError: {type: ["string", "null"]}
         websiteUrl: {type: ["string", "null"]}
         instructions: {type: array, items: {type: string}}
+        hostingProvider: {type: string, enum: [vercel, replit]}
+        providerManagementAvailable: {type: boolean}
+        providerRegistered: {type: boolean}
+        providerVerified: {type: boolean}
+        providerCheckedAt: {type: ["string", "null"], format: date-time}
+        providerError: {type: ["string", "null"]}
+        dnsRecords: {type: array, items: {$ref: "#/components/schemas/DomainDnsRecord"}}
       required: [domain, status, txtName, txtValue, hostingConnected]
     WhiteLabelProvisioning:
       type: object
@@ -2592,6 +2722,10 @@ components:
     WebsiteSettings:
       type: object
       properties:
+        reviewLinks:
+          type: array
+          maxItems: 6
+          items: {$ref: "#/components/schemas/SiteLink"}
         navigation:
           type: array
           maxItems: 12

@@ -84,6 +84,7 @@ export async function scanWallet(p: Principal, tenantId: string, walletId: strin
     validateWallets(configuration, catalog);
     const wallet = configuration.wallets?.find(w => w.id === walletId);
     if (!wallet) throw new HttpError(404, "Wallet not found.");
+    if (wallet.purpose === "customer") throw new HttpError(409, "Customer public addresses are not monitoring configurations. Configure a separate Super Admin monitoring record.");
     const assetNetwork = catalog.find(a => a.assetNetworkId === wallet.assetNetworkId);
     const asset = configuration.assets.find(a => a.assetId === assetNetwork?.assetId);
     const network = configuration.networks.find(n => n.assetNetworkId === wallet.assetNetworkId);

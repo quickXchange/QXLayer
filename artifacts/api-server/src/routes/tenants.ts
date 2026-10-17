@@ -12,7 +12,9 @@ import { requireAuthentication, principalFrom, sameOriginMutation } from "../mid
 import { activateTenant, createTenant, getTenant, listTenants, saveAssets, saveBrand, saveConfiguration, saveDomain, saveModules } from "../modules/tenants/service";
 import { SetStaffPermissionsParams, SetStaffPermissionsBody, SetStaffPermissionsResponse, GetDomainVerificationParams, GetDomainVerificationResponse, VerifyTenantDomainParams, VerifyTenantDomainResponse, GetProductConfigurationParams, GetProductConfigurationResponse, SetProductConfigurationParams, SetProductConfigurationBody, SetProductConfigurationResponse } from "@workspace/api-zod";
 import { setStaffPermissions } from "../modules/entitlements/resources";
-import { getDomainVerification, verifyTenantDomain } from "../modules/domains/service";
+import { getDomainVerification, verifyTenantDomain, listCustomerDomains } from "../modules/domains/service";
+import { manageDomainProvider } from "../modules/domains/provider";
+import { ListCustomerDomainsResponse, ManageTenantDomainHostingParams, ManageTenantDomainHostingBody, ManageTenantDomainHostingResponse } from "@workspace/api-zod";
 import { checkHosting } from "../modules/domains/hosting";
 import { CheckTenantDomainHostingResponse } from "@workspace/api-zod";
 import { productConfiguration } from "../modules/product-registry/configuration";
@@ -70,6 +72,14 @@ router.put("/tenants/:tenantId/administrators/:userId", async (req, res) => {
 router.put("/tenants/:tenantId/staff/:userId/permissions", async (req, res) => {
   const { tenantId, userId } = SetStaffPermissionsParams.parse(req.params);
   res.json(SetStaffPermissionsResponse.parse(await setStaffPermissions(principalFrom(res), tenantId, userId, SetStaffPermissionsBody.parse(req.body).permissions)));
+});
+router.get("/operator/customer-domains", requireAuthentication, async (_req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(ListCustomerDomainsResponse.parse(await listCustomerDomains(principalFrom(res))));
+});
+router.post("/tenants/:tenantId/domain-hosting-provider", async (req, res) => {
+  const { tenantId } = ManageTenantDomainHostingParams.parse(req.params);
+  res.json(ManageTenantDomainHostingResponse.parse(await manageDomainProvider(principalFrom(res), tenantId, ManageTenantDomainHostingBody.parse(req.body).action)));
 });
 router.get("/tenants/:tenantId/domain-verification", async (req, res) => {
   const { tenantId } = GetDomainVerificationParams.parse(req.params);

@@ -14,7 +14,7 @@ export function ProvisioningProgress({ requestId, closed, onDone }: { requestId:
   const key = getGetWhiteLabelProvisioningQueryKey(requestId);
   const q = useGetWhiteLabelProvisioning(requestId, { query: { queryKey: key, refetchInterval: 10000, refetchOnWindowFocus: true } });
   const m = useRetryWhiteLabelProvisioning();
-  const resume = useGatedMutate(m.mutate, 'Resume provisioning; a ready website will be activated in Sandbox and delivered to the original customer account');
+  const resume = useGatedMutate(m.mutate, 'Resume provisioning; provisioning resumes; delivery stays a separate explicit step');
   const qc = useQueryClient(); const inv = useInvalidateTenant(); const { toast } = useToast();
   const d = q.data;
   if (q.isLoading) return <Skeleton className="h-24" />;
@@ -44,7 +44,7 @@ export function ProvisioningProgress({ requestId, closed, onDone }: { requestId:
       </ol>
       {d.lastError && <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm [overflow-wrap:anywhere]" data-testid="text-provisioning-error">Last error: {d.lastError}</p>}
       {d.blockers.length > 0 && <ul className="list-disc space-y-1 pl-5 text-sm" data-testid="list-provisioning-blockers">{d.blockers.map((b) => <li key={b}>{b}</li>)}</ul>}
-      {d.canRetry && <p className="text-xs text-muted-foreground">Retry preserves saved settings. If setup is ready, it activates the Sandbox website and delivers access to the original customer account.</p>}
+      {d.canRetry && <p className="text-xs text-muted-foreground">Retry preserves saved settings. Delivery remains a separate explicit action on a Ready order.</p>}
       <div className="flex flex-wrap items-center gap-3 text-sm">
         {closed ? <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Order closed, read only</span>
           : d.canRetry ? <Button size="sm" data-testid="button-retry-provisioning" disabled={m.isPending} onClick={retry}>{m.isPending ? 'Retrying' : 'Retry provisioning'}</Button> : null}
