@@ -39,7 +39,7 @@ export function ProductExploreTemplate({ p }: { p: LandingProduct }) {
           </div>
           <p className="s-muted mt-4 max-w-md text-xs" data-testid="text-readiness-disclaimer">{readinessNote(p.readiness)} {isExchange ? 'Ordering follows the published plans below.' : 'Continuing opens an account request, not a purchase of this service.'}</p>
         </div>
-        {on('heroVisual') && <div className="vx-in" style={{ '--i': 3 } as never}><ExploreHeroVisual p={p} url={heroUrl} capture={cap as never} /></div>}
+        {on('heroVisual') && <div className="vx-in" style={{ '--i': 3 } as never}><ExploreHeroVisual p={p} url={heroUrl} capture={cap as never} gallery={gallery as never} /></div>}
       </div></section>
 
       {on('showcase') && (!(e?.gallery?.length) || gallery.length > 0) && <ExploreShowcase p={p} gallery={gallery as never} />}
@@ -61,7 +61,7 @@ export function ProductExploreTemplate({ p }: { p: LandingProduct }) {
       )}
       {isExchange && on('pricing') && <ExchangePricing tiers={e?.pricingTiers} />}
       {on('getStarted') && <ExploreGetStarted p={p} exchange={isExchange} />}
-      <div className="s-wrap pb-8"><p className="s-muted flex items-start gap-2 text-xs"><Check size={14} className="mt-0.5 shrink-0" />{capturesShown || (!heroUrl && cap) ? 'Application captures show the shared Exchange sandbox with fictitious records and no live funds. Concept visuals, where shown, are planned and illustrative, not operating products. Nothing here is a customer result or financial offer.' : 'All visuals are illustrative concepts. Nothing here is a live service, customer result or financial offer.'}</p></div>
+      <div className="s-wrap pb-8"><p className="s-muted flex items-start gap-2 text-xs"><Check size={14} className="mt-0.5 shrink-0" />{capturesShown ? 'Application captures show the shared Exchange sandbox with fictitious records and no live funds. Concept visuals, where shown, are planned and illustrative, not operating products. Nothing here is a customer result or financial offer.' : 'All visuals are illustrative concepts. Nothing here is a live service, customer result or financial offer.'}</p></div>
     </div>
   );
 }

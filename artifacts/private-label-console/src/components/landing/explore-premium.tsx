@@ -1,8 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight, CircleDot, Plug } from 'lucide-react';
 import type { LandingProduct } from '@workspace/api-client-react';
 import { ShowcaseScene } from './showcase-scenes';
+import { ProductScene } from './product-scenes';
+import { CaptureViewer, type ViewerItem } from './capture-viewer';
 import { FALLBACK, MOCKS, type Mock } from './explore-data';
 import { cardPresentation } from './explore-visual-model';
 import '@/styles/explore-premium.css';
@@ -39,35 +41,9 @@ function CardArt({ m }: { m: Mock }) {
   const card = cardPresentation(m.rows);
   return (
     <div className="xp-cardart">
-      <div className="xp-card"><b>VYNOX</b><i className="xp-chip" /><span className="xp-pan">•••• •••• •••• {card.lastFour}</span><span className="xp-cn"><small>Cardholder</small>{card.primaryHolder}</span></div>
+      <div className="xp-card"><b>Orvex</b><i className="xp-chip" /><span className="xp-pan">•••• •••• •••• {card.lastFour}</span><span className="xp-cn"><small>Cardholder</small>{card.primaryHolder}</span></div>
       <div className="xp-card v2"><b>Virtual</b><span className="xp-pan">•••• •••• •••• 1190</span><span className="xp-cn"><small>Cardholder</small>{card.secondaryHolder}</span></div>
       <div className="xp-ctl"><h4>{m.title} <Concept /></h4>{m.phone.items.map(([a, b]) => <div key={a} className="xp-ph-row"><span>{a}</span><span>{b}</span></div>)}<Table m={m} /></div>
-    </div>
-  );
-}
-
-function NodesArt({ m }: { m: Mock }) {
-  return (
-    <div className="xp-nodes">
-      <div className="xp-hub"><b>Operator gateway</b><small>Credentials held by Super Admin</small></div>
-      <svg viewBox="0 0 100 20" preserveAspectRatio="none" aria-hidden="true"><path d="M50 0V10M12 10H88M12 10V20M37 10V20M63 10V20M88 10V20" fill="none" stroke="#7c5cff" strokeWidth=".6" vectorEffect="non-scaling-stroke" /></svg>
-      <div className="xp-leaves">{m.rows.map((r) => <div key={r[0]} className="xp-leaf"><b>{r[0]}</b><small>{r[1]}</small><span>{r[2]}</span><em className={`xp-st ${WARN.test(r[3]) ? 'w' : ''}`}>{r[3]}</em></div>)}</div>
-      <div className="xp-kpis">{m.kpis.map(([l, v]) => <div key={l} className="xp-kpi"><small>{l} (sample)</small><strong>{v}</strong></div>)}</div>
-    </div>
-  );
-}
-
-function EditorArt({ m }: { m: Mock }) {
-  return (
-    <div className="xp-dash">
-      <div className="xp-side"><b>VYNOX</b>{m.nav.map((n, i) => <span key={n} className={i === 0 ? 'on' : ''}>{n}</span>)}</div>
-      <div className="xp-main">
-        <div className="xp-tool">{['B', 'I', 'H2', 'Link', 'Quote'].map((t) => <span key={t}>{t}</span>)}<Concept /></div>
-        <h4 className="xp-art-t">{m.rows[0][0]}</h4>
-        <p className="xp-art-p">By {m.rows[0][1]}, {m.rows[0][2]}. {m.story}</p>
-        <div className="xp-art-p" style={{ opacity: .6 }}>Body copy continues here in the editor. Sample text only.</div>
-        <Table m={{ ...m, rows: m.rows.slice(1) }} />
-      </div>
     </div>
   );
 }
@@ -76,7 +52,7 @@ export function MockDash({ m, tone = 0 }: { m: Mock; tone?: number }) {
   const bars = tone ? [...m.bars].reverse() : m.bars;
   return (
     <div className="xp-dash">
-      <div className="xp-side"><b>VYNOX</b>{m.nav.map((n, i) => <span key={n} className={i === tone % m.nav.length ? 'on' : ''}>{n}</span>)}</div>
+      <div className="xp-side"><b>Orvex</b>{m.nav.map((n, i) => <span key={n} className={i === tone % m.nav.length ? 'on' : ''}>{n}</span>)}</div>
       <div className="xp-main">
         <h4>{m.title} <Concept /></h4>
         <div className="xp-kpis">{m.kpis.map(([l, v, d]) => <div key={l} className="xp-kpi"><small>{l} (sample)</small><strong>{v}</strong>{d && <em>{d}</em>}</div>)}</div>
@@ -89,9 +65,7 @@ export function MockDash({ m, tone = 0 }: { m: Mock; tone?: number }) {
 
 export function ConceptArt({ p, m, tone = 0 }: { p: LandingProduct; m: Mock; tone?: number }) {
   if (p.key === 'crypto_card') return <CardArt m={m} />;
-  if (p.key === 'rpc_nodes') return <NodesArt m={m} />;
-  if (p.key === 'articles') return <EditorArt m={m} />;
-  return <MockDash m={m} tone={tone} />;
+  return <ProductScene k={p.key} m={m} fallback={<MockDash m={m} tone={tone} />} />;
 }
 
 export function MockPhone({ m, k = '', className = '' }: { m: Mock; k?: string; className?: string }) {
@@ -117,24 +91,46 @@ export function MockPhone({ m, k = '', className = '' }: { m: Mock; k?: string; 
 const conceptNote = (p: LandingProduct) => (p.readiness === 'sandbox_only' ? 'Sandbox preview. No funds move.' : 'Coming Soon concept. Not an operating product.');
 const CAP_NOTE = 'Actual shared Exchange sandbox capture. Fictitious records, no live funds.';
 
-export function ExploreHeroVisual({ p, url, capture }: { p: LandingProduct; url?: string; capture?: G }) {
+function useNarrow() {
+  const [n, setN] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches);
+  useEffect(() => { const q = window.matchMedia('(max-width: 700px)'); const f = () => setN(q.matches); q.addEventListener('change', f); return () => q.removeEventListener('change', f); }, []);
+  return n;
+}
+export const NOVAX_HOST = 'novax.example';
+export const novaxLabel = (l: string) => `NovaX Exchange, fictional demo (not a real client). ${l}`;
+
+export function ExploreHeroVisual({ p, url, capture, gallery }: { p: LandingProduct; url?: string; capture?: G; gallery?: G[] }) {
   const m = concept(p);
+  const narrow = useNarrow();
   const src = url || capture?.imageUrl;
   const phoneFirst = PHONE_FIRST.includes(p.key);
+  const ex = p.key === 'crypto_exchange';
   if (src) {
-    const phone = !url && capture?.device === 'phone';
+    if (url) return <div className="xp-stage" data-testid="visual-product-hero"><BrowserFrame url={m.host}><Img src={src} alt={`${p.name} hero`} /></BrowserFrame></div>;
+    const caps = (gallery ?? []).filter((x) => x.mediaKind === 'application_capture' && x.imageUrl);
+    const phoneCap = caps.find((x) => x.device === 'phone');
+    const deskCap = caps.find((x) => x.device !== 'phone');
+    const host = ex ? NOVAX_HOST : m.host;
+    const raw = (c?: G) => c?.sourceLabel || CAP_NOTE;
+    const lab = (c?: G) => (ex ? novaxLabel(raw(c)) : raw(c));
+    const usePhone = (narrow && phoneCap) || (!deskCap && (phoneCap || capture?.device === 'phone'));
+    if (usePhone) {
+      const pc = phoneCap ?? capture;
+      return <div className="xp-stage" data-testid="visual-product-hero"><div className="xpv-stage"><div className="xpv-phone big"><Img src={pc!.imageUrl!} alt={`${p.name} capture`} /></div></div><p className="xp-label s-muted">{lab(pc)}</p></div>;
+    }
+    const dc = deskCap ?? capture;
     return (
-      <div className="xp-stage" data-testid="visual-product-hero">
-        {phone ? <div className="xp-duo" style={{ justifyContent: 'center' }}><div className="xp-phone" style={{ padding: 0, aspectRatio: 'auto', maxWidth: '16rem' }}><Img src={src} alt={`${p.name} capture`} /></div></div>
-          : <BrowserFrame url={m.host}><Img src={src} alt={`${p.name} hero`} /></BrowserFrame>}
-        {!url && <p className="xp-label s-muted">{capture?.sourceLabel || CAP_NOTE}</p>}
+      <div className="xp-stage xp-herocap" data-testid="visual-product-hero">
+        <BrowserFrame url={host}><Img src={dc!.imageUrl!} alt={`${p.name} capture`} /></BrowserFrame>
+        {phoneCap && !narrow && <div className="xpv-phone xp-herophone"><Img src={phoneCap.imageUrl!} alt={`${p.name} phone capture`} /></div>}
+        <p className="xp-label s-muted">{lab(dc)}</p>
       </div>
     );
   }
   return (
     <div className="xp-stage" data-testid="visual-product-hero">
       {phoneFirst
-        ? <div className="xp-trio"><MockPhone m={m} k={p.key} /><MockPhone m={m} k={p.key} className="mid xp-float" /><MockPhone m={{ ...m, phone: { ...m.phone, title: m.nav[1], hero: [m.kpis[0][0], m.kpis[0][1]] } }} k={p.key} /></div>
+        ? <ConceptArt p={p} m={m} />
         : <><BrowserFrame url={m.host}><ConceptArt p={p} m={m} /></BrowserFrame><MockPhone m={m} k={p.key} className="side xp-float" /></>}
       <p className="xp-label s-muted">{conceptNote(p)}</p>
     </div>
@@ -163,7 +159,7 @@ export function ExploreShowcase({ p, gallery }: { p: LandingProduct; gallery: G[
   return (
     <section id="showcase" className="xp-sec" aria-labelledby="xp-sc-h" data-testid="section-showcase"><div className="xp-wrap">
       <p className="xp-eye">Product showcase</p><h2 id="xp-sc-h" className="xp-h2">See {p.name} the way your customers and operators will</h2>
-      {rows}
+      {real.length > 0 ? <CaptureViewer name={p.name} host={p.key === 'crypto_exchange' ? NOVAX_HOST : m.host} items={real.map((g): ViewerItem => ({ title: g.title || p.name, caption: g.caption, imageUrl: g.imageUrl!, device: g.device, captured: g.mediaKind === 'application_capture', label: g.mediaKind === 'application_capture' ? (p.key === 'crypto_exchange' ? novaxLabel(g.sourceLabel || CAP_NOTE) : (g.sourceLabel || CAP_NOTE)) : (g.sourceLabel || conceptNote(p)) }))} /> : rows}
     </div></section>
   );
 }

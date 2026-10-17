@@ -75,8 +75,11 @@ export function ExchangeWidget() {
 }
 
 type Brand = { name: string; color: string; domain: string; dark: boolean; logo: string | null };
-let brand: Brand = { name: 'Your Brand', color: '#7c5cff', domain: 'exchange.yourbrand.example', dark: false, logo: null };
+let brand: Brand = { name: 'Orvex', color: '#0f8b8d', domain: 'swap.orvex.example', dark: false, logo: null };
 const subs = new Set<() => void>();
+const DEFAULT_BRAND: Brand = { name: 'Orvex', color: '#0f8b8d', domain: 'swap.orvex.example', dark: false, logo: null };
+const PRESETS = [['Teal', '#0f8b8d'], ['Ember', '#d9532b'], ['Indigo', '#4a46d8'], ['Moss', '#4d7c3a'], ['Plum', '#a23b78']];
+const resetBrand = () => { if (brand.logo) URL.revokeObjectURL(brand.logo); brand = { ...DEFAULT_BRAND }; subs.forEach((f) => f()); };
 const setBrand = (p: Partial<Brand>) => {
   if (p.logo !== undefined && brand.logo && brand.logo !== p.logo) URL.revokeObjectURL(brand.logo);
   brand = { ...brand, ...p }; subs.forEach((f) => f());
@@ -193,6 +196,39 @@ function Scene({ k, b }: { k: string; b: Brand }) {
     </SiteFrame>);
 }
 
+function BrandSite({ b }: { b: Brand }) {
+  const c = HEX.test(b.color) ? b.color : '#0f8b8d';
+  const bg = b.dark ? '#0c1014' : '#fbfaf7', fg = b.dark ? '#eef2f3' : '#14201f', card = b.dark ? '#151b20' : '#ffffff';
+  const [amt, setAmt] = useState('250'); const [from, setFrom] = useState('EUR'); const [to, setTo] = useState('BTC'); const [placed, setPlaced] = useState(false);
+  const usd = (x: string) => CRYPTO[x] ?? ({ EUR: 1.08, USD: 1, GBP: 1.27 } as Record<string, number>)[x] ?? 1;
+  const n = Number(amt); const out = Number.isFinite(n) && n > 0 && from !== to ? (n * usd(from)) / usd(to) : null;
+  const assets = ['EUR', 'USD', 'GBP', ...Object.keys(CRYPTO)];
+  const bd = { borderColor: `color-mix(in srgb,${fg} 14%,transparent)` };
+  const name = b.name || 'Your brand';
+  return (
+    <div className="overflow-hidden rounded-2xl border shadow-2xl" style={{ background: bg, color: fg, borderColor: 'var(--s-line)' }} role="group" aria-label="Local customer website preview">
+      <div className="flex items-center gap-2 border-b px-4 py-2.5" style={bd}><span className="flex gap-1.5" aria-hidden="true"><i className="h-2.5 w-2.5 rounded-full" style={{ background: bd.borderColor }} /><i className="h-2.5 w-2.5 rounded-full" style={{ background: bd.borderColor }} /><i className="h-2.5 w-2.5 rounded-full" style={{ background: bd.borderColor }} /></span><span className="ml-2 flex min-w-0 flex-1 items-center gap-1 truncate rounded-md px-2 py-1 font-mono text-[11px]" style={{ background: `color-mix(in srgb,${fg} 8%,transparent)` }}><Globe size={12} className="shrink-0" /><span className="truncate">https://{b.domain}</span></span></div>
+      <nav className="flex items-center justify-between gap-3 px-4 py-3 sm:px-8"><span className="flex min-w-0 items-center gap-2.5 text-lg font-bold"><Mark b={b} size={36} /><span className="truncate">{name}</span></span>
+        <span className="hidden gap-6 text-sm opacity-75 sm:flex"><span>Markets</span><span>Orders</span><span>Support</span></span>
+        <span className="rounded-lg px-4 py-2 text-sm font-semibold text-white" style={{ background: c }}>Sign in</span></nav>
+      <div className="grid gap-8 px-4 py-8 sm:px-8 sm:py-12 lg:grid-cols-[1.05fr_1fr] lg:items-center" style={{ background: `linear-gradient(135deg,color-mix(in srgb,${c} 24%,${bg}),${bg} 70%)` }}>
+        <div><p className="text-xs font-semibold uppercase tracking-[.18em]" style={{ color: c }}>{b.domain}</p>
+          <h3 className="mt-3 text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">Exchange crypto with <span style={{ color: c }}>{name}</span></h3>
+          <p className="mt-4 max-w-md opacity-75">Swap, convert, buy and sell in a few steps. Sample figures only.</p>
+          <div className="mt-5 flex flex-wrap gap-2 text-xs">{['Swap', 'Convert', 'Buy', 'Sell'].map((x, i) => <span key={x} className="rounded-full border px-3 py-1.5 font-semibold" style={i === 0 ? { background: c, color: '#fff', borderColor: c } : bd}>{x}</span>)}</div></div>
+        <div className="rounded-2xl border p-4 shadow-xl sm:p-5" style={{ background: card, ...bd }}>
+          <label className="block text-xs opacity-70">You send<span className="mt-1 flex gap-2"><input className="min-w-0 flex-1 rounded-xl border bg-transparent px-3 py-3 text-lg font-semibold" style={bd} inputMode="decimal" value={amt} onChange={(e) => { setAmt(e.target.value); setPlaced(false); }} aria-label="Preview amount" /><select className="rounded-xl border bg-transparent px-2 font-semibold" style={bd} value={from} onChange={(e) => { setFrom(e.target.value); setPlaced(false); }} aria-label="Preview from asset">{assets.map((x) => <option key={x} style={{ color: '#14201f' }}>{x}</option>)}</select></span></label>
+          <div className="my-2 text-center" style={{ color: c }}><ArrowDownUp size={18} className="mx-auto" /></div>
+          <label className="block text-xs opacity-70">You receive (sample estimate)<span className="mt-1 flex gap-2"><output className="flex min-w-0 flex-1 items-center rounded-xl border px-3 py-3 text-lg font-semibold" style={bd}>{out === null ? 'Choose different assets' : out.toLocaleString(undefined, { maximumFractionDigits: 6 })}</output><select className="rounded-xl border bg-transparent px-2 font-semibold" style={bd} value={to} onChange={(e) => { setTo(e.target.value); setPlaced(false); }} aria-label="Preview to asset">{assets.map((x) => <option key={x} style={{ color: '#14201f' }}>{x}</option>)}</select></span></label>
+          <button type="button" disabled={out === null} onClick={() => setPlaced(true)} className="mt-4 w-full rounded-xl px-4 py-3.5 font-semibold text-white disabled:opacity-50" style={{ background: c }}>Start exchange</button>
+          <p role="status" className="mt-2 text-[11px] opacity-70">{placed ? `Sample order for ${name} created locally. Nothing was sent.` : 'Local illustration. No funds move.'}</p></div>
+      </div>
+      <div className="grid gap-3 px-4 py-6 sm:grid-cols-3 sm:px-8">{[['Order created', 'Awaiting payment', AMBER], ['Payment detected', 'Processing', BLUE], ['Order completed', 'Completed', GREEN]].map(([t, s2, tone]) => <div key={t} className="rounded-xl border p-4" style={{ background: card, borderLeftColor: bd.borderColor, borderRightColor: bd.borderColor, borderBottomColor: bd.borderColor, borderTopColor: c, borderTopWidth: 3 }}><p className="font-semibold">{t}</p><p className="mt-1 text-xs opacity-65">{name} / sample order</p><div className="mt-3"><Pill tone={tone}>{s2}</Pill></div></div>)}</div>
+      <p className="border-t px-4 py-3 text-[11px] opacity-65 sm:px-8" style={bd}>{name} is a fictional customer brand. Illustrative browser-only preview; nothing is uploaded, saved or published. NovaX sandbox captures elsewhere are a separate fictional demo and are not rebranded here.</p>
+    </div>
+  );
+}
+
 export function ExchangeBranding() {
   const b = useBrand();
   const [err, setErr] = useState('');
@@ -205,32 +241,27 @@ export function ExchangeBranding() {
   };
   const safe = HEX.test(b.color) ? b.color : '#7c5cff';
   return (
-    <section id="branding" className="vx-sec" aria-labelledby="vx-brand-h" data-testid="section-exchange-branding"><div className="s-wrap vx-split">
-      <div><p className="s-eyebrow">Your brand, your domain</p>
+    <section id="branding" className="vx-sec" aria-labelledby="vx-brand-h" data-testid="section-exchange-branding"><div className="s-wrap">
+      <div className="max-w-4xl"><p className="s-eyebrow">Your brand, your domain</p>
         <h2 id="vx-brand-h" className="mt-2 text-3xl font-semibold tracking-tight">A personalized customer website</h2>
-        <p className="s-muted mt-3 text-sm">Try the controls; the order screens below follow them. Changes stay in this browser tab. Nothing is uploaded, saved, registered or published.</p>
+        <p className="s-muted mt-3 text-sm">Try the controls; the order screens below follow them. Orvex is a fictional customer brand, not a real client. Changes stay in this browser tab. Nothing is uploaded, saved, registered or published.</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <label className="text-sm">Brand name<input className="vx-field mt-1" value={b.name} maxLength={28} onChange={(e) => setBrand({ name: e.target.value })} data-testid="input-brand-name" /></label>
           <label className="text-sm">Domain (illustration)<input className="vx-field mt-1" value={b.domain} maxLength={60} onChange={(e) => setBrand({ domain: e.target.value })} data-testid="input-brand-domain" /></label>
           <label className="text-sm">Primary colour<span className="mt-1 flex gap-2"><input type="color" aria-label="Pick colour" value={safe} onChange={(e) => setBrand({ color: e.target.value })} className="h-11 w-14 shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-0" /><input className="vx-field" value={b.color} onChange={(e) => setBrand({ color: e.target.value })} aria-label="Hex colour" /></span></label>
           <label className="flex items-center gap-2 self-end pb-3 text-sm"><input type="checkbox" checked={b.dark} onChange={(e) => setBrand({ dark: e.target.checked })} />Dark theme preview</label>
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Colour presets">{PRESETS.map(([n, c]) => <button key={n} type="button" onClick={() => setBrand({ color: c })} aria-label={`${n} colour`} aria-pressed={b.color === c} data-testid={`button-brand-preset-${n.toLowerCase()}`} className="h-9 w-9 rounded-full border-2" style={{ background: c, borderColor: b.color === c ? 'currentColor' : 'transparent' }} />)}</div>
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <label className="s-btn s-btn-ghost cursor-pointer focus-within:outline focus-within:outline-2"><ImagePlus size={16} />{b.logo ? 'Replace logo' : 'Choose logo'}
             <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" data-testid="input-brand-logo" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ''; }} /></label>
           {b.logo && <button type="button" className="s-btn s-btn-ghost" onClick={() => setBrand({ logo: null })} data-testid="button-brand-logo-remove">Remove</button>}
+          <button type="button" className="s-btn s-btn-ghost" onClick={() => { resetBrand(); setErr(''); }} data-testid="button-brand-reset">Reset to Orvex</button>
           <span className="s-muted text-xs">PNG, JPG or WebP, up to 2 MB. Preview only.</span>
         </div>
         {err && <p role="alert" className="mt-2 text-sm" style={{ color: '#e5484d' }} data-testid="text-logo-error">{err}</p>}
       </div>
-      <div data-testid="preview-branded-site">
-        <SiteFrame b={b} label="Branded customer website preview">
-          <p className="text-xl font-semibold leading-tight">Exchange crypto with {b.name || 'your brand'}</p>
-          <div className="mt-3 rounded-xl border p-3 text-sm" style={line}>100 EUR to sample BTC</div>
-          <div className="mt-3"><Btn b={b}>Start exchange</Btn></div>
-          <p className="mt-3 flex items-center gap-1.5 text-[11px] opacity-70"><Palette size={12} />Local illustration only</p>
-        </SiteFrame>
-      </div>
+      <div className="mt-8" data-testid="preview-branded-site"><BrandSite b={b} /></div>
     </div></section>
   );
 }
@@ -254,6 +285,7 @@ const ADMIN: [string, string, string, string, string, string][] = [
 const SEL: Record<string, number> = { create: 0, view: 0, pay: 0, track: 1, done: 2, invoice: 2, review: 2 };
 export function ExchangeJourney() {
   const [k, setK] = useState('create');
+  const [phone, setPhone] = useState(false);
   const b = useBrand();
   const i = FLOW.findIndex((f) => f.key === k);
   const f = FLOW[i];
@@ -264,10 +296,12 @@ export function ExchangeJourney() {
       <h2 id="vx-jr-h" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">From order creation to the invoice</h2>
       <div className="mt-6 overflow-x-auto pb-1"><VxTabs id="journey" label="Order journey" tabs={FLOW.map((x) => ({ key: x.key, label: x.label }))} value={k} onChange={setK} /></div>
       <div className="vx-bar mt-4" aria-hidden="true"><i style={{ width: `${((i + 1) / FLOW.length) * 100}%` }} /></div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-        <div key={k} className="vx-panel" {...tabPanelProps('journey', k)}>
-          <p className="vx-num mb-2">STEP {i + 1} / {FLOW.length} - {f.t}</p>
-          <Scene k={k} b={b} />
+      <div className="mt-5 grid gap-5">
+        <div key={k} className="vx-panel xj" {...tabPanelProps('journey', k)}>
+          <div className="xj-top"><p className="vx-num">STEP {i + 1} / {FLOW.length} - {f.t}</p>
+            <div className="xj-dev" role="group" aria-label="Preview device"><button type="button" aria-pressed={!phone} onClick={() => setPhone(false)} data-testid="button-journey-desktop">Desktop</button><button type="button" aria-pressed={phone} onClick={() => setPhone(true)} data-testid="button-journey-phone">Phone</button></div></div>
+          <div className={`xj-stage ${phone ? 'phone' : ''}`} data-testid="stage-journey"><div className="xj-chrome" aria-hidden="true"><i /><i /><i /><span>https://{b.domain}/{k}</span></div><div className="xj-body"><Scene k={k} b={b} /></div></div>
+          <p className="xj-note">Illustrative local example for {b.name || 'the customer'}, a fictional customer brand. Not a capture and not a live order.</p>
         </div>
         <VxCard><p className="s-eyebrow">Admin panel (illustration)</p>
           <div className="mt-3 flex flex-wrap gap-1.5 text-xs" aria-hidden="true">{['All', 'Awaiting payment', 'Processing', 'Completed'].map((c, n) => <span key={c} className="s-badge" style={n === 0 ? { borderColor: 'var(--s-accent)' } : undefined}>{c}</span>)}</div>

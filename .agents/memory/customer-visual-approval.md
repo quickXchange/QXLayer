@@ -10,6 +10,12 @@ The current follow-up covers premium presentations for all 15 VYNOX LAYER Produc
 
 **How to apply:** Reuse existing registry, Plans, Super Admin controls, accounts and tenant isolation. Public copy, artwork, visual content, visibility and tier references stay editable through existing controls. Capture only actually available shared interfaces with fictional/sanitized data; do not fabricate invoice or Mini App screenshots or enable tenant capabilities merely to obtain them. Local authored scenes remain clearly labelled illustrations. All nonoperational products remain Preview/Coming Soon. Preserve published-price protections; Basic/Premium/Pro proposals cannot purchase. Protected candidate-only deployment and bounded marketing parity are authorized; public Live, DNS, customer records and live financial execution remain unchanged.
 
+The Explore presentation must show customer websites under fictional customer identities, not VYNOX platform branding. Genuine NovaX demo captures retain their actual branding; the instant browser-only branding preview is a separate authored example and must not imply that it rebrands those captures.
+
+**Why:** The user specifically requested native, sanitized, large readable product images, fictional customer branding, and accurate discreet disclosures instead of generic small mockups or unrelated platform branding.
+
+**How to apply:** Crop actual Admin content to exclude unrelated global platform chrome; never fabricate a native product surface or modify the approved Exchange master just to obtain a capture. Keep local invoice/review/payment examples honestly distinguished from available native screens.
+
 ## Retained tenant and historical visual constraints
 
 Tenant-branding demonstrations must use a real disposable customer and tenant, provisioned through the existing completed workflow, on the same White Label master frontend. Change tenant configuration and branding assets only; no separate customer frontend or mocked/intercepted API responses.
