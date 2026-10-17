@@ -15,6 +15,17 @@ const saved = {
   paymentMethods: [], providers: [],
 } as ExchangeSettings;
 
+test('unrelated settings saves retain all typed group pricing rules and their activation', () => {
+  const pricingRules = [
+    { id: 'crypto-fiat', action: 'swap', source: 'crypto:*', destination: 'fiat:*', enabled: true, priority: 10, feeBps: 25, fixedFee: '0', spreadBps: 10 },
+    { id: 'fiat-crypto', action: 'swap', source: 'fiat:*', destination: 'crypto:*', enabled: true, priority: 10, feeBps: 25, fixedFee: '0', spreadBps: 10 },
+    { id: 'crypto-crypto', action: 'convert', source: 'crypto:*', destination: 'crypto:*', enabled: true, priority: 10, feeBps: 25, fixedFee: '0', spreadBps: 10 },
+  ] as NonNullable<ExchangeSettings['pricingRules']>;
+  const reconciled = reconcileExchangeScope({ ...saved, pricingRules }, catalog);
+  assert.deepEqual(reconciled.pricingRules, pricingRules);
+  assert.equal(reconcileExchangeScope(reconciled, catalog), reconciled);
+});
+
 test('disabled historical routes cannot block unrelated settings saves or be reenabled with invalid endpoints', () => {
   const networks = new Set(['btc:bitcoin-testnet', 'eth:ethereum-sepolia']);
   const route = { enabled: true, action: 'swap', source: 'btc:bitcoin-testnet', destination: 'eth:ethereum-sepolia' };

@@ -39,4 +39,4 @@
 .s-opt[aria-selected=true]{background:color-mix(in srgb,var(--s-accent) 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--s-accent) 40%,transparent)}
 .s-opt:disabled{opacity:.45;cursor:not-allowed}
 
-@media (max-width:480px){.s-exchange-functional .s-amount{font-size:clamp(1.35rem,7vw,1.9rem);text-overflow:ellipsis}.s-exchange-functional .s-pick{flex-shrink:0;max-width:46%;gap:.3rem;padding-right:.5rem}.s-exchange-functional .s-pick .truncate{min-width:3ch}}
+@media (max-width:480px){.s-exchange-functional .s-amount{font-size:clamp(1.35rem,7vw,1.9rem);text-overflow:ellipsis}.site .s-pick{flex-shrink:0;min-width:132px;max-width:60%;gap:.3rem;padding-right:.5rem}.site .s-pick .truncate{min-width:3ch}.site .s-pick>svg{flex-shrink:0}}

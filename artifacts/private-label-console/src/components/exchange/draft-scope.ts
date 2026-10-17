@@ -13,7 +13,8 @@ export function reconcileExchangeScope(d: ExchangeSettings, catalog: ExchangeCat
     if (!networks.some(n => n.assetNetworkId === c.assetNetworkId)) networks.push({ assetNetworkId: c.assetNetworkId, enabled: false, available: false, minimum: '0', maximum: '0', fee: '0', information: '' });
   });
   const routes = d.routes.filter(r => (r.source.startsWith('fiat:') || netIds.has(r.source)) && (r.destination.startsWith('fiat:') || netIds.has(r.destination)));
-  const pricingRules = d.pricingRules?.filter(r => (r.source === '*' || r.source.startsWith('fiat:') || netIds.has(r.source)) && (r.destination === '*' || r.destination.startsWith('fiat:') || netIds.has(r.destination)));
+  const ruleEndpoint = (id: string) => id === '*' || id === 'crypto:*' || id.startsWith('fiat:') || netIds.has(id);
+  const pricingRules = d.pricingRules?.filter(r => ruleEndpoint(r.source) && ruleEndpoint(r.destination));
   const wallets = d.wallets?.filter(w => netIds.has(w.assetNetworkId));
   const unchanged = <T,>(a: T[], b: T[]) => a.length === b.length && a.every((v, i) => v === b[i]);
   return unchanged(assets, d.assets) && unchanged(networks, d.networks) && unchanged(routes, d.routes) &&
