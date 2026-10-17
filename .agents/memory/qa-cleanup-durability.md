@@ -48,3 +48,15 @@ foreign keys and rolled back identity cleanup, leaving privileged test accounts 
 **How to apply:** Check the live dependency graph across the explicitly approved
 schemas before cleanup. Delete only the tracked fixture children before their
 parents, then verify provider identity removal and database absence separately.
+
+Separate authentication throttle progression from business-data preservation.
+Do not rewind shared anti-abuse counters to make a whole-database fingerprint
+match after native sign-in and MFA tests.
+
+**Why:** Native QA legitimately advanced private rate-limit records even after
+all disposable identities, factors, sessions, tenants and catalog rows were
+removed. The broad fingerprint assertion failed solely on throttle state.
+
+**How to apply:** Compare original business/account records and RLS/grants
+strictly; permit only explicitly reported authentication-counter progression.
+Keep the original baseline intact and record the exception in final evidence.

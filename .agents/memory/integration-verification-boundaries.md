@@ -25,3 +25,17 @@ Allowlisted external schema references are a deliberate source-reuse compatibili
 **Why:** Copied source contracts can reference shared workspace schemas that the generator otherwise rejects.
 
 **How to apply:** Permit only reviewed shared references; retain source schemas and real context providers instead of replacing them with no-op shims or excluding copied packages from checks.
+
+A managed PostgreSQL operator is not necessarily a member of the application
+runtime role. Exercise RLS through the existing application login, and switch to
+its runtime role before even schema-qualified metadata or `regclass` lookups.
+
+**Why:** The operator correctly could not assume the runtime role. A separate
+application-login readback then ran metadata before its role switch and
+incorrectly appeared to show a missing private-schema grant; the existing grant
+was correct.
+
+**How to apply:** Keep operator DDL/fingerprints separate from actual restricted
+login checks. Do not grant new role memberships or schema privileges merely to
+repair the verifier. Roll back runtime write probes after checking denials and
+authorized writes.
