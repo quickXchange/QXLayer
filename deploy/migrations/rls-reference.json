@@ -191,6 +191,44 @@
       ]
     },
     {
+      "name": "global_exchange_catalog",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
+      "name": "global_exchange_catalog_links",
+      "enabled": true,
+      "forced": true,
+      "policies": [
+        {
+          "name": "qx_read",
+          "check": null,
+          "using": "true",
+          "command": "r"
+        },
+        {
+          "name": "qx_write",
+          "check": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "using": "((COALESCE(current_setting('app.is_super_admin'::text, true), ''::text) = 'true'::text) AND (COALESCE(current_setting('app.can_write'::text, true), ''::text) = 'true'::text))",
+          "command": "*"
+        }
+      ]
+    },
+    {
       "name": "landing_products",
       "enabled": true,
       "forced": true,

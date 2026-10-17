@@ -20,10 +20,10 @@ export function NetworksPanel({ tenant, d, locked }: { tenant: Tenant; d: Exchan
   const [bulk, setBulk] = useState<'fields' | 'provider' | null>(null);
   const cat = (id: string) => d.catalog.find((x) => x.assetNetworkId === id);
   const provName = (id?: string) => (id ? d.providerCatalog.find((p) => p.id === id)?.name ?? id : 'Manual / sandbox');
-  const [ty, setTy] = useState('all'); const [q, setQ] = useState(''); const [av, setAv] = useState('all'); const [en, setEn] = useState('all'); const [pv, setPv] = useState('all');
-  const filtered = s.networks.filter((n) => { const c = cat(n.assetNetworkId); return (ty === 'all' || (ty === 'test') === !!c?.testnet) && (av === 'all' || (av === 'on') === n.available) && (en === 'all' || (en === 'on') === n.enabled) && (pv === 'all' || (n.providerId || 'manual') === pv) && `${c?.networkName ?? ''} ${c?.networkId ?? ''} ${c?.symbol ?? ''}`.toLowerCase().includes(q.trim().toLowerCase()); });
-  const resetF = () => { setTy('all'); setQ(''); setAv('all'); setEn('all'); setPv('all'); };
-  const pg = usePaged(filtered, `${q}|${av}|${en}|${pv}|${ty}`); const rows = pg.pageRows;
+  const [ty, setTy] = useState('all'); const [q, setQ] = useState(''); const [av, setAv] = useState('all'); const [en, setEn] = useState('all'); const [pv, setPv] = useState('all'); const [as, setAs] = useState('all');
+  const filtered = s.networks.filter((n) => { const c = cat(n.assetNetworkId); return (as === 'all' || c?.symbol === as) && (ty === 'all' || (ty === 'test') === !!c?.testnet) && (av === 'all' || (av === 'on') === n.available) && (en === 'all' || (en === 'on') === n.enabled) && (pv === 'all' || (n.providerId || 'manual') === pv) && `${c?.networkName ?? ''} ${c?.networkId ?? ''} ${c?.symbol ?? ''}`.toLowerCase().includes(q.trim().toLowerCase()); });
+  const resetF = () => { setTy('all'); setQ(''); setAv('all'); setEn('all'); setPv('all'); setAs('all'); };
+  const pg = usePaged(filtered, `${q}|${av}|${en}|${pv}|${ty}|${as}`); const rows = pg.pageRows;
   const sel = useSelection(rows.map((n) => n.assetNetworkId));
   const bindName = (id: string) => `${cat(id)?.symbol ?? ''} on ${cat(id)?.networkName ?? id}`;
   const setMany = (ids: string[], p: Partial<ExchangeNetworkSettings>) => d.patch({ networks: s.networks.map((n) => (ids.includes(n.assetNetworkId) ? { ...n, ...p } : n)) });
@@ -40,7 +40,8 @@ export function NetworksPanel({ tenant, d, locked }: { tenant: Tenant; d: Exchan
     <Section n="X2" title="Networks" note="Each row is an asset-network binding. Type is mainnet or testnet catalog data; every execution is sandbox. Enabled and available are staged settings; removal is a persisted tenant assignment change." footer={<DraftFooter d={d} locked={locked} />}>
       {s.networks.length === 0 && <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-networks">No asset networks are selected. Use the Assets section to select them.</p>}{(
         <>
-          <FilterBar noun="networks" search={q} onSearch={setQ} placeholder="Search network, code or symbol" shown={filtered.length} total={s.networks.length} onReset={resetF} active={ty !== 'all' || q !== '' || av !== 'all' || en !== 'all' || pv !== 'all'}>
+          <FilterBar noun="networks" search={q} onSearch={setQ} placeholder="Search network, code or symbol" shown={filtered.length} total={s.networks.length} onReset={resetF} active={ty !== 'all' || q !== '' || av !== 'all' || en !== 'all' || pv !== 'all' || as !== 'all'}>
+            <div className="w-40"><Pick testid="select-network-asset-filter" bounded value={as} onChange={setAs} options={[['all', 'Any asset'], ...[...new Set(d.catalog.map((c) => c.symbol))].map((x) => [x, x] as [string, string])]} /></div>
             <div className="w-36"><Pick testid="select-network-type" value={ty} onChange={setTy} options={[['all', 'Any type'], ['main', 'Mainnet'], ['test', 'Testnet']]} /></div>
             <div className="w-36"><Pick testid="select-network-enabled" value={en} onChange={setEn} options={[['all', 'Any state'], ['on', 'Enabled'], ['off', 'Disabled']]} /></div>
             <div className="w-40"><Pick testid="select-network-availability" value={av} onChange={setAv} options={[['all', 'Any availability'], ['on', 'Available'], ['off', 'Unavailable']]} /></div>

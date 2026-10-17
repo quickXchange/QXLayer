@@ -138,11 +138,11 @@ function findSecret(v: unknown): string | null {
   return null;
 }
 
-const ACTIONS = ['swap', 'convert', 'buy', 'sell'];
+const ACTIONS = ['swap', 'convert'];
 function exchangeError(p: Record<string, unknown>) {
   const extra = Object.keys(p).filter((k) => k !== 'defaultAction' && k !== 'publicNote');
   if (extra.length) return `Exchange settings accept only defaultAction and publicNote, not "${extra[0]}"`;
-  if (p.defaultAction !== undefined && !ACTIONS.includes(String(p.defaultAction))) return 'defaultAction must be swap, convert, buy or sell';
+  if (p.defaultAction !== undefined && !ACTIONS.includes(String(p.defaultAction))) return 'defaultAction must be swap or convert';
   if (p.publicNote !== undefined && typeof p.publicNote !== 'string') return 'publicNote must be text';
   return '';
 }
@@ -165,7 +165,7 @@ function ProductPanel({ tenantId, mod, readOnly }: { tenantId: string; mod: Prod
         <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground" data-testid={`text-exec-${mod.key}`}>{mod.lifecycle === 'core_ready' ? 'core ready' : mod.lifecycle === 'sandbox_only' ? 'sandbox only' : 'deferred, no service implemented'}</span></div>
       {q.isLoading ? <Skeleton className="h-24" /> : q.isError ? <ErrorState what="product settings" onRetry={() => q.refetch()} /> : (
         <>
-          {isEx && <p className="text-xs text-muted-foreground" data-testid={`text-help-${mod.key}`}>Schema: {'{ "defaultAction": "swap" | "convert" | "buy" | "sell", "publicNote": "text" }'}, both optional. The default action must be one the client is entitled to. Nothing is executed.</p>}
+          {isEx && <p className="text-xs text-muted-foreground" data-testid={`text-help-${mod.key}`}>Schema: {'{ "defaultAction": "swap" | "convert", "publicNote": "text" }'}, both optional. The default action must be one the client is entitled to. Nothing is executed.</p>}
           <Textarea data-testid={`input-config-${mod.key}`} disabled={readOnly} className="min-h-28 font-mono text-xs" value={txt} onChange={(e) => setTxt(e.target.value)} />
           <div className="flex items-center gap-3">
             {readOnly ? RO : <Button size="sm" data-testid={`button-save-config-${mod.key}`} disabled={!!err || !parsed || m.isPending || txt === server} onClick={() => parsed && gM({ tenantId, moduleKey: mod.key, data: { configuration: parsed } }, {

@@ -2,6 +2,7 @@ import type { ExchangeSettings, ExchangeCatalogAsset, ExchangeQuoteInput, Exchan
 import { HttpError } from "../../lib/errors";
 import { decimal, decimalString } from "../../modules/entitlements/decimal";
 import { selectPricingRule } from "./pricing-rules";
+import { selectedFiats, isFiat, methodCurrencies, fiatPrecision } from "./global-catalog";
 
 const SCALE = 10n ** 18n;
 const BPS = 10000n;
@@ -16,36 +17,45 @@ export function calculateQuote(s: ExchangeSettings, catalog: ExchangeCatalogAsse
   const amount = decimal(input.amount);
   if (amount <= 0n || amount < decimal(route.minimum) || amount > decimal(route.maximum)) throw new HttpError(400, `Amount must be between ${route.minimum} and ${route.maximum}.`);
   const endpoint = (id: string) => {
-    if (id === `fiat:${s.fiatCurrency}`) return { symbol: s.fiatCurrency, decimals: 2, networkFee: 0n, planRate: s.fiatPlanRate, network: null };
+    if (isFiat(id) && selectedFiats(s).includes(id.slice(5))) {
+      const code = id.slice(5);
+      return { symbol: code, decimals: fiatPrecision(code,s.fiatPrecisions?.[code]), networkFee: 0n,
+        planRate: s.fiatPlanRates?.[code] ?? (code === s.fiatCurrency ? s.fiatPlanRate : "0"), network: null };
+    }
     const c = catalog.find(a => a.assetNetworkId === id);
     const a = c && s.assets.find(a => a.assetId === c.assetId && a.enabled);
     const n = s.networks.find(n => n.assetNetworkId === id && n.enabled && n.available);
     if (!c || !a || !n) throw new HttpError(409, "An asset or network on this route is disabled or unavailable.");
-    return { symbol: a.symbol, decimals: a.decimals, networkFee: decimal(n.fee), planRate: a.sandboxPlanRate, network: n };
+    return { symbol: a.symbol, decimals: c.decimals ?? a.decimals, networkFee: decimal(n.fee), planRate: a.sandboxPlanRate, network: n };
   };
   const source = endpoint(input.source), destination = endpoint(input.destination);
   if (amount % (10n ** BigInt(18 - source.decimals)) !== 0n) throw new HttpError(400, `Source amount supports at most ${source.decimals} decimal places.`);
   let paymentMethod: string | null = null;
   let paymentFeeBps = 0n, paymentFixedFee = 0n, paymentMinimum = 0n, paymentMaximum: bigint | null = null;
-  if (input.action === "buy" || input.action === "sell") {
-    const method = s.paymentMethods.find(m => m.id === input.paymentMethodId && m.enabled && m[input.action as "buy" | "sell"] && route.paymentMethodIds.includes(m.id));
+  const fiatSwap = input.action === "swap" && (isFiat(input.source) || isFiat(input.destination));
+  const fiatIn = input.action === "buy" || (fiatSwap && isFiat(input.source));
+  const fiatOut = input.action === "sell" || (fiatSwap && isFiat(input.destination));
+  if (fiatSwap || input.action === "buy" || input.action === "sell") {
+    const currency = (isFiat(input.source) ? input.source : input.destination).slice(5);
+    const method = s.paymentMethods.find(m => m.id === input.paymentMethodId && m.enabled &&
+      (fiatSwap ? methodCurrencies(m).includes(currency) : m[input.action as "buy" | "sell"]) && route.paymentMethodIds.includes(m.id));
     if (!method) throw new HttpError(400, "Select an enabled sandbox payment method for this route.");
     paymentMethod = method.label;
     paymentFeeBps = BigInt(method.feeBps ?? 0);
     paymentFixedFee = decimal(method.fixedFee ?? "0");
     paymentMinimum = decimal(method.minimum ?? "0");
     paymentMaximum = method.maximum != null ? decimal(method.maximum) : null;
-  } else if (input.paymentMethodId) throw new HttpError(400, "Payment methods apply only to Buy or Sell.");
+  } else if (input.paymentMethodId) throw new HttpError(400, "Payment methods apply only to Crypto/Fiat Swap.");
   const effectiveRate = decimal(route.rate) * (BPS - BigInt(route.spreadBps)) / BPS;
   // All service fees are in SOURCE units. Destination network fees are OUTPUT units.
-  const buyFee = input.action === "buy" ? amount * paymentFeeBps / BPS + paymentFixedFee : 0n;
+  const buyFee = fiatIn ? amount * paymentFeeBps / BPS + paymentFixedFee : 0n;
   const fee = amount * BigInt(route.feeBps) / BPS + decimal(route.fixedFee) + source.networkFee + buyFee;
   if (fee >= amount) throw new HttpError(400, "The amount does not cover the configured sandbox fees.");
   let output = (amount - fee) * effectiveRate / SCALE - destination.networkFee;
-  const fiatAmount = input.action === "sell" ? output : amount;
-  if ((input.action === "buy" || input.action === "sell") &&
+  const fiatAmount = fiatOut ? output : amount;
+  if ((fiatIn || fiatOut) &&
       (fiatAmount < paymentMinimum || (paymentMaximum != null && fiatAmount > paymentMaximum))) throw new HttpError(400, "Fiat amount is outside this payment method's minimum/maximum.");
-  const sellFee = input.action === "sell" ? output * paymentFeeBps / BPS + paymentFixedFee : 0n;
+  const sellFee = fiatOut ? output * paymentFeeBps / BPS + paymentFixedFee : 0n;
   output -= sellFee;
   const quantum = 10n ** BigInt(18 - destination.decimals);
   output = output > 0n ? output / quantum * quantum : 0n;

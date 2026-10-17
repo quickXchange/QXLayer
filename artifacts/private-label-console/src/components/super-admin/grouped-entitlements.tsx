@@ -2,12 +2,13 @@ import type { EntitlementDefinition } from '@workspace/api-client-react';
 import { EntitlementEditor, type EntMap } from '@/components/app/entitlement-editor';
 
 const GROUPS: [string, RegExp][] = [
-  ['Swap', /swap/i], ['Convert', /convert/i], ['Buy', /(^|_)buy|buy(_|$)/i], ['Sell', /(^|_)sell|sell(_|$)/i],
+  ['Swap', /swap/i], ['Convert', /convert/i],
   ['Admin', /admin|staff|domain|brand|website|custom/i], ['Integration allowances', /api|webhook|rpc|integration|key|provider/i],
 ];
 export function groupDefs(defs: EntitlementDefinition[]) {
   const out = new Map<string, EntitlementDefinition[]>();
   for (const d of defs) {
+    if (/(^|_)(buy|sell)(_|$)/i.test(d.key)) continue; // retired products: hidden from editors, stored values untouched
     const hit = d.kind === 'limit' ? undefined : GROUPS.find(([, re]) => re.test(`${d.key} ${d.label}`));
     const g = hit ? hit[0] : d.kind === 'limit' ? 'Limits' : 'Other';
     out.set(g, [...(out.get(g) ?? []), d]);

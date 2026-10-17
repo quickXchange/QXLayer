@@ -31,7 +31,7 @@ test("paused configuration retains configured action controls, never admits trad
     networks: [{ assetNetworkId: "btc-test", enabled: true, available: true, minimum: "0", maximum: "100", fee: "0", information: "" }] };
   const a = projectPublicExchangeConfiguration(settings, catalog, { features, overLimit: false }, true);
   assert.equal(a.enabled, false);
-  assert.deepEqual(a.actions, ["swap", "convert", "buy", "sell"]);
+  assert.deepEqual(a.actions, ["swap", "convert"]);
   assert.deepEqual(a.assets.map(x => x.symbol), ["BTC"]);
   const b = projectPublicExchangeConfiguration(emptySettings(), catalog, { features, overLimit: false }, true);
   assert.deepEqual(b.assets, []);

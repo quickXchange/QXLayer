@@ -6,7 +6,7 @@ import { ArrowLeftRight, Bell, Boxes, ChevronDown, Globe, LayoutGrid, Plug, Sett
 type SectionLink = [string, string];
 type Group = { label: string; icon: ElementType; sections: SectionLink[] };
 const groups: Group[] = [
-  { label: 'Orders', icon: ArrowLeftRight, sections: [['orders', 'All Orders'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell']] },
+  { label: 'Orders', icon: ArrowLeftRight, sections: [['orders', 'All Orders'], ['swap', 'Swap'], ['convert', 'Convert']] },
   { label: 'Exchange', icon: Boxes, sections: [['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['payment-methods', 'Payment Methods'], ['pricing', 'Pricing & Fees'], ['fees', 'Fees / Spread'], ['wallets', 'Wallet Addresses']] },
   { label: 'Integrations', icon: Plug, sections: [['providers', 'Providers / Integrations'], ['api-keys', 'API Keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview']] },
   { label: 'Website', icon: Globe, sections: [['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain']] },

@@ -9,8 +9,13 @@ import type { AssetNetwork } from './assetNetwork';
 import type { ExchangeAction } from './exchangeAction';
 import type { ExchangePaymentMethod } from './exchangePaymentMethod';
 import type { ExchangeRoute } from './exchangeRoute';
+import type { GlobalCatalogEntry } from './globalCatalogEntry';
+import type { PublicExchangeDefaultPairs } from './publicExchangeDefaultPairs';
 
 export interface PublicExchange {
+  fiatCurrencies?: string[];
+  currencies?: GlobalCatalogEntry[];
+  defaultPairs?: PublicExchangeDefaultPairs;
   enabled: boolean;
   defaultAction?: ExchangeAction;
   actions: ExchangeAction[];

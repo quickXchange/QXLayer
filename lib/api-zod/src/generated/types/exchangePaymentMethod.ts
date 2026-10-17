@@ -5,7 +5,7 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
-import type { ExchangePaymentMethodCurrency } from './exchangePaymentMethodCurrency';
+import type { ExchangePaymentMethodAccountFields } from './exchangePaymentMethodAccountFields';
 import type { ExchangePaymentMethodMethodType } from './exchangePaymentMethodMethodType';
 
 export interface ExchangePaymentMethod {
@@ -21,7 +21,16 @@ export interface ExchangePaymentMethod {
      */
   instructions?: string;
   enabled: boolean;
-  currency: ExchangePaymentMethodCurrency;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  /** @maxLength 100 */
+  catalogId?: string;
+  accountFields?: ExchangePaymentMethodAccountFields;
+  /**
+     * @maxItems 180
+     * @items.pattern ^[A-Z]{3}$
+     */
+  currencies?: string[];
   buy: boolean;
   sell: boolean;
   /**

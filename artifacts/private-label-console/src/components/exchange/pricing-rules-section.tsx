@@ -5,12 +5,13 @@ import { useToast } from '@/hooks/use-toast';
 import { Dec, Field, IntInput, Pick, isDec, isInt, isPos } from './ui';
 import { BulkBar, BulkBtn, DataTable, EditDrawer, FilterBar, NoMatch, StatusPill, useConfirm, useSelection, useStaged } from './bulk';
 import { NameList, PageBar, usePaged } from './manage';
-import { fiatId, type ExchangeDraft } from './use-exchange-draft';
+import { fiatCodes, fiatId, isFiatEp, methodServes, type ExchangeDraft } from './use-exchange-draft';
 import type { ExchangePricingRule } from '@workspace/api-client-react';
 
 type Rule = ExchangePricingRule;
 const ANY = '*';
-const ACTIONS: [string, string][] = [['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy (fiat to crypto)'], ['sell', 'Sell (crypto to fiat)']];
+const ACTIONS: [string, string][] = [['swap', 'Swap (crypto and fiat)'], ['convert', 'Convert (crypto to crypto)']];
+const LEGACY: [string, string][] = [['buy', 'Buy (legacy)'], ['sell', 'Sell (legacy)']];
 
 export function PricingRulesSection({ d, locked }: { d: ExchangeDraft; locked: boolean }) {
   const { toast } = useToast(); const staged = useStaged(); const [ask, confirmNode] = useConfirm(locked);
@@ -19,8 +20,8 @@ export function PricingRulesSection({ d, locked }: { d: ExchangeDraft; locked: b
   const [q, setQ] = useState(''); const [fa, setFa] = useState('all'); const [fs, setFs] = useState('all');
   const [edit, setEdit] = useState<Rule | null>(null); const [isNew, setIsNew] = useState(false);
   const [bulk, setBulk] = useState(false);
-  const label = (id: string) => (id === ANY ? 'Any' : id.startsWith('fiat:') ? id.slice(5) : d.catalog.find((c) => c.assetNetworkId === id)?.symbol ?? id);
-  const full = (id: string) => { if (id === ANY) return 'Any'; const c = d.catalog.find((x) => x.assetNetworkId === id); return c ? `${c.symbol} on ${c.networkName}` : id.startsWith('fiat:') ? `${id.slice(5)} (fiat)` : id; };
+  const label = (id: string) => (id === ANY ? 'Any' : id === 'crypto:*' ? 'Any Crypto' : id === 'fiat:*' ? 'Any Fiat' : id.startsWith('fiat:') ? id.slice(5) : d.catalog.find((c) => c.assetNetworkId === id)?.symbol ?? id);
+  const full = (id: string) => { if (id === ANY) return 'Any'; if (id === 'crypto:*') return 'Any Crypto'; if (id === 'fiat:*') return 'Any Fiat'; const c = d.catalog.find((x) => x.assetNetworkId === id); return c ? `${c.symbol} on ${c.networkName}` : id.startsWith('fiat:') ? `${id.slice(5)} (fiat)` : id; };
   const rname = (r: Rule) => `${r.action}: ${label(r.source)} to ${label(r.destination)} (priority ${r.priority}, ${r.id.slice(0, 8)})`;
   const filtered = rules.filter((r) => (fa === 'all' || r.action === fa) && (fs === 'all' || (fs === 'on') === r.enabled) && `${label(r.source)} ${label(r.destination)} ${r.action}`.toLowerCase().includes(q.trim().toLowerCase()));
   const resetF = () => { setQ(''); setFa('all'); setFs('all'); };
@@ -32,15 +33,16 @@ export function PricingRulesSection({ d, locked }: { d: ExchangeDraft; locked: b
   const setMany = (ids: string[], p: Partial<Rule>) => set(rules.map((r) => (ids.includes(r.id) ? { ...r, ...p } : r)));
   const sig = (r: Rule) => `${r.action}|${r.source}|${r.destination}|${r.paymentMethodId ?? ''}|${r.priority}`;
   const conflictOf = (r: Rule, all: Rule[]) => r.enabled && all.some((x) => x.id !== r.id && x.enabled && sig(x) === sig(r));
-  const endpoints: [string, string][] = [[ANY, 'Any'], ...d.catalog.map((c): [string, string] => [c.assetNetworkId, `${c.symbol} on ${c.networkName}`]), [fiat, `${s.fiatCurrency} (fiat)`]];
-  const pms = s.paymentMethods.filter((p) => p.currency === s.fiatCurrency);
+  const endpoints: [string, string][] = [[ANY, 'Any'], ['crypto:*', 'Any Crypto'], ['fiat:*', 'Any Fiat'], ...d.catalog.map((c): [string, string] => [c.assetNetworkId, `${c.symbol} on ${c.networkName}`]), ...fiatCodes(s).map((c): [string, string] => [`fiat:${c}`, `${c} (fiat)`])];
+  const pmsFor = (r: Rule) => { const codes = [r.source, r.destination].filter(isFiatEp).map((e) => e.slice(5)); return s.paymentMethods.filter((p) => (codes.length ? codes : fiatCodes(s)).some((c) => methodServes(p, c))); };
 
   const add = () => { const r: Rule = { id: crypto.randomUUID(), action: 'swap', source: ANY, destination: ANY, enabled: false, priority: 100, feeBps: 0, fixedFee: '0', spreadBps: 0 }; setIsNew(true); setEdit(r); };
   const check = (r: Rule, all: Rule[]): string | null => {
     if (r.source === r.destination && r.source !== ANY) return 'Source and destination must differ';
     if (r.action === 'buy' && r.source !== ANY && r.source !== fiat) return 'Buy source must be fiat or Any';
     if (r.action === 'sell' && r.destination !== ANY && r.destination !== fiat) return 'Sell destination must be fiat or Any';
-    if ((r.action === 'swap' || r.action === 'convert') && (r.source === fiat || r.destination === fiat)) return 'Swap and convert cannot use the fiat endpoint';
+    if (r.action === 'convert' && (isFiatEp(r.source) || isFiatEp(r.destination))) return 'Convert is crypto to crypto and cannot use a fiat endpoint';
+    if (r.action === 'swap' && r.source !== ANY && r.destination !== ANY && isFiatEp(r.source) === isFiatEp(r.destination)) return 'Swap needs one fiat endpoint and one crypto endpoint';
     if (!isInt(r.priority, 1000)) return 'Priority is an integer 0 to 1000';
     if (!isInt(r.feeBps, 5000) || !isInt(r.spreadBps, 5000)) return 'Fee and spread are integer basis points 0 to 5000';
     if (!isDec(r.fixedFee)) return 'Fixed fee must be a decimal string';
@@ -49,7 +51,7 @@ export function PricingRulesSection({ d, locked }: { d: ExchangeDraft; locked: b
     return null;
   };
   const apply = (v: Rule) => {
-    const clean: Rule = { ...v }; if (!clean.rate) delete clean.rate; if (!(clean.action === 'buy' || clean.action === 'sell') || !clean.paymentMethodId) delete clean.paymentMethodId;
+    const clean: Rule = { ...v }; if (!clean.rate) delete clean.rate; if (clean.action === 'convert' || !clean.paymentMethodId) delete clean.paymentMethodId;
     const next = isNew ? [...rules, clean] : rules.map((r) => (r.id === clean.id ? clean : r));
     const err = check(clean, next); if (err) { toast({ title: err, variant: 'destructive' }); return; }
     setEdit(null);
@@ -70,8 +72,8 @@ export function PricingRulesSection({ d, locked }: { d: ExchangeDraft; locked: b
   return (
     <div className="space-y-3 border-t pt-4" data-testid="section-pricing-rules">
       <div>
-        <h3 className="font-display text-lg">Any-to-Any pricing rules</h3>
-        <p className="text-xs text-muted-foreground">Rules adjust fees and spread on routes you have already configured; they never create routes. They apply to sandbox quotes only. The most specific matching rule wins first (exact source and destination, then payment method), and priority only breaks ties between equally specific rules. Two enabled rules with identical action, endpoints, payment method and priority are rejected as a conflict. Use exact tenant asset/network IDs from the selectors, or Any. Manual rate is optional: leave blank to inherit the route or provider rate.</p>
+        <h3 className="font-display text-lg">Any-to-Any pricing rules (Swap and Convert)</h3>
+        <p className="text-xs text-muted-foreground">Rules adjust fees and spread on routes you have already configured; they never create routes. They apply to sandbox quotes only. The most specific matching rule wins first (exact source and destination, then payment method), and priority only breaks ties between equally specific rules. Two enabled rules with identical action, endpoints, payment method and priority are rejected as a conflict. Use exact tenant asset/network IDs from the selectors, an explicit fiat currency, or Any. Manual rate is optional: leave blank to inherit the route or provider rate.</p>
       </div>
       {rules.length === 0 && <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-pricing-rules">No pricing rules. Routes use their own fee and spread.</p>}
       {rules.length > 0 && <>
@@ -95,14 +97,14 @@ export function PricingRulesSection({ d, locked }: { d: ExchangeDraft; locked: b
       </>}
       {!locked && <Button type="button" variant="outline" data-testid="button-add-rule" onClick={add}>Add pricing rule</Button>}
       <EditDrawer item={edit} itemKey={edit?.id ?? ''} title={isNew ? 'New pricing rule' : 'Pricing rule'} note="Stages into the exchange draft. Press Save exchange settings to persist." locked={locked} onClose={() => setEdit(null)} applyLabel="Review changes" onApply={apply}>
-        {(f, upd) => { const pay = f.action === 'buy' || f.action === 'sell'; return (<>
+        {(f, upd) => { const pay = f.action !== 'convert'; const pms = pmsFor(f); const cryptoOnly = endpoints.filter(([v]) => v === ANY || v === 'crypto:*' || (!isFiatEp(v))); return (<>
           <div className="flex items-center justify-between rounded-md border p-3 text-sm">Enabled<Switch checked={f.enabled} onCheckedChange={(v) => upd({ enabled: v })} /></div>
-          <Field label="Action"><Pick testid="select-rule-action" value={f.action} onChange={(v) => upd({ action: v as Rule['action'], source: ANY, destination: ANY, paymentMethodId: undefined })} options={ACTIONS} /></Field>
+          <Field label="Action"><Pick testid="select-rule-action" value={f.action} onChange={(v) => upd({ action: v as Rule['action'], source: ANY, destination: ANY, paymentMethodId: undefined })} options={[...ACTIONS, ...(f.action === 'buy' || f.action === 'sell' ? LEGACY.filter(([k]) => k === f.action) : [])]} /></Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Source"><Pick bounded value={f.source} onChange={(v) => upd({ source: v })} options={endpoints.filter(([v]) => (f.action === 'buy' ? v === ANY || v === fiat : v === ANY || v !== fiat))} /></Field>
-            <Field label="Destination"><Pick bounded value={f.destination} onChange={(v) => upd({ destination: v })} options={endpoints.filter(([v]) => (f.action === 'sell' ? v === ANY || v === fiat : v === ANY || v !== fiat))} /></Field>
+            <Field label="Source"><Pick bounded value={f.source} onChange={(v) => upd({ source: v })} options={f.action === 'swap' ? endpoints : f.action === 'buy' ? endpoints.filter(([v]) => v === ANY || v === fiat) : cryptoOnly} /></Field>
+            <Field label="Destination"><Pick bounded value={f.destination} onChange={(v) => upd({ destination: v })} options={f.action === 'swap' ? endpoints.filter(([v]) => v === ANY || !isFiatEp(f.source) || f.source === ANY ? (f.source === ANY || isFiatEp(v) !== isFiatEp(f.source)) : true) : f.action === 'sell' ? endpoints.filter(([v]) => v === ANY || v === fiat) : cryptoOnly} /></Field>
           </div>
-          {pay && <Field label="Payment method (optional)"><Pick value={f.paymentMethodId ?? ANY} onChange={(v) => upd({ paymentMethodId: v === ANY ? undefined : v })} options={[[ANY, 'Any payment method'], ...pms.map((p): [string, string] => [p.id, p.label || 'Unnamed'])]} /></Field>}
+          {pay && <Field label="Payment method (optional, only methods linked to the fiat currency)"><Pick value={f.paymentMethodId ?? ANY} onChange={(v) => upd({ paymentMethodId: v === ANY ? undefined : v })} options={[[ANY, 'Any payment method'], ...pms.map((p): [string, string] => [p.id, p.label || 'Unnamed'])]} /></Field>}
           <Field label="Priority (0 to 1000, tie-break only)"><IntInput value={f.priority} onChange={(v) => upd({ priority: v })} /></Field>
           <Field label="Manual rate (blank inherits route/provider rate)"><Dec positive value={f.rate ?? ''} onChange={(v) => upd({ rate: v === '' ? undefined : v })} placeholder="inherit" testid="input-rule-rate" /></Field>
           <div className="grid grid-cols-3 gap-3"><Field label="Fee (bps)"><IntInput value={f.feeBps} onChange={(v) => upd({ feeBps: v })} /></Field><Field label="Spread (bps)"><IntInput value={f.spreadBps} onChange={(v) => upd({ spreadBps: v })} /></Field><Field label="Fixed fee"><Dec value={f.fixedFee} onChange={(v) => upd({ fixedFee: v })} /></Field></div>

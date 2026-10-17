@@ -5,6 +5,7 @@ const pages: Record<string, () => Promise<unknown>> = {
   admin: () => import('@/pages/admin'), clients: () => import('@/pages/clients'),
   account: () => import('@/pages/account'), plans: () => import('@/pages/plans'),
   'add-ons': () => import('@/pages/addons'), modules: () => import('@/pages/modules'),
+  'exchange-catalog': () => import('@/pages/global-catalog'),
   providers: () => import('@/pages/providers'), integrations: () => import('@/pages/integrations'),
   provisioning: () => import('@/pages/provisioning'), activity: () => import('@/pages/activity'),
   'white-labels': () => import('@/pages/white-labels'),

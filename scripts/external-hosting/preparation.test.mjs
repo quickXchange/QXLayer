@@ -40,7 +40,9 @@ test("Versioned SQL has intact checksums, no rows and complete RLS/reference", a
     assert.doesNotMatch(sql,/\b(?:INSERT INTO|COPY .* FROM stdin|TRUNCATE|DROP TABLE)\b|(?:ALTER|CREATE)\s+(?:ROLE|USER)[^;]*\bPASSWORD\b/i);
   }
   const ref = JSON.parse(await readFile(new URL("rls-reference.json",dir),"utf8"));
-  assert.equal(ref.tables.length,42);
+  assert.equal(ref.tables.length,44);
+  assert(ref.tables.some(t=>t.name==="global_exchange_catalog"));
+  assert(ref.tables.some(t=>t.name==="global_exchange_catalog_links"));
   for (const table of ref.tables) {
     assert.equal(table.forced,true); assert.equal(table.enabled,true); assert.equal(table.policies.length,2);
     assert.ok(table.policies.every(p=>p.using && (p.command!=="*" || p.check)));

@@ -81,7 +81,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   return (
     <div className="space-y-4">
       <SimNote />
-      <div className="flex flex-wrap gap-1" role="tablist" aria-label="Order shortcuts" data-testid="order-shortcuts">{[['all', 'All'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['active', 'Active'], ['archived', 'Archived']].map(([k, l]) => <Button key={k} type="button" size="sm" role="tab" aria-selected={cur === k} variant={cur === k ? 'default' : 'outline'} data-testid={`button-shortcut-${k}`} onClick={() => shortcut(k)}>{l}</Button>)}</div>
+      <div className="flex flex-wrap gap-1" role="tablist" aria-label="Order shortcuts" data-testid="order-shortcuts">{[['all', 'All'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy (legacy)'], ['sell', 'Sell (legacy)'], ['active', 'Active'], ['archived', 'Archived']].map(([k, l]) => <Button key={k} type="button" size="sm" role="tab" aria-selected={cur === k} variant={cur === k ? 'default' : 'outline'} data-testid={`button-shortcut-${k}`} onClick={() => shortcut(k)}>{l}</Button>)}</div>
       {bucket && <p className="text-xs text-muted-foreground" data-testid="text-bucket-note">{bucket === 'active' ? 'Active: pending and processing orders' : 'Archived: completed, cancelled and failed orders'}, across all pages.</p>}
        <form className="flex flex-wrap items-end gap-2" onSubmit={(e) => {
          e.preventDefault();
@@ -91,7 +91,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
        }}>
         <Input data-testid="input-order-search" className="w-full sm:w-64" placeholder="Search order id, symbol" value={text} onChange={(e) => setText(e.target.value)} />
         <div className="w-36"><Pick testid="select-order-status" value={status} onChange={(v) => { setStatus(v); setBucket(''); reset(); }} options={[[ALL, 'Any status'], ['pending', 'Pending'], ['processing', 'Processing'], ['completed', 'Completed'], ['cancelled', 'Cancelled'], ['failed', 'Failed']]} /></div>
-        <div className="w-36"><Pick testid="select-order-action" value={action} onChange={(v) => { setAction(v); reset(); }} options={[[ALL, 'Any type'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell']]} /></div>
+        <div className="w-36"><Pick testid="select-order-action" value={action} onChange={(v) => { setAction(v); reset(); }} options={[[ALL, 'Any type'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy (legacy)'], ['sell', 'Sell (legacy)']]} /></div>
         <div className="w-44"><Pick testid="select-order-customer" value={customer} onChange={(v) => { setCustomer(v); reset(); }} options={[[ALL, 'Any customer'], ['anonymous', 'Anonymous visitors'], ...(customer !== ALL && customer !== 'anonymous' ? [[customer, 'Selected contact'] as [string, string]] : [])]} /></div>
          <label className="text-xs text-muted-foreground">From<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-from" value={from} onChange={(e) => { setFrom(e.target.value); setDateError(''); }} /></label>
          <label className="text-xs text-muted-foreground">To<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-to" value={to} onChange={(e) => { setTo(e.target.value); setDateError(''); }} /></label>

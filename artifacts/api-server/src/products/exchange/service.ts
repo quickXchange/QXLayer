@@ -10,6 +10,7 @@ import { publicTenantId } from "../../modules/website/service";
 import type { WebsitePreview } from "../../modules/website/operator-preview";
 import { ACTIONS, emptySettings, readExchange, validateExchange } from "./settings";
 import { calculateQuote } from "./calculation";
+import { validateTenantCatalog, validActionPair } from "./global-catalog";
 import { publicExchangeConfiguration } from "./public-configuration";
 import { statusesForOrderView } from "./order-views";
 import { paymentInstructionsSnapshot } from "./payment-snapshot";
@@ -62,6 +63,7 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
       }
       requireFeature(e, "crypto_exchange");
       const s = validateExchange(input, e, result.catalog);
+      await validateTenantCatalog(client,s);
       const previousIds = result.configuration.paymentMethods.map(m => m.id);
       const existing = await client.query("SELECT id,label FROM tenant_payment_methods WHERE tenant_id=$1", [tenantId]);
       const total = new Set([...existing.rows.map(m => m.id).filter(id => !previousIds.includes(id) || s.paymentMethods.some(m => m.id === id)), ...s.paymentMethods.map(m => m.id)]).size;
@@ -124,6 +126,7 @@ function quoteAdmission(e: EffectiveEntitlements, volume: string) {
   enforceLimit(e, "max_monthly_volume", decimalString(decimal(used.max_monthly_volume ?? "0") + decimal(volume)));
 }
 async function operationalExchange(client: DatabaseClient, tenantId: string, action?: string) {
+  if (action && !["swap","convert"].includes(action)) throw new HttpError(400, "Buy and Sell are retired; select Swap or Convert.");
   const e = await resolveEntitlements(client, tenantId); guard(e, action);
   if (e.overLimit) throw new HttpError(409, "Resolve the tenant's over-limit resource usage before creating sandbox quotes or orders.");
   const legacy = await client.query("SELECT exchange_enabled FROM tenant_configuration WHERE tenant_id=$1", [tenantId]);
@@ -133,6 +136,8 @@ async function operationalExchange(client: DatabaseClient, tenantId: string, act
   return e;
 }
 export async function sandboxQuote(slug: string, input: ExchangeQuoteInput, channel?: "telegram") {
+  if (!validActionPair(input.action,input.source,input.destination))
+    throw new HttpError(400,"Swap requires Crypto/Fiat; Convert requires Crypto/Crypto.");
   const tenantId = await publicTenantId(slug);
   return withDatabase({ actorId: "sandbox-visitor", tenantId }, async client => {
     const e = await operationalExchange(client, tenantId, input.action);
@@ -185,6 +190,8 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
     }
     const { configuration: s, catalog } = await readExchange(client, tenantId);
     const request = verify(input.quoteToken, tenantId, s, e.plan!.currency);
+    if (!validActionPair(request.action,request.source,request.destination))
+      throw new HttpError(400,"This quote is for a retired or incompatible offering; request a new Swap or Convert quote.");
     await assertPricingSnapshot(client, tenantId, request.pricing, request.action, e);
     if (channel) await assertTelegramTransaction(client, tenantId, request.action);
     guard(e, request.action);

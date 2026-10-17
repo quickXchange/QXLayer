@@ -13,7 +13,9 @@ import type { ExchangePricingRule } from './exchangePricingRule';
 import type { ExchangeProviderConfiguration } from './exchangeProviderConfiguration';
 import type { ExchangeRoute } from './exchangeRoute';
 import type { ExchangeSettingsActions } from './exchangeSettingsActions';
-import type { ExchangeSettingsFiatCurrency } from './exchangeSettingsFiatCurrency';
+import type { ExchangeSettingsDefaultPairs } from './exchangeSettingsDefaultPairs';
+import type { ExchangeSettingsFiatPlanRates } from './exchangeSettingsFiatPlanRates';
+import type { ExchangeSettingsFiatPrecisions } from './exchangeSettingsFiatPrecisions';
 import type { ExchangeWallet } from './exchangeWallet';
 
 export interface ExchangeSettings {
@@ -21,9 +23,19 @@ export interface ExchangeSettings {
   defaultAction: ExchangeAction;
   /** @maxLength 1000 */
   publicNote: string;
-  fiatCurrency: ExchangeSettingsFiatCurrency;
+  /** @pattern ^[A-Z]{3}$ */
+  fiatCurrency: string;
+  /**
+     * @maxItems 180
+     * @items.pattern ^[A-Z]{3}$
+     */
+  fiatCurrencies?: string[];
+  defaultPairs?: ExchangeSettingsDefaultPairs;
   /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
   fiatPlanRate: string;
+  fiatPlanRates?: ExchangeSettingsFiatPlanRates;
+  /** Server-computed from the authoritative global catalog on every read. */
+  readonly fiatPrecisions?: ExchangeSettingsFiatPrecisions;
   actions: ExchangeSettingsActions;
   /** @maxItems 100 */
   assets: ExchangeAssetSettings[];

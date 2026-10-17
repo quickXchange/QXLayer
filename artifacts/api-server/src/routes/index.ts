@@ -10,6 +10,7 @@ import websiteDiagnosticsRouter from "./website-diagnostics";
 import landingCatalogRouter from "./landing-catalog";
 import marketingMediaRouter from "./marketing-media";
 import exchangeRouter from "./exchange";
+import globalExchangeCatalogRouter from "./global-exchange-catalog";
 import providerFoundationRouter from "./provider-foundation";
 import integrationsRouter from "./integrations";
 import customerRouter from "./customer";
@@ -39,6 +40,7 @@ router.use("/tenants/:tenantId", requireAuthentication, async (req, res, next) =
   next();
 });
 router.use(exchangeRouter);
+router.use(globalExchangeCatalogRouter);
 router.use(providerFoundationRouter);
 router.use(integrationsRouter);
 router.use(catalogRouter);

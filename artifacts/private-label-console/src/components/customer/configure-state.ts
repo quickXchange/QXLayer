@@ -8,7 +8,7 @@ export type Cfg = {
 };
 export const initialCfg = (): Cfg => ({ projectName: '', brandName: '', companyName: '', domain: '', designType: 'standard', logo: null, favicon: null, primary: '#12423f', accent: '#b4551f', theme: 'light', styleName: '', description: '', refUrl: '', notes: '', refs: [], acts: ['swap'], planId: '', addonIds: [], period: 'monthly', details: '', reqFiles: [] });
 export const STEPS = ['Project', 'Design', 'Features', 'Plan', 'Add-ons', 'Requirements', 'Review'] as const;
-export const ACTS = ['swap', 'convert', 'buy', 'sell'] as const;
+export const ACTS = ['swap', 'convert'] as const;
 export type StepProps = { cfg: Cfg; set: (p: Partial<Cfg> | ((c: Cfg) => Partial<Cfg>)) => void; onBusy: (d: number) => void };
 export const stepError = (i: number, c: Cfg): string => {
   if ((i === 1 || i === 5) && fileError(c)) return fileError(c);

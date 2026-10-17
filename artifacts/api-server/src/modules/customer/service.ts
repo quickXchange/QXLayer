@@ -51,6 +51,8 @@ export function listRequests(p: Principal, operator = false) {
 export function submitRequest(p: Principal, raw: WhiteLabelRequestInput) {
   if (p.role === "super_admin") throw new HttpError(403, "Super Admin reviews customer requests; use a customer account to submit.");
   const input = SubmitWhiteLabelRequestBody.parse(raw);
+  if(input.actions.some(action=>!["swap","convert"].includes(action)))
+    throw new HttpError(400,"Only Crypto/Fiat Swap and Crypto/Crypto Convert can be ordered. Buy and Sell are retired.");
   const { idempotencyKey, ...fields } = input;
   const configuration = { ...fields, projectName: fields.projectName.trim(), brandName: fields.brandName.trim(), preferredDomain: fields.preferredDomain?.trim() || null };
   if (configuration.projectName.length < 2 || configuration.brandName.length < 2 || new Set(input.actions).size !== input.actions.length) throw new HttpError(400, "Provide project and brand names and distinct Exchange actions.");
@@ -167,6 +169,7 @@ export async function deliverLinkedRequest(c: DatabaseClient, p: Principal, id: 
     const settings = configured.rows[0]?.configuration;
     if (!settings || settings.referenceCurrency !== effective.plan?.currency) throw new HttpError(409, "Review and save the Exchange reference rates for the assigned plan before provisioning.");
     for (const action of row.configuration.actions as string[]) {
+      if(!["swap","convert"].includes(action))continue; // Historical requested offerings are retained, not reactivated.
       requireFeature(effective, action);
       if (!settings.actions?.[action] || !settings.routes?.some((r: { action: string; enabled: boolean }) => r.enabled && r.action === action)) throw new HttpError(409, `Configure the requested ${action} action and its route before provisioning.`);
     }

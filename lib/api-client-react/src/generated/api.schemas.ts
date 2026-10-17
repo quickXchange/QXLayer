@@ -1117,14 +1117,7 @@ export interface ExchangeWallet {
   providerKey: ExchangeWalletProviderKey;
 }
 
-export type ExchangePaymentMethodCurrency = typeof ExchangePaymentMethodCurrency[keyof typeof ExchangePaymentMethodCurrency];
-
-
-export const ExchangePaymentMethodCurrency = {
-  USD: 'USD',
-  EUR: 'EUR',
-  GBP: 'GBP',
-} as const;
+export type ExchangePaymentMethodAccountFields = {[key: string]: string};
 
 export type ExchangePaymentMethodMethodType = typeof ExchangePaymentMethodMethodType[keyof typeof ExchangePaymentMethodMethodType];
 
@@ -1148,7 +1141,16 @@ export interface ExchangePaymentMethod {
      */
   instructions?: string;
   enabled: boolean;
-  currency: ExchangePaymentMethodCurrency;
+  /** @pattern ^[A-Z]{3}$ */
+  currency: string;
+  /** @maxLength 100 */
+  catalogId?: string;
+  accountFields?: ExchangePaymentMethodAccountFields;
+  /**
+     * @maxItems 180
+     * @items.pattern ^[A-Z]{3}$
+     */
+  currencies?: string[];
   buy: boolean;
   sell: boolean;
   /**
@@ -1210,14 +1212,31 @@ export interface ExchangeProviderConfiguration {
   endpoint?: string | null;
 }
 
-export type ExchangeSettingsFiatCurrency = typeof ExchangeSettingsFiatCurrency[keyof typeof ExchangeSettingsFiatCurrency];
+export interface ExchangeDefaultPair {
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  source: string;
+  /**
+     * @minLength 1
+     * @maxLength 80
+     */
+  destination: string;
+  paymentMethodId?: string;
+}
 
+export type ExchangeSettingsDefaultPairs = {
+  swap?: ExchangeDefaultPair;
+  convert?: ExchangeDefaultPair;
+};
 
-export const ExchangeSettingsFiatCurrency = {
-  USD: 'USD',
-  EUR: 'EUR',
-  GBP: 'GBP',
-} as const;
+export type ExchangeSettingsFiatPlanRates = {[key: string]: string};
+
+/**
+ * Server-computed from the authoritative global catalog on every read.
+ */
+export type ExchangeSettingsFiatPrecisions = {[key: string]: number};
 
 export type ExchangeSettingsActions = {
   swap: boolean;
@@ -1231,9 +1250,19 @@ export interface ExchangeSettings {
   defaultAction: ExchangeAction;
   /** @maxLength 1000 */
   publicNote: string;
-  fiatCurrency: ExchangeSettingsFiatCurrency;
+  /** @pattern ^[A-Z]{3}$ */
+  fiatCurrency: string;
+  /**
+     * @maxItems 180
+     * @items.pattern ^[A-Z]{3}$
+     */
+  fiatCurrencies?: string[];
+  defaultPairs?: ExchangeSettingsDefaultPairs;
   /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
   fiatPlanRate: string;
+  fiatPlanRates?: ExchangeSettingsFiatPlanRates;
+  /** Server-computed from the authoritative global catalog on every read. */
+  readonly fiatPrecisions?: ExchangeSettingsFiatPrecisions;
   actions: ExchangeSettingsActions;
   /** @maxItems 100 */
   assets: ExchangeAssetSettings[];
@@ -1252,6 +1281,17 @@ export interface ExchangeSettings {
 }
 
 export interface ExchangeCatalogAsset {
+  /**
+     * @minimum 0
+     * @maximum 18
+     */
+  decimals?: number;
+  /** @nullable */
+  contractAddress?: string | null;
+  native?: boolean;
+  memoRequired?: boolean;
+  /** @nullable */
+  addressFormat?: string | null;
   assetNetworkId: string;
   assetId: string;
   symbol: string;
@@ -1488,6 +1528,57 @@ export interface ExchangeDashboard {
   recentOrders: ExchangeOrder[];
 }
 
+export type PublicExchangeDefaultPairs = {
+  swap?: ExchangeDefaultPair;
+  convert?: ExchangeDefaultPair;
+};
+
+export type GlobalCatalogEntryKind = typeof GlobalCatalogEntryKind[keyof typeof GlobalCatalogEntryKind];
+
+
+export const GlobalCatalogEntryKind = {
+  currencies: 'currencies',
+  payment_methods: 'payment_methods',
+  assets: 'assets',
+  networks: 'networks',
+} as const;
+
+export type GlobalCatalogEntryStatus = typeof GlobalCatalogEntryStatus[keyof typeof GlobalCatalogEntryStatus];
+
+
+export const GlobalCatalogEntryStatus = {
+  enabled: 'enabled',
+  disabled: 'disabled',
+  catalog_only: 'catalog_only',
+} as const;
+
+export type GlobalCatalogEntryMetadata = { [key: string]: unknown };
+
+export interface GlobalCatalogEntry {
+  kind: GlobalCatalogEntryKind;
+  /** @pattern ^[A-Za-z0-9:_-]{1,100}$ */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 40
+     */
+  code: string;
+  /**
+     * @minLength 1
+     * @maxLength 160
+     */
+  name: string;
+  status: GlobalCatalogEntryStatus;
+  /**
+     * @maxLength 2000
+     * @nullable
+     */
+  logoUrl: string | null;
+  metadata: GlobalCatalogEntryMetadata;
+  /** @minimum 0 */
+  revision: number;
+}
+
 export interface AssetNetwork {
   assetId: string;
   assetNetworkId?: string;
@@ -1502,6 +1593,9 @@ export interface AssetNetwork {
 }
 
 export interface PublicExchange {
+  fiatCurrencies?: string[];
+  currencies?: GlobalCatalogEntry[];
+  defaultPairs?: PublicExchangeDefaultPairs;
   enabled: boolean;
   defaultAction?: ExchangeAction;
   actions: ExchangeAction[];
@@ -2693,6 +2787,68 @@ export interface CapabilityStatus {
   feature: string;
   status: string;
   message: string;
+}
+
+export type GlobalCatalogLinkKind = typeof GlobalCatalogLinkKind[keyof typeof GlobalCatalogLinkKind];
+
+
+export const GlobalCatalogLinkKind = {
+  payment_fiat: 'payment_fiat',
+  asset_network: 'asset_network',
+} as const;
+
+export type GlobalCatalogLinkMetadata = { [key: string]: unknown };
+
+export interface GlobalCatalogLink {
+  kind: GlobalCatalogLinkKind;
+  /** @pattern ^[A-Za-z0-9:_-]{1,220}$ */
+  id: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  sourceId: string;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  targetId: string;
+  enabled: boolean;
+  verified: boolean;
+  metadata: GlobalCatalogLinkMetadata;
+}
+
+export interface GlobalExchangeCatalog {
+  entries: GlobalCatalogEntry[];
+  links: GlobalCatalogLink[];
+}
+
+export type GlobalCatalogDeletionKind = typeof GlobalCatalogDeletionKind[keyof typeof GlobalCatalogDeletionKind];
+
+
+export const GlobalCatalogDeletionKind = {
+  currencies: 'currencies',
+  payment_methods: 'payment_methods',
+  assets: 'assets',
+  networks: 'networks',
+} as const;
+
+export interface GlobalCatalogDeletion {
+  kind: GlobalCatalogDeletionKind;
+  /**
+     * @minLength 1
+     * @maxLength 100
+     */
+  id: string;
+}
+
+export interface GlobalCatalogPatch {
+  /** @maxItems 500 */
+  entries?: GlobalCatalogEntry[];
+  /** @maxItems 1000 */
+  links?: GlobalCatalogLink[];
+  /** @maxItems 100 */
+  deleteEntries?: GlobalCatalogDeletion[];
 }
 
 export type PlatformMethodInputKind = typeof PlatformMethodInputKind[keyof typeof PlatformMethodInputKind];

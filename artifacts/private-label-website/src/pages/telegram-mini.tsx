@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useParams } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeftRight, Banknote, Coins, Repeat, Search, ShieldCheck, WifiOff } from 'lucide-react';
+import { ArrowLeftRight, Repeat, Search, ShieldCheck, WifiOff } from 'lucide-react';
 import {
   useGetPublicSite, getGetPublicSiteQueryKey, useGetPublicTelegramMiniConfig, getGetPublicTelegramMiniConfigQueryKey,
   trackSandboxOrder,
@@ -15,8 +15,8 @@ import { websitePreviewRequest } from '@/lib/development-preview';
 
 type Item = ExchangeTab | 'tracking';
 const ALL: Item[] = [...TAB_ORDER, 'tracking'];
-const LABEL: Record<Item, string> = { swap: 'Swap', buy: 'Buy', sell: 'Sell', convert: 'Convert', tracking: 'Tracking' };
-const ICON: Record<Item, typeof Repeat> = { swap: Repeat, buy: Coins, sell: Banknote, convert: ArrowLeftRight, tracking: Search };
+const LABEL: Record<Item, string> = { swap: 'Swap', convert: 'Convert', tracking: 'Tracking' };
+const ICON: Record<Item, typeof Repeat> = { swap: Repeat, convert: ArrowLeftRight, tracking: Search };
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
 interface TgHost { ready?: () => void; expand?: () => void; colorScheme: 'light' | 'dark'; onEvent?: (e: string, cb: () => void) => void; offEvent?: (e: string, cb: () => void) => void }

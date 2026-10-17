@@ -70,7 +70,8 @@ export async function readAddon(client: DatabaseClient, id: string) {
 }
 export async function listDefinitions(principal: Principal) {
   if (principal.role === "unassigned") throw new HttpError(403, "Administrator access required.");
-  return withDatabase({ actorId: principal.userId, isSuperAdmin: principal.role === "super_admin" }, definitions);
+  return withDatabase({ actorId: principal.userId, isSuperAdmin: principal.role === "super_admin" }, async c =>
+    (await definitions(c)).filter(d => !["buy","sell"].includes(d.key)));
 }
 export function listPlans(principal: Principal) {
   requireSuperAdmin(principal);

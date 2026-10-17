@@ -9,13 +9,14 @@ import { containsCredential, PROVIDER_CATALOG } from "./providers";
 import { isImportedVisualUrl } from "./visual-assets";
 import { validatePricingRules } from "./pricing-rules";
 import { validateWallets } from "./wallets";
+import { applyGlobalAvailability, selectedFiats, isFiat, validActionPair, methodCurrencies } from "./global-catalog";
 
 function safeExchangeLogo(value: string | null) {
   if (value && isImportedVisualUrl(value)) return;
   safeHttps(value);
 }
 
-export const ACTIONS = ["swap", "convert", "buy", "sell"] as const;
+export const ACTIONS = ["swap", "convert"] as const;
 export function emptySettings(): ExchangeSettings {
   return { enabled: false, defaultAction: "swap", publicNote: "", fiatCurrency: "USD", fiatPlanRate: "0",
     actions: { swap: false, convert: false, buy: false, sell: false },
@@ -24,12 +25,19 @@ export function emptySettings(): ExchangeSettings {
 export async function readExchange(client: DatabaseClient, tenantId: string) {
   const rows = await client.query("SELECT configuration FROM tenant_product_configuration WHERE tenant_id=$1 AND module_key='crypto_exchange'", [tenantId]);
   const raw = rows.rows[0]?.configuration ?? {};
-  const configuration = SaveExchangeConfigurationBody.parse({ ...emptySettings(), ...raw });
+  const configuration = await applyGlobalAvailability(client,SaveExchangeConfigurationBody.parse({ ...emptySettings(), ...raw }));
   const catalog = (await client.query(
-    `SELECT c.id AS "assetNetworkId",c.asset_id AS "assetId",a.symbol,a.name,c.network_id AS "networkId",n.name AS "networkName",n.testnet
+    `SELECT c.id AS "assetNetworkId",c.asset_id AS "assetId",a.symbol,a.name,c.network_id AS "networkId",n.name AS "networkName",n.testnet,
+     (l.metadata->>'decimals')::integer AS decimals, l.metadata->>'contractAddress' AS "contractAddress",
+     coalesce((l.metadata->>'native')::boolean,false) AS native,
+     coalesce((l.metadata->>'memoRequired')::boolean,false) AS "memoRequired",l.metadata->>'addressFormat' AS "addressFormat"
      FROM tenant_asset_networks t JOIN asset_network_catalog c ON c.id=t.asset_network_id
      JOIN asset_catalog a ON a.id=c.asset_id JOIN network_catalog n ON n.id=c.network_id
-     WHERE t.tenant_id=$1 ORDER BY a.symbol,n.name`, [tenantId])).rows as ExchangeCatalogAsset[];
+     LEFT JOIN global_exchange_catalog_links l ON l.kind='asset_network' AND l.source_id=c.asset_id AND l.target_id=c.network_id
+      WHERE t.tenant_id=$1 ORDER BY a.symbol,n.name`, [tenantId])).rows.map(row=>{
+        const {decimals,...rest}=row;
+        return {...rest,...(decimals==null?{}:{decimals})};
+      }) as ExchangeCatalogAsset[];
   return { configuration, catalog, providerCatalog: PROVIDER_CATALOG };
 }
 function unique(values: string[], label: string) {
@@ -74,23 +82,31 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
   }
   for (const m of s.paymentMethods) {
     if (!m.label.trim()) throw new HttpError(400, "Payment method label is required.");
-    if (m.currency !== s.fiatCurrency) throw new HttpError(400, "Payment method currency must match exchange fiat currency.");
-    if (m.enabled && m.buy) requireFeature(e, "buy");
-    if (m.enabled && m.sell) requireFeature(e, "sell");
+    if (m.enabled && methodCurrencies(m).some(f => !selectedFiats(s).includes(f))) throw new HttpError(400, "Payment method currencies must be selected in this exchange.");
     safeExchangeLogo(m.logoUrl ?? null);
     if (m.maximum != null && decimal(m.maximum) < decimal(m.minimum ?? "0")) throw new HttpError(400, "Payment method maximum must be at least its minimum.");
   }
-  const fiat = `fiat:${s.fiatCurrency}`;
-  const validEndpoint = (id: string) => id === fiat || s.networks.some(n => n.assetNetworkId === id);
+  if (s.actions.buy || s.actions.sell) throw new HttpError(400, "Buy and Sell are retired. Configure Crypto/Fiat Swap or Crypto/Crypto Convert.");
+  const validEndpoint = (id: string) => isFiat(id) ? selectedFiats(s).includes(id.slice(5)) : s.networks.some(n => n.assetNetworkId === id);
   for (const r of s.routes) {
-    if (r.source === r.destination || !validEndpoint(r.source) || !validEndpoint(r.destination)) throw new HttpError(400, "Routes require distinct, configured source and destination endpoints.");
-    if ((r.action === "buy" && (r.source !== fiat || r.destination === fiat)) ||
-        (r.action === "sell" && (r.destination !== fiat || r.source === fiat)) ||
-        (["swap", "convert"].includes(r.action) && (r.source === fiat || r.destination === fiat))) throw new HttpError(400, "Route endpoints do not match its exchange action.");
+    if (r.enabled && (r.source === r.destination || !validEndpoint(r.source) || !validEndpoint(r.destination))) throw new HttpError(400, "Routes require distinct, configured source and destination endpoints.");
+    if (r.enabled && !validActionPair(r.action,r.source,r.destination)) throw new HttpError(400, "Swap requires Crypto/Fiat; Convert requires Crypto/Crypto.");
+    if (r.enabled && r.action === "swap" && !r.paymentMethodIds.some(id => s.paymentMethods.some(m =>
+       m.id === id && m.enabled && methodCurrencies(m).includes((isFiat(r.source) ? r.source : r.destination).slice(5)))))
+       throw new HttpError(400, "An enabled Swap route requires a compatible enabled payment method.");
     if (decimal(r.rate) <= 0n || decimal(r.maximum) < decimal(r.minimum) || decimal(r.maximum) === 0n) throw new HttpError(400, "Set a positive rate and valid nonzero route limits.");
     if (r.enabled) requireFeature(e, r.action);
     if (r.paymentMethodIds.some(id => !s.paymentMethods.some(m => m.id === id))) throw new HttpError(400, "Route payment method does not belong to this exchange.");
     assignment(r.providerId, r.action);
+  }
+  for (const action of ACTIONS) {
+    const pair = s.defaultPairs?.[action];
+    if (!pair) continue;
+    const r = s.routes.find(r => r.enabled && r.action === action && r.source === pair.source && r.destination === pair.destination);
+    if (!r || !validActionPair(action,pair.source,pair.destination)) throw new HttpError(400, `Default ${action} pair must have an enabled compatible route.`);
+    if (action === "swap" && (!pair.paymentMethodId || !r.paymentMethodIds.includes(pair.paymentMethodId) ||
+      !s.paymentMethods.some(m => m.enabled && m.id === pair.paymentMethodId && methodCurrencies(m).includes(
+        (isFiat(pair.source) ? pair.source : pair.destination).slice(5))))) throw new HttpError(400, "Default Swap payment method is not compatible.");
   }
   return s;
 }

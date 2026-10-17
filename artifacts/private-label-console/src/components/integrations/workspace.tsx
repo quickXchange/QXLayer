@@ -14,7 +14,7 @@ import { Switch } from '@/components/ui/switch';
 import { usePrincipal } from '@/lib/principal';
 
 type Def = IntegrationRuntimeBundle['definitions'][number];
-const MENU = ['swap', 'buy', 'sell', 'convert', 'tracking'] as const;
+const MENU = ['swap', 'convert', 'tracking'] as const;
 const KINDS = ['evm', 'tron', 'solana', 'bitcoin'] as const;
 const MGMT: [string, string][] = [['super_admin', 'Super Admin only'], ['customer', 'Customer only'], ['both', 'Super Admin and customer']];
 const str = (v: unknown) => (typeof v === 'string' ? v : v == null ? '' : String(v));

@@ -63,6 +63,8 @@ import type {
   ExchangeWalletScanInput,
   GetDomainHostingProof200,
   GetPhase1Catalog200,
+  GlobalCatalogPatch,
+  GlobalExchangeCatalog,
   HealthStatus,
   IntegrationRuntimeBundle,
   LandingProduct,
@@ -145,6 +147,33 @@ import type {
 import { customFetch } from '../custom-fetch';
 import type { ErrorType , BodyType } from '../custom-fetch';
 
+// https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
+type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
+T,
+>() => T extends Y ? 1 : 2
+? A
+: B;
+
+type WritableKeys<T> = {
+[P in keyof T]-?: IfEquals<
+  { [Q in P]: T[P] },
+  { -readonly [Q in P]: T[P] },
+  P
+>;
+}[keyof T];
+
+type UnionToIntersection<U> =
+  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
+type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
+
+type Writable<T> = Pick<T, WritableKeys<T>>;
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
+  [P in keyof Writable<T>]: T[P] extends object
+    ? NonReadonly<NonNullable<T[P]>>
+    : T[P];
+} : DistributeReadOnlyOverUnions<T>;
+
+
 type AwaitedInput<T> = PromiseLike<T> | T;
 
       type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
@@ -168,6 +197,159 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetGlobalExchangeCatalogUrl = () => {
+
+
+
+
+  return `/api/exchange/catalog`
+}
+
+export const getGlobalExchangeCatalog = async ( options?: Parameters<typeof customFetch>[1]): Promise<GlobalExchangeCatalog> => {
+
+  return customFetch<GlobalExchangeCatalog>(getGetGlobalExchangeCatalogUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetGlobalExchangeCatalogQueryKey = () => {
+    return [
+    `/api/exchange/catalog`
+    ] as const;
+    }
+
+
+export const getGetGlobalExchangeCatalogQueryOptions = <TData = Awaited<ReturnType<typeof getGlobalExchangeCatalog>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGlobalExchangeCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetGlobalExchangeCatalogQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getGlobalExchangeCatalog>>> = ({ signal }) => getGlobalExchangeCatalog({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getGlobalExchangeCatalog>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetGlobalExchangeCatalogQueryResult = NonNullable<Awaited<ReturnType<typeof getGlobalExchangeCatalog>>>
+export type GetGlobalExchangeCatalogQueryError = ErrorType<unknown>
+
+
+
+export function useGetGlobalExchangeCatalog<TData = Awaited<ReturnType<typeof getGlobalExchangeCatalog>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getGlobalExchangeCatalog>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetGlobalExchangeCatalogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPatchGlobalExchangeCatalogUrl = () => {
+
+
+
+
+  return `/api/operator/exchange/catalog`
+}
+
+export const patchGlobalExchangeCatalog = async (globalCatalogPatch: GlobalCatalogPatch, options?: Parameters<typeof customFetch>[1]): Promise<GlobalExchangeCatalog> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<GlobalExchangeCatalog>(getPatchGlobalExchangeCatalogUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(globalCatalogPatch)
+  }
+);}
+
+
+
+
+
+export const getPatchGlobalExchangeCatalogMutationKey = () => ['patchGlobalExchangeCatalog'] as const;
+
+export const getPatchGlobalExchangeCatalogMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchGlobalExchangeCatalog>>, TError,PatchGlobalExchangeCatalogMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchGlobalExchangeCatalog>>, TError,PatchGlobalExchangeCatalogMutationVariables, TContext> => {
+
+const mutationKey = getPatchGlobalExchangeCatalogMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchGlobalExchangeCatalog>>, PatchGlobalExchangeCatalogMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  patchGlobalExchangeCatalog(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchGlobalExchangeCatalogMutationResult = NonNullable<Awaited<ReturnType<typeof patchGlobalExchangeCatalog>>>
+    export type PatchGlobalExchangeCatalogMutationBody = BodyType<GlobalCatalogPatch>
+    export type PatchGlobalExchangeCatalogMutationError = ErrorType<unknown>
+    export type PatchGlobalExchangeCatalogMutationVariables = {data: BodyType<GlobalCatalogPatch>}
+
+    export const usePatchGlobalExchangeCatalog = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchGlobalExchangeCatalog>>, TError,PatchGlobalExchangeCatalogMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof patchGlobalExchangeCatalog>>,
+        TError,
+        PatchGlobalExchangeCatalogMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPatchGlobalExchangeCatalogMutationOptions(options));
+    }
 
 export const getScanExchangeWalletUrl = (tenantId: string,
     walletId: string,) => {
@@ -4445,7 +4627,7 @@ export const getSaveExchangeConfigurationUrl = (tenantId: string,) => {
 }
 
 export const saveExchangeConfiguration = async (tenantId: string,
-    exchangeSettings: ExchangeSettings, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeConfiguration> => {
+    exchangeSettings: NonReadonly<ExchangeSettings>, options?: Parameters<typeof customFetch>[1]): Promise<ExchangeConfiguration> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -4504,9 +4686,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type SaveExchangeConfigurationMutationResult = NonNullable<Awaited<ReturnType<typeof saveExchangeConfiguration>>>
-    export type SaveExchangeConfigurationMutationBody = BodyType<ExchangeSettings>
+    export type SaveExchangeConfigurationMutationBody = BodyType<NonReadonly<ExchangeSettings>>
     export type SaveExchangeConfigurationMutationError = ErrorType<unknown>
-    export type SaveExchangeConfigurationMutationVariables = {tenantId: string;data: BodyType<ExchangeSettings>}
+    export type SaveExchangeConfigurationMutationVariables = {tenantId: string;data: BodyType<NonReadonly<ExchangeSettings>>}
 
     export const useSaveExchangeConfiguration = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveExchangeConfiguration>>, TError,SaveExchangeConfigurationMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}

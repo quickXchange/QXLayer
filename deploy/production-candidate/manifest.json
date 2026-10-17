@@ -1,7 +1,31 @@
 [
-  {"file":"0001_application_schema.sql","source":"../migrations/0001_application_schema.sql","sha256":"a98288bddf07dd765aee55c3be4911c943294bee8903bb9cd1516a6abe155e43"},
-  {"file":"0002_runtime_security.sql","source":"../migrations/0002_runtime_security.sql","sha256":"a264bf8bf3951addd48b94a1b137b9706b06a26c5504fa1e77fe7b3904a4139d"},
-  {"file":"0004_latest_schema.sql","source":"0004_latest-schema-PREPARED.sql","sha256":"569b6e072f87f1d581f51a0b6396817108f71e4e7f29183cffee3a5b7b828514"},
-  {"file":"0005_auth_runtime.sql","source":"0005_auth_runtime.sql","sha256":"47badb3347827e3765afc7ac1db0960f2e45c780f84dcd1dafdaee3aef06df90"},
-  {"file":"0006_plan_entitlements.sql","sha256":"eaf978303aef346c19d8cfe741bcd5a1ed8c499ee57c2aca482bb1a434371ce8"}
+  {
+    "file": "0001_application_schema.sql",
+    "source": "../migrations/0001_application_schema.sql",
+    "sha256": "a98288bddf07dd765aee55c3be4911c943294bee8903bb9cd1516a6abe155e43"
+  },
+  {
+    "file": "0002_runtime_security.sql",
+    "source": "../migrations/0002_runtime_security.sql",
+    "sha256": "a264bf8bf3951addd48b94a1b137b9706b06a26c5504fa1e77fe7b3904a4139d"
+  },
+  {
+    "file": "0004_latest_schema.sql",
+    "source": "0004_latest-schema-PREPARED.sql",
+    "sha256": "569b6e072f87f1d581f51a0b6396817108f71e4e7f29183cffee3a5b7b828514"
+  },
+  {
+    "file": "0005_auth_runtime.sql",
+    "source": "0005_auth_runtime.sql",
+    "sha256": "47badb3347827e3765afc7ac1db0960f2e45c780f84dcd1dafdaee3aef06df90"
+  },
+  {
+    "file": "0006_plan_entitlements.sql",
+    "sha256": "eaf978303aef346c19d8cfe741bcd5a1ed8c499ee57c2aca482bb1a434371ce8"
+  },
+  {
+    "file": "0007_global_exchange_catalog.sql",
+    "sha256": "7f9831fbfa0cd904da08d7b8d6d251a0d3e4378500716b25ca943432dee3e2fc",
+    "source": "../migrations/0007_global_exchange_catalog.sql"
+  }
 ]

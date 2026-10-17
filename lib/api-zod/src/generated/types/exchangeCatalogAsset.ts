@@ -7,6 +7,17 @@
  */
 
 export interface ExchangeCatalogAsset {
+  /**
+     * @minimum 0
+     * @maximum 18
+     */
+  decimals?: number;
+  /** @nullable */
+  contractAddress?: string | null;
+  native?: boolean;
+  memoRequired?: boolean;
+  /** @nullable */
+  addressFormat?: string | null;
   assetNetworkId: string;
   assetId: string;
   symbol: string;
