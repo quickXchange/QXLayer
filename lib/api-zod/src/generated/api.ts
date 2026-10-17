@@ -6250,6 +6250,53 @@ export const SetStaffPermissionsResponse = zod.object({
 })
 
 
+export const ListCustomerDomainsResponseItem = zod.object({
+  "tenantId": zod.string().uuid(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "tenantStatus": zod.string(),
+  "domain": zod.string().nullable(),
+  "status": zod.string(),
+  "deliveryStatus": zod.string(),
+  "requestId": zod.string().uuid().nullable()
+})
+export const ListCustomerDomainsResponse = zod.array(ListCustomerDomainsResponseItem)
+
+
+export const ManageTenantDomainHostingParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const ManageTenantDomainHostingBody = zod.object({
+  "action": zod.enum(['register', 'refresh'])
+})
+
+export const ManageTenantDomainHostingResponse = zod.object({
+  "domain": zod.string().nullable(),
+  "status": zod.enum(['unconfigured', 'unverified', 'verified']),
+  "txtName": zod.string().nullable(),
+  "txtValue": zod.string().nullable(),
+  "hostingConnected": zod.boolean(),
+  "httpsReady": zod.boolean().optional(),
+  "hostingCheckedAt": zod.coerce.date().nullish(),
+  "hostingError": zod.string().nullish(),
+  "websiteUrl": zod.string().nullish(),
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
+})
+
+
 export const GetDomainVerificationParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
@@ -6264,7 +6311,19 @@ export const GetDomainVerificationResponse = zod.object({
   "hostingCheckedAt": zod.coerce.date().nullish(),
   "hostingError": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
-  "instructions": zod.array(zod.string()).optional()
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
 })
 
 
@@ -6282,7 +6341,19 @@ export const VerifyTenantDomainResponse = zod.object({
   "hostingCheckedAt": zod.coerce.date().nullish(),
   "hostingError": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
-  "instructions": zod.array(zod.string()).optional()
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
 })
 
 
@@ -6300,7 +6371,19 @@ export const CheckTenantDomainHostingResponse = zod.object({
   "hostingCheckedAt": zod.coerce.date().nullish(),
   "hostingError": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
-  "instructions": zod.array(zod.string()).optional()
+  "instructions": zod.array(zod.string()).optional(),
+  "hostingProvider": zod.enum(['vercel', 'replit']).optional(),
+  "providerManagementAvailable": zod.boolean().optional(),
+  "providerRegistered": zod.boolean().optional(),
+  "providerVerified": zod.boolean().optional(),
+  "providerCheckedAt": zod.coerce.date().nullish(),
+  "providerError": zod.string().nullish(),
+  "dnsRecords": zod.array(zod.object({
+  "type": zod.string(),
+  "name": zod.string(),
+  "value": zod.string(),
+  "purpose": zod.string()
+})).optional()
 })
 
 

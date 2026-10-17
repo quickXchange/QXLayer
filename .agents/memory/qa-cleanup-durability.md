@@ -60,3 +60,14 @@ removed. The broad fingerprint assertion failed solely on throttle state.
 **How to apply:** Compare original business/account records and RLS/grants
 strictly; permit only explicitly reported authentication-counter progression.
 Keep the original baseline intact and record the exception in final evidence.
+
+A failed fixture setup is still active data. Resume its tracked resources or
+complete its scoped cleanup before replaying setup.
+
+**Why:** A verifier failed after creating a customer domain and synthetic billing
+records. Replaying setup created another tenant and collided with the retained
+domain even though the earlier run had been reported as failed.
+
+**How to apply:** Validate fixture inputs before creating resources, persist scope
+as resources are created, and reconcile public and approved private-schema
+dependencies before starting fresh. Never broaden cleanup to unrelated records.

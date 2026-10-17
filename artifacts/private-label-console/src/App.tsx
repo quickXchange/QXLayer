@@ -30,7 +30,7 @@ const NotProvisioned = lazy(() => import('@/pages/account').then(m => ({ default
 const WhiteLabelRequests = lazy(() => import('@/pages/white-label-requests'));
 const WhiteLabelOrder = lazy(() => import('@/pages/white-label-order'));
 const AccountOrderDetail = lazy(() => import('@/pages/account-order'));
-import { useParams } from 'wouter';
+import { Link, useParams } from 'wouter';
 const Admin = lazy(() => import('@/pages/admin'));
 const Clients = lazy(() => import('@/pages/clients'));
 const ClientNew = lazy(() => import('@/pages/client-new'));
@@ -39,6 +39,7 @@ const Exchange = lazy(() => import('@/pages/exchange'));
 const Modules = lazy(() => import('@/pages/modules'));
 const Activity = lazy(() => import('@/pages/activity'));
 const WhiteLabels = lazy(() => import('@/pages/white-labels'));
+const CustomerDomains = lazy(() => import('@/pages/customer-domains'));
 const Provisioning = lazy(() => import('@/pages/provisioning'));
 const Integrations = lazy(() => import('@/pages/integrations'));
 const TenantIntegrations = lazy(() => import('@/pages/integrations').then(m => ({ default: m.TenantIntegrations })));
@@ -87,7 +88,9 @@ function HomeRedirect() {
 
 function PrincipalGate({ children }: { children: ReactNode }) {
   const [location] = useLocation();
-  const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(), refetchInterval: query => externalStaging && query.state.error ? false : 10000 } });
+  const q = useGetCurrentPrincipal({ query: { queryKey: getGetCurrentPrincipalQueryKey(),
+    retry: (count, error) => ![401, 403, 428].includes((error as { status?: number }).status ?? 0) && count < 1,
+    refetchInterval: query => externalStaging && query.state.error ? false : 10000 } });
   const { signOut } = useAccountAuth();
   const qc = useQueryClient();
   let demoTab = false;
@@ -99,9 +102,9 @@ function PrincipalGate({ children }: { children: ReactNode }) {
       window.location.assign(import.meta.env.BASE_URL);
     }
   };
-  if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" /></div></ConsoleThemeScope>;
-  if (demoTab && q.data && !q.data.demo) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   if ((q.error as { status?: number } | null)?.status === 428) return <Redirect to="/account/security" replace={supabaseAuth} />;
+  if (q.isLoading) return <ConsoleThemeScope><div className="space-y-3 p-10"><BrandLogo size={48} /><Skeleton className="h-10 w-64" /><Skeleton className="h-64 w-full" />{supabaseAuth && <Link href="/account/security" className="inline-block text-sm underline" data-testid="link-pending-security">Account security and two-factor setup</Link>}</div></ConsoleThemeScope>;
+  if (demoTab && q.data && !q.data.demo) return <ConsoleThemeScope><Skeleton className="m-10 h-64" /></ConsoleThemeScope>;
   if (q.isError || !q.data) {
     return (
       <ConsoleThemeScope><div className="grid min-h-[100dvh] place-items-center px-5 text-center">
@@ -166,7 +169,7 @@ const guard = (C: ComponentType) => () => <Protected><SuperOnly><C /></SuperOnly
 const open = (C: ComponentType) => () => <Protected><C /></Protected>;
 const rTenantInt = () => <Protected><DeliveredOnly><TenantIntegrations /></DeliveredOnly></Protected>;
 const rDelivered = () => <Protected><DeliveredOnly><Exchange /></DeliveredOnly></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rProv = guard(Provisioning), rProviders = guard(Providers), rInt = guard(Integrations), rCust = guard(CustomerDetail);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rCD = guard(CustomerDomains), rProv = guard(Provisioning), rProviders = guard(Providers), rInt = guard(Integrations), rCust = guard(CustomerDetail);
 const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile), rOrdD = open(AccountOrderDetail);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -205,6 +208,7 @@ function AppRoutes() {
               <Route path="/white-label-requests" component={rWL} />
               <Route path="/white-label-requests/:orderId" component={rWLO} />
               <Route path="/white-labels" component={rWLs} />
+              <Route path="/customer-domains" component={rCD} />
               <Route path="/provisioning" component={rProv} />
               <Route path="/providers" component={rProviders} />
               <Route path="/integrations" component={rInt} />

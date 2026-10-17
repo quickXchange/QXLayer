@@ -39,3 +39,15 @@ was correct.
 login checks. Do not grant new role memberships or schema privileges merely to
 repair the verifier. Roll back runtime write probes after checking denials and
 authorized writes.
+
+Treat the server's tenant context as an authorization capability, not as
+untrusted browser input, when interpreting isolation probes.
+
+**Why:** A raw SQL probe supplied an outsider with another tenant's trusted
+context and incorrectly expected actor-only denial. This does not represent a
+client request; the application must first refuse to issue that tenant context.
+
+**How to apply:** Verify foreign-context issuance is denied by the real principal
+checks, then probe SQL with the principal's legitimate tenant or empty context.
+Report application authorization plus scoped RLS accurately; do not claim RLS
+independently protects against a compromised backend forging trusted settings.

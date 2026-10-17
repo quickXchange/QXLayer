@@ -112,7 +112,7 @@ export function DomainSection({ tenant, readOnly, onSaved, saveLabel }: SP) {
   const bad = v !== '' && !/^(?!-)[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(v);
   return (
     <form onSubmit={(e) => { e.preventDefault(); gM({ tenantId: tenant.id, data: { domain: v || null } }, { onSuccess: () => save.ok('Domain'), onError: save.fail }); }}>
-      <Section n="02" title="Domain" note="Saved as unverified configuration. DNS is not checked and nothing is served."
+      <Section n="02" title="Domain" note="Saving stores the domain as unverified. Ownership is verified independently with a TXT record, and HTTPS is proven separately after hosting is registered."
         footer={<>{bad && <span role="alert" className="mr-auto text-sm text-destructive">Enter a hostname like app.example.com</span>}<SaveBtn id="domain" pending={m.isPending} disabled={bad} readOnly={readOnly} label={saveLabel ?? (v ? 'Save domain' : 'Save without domain')} /></>}>
         <div className="space-y-1.5"><Label>Custom domain (optional)</Label>
           <Input data-testid="input-domain" disabled={readOnly} className="font-mono" placeholder="app.example.com" value={d} onChange={(e) => setD(e.target.value)} /></div>

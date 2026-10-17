@@ -30,10 +30,12 @@ import type {
   CapabilityStatus,
   CurrentPrincipal,
   CustomerAdminPanel,
+  CustomerDomain,
   CustomerNotifications,
   DeletePhase1Method200,
   DemoLaunchInput,
   DemoSession,
+  DomainHostingAction,
   DomainInput,
   DomainVerification,
   EntitlementDefinition,
@@ -6617,6 +6619,160 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSetStaffPermissionsMutationOptions(options));
+    }
+
+export const getListCustomerDomainsUrl = () => {
+
+
+
+
+  return `/api/operator/customer-domains`
+}
+
+export const listCustomerDomains = async ( options?: Parameters<typeof customFetch>[1]): Promise<CustomerDomain[]> => {
+
+  return customFetch<CustomerDomain[]>(getListCustomerDomainsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListCustomerDomainsQueryKey = () => {
+    return [
+    `/api/operator/customer-domains`
+    ] as const;
+    }
+
+
+export const getListCustomerDomainsQueryOptions = <TData = Awaited<ReturnType<typeof listCustomerDomains>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCustomerDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListCustomerDomainsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCustomerDomains>>> = ({ signal }) => listCustomerDomains({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listCustomerDomains>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListCustomerDomainsQueryResult = NonNullable<Awaited<ReturnType<typeof listCustomerDomains>>>
+export type ListCustomerDomainsQueryError = ErrorType<unknown>
+
+
+
+export function useListCustomerDomains<TData = Awaited<ReturnType<typeof listCustomerDomains>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listCustomerDomains>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListCustomerDomainsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getManageTenantDomainHostingUrl = (tenantId: string,) => {
+
+
+
+
+  return `/api/tenants/${tenantId}/domain-hosting-provider`
+}
+
+export const manageTenantDomainHosting = async (tenantId: string,
+    domainHostingAction: DomainHostingAction, options?: Parameters<typeof customFetch>[1]): Promise<DomainVerification> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<DomainVerification>(getManageTenantDomainHostingUrl(tenantId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(domainHostingAction)
+  }
+);}
+
+
+
+
+
+export const getManageTenantDomainHostingMutationKey = () => ['manageTenantDomainHosting'] as const;
+
+export const getManageTenantDomainHostingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof manageTenantDomainHosting>>, TError,ManageTenantDomainHostingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof manageTenantDomainHosting>>, TError,ManageTenantDomainHostingMutationVariables, TContext> => {
+
+const mutationKey = getManageTenantDomainHostingMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof manageTenantDomainHosting>>, ManageTenantDomainHostingMutationVariables> = (props) => {
+          const {tenantId,data} = props ?? {};
+
+          return  manageTenantDomainHosting(tenantId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ManageTenantDomainHostingMutationResult = NonNullable<Awaited<ReturnType<typeof manageTenantDomainHosting>>>
+    export type ManageTenantDomainHostingMutationBody = BodyType<DomainHostingAction>
+    export type ManageTenantDomainHostingMutationError = ErrorType<unknown>
+    export type ManageTenantDomainHostingMutationVariables = {tenantId: string;data: BodyType<DomainHostingAction>}
+
+    export const useManageTenantDomainHosting = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof manageTenantDomainHosting>>, TError,ManageTenantDomainHostingMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof manageTenantDomainHosting>>,
+        TError,
+        ManageTenantDomainHostingMutationVariables,
+        TContext
+      > => {
+      return useMutation(getManageTenantDomainHostingMutationOptions(options));
     }
 
 export const getGetDomainVerificationUrl = (tenantId: string,) => {

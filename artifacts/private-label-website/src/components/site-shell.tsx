@@ -122,6 +122,7 @@ function Footer({ site, nav }: { site: PublicSite; nav: { id: string; label: str
           <Link href={`${base}/privacy`} className={lk} data-testid="link-privacy">Privacy policy</Link>
           <Link href={`${base}/terms`} className={lk} data-testid="link-terms">Terms of service</Link>
           {ws.socialLinks.map((l) => <a key={l.url} className={lk} href={l.url} target="_blank" rel="noreferrer noopener">{l.label}</a>)}
+          {(ws.reviewLinks ?? []).map((l, i) => <a key={`review-${i}`} className={lk} href={l.url} target="_blank" rel="noreferrer noopener" data-testid={`link-review-${i}`}>{l.label}</a>)}
         </div>
       </div>
       <div className="border-t" style={{ borderColor: 'var(--s-line)' }}>

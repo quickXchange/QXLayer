@@ -5,6 +5,8 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { DomainDnsRecord } from './domainDnsRecord';
+import type { DomainVerificationHostingProvider } from './domainVerificationHostingProvider';
 import type { DomainVerificationStatus } from './domainVerificationStatus';
 
 export interface DomainVerification {
@@ -24,4 +26,13 @@ export interface DomainVerification {
   /** @nullable */
   websiteUrl?: string | null;
   instructions?: string[];
+  hostingProvider?: DomainVerificationHostingProvider;
+  providerManagementAvailable?: boolean;
+  providerRegistered?: boolean;
+  providerVerified?: boolean;
+  /** @nullable */
+  providerCheckedAt?: Date | null;
+  /** @nullable */
+  providerError?: string | null;
+  dnsRecords?: DomainDnsRecord[];
 }

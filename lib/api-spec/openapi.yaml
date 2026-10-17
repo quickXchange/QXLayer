@@ -681,6 +681,34 @@ paths:
           content:
             application/json:
               schema: {$ref: "#/components/schemas/MutationStatus"}
+  /operator/customer-domains:
+    get:
+      operationId: listCustomerDomains
+      tags: [domains]
+      responses:
+        "200":
+          description: Super Admin tenant domain and delivery inventory
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: "#/components/schemas/CustomerDomain"}
+  /tenants/{tenantId}/domain-hosting-provider:
+    post:
+      operationId: manageTenantDomainHosting
+      tags: [domains]
+      parameters: [{name: tenantId, in: path, required: true, schema: {type: string, format: uuid}}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/DomainHostingAction"}
+      responses:
+        "200":
+          description: Protected hosting registration status; no DNS records are changed
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/DomainVerification"}
   /tenants/{tenantId}/domain-verification:
     get:
       operationId: getDomainVerification
@@ -2277,6 +2305,31 @@ components:
           maxItems: 4
           items: {type: string, enum: [branding.manage, domains.manage, configuration.manage, resources.manage]}
       required: [permissions]
+    DomainHostingAction:
+      type: object
+      required: [action]
+      properties:
+        action: {type: string, enum: [register, refresh]}
+    CustomerDomain:
+      type: object
+      required: [tenantId, name, slug, tenantStatus, domain, status, deliveryStatus, requestId]
+      properties:
+        tenantId: {type: string, format: uuid}
+        name: {type: string}
+        slug: {type: string}
+        tenantStatus: {type: string}
+        domain: {type: ["string", "null"]}
+        status: {type: string}
+        deliveryStatus: {type: string}
+        requestId: {type: ["string", "null"], format: uuid}
+    DomainDnsRecord:
+      type: object
+      required: [type, name, value, purpose]
+      properties:
+        type: {type: string}
+        name: {type: string}
+        value: {type: string}
+        purpose: {type: string}
     DomainVerification:
       type: object
       properties:
@@ -2290,6 +2343,13 @@ components:
         hostingError: {type: ["string", "null"]}
         websiteUrl: {type: ["string", "null"]}
         instructions: {type: array, items: {type: string}}
+        hostingProvider: {type: string, enum: [vercel, replit]}
+        providerManagementAvailable: {type: boolean}
+        providerRegistered: {type: boolean}
+        providerVerified: {type: boolean}
+        providerCheckedAt: {type: ["string", "null"], format: date-time}
+        providerError: {type: ["string", "null"]}
+        dnsRecords: {type: array, items: {$ref: "#/components/schemas/DomainDnsRecord"}}
       required: [domain, status, txtName, txtValue, hostingConnected]
     WhiteLabelProvisioning:
       type: object

@@ -6,10 +6,13 @@ import { testQuickexCredentials } from "./vendor/quickex/quickex";
 
 // Read-only bridge extracted from the verified QuickXchange transport implementations.
 // Credential lookup, nonce allocation and diagnostic persistence are injected tenant boundaries.
-export async function testProvider(key: string, settings: Record<string, any>, secrets: Record<string, string>, nonce?: number) {
+export async function testProvider(key: string, settings: Record<string, any>, secrets: Record<string, string>, nonce?: number, fetcher: typeof fetch = fetch) {
   const read = async (url: string, init: RequestInit = {}) => {
-    const r = await fetch(url, { ...init, redirect: "error", signal: AbortSignal.timeout(12000) });
-    if (!r.ok) throw new HttpError(502, r.status === 401 || r.status === 403 ? "Provider rejected authentication or account permissions." : "Provider request failed.");
+    const r = await fetcher(url, { ...init, redirect: "error", signal: AbortSignal.timeout(12000) });
+    if (!r.ok) throw new HttpError(502, r.status === 401 || r.status === 403
+      ? "Provider rejected authentication or account permissions. Check the key pair, read-only API permissions and the provider IP allowlist."
+      : r.status === 429 ? "Provider rate limit reached. Wait before testing again."
+      : "Provider request failed. Retry later or check provider service status.");
     return r.json();
   };
   if (key === "1forge") {

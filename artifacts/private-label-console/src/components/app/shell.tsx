@@ -13,6 +13,7 @@ const nav = [
   { href: '/admin', label: 'Overview', icon: LayoutGrid },
   { href: '/white-label-requests', label: 'White Label Orders', icon: ScrollText, op: true, group: 'White Labels' },
   { href: '/white-labels', label: 'White Labels', icon: Globe2, op: true, group: 'White Labels' },
+  { href: '/customer-domains', label: 'Customer Domains', icon: Globe2, op: true, group: 'White Labels' },
   { href: '/clients', label: 'Clients', icon: Users, group: 'White Labels' },
   { href: '/plans', label: 'Plans', icon: Boxes, op: true, group: 'Commercial' },
   { href: '/add-ons', label: 'Add-ons', icon: Puzzle, op: true, group: 'Commercial' },

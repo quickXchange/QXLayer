@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGatedMutate } from '@/components/super-admin/review-gate';
 import {
-  useGetDomainVerification, getGetDomainVerificationQueryKey, useVerifyTenantDomain, useCheckTenantDomainHosting, useSetStaffPermissions,
+  useGetDomainVerification, getGetDomainVerificationQueryKey, useVerifyTenantDomain, useCheckTenantDomainHosting, useManageTenantDomainHosting, useSetStaffPermissions,type DomainVerification,
   useListTenantResources, getListTenantResourcesQueryKey, useListProductRegistry, useGetProductConfiguration, getGetProductConfigurationQueryKey,
   useSetProductConfiguration, useListTenantAdministrators, getListTenantAdministratorsQueryKey, useAssignTenantAdministrator, useSetTenantAdministratorStatus, type Tenant, type SubscriptionView, type ProductModule,
 } from '@workspace/api-client-react';
@@ -19,12 +19,32 @@ import { Section } from './sections';
 
 const RO = <span className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Read only for your role</span>;
 
+function copy(v: string, t: (a: { title: string }) => void) { void navigator.clipboard?.writeText(v).then(() => t({ title: 'Copied' })); }
+
+export function DnsRecordList({ d }: { d: DomainVerification }) {
+  const { toast } = useToast();
+  const recs = d.dnsRecords ?? [];
+  if (recs.length === 0) return null;
+  return (
+    <div className="space-y-2 rounded-md border p-3 text-sm" data-testid="list-dns-records">
+      <p>{d.hostingProvider === 'vercel' ? 'Vercel hosting: add these exact records at your DNS provider.' : 'Add these exact records at your DNS provider.'}</p>
+      {recs.map((r, i) => (
+        <div key={i} className="flex flex-wrap items-center gap-2 font-mono text-xs" data-testid={`row-dns-record-${i}`}>
+          <span className="uppercase text-copper">{r.type}</span><span className="break-all">{r.name}</span><span className="break-all text-muted-foreground">{r.value}</span>
+          <Button size="sm" variant="ghost" onClick={() => copy(r.value, toast)} data-testid={`button-copy-dns-${i}`}>Copy value</Button>
+          <span className="w-full font-sans text-muted-foreground">{r.purpose}</span>
+        </div>))}
+    </div>
+  );
+}
+
 export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; readOnly?: boolean }) {
   const q = useGetDomainVerification(tenant.id);
   const m = useVerifyTenantDomain();
   const verify = useGatedMutate(m.mutate, 'Check and record domain ownership (DNS records will not be changed)');
   const hm = useCheckTenantDomainHosting();
   const checkHosting = useGatedMutate(hm.mutate, 'Check hosting and HTTPS for the saved domain (read only)');
+  const rm = useManageTenantDomainHosting();
   const qc = useQueryClient();
   const inv = useInvalidateTenant();
   const { toast } = useToast();
@@ -41,6 +61,7 @@ export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; r
           onSuccess: (r) => { qc.setQueryData(getGetDomainVerificationQueryKey(tenant.id), r); qc.invalidateQueries({ queryKey: getGetDomainVerificationQueryKey(tenant.id) }); inv(tenant.id); toast({ title: r.status === 'verified' ? 'Domain verified' : 'TXT record not found yet', description: r.status === 'verified' ? undefined : 'DNS changes can take time to propagate.' }); },
           onError: (e) => toast({ title: 'Verification failed', description: (e as Error).message, variant: 'destructive' }),
         })}>{m.isPending ? 'Checking DNS' : 'Check DNS record'}</Button></div>}>
+      {m.isError && <p role="alert" className="rounded border border-destructive/40 p-3 text-sm text-destructive" data-testid="text-dns-verification-error">{(m.error as { data?: { error?: string }; message?: string })?.data?.error ?? (m.error as Error)?.message ?? 'DNS ownership could not be verified. Check the TXT record and allow DNS propagation, then retry.'}</p>}
       {q.isLoading ? <Skeleton className="h-24" /> : q.isError || !d ? <ErrorState what="domain verification" onRetry={() => q.refetch()} /> : d.status === 'unconfigured' ? (
         <p className="text-sm text-muted-foreground" data-testid="text-domain-unconfigured">No domain is saved for this client. Save a domain above to receive a verification record.</p>
       ) : (
@@ -60,7 +81,12 @@ export function DomainOwnershipSection({ tenant, readOnly }: { tenant: Tenant; r
             {d.hostingError && <p role="alert" className="text-destructive [overflow-wrap:anywhere]" data-testid="text-hosting-error">{d.hostingError} Fix the records and check again.</p>}
             {d.httpsReady && d.websiteUrl && <p><a href={d.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-copper underline" data-testid="link-domain-website">{d.websiteUrl}</a></p>}
             {d.instructions && d.instructions.length > 0 && <ul className="list-disc space-y-1 pl-5" data-testid="list-hosting-instructions">{d.instructions.map((i) => <li key={i}>{i}</li>)}</ul>}
-            <p className="text-xs text-muted-foreground">An authorized publisher must register this exact hostname in Publishing, then the customer applies the DNS records Publishing provides. No records are invented here and native domain enrollment is not automatic. Replit issues and renews the certificate after DNS is correct; the backend proves HTTPS and tenant routing. The platform gate stays active: only an authoritative delivered custom site resolves independently.</p>
+            <DnsRecordList d={d} />
+            <p data-testid="text-provider-state">Provider registration: {d.providerRegistered ? (d.providerVerified ? 'registered and verified' : 'registered, not yet verified') : 'not registered'}{d.providerCheckedAt && <span className="text-muted-foreground"> . checked {new Date(d.providerCheckedAt).toLocaleString()}</span>}</p>
+            {d.providerError && <p role="alert" className="text-destructive [overflow-wrap:anywhere]">{d.providerError}</p>}
+            <Button size="sm" variant="outline" data-testid="button-refresh-provider" disabled={!d.providerManagementAvailable || rm.isPending} onClick={() => rm.mutate({ tenantId: tenant.id, data: { action: 'refresh' } }, { onSuccess: (r) => { qc.setQueryData(getGetDomainVerificationQueryKey(tenant.id), r); toast({ title: 'Provider state refreshed' }); }, onError: (e) => toast({ title: 'Refresh failed', description: (e as Error).message, variant: 'destructive' }) })}>{rm.isPending ? 'Refreshing' : 'Refresh registration state'}</Button>
+            {!d.providerManagementAvailable && <p className="text-xs text-muted-foreground">Refresh is unavailable: provider management is not configured.</p>}
+            <p className="text-xs text-muted-foreground">Three separate steps: TXT proves ownership, the operator registers the hostname with the hosting provider, then HTTPS is proven after DNS is correct. Registration is performed by the platform operator; the customer only applies the DNS records above.</p>
           </div>
         </div>)}
     </Section>

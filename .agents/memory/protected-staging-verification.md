@@ -52,6 +52,18 @@ Keep credentials in memory, wait for a bounded successful access probe, then
 let the browser follow genuine same-origin redirects. Revocation and existing
 protection readback remain required. This does not verify Clerk login.
 
+An application-gate JSON 403 is not a Vercel protection failure.
+
+**Why:** An automated browser helper stopped after an origin-scoped provider
+handshake returned `Production access required.` The request had passed Vercel
+and reached the application's own gate; its default non-HTML Accept header
+selected JSON instead of the native gate document.
+
+**How to apply:** Identify the responding layer from its body and redirects.
+After provider access succeeds, navigate a real browser page with its normal
+HTML Accept header and submit the native app gate. Never weaken provider
+protection because an API-style probe receives the expected app-gate 403.
+
 When temporary access creation is authorized for routing checks, prefer
 short-lived, deployment-scoped access over a persistent project-wide automation
 credential. Revoke it in cleanup and confirm the deployment's access entry was

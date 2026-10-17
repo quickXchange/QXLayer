@@ -17,7 +17,7 @@ const publicView = (r: Record<string, any>, p: Principal, effective?: Awaited<Re
     credentialManagement: p.role === "super_admin" ? r.credential_management : own ? "customer" : "super_admin",
     enabled: r.enabled, settings: p.role === "super_admin" ? r.settings : customerSettings(r.provider_key, r.settings),
     credentialsConfigured: own && !!r.encrypted_credentials, canManageCredentials: own,
-    revision: Number(r.revision), health: p.role === "super_admin" ? r.health : { state: r.health?.state, checkedAt: r.health?.checkedAt, message: "Tenant service status. Central configuration is managed by Super Admin." }, updatedAt: r.updated_at };
+    revision: Number(r.revision), health: p.role === "super_admin" || own ? r.health : { state: r.health?.state, checkedAt: r.health?.checkedAt, message: "Tenant service status. Central configuration is managed by Super Admin." }, updatedAt: r.updated_at };
 };
 export async function accessible(p: Principal, tenantId: string, write = false, key?: string) {
   const ctx = contextFor(p, tenantId, write, write ? "configuration.manage" : undefined);

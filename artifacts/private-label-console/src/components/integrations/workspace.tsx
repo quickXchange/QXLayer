@@ -69,7 +69,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
   const telegram = k.toLowerCase().includes('telegram');
   const vault = bundle.vaultAvailable;
   // Effective mode: Super Admin acts on the selected (unsaved) mode, customers on the saved one.
-  const mode = isSuper ? f.mgmt : conn?.credentialManagement ?? 'super_admin';
+  const mode = isSuper ? f.mgmt : conn?.credentialManagement ?? (def.secretFields.length ? 'customer' : 'super_admin');
   const modeAllows = isSuper ? mode === 'super_admin' || mode === 'both' : mode === 'customer' && (conn ? !!conn.canManageCredentials : !telegram);
   const canCreds = !readOnly && (isSuper ? !!conn : true) && modeAllows && vault;
   const canWrite = !readOnly && !!canConfigure && (isSuper || !!conn || !telegram);
@@ -81,6 +81,8 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
   const hLabel = hState === 'connected' ? 'Connected' : hState === 'ready' ? 'Configuration ready' : hState.replace(/_/g, ' ');
   const hTone = hState === 'connected' || hState === 'ready' ? 'ok' : hState === 'unknown' || hState === 'unconfigured' || hState === 'disabled' || hState === 'not_configured' ? undefined : 'bad';
   const secretsFilled = Object.entries(secrets).filter(([, v]) => v.length > 0);
+  const invalidPair = ['quickex', 'whitebit'].includes(k) && secretsFilled.length > 0 &&
+    (!secrets.apiKey || !secrets.secretKey || Object.values(secrets).some(v => /[\s\x00-\x1f\x7f]/.test(v)));
 
   const invalidate = () => {
     void qc.invalidateQueries({ queryKey: getGetIntegrationRuntimeQueryKey() });
@@ -113,7 +115,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
   const onSave = () => {
     setMsg(null);
     const data: Parameters<typeof save.mutate>[0]['data'] = {
-      enabled: isSuper ? f.enabled : conn?.enabled ?? false, settings: settings(), reason: reason.trim(),
+      enabled: isSuper || (conn && f.customerActivation) ? f.enabled : conn?.enabled ?? false, settings: settings(), reason: reason.trim(),
       ...(isSuper ? { credentialManagement: f.mgmt as 'super_admin' | 'customer' | 'both' } : !conn ? { credentialManagement: 'customer' as const } : {}),
       ...(canCreds && secretsFilled.length ? { secrets: Object.fromEntries(secretsFilled) } : {}),
       ...(canCreds && clear ? { clearCredentials: true } : {}),
@@ -159,7 +161,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
         </div>
       </header>
 
-      {isSuper && <dl className="mt-3 grid gap-2 rounded border bg-muted/30 p-3 text-sm sm:grid-cols-3" data-testid={`health-${k}`}>
+      {(isSuper || (['quickex', 'whitebit'].includes(k) && !!conn?.canManageCredentials)) && <dl className="mt-3 grid gap-2 rounded border bg-muted/30 p-3 text-sm sm:grid-cols-3" data-testid={`health-${k}`}>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Last checked</dt><dd>{when(health.checkedAt)}</dd></div>
         <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Latency</dt><dd>{typeof health.latencyMs === 'number' ? `${health.latencyMs} ms` : 'Not measured'}</dd></div>
         {['alchemy', 'rpc'].includes(k) && <div><dt className="font-mono text-[11px] uppercase text-muted-foreground">Observed network head</dt><dd>{str(health.head) || 'Not observed'}{health.chainId != null && <span className="block text-xs">Chain {str(health.chainId)}</span>}</dd></div>}
@@ -180,7 +182,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
                 {MGMT.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select></label>
           </div>
-        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? 'Availability of this service is managed by VYNOX LAYER under your plan.' : 'Not authorized yet. VYNOX LAYER must authorize this integration first.'}</p>}
+        ) : <p className="text-sm text-muted-foreground" data-testid={`text-policy-${k}`}>{conn ? 'Availability of this service is managed by VYNOX LAYER under your plan.' : def.secretFields.length ? 'Your plan permits customer-owned credentials. Save a connection below. Saving does not enable financial execution.' : 'Not authorized yet. VYNOX LAYER must authorize this integration first.'}</p>}
 
         {isSuper && <label className="flex items-center justify-between gap-3 rounded border p-3 text-sm">
           <span>Allow customer to activate this authorized integration</span>
@@ -260,6 +262,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
           {vault && !conn && isSuper && <p className="mt-2 text-sm text-muted-foreground">Save an authorized configuration before adding credentials.</p>}
           {vault && conn && !modeAllows && <p className="mt-2 text-sm text-muted-foreground" data-testid={`notice-nocreds-${k}`}>Credentials are not managed by you under the selected management mode, or you lack permission.</p>}
           <p className="mt-2 text-sm" data-testid={`text-creds-${k}`}>{conn?.credentialsConfigured ? 'Credentials are stored. Values are never shown.' : 'No credentials stored.'}</p>
+          {invalidPair && <p role="alert" className="mt-2 text-sm text-destructive" data-testid={`error-secret-pair-${k}`}>Enter both the API key and secret key, without spaces or control characters. Existing stored values are unchanged until a valid save.</p>}
           {def.secretFields.length > 0 && (
             <div className="mt-2 grid gap-3 sm:grid-cols-2">
               {def.secretFields.map((sf) => (
@@ -276,7 +279,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
         <div className="mt-4 flex flex-wrap items-end gap-3">
           <label className="min-w-[14rem] flex-1 text-sm" htmlFor={`reason-${k}`}><span className="mb-1 block font-mono text-[11px] uppercase tracking-wider text-muted-foreground">Reason (audited, 3+ characters)</span>
             <Input id={`reason-${k}`} data-testid={`input-reason-${k}`} value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} /></label>
-          <Button onClick={onSave} disabled={!canWrite || (!isSuper && !telegram && !canCreds) || !reasonOk || save.isPending} data-testid={`button-save-${k}`}>{save.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Save</Button>
+          <Button onClick={onSave} disabled={!canWrite || (!isSuper && !telegram && !canCreds) || invalidPair || !reasonOk || save.isPending} data-testid={`button-save-${k}`}>{save.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Save</Button>
           <Button variant="outline" onClick={onTest} disabled={!canWrite || !conn || (!isSuper && (telegram || !canCreds)) || !reasonOk || test.isPending || save.isPending} data-testid={`button-test-${k}`}>{test.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Test connection</Button>
           {isBot && isSuper && <Button variant="outline" onClick={onWebhook} disabled={!canWebhook} title={canWebhook ? undefined : 'Requires a saved, enabled bot, no unsaved edits, a reason, and permission to manage credentials.'} data-testid="button-apply-webhook">{webhook.isPending && <Loader2 className="mr-1 h-4 w-4 animate-spin" aria-hidden />}Apply webhook</Button>}
         </div>)}

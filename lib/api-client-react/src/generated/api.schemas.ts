@@ -1991,6 +1991,38 @@ export interface StaffPermissions {
   permissions: StaffPermissionsPermissionsItem[];
 }
 
+export type DomainHostingActionAction = typeof DomainHostingActionAction[keyof typeof DomainHostingActionAction];
+
+
+export const DomainHostingActionAction = {
+  register: 'register',
+  refresh: 'refresh',
+} as const;
+
+export interface DomainHostingAction {
+  action: DomainHostingActionAction;
+}
+
+export interface CustomerDomain {
+  tenantId: string;
+  name: string;
+  slug: string;
+  tenantStatus: string;
+  /** @nullable */
+  domain: string | null;
+  status: string;
+  deliveryStatus: string;
+  /** @nullable */
+  requestId: string | null;
+}
+
+export interface DomainDnsRecord {
+  type: string;
+  name: string;
+  value: string;
+  purpose: string;
+}
+
 export type DomainVerificationStatus = typeof DomainVerificationStatus[keyof typeof DomainVerificationStatus];
 
 
@@ -1998,6 +2030,14 @@ export const DomainVerificationStatus = {
   unconfigured: 'unconfigured',
   unverified: 'unverified',
   verified: 'verified',
+} as const;
+
+export type DomainVerificationHostingProvider = typeof DomainVerificationHostingProvider[keyof typeof DomainVerificationHostingProvider];
+
+
+export const DomainVerificationHostingProvider = {
+  vercel: 'vercel',
+  replit: 'replit',
 } as const;
 
 export interface DomainVerification {
@@ -2017,6 +2057,15 @@ export interface DomainVerification {
   /** @nullable */
   websiteUrl?: string | null;
   instructions?: string[];
+  hostingProvider?: DomainVerificationHostingProvider;
+  providerManagementAvailable?: boolean;
+  providerRegistered?: boolean;
+  providerVerified?: boolean;
+  /** @nullable */
+  providerCheckedAt?: string | null;
+  /** @nullable */
+  providerError?: string | null;
+  dnsRecords?: DomainDnsRecord[];
 }
 
 export type WhiteLabelProvisioningStepState = typeof WhiteLabelProvisioningStepState[keyof typeof WhiteLabelProvisioningStepState];
