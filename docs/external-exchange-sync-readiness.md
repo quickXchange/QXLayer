@@ -29,6 +29,11 @@ Verified 17 October 2026. **Ready for protected candidate Sync, not public cutov
    workspace tree. A stale, unheld Git index lock was quarantined without
    changing the original index. A normal non-force push dry-run passed using
    the approved workspace Git credential.
+   The Git panel explicitly pulls with rebase: repository-local
+   `rebase.rebaseMerges=true` is required to preserve this reconciliation.
+   A plain flattening rebase was reproduced as a conflict in the landing
+   Exchange demo; the merge-preserving command retained the exact original
+   commit, source tree and ancestry in the isolated rehearsal.
 2. Catalog migration `0007_global_exchange_catalog.sql` had previously executed
    successfully but was missing from the standard migration ledger. Verified
    its immutable execution receipt, exact SQL checksum and complete reviewed

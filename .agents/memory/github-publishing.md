@@ -78,5 +78,19 @@ the workspace checkpoint history over external releases.
 and externally deployed commit histories, blocking an ordinary Sync.
 
 **How to apply:** Prove the merge result preserves the reviewed source tree,
-then reconcile locally and verify a non-force push dry-run without performing
-the user's synchronization prematurely.
+then reconcile locally without prematurely pushing. A push dry-run alone does
+not validate the Git panel's pull step.
+
+Replit Sync uses an explicit `pull --rebase`. After merging snapshot-release
+history, keep repository-local `rebase.rebaseMerges=true`; plain rebase flattens
+the reconciliation and replays old checkpoints over their already-deployed
+equivalents.
+
+**Why:** The original Git-panel pull was reproduced as a conflict in the
+landing Exchange demo. Merge-preserving rebase passed the identical command
+while retaining the exact tip, tree and every original commit.
+
+**How to apply:** Rehearse the actual panel pull command in a temporary clone,
+assert ancestry and exact source preservation, then verify the real configured
+pull and a normal push dry-run. Do not force-push, flatten the merge, reset
+source or resolve this by discarding application code.
