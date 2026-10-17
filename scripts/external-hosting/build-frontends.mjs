@@ -3,6 +3,7 @@ import { cp, mkdir, rm, writeFile, readdir, stat, readFile } from "node:fs/promi
 import { brotliCompressSync, gzipSync, constants } from "node:zlib";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { frontendRoutes } from "./frontend-routes.mjs";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 process.chdir(root);
 const api = new URL(process.env.QXLAYER_API_ORIGIN ?? "https://unconfigured.invalid");
@@ -76,15 +77,12 @@ await writeFile(path.join(fn, ".vc-config.json"), JSON.stringify({
   shouldAddHelpers: false, maxDuration: 15,
 }, null, 2));
 // API/uploads bypass the Node function and preserve existing 8-MB uploads.
-// Staging gate entry stays same-origin in the Vercel function. Production keeps
-// its original Render entry route. API requests still use the existing API gate.
-await writeFile(path.join(output, "config.json"), JSON.stringify({ version: 3, routes: bootstrap
-  ? [{ src: "^/(.*)$", dest: "/frontend" }] : [
-  { src: "^/__qx_access/enter$", dest: process.env.QXLAYER_EXTERNAL_ENVIRONMENT === "staging"
-    ? "/frontend" : `${api.origin}/api/__qx_access/enter` },
-  { src: "^/api(?:/(.*))?$", dest: `${api.origin}/api/$1` },
-  { src: "^/(.*)$", dest: "/frontend" },
-] }, null, 2));
+// Protected Staging/acceptance gate entry stays in the same-origin function.
+// The public Production route and API/upload proxy remain unchanged.
+await writeFile(path.join(output, "config.json"), JSON.stringify({ version: 3, routes: frontendRoutes({
+  apiOrigin: api.origin, environment: process.env.QXLAYER_EXTERNAL_ENVIRONMENT,
+  acceptanceApproved: process.env.QXLAYER_EXTERNAL_ACCEPTANCE_APPROVED, bootstrap,
+}) }, null, 2));
 console.info(bootstrap
   ? "Built gated Preview-only frontends; API disabled and no external rewrites; nothing deployed."
   : "Built gated Vercel frontends and same-origin Render routes; nothing deployed.");

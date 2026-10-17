@@ -98,3 +98,20 @@ Use the served form's actual action for HTTP diagnostics rather than assuming
 the frontend and API entry paths match. A successful running-handler form POST
 and cookie-authenticated catalog check are backend evidence, not proof that
 automated Vercel SSO or a full frontend browser journey succeeded.
+
+## Native form attribution and repeat submissions
+
+Browser verification must observe the browser's own Origin and redirect chain,
+including repeat submissions with an existing review session. Do not substitute
+a manually supplied Origin for that evidence.
+
+**Why:** A fresh-cookie HTTP probe with a supplied Origin accepted the review
+code, but Android reported an origin error. The access page's `no-referrer`
+policy could produce `Origin: null`, and an already-authorized entry POST could
+fall through to unrelated account authentication. Credential validity alone
+did not establish a working browser flow.
+
+**How to apply:** Keep the protected form same-origin, retain signed CSRF and
+exact-origin validation, and make entry POSTs terminate at the gate. Distinguish
+build-time approval flags from function-runtime configuration; verify the
+runtime inputs before relying on a flag to select security behavior.
