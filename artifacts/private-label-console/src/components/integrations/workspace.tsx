@@ -69,7 +69,7 @@ function ProviderCard({ tenantId, def, conn, bundle, isSuper, readOnly, canConfi
   const telegram = k.toLowerCase().includes('telegram');
   const vault = bundle.vaultAvailable;
   // Effective mode: Super Admin acts on the selected (unsaved) mode, customers on the saved one.
-  const mode = isSuper ? f.mgmt : conn?.credentialManagement ?? 'super_admin';
+  const mode = isSuper ? f.mgmt : conn?.credentialManagement ?? (def.secretFields.length ? 'customer' : 'super_admin');
   const modeAllows = isSuper ? mode === 'super_admin' || mode === 'both' : mode === 'customer' && (conn ? !!conn.canManageCredentials : !telegram);
   const canCreds = !readOnly && (isSuper ? !!conn : true) && modeAllows && vault;
   const canWrite = !readOnly && !!canConfigure && (isSuper || !!conn || !telegram);
