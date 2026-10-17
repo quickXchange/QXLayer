@@ -81,3 +81,20 @@ origin validation. Compare it with the API's pinned origin and the approved
 deployment receipt. Do not allow all Preview subdomains, trust arbitrary
 forwarded hosts, or remove CSRF checks to make old bookmarks work. Mobile
 emulation is not proof of behavior on a physical Android device.
+
+## Private review codes and Owner continuity
+
+The acceptance site's Private Access code is independent of the Owner's account
+password and authenticator. Reissues are candidate-only and delivered to the
+already approved, verified Owner email; never put the code in chat, evidence
+files or review URLs, or rotate the independent Public Live/Shared credential.
+
+**Why:** The user requested a fresh review code while explicitly preserving
+Super Admin access, protection, Public Live and DNS.
+
+**How to apply:** Synchronize only the candidate runtime and Sensitive Preview
+secret, redeploy the protected candidate, and preserve account/MFA settings.
+Use the served form's actual action for HTTP diagnostics rather than assuming
+the frontend and API entry paths match. A successful running-handler form POST
+and cookie-authenticated catalog check are backend evidence, not proof that
+automated Vercel SSO or a full frontend browser journey succeeded.
