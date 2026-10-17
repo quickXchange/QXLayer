@@ -43,6 +43,7 @@ const CustomerDomains = lazy(() => import('@/pages/customer-domains'));
 const Provisioning = lazy(() => import('@/pages/provisioning'));
 const Integrations = lazy(() => import('@/pages/integrations'));
 const TenantIntegrations = lazy(() => import('@/pages/integrations').then(m => ({ default: m.TenantIntegrations })));
+const GlobalCatalog = lazy(() => import('@/pages/global-catalog'));
 const Providers = lazy(() => import('@/pages/providers'));
 const CustomerDetail = lazy(() => import('@/pages/customer-detail'));
 const Plans = lazy(() => import('@/pages/plans'));
@@ -169,7 +170,7 @@ const guard = (C: ComponentType) => () => <Protected><SuperOnly><C /></SuperOnly
 const open = (C: ComponentType) => () => <Protected><C /></Protected>;
 const rTenantInt = () => <Protected><DeliveredOnly><TenantIntegrations /></DeliveredOnly></Protected>;
 const rDelivered = () => <Protected><DeliveredOnly><Exchange /></DeliveredOnly></Protected>;
-const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rCD = guard(CustomerDomains), rProv = guard(Provisioning), rProviders = guard(Providers), rInt = guard(Integrations), rCust = guard(CustomerDetail);
+const rAdmin = guard(Admin), rClients = guard(Clients), rNew = guard(ClientNew), rDetail = guard(ClientDetail), rModules = guard(Modules), rActivity = guard(Activity), rPlans = guard(Plans), rPlan = guard(PlanDetail), rAddons = guard(Addons), rLanding = guard(LandingProducts), rWL = guard(WhiteLabelRequests), rWLO = guard(WhiteLabelOrder), rWLs = guard(WhiteLabels), rCD = guard(CustomerDomains), rProv = guard(Provisioning), rProviders = guard(Providers), rGCat = guard(GlobalCatalog), rInt = guard(Integrations), rCust = guard(CustomerDetail);
 const rAcc = open(AccountDashboard), rOrd = open(AccountOrders), rWls = open(AccountWhiteLabels), rPanels = open(AdminPanels), rCfg = open(ConfigureExchange), rProf = open(AccountProfile), rOrdD = open(AccountOrderDetail);
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
@@ -211,6 +212,7 @@ function AppRoutes() {
               <Route path="/customer-domains" component={rCD} />
               <Route path="/provisioning" component={rProv} />
               <Route path="/providers" component={rProviders} />
+              <Route path="/exchange-catalog" component={rGCat} />
               <Route path="/integrations" component={rInt} />
               <Route path="/customers/:customerId" component={rCust} />
               <Route path="/admin" component={rAdmin} />

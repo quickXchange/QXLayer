@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "sourceSha256": "84a0c344f06b48fc08ec2a690c584c809c53747f1e3a73d1409f9d8bc12160ac",
   "dataSha256": "8a3b1fad6cfa1a5b5047e1f86e688877575664fd8bd3122a620eb80dfa871429",
   "policy": "Global reference data only; retained Development customer fixtures excluded; sample plans/add-ons disabled; no approved commercial prices invented",
@@ -382,6 +382,125 @@
         "type": "timestamp with time zone",
         "required": true,
         "default_value": "now()"
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "kind",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "id",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "code",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "name",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "status",
+        "type": "text",
+        "required": true,
+        "default_value": "'catalog_only'::text"
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "logo_url",
+        "type": "text",
+        "required": false,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "metadata",
+        "type": "jsonb",
+        "required": true,
+        "default_value": "'{}'::jsonb"
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "revision",
+        "type": "integer",
+        "required": true,
+        "default_value": "1"
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "id",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "kind",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "source_id",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "target_id",
+        "type": "text",
+        "required": true,
+        "default_value": null
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "source_kind",
+        "type": "text",
+        "required": false,
+        "default_value": "\nCASE\n    WHEN (kind = 'asset_network'::text) THEN 'assets'::text\n    ELSE 'payment_methods'::text\nEND"
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "target_kind",
+        "type": "text",
+        "required": false,
+        "default_value": "\nCASE\n    WHEN (kind = 'asset_network'::text) THEN 'networks'::text\n    ELSE 'currencies'::text\nEND"
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "enabled",
+        "type": "boolean",
+        "required": true,
+        "default_value": "false"
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "verified",
+        "type": "boolean",
+        "required": true,
+        "default_value": "false"
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "metadata",
+        "type": "jsonb",
+        "required": true,
+        "default_value": "'{}'::jsonb"
       },
       {
         "table_name": "landing_products",
@@ -2052,6 +2171,111 @@
         "validated": true
       },
       {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_check",
+        "type": "c",
+        "definition": "CHECK (kind <> 'currencies'::text OR id = code AND code ~ '^[A-Z]{3}$'::text AND (code <> ALL (ARRAY['DZD'::text, 'ILS'::text])))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_check1",
+        "type": "c",
+        "definition": "CHECK (status <> 'enabled'::text OR COALESCE((metadata ->> 'verified'::text) = 'true'::text AND (metadata ->> 'sourceUrl'::text) ~~ 'https://%'::text, false))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_kind_check",
+        "type": "c",
+        "definition": "CHECK (kind = ANY (ARRAY['currencies'::text, 'payment_methods'::text, 'assets'::text, 'networks'::text]))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_metadata_check",
+        "type": "c",
+        "definition": "CHECK (NOT COALESCE((metadata -> 'countryCodes'::text) ?| ARRAY['DZ'::text, 'IL'::text], false))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (kind, id)",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_revision_check",
+        "type": "c",
+        "definition": "CHECK (revision > 0)",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_status_check",
+        "type": "c",
+        "definition": "CHECK (status = ANY (ARRAY['enabled'::text, 'disabled'::text, 'catalog_only'::text]))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_check",
+        "type": "c",
+        "definition": "CHECK (NOT enabled OR verified)",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_check1",
+        "type": "c",
+        "definition": "CHECK (NOT verified OR kind <> 'asset_network'::text OR COALESCE((metadata ->> 'native'::text) = 'true'::text, false) OR COALESCE(length(metadata ->> 'contractAddress'::text) > 0, false))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_kind_check",
+        "type": "c",
+        "definition": "CHECK (kind = ANY (ARRAY['payment_fiat'::text, 'asset_network'::text]))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_kind_source_id_target_id_key",
+        "type": "u",
+        "definition": "UNIQUE (kind, source_id, target_id)",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_metadata_check",
+        "type": "c",
+        "definition": "CHECK (NOT COALESCE((metadata -> 'countryCodes'::text) ?| ARRAY['DZ'::text, 'IL'::text], false))",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_pkey",
+        "type": "p",
+        "definition": "PRIMARY KEY (id)",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_source_kind_source_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (source_kind, source_id) REFERENCES global_exchange_catalog(kind, id)",
+        "validated": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_target_kind_target_id_fkey",
+        "type": "f",
+        "definition": "FOREIGN KEY (target_kind, target_id) REFERENCES global_exchange_catalog(kind, id)",
+        "validated": true
+      },
+      {
         "table_name": "landing_products",
         "name": "landing_products_amounts",
         "type": "c",
@@ -2949,6 +3173,30 @@
         "table_name": "exchange_orders",
         "name": "orders_id_tenant_unique",
         "definition": "CREATE UNIQUE INDEX orders_id_tenant_unique ON public.exchange_orders USING btree (id, tenant_id)",
+        "valid": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_identity",
+        "definition": "CREATE UNIQUE INDEX global_exchange_catalog_identity ON public.global_exchange_catalog USING btree (kind, lower(code))",
+        "valid": true
+      },
+      {
+        "table_name": "global_exchange_catalog",
+        "name": "global_exchange_catalog_pkey",
+        "definition": "CREATE UNIQUE INDEX global_exchange_catalog_pkey ON public.global_exchange_catalog USING btree (kind, id)",
+        "valid": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_kind_source_id_target_id_key",
+        "definition": "CREATE UNIQUE INDEX global_exchange_catalog_links_kind_source_id_target_id_key ON public.global_exchange_catalog_links USING btree (kind, source_id, target_id)",
+        "valid": true
+      },
+      {
+        "table_name": "global_exchange_catalog_links",
+        "name": "global_exchange_catalog_links_pkey",
+        "definition": "CREATE UNIQUE INDEX global_exchange_catalog_links_pkey ON public.global_exchange_catalog_links USING btree (id)",
         "valid": true
       },
       {

@@ -58,3 +58,6 @@
 - [Supabase Storage missing objects](supabase-storage-not-found.md) — authenticated object-info may use HTTP 400 with structured statusCode 404; never treat all 400s as missing.
 - [Customer public wallets](customer-public-wallets.md) — customer public addresses are independent of Super Admin RPC monitoring and never activate deposits.
 - [PDF download evidence](browser-pdf-download-evidence.md) — empty CDP captures can be false failures; verify the actual saved native Download before changing working invoice code.
+- [Exchange product scope](exchange-product-scope.md) — only Crypto/Fiat Swap and Crypto/Crypto Convert; preserve history, Landing/master and the retained protected Solara demo.
+- [Reference seed idempotency](reference-seed-idempotency.md) — schema-only releases must not replay identical previously applied seed data over later operator edits or deletions.
+- [Exchange group selectors](exchange-group-selectors.md) — typed Crypto/Fiat groups must survive scope reconciliation and unrelated settings saves, with server-consistent specificity.

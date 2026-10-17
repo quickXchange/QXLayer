@@ -1,7 +1,7 @@
 import type { PublicSite } from '@workspace/api-client-react';
 
-export type ExchangeTab = 'swap' | 'convert' | 'buy' | 'sell';
-export const TAB_ORDER: ExchangeTab[] = ['swap', 'convert', 'buy', 'sell'];
+export type ExchangeTab = 'swap' | 'convert';
+export const TAB_ORDER: ExchangeTab[] = ['swap', 'convert'];
 export interface Caps {
   exchange: 'off' | 'empty' | 'on';
   exchangeKey: string | null;

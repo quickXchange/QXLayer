@@ -11,6 +11,7 @@ const publicTenant = `${tenant}='' AND tenant_id IN (SELECT id FROM public.tenan
  (${slug}<>'' AND slug=${slug}) OR
  (${domain}<>'' AND id IN (SELECT tenant_id FROM public.tenant_domains WHERE domain=${domain} AND status='verified')))`;
 const globals = new Set(["addon_entitlements", "addons", "asset_catalog", "asset_network_catalog",
+  "global_exchange_catalog", "global_exchange_catalog_links",
   "entitlement_definitions", "landing_products", "module_catalog", "network_catalog",
   "plan_entitlements", "plans", "provider_catalog"]);
 

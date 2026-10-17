@@ -25,8 +25,8 @@ import { PreviewIntegrations } from '@/components/exchange/preview-integrations'
 import { sectionGate } from '@/lib/feature-gate';
 import { useConsoleNavigation } from '@/components/app/console-frame';
 
-const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['notifications', 'Notifications'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['wallets', 'Wallet Addresses'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
-const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'buy', 'sell', 'fees', 'payment-methods', 'pricing', 'wallets', 'settings'];
+const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['notifications', 'Notifications'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['wallets', 'Wallet Addresses'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
+const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'fees', 'payment-methods', 'pricing', 'wallets', 'settings'];
 
 export default function Exchange() {
   const setNavigation = useConsoleNavigation();
@@ -49,7 +49,7 @@ export default function Exchange() {
   const gate = sectionGate(sec, F, isSuper);
   const gateKnown = isSuper || !!sub;
   const denied = gateKnown && !gate.allowed;
-  const allowedActions = isSuper ? undefined : ['swap', 'convert', 'buy', 'sell'].filter((a) => F[a] === true);
+  const allowedActions = isSuper ? undefined : ['swap', 'convert'].filter((a) => F[a] === true);
   const needsDraft = !denied && DRAFT_SECTIONS.includes(sec);
   const featureOk = isSuper || F.crypto_exchange === true;
   const d = useExchangeDraft(id, needsDraft && gateKnown && featureOk);
@@ -61,7 +61,7 @@ export default function Exchange() {
 
   let body;
   if (!t) body = null;
-  else if (!gateKnown && ['swap', 'convert', 'buy', 'sell', 'providers', 'api-keys', 'api-preview', 'webhooks-preview', 'wallets', 'rpc-preview'].includes(sec)) body = <ListSkeleton />;
+  else if (!gateKnown && ['swap', 'convert', 'providers', 'api-keys', 'api-preview', 'webhooks-preview', 'wallets', 'rpc-preview'].includes(sec)) body = <ListSkeleton />;
   else if (denied) body = <div className="space-y-2 rounded-md border p-6" role="alert" data-testid="text-section-denied"><h2 className="font-display text-2xl">Not available</h2><p className="text-sm text-muted-foreground">{gate.reason}</p><Link href={root} className="text-sm text-copper hover:underline">Back to overview</Link></div>;
   else if (needsDraft && (d.loading || (!d.draft && !d.error))) body = <ListSkeleton />;
   else if (needsDraft && (d.error || !d.draft)) body = <ErrorState what="exchange settings" onRetry={d.refetch} />;
@@ -73,7 +73,7 @@ export default function Exchange() {
   else if (sec === 'assets') body = <AssetsPanel tenant={t} d={d} locked={cfgLocked} />;
   else if (sec === 'networks') body = <NetworksPanel tenant={t} d={d} locked={cfgLocked} />;
   else if (sec === 'routes') body = <RoutesPanel d={d} locked={cfgLocked} allowed={allowedActions} />;
-  else if (sec === 'swap' || sec === 'convert' || sec === 'buy' || sec === 'sell') body = <RoutesPanel d={d} locked={cfgLocked} action={sec} />;
+  else if (sec === 'swap' || sec === 'convert') body = <RoutesPanel d={d} locked={cfgLocked} action={sec} />;
   else if (sec === 'fees') body = <PricingPanel d={d} locked={cfgLocked} allowed={allowedActions} />;
   else if (sec === 'domain') body = <div className="space-y-6"><Guide title="Domain" note="Custom domain and ownership verification." links={[['branding', 'Branding'], ['website', 'Website settings']]} root={root} /><DomainSection tenant={t} readOnly={ro('domains.manage')} /><DomainOwnershipSection tenant={t} readOnly={ro('domains.manage')} /></div>;
   else if (sec === 'payment-methods') body = <PaymentMethodsPanel d={d} locked={cfgLocked} />;

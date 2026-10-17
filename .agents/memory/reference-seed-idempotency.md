@@ -1,0 +1,17 @@
+---
+name: Reference seed idempotency across schema releases
+description: Additive schema versions must not replay previously applied reference data over operator edits.
+---
+
+A reviewed schema-only release carrying exactly the same already-applied
+reference-data digest must preserve subsequent operator edits and deletions.
+Keep the original data immutable; record the new reviewed schema version
+without reapplying that seed data.
+
+**Why:** Recapturing Development reference data after an additive catalog
+migration encountered legitimate existing operator configuration conflicts.
+The protected candidate correctly blocked overwriting them.
+
+**How to apply:** Check strict schema parity first, then match the exact
+reference-data digest against an earlier applied version. Unknown or changed
+digests still need full conflict review; never skip checks for novel data.

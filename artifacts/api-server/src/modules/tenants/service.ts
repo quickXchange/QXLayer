@@ -151,6 +151,13 @@ export function saveAssets(principal: Principal, tenantId: string, ids: string[]
       catalog.rows.find(r => `${r.asset_id}:${r.network_id}` === id));
     if (selected.some(r => !r)) throw new HttpError(400, "Only configured sandbox asset/network pairs are supported.");
     const pairs = selected.filter((r): r is NonNullable<typeof r> => !!r);
+    const previous = (await client.query("SELECT asset_network_id FROM tenant_asset_networks WHERE tenant_id=$1",[tenantId])).rows.map(r=>r.asset_network_id);
+    const supported = (await client.query(`SELECT l.metadata->>'legacyAssetNetworkId' AS id
+      FROM global_exchange_catalog_links l JOIN global_exchange_catalog a ON a.kind='assets' AND a.id=l.source_id
+      JOIN global_exchange_catalog n ON n.kind='networks' AND n.id=l.target_id
+      WHERE l.kind='asset_network' AND l.enabled AND l.verified AND a.status='enabled' AND n.status='enabled'`)).rows.map(r=>r.id);
+    if (pairs.some(p=>!previous.includes(p.id) && !supported.includes(p.id)))
+      throw new HttpError(400,"New asset/network selections must have an enabled verified global mapping.");
     enforceLimit(effective, "max_supported_assets", String(new Set(pairs.map((r) => r.asset_id)).size));
     enforceLimit(effective, "max_supported_networks", String(new Set(pairs.map((r) => r.network_id)).size));
     await client.query("DELETE FROM tenant_asset_networks WHERE tenant_id=$1", [tenantId]);

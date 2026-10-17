@@ -9,7 +9,7 @@ Use the supplied catalog as the authority for visual identity. Multiple artworks
 
 **How to apply:** Match stable codes and explicit names, retain alternatives, and leave ambiguous labels unbranded until an administrator deliberately selects an identity.
 
-Currency-associated flags describe the catalog's currency visual, not the customer's country. Sandbox orders currently do not collect bank/payment details or customer country; do not substitute administrator configuration for missing order data.
+Currency-associated flags describe the catalog's currency visual, not the customer's country. Frozen order payment instructions describe the configured recipient method, not the customer's personal bank details or country. Never substitute current administrator configuration for a historical order snapshot.
 
 **Why:** A currency can map to several countries, and account-level payment configuration is not a historical customer payment snapshot.
 
@@ -26,3 +26,14 @@ Exchange logos must retain original brand colors and source files in both themes
 **Why:** The user explicitly required full, centered circles and readable dark/light artwork while prohibiting permanent recoloring, destructive cropping and changes to the QXLayer theme.
 
 **How to apply:** Apply the existing shared Exchange logo system to new surfaces. Inspect every supplied original and variant; keep wide wordmarks complete and distinguish source contrast/padding from corrected presentation.
+
+Verify imported artwork bytes separately from catalog rows when preparing an
+external candidate.
+
+**Why:** Catalog CRUD and relational checks passed while the hash-addressed
+artwork existed only in Development storage. The protected candidate showed
+fallback initials because its separate private bucket lacked those objects.
+
+**How to apply:** Copy only manifest-allowlisted public artwork with verified
+source hashes, immutable no-overwrite writes and authenticated byte readback.
+Do not assume restoring database metadata also restores referenced files.

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { routeEndpointsCompatible, pricingRuleSpecificity } from './route-endpoint-validation';
 import { test } from 'node:test';
 import type { ExchangeSettings, ExchangeCatalogAsset } from '@workspace/api-client-react';
 import { reconcileExchangeScope } from './draft-scope';
@@ -13,6 +14,40 @@ const saved = {
   routes: [{ id: 'retained', source: 'fiat:USD', destination: 'network-kept' }, { id: 'removed', source: 'network-kept', destination: 'network-removed' }],
   paymentMethods: [], providers: [],
 } as ExchangeSettings;
+
+test('customer conflict validation ranks exact pairs above typed groups like the quote server', () => {
+  const any = pricingRuleSpecificity({ source: '*', destination: '*' });
+  const group = pricingRuleSpecificity({ source: 'crypto:*', destination: 'fiat:*' });
+  const exact = pricingRuleSpecificity({ source: 'network-kept', destination: 'fiat:USD' });
+  assert(any < group && group < exact);
+  assert.equal(exact, 8);
+  assert.equal(pricingRuleSpecificity({ source: 'network-kept', destination: 'fiat:USD', paymentMethodId: 'method' }), 9);
+});
+
+test('unrelated settings saves retain all typed group pricing rules and their activation', () => {
+  const pricingRules = [
+    { id: 'crypto-fiat', action: 'swap', source: 'crypto:*', destination: 'fiat:*', enabled: true, priority: 10, feeBps: 25, fixedFee: '0', spreadBps: 10 },
+    { id: 'fiat-crypto', action: 'swap', source: 'fiat:*', destination: 'crypto:*', enabled: true, priority: 10, feeBps: 25, fixedFee: '0', spreadBps: 10 },
+    { id: 'crypto-crypto', action: 'convert', source: 'crypto:*', destination: 'crypto:*', enabled: true, priority: 10, feeBps: 25, fixedFee: '0', spreadBps: 10 },
+  ] as NonNullable<ExchangeSettings['pricingRules']>;
+  const reconciled = reconcileExchangeScope({ ...saved, pricingRules }, catalog);
+  assert.deepEqual(reconciled.pricingRules, pricingRules);
+  assert.equal(reconcileExchangeScope(reconciled, catalog), reconciled);
+});
+
+test('disabled historical routes cannot block unrelated settings saves or be reenabled with invalid endpoints', () => {
+  const networks = new Set(['btc:bitcoin-testnet', 'eth:ethereum-sepolia']);
+  const route = { enabled: true, action: 'swap', source: 'btc:bitcoin-testnet', destination: 'eth:ethereum-sepolia' };
+  assert.equal(routeEndpointsCompatible({ ...route, enabled: false }, ['USD'], networks), true);
+  assert.equal(routeEndpointsCompatible(route, ['USD'], networks), false);
+  assert.equal(routeEndpointsCompatible({ ...route, source: 'fiat:USD' }, ['USD'], networks), true);
+  assert.equal(routeEndpointsCompatible({ ...route, destination: 'fiat:USD' }, ['USD'], networks), true);
+  assert.equal(routeEndpointsCompatible({ ...route, source: 'fiat:EUR' }, ['USD'], networks), false);
+  assert.equal(routeEndpointsCompatible({ ...route, action: 'convert' }, ['USD'], networks), true);
+  assert.equal(routeEndpointsCompatible({ ...route, action: 'convert', destination: route.source }, ['USD'], networks), false);
+  assert.equal(routeEndpointsCompatible({ ...route, action: 'buy', source: 'fiat:USD' }, ['USD'], networks), false);
+  assert.equal(routeEndpointsCompatible({ ...route, action: 'buy', enabled: false }, ['USD'], networks), true);
+});
 
 test('discarding after saved scope removal cannot restore unassigned draft rows', () => {
   const result = reconcileExchangeScope(saved, catalog);

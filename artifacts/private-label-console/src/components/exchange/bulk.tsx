@@ -122,7 +122,7 @@ export function Logo(props: { url?: string | null; label: string; kind?: LogoKin
 type Opts = { title: string; body: ReactNode; label: string; destructive?: boolean; run: () => ReactNode | void | Promise<ReactNode | void>; readOnly?: boolean };
 
 /** Review changes -> Confirm -> Apply -> Result. Guards double submission. */
-export function useConfirm(readOnly = false): [(o: Opts) => void, ReactNode] {
+export function useConfirm(readOnly = false, resultMessage = 'Applied. Exchange setting changes are staged only until you press Save exchange settings.'): [(o: Opts) => void, ReactNode] {
   const [o, setO] = useState<Opts | null>(null);
   const [phase, setPhase] = useState<'review' | 'applying' | 'result'>('review');
   const [res, setRes] = useState<ReactNode>(null);
@@ -140,7 +140,7 @@ export function useConfirm(readOnly = false): [(o: Opts) => void, ReactNode] {
         <AlertDialogHeader>
           <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground" data-testid="text-confirm-phase">{phase === 'review' ? 'Step 1 of 2: Review changes' : phase === 'applying' ? 'Applying' : 'Result'}</p>
           <AlertDialogTitle>{o?.title}</AlertDialogTitle>
-          <AlertDialogDescription asChild><div className="min-w-0 break-words space-y-2 text-sm">{phase === 'result' ? (err ? <p className="text-destructive" data-testid="text-confirm-error">{err}</p> : (res ?? <p data-testid="text-confirm-result">Applied. Exchange setting changes are staged only until you press Save exchange settings.</p>)) : phase === 'applying' ? <p>Applying, please wait.</p> : o?.body}</div></AlertDialogDescription>
+          <AlertDialogDescription asChild><div className="min-w-0 break-words space-y-2 text-sm">{phase === 'result' ? (err ? <p className="text-destructive" data-testid="text-confirm-error">{err}</p> : (res ?? <p data-testid="text-confirm-result">{resultMessage}</p>)) : phase === 'applying' ? <p>Applying, please wait.</p> : o?.body}</div></AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           {phase === 'result' ? <Button type="button" data-testid="button-confirm-close" onClick={() => setO(null)}>Close</Button> : <>

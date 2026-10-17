@@ -18,3 +18,12 @@ obscure preservation evidence.
 **How to apply:** Inspect the precise catalog delta before treating it as a
 migration failure. Add positive and negative comparison tests for any approved
 equivalence, and rerun the strict schema/RLS/grant readback without data changes.
+
+Preserve database column ordinal ordering when combining additive metadata
+captures; do not alphabetize previously captured columns.
+
+**Why:** A strict restore rehearsal reported schema drift solely because a
+metadata merge reordered columns, not because the restored schema changed.
+
+**How to apply:** Keep comparison serialization aligned with catalog query
+ordering while preserving the original metadata values.

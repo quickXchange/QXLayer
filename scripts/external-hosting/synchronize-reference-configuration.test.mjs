@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { productionReferences, TABLES, appliedVersionMatches } from "./synchronize-reference-configuration.mjs";
+import { productionReferences, TABLES, appliedVersionMatches,previouslyAppliedDataMatches } from "./synchronize-reference-configuration.mjs";
 
 function source() {
   const result = Object.fromEntries(TABLES.map(t => [t, []]));
@@ -32,4 +32,11 @@ test("an applied package is a no-op, not permission to restore Admin edits or de
   assert.equal(appliedVersionMatches(undefined, { dataSha256: "reviewed" }), false);
   assert.equal(appliedVersionMatches({ sha256: "reviewed" }, { dataSha256: "reviewed" }), true);
   assert.throws(() => appliedVersionMatches({ sha256: "reviewed" }, { dataSha256: "mutated" }));
+});
+test("an additive schema version carrying already-applied exact data preserves all later operator edits",()=>{
+ const payload={version:2,dataSha256:"reviewed"};
+ assert.equal(previouslyAppliedDataMatches({version:1,sha256:"reviewed"},payload),true);
+ assert.equal(previouslyAppliedDataMatches({version:1,sha256:"changed"},payload),false);
+ assert.equal(previouslyAppliedDataMatches({version:2,sha256:"reviewed"},payload),false);
+ assert.equal(previouslyAppliedDataMatches(undefined,payload),false);
 });

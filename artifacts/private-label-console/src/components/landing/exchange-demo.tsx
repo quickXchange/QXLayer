@@ -3,7 +3,7 @@ import { ArrowDownUp, Check, Clock, Globe, ImagePlus, Palette, ShieldAlert, Star
 import { VxTabs, tabPanelProps, VxCard } from './vx-ui';
 
 const SANDBOX = 'Illustrative sandbox. Sample figures only; not quotes, not transactions.';
-const ACTIONS = [{ key: 'swap', label: 'Swap' }, { key: 'convert', label: 'Convert' }, { key: 'buy', label: 'Buy' }, { key: 'sell', label: 'Sell' }];
+const ACTIONS = [{ key: 'swap', label: 'Swap' }, { key: 'convert', label: 'Convert' }];
 const CRYPTO: Record<string, number> = { BTC: 60000, ETH: 3000, USDT: 1, SOL: 150 };
 const FIAT = ['EUR', 'USD', 'GBP'];
 const COPY: Record<string, string> = {
@@ -45,7 +45,7 @@ export function ExchangeActions() {
   return (
     <section id="demo" className="vx-sec" aria-labelledby="vx-act-h" data-testid="section-exchange-actions"><div className="s-wrap">
       <p className="s-eyebrow">Four customer actions</p>
-      <h2 id="vx-act-h" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Swap, Convert, Buy and Sell</h2>
+      <h2 id="vx-act-h" className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Swap and Convert</h2>
       <div className="mt-6"><VxTabs id="actions" label="Customer actions" tabs={ACTIONS} value={a} onChange={setA} /></div>
       <VxCard className="mt-5"><div key={a} className="vx-panel" {...tabPanelProps('actions', a)}>
         <p className="s-muted mb-5 max-w-2xl text-sm">{COPY[a]}</p><Panel key={a} action={a} />
@@ -137,7 +137,7 @@ function Scene({ k, b }: { k: string; b: Brand }) {
   if (k === 'view') return (
     <SiteFrame b={b} label="Sample view order page">
       <div className="flex flex-wrap items-center justify-between gap-2"><h4 className="text-lg font-semibold">Order SAMPLE-0001</h4><Pill tone={AMBER}>Awaiting payment</Pill></div>
-      <div className="mt-3"><Row k="Type" v="Buy" /><Row k="You pay" v="100.00 EUR" /><Row k="You receive" v="0.001612 BTC (sample)" /><Row k="Method" v="Sample bank transfer" /><Row k="Created" v="Sample date" /></div>
+      <div className="mt-3"><Row k="Type" v="Swap" /><Row k="You pay" v="100.00 EUR" /><Row k="You receive" v="0.001612 BTC (sample)" /><Row k="Method" v="Sample bank transfer" /><Row k="Created" v="Sample date" /></div>
       <div className="mt-4"><Btn b={b}>Continue to payment</Btn></div>
     </SiteFrame>);
   if (k === 'pay') return (
@@ -182,7 +182,7 @@ function Scene({ k, b }: { k: string; b: Brand }) {
       </div>
       <div className="mt-4 overflow-x-auto"><table className="w-full min-w-[300px] text-sm">
         <thead><tr className="border-b text-left text-[11px] uppercase opacity-65" style={line}><th className="py-2 font-medium">Description</th><th className="text-right font-medium">Qty</th><th className="text-right font-medium">Amount</th></tr></thead>
-        <tbody>{[['Buy 0.001612 BTC (sample)', '1', '100.00'], ['Service fee (sample)', '1', '1.50'], ['Network fee (sample)', '1', '0.75']].map((r) => <tr key={r[0]} className="border-b" style={line}><td className="py-2">{r[0]}</td><td className="text-right">{r[1]}</td><td className="text-right">{r[2]}</td></tr>)}</tbody>
+        <tbody>{[['Swap 0.001612 BTC (sample)', '1', '100.00'], ['Service fee (sample)', '1', '1.50'], ['Network fee (sample)', '1', '0.75']].map((r) => <tr key={r[0]} className="border-b" style={line}><td className="py-2">{r[0]}</td><td className="text-right">{r[1]}</td><td className="text-right">{r[2]}</td></tr>)}</tbody>
         <tfoot><tr><td colSpan={2} className="pt-3 text-right opacity-70">Subtotal</td><td className="pt-3 text-right">102.25</td></tr><tr><td colSpan={2} className="text-right opacity-70">Tax (sample 0%)</td><td className="text-right">0.00</td></tr><tr><td colSpan={2} className="pt-1 text-right font-semibold">Total EUR</td><td className="pt-1 text-right text-base font-semibold" style={{ color: c }}>102.25</td></tr></tfoot>
       </table></div>
       <p className="mt-3 text-[11px] opacity-65">Sample invoice. Not a real charge or tax document.</p>
@@ -215,7 +215,7 @@ function BrandSite({ b }: { b: Brand }) {
         <div><p className="text-xs font-semibold uppercase tracking-[.18em]" style={{ color: c }}>{b.domain}</p>
           <h3 className="mt-3 text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">Exchange crypto with <span style={{ color: c }}>{name}</span></h3>
           <p className="mt-4 max-w-md opacity-75">Swap, convert, buy and sell in a few steps. Sample figures only.</p>
-          <div className="mt-5 flex flex-wrap gap-2 text-xs">{['Swap', 'Convert', 'Buy', 'Sell'].map((x, i) => <span key={x} className="rounded-full border px-3 py-1.5 font-semibold" style={i === 0 ? { background: c, color: '#fff', borderColor: c } : bd}>{x}</span>)}</div></div>
+          <div className="mt-5 flex flex-wrap gap-2 text-xs">{['Swap', 'Convert'].map((x, i) => <span key={x} className="rounded-full border px-3 py-1.5 font-semibold" style={i === 0 ? { background: c, color: '#fff', borderColor: c } : bd}>{x}</span>)}</div></div>
         <div className="rounded-2xl border p-4 shadow-xl sm:p-5" style={{ background: card, ...bd }}>
           <label className="block text-xs opacity-70">You send<span className="mt-1 flex gap-2"><input className="min-w-0 flex-1 rounded-xl border bg-transparent px-3 py-3 text-lg font-semibold" style={bd} inputMode="decimal" value={amt} onChange={(e) => { setAmt(e.target.value); setPlaced(false); }} aria-label="Preview amount" /><select className="rounded-xl border bg-transparent px-2 font-semibold" style={bd} value={from} onChange={(e) => { setFrom(e.target.value); setPlaced(false); }} aria-label="Preview from asset">{assets.map((x) => <option key={x} style={{ color: '#14201f' }}>{x}</option>)}</select></span></label>
           <div className="my-2 text-center" style={{ color: c }}><ArrowDownUp size={18} className="mx-auto" /></div>
@@ -276,11 +276,11 @@ const FLOW = [
   { key: 'review', label: 'Review', t: 'Sample review panel' },
 ];
 const ADMIN: [string, string, string, string, string, string][] = [
-  ['SAMPLE-0001', 'Buy', 'Sample Customer A', '100.00 EUR', 'Awaiting payment', AMBER],
+  ['SAMPLE-0001', 'Swap', 'Sample Customer A', '100.00 EUR', 'Awaiting payment', AMBER],
   ['SAMPLE-0002', 'Swap', 'Sample Customer B', '0.50 ETH', 'Processing', BLUE],
-  ['SAMPLE-0003', 'Sell', 'Sample Customer C', '250.00 USDT', 'Completed', GREEN],
+  ['SAMPLE-0003', 'Swap', 'Sample Customer C', '250.00 USDT', 'Completed', GREEN],
   ['SAMPLE-0004', 'Convert', 'Sample Customer D', '1.20 SOL', 'Completed', GREEN],
-  ['SAMPLE-0005', 'Buy', 'Sample Customer E', '40.00 EUR', 'Awaiting payment', AMBER],
+  ['SAMPLE-0005', 'Swap', 'Sample Customer E', '40.00 EUR', 'Awaiting payment', AMBER],
 ];
 const SEL: Record<string, number> = { create: 0, view: 0, pay: 0, track: 1, done: 2, invoice: 2, review: 2 };
 export function ExchangeJourney() {

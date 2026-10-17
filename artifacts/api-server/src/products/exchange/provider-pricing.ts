@@ -6,6 +6,7 @@ import { open } from "../../modules/integrations/vault";
 import { providerRate, positiveRate } from "../../modules/integrations/pricing-adapters";
 import { decimal } from "../../modules/entitlements/decimal";
 import { selectPricingRule } from "./pricing-rules";
+import { isFiat } from "./global-catalog";
 
 export interface PricingSnapshot { providerKey: string; revision: number; routeId: string; rate: string; manualFallback: boolean }
 export function applyPricing(settings: ExchangeSettings, snapshot?: PricingSnapshot): ExchangeSettings {
@@ -24,6 +25,9 @@ export async function sandboxPricing(c: DatabaseClient, tenantId: string, input:
   // An explicitly configured manual override never requires an external call.
   // The signed quote binds the entire tenant configuration, including this rule.
   if (rule?.rate !== undefined) return { providerKey: "manual_rule", revision: 0, routeId: route.id, rate: rule.rate, manualFallback: false };
+  // Crypto/Fiat Swap is the manual desk, never a crypto conversion-provider call.
+  if(input.action==="swap" && (isFiat(input.source)||isFiat(input.destination)))
+    return {providerKey:"manual_rule",revision:0,routeId:route.id,rate:route.rate,manualFallback:false};
   const rows = await c.query(`SELECT * FROM tenant_integrations WHERE tenant_id=$1
     AND provider_key IN ('1forge','whitebit','quickex') AND settings->'quoteActions' ? $2`, [tenantId, input.action]);
   if (!rows.rowCount) return undefined;

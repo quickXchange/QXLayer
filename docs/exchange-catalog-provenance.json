@@ -1,0 +1,25 @@
+{
+  "retrievedAt": "2026-10-17",
+  "sources": {
+    "iso": "https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml",
+    "regions": "https://raw.githubusercontent.com/unicode-org/cldr-json/main/cldr-json/cldr-core/supplemental/currencyData.json",
+    "names": "https://raw.githubusercontent.com/unicode-org/cldr-json/main/cldr-json/cldr-numbers-full/main/en/currencies.json",
+    "chains": "https://chainid.network/chains.json"
+  },
+  "hashes": {
+    "iso": "33139b438657d1cee116ba737807ea71d19d6de4b90f799a09c56f0cc6a1b0ff",
+    "regions": "e50315091b1f34428480f82970be64159ad207af0bdcebe7faa6260d3e34c8a6",
+    "names": "a6c41b28f4035f65ae698b53a66866982b4ff49bc0de7e840f91d2c6e6bdc23b",
+    "chains": "f953630ecc016b267d44deb93737d989308bd50d3b304767978623d859465e71"
+  },
+  "quickxSha256": "3e45f2e63495820e0ff3d8d4b69f593f11dd065865caec2a98218bb32ff098c1",
+  "counts": {
+    "currencies": 151,
+    "payment_methods": 49,
+    "assets": 33,
+    "networks": 18
+  },
+  "mappings": 257,
+  "financialExecution": false,
+  "notes": "QuickXchange source-only catalogs adapted. Unverified payment providers and asset deployments remain catalog-only; no routes or tenant activation are generated."
+}

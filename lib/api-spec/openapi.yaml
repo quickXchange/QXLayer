@@ -17,6 +17,31 @@ tags:
   - name: catalog
     description: Sandbox product, asset, and network catalogs
 paths:
+  /exchange/catalog:
+    get:
+      operationId: getGlobalExchangeCatalog
+      tags: [catalog]
+      responses:
+        "200":
+          description: Global reference catalogs, not live financial integrations
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/GlobalExchangeCatalog"}
+  /operator/exchange/catalog:
+    post:
+      operationId: patchGlobalExchangeCatalog
+      tags: [catalog]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/GlobalCatalogPatch"}
+      responses:
+        "200":
+          description: Atomically updated catalog
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/GlobalExchangeCatalog"}
   /tenants/{tenantId}/exchange/wallets/{walletId}/scan:
     post:
       operationId: scanExchangeWallet
@@ -1824,7 +1849,10 @@ components:
         label: {type: string, minLength: 2, maxLength: 80}
         instructions: {type: string, maxLength: 2000, description: "Optional sandbox payment instructions, frozen on order creation; never include credentials"}
         enabled: {type: boolean}
-        currency: {type: string, enum: [USD, EUR, GBP]}
+        currency: {type: string, pattern: '^[A-Z]{3}$'}
+        catalogId: {type: string, maxLength: 100}
+        accountFields: {type: object, additionalProperties: {type: string, maxLength: 500}}
+        currencies: {type: array, maxItems: 180, uniqueItems: true, items: {type: string, pattern: '^[A-Z]{3}$'}}
         buy: {type: boolean}
         sell: {type: boolean}
         logoUrl: {type: ["string", "null"], maxLength: 2000}
@@ -1863,8 +1891,16 @@ components:
         enabled: {type: boolean}
         defaultAction: {$ref: "#/components/schemas/ExchangeAction"}
         publicNote: {type: string, maxLength: 1000}
-        fiatCurrency: {type: string, enum: [USD, EUR, GBP]}
+        fiatCurrency: {type: string, pattern: '^[A-Z]{3}$'}
+        fiatCurrencies: {type: array, maxItems: 180, uniqueItems: true, items: {type: string, pattern: '^[A-Z]{3}$'}}
+        defaultPairs:
+          type: object
+          properties:
+            swap: {$ref: "#/components/schemas/ExchangeDefaultPair"}
+            convert: {$ref: "#/components/schemas/ExchangeDefaultPair"}
         fiatPlanRate: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        fiatPlanRates: {type: object, additionalProperties: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}}
+        fiatPrecisions: {type: object, readOnly: true, additionalProperties: {type: integer, minimum: 0, maximum: 18}, description: "Server-computed from the authoritative global catalog on every read."}
         actions:
           type: object
           required: [swap, convert, buy, sell]
@@ -1884,6 +1920,11 @@ components:
       type: object
       required: [assetNetworkId, assetId, symbol, name, networkId, networkName, testnet]
       properties:
+        decimals: {type: integer, minimum: 0, maximum: 18}
+        contractAddress: {type: ["string", "null"]}
+        native: {type: boolean}
+        memoRequired: {type: boolean}
+        addressFormat: {type: ["string", "null"]}
         assetNetworkId: {type: string}
         assetId: {type: string}
         symbol: {type: string}
@@ -2059,6 +2100,13 @@ components:
       type: object
       required: [enabled, actions, assets, routes, paymentMethods, fiatCurrency, publicNote]
       properties:
+        fiatCurrencies: {type: array, items: {type: string}}
+        currencies: {type: array, items: {$ref: "#/components/schemas/GlobalCatalogEntry"}}
+        defaultPairs:
+          type: object
+          properties:
+            swap: {$ref: "#/components/schemas/ExchangeDefaultPair"}
+            convert: {$ref: "#/components/schemas/ExchangeDefaultPair"}
         enabled: {type: boolean}
         defaultAction: {$ref: "#/components/schemas/ExchangeAction"}
         actions: {type: array, items: {$ref: "#/components/schemas/ExchangeAction"}}
@@ -2806,4 +2854,55 @@ components:
       type: object
       properties: {feature: {type: string}, status: {type: string}, message: {type: string}}
       required: [feature, status, message]
+    ExchangeDefaultPair:
+      type: object
+      required: [source, destination]
+      properties:
+        source: {type: string, minLength: 1, maxLength: 80}
+        destination: {type: string, minLength: 1, maxLength: 80}
+        paymentMethodId: {type: string, format: uuid}
+    GlobalCatalogEntry:
+      type: object
+      required: [kind, id, code, name, status, logoUrl, metadata, revision]
+      properties:
+        kind: {type: string, enum: [currencies, payment_methods, assets, networks]}
+        id: {type: string, pattern: '^[A-Za-z0-9:_-]{1,100}$'}
+        code: {type: string, minLength: 1, maxLength: 40}
+        name: {type: string, minLength: 1, maxLength: 160}
+        status: {type: string, enum: [enabled, disabled, catalog_only]}
+        logoUrl: {type: ["string", "null"], maxLength: 2000}
+        metadata: {type: object, additionalProperties: true}
+        revision: {type: integer, minimum: 0}
+    GlobalCatalogLink:
+      type: object
+      required: [kind, id, sourceId, targetId, enabled, verified, metadata]
+      properties:
+        kind: {type: string, enum: [payment_fiat, asset_network]}
+        id: {type: string, pattern: '^[A-Za-z0-9:_-]{1,220}$'}
+        sourceId: {type: string, minLength: 1, maxLength: 100}
+        targetId: {type: string, minLength: 1, maxLength: 100}
+        enabled: {type: boolean}
+        verified: {type: boolean}
+        metadata: {type: object, additionalProperties: true}
+    GlobalExchangeCatalog:
+      type: object
+      required: [entries, links]
+      properties:
+        entries: {type: array, items: {$ref: "#/components/schemas/GlobalCatalogEntry"}}
+        links: {type: array, items: {$ref: "#/components/schemas/GlobalCatalogLink"}}
+    GlobalCatalogPatch:
+      type: object
+      properties:
+        entries: {type: array, maxItems: 500, items: {$ref: "#/components/schemas/GlobalCatalogEntry"}}
+        links: {type: array, maxItems: 1000, items: {$ref: "#/components/schemas/GlobalCatalogLink"}}
+        deleteEntries:
+          type: array
+          maxItems: 100
+          items: {$ref: "#/components/schemas/GlobalCatalogDeletion"}
+    GlobalCatalogDeletion:
+      type: object
+      required: [kind, id]
+      properties:
+        kind: {type: string, enum: [currencies, payment_methods, assets, networks]}
+        id: {type: string, minLength: 1, maxLength: 100}
 

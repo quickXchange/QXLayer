@@ -11,7 +11,7 @@ export function ExchangeSpotlight() {
       <Reveal><div>
         <p className="s-eyebrow">Flagship</p>
         <h2 id="vx-ex-h" className="mt-2 text-3xl font-semibold tracking-tight sm:text-5xl" style={{ lineHeight: 1.05 }}>A white-label Exchange, branded as yours</h2>
-        <p className="s-muted mt-4 max-w-lg text-sm leading-relaxed sm:text-base">Swap, Convert, Buy and Sell on a customer website with your logo, colours and domain, plus an admin panel for orders, payment instructions, tracking and invoices.</p>
+        <p className="s-muted mt-4 max-w-lg text-sm leading-relaxed sm:text-base">Swap and Convert on a customer website with your logo, colours and domain, plus an admin panel for orders, payment instructions, tracking and invoices.</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/products/crypto_exchange" className="s-btn s-btn-primary" data-testid="link-spotlight-explore">Explore Exchange<ArrowRight size={16} /></Link>
           <Link href="/products/crypto_exchange#pricing" className="s-btn s-btn-ghost" data-testid="link-spotlight-pricing">View plans</Link>

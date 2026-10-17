@@ -6,9 +6,10 @@ import { websitePreviewRequest } from '../lib/development-preview';
 import type { Caps, ExchangeTab } from '../lib/capabilities';
 import { AssetPicker, Coin, NetBadge, assetKey } from './asset-picker';
 
-const LABEL: Record<ExchangeTab, string> = { swap: 'Swap', convert: 'Convert', buy: 'Buy', sell: 'Sell' };
+const LABEL: Record<ExchangeTab, string> = { swap: 'Swap', convert: 'Convert' };
 const AMOUNT = /^\d{0,12}(\.\d{0,18})?$/;
 const NOQ = 'No pricing source is connected in this sandbox.';
+const isTab = (a: string): a is ExchangeTab => a === 'swap' || a === 'convert';
 const EMPTY_ASSETS: AssetNetwork[] = [];
 
 const Side = memo(function Side({ label, asset, onPick, value, onValue, readOnly, fiat, fiatCurrency = 'Fiat', error, id, assetsAvailable }: { label: string; asset: AssetNetwork | null; onPick?: () => void; value: string; onValue?: (v: string) => void; readOnly?: boolean; fiat?: boolean; fiatCurrency?: string; error?: string | null; id: string; assetsAvailable: boolean }) {
@@ -43,7 +44,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
   const exchangeQ = useGetPublicExchange(site.tenantSlug, { request: websitePreviewRequest(site.tenantSlug), query: { queryKey: getGetPublicExchangeQueryKey(site.tenantSlug), enabled: !presentation, refetchInterval: 15000 } });
   const config = exchangeQ.data;
   const assets = presentation ? site.assets : config?.assets ?? EMPTY_ASSETS;
-  const allTabs = presentation || !config ? caps.tabs : config.actions;
+  const allTabs = presentation || !config ? caps.tabs : config.actions.filter(isTab);
   const tabs = allowedActions ? allTabs.filter((t) => allowedActions.includes(t)) : allTabs;
   const previewProof = useMemo(() => !presentation && !!websitePreviewRequest(site.tenantSlug).headers, [presentation, site.tenantSlug]);
   const loadingCfg = !presentation && exchangeQ.isLoading;
@@ -74,28 +75,47 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
   const from = fromKey ? byKey.get(fromKey) ?? null : null;
   const to = toKey ? byKey.get(toKey) ?? null : null;
   const distinct = useMemo(() => new Set(assets.map((a) => presentation ? a.assetId : assetKey(a))).size, [assets, presentation]);
-  const twoSided = tab === 'swap' || tab === 'convert';
+  const twoSided = tab === 'convert';
+  const [swapDir, setSwapDir] = useState<'f2c' | 'c2f'>('f2c');
+  const [fiatSel, setFiatSel] = useState('');
+  const swapRoutes = useMemo(() => (config?.routes ?? []).filter((r) => r.action === 'swap'), [config]);
+  const fiatCodes = useMemo(() => [...new Set(swapRoutes.flatMap((r) => [r.source, r.destination]).filter((e) => e.startsWith('fiat:')).map((e) => e.slice(5)))], [swapRoutes]);
+  const fiatCode = fiatSel && fiatCodes.includes(fiatSel) ? fiatSel : fiatCodes[0] ?? config?.fiatCurrency ?? '';
+  const fiatSource = tab === 'swap' && swapDir === 'f2c';
+  const fiatDest = tab === 'swap' && swapDir === 'c2f';
+  const fiatEp = `fiat:${fiatCode}`;
+  const swapAssets = useMemo(() => presentation ? assets : assets.filter((a) => swapRoutes.some((r) => (swapDir === 'f2c' ? r.source === fiatEp && r.destination === a.assetNetworkId : r.destination === fiatEp && r.source === a.assetNetworkId))), [assets, swapRoutes, swapDir, fiatEp, presentation]);
+  const pickList = tab === 'swap' ? swapAssets : assets;
   const insufficient = twoSided && distinct < 2;
   const noAssets = assets.length === 0;
   const amountError = touched ? (amount === '' || Number(amount) <= 0 ? 'Enter an amount greater than zero.' : null) : null;
   const reset = () => { revision.current++; setQuote(null); setStatus(null); attemptedOrder.current = null; idempotency.current = crypto.randomUUID(); };
-  const source = tab === 'buy' ? `fiat:${config?.fiatCurrency}` : from?.assetNetworkId;
-  const destination = tab === 'sell' ? `fiat:${config?.fiatCurrency}` : to?.assetNetworkId;
+  const source = fiatSource ? fiatEp : from?.assetNetworkId;
+  const destination = fiatDest ? fiatEp : (tab === 'swap' ? from : to)?.assetNetworkId;
   const route = config?.routes.find(r => r.action === tab && r.source === source && r.destination === destination);
-  const methods = config?.paymentMethods.filter(m => route?.paymentMethodIds.includes(m.id) && ((tab === 'buy' && m.buy) || (tab === 'sell' && m.sell))) ?? [];
+  const methods = config?.paymentMethods.filter(m => route?.paymentMethodIds.includes(m.id) && tab === 'swap' && (m.currency === fiatCode || (m.currencies ?? []).includes(fiatCode))) ?? [];
   useEffect(() => {
     if (presentation) return;
     if (!initialized.current && config) {
       initialized.current = true;
-      setTab(initialAction && tabs.includes(initialAction) ? initialAction : config.defaultAction && tabs.includes(config.defaultAction) ? config.defaultAction : tabs[0] ?? 'swap');
+      setTab(initialAction && tabs.includes(initialAction) ? initialAction : config.defaultAction && isTab(config.defaultAction) && tabs.includes(config.defaultAction) ? config.defaultAction : tabs[0] ?? 'swap');
       if (assets[0]) setFromKey(assetKey(assets[0]));
       const other = assets.find(a => assetKey(a) !== assetKey(assets[0]));
       if (other) setToKey(assetKey(other));
+      const dp = config.defaultPairs;
+      const sw = dp?.swap, cv = dp?.convert;
+      const byNet = (id?: string) => assets.find((a) => a.assetNetworkId === id);
+      if (sw) { const f2c = sw.source.startsWith('fiat:'); setSwapDir(f2c ? 'f2c' : 'c2f'); setFiatSel((f2c ? sw.source : sw.destination).slice(5)); const a = byNet(f2c ? sw.destination : sw.source); if (a) setFromKey(assetKey(a)); }
+      if (cv && byNet(cv.source) && byNet(cv.destination)) { setFromKey((k) => (sw ? k : assetKey(byNet(cv.source)!))); setToKey(assetKey(byNet(cv.destination)!)); }
     }
     if (tabs.length && !tabs.includes(tab)) { setTab(tabs[0]); reset(); }
     if (fromKey && !assets.some(a => assetKey(a) === fromKey)) setFromKey(null);
     if (toKey && !assets.some(a => assetKey(a) === toKey)) setToKey(null);
   }, [config, presentation, tab, fromKey, toKey]);
+  useEffect(() => {
+    if (presentation || tab !== 'swap' || !swapAssets.length) return;
+    if (!from || !swapAssets.some((a) => assetKey(a) === assetKey(from))) { setFromKey(assetKey(swapAssets[0])); reset(); }
+  }, [tab, swapAssets, from, presentation]);
   useEffect(() => {
     if (presentation || !initialAction || !tabs.includes(initialAction)) return;
     setTab((cur) => { if (cur === initialAction) return cur; setTouched(false); setPaymentMethodId(''); reset(); return initialAction; });
@@ -112,12 +132,12 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
   useEffect(() => {
     if (presentation) return;
     setQuote(null); setStatus(null); setQuoting(false);
-    if (inactive || !source || !destination || !amount || Number(amount) <= 0 || !tabs.includes(tab) || (!twoSided && !paymentMethodId)) return;
+    if (inactive || !source || !destination || !amount || Number(amount) <= 0 || !tabs.includes(tab) || (tab === 'swap' && !paymentMethodId)) return;
     const controller = new AbortController();
     const current = ++revision.current;
     const timer = setTimeout(() => {
       setQuoting(true);
-      createSandboxQuote(site.tenantSlug, { action: tab, source, destination, amount, ...(paymentMethodId && !twoSided ? { paymentMethodId } : {}) }, { signal: controller.signal })
+      createSandboxQuote(site.tenantSlug, { action: tab, source, destination, amount, ...(paymentMethodId && tab === 'swap' ? { paymentMethodId } : {}) }, { signal: controller.signal })
         .then(q => { if (!controller.signal.aborted && current === revision.current) { setQuote(q); idempotency.current = crypto.randomUUID(); } })
         .catch(e => { if (!controller.signal.aborted && current === revision.current) setStatus((e as Error).message); })
         .finally(() => { if (!controller.signal.aborted && current === revision.current) setQuoting(false); });
@@ -154,7 +174,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
     return () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave); if (raf) cancelAnimationFrame(raf); };
   }, []);
 
-  const cryptoSide = tab === 'sell' ? 'from' : 'to';
+  const cryptoSide = tab === 'swap' ? 'from' : 'to';
   const pickBottom = useCallback(() => setPicker(cryptoSide === 'to' ? 'to' : 'from'), [cryptoSide]);
   const shell = (inner: React.ReactNode) => (
     <div ref={frame} className="s-glowframe" data-testid="widget-exchange"><div className="s-glowinner p-3.5 sm:p-7"><div className="s-clip" aria-hidden="true"><span className="s-spec" /><span className="s-sheen" /></div>{inner}</div></div>
@@ -163,7 +183,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
     <div className="py-6 text-center" data-testid="state-exchange-empty">
       <span className="s-badge">Exchange enabled</span>
       <h3 className="mt-4 text-xl font-semibold">No exchange actions are enabled yet</h3>
-      <p className="s-muted mx-auto mt-2 max-w-sm text-sm leading-relaxed">{site.brandName} has the exchange service turned on, but none of Swap, Convert, Buy or Sell have been enabled. They will appear here once configured.</p>
+      <p className="s-muted mx-auto mt-2 max-w-sm text-sm leading-relaxed">{site.brandName} has the exchange service turned on, but neither Swap nor Convert has been enabled. They will appear here once configured.</p>
     </div>);
 
   const onSelect = (a: AssetNetwork) => {
@@ -172,10 +192,10 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
     else { setToKey(k); if (twoSided && from && (presentation ? from.assetId === a.assetId : assetKey(from) === k)) setFromKey(null); }
     reset(); setPicker(null);
   };
-  const flip = () => { const f = fromKey; setFromKey(toKey); setToKey(f); reset(); };
+  const flip = () => { if (tab === 'swap') { setSwapDir((d) => (d === 'f2c' ? 'c2f' : 'f2c')); setPaymentMethodId(''); reset(); return; } const f = fromKey; setFromKey(toKey); setToKey(f); reset(); };
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setTouched(true);
-    const a = twoSided ? from && to : tab === 'buy' ? to : from;
+    const a = twoSided ? from && to : from;
     if (inactive) return;
     if (!a) { setStatus('Choose an asset first.'); return; }
     if (amount === '' || Number(amount) <= 0) { setStatus(null); return; }
@@ -224,10 +244,11 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
       </div>
       {(
         <div className="mt-4 sm:mt-5">
-          <Side id="top" label={tab === 'buy' ? 'You pay' : tab === 'convert' ? 'You convert' : 'You send'} asset={tab === 'buy' ? null : from} fiat={tab === 'buy'} fiatCurrency={config?.fiatCurrency} onPick={() => setPicker('from')} value={amount} onValue={(v) => { setAmount(v); reset(); }} error={amountError} assetsAvailable={assets.length > 0} />
-          {twoSided ? <button type="button" className="s-swapbtn" onClick={flip} aria-label="Switch direction" disabled={!from || !to} data-testid="button-switch-direction"><ArrowDownUp size={17} /></button> : <div className="h-3" />}
-          <Side id="bottom" label="You receive" asset={tab === 'sell' ? null : to} fiat={tab === 'sell'} fiatCurrency={config?.fiatCurrency} onPick={pickBottom} value={quote?.outputAmount ?? ''} readOnly assetsAvailable={assets.length > 0} />
-          {!presentation && !twoSided && <label className="s-muted mt-3 block text-xs">Sandbox payment method<select className="s-field mt-1 w-full rounded-lg border bg-transparent p-2" value={paymentMethodId} onChange={e => { setPaymentMethodId(e.target.value); reset(); }} data-testid="select-exchange-payment-method"><option value="">Select a method</option>{methods.map(m => <option key={m.id} value={m.id}>{m.label} ({m.currency})</option>)}</select></label>}
+          <Side id="top" label={fiatSource ? 'You pay' : tab === 'convert' ? 'You convert' : 'You send'} asset={fiatSource ? null : from} fiat={fiatSource} fiatCurrency={fiatCode || undefined} onPick={() => setPicker('from')} value={amount} onValue={(v) => { setAmount(v); reset(); }} error={amountError} assetsAvailable={assets.length > 0} />
+          {true ? <button type="button" className="s-swapbtn" onClick={flip} aria-label="Switch direction" disabled={tab === 'swap' ? swapAssets.length === 0 : !from || !to} data-testid="button-switch-direction"><ArrowDownUp size={17} /></button> : <div className="h-3" />}
+          <Side id="bottom" label="You receive" asset={tab === 'swap' ? (fiatSource ? from : null) : to} fiat={fiatDest} fiatCurrency={fiatCode || undefined} onPick={pickBottom} value={quote?.outputAmount ?? ''} readOnly assetsAvailable={assets.length > 0} />
+          {!presentation && fiatCodes.length > 1 && tab === 'swap' && <label className="s-muted mt-3 block text-xs">Fiat currency<select className="s-field mt-1 w-full rounded-lg border bg-transparent p-2" value={fiatCode} onChange={(e) => { setFiatSel(e.target.value); setPaymentMethodId(''); reset(); }} data-testid="select-exchange-fiat">{fiatCodes.map((c) => <option key={c} value={c}>{c}</option>)}</select></label>}
+          {!presentation && tab === 'swap' && <label className="s-muted mt-3 block text-xs">Sandbox payment method<select className="s-field mt-1 w-full rounded-lg border bg-transparent p-2" value={paymentMethodId} onChange={e => { setPaymentMethodId(e.target.value); reset(); }} data-testid="select-exchange-payment-method"><option value="">Select a method</option>{methods.map(m => <option key={m.id} value={m.id}>{m.label} ({m.currency})</option>)}</select></label>}
           <p className="s-muted mt-2 text-xs" aria-live="polite" data-testid="text-receive-note">{quoting ? 'Calculating sandbox quote…' : quote ? `Receive ${quote.outputAmount} ${quote.destinationSymbol} · sandbox estimate · markup ${quote.spreadBps / 100}% · valid until ${new Date(quote.expiresAt).toLocaleTimeString()}` : 'Receive amount appears once a quote is available.'}</p>
         </div>
       )}
@@ -262,7 +283,7 @@ export function ExchangeWidget({ site, caps, presentation = false, allowedAction
         <a className="s-link ml-3" href={`${import.meta.env.BASE_URL}${site.tenantSlug}/orders/${created.order.id}#${created.trackingToken}`} data-testid="link-track-order">Track order</a>
         <p className="s-muted mt-2">Keep your tracking link private. All statuses are simulations.</p>
       </div>}
-      {picker && <AssetPicker assets={assets} selected={pickerAsset ? assetKey(pickerAsset) : null} blockedAssetId={blocked} blockedKey={blockedKey} title={picker === 'from' ? 'Select asset to send' : 'Select asset to receive'} onSelect={onSelect} onClose={() => setPicker(null)} />}
+      {picker && <AssetPicker assets={pickList} selected={pickerAsset ? assetKey(pickerAsset) : null} blockedAssetId={blocked} blockedKey={blockedKey} title={picker === 'from' ? 'Select asset to send' : 'Select asset to receive'} onSelect={onSelect} onClose={() => setPicker(null)} />}
     </form>
   );
 }

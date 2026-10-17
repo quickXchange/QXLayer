@@ -69,17 +69,17 @@ test("rules cannot enable a missing route, bypass limits, or target another tena
   assert.throws(() => calculateQuote(s, catalog, { ...input, amount: "1001" }), /between/);
   assert.throws(() => validatePricingRules(settings([rule({ source: "tenant-b-network" })])), /does not belong/);
   assert.throws(() => validatePricingRules(settings([rule({ rate: "0" })])), /positive/);
-  assert.throws(() => validatePricingRules(settings([rule({ source: "fiat:USD" })])), /action/);
+  assert.throws(() => validatePricingRules(settings([rule({ action: "convert", source: "fiat:USD" })])), /action/);
 });
 test("tenant configurations never share a pricing rule result", () => {
   assert.equal(calculateQuote(settings([rule({ rate: "3" })]), catalog, input).quote.rate, "2.97");
   assert.equal(calculateQuote(settings(), catalog, input).quote.rate, "2");
 });
-test("payment-method-specific Buy rules are isolated from other methods and actions", () => {
-  const s = settings([rule({ action: "buy", source: "fiat:USD", paymentMethodId: "method-a" })]);
+test("payment-method-specific Fiat Swap rules are isolated from other methods and actions", () => {
+  const s = settings([rule({ action: "swap", source: "fiat:USD", paymentMethodId: "method-a" })]);
   s.paymentMethods = [{ id: "method-a", label: "Bank", enabled: true, currency: "USD", buy: true, sell: false }];
   validatePricingRules(s);
-  const buy = { ...input, action: "buy" as const, source: "fiat:USD", paymentMethodId: "method-a" };
+  const buy = { ...input, action: "swap" as const, source: "fiat:USD", paymentMethodId: "method-a" };
   assert.equal(selectPricingRule(s, buy)?.id, s.pricingRules![0].id);
   assert.equal(selectPricingRule(s, { ...buy, paymentMethodId: "method-b" }), undefined);
   assert.throws(() => validatePricingRules(settings([rule({ paymentMethodId: "method-a" })])), /payment method/);

@@ -10,5 +10,9 @@
   {
     "file": "0003_owned_auth.sql",
     "sha256": "3814d317a99cc091168ef93f98996acc97e4d0d8ea253b570291e746a885153d"
+  },
+  {
+    "file": "0007_global_exchange_catalog.sql",
+    "sha256": "7f9831fbfa0cd904da08d7b8d6d251a0d3e4378500716b25ca943432dee3e2fc"
   }
 ]
