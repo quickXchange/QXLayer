@@ -21,6 +21,16 @@ never disable protection simply to make a test pass.
 
 ## First-deployment target safety
 
+Deployment-detail readback can report `target: null` for a Preview rather than
+the literal string `preview`. Do not silently rewrite that field as evidence.
+
+**Why:** A ready, protected candidate appeared in the provider's explicit
+`target=preview` deployment listing while its deployment-detail target was null.
+
+**How to apply:** Preserve the raw target in receipts and corroborate Preview
+membership, the exact source commit, the stable alias and absence of a project
+Production target. A null field alone does not establish the authorized boundary.
+
 Vercel's first-deployment rule overrides the ordinary Preview default: a new
 project's first deployment is always Production, including non-production Git
 branches and CLI commands without --prod. The isolated Staging project returned

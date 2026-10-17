@@ -4,11 +4,11 @@ description: Visual preferences remain relevant, but the user has prioritized th
 ---
 ## Current public marketplace direction
 
-The user explicitly authorized redesigning the VYNOX LAYER public landing page and dedicated Explore pages for every visible registered product, using Monbits only as structural inspiration. This supersedes the older public-landing preservation restriction below, not the approved tenant Exchange master or authenticated Admin design.
+The current follow-up covers premium presentations for all 15 VYNOX LAYER Product Explore pages, using Monbits as structural inspiration. Preserve the existing logo, colors and main Landing Page identity, the approved tenant Exchange master and authenticated Admin design.
 
-**Why:** The new request is a premium product-marketing redesign, with a rich illustrative Exchange journey and three Basic/Premium/Pro EUR cards; it is not permission to implement the other advertised services.
+**Why:** The user requested distinct, substantial product showcases with real sanitized captures of implemented interfaces and explicitly labelled concepts for planned products. This is not permission to implement the other advertised services.
 
-**How to apply:** Reuse existing registry, Plans, Super Admin controls, accounts and tenant isolation. Public copy, artwork and tier references stay editable through existing controls. Local branding/order/invoice/review scenes are clearly labelled marketing illustrations, not proof of real delivery. All nonoperational products remain Preview/Coming Soon. Preserve published-price protections; unapproved proposals cannot purchase. No publishing, Production data, DNS or live financial changes were authorized.
+**How to apply:** Reuse existing registry, Plans, Super Admin controls, accounts and tenant isolation. Public copy, artwork, visual content, visibility and tier references stay editable through existing controls. Capture only actually available shared interfaces with fictional/sanitized data; do not fabricate invoice or Mini App screenshots or enable tenant capabilities merely to obtain them. Local authored scenes remain clearly labelled illustrations. All nonoperational products remain Preview/Coming Soon. Preserve published-price protections; Basic/Premium/Pro proposals cannot purchase. Protected candidate-only deployment and bounded marketing parity are authorized; public Live, DNS, customer records and live financial execution remain unchanged.
 
 ## Retained tenant and historical visual constraints
 

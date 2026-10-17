@@ -3,7 +3,7 @@
 - [OpenAPI body names](openapi-body-names.md) — named component request schemas avoid duplicate Orval Zod exports.
 - [Vite dependency cache](vite-dependency-cache.md) — React version errors can come from stale prebundles even when package resolution matches.
 - [Website CSS cascade](website-css-cascade.md) — layered visibility utilities can lose to custom display rules; verify mobile and desktop computed display.
-- [Core and catalog scope](customer-visual-approval.md) — premium catalog advertising is not service implementation; reusable core, no live crypto, publishing or QuickXchange changes.
+- [Core and catalog scope](customer-visual-approval.md) — premium Explore presentations, preserve main Landing/master; protected candidate only, no public Live, DNS or financial activation.
 - [Official VYNOX LAYER brand](qxlayer-brand.md) — supplied master supersedes the old identity; preserve the approved platform design and tenant branding.
 - [Exchange-only scope](exchange-only-scope.md) — develop only White Label Exchange sandbox and its tenant admin; all other products stay unchanged visual previews.
 - [Clerk UI test identities](clerk-testing-memberships.md) — grant the actual generated identity temporary tenant access; extra claim arguments do not override the session.
@@ -55,3 +55,4 @@
 - [Production Owner continuity](production-owner-continuity.md) — preserve the original Production identity; verified Development Gmail is not automatic migration authority.
 - [Recovery token custody](production-recovery-custody.md) — explicit redemption, protected redirect preservation, recovery-cookie resume and native mail evidence.
 - [Private commerce RLS](private-outbox-rls.md) — conflict and row-lock clauses can require policies beyond an ordinary insert or read.
+- [Supabase Storage missing objects](supabase-storage-not-found.md) — authenticated object-info may use HTTP 400 with structured statusCode 404; never treat all 400s as missing.
