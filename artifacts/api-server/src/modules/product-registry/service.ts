@@ -62,6 +62,12 @@ export async function registerProductModule(principal: Principal, input: ModuleM
       await client.query("INSERT INTO entitlement_definitions (key,label,kind,value_type) VALUES ($1,$2,'feature','boolean')", [f.key, f.label]);
     }
     for (const l of input.limits) await client.query("INSERT INTO entitlement_definitions (key,label,kind,value_type) VALUES ($1,$2,'limit',$3)", [l.key, l.label, l.valueType]);
+    // Future registered services receive an editable, initially hidden marketing
+    // entry. Registration never silently advertises an operational product.
+    await client.query(`INSERT INTO landing_products(key,name,description,icon,visible,status,currency,cta_label)
+      VALUES($1,$2,$3,'engine',false,'coming_soon','EUR','Explore')`,
+      [input.key,input.name.trim().slice(0,100),input.description.trim().length >= 10
+        ? input.description.trim().slice(0,500) : `${input.name.trim()} is a planned product. Runtime delivery is not available.`]);
     await audit(client, principal, null, "product.registered", `Registered deferred module ${input.key}`, { key: input.key });
     return input;
   });

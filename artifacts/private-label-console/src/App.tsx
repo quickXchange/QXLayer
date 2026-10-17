@@ -48,6 +48,7 @@ const Plans = lazy(() => import('@/pages/plans'));
 const PlanDetail = lazy(() => import('@/pages/plan-detail'));
 const Addons = lazy(() => import('@/pages/addons'));
 const LandingProducts = lazy(() => import('@/pages/landing-products'));
+const ProductExplore = lazy(() => import('@/pages/product-explore'));
 const CatalogPreview = lazy(() => import('@/pages/catalog-preview'));
 import { BrandLogo } from '@/components/brand-logo';
 import { ConsoleThemeScope } from '@/components/app/console-frame';
@@ -186,6 +187,7 @@ function AppRoutes() {
   <Switch>
               <Route path="/" component={HomeRedirect} />
               <Route path="/demo/admin" component={DemoAdmin} />
+              <Route path="/products/:productKey" component={ProductExplore} />
               {ownedAuth && <Route path="/sign-in" component={OwnedSignIn} />}
               {ownedAuth && <Route path="/sign-up" component={OwnedSignUp} />}
               {ownedAuth && <Route path="/forgot-password" component={OwnedForgot} />}

@@ -2,8 +2,8 @@ import { lazy, Suspense, useMemo, useState } from 'react';
 import { Link } from 'wouter';
 import { useGetPublicProductCatalog, type LandingProduct } from '@workspace/api-client-react';
 import { SiteShell } from '@site/components/site-shell';
-import { Hero } from '@site/components/hero';
-import { resolveCaps } from '@site/lib/capabilities';
+import { VynoxHero } from './vynox-hero';
+import { ExchangeSpotlight, HomeJourney, HomeFaq } from './home-sections';
 import { PLATFORM_SITE } from '@/lib/platform-site';
 const PlatformCatalog = lazy(() => import('./platform-catalog').then(m => ({ default: m.PlatformCatalog })));
 import { LiveDemo } from './live-demo';
@@ -25,7 +25,6 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const items = useMemo(() => [...(q.data ?? [])].sort((a, b) => a.displayOrder - b.displayOrder), [q.data]);
   const open = items.find((p) => p.key === openKey) ?? null;
-  const caps = useMemo(() => resolveCaps(PLATFORM_SITE), []);
   const root = preview ? '/catalog-preview' : '/';
   const actions = preview
     ? <Link href="/admin" className="s-btn s-btn-ghost" data-testid="link-back-console">Back to console</Link>
@@ -40,13 +39,16 @@ export function CatalogLanding({ preview }: { preview?: boolean }) {
   );
   return (
     <div data-testid="page-landing">
-      <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV, actions, footer, lightLogoUrl: QXLAYER_LIGHT_LOGO_URL, lightFaviconUrl: QXLAYER_LIGHT_ICON_URL,
+      <SiteShell site={PLATFORM_SITE} ambient platform={{ root, nav: NAV.filter(n => n.id !== 'exchange' || items.some(p => p.key === 'crypto_exchange')), actions, footer, lightLogoUrl: QXLAYER_LIGHT_LOGO_URL, lightFaviconUrl: QXLAYER_LIGHT_ICON_URL,
         headerBrand: <BrandLogo size={60} className="w-[150px] min-[360px]:w-[168px] sm:w-[192px] lg:w-[204px]" style={{ width: undefined, height: 'auto' }} /> }}>
-        <Hero site={PLATFORM_SITE} caps={caps} root={root} secondary={{ id: 'products', label: 'Browse products' }} />
+        <VynoxHero items={items} />
+        {items.some(p => p.key === 'crypto_exchange') && <ExchangeSpotlight />}
         <Suspense fallback={<div className="s-wrap py-20" aria-busy="true"><div className="s-skel h-8 w-64" /></div>}>
           <PlatformCatalog items={items} loading={q.isLoading} error={q.isError} onRetry={() => void q.refetch()} open={open} setOpen={(p: LandingProduct | null) => setOpenKey(p ? p.key : null)} />
         </Suspense>
+        <HomeJourney />
         <LiveDemo />
+        <HomeFaq />
       </SiteShell>
     </div>
   );

@@ -86,6 +86,7 @@ export async function verifyCore(f: { admin: Principal; clientAdmin: Principal; 
     await pool.query("DELETE FROM tenant_entitlement_overrides WHERE key=ANY($1::text[])", [[key, child, limit]]);
     await pool.query("DELETE FROM tenant_usage_counters WHERE key=$1", [limit]);
     await pool.query("DELETE FROM entitlement_definitions WHERE key=ANY($1::text[])", [[key, child, limit]]);
+    await pool.query("DELETE FROM landing_products WHERE key=$1", [key]);
     await pool.query("DELETE FROM module_catalog WHERE key=$1", [key]);
   }
 }

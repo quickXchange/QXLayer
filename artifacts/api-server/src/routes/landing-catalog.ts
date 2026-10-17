@@ -2,8 +2,13 @@ import { Router } from "express";
 import * as v from "@workspace/api-zod";
 import { principalFrom, requireAuthentication, sameOriginMutation } from "../middlewares/authentication";
 import { publicProductCatalog, listProducts, saveProduct } from "../modules/landing-catalog/service";
+import { publicPlanProposals } from "../modules/landing-catalog/plan-proposals";
 
 const router = Router();
+router.get("/public/plan-proposals", async (_req, res): Promise<void> => {
+  res.set("Cache-Control", "no-store");
+  res.json(v.GetPublicPlanProposalsResponse.parse(await publicPlanProposals()));
+});
 router.get("/public/product-catalog", async (_req, res): Promise<void> => {
   res.set("Cache-Control", "no-store");
   const catalog = await publicProductCatalog();

@@ -12,11 +12,11 @@ export function priceText(p: LandingProduct) {
   return { main: money(p.startingPrice, p.currency), sub: p.billingPeriod === 'on_request' ? '' : billingLabel[p.billingPeriod] };
 }
 export function setupText(p: LandingProduct) { return p.setupFee === null ? null : money(p.setupFee, p.currency); }
-export const statusLabel = (s: string) => (s === 'available' ? 'Available' : 'Coming soon');
+export const statusLabel = (s: string) => (s === 'available' ? 'Preview' : 'Coming soon');
 export const readinessNote = (r: string) =>
   r === 'sandbox_only'
     ? 'Sandbox only. This is a non-executing Exchange sandbox: no live trading, no real funds, no production service.'
-    : 'Planned. Not implemented: there are no demos, APIs or dashboards for this product.';
+    : 'Coming Soon. Illustrative interfaces only: no operational API, customer dashboard or live service is enabled.';
 
 const KEY = 'pl-landing-theme';
 export function useLandingTheme() {

@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { ExploreContentEditor } from '@/components/super-admin/explore-content-editor';
 
 type Form = { visible: boolean; name: string; description: string; icon: string; startingPrice: string; setupFee: string; currency: string; billingPeriod: string; status: string; ctaLabel: string; displayOrder: string };
 const PRICE = /^(0|[1-9][0-9]{0,9})(\.[0-9]{1,2})?$/;
@@ -102,18 +103,19 @@ export default function LandingProducts() {
 function Editor() {
   const q = useListLandingProducts({ query: { refetchInterval: 30000, refetchOnWindowFocus: true } as never });
   const [edit, setEdit] = useState<LandingProduct | null>(null);
+  const [exploreEdit, setExploreEdit] = useState<LandingProduct | null>(null);
   const items = [...(q.data ?? [])].sort((a, b) => a.displayOrder - b.displayOrder);
   return (
     <div>
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-copper">Landing page</p>
       <h1 className="font-display mt-2 text-4xl">Landing products</h1>
-      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Everything on the public product catalog is read from these records. Changes appear on the landing page within about 30 seconds.</p>
+      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">Manage landing cards and dedicated Explore pages here. Content and visibility refresh on the website automatically. Exchange plan prices and entitlements remain in <Link href="/plans" className="underline">Plans</Link>; publish reviewed changes there to update public offers and ordering.</p>
       <div className="mt-8 space-y-2">
         {q.isLoading && Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-16 w-full" />)}
         {q.isError && <div className="rounded-md border p-6" role="alert" data-testid="error-list"><p className="font-medium">Could not load landing products.</p><Button className="mt-3" onClick={() => q.refetch()} data-testid="button-retry"><RefreshCw className="mr-2 h-4 w-4" />Retry</Button></div>}
         {q.data && items.length === 0 && <p className="rounded-md border p-6 text-sm text-muted-foreground" data-testid="empty-list">No landing products exist.</p>}
         {items.map((it) => (
-          <div key={it.key} className="flex items-center gap-4 rounded-md border bg-card p-3" data-testid={`row-landing-${it.key}`}>
+          <div key={it.key} className="flex flex-wrap items-center gap-3 rounded-md border bg-card p-3" data-testid={`row-landing-${it.key}`}>
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-md bg-sidebar text-sidebar-primary"><ProductIcon icon={it.icon} className="h-8 w-8" /></div>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{it.name}</p>
@@ -121,10 +123,12 @@ function Editor() {
             </div>
             <span className={`rounded-full border px-2.5 py-0.5 font-mono text-[11px] uppercase ${it.visible ? 'text-emerald-600' : 'text-muted-foreground'}`}>{it.visible ? 'Visible' : 'Hidden'}</span>
             <Button size="sm" variant="outline" onClick={() => setEdit(it)} data-testid={`button-edit-${it.key}`}><Pencil className="mr-1.5 h-3.5 w-3.5" />Edit</Button>
+            <Button size="sm" variant="outline" disabled={!it.explore} onClick={() => setExploreEdit(it)} data-testid={`button-explore-edit-${it.key}`}>Explore content</Button>
           </div>
         ))}
       </div>
       {edit && <EditDialog key={edit.key} product={edit} onClose={() => setEdit(null)} />}
+      {exploreEdit && <ExploreContentEditor key={exploreEdit.key} product={exploreEdit} onClose={() => setExploreEdit(null)} />}
     </div>
   );
 }

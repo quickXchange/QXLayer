@@ -1,0 +1,49 @@
+.vx-hero{position:relative;overflow:hidden;padding:clamp(3rem,8vw,6.5rem) 0 clamp(2.5rem,6vw,4.5rem)}
+.vx-hero-grid{display:grid;gap:2.5rem;align-items:center}
+@media(min-width:1024px){.vx-hero-grid{grid-template-columns:minmax(0,6fr) minmax(0,5fr);gap:3rem}}
+.vx-h1{font-size:clamp(2.3rem,6.4vw,5rem);line-height:1;letter-spacing:-.04em;font-weight:650;overflow-wrap:anywhere}
+.vx-grad{background:linear-gradient(100deg,var(--s-primary-ink,var(--s-primary)),var(--s-accent-ink,var(--s-accent)) 60%,var(--s-primary-ink,var(--s-primary)));background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:vx-shift 9s linear infinite}
+@keyframes vx-shift{to{background-position:-200% 0}}
+.vx-in{opacity:0;transform:translateY(14px);animation:vx-rise .8s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i,0)*90ms)}
+@keyframes vx-rise{to{opacity:1;transform:none}}
+.vx-orbit{position:relative;aspect-ratio:1;width:100%;max-width:34rem;margin-inline:auto;container-type:inline-size}
+.vx-ring{position:absolute;inset:var(--r);border-radius:50%;border:1px dashed color-mix(in srgb,var(--s-primary) 40%,transparent);animation:vx-spin var(--d) linear infinite}
+.vx-ring.rev{animation-direction:reverse}
+@keyframes vx-spin{to{transform:rotate(360deg)}}
+.vx-node{position:absolute;left:50%;top:0;width:0;height:0}
+.vx-chip{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-size:clamp(9px,2.6cqw,12px);padding:.5em .9em;border-radius:99px;border:1px solid var(--s-line);background:color-mix(in srgb,var(--s-bg2) 88%,transparent);backdrop-filter:blur(6px);transition:transform .3s,border-color .3s;text-decoration:none;color:inherit}
+.vx-chip:hover,.vx-chip:focus-visible{border-color:var(--s-accent);transform:translate(-50%,-50%) scale(1.1)}
+.vx-counter{animation:vx-spin var(--d) linear infinite reverse}
+.vx-core{position:absolute;inset:34%;border-radius:32%;display:grid;place-items:center;text-align:center;border:1px solid var(--s-line);background:radial-gradient(circle at 30% 20%,color-mix(in srgb,var(--s-accent) 45%,transparent),color-mix(in srgb,var(--s-primary) 55%,var(--s-bg2)));box-shadow:0 30px 80px -30px var(--s-primary);animation:vx-float 6s ease-in-out infinite}
+@keyframes vx-float{50%{transform:translateY(-8px)}}
+.vx-pulse{position:absolute;inset:34%;border-radius:32%;border:1px solid var(--s-accent);animation:vx-ping 3.2s ease-out infinite}
+@keyframes vx-ping{to{transform:scale(2.1);opacity:0}}
+.vx-strip{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase}
+.vx-sec{padding:clamp(3rem,7vw,5.5rem) 0;scroll-margin-top:5rem}
+.vx-card{position:relative;border:1px solid var(--s-line);border-radius:1.25rem;background:var(--s-card);padding:1.4rem;overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .3s}
+.vx-card::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(18rem 12rem at var(--gx,50%) var(--gy,0%),color-mix(in srgb,var(--s-accent) 14%,transparent),transparent 70%)}
+.vx-card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--s-accent) 55%,var(--s-line))}
+.vx-card:hover::after{opacity:1}
+.vx-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr))}
+.vx-num{font-family:ui-monospace,monospace;font-size:.7rem;letter-spacing:.14em;color:var(--s-accent-ink,var(--s-accent))}
+.vx-tabs{display:inline-flex;flex-wrap:wrap;gap:.25rem;padding:.25rem;border-radius:99px;border:1px solid var(--s-line);background:var(--s-bg2);max-width:100%}
+.vx-tab{padding:.5rem 1rem;border-radius:99px;font-size:.85rem;font-weight:550;transition:background .25s,color .25s}
+.vx-tab[aria-selected=true]{background:var(--s-primary);color:var(--s-primary-fg)}
+.vx-tab:not([aria-selected=true]):hover{background:color-mix(in srgb,var(--s-primary) 14%,transparent)}
+.vx-field{width:100%;min-width:0;border:1px solid var(--s-line);border-radius:.8rem;background:var(--s-bg2);color:inherit;padding:.7rem .9rem;font:inherit}
+.vx-field:focus-visible{outline:2px solid var(--s-accent);outline-offset:1px}
+.vx-panel{animation:vx-rise .45s cubic-bezier(.2,.7,.2,1)}
+.vx-faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:1rem;padding:1.1rem 0;font-weight:600}
+.vx-faq summary::-webkit-details-marker{display:none}
+.vx-faq summary svg{transition:transform .3s;flex:none}
+.vx-faq details[open] summary svg{transform:rotate(45deg)}
+.vx-faq details{border-bottom:1px solid var(--s-line)}
+.vx-bar{height:.5rem;border-radius:99px;background:color-mix(in srgb,var(--s-primary) 18%,transparent);overflow:hidden}
+.vx-bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--s-primary),var(--s-accent));transition:width .6s cubic-bezier(.2,.7,.2,1)}
+.vx-split{display:grid;gap:2rem;align-items:center}
+@media(min-width:900px){.vx-split{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}}
+.vx-tier{display:grid;gap:1rem;grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:860px){.vx-tier{grid-template-columns:1fr}}
+.vx-tier .vx-card.hot{border-color:var(--s-accent);box-shadow:0 30px 70px -40px var(--s-primary)}
+.vx-wrap *{min-width:0}
+@media(prefers-reduced-motion:reduce){.vx-in{opacity:1;transform:none;animation:none}.vx-ring,.vx-counter,.vx-core,.vx-pulse,.vx-grad{animation:none!important}.vx-card,.vx-chip,.vx-bar>i{transition:none}.vx-panel{animation:none}.vx-card:hover{transform:none}}

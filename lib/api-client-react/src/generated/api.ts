@@ -70,6 +70,7 @@ import type {
   NotificationReadInput,
   Plan,
   PlanInput,
+  PlanProposalCatalog,
   PlanStatusInput,
   PlatformApprovalInput,
   PlatformBillingPeriods,
@@ -5271,6 +5272,77 @@ export function useGetPublicProductCatalog<TData = Awaited<ReturnType<typeof get
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetPublicProductCatalogQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPublicPlanProposalsUrl = () => {
+
+
+
+
+  return `/api/public/plan-proposals`
+}
+
+export const getPublicPlanProposals = async ( options?: Parameters<typeof customFetch>[1]): Promise<PlanProposalCatalog> => {
+
+  return customFetch<PlanProposalCatalog>(getGetPublicPlanProposalsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicPlanProposalsQueryKey = () => {
+    return [
+    `/api/public/plan-proposals`
+    ] as const;
+    }
+
+
+export const getGetPublicPlanProposalsQueryOptions = <TData = Awaited<ReturnType<typeof getPublicPlanProposals>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPlanProposals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicPlanProposalsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicPlanProposals>>> = ({ signal }) => getPublicPlanProposals({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicPlanProposals>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicPlanProposalsQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicPlanProposals>>>
+export type GetPublicPlanProposalsQueryError = ErrorType<unknown>
+
+
+
+export function useGetPublicPlanProposals<TData = Awaited<ReturnType<typeof getPublicPlanProposals>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicPlanProposals>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicPlanProposalsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

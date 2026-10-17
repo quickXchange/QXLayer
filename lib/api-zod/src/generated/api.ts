@@ -4801,6 +4801,69 @@ export const getPublicProductCatalogResponseOneCtaLabelMax = 40;
 export const getPublicProductCatalogResponseOneDisplayOrderMin = 0;
 export const getPublicProductCatalogResponseOneDisplayOrderMax = 10000;
 
+export const getPublicProductCatalogResponseOneExploreEyebrowMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreHeadlineMax = 180;
+
+export const getPublicProductCatalogResponseOneExploreSummaryMax = 1200;
+
+export const getPublicProductCatalogResponseOneExploreHeroImageUrlMax = 2048;
+
+export const getPublicProductCatalogResponseOneExploreLandingHeadlineMax = 180;
+
+export const getPublicProductCatalogResponseOneExploreLandingSummaryMax = 1200;
+
+export const getPublicProductCatalogResponseOneExploreCustomerExperienceMax = 1600;
+
+export const getPublicProductCatalogResponseOneExploreFeaturesItemTitleMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreFeaturesItemBodyMax = 1200;
+
+export const getPublicProductCatalogResponseOneExploreFeaturesMax = 16;
+
+export const getPublicProductCatalogResponseOneExploreBenefitsItemTitleMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreBenefitsItemBodyMax = 1200;
+
+export const getPublicProductCatalogResponseOneExploreBenefitsMax = 12;
+
+export const getPublicProductCatalogResponseOneExploreStepsItemTitleMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreStepsItemBodyMax = 1200;
+
+export const getPublicProductCatalogResponseOneExploreStepsMax = 8;
+
+export const getPublicProductCatalogResponseOneExploreIntegrationsItemTitleMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreIntegrationsItemBodyMax = 1200;
+
+export const getPublicProductCatalogResponseOneExploreIntegrationsMax = 16;
+
+export const getPublicProductCatalogResponseOneExploreUseCasesItemTitleMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreUseCasesItemBodyMax = 1200;
+
+export const getPublicProductCatalogResponseOneExploreUseCasesMax = 12;
+
+export const getPublicProductCatalogResponseOneExploreFaqsItemQuestionMax = 200;
+
+export const getPublicProductCatalogResponseOneExploreFaqsItemAnswerMax = 1600;
+
+export const getPublicProductCatalogResponseOneExploreFaqsMax = 16;
+
+export const getPublicProductCatalogResponseOneExploreGalleryItemTitleMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreGalleryItemCaptionMax = 700;
+
+export const getPublicProductCatalogResponseOneExploreGalleryItemImageUrlMax = 2048;
+
+export const getPublicProductCatalogResponseOneExploreGalleryMax = 12;
+
+export const getPublicProductCatalogResponseOneExplorePricingTiersItemLabelMin = 2;
+export const getPublicProductCatalogResponseOneExplorePricingTiersItemLabelMax = 60;
+
+export const getPublicProductCatalogResponseOneExplorePricingTiersMax = 3;
+
 
 
 export const GetPublicProductCatalogResponseItem = zod.object({
@@ -4814,12 +4877,86 @@ export const GetPublicProductCatalogResponseItem = zod.object({
   "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
   "status": zod.enum(['available', 'coming_soon']),
   "ctaLabel": zod.string().min(getPublicProductCatalogResponseOneCtaLabelMin).max(getPublicProductCatalogResponseOneCtaLabelMax),
-  "displayOrder": zod.number().int().min(getPublicProductCatalogResponseOneDisplayOrderMin).max(getPublicProductCatalogResponseOneDisplayOrderMax)
+  "displayOrder": zod.number().int().min(getPublicProductCatalogResponseOneDisplayOrderMin).max(getPublicProductCatalogResponseOneDisplayOrderMax),
+  "explore": zod.object({
+  "eyebrow": zod.string().max(getPublicProductCatalogResponseOneExploreEyebrowMax),
+  "headline": zod.string().max(getPublicProductCatalogResponseOneExploreHeadlineMax),
+  "summary": zod.string().max(getPublicProductCatalogResponseOneExploreSummaryMax),
+  "heroImageUrl": zod.string().max(getPublicProductCatalogResponseOneExploreHeroImageUrlMax),
+  "landingHeadline": zod.string().max(getPublicProductCatalogResponseOneExploreLandingHeadlineMax).optional(),
+  "landingSummary": zod.string().max(getPublicProductCatalogResponseOneExploreLandingSummaryMax).optional(),
+  "customerExperience": zod.string().max(getPublicProductCatalogResponseOneExploreCustomerExperienceMax),
+  "features": zod.array(zod.object({
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreFeaturesItemTitleMax),
+  "body": zod.string().max(getPublicProductCatalogResponseOneExploreFeaturesItemBodyMax)
+})).max(getPublicProductCatalogResponseOneExploreFeaturesMax),
+  "benefits": zod.array(zod.object({
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreBenefitsItemTitleMax),
+  "body": zod.string().max(getPublicProductCatalogResponseOneExploreBenefitsItemBodyMax)
+})).max(getPublicProductCatalogResponseOneExploreBenefitsMax),
+  "steps": zod.array(zod.object({
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreStepsItemTitleMax),
+  "body": zod.string().max(getPublicProductCatalogResponseOneExploreStepsItemBodyMax)
+})).max(getPublicProductCatalogResponseOneExploreStepsMax),
+  "integrations": zod.array(zod.object({
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreIntegrationsItemTitleMax),
+  "body": zod.string().max(getPublicProductCatalogResponseOneExploreIntegrationsItemBodyMax)
+})).max(getPublicProductCatalogResponseOneExploreIntegrationsMax),
+  "useCases": zod.array(zod.object({
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreUseCasesItemTitleMax),
+  "body": zod.string().max(getPublicProductCatalogResponseOneExploreUseCasesItemBodyMax)
+})).max(getPublicProductCatalogResponseOneExploreUseCasesMax),
+  "faqs": zod.array(zod.object({
+  "question": zod.string().max(getPublicProductCatalogResponseOneExploreFaqsItemQuestionMax),
+  "answer": zod.string().max(getPublicProductCatalogResponseOneExploreFaqsItemAnswerMax)
+})).max(getPublicProductCatalogResponseOneExploreFaqsMax),
+  "gallery": zod.array(zod.object({
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemTitleMax),
+  "caption": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemCaptionMax),
+  "imageUrl": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemImageUrlMax)
+})).max(getPublicProductCatalogResponseOneExploreGalleryMax),
+  "pricingTiers": zod.array(zod.object({
+  "label": zod.string().min(getPublicProductCatalogResponseOneExplorePricingTiersItemLabelMin).max(getPublicProductCatalogResponseOneExplorePricingTiersItemLabelMax),
+  "planId": zod.string().uuid().nullable()
+})).max(getPublicProductCatalogResponseOneExplorePricingTiersMax).optional()
+}).optional()
 }).and(zod.object({
   "key": zod.string(),
   "readiness": zod.enum(['sandbox_only', 'planned'])
 }))
 export const GetPublicProductCatalogResponse = zod.array(GetPublicProductCatalogResponseItem)
+
+
+export const getPublicPlanProposalsResponsePlansItemEntitlementsItemKeyMax = 80;
+
+
+export const getPublicPlanProposalsResponsePlansItemEntitlementsItemKeyRegExp = new RegExp('^[a-z][a-z0-9_]*$');
+export const getPublicPlanProposalsResponsePlansItemEntitlementsItemValueTwoMax = 38;
+
+
+export const getPublicPlanProposalsResponsePlansItemEntitlementsItemValueTwoRegExp = new RegExp('^[0-9]+(?:\\.[0-9]{1,18})?$');
+
+
+export const GetPublicPlanProposalsResponse = zod.object({
+  "plans": zod.array(zod.object({
+  "id": zod.string().uuid(),
+  "name": zod.string(),
+  "planName": zod.string(),
+  "description": zod.string(),
+  "monthlyPrice": zod.string().nullable(),
+  "yearlyPrice": zod.string().nullable(),
+  "setupFee": zod.string().nullable(),
+  "currency": zod.string(),
+  "entitlements": zod.array(zod.object({
+  "key": zod.string().max(getPublicPlanProposalsResponsePlansItemEntitlementsItemKeyMax).regex(getPublicPlanProposalsResponsePlansItemEntitlementsItemKeyRegExp),
+  "value": zod.union([zod.boolean(),zod.string().max(getPublicPlanProposalsResponsePlansItemEntitlementsItemValueTwoMax).regex(getPublicPlanProposalsResponsePlansItemEntitlementsItemValueTwoRegExp)])
+})),
+  "pricingConfigured": zod.boolean(),
+  "billingPeriods": zod.array(zod.enum(['monthly', 'yearly']))
+})),
+  "purchaseAvailable": zod.boolean(),
+  "proposal": zod.boolean()
+})
 
 
 export const listLandingProductsResponseOneNameMin = 2;
@@ -4837,6 +4974,69 @@ export const listLandingProductsResponseOneCtaLabelMax = 40;
 export const listLandingProductsResponseOneDisplayOrderMin = 0;
 export const listLandingProductsResponseOneDisplayOrderMax = 10000;
 
+export const listLandingProductsResponseOneExploreEyebrowMax = 120;
+
+export const listLandingProductsResponseOneExploreHeadlineMax = 180;
+
+export const listLandingProductsResponseOneExploreSummaryMax = 1200;
+
+export const listLandingProductsResponseOneExploreHeroImageUrlMax = 2048;
+
+export const listLandingProductsResponseOneExploreLandingHeadlineMax = 180;
+
+export const listLandingProductsResponseOneExploreLandingSummaryMax = 1200;
+
+export const listLandingProductsResponseOneExploreCustomerExperienceMax = 1600;
+
+export const listLandingProductsResponseOneExploreFeaturesItemTitleMax = 120;
+
+export const listLandingProductsResponseOneExploreFeaturesItemBodyMax = 1200;
+
+export const listLandingProductsResponseOneExploreFeaturesMax = 16;
+
+export const listLandingProductsResponseOneExploreBenefitsItemTitleMax = 120;
+
+export const listLandingProductsResponseOneExploreBenefitsItemBodyMax = 1200;
+
+export const listLandingProductsResponseOneExploreBenefitsMax = 12;
+
+export const listLandingProductsResponseOneExploreStepsItemTitleMax = 120;
+
+export const listLandingProductsResponseOneExploreStepsItemBodyMax = 1200;
+
+export const listLandingProductsResponseOneExploreStepsMax = 8;
+
+export const listLandingProductsResponseOneExploreIntegrationsItemTitleMax = 120;
+
+export const listLandingProductsResponseOneExploreIntegrationsItemBodyMax = 1200;
+
+export const listLandingProductsResponseOneExploreIntegrationsMax = 16;
+
+export const listLandingProductsResponseOneExploreUseCasesItemTitleMax = 120;
+
+export const listLandingProductsResponseOneExploreUseCasesItemBodyMax = 1200;
+
+export const listLandingProductsResponseOneExploreUseCasesMax = 12;
+
+export const listLandingProductsResponseOneExploreFaqsItemQuestionMax = 200;
+
+export const listLandingProductsResponseOneExploreFaqsItemAnswerMax = 1600;
+
+export const listLandingProductsResponseOneExploreFaqsMax = 16;
+
+export const listLandingProductsResponseOneExploreGalleryItemTitleMax = 120;
+
+export const listLandingProductsResponseOneExploreGalleryItemCaptionMax = 700;
+
+export const listLandingProductsResponseOneExploreGalleryItemImageUrlMax = 2048;
+
+export const listLandingProductsResponseOneExploreGalleryMax = 12;
+
+export const listLandingProductsResponseOneExplorePricingTiersItemLabelMin = 2;
+export const listLandingProductsResponseOneExplorePricingTiersItemLabelMax = 60;
+
+export const listLandingProductsResponseOneExplorePricingTiersMax = 3;
+
 
 
 export const ListLandingProductsResponseItem = zod.object({
@@ -4850,7 +5050,49 @@ export const ListLandingProductsResponseItem = zod.object({
   "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
   "status": zod.enum(['available', 'coming_soon']),
   "ctaLabel": zod.string().min(listLandingProductsResponseOneCtaLabelMin).max(listLandingProductsResponseOneCtaLabelMax),
-  "displayOrder": zod.number().int().min(listLandingProductsResponseOneDisplayOrderMin).max(listLandingProductsResponseOneDisplayOrderMax)
+  "displayOrder": zod.number().int().min(listLandingProductsResponseOneDisplayOrderMin).max(listLandingProductsResponseOneDisplayOrderMax),
+  "explore": zod.object({
+  "eyebrow": zod.string().max(listLandingProductsResponseOneExploreEyebrowMax),
+  "headline": zod.string().max(listLandingProductsResponseOneExploreHeadlineMax),
+  "summary": zod.string().max(listLandingProductsResponseOneExploreSummaryMax),
+  "heroImageUrl": zod.string().max(listLandingProductsResponseOneExploreHeroImageUrlMax),
+  "landingHeadline": zod.string().max(listLandingProductsResponseOneExploreLandingHeadlineMax).optional(),
+  "landingSummary": zod.string().max(listLandingProductsResponseOneExploreLandingSummaryMax).optional(),
+  "customerExperience": zod.string().max(listLandingProductsResponseOneExploreCustomerExperienceMax),
+  "features": zod.array(zod.object({
+  "title": zod.string().max(listLandingProductsResponseOneExploreFeaturesItemTitleMax),
+  "body": zod.string().max(listLandingProductsResponseOneExploreFeaturesItemBodyMax)
+})).max(listLandingProductsResponseOneExploreFeaturesMax),
+  "benefits": zod.array(zod.object({
+  "title": zod.string().max(listLandingProductsResponseOneExploreBenefitsItemTitleMax),
+  "body": zod.string().max(listLandingProductsResponseOneExploreBenefitsItemBodyMax)
+})).max(listLandingProductsResponseOneExploreBenefitsMax),
+  "steps": zod.array(zod.object({
+  "title": zod.string().max(listLandingProductsResponseOneExploreStepsItemTitleMax),
+  "body": zod.string().max(listLandingProductsResponseOneExploreStepsItemBodyMax)
+})).max(listLandingProductsResponseOneExploreStepsMax),
+  "integrations": zod.array(zod.object({
+  "title": zod.string().max(listLandingProductsResponseOneExploreIntegrationsItemTitleMax),
+  "body": zod.string().max(listLandingProductsResponseOneExploreIntegrationsItemBodyMax)
+})).max(listLandingProductsResponseOneExploreIntegrationsMax),
+  "useCases": zod.array(zod.object({
+  "title": zod.string().max(listLandingProductsResponseOneExploreUseCasesItemTitleMax),
+  "body": zod.string().max(listLandingProductsResponseOneExploreUseCasesItemBodyMax)
+})).max(listLandingProductsResponseOneExploreUseCasesMax),
+  "faqs": zod.array(zod.object({
+  "question": zod.string().max(listLandingProductsResponseOneExploreFaqsItemQuestionMax),
+  "answer": zod.string().max(listLandingProductsResponseOneExploreFaqsItemAnswerMax)
+})).max(listLandingProductsResponseOneExploreFaqsMax),
+  "gallery": zod.array(zod.object({
+  "title": zod.string().max(listLandingProductsResponseOneExploreGalleryItemTitleMax),
+  "caption": zod.string().max(listLandingProductsResponseOneExploreGalleryItemCaptionMax),
+  "imageUrl": zod.string().max(listLandingProductsResponseOneExploreGalleryItemImageUrlMax)
+})).max(listLandingProductsResponseOneExploreGalleryMax),
+  "pricingTiers": zod.array(zod.object({
+  "label": zod.string().min(listLandingProductsResponseOneExplorePricingTiersItemLabelMin).max(listLandingProductsResponseOneExplorePricingTiersItemLabelMax),
+  "planId": zod.string().uuid().nullable()
+})).max(listLandingProductsResponseOneExplorePricingTiersMax).optional()
+}).optional()
 }).and(zod.object({
   "key": zod.string(),
   "readiness": zod.enum(['sandbox_only', 'planned'])
@@ -4883,6 +5125,69 @@ export const updateLandingProductBodyCtaLabelMax = 40;
 export const updateLandingProductBodyDisplayOrderMin = 0;
 export const updateLandingProductBodyDisplayOrderMax = 10000;
 
+export const updateLandingProductBodyExploreEyebrowMax = 120;
+
+export const updateLandingProductBodyExploreHeadlineMax = 180;
+
+export const updateLandingProductBodyExploreSummaryMax = 1200;
+
+export const updateLandingProductBodyExploreHeroImageUrlMax = 2048;
+
+export const updateLandingProductBodyExploreLandingHeadlineMax = 180;
+
+export const updateLandingProductBodyExploreLandingSummaryMax = 1200;
+
+export const updateLandingProductBodyExploreCustomerExperienceMax = 1600;
+
+export const updateLandingProductBodyExploreFeaturesItemTitleMax = 120;
+
+export const updateLandingProductBodyExploreFeaturesItemBodyMax = 1200;
+
+export const updateLandingProductBodyExploreFeaturesMax = 16;
+
+export const updateLandingProductBodyExploreBenefitsItemTitleMax = 120;
+
+export const updateLandingProductBodyExploreBenefitsItemBodyMax = 1200;
+
+export const updateLandingProductBodyExploreBenefitsMax = 12;
+
+export const updateLandingProductBodyExploreStepsItemTitleMax = 120;
+
+export const updateLandingProductBodyExploreStepsItemBodyMax = 1200;
+
+export const updateLandingProductBodyExploreStepsMax = 8;
+
+export const updateLandingProductBodyExploreIntegrationsItemTitleMax = 120;
+
+export const updateLandingProductBodyExploreIntegrationsItemBodyMax = 1200;
+
+export const updateLandingProductBodyExploreIntegrationsMax = 16;
+
+export const updateLandingProductBodyExploreUseCasesItemTitleMax = 120;
+
+export const updateLandingProductBodyExploreUseCasesItemBodyMax = 1200;
+
+export const updateLandingProductBodyExploreUseCasesMax = 12;
+
+export const updateLandingProductBodyExploreFaqsItemQuestionMax = 200;
+
+export const updateLandingProductBodyExploreFaqsItemAnswerMax = 1600;
+
+export const updateLandingProductBodyExploreFaqsMax = 16;
+
+export const updateLandingProductBodyExploreGalleryItemTitleMax = 120;
+
+export const updateLandingProductBodyExploreGalleryItemCaptionMax = 700;
+
+export const updateLandingProductBodyExploreGalleryItemImageUrlMax = 2048;
+
+export const updateLandingProductBodyExploreGalleryMax = 12;
+
+export const updateLandingProductBodyExplorePricingTiersItemLabelMin = 2;
+export const updateLandingProductBodyExplorePricingTiersItemLabelMax = 60;
+
+export const updateLandingProductBodyExplorePricingTiersMax = 3;
+
 
 
 export const UpdateLandingProductBody = zod.object({
@@ -4896,7 +5201,49 @@ export const UpdateLandingProductBody = zod.object({
   "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
   "status": zod.enum(['available', 'coming_soon']),
   "ctaLabel": zod.string().min(updateLandingProductBodyCtaLabelMin).max(updateLandingProductBodyCtaLabelMax),
-  "displayOrder": zod.number().int().min(updateLandingProductBodyDisplayOrderMin).max(updateLandingProductBodyDisplayOrderMax)
+  "displayOrder": zod.number().int().min(updateLandingProductBodyDisplayOrderMin).max(updateLandingProductBodyDisplayOrderMax),
+  "explore": zod.object({
+  "eyebrow": zod.string().max(updateLandingProductBodyExploreEyebrowMax),
+  "headline": zod.string().max(updateLandingProductBodyExploreHeadlineMax),
+  "summary": zod.string().max(updateLandingProductBodyExploreSummaryMax),
+  "heroImageUrl": zod.string().max(updateLandingProductBodyExploreHeroImageUrlMax),
+  "landingHeadline": zod.string().max(updateLandingProductBodyExploreLandingHeadlineMax).optional(),
+  "landingSummary": zod.string().max(updateLandingProductBodyExploreLandingSummaryMax).optional(),
+  "customerExperience": zod.string().max(updateLandingProductBodyExploreCustomerExperienceMax),
+  "features": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductBodyExploreFeaturesItemTitleMax),
+  "body": zod.string().max(updateLandingProductBodyExploreFeaturesItemBodyMax)
+})).max(updateLandingProductBodyExploreFeaturesMax),
+  "benefits": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductBodyExploreBenefitsItemTitleMax),
+  "body": zod.string().max(updateLandingProductBodyExploreBenefitsItemBodyMax)
+})).max(updateLandingProductBodyExploreBenefitsMax),
+  "steps": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductBodyExploreStepsItemTitleMax),
+  "body": zod.string().max(updateLandingProductBodyExploreStepsItemBodyMax)
+})).max(updateLandingProductBodyExploreStepsMax),
+  "integrations": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductBodyExploreIntegrationsItemTitleMax),
+  "body": zod.string().max(updateLandingProductBodyExploreIntegrationsItemBodyMax)
+})).max(updateLandingProductBodyExploreIntegrationsMax),
+  "useCases": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductBodyExploreUseCasesItemTitleMax),
+  "body": zod.string().max(updateLandingProductBodyExploreUseCasesItemBodyMax)
+})).max(updateLandingProductBodyExploreUseCasesMax),
+  "faqs": zod.array(zod.object({
+  "question": zod.string().max(updateLandingProductBodyExploreFaqsItemQuestionMax),
+  "answer": zod.string().max(updateLandingProductBodyExploreFaqsItemAnswerMax)
+})).max(updateLandingProductBodyExploreFaqsMax),
+  "gallery": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductBodyExploreGalleryItemTitleMax),
+  "caption": zod.string().max(updateLandingProductBodyExploreGalleryItemCaptionMax),
+  "imageUrl": zod.string().max(updateLandingProductBodyExploreGalleryItemImageUrlMax)
+})).max(updateLandingProductBodyExploreGalleryMax),
+  "pricingTiers": zod.array(zod.object({
+  "label": zod.string().min(updateLandingProductBodyExplorePricingTiersItemLabelMin).max(updateLandingProductBodyExplorePricingTiersItemLabelMax),
+  "planId": zod.string().uuid().nullable()
+})).max(updateLandingProductBodyExplorePricingTiersMax).optional()
+}).optional()
 })
 
 export const updateLandingProductResponseOneNameMin = 2;
@@ -4914,6 +5261,69 @@ export const updateLandingProductResponseOneCtaLabelMax = 40;
 export const updateLandingProductResponseOneDisplayOrderMin = 0;
 export const updateLandingProductResponseOneDisplayOrderMax = 10000;
 
+export const updateLandingProductResponseOneExploreEyebrowMax = 120;
+
+export const updateLandingProductResponseOneExploreHeadlineMax = 180;
+
+export const updateLandingProductResponseOneExploreSummaryMax = 1200;
+
+export const updateLandingProductResponseOneExploreHeroImageUrlMax = 2048;
+
+export const updateLandingProductResponseOneExploreLandingHeadlineMax = 180;
+
+export const updateLandingProductResponseOneExploreLandingSummaryMax = 1200;
+
+export const updateLandingProductResponseOneExploreCustomerExperienceMax = 1600;
+
+export const updateLandingProductResponseOneExploreFeaturesItemTitleMax = 120;
+
+export const updateLandingProductResponseOneExploreFeaturesItemBodyMax = 1200;
+
+export const updateLandingProductResponseOneExploreFeaturesMax = 16;
+
+export const updateLandingProductResponseOneExploreBenefitsItemTitleMax = 120;
+
+export const updateLandingProductResponseOneExploreBenefitsItemBodyMax = 1200;
+
+export const updateLandingProductResponseOneExploreBenefitsMax = 12;
+
+export const updateLandingProductResponseOneExploreStepsItemTitleMax = 120;
+
+export const updateLandingProductResponseOneExploreStepsItemBodyMax = 1200;
+
+export const updateLandingProductResponseOneExploreStepsMax = 8;
+
+export const updateLandingProductResponseOneExploreIntegrationsItemTitleMax = 120;
+
+export const updateLandingProductResponseOneExploreIntegrationsItemBodyMax = 1200;
+
+export const updateLandingProductResponseOneExploreIntegrationsMax = 16;
+
+export const updateLandingProductResponseOneExploreUseCasesItemTitleMax = 120;
+
+export const updateLandingProductResponseOneExploreUseCasesItemBodyMax = 1200;
+
+export const updateLandingProductResponseOneExploreUseCasesMax = 12;
+
+export const updateLandingProductResponseOneExploreFaqsItemQuestionMax = 200;
+
+export const updateLandingProductResponseOneExploreFaqsItemAnswerMax = 1600;
+
+export const updateLandingProductResponseOneExploreFaqsMax = 16;
+
+export const updateLandingProductResponseOneExploreGalleryItemTitleMax = 120;
+
+export const updateLandingProductResponseOneExploreGalleryItemCaptionMax = 700;
+
+export const updateLandingProductResponseOneExploreGalleryItemImageUrlMax = 2048;
+
+export const updateLandingProductResponseOneExploreGalleryMax = 12;
+
+export const updateLandingProductResponseOneExplorePricingTiersItemLabelMin = 2;
+export const updateLandingProductResponseOneExplorePricingTiersItemLabelMax = 60;
+
+export const updateLandingProductResponseOneExplorePricingTiersMax = 3;
+
 
 
 export const UpdateLandingProductResponse = zod.object({
@@ -4927,7 +5337,49 @@ export const UpdateLandingProductResponse = zod.object({
   "billingPeriod": zod.enum(['monthly', 'yearly', 'one_time', 'on_request']),
   "status": zod.enum(['available', 'coming_soon']),
   "ctaLabel": zod.string().min(updateLandingProductResponseOneCtaLabelMin).max(updateLandingProductResponseOneCtaLabelMax),
-  "displayOrder": zod.number().int().min(updateLandingProductResponseOneDisplayOrderMin).max(updateLandingProductResponseOneDisplayOrderMax)
+  "displayOrder": zod.number().int().min(updateLandingProductResponseOneDisplayOrderMin).max(updateLandingProductResponseOneDisplayOrderMax),
+  "explore": zod.object({
+  "eyebrow": zod.string().max(updateLandingProductResponseOneExploreEyebrowMax),
+  "headline": zod.string().max(updateLandingProductResponseOneExploreHeadlineMax),
+  "summary": zod.string().max(updateLandingProductResponseOneExploreSummaryMax),
+  "heroImageUrl": zod.string().max(updateLandingProductResponseOneExploreHeroImageUrlMax),
+  "landingHeadline": zod.string().max(updateLandingProductResponseOneExploreLandingHeadlineMax).optional(),
+  "landingSummary": zod.string().max(updateLandingProductResponseOneExploreLandingSummaryMax).optional(),
+  "customerExperience": zod.string().max(updateLandingProductResponseOneExploreCustomerExperienceMax),
+  "features": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductResponseOneExploreFeaturesItemTitleMax),
+  "body": zod.string().max(updateLandingProductResponseOneExploreFeaturesItemBodyMax)
+})).max(updateLandingProductResponseOneExploreFeaturesMax),
+  "benefits": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductResponseOneExploreBenefitsItemTitleMax),
+  "body": zod.string().max(updateLandingProductResponseOneExploreBenefitsItemBodyMax)
+})).max(updateLandingProductResponseOneExploreBenefitsMax),
+  "steps": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductResponseOneExploreStepsItemTitleMax),
+  "body": zod.string().max(updateLandingProductResponseOneExploreStepsItemBodyMax)
+})).max(updateLandingProductResponseOneExploreStepsMax),
+  "integrations": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductResponseOneExploreIntegrationsItemTitleMax),
+  "body": zod.string().max(updateLandingProductResponseOneExploreIntegrationsItemBodyMax)
+})).max(updateLandingProductResponseOneExploreIntegrationsMax),
+  "useCases": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductResponseOneExploreUseCasesItemTitleMax),
+  "body": zod.string().max(updateLandingProductResponseOneExploreUseCasesItemBodyMax)
+})).max(updateLandingProductResponseOneExploreUseCasesMax),
+  "faqs": zod.array(zod.object({
+  "question": zod.string().max(updateLandingProductResponseOneExploreFaqsItemQuestionMax),
+  "answer": zod.string().max(updateLandingProductResponseOneExploreFaqsItemAnswerMax)
+})).max(updateLandingProductResponseOneExploreFaqsMax),
+  "gallery": zod.array(zod.object({
+  "title": zod.string().max(updateLandingProductResponseOneExploreGalleryItemTitleMax),
+  "caption": zod.string().max(updateLandingProductResponseOneExploreGalleryItemCaptionMax),
+  "imageUrl": zod.string().max(updateLandingProductResponseOneExploreGalleryItemImageUrlMax)
+})).max(updateLandingProductResponseOneExploreGalleryMax),
+  "pricingTiers": zod.array(zod.object({
+  "label": zod.string().min(updateLandingProductResponseOneExplorePricingTiersItemLabelMin).max(updateLandingProductResponseOneExplorePricingTiersItemLabelMax),
+  "planId": zod.string().uuid().nullable()
+})).max(updateLandingProductResponseOneExplorePricingTiersMax).optional()
+}).optional()
 }).and(zod.object({
   "key": zod.string(),
   "readiness": zod.enum(['sandbox_only', 'planned'])

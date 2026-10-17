@@ -87,6 +87,17 @@ function ProductModal({ p, onClose }: { p: LandingProduct; onClose: () => void }
 export function PlatformCatalog({ items, loading, error, onRetry, open, setOpen }: {
   items: LandingProduct[]; loading: boolean; error: boolean; onRetry: () => void; open: LandingProduct | null; setOpen: (p: LandingProduct | null) => void;
 }) {
+  // Cross-route hashes arrive before this lazy catalog mounts. Native fragment
+  // scrolling cannot find those anchors yet; resolve them after real content.
+  useEffect(() => {
+    if (loading || !window.location.hash) return;
+    let id: string;
+    try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; }
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [loading, items.length]);
   const skel = (n: number, h: string) => <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: n }, (_, i) => <div key={i} className={`s-skel ${h}`} />)}</div>;
   return (
     <>

@@ -19,6 +19,15 @@ export function ConfigureExchange() {
   const [cfg, setCfg] = useState<Cfg>(initialCfg()); const [step, setStep] = useState(0); const [maxStep, setMax] = useState(0);
   const [busy, setBusy] = useState(0); const [err, setErr] = useState<string | null>(null); const [done, setDone] = useState<WlOrder | null>(null);
   const key = useRef(crypto.randomUUID());
+  const intendedPlanApplied = useRef(false);
+  useEffect(() => {
+    if (!cat.data || intendedPlanApplied.current) return;
+    intendedPlanApplied.current = true;
+    let intended = new URLSearchParams(window.location.search).get('selectedPlanId');
+    try { intended ||= sessionStorage.getItem('vynox-intended-plan'); sessionStorage.removeItem('vynox-intended-plan'); } catch { /* storage optional */ }
+    const plan = cat.data.plans.find(p => p.id === intended);
+    if (plan) setCfg(c => ({ ...c, planId: plan.id, period: planPeriods(plan)[0] ?? c.period }));
+  }, [cat.data]);
   const set = (p: Partial<Cfg> | ((c: Cfg) => Partial<Cfg>)) => { setErr(null); setCfg((c) => ({ ...c, ...(typeof p === 'function' ? p(c) : p) })); };
   const onBusy = (d: number) => setBusy((b) => b + d);
   const selPlan = cat.data?.plans.find((x) => x.id === cfg.planId); const avail = planPeriods(selPlan);

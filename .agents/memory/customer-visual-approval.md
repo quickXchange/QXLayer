@@ -2,6 +2,16 @@
 name: Customer website visual approval
 description: Visual preferences remain relevant, but the user has prioritized the permanent White Label Core.
 ---
+## Current public marketplace direction
+
+The user explicitly authorized redesigning the VYNOX LAYER public landing page and dedicated Explore pages for every visible registered product, using Monbits only as structural inspiration. This supersedes the older public-landing preservation restriction below, not the approved tenant Exchange master or authenticated Admin design.
+
+**Why:** The new request is a premium product-marketing redesign, with a rich illustrative Exchange journey and three Basic/Premium/Pro EUR cards; it is not permission to implement the other advertised services.
+
+**How to apply:** Reuse existing registry, Plans, Super Admin controls, accounts and tenant isolation. Public copy, artwork and tier references stay editable through existing controls. Local branding/order/invoice/review scenes are clearly labelled marketing illustrations, not proof of real delivery. All nonoperational products remain Preview/Coming Soon. Preserve published-price protections; unapproved proposals cannot purchase. No publishing, Production data, DNS or live financial changes were authorized.
+
+## Retained tenant and historical visual constraints
+
 Tenant-branding demonstrations must use a real disposable customer and tenant, provisioned through the existing completed workflow, on the same White Label master frontend. Change tenant configuration and branding assets only; no separate customer frontend or mocked/intercepted API responses.
 
 **Why:** The user explicitly wants to verify that tenant configuration alone transforms the master template while preserving its structure, components and design.

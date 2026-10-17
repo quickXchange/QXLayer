@@ -8,6 +8,7 @@
 import type { LandingProductInputBillingPeriod } from './landingProductInputBillingPeriod';
 import type { LandingProductInputIcon } from './landingProductInputIcon';
 import type { LandingProductInputStatus } from './landingProductInputStatus';
+import type { ProductExploreContent } from './productExploreContent';
 
 export interface LandingProductInput {
   visible: boolean;
@@ -46,4 +47,5 @@ export interface LandingProductInput {
      * @maximum 10000
      */
   displayOrder: number;
+  explore?: ProductExploreContent;
 }

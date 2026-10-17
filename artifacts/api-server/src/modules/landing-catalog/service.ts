@@ -7,12 +7,21 @@ import { HttpError } from "../../lib/errors";
 import { discountedRecurring } from "../entitlements/commercial-pricing";
 import { cents } from "../commerce/pricing";
 import { publishedOffers } from "../commerce/pricing-publication";
+import { defaultExploreContent, assertPublicArtworkUrl } from "./explore-content";
 
 export type LandingProductInput = z.infer<typeof UpdateLandingProductBody>;
 const projection = `key,visible,name,description,icon,starting_price AS "startingPrice",
   setup_fee AS "setupFee",currency,billing_period AS "billingPeriod",status,
   cta_label AS "ctaLabel",display_order AS "displayOrder",
-  CASE WHEN key='crypto_exchange' THEN 'sandbox_only' ELSE 'planned' END AS readiness`;
+  CASE WHEN key='crypto_exchange' THEN 'sandbox_only' ELSE 'planned' END AS readiness,
+  (SELECT definition->'publicMarketing' FROM module_catalog WHERE module_catalog.key=landing_products.key) AS explore`;
+
+function withExplore(product: any) {
+  const explore = { ...defaultExploreContent(product.key, product.name, product.description), ...(product.explore ?? {}) };
+  // Parse only the public content contract; never expose the registry definition.
+  const parsed = UpdateLandingProductBody.parse({ ...product, explore });
+  return { ...product, explore: parsed.explore };
+}
 
 // Explicit public projection; execution readiness is server-owned, never marketing-editable.
 export function publicProductCatalog() {
@@ -29,7 +38,7 @@ export function publicProductCatalog() {
       product.startingPrice = offer?.price ?? null; product.setupFee = offer?.setup_fee ?? null;
       product.currency = offer?.currency ?? "EUR"; product.billingPeriod = offer?.period ?? "on_request";
     }
-    const catalog = { source: "database" as const, products };
+    const catalog = { source: "database" as const, products: products.map(withExplore) };
     return catalog;
   });
 }
@@ -39,23 +48,34 @@ export async function publicProducts() {
 export function listProducts(principal: Principal) {
   requireSuperAdmin(principal);
   return withDatabase(contextFor(principal), async (client) =>
-    (await client.query(`SELECT ${projection} FROM landing_products ORDER BY display_order,key`)).rows);
+    (await client.query(`SELECT ${projection} FROM landing_products ORDER BY display_order,key`)).rows.map(withExplore));
 }
 async function readProduct(client: DatabaseClient, key: string) {
   const result = await client.query(`SELECT ${projection} FROM landing_products WHERE key=$1`, [key]);
   if (!result.rows[0]) throw new HttpError(404, "Catalog product not found.");
-  return result.rows[0];
+  return withExplore(result.rows[0]);
 }
 export function saveProduct(principal: Principal, key: string, input: LandingProductInput) {
   requireSuperAdmin(principal);
   const parsed = UpdateLandingProductBody.parse(input);
   const name = parsed.name.trim(), description = parsed.description.trim(), ctaLabel = parsed.ctaLabel.trim();
+  if (parsed.explore) {
+    assertPublicArtworkUrl(parsed.explore.heroImageUrl);
+    for (const image of parsed.explore.gallery) assertPublicArtworkUrl(image.imageUrl);
+  }
   if (name.length < 2 || description.length < 10 || ctaLabel.length < 2) {
     throw new HttpError(400, "Product name, description and CTA cannot be blank.");
   }
   return withDatabase(contextFor(principal, undefined, true), async (client) => {
     await client.query("SELECT key FROM landing_products WHERE key=$1 FOR UPDATE", [key]);
     const before = await readProduct(client, key);
+    const selectedPlans = parsed.explore?.pricingTiers?.flatMap(t => t.planId ? [t.planId] : []) ?? [];
+    if (new Set(selectedPlans).size !== selectedPlans.length)
+      throw new HttpError(400, "Select a different existing plan for each pricing tier.");
+    if (selectedPlans.length) {
+      const found = await client.query("SELECT id FROM plans WHERE id=ANY($1::uuid[])", [selectedPlans]);
+      if (found.rowCount !== selectedPlans.length) throw new HttpError(400, "One selected pricing plan no longer exists.");
+    }
     const samePrice = (a: string | null, b: string | null) => a == null || b == null ? a == null && b == null : cents(a) === cents(b);
     if (key === "crypto_exchange" && (!samePrice(parsed.startingPrice, before.startingPrice) ||
       !samePrice(parsed.setupFee, before.setupFee) || parsed.currency !== before.currency || parsed.billingPeriod !== before.billingPeriod))
@@ -65,6 +85,9 @@ export function saveProduct(principal: Principal, key: string, input: LandingPro
       cta_label=$11,display_order=$12 WHERE key=$1`,
     [key, parsed.visible, name, description, parsed.icon, parsed.startingPrice, parsed.setupFee,
       parsed.currency, parsed.billingPeriod, parsed.status, ctaLabel, parsed.displayOrder]);
+    if (parsed.explore) await client.query(
+      "UPDATE module_catalog SET definition=jsonb_set(definition,'{publicMarketing}',$2::jsonb,true) WHERE key=$1",
+      [key, JSON.stringify(parsed.explore)]);
     const after = await readProduct(client, key);
     await audit(client, principal, null, "landing_catalog.updated", `Updated marketing catalog: ${name}`, { key, before, after });
     return after;

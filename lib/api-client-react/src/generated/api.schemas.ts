@@ -1462,6 +1462,103 @@ export interface PublicExchange {
   publicNote: string;
 }
 
+export type PlanProposalBillingPeriodsItem = typeof PlanProposalBillingPeriodsItem[keyof typeof PlanProposalBillingPeriodsItem];
+
+
+export const PlanProposalBillingPeriodsItem = {
+  monthly: 'monthly',
+  yearly: 'yearly',
+} as const;
+
+export interface PlanProposal {
+  id: string;
+  name: string;
+  planName: string;
+  description: string;
+  /** @nullable */
+  monthlyPrice: string | null;
+  /** @nullable */
+  yearlyPrice: string | null;
+  /** @nullable */
+  setupFee: string | null;
+  currency: string;
+  entitlements: EntitlementEntry[];
+  pricingConfigured: boolean;
+  billingPeriods: PlanProposalBillingPeriodsItem[];
+}
+
+export interface PlanProposalCatalog {
+  plans: PlanProposal[];
+  purchaseAvailable: boolean;
+  proposal: boolean;
+}
+
+export interface ExplorePricingTier {
+  /**
+     * @minLength 2
+     * @maxLength 60
+     */
+  label: string;
+  /** @nullable */
+  planId: string | null;
+}
+
+export interface ExplorePoint {
+  /** @maxLength 120 */
+  title: string;
+  /** @maxLength 1200 */
+  body: string;
+}
+
+export interface ExploreVisual {
+  /** @maxLength 120 */
+  title: string;
+  /** @maxLength 700 */
+  caption: string;
+  /** @maxLength 2048 */
+  imageUrl: string;
+}
+
+export interface ExploreFaq {
+  /** @maxLength 200 */
+  question: string;
+  /** @maxLength 1600 */
+  answer: string;
+}
+
+export interface ProductExploreContent {
+  /** @maxLength 120 */
+  eyebrow: string;
+  /** @maxLength 180 */
+  headline: string;
+  /** @maxLength 1200 */
+  summary: string;
+  /** @maxLength 2048 */
+  heroImageUrl: string;
+  /** @maxLength 180 */
+  landingHeadline?: string;
+  /** @maxLength 1200 */
+  landingSummary?: string;
+  /** @maxLength 1600 */
+  customerExperience: string;
+  /** @maxItems 16 */
+  features: ExplorePoint[];
+  /** @maxItems 12 */
+  benefits: ExplorePoint[];
+  /** @maxItems 8 */
+  steps: ExplorePoint[];
+  /** @maxItems 16 */
+  integrations: ExplorePoint[];
+  /** @maxItems 12 */
+  useCases: ExplorePoint[];
+  /** @maxItems 16 */
+  faqs: ExploreFaq[];
+  /** @maxItems 12 */
+  gallery: ExploreVisual[];
+  /** @maxItems 3 */
+  pricingTiers?: ExplorePricingTier[];
+}
+
 export type LandingProductInputIcon = typeof LandingProductInputIcon[keyof typeof LandingProductInputIcon];
 
 
@@ -1539,6 +1636,7 @@ export interface LandingProductInput {
      * @maximum 10000
      */
   displayOrder: number;
+  explore?: ProductExploreContent;
 }
 
 export type LandingProductReadiness = typeof LandingProductReadiness[keyof typeof LandingProductReadiness];
