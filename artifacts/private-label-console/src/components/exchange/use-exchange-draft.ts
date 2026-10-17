@@ -11,7 +11,7 @@ import { isAllowedLogo } from './visual-catalog';
 import { gtDec, isDec, isInt, isPos } from './ui-validate';
 import { useGlobalCatalog } from '@/hooks/use-global-catalog';
 import { reconcileExchangeScope } from './draft-scope';
-import { routeEndpointsCompatible } from './route-endpoint-validation';
+import { routeEndpointsCompatible, pricingRuleSpecificity } from './route-endpoint-validation';
 
 export interface ExchangeDraft {
   loading: boolean; error: boolean; refetch: () => void;
@@ -95,7 +95,7 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[], r
   const rules = s.pricingRules ?? [];
   if (new Set(rules.map(r => r.id)).size !== rules.length) e.push('Pricing rule identifiers must be unique');
   const ruleEndpoint = (id: string) => id === '*' || id === 'crypto:*' || id === 'fiat:*' || id === fiat || (isFiatEp(id) && fiatCodes(s).includes(id.slice(5))) || s.networks.some(n => n.assetNetworkId === id);
-  const specificity = (r: typeof rules[number]) => Number(r.source !== '*') + Number(r.destination !== '*') + Number(Boolean(r.paymentMethodId));
+  const specificity = pricingRuleSpecificity;
   rules.forEach((r, i) => {
     if (!r.enabled) return;
     const nm = `Pricing rule ${i + 1}`;

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { routeEndpointsCompatible } from './route-endpoint-validation';
+import { routeEndpointsCompatible, pricingRuleSpecificity } from './route-endpoint-validation';
 import { test } from 'node:test';
 import type { ExchangeSettings, ExchangeCatalogAsset } from '@workspace/api-client-react';
 import { reconcileExchangeScope } from './draft-scope';
@@ -14,6 +14,15 @@ const saved = {
   routes: [{ id: 'retained', source: 'fiat:USD', destination: 'network-kept' }, { id: 'removed', source: 'network-kept', destination: 'network-removed' }],
   paymentMethods: [], providers: [],
 } as ExchangeSettings;
+
+test('customer conflict validation ranks exact pairs above typed groups like the quote server', () => {
+  const any = pricingRuleSpecificity({ source: '*', destination: '*' });
+  const group = pricingRuleSpecificity({ source: 'crypto:*', destination: 'fiat:*' });
+  const exact = pricingRuleSpecificity({ source: 'network-kept', destination: 'fiat:USD' });
+  assert(any < group && group < exact);
+  assert.equal(exact, 8);
+  assert.equal(pricingRuleSpecificity({ source: 'network-kept', destination: 'fiat:USD', paymentMethodId: 'method' }), 9);
+});
 
 test('unrelated settings saves retain all typed group pricing rules and their activation', () => {
   const pricingRules = [
