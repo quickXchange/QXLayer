@@ -63,7 +63,7 @@ export function ReviewForm({ o, onDone }: { o: WlOrder; onDone: () => void }) {
         {validTargets(o.status).includes('approved') && <Button type="button" variant="secondary" data-testid="button-approve" disabled={!!formErr || !canApprove || review.isPending} onClick={() => { setStatus('approved'); save('approved'); }}>Approve</Button>}
         {validTargets(o.status).includes('rejected') && <Button type="button" variant="outline" data-testid="button-reject" disabled={!!formErr || review.isPending} onClick={() => { setStatus('rejected'); save('rejected'); }}>Reject</Button>}
       </div>
-      <p className="text-xs text-muted-foreground">Approval creates a linked sandbox draft. Finish its Exchange setup and activate it to deliver automatically. Custom designs also need to be marked Ready; approval alone does not create the design or grant customer access.</p>
+      <p className="text-xs text-muted-foreground">Approval creates a linked sandbox draft only. Activate Sandbox and Mark Ready are separate steps and neither delivers. Customer access is granted only by the explicit Deliver action on a Ready order.</p>
       <ReviewDialog open={!!pendingSt} onClose={() => setPendingSt(null)} title="order review" pending={review.isPending} error={err} destructive={pendingSt === 'rejected'}
         applyLabel="Confirm and apply" onApply={() => pendingSt && apply(pendingSt)}
         rows={[['Status', `${statusText(o.status)} to ${statusText(pendingSt ?? status)}`], ['Plan', (plans.data ?? []).find((p) => p.id === pid)?.name ?? 'None'], ['Add-ons', aids.length ? String(aids.length) : 'None'], ['Recurring', cash(m, cur)], ['Setup fee', cash(s, cur)], ['Customization', cash(cust, cur)]]} />

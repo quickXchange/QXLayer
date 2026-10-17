@@ -8,6 +8,15 @@
 
 export interface ExchangeOrderInput {
   /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  customerName?: string;
+  /** @maxLength 254 */
+  customerEmail?: string;
+  /** Must be true when optional contact details are supplied. Does not opt in to marketing. */
+  contactConsent?: boolean;
+  /**
      * @minLength 40
      * @maxLength 12000
      */

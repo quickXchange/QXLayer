@@ -15,6 +15,8 @@ import type { WebsiteSettingsSurfaceStyle } from './websiteSettingsSurfaceStyle'
 import type { WebsiteSettingsTemplateKey } from './websiteSettingsTemplateKey';
 
 export interface WebsiteSettings {
+  /** @maxItems 6 */
+  reviewLinks?: SiteLink[];
   /** @maxItems 12 */
   navigation?: WebsiteSettingsNavigationItem[];
   /** @pattern ^#[0-9A-Fa-f]{6}$ */

@@ -38,9 +38,8 @@ export function getProvisioning(p: Principal, id: string) {
     if (!approved) blockers.push("Review final pricing and approve this order before preparing its website.");
     if (tenant && !tenant.configurationComplete) blockers.push(...tenant.activationBlockers,
       ...(tenant.provisioningStep !== "ready" ? [`Complete the ${tenant.provisioningStep.replaceAll("_", " ")} setup step.`] : []));
-    if (row.configuration.design?.type === "custom" && row.status !== "ready" && !delivered) {
-      blockers.push("Custom design requires the operator's explicit Ready review before delivery.");
-    }
+    if (row.status !== "ready" && !delivered) blockers.push("Super Admin must mark this website Ready after reviewing its configuration.");
+    if (tenant && tenant.status !== "active" && !delivered) blockers.push("Activate the configured Sandbox before final delivery.");
     if (["rejected", "cancelled"].includes(row.status)) blockers.splice(0, blockers.length, "This order is closed and cannot be provisioned.");
     const step = (key: string, label: string, complete: boolean, message: string) => ({
       key, label, state: complete ? "complete" as const : lastError && key === "website" && !tenant ? "failed" as const
@@ -71,7 +70,7 @@ export async function retryProvisioning(p: Principal, id: string) {
       if (!eligible.has(current.status)) throw new HttpError(409, "Approve this order before retrying provisioning.");
       if (!current.tenantId) {
         const selection = await catalogSelection(c, current.approvedConfiguration?.plan?.id ?? current.configuration.requestedPlanId,
-          current.approvedConfiguration?.addons?.map((a: { id: string }) => a.id) ?? []);
+          current.approvedConfiguration?.addons?.map((a: { id: string }) => a.id) ?? [], true);
         // Read current pricing under the row lock, never resubmit a stale snapshot.
         const prepared = await prepareReviewedWebsite(c, p, current, selection);
         return { ...current, tenantId: prepared.tenantId };

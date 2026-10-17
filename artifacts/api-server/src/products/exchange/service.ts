@@ -16,6 +16,7 @@ import { paymentInstructionsSnapshot } from "./payment-snapshot";
 import { assertTelegramTransaction } from "../../modules/integrations/channel";
 import { applyPricing, sandboxPricing, assertPricingSnapshot, type PricingSnapshot } from "./provider-pricing";
 import { customerExchangeConfiguration, mergeCustomerExchangeConfiguration } from "./customer-configuration";
+import { customerList, orderContact } from "./customer-management";
 
 const hash = (v: string) => createHash("sha256").update(v).digest("hex");
 function sign(v: string) {
@@ -82,6 +83,8 @@ export function exchangeConfiguration(principal: Principal, tenantId: string, in
       }
       await client.query(`INSERT INTO tenant_product_configuration (tenant_id,module_key,configuration) VALUES ($1,'crypto_exchange',$2)
         ON CONFLICT (tenant_id,module_key) DO UPDATE SET configuration=EXCLUDED.configuration ||
+          jsonb_build_object('_customerDirectory',COALESCE(tenant_product_configuration.configuration->'_customerDirectory','{}'::jsonb),
+            '_notificationInbox',COALESCE(tenant_product_configuration.configuration->'_notificationInbox','{}'::jsonb)) ||
           CASE WHEN tenant_product_configuration.configuration ? 'optionalIntegrations'
             THEN jsonb_build_object('optionalIntegrations',tenant_product_configuration.configuration->'optionalIntegrations')
             ELSE '{}'::jsonb END,updated_at=now()`, [tenantId, JSON.stringify({ ...s, referenceCurrency: e.plan?.currency })]);
@@ -147,6 +150,7 @@ type StoredRequest = ReturnType<typeof calculateQuote>["quote"] & {
   paymentMethod: string | null; paymentMethodId?: string | null; volume: string; history: { status: string; at: string; note: string }[];
   pricingSource?: string;
   paymentInstructions?: string | null;
+  customerName?: string; customerEmail?: string; customerId?: string;
 };
 interface OrderRow { id: string; status: string; request: StoredRequest; created_at: Date }
 function serializeOrder(row: OrderRow): ExchangeOrder {
@@ -155,7 +159,7 @@ function serializeOrder(row: OrderRow): ExchangeOrder {
     sourceSymbol: r.sourceSymbol, destinationSymbol: r.destinationSymbol, inputAmount: r.inputAmount,
     outputAmount: r.outputAmount, rate: r.rate, fee: r.fee, destinationFee: r.destinationFee ?? "0", spreadBps: r.spreadBps,
     paymentMethod: r.paymentMethod, paymentMethodId: r.paymentMethodId ?? null, paymentInstructions: r.paymentInstructions ?? null, createdAt: row.created_at,
-    updatedAt: new Date(r.history.at(-1)?.at ?? row.created_at), customerName: null, customerEmail: null,
+    updatedAt: new Date(r.history.at(-1)?.at ?? row.created_at), customerName: r.customerName ?? null, customerEmail: r.customerEmail ?? null,
     history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true, pricingSource: r.pricingSource ?? "manual",
     pricingRuleId: r.pricingRuleId ?? null };
 }
@@ -165,6 +169,7 @@ async function orderRow(client: DatabaseClient, tenantId: string, id: string, lo
   return r.rows[0];
 }
 export async function sandboxOrder(slug: string, input: ExchangeOrderInput, channel?: "telegram") {
+  const contact = orderContact(input);
   const tenantId = await publicTenantId(slug);
   return withDatabase({ actorId: "sandbox-visitor", tenantId, canWrite: true }, async client => {
     await lockTenant(client, tenantId);
@@ -173,6 +178,9 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
     if (old.rowCount) {
       if (channel) await assertTelegramTransaction(client, tenantId, old.rows[0].request.action);
       if (old.rows[0].request.quoteHash !== hash(input.quoteToken)) throw new HttpError(409, "This idempotency key belongs to another request.");
+      if ((old.rows[0].request.customerEmail ?? null) !== (contact.customerEmail ?? null) ||
+          (old.rows[0].request.customerName ?? null) !== (contact.customerName ?? null))
+        throw new HttpError(409, "This submission key belongs to another contact selection.");
       return { order: serializeOrder(old.rows[0]), trackingToken: sign(`track:${tenantId}:${old.rows[0].id}`) };
     }
     const { configuration: s, catalog } = await readExchange(client, tenantId);
@@ -183,7 +191,7 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
     const { quote, volume, paymentMethod } = calculateQuote(applyPricing(s, request.pricing), catalog, request);
     await consumeMonthlyUsage(client, tenantId, "crypto_exchange", volume);
     const id = randomUUID();
-    const stored: StoredRequest = { ...quote, product: "crypto_exchange", paymentMethod, paymentMethodId: request.paymentMethodId ?? null, volume,
+    const stored: StoredRequest = { ...quote, ...contact, product: "crypto_exchange", paymentMethod, paymentMethodId: request.paymentMethodId ?? null, volume,
       paymentInstructions: paymentInstructionsSnapshot(s, request),
       pricingSource: request.pricing ? (request.pricing.manualFallback ? `${request.pricing.providerKey}:manual_fallback` : request.pricing.providerKey) : "manual",
       quoteHash: hash(input.quoteToken), idempotencyHash: hash(input.idempotencyKey),
@@ -233,12 +241,13 @@ export function tenantOrders(principal: Principal, tenantId: string, query: { se
   return withDatabase(contextFor(principal, tenantId), async client => {
     for (const date of [query.from, query.to]) if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date)) throw new HttpError(400, "Use valid calendar dates in YYYY-MM-DD format.");
     if (query.from && query.to && query.from > query.to) throw new HttpError(400, "Start date must not be after end date.");
-    if (query.customer && query.customer !== "anonymous") throw new HttpError(400, "Sandbox orders do not collect customer identity.");
+    if (query.customer && query.customer !== "anonymous" && !/^[a-f0-9]{64}$/.test(query.customer)) throw new HttpError(400, "Invalid customer filter.");
     const page = query.page ?? 1, pageSize = 25;
     const filter = "tenant_id=$1 AND request->>'product'='crypto_exchange' AND ($2='' OR status=$2) AND ($3='' OR request->>'action'=$3) AND ($4='' OR id::text ILIKE '%'||$4||'%' OR request->>'sourceSymbol' ILIKE '%'||$4||'%' OR request->>'destinationSymbol' ILIKE '%'||$4||'%') AND ($5::timestamptz IS NULL OR created_at >= $5::timestamptz) AND ($6::timestamptz IS NULL OR created_at < $6::timestamptz + interval '1 day') AND ($7::text[] IS NULL OR status=ANY($7::text[]))";
-    const args = [tenantId, query.status ?? "", query.action ?? "", query.search ?? "", query.from ? `${query.from}T00:00:00Z` : null, query.to ? `${query.to}T00:00:00Z` : null, statusesForOrderView(query.view)];
-    const count = await client.query(`SELECT count(*)::int AS total FROM exchange_orders WHERE ${filter}`, args);
-    const rows = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE ${filter} ORDER BY created_at DESC,id DESC LIMIT $8 OFFSET $9`, [...args, pageSize, (page - 1) * pageSize]);
+    const args = [tenantId, query.status ?? "", query.action ?? "", query.search ?? "", query.from ? `${query.from}T00:00:00Z` : null, query.to ? `${query.to}T00:00:00Z` : null, statusesForOrderView(query.view), query.customer ?? ""];
+    const filtered = `${filter} AND ($8='' OR COALESCE(request->>'customerId','anonymous')=$8)`;
+    const count = await client.query(`SELECT count(*)::int AS total FROM exchange_orders WHERE ${filtered}`, args);
+    const rows = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE ${filtered} ORDER BY created_at DESC,id DESC LIMIT $9 OFFSET $10`, [...args, pageSize, (page - 1) * pageSize]);
     return { orders: rows.rows.map(serializeOrder), total: count.rows[0].total as number, page, pageSize };
   });
 }
@@ -257,17 +266,13 @@ export function exchangeDashboard(principal: Principal, tenantId: string) {
       pending: counts.pending ?? 0, processing: counts.processing ?? 0, completed: counts.completed ?? 0, cancelled: counts.cancelled ?? 0, failed: counts.failed ?? 0,
       assets: s.assets.filter(a => a.enabled && catalog.some(c => c.assetId === a.assetId)).length,
       networks: new Set(enabledNetworks.map(n => catalog.find(c => c.assetNetworkId === n.assetNetworkId)!.networkId)).size,
-      customers: 0, paymentMethods: s.paymentMethods.filter(m => m.enabled && (m.buy || m.sell)).length,
+      customers: (await customerList(client, tenantId)).filter(c => c.status !== "unidentified").length, paymentMethods: s.paymentMethods.filter(m => m.enabled && (m.buy || m.sell)).length,
       routes: s.routes.filter(r => r.enabled).length, volume: volume.rows, recentOrders: recent.rows.map(serializeOrder) };
   });
 }
 export function exchangeCustomers(principal: Principal, tenantId: string) {
   return withDatabase(contextFor(principal, tenantId), async client => {
-    // No identity is collected by the current sandbox. Never fabricate names, emails,
-    // accounts or a count of unique people from anonymous order records.
-    const r = await client.query("SELECT count(*)::int AS orders, max(COALESCE((request->'history'->-1->>'at')::timestamptz,created_at)) AS last FROM exchange_orders WHERE tenant_id=$1 AND request->>'product'='crypto_exchange'", [tenantId]);
-    return r.rows[0].orders ? [{ id: "anonymous", name: "Anonymous sandbox visitors", email: null,
-      orders: r.rows[0].orders as number, lastActivity: r.rows[0].last as Date, status: "unidentified" as const }] : [];
+    return customerList(client, tenantId);
   });
 }
 export function exchangeAudit(principal: Principal, tenantId: string, page = 1) {

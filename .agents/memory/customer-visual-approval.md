@@ -2,7 +2,15 @@
 name: Customer website visual approval
 description: Visual preferences remain relevant, but the user has prioritized the permanent White Label Core.
 ---
-## Current public marketplace direction
+## Current implementation priority
+
+Stop main Landing and Explore redesign work. Focus on completing actual customer White Label Exchange websites, their Admin Panels and explicit delivery, reusing the migration package and existing multi-tenant engine rather than building another frontend.
+
+**Why:** The user explicitly changed priorities to customer website completion and end-to-end verification.
+
+**How to apply:** Preserve the platform and approved NovaX master; restrict financial flows to Sandbox until separately configured and verified. Treat the marketplace direction below as paused.
+
+## Paused public marketplace direction
 
 The current follow-up covers premium presentations for all 15 VYNOX LAYER Product Explore pages, using Monbits as structural inspiration. Preserve the existing logo, colors and main Landing Page identity, the approved tenant Exchange master and authenticated Admin design.
 

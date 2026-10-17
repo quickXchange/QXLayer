@@ -1,7 +1,7 @@
 import { useEffect, useState, type ElementType } from 'react';
 import { Link } from 'wouter';
 import { hiddenForCustomer, hasIntegrationGrant } from '@/lib/feature-gate';
-import { ArrowLeftRight, Boxes, ChevronDown, Globe, LayoutGrid, Plug, Settings, Users } from 'lucide-react';
+import { ArrowLeftRight, Bell, Boxes, ChevronDown, Globe, LayoutGrid, Plug, Settings, Users } from 'lucide-react';
 
 type SectionLink = [string, string];
 type Group = { label: string; icon: ElementType; sections: SectionLink[] };
@@ -48,6 +48,9 @@ export function ExchangeAdminNavigation({ root, section, showWebsite, isSuper = 
       {groups.slice(0, 2).map(group => <NavigationGroup key={group.label} {...{ group, root, section, showWebsite, gate }} />)}
       <Link href={`${root}/customers`} className="qx-navlink" aria-current={section === 'customers' ? 'page' : undefined} data-testid="link-exchange-customers">
         <Users className="h-4 w-4 shrink-0" /><span>Customers</span>
+      </Link>
+      <Link href={`${root}/notifications`} className="qx-navlink" aria-current={section === 'notifications' ? 'page' : undefined} data-testid="link-exchange-notifications">
+        <Bell className="h-4 w-4 shrink-0" /><span>Notifications</span>
       </Link>
       {!isSuper && hasIntegrationGrant(features) && <Link href={`${root.replace(/\/exchange$/, '')}/integrations`} className="qx-navlink" data-testid="link-exchange-integrations"><Plug className="h-4 w-4 shrink-0" /><span>Integrations</span></Link>}
       {groups.slice(2).filter(group => isSuper || group.label !== 'Integrations').map(group => <NavigationGroup key={group.label} {...{ group, root, section, showWebsite, gate }} />)}

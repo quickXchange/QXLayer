@@ -56,3 +56,4 @@
 - [Recovery token custody](production-recovery-custody.md) — explicit redemption, protected redirect preservation, recovery-cookie resume and native mail evidence.
 - [Private commerce RLS](private-outbox-rls.md) — conflict and row-lock clauses can require policies beyond an ordinary insert or read.
 - [Supabase Storage missing objects](supabase-storage-not-found.md) — authenticated object-info may use HTTP 400 with structured statusCode 404; never treat all 400s as missing.
+- [Customer public wallets](customer-public-wallets.md) — customer public addresses are independent of Super Admin RPC monitoring and never activate deposits.

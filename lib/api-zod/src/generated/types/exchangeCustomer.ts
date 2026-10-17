@@ -15,4 +15,6 @@ export interface ExchangeCustomer {
   orders: number;
   lastActivity: Date;
   status: ExchangeCustomerStatus;
+  /** @maxLength 2000 */
+  notes?: string;
 }

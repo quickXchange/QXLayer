@@ -41,7 +41,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   const m = useUpdateExchangeOrderStatus();
   const [text, setText] = useState(''); const [search, setSearch] = useState('');
   const [status, setStatus] = useState(ALL); const [action, setAction] = useState(ALL);
-  const [customer, setCustomer] = useState(() => (new URLSearchParams(window.location.search).get('customer') === 'anonymous' ? 'anonymous' : ALL));
+  const [customer, setCustomer] = useState(() => (new URLSearchParams(window.location.search).get('customer') || ALL));
   const [from, setFrom] = useState(''); const [to, setTo] = useState('');
    const [range, setRange] = useState({ from: '', to: '' });
    const [dateError, setDateError] = useState('');
@@ -51,7 +51,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   const [step, setStep] = useState<null | 'form' | 'review'>(null);
   const [target, setTarget] = useState(''); const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false); const [failures, setFailures] = useState<string[]>([]);
-   const params: ListExchangeOrdersParams = { ...(search ? { search } : {}), ...(status !== ALL ? { status } : {}), ...(action !== ALL ? { action } : {}), ...(bucket ? { view: bucket } : {}), ...(customer === 'anonymous' ? { customer: 'anonymous' as const } : {}), ...(range.from ? { from: range.from } : {}), ...(range.to ? { to: range.to } : {}), page };
+   const params: ListExchangeOrdersParams = { ...(search ? { search } : {}), ...(status !== ALL ? { status } : {}), ...(action !== ALL ? { action } : {}), ...(bucket ? { view: bucket } : {}), ...(customer !== ALL ? { customer: customer as ListExchangeOrdersParams['customer'] } : {}), ...(range.from ? { from: range.from } : {}), ...(range.to ? { to: range.to } : {}), page };
   const q = useListExchangeOrders(tenantId, params, { query: { queryKey: getListExchangeOrdersQueryKey(tenantId, params), placeholderData: keepPreviousData } });
   const cfgQ = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
   const idr = useIdentityResolver(cfgQ.data?.configuration, cfgQ.data?.catalog);
@@ -92,7 +92,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
         <Input data-testid="input-order-search" className="w-full sm:w-64" placeholder="Search order id, symbol" value={text} onChange={(e) => setText(e.target.value)} />
         <div className="w-36"><Pick testid="select-order-status" value={status} onChange={(v) => { setStatus(v); setBucket(''); reset(); }} options={[[ALL, 'Any status'], ['pending', 'Pending'], ['processing', 'Processing'], ['completed', 'Completed'], ['cancelled', 'Cancelled'], ['failed', 'Failed']]} /></div>
         <div className="w-36"><Pick testid="select-order-action" value={action} onChange={(v) => { setAction(v); reset(); }} options={[[ALL, 'Any type'], ['swap', 'Swap'], ['convert', 'Convert'], ['buy', 'Buy'], ['sell', 'Sell']]} /></div>
-        <div className="w-44"><Pick testid="select-order-customer" value={customer} onChange={(v) => { setCustomer(v); reset(); }} options={[[ALL, 'Any customer'], ['anonymous', 'Anonymous visitors']]} /></div>
+        <div className="w-44"><Pick testid="select-order-customer" value={customer} onChange={(v) => { setCustomer(v); reset(); }} options={[[ALL, 'Any customer'], ['anonymous', 'Anonymous visitors'], ...(customer !== ALL && customer !== 'anonymous' ? [[customer, 'Selected contact'] as [string, string]] : [])]} /></div>
          <label className="text-xs text-muted-foreground">From<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-from" value={from} onChange={(e) => { setFrom(e.target.value); setDateError(''); }} /></label>
          <label className="text-xs text-muted-foreground">To<Input type="date" min="0001-01-01" max="9999-12-31" data-testid="input-order-to" value={to} onChange={(e) => { setTo(e.target.value); setDateError(''); }} /></label>
         <Button data-testid="button-order-search">Search</Button>

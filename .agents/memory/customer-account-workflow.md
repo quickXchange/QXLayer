@@ -1,13 +1,13 @@
 ---
 name: QXLayer customer account workflow
-description: Same-account customer access; new approvals deliver the isolated master independently of financial setup.
+description: Same-account customer access with draft approval, readiness review and explicit Super Admin delivery.
 ---
 
-For NEW approvals, automatically provision and deliver the isolated NovaX-master website and customer Admin Panel in the existing account. Website/Admin delivery is independent of financial configuration readiness; do not fabricate routes, provider connectivity or custom design work. Existing linked requests retain their lifecycle and settings.
+Approval must prepare an isolated draft, not deliver an unfinished website. Configuration, readiness checks and Ready review precede a separate, explicit Super Admin delivery decision. Sandbox activation and marking Ready must never deliver automatically. The delivered website and Admin Panel appear in the customer's existing account.
 
-**Why:** The user's expanded integration request explicitly supersedes the earlier manual-delivery boundary for new approvals, while preserving existing customers and the retained review fixture.
+**Why:** The user explicitly superseded automatic delivery when requesting complete customer White Label websites and Admin Panels. Only Super Admin may approve final delivery.
 
-**How to apply:** Apply the new approval rule without reprocessing existing linked orders. Keep financial setup validation separate from account access and preserve permanent Owner access.
+**How to apply:** Preserve existing delivered assignments, the retained Asterlane review fixture and permanent Owner access. Require usable plan-authorized Sandbox configuration before delivery, without treating Sandbox delivery as authority for real financial execution.
 
 Customers use their existing QXLayer account and session for both their customer workspace and their delivered Exchange administration. Never create a second tenant/admin login.
 
@@ -21,11 +21,11 @@ Only Super Admin reviews/approves requests, sets final pricing, provisions, assi
 
 **How to apply:** Keep customer requests separate from tenant administration and simulated Exchange trading orders. Suspension or a plan change does not undo the fact that an Exchange was delivered; preserve authorized read-only access, while enforcing current operational entitlements on writes.
 
-Admin approval triggers automatic preparation of a linked sandbox Exchange; submission alone never releases it. Release to the customer's existing account happens automatically only after required setup and activation are valid. An approved custom design must be marked Ready by the operator before delivery; approval does not generate the design.
+Admin approval triggers preparation of a linked sandbox Exchange; submission alone never releases it. After required setup and Sandbox activation are valid, Super Admin must mark it Ready and explicitly deliver it. Custom-design approval does not generate the design.
 
-**Why:** The user chose after-admin-approval automation while retaining the required setup safeguards.
+**Why:** The user requires operator-reviewed completion and explicit delivery, not automatic access to an unfinished tenant.
 
-**How to apply:** Never expose a pending linked tenant through customer membership or its public site. Keep approval, setup and delivery distinct states even when the handoff runs automatically.
+**How to apply:** Never expose a pending linked tenant through customer membership or its public site. Keep approval, setup, Ready review and delivery distinct states; none of the earlier steps may perform the final handoff.
 
 General client setup completion is not proof that an Exchange is ready. Check actual Exchange assets, available networks, requested actions, routes and pricing before advertising readiness or offering activation. A metadata-only configuration row is not a provisioned Exchange.
 

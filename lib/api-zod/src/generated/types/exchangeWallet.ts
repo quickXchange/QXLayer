@@ -8,8 +8,11 @@
 import type { ExchangeWalletAdapterKind } from './exchangeWalletAdapterKind';
 import type { ExchangeWalletKind } from './exchangeWalletKind';
 import type { ExchangeWalletProviderKey } from './exchangeWalletProviderKey';
+import type { ExchangeWalletPurpose } from './exchangeWalletPurpose';
 
 export interface ExchangeWallet {
+  /** Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records. */
+  purpose?: ExchangeWalletPurpose;
   id: string;
   /**
      * @minLength 1

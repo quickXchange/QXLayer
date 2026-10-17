@@ -5,7 +5,7 @@ export type GateResult = { allowed: boolean; reason: string };
 /** Customer-side section gate. Super Admin always passes except nothing is hidden from them. */
 export function sectionGate(section: string, features: Record<string, unknown>, isSuper: boolean): GateResult {
   if (isSuper) return { allowed: true, reason: '' };
-  if (section === 'wallets') return { allowed: false, reason: 'Wallet addresses and on-demand RPC monitoring are managed by VYNOX LAYER only.' };
+  if (section === 'wallets') return features.crypto_exchange === true ? { allowed: true, reason: '' } : { allowed: false, reason: 'Exchange public address configuration requires an active Exchange plan.' };
   if (section === 'rpc-preview') return { allowed: false, reason: 'RPC and node infrastructure is managed by VYNOX LAYER only.' };
   const need = SECTION_FEATURE[section];
   if (need) return features[need] === true ? { allowed: true, reason: '' } : { allowed: false, reason: `The ${need} feature is not included in your current plan.` };

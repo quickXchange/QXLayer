@@ -18,6 +18,13 @@ export function validateSettings(input: WebsiteSettings) {
   if (input.heroTitle.trim().length < 2) throw new HttpError(400, "Hero title must contain at least two non-whitespace characters.");
   if (input.faq?.some((item) => item.question.trim().length < 2 || item.answer.trim().length < 2)) throw new HttpError(400, "FAQ questions and answers must contain text.");
   [input.faviconUrl, input.supportUrl, ...input.socialLinks.map((s) => s.url)].forEach(safeHttps);
+  for (const link of input.reviewLinks ?? []) {
+    if (!link.label.trim()) throw new HttpError(400, "Review links need a label.");
+    // Review destinations are external HTTPS URLs, not branding-file paths.
+    let url: URL;
+    try { url = new URL(link.url); } catch { throw new HttpError(400, "Review links must use HTTPS."); }
+    if (url.protocol !== "https:" || url.username || url.password) throw new HttpError(400, "Review links must use HTTPS without credentials.");
+  }
   if (input.supportEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.supportEmail)) throw new HttpError(400, "Provide a valid support email or leave it empty.");
   return input;
 }
