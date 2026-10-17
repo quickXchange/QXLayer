@@ -1106,3 +1106,31 @@ mtime_ms = 1792059799683
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/d3904332-bfc0-4c7c-a057-10305700ca39/75701cd7-1101-48ad-b9e8-1f77bf003a1c"
 storage_version_token = "1792059848093412"
 content_type = "text/html"
+
+[[outputs]]
+id = "7_81p5U0mbRZkVoenEUIc"
+uri = "file://docs/exchange-rebuild-architecture.md"
+type = "text"
+title = "Exchange architecture"
+description = "Responsibilities, directional rule precedence, real market feeds, immutable quotes and the Sandbox order/privacy boundaries."
+logical_id = "9ce48039-6853-4f1c-b6dd-6dc508d5963d"
+content_hash = "sha256:d8e63c931ea2fef1bb27cd9356b0a19ee3c7e5d2bb3f8e0ee3f78e565169c90b"
+size = 10326
+mtime_ms = 1792273819671
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/9ce48039-6853-4f1c-b6dd-6dc508d5963d/03d84074-7f5f-468e-871a-7b1dbb0f02da"
+storage_version_token = "1792275112544822"
+content_type = "text/markdown"
+
+[[outputs]]
+id = "cpsw3lDPu4x-2-mUtwUmW"
+uri = "file://generated-artifacts/exchange-rebuild/solara-native-journey-acceptance-report.md"
+type = "text"
+title = "Solara browser acceptance results"
+description = "Final desktop/mobile Swap and Convert results, branded PDF evidence, fixes, preservation checks and remaining limitations. No private tracking URLs or credentials."
+logical_id = "c3e2beb6-2cbb-435a-ad6f-c0f6ed9ef9a8"
+content_hash = "sha256:47038ad27eda0cde2649b2ef89c3ca135614f6aa2960177865fd6f97893f8c70"
+size = 20269
+mtime_ms = 1792275055572
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/c3e2beb6-2cbb-435a-ad6f-c0f6ed9ef9a8/67fdd2fd-1d20-453b-bbab-368b2115b014"
+storage_version_token = "1792275113096597"
+content_type = "text/markdown"

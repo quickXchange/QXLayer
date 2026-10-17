@@ -7,7 +7,7 @@ import { requireFeature, type EffectiveEntitlements } from "../../modules/entitl
 import { safeHttps } from "../../modules/website/settings";
 import { containsCredential, PROVIDER_CATALOG } from "./providers";
 import { isImportedVisualUrl } from "./visual-assets";
-import { validatePricingRules } from "./pricing-rules";
+import { validatePricingRules,selectPricingRule } from "./pricing-rules";
 import { validateWallets } from "./wallets";
 import { applyGlobalAvailability, selectedFiats, isFiat, validActionPair, methodCurrencies } from "./global-catalog";
 
@@ -53,7 +53,7 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
   unique(s.routes.map(r => r.id), "route identifiers");
   unique(s.routes.map(r => `${r.action}:${r.source}:${r.destination}`), "routes for an action and pair");
   unique(s.paymentMethods.map(m => m.id), "payment methods");
-  validatePricingRules(s);
+  validatePricingRules(s,catalog);
   validateWallets(s, catalog);
   for (const rule of s.pricingRules ?? []) if (rule.enabled) requireFeature(e, rule.action);
   unique((s.providers ?? []).map(p => p.providerId), "providers");
@@ -104,6 +104,8 @@ export function validateExchange(value: unknown, e: EffectiveEntitlements, catal
     if (!pair) continue;
     const r = s.routes.find(r => r.enabled && r.action === action && r.source === pair.source && r.destination === pair.destination);
     if (!r || !validActionPair(action,pair.source,pair.destination)) throw new HttpError(400, `Default ${action} pair must have an enabled compatible route.`);
+    const selected=selectPricingRule(s,{action,source:pair.source,destination:pair.destination,amount:r.minimum,paymentMethodId:pair.paymentMethodId},catalog);
+    if(action==="swap"&&!selected&&s.pricingRules?.some(r=>r.pricingMode==="market"))throw new HttpError(400,"Default Swap direction needs an available matching pricing rule.");
     if (action === "swap" && (!pair.paymentMethodId || !r.paymentMethodIds.includes(pair.paymentMethodId) ||
       !s.paymentMethods.some(m => m.enabled && m.id === pair.paymentMethodId && methodCurrencies(m).includes(
         (isFiat(pair.source) ? pair.source : pair.destination).slice(5))))) throw new HttpError(400, "Default Swap payment method is not compatible.");

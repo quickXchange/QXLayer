@@ -44,7 +44,7 @@
 - [Production secret scope](production-secret-scope.md) — Production existence checks include Shared entries; distinguish user-confirmed Publishing storage from independent proof.
 - [Supabase scoped inventory](supabase-scoped-inventory.md) — global listing 403 can coexist with authorized organization GETs; try the pinned organization before widening credentials.
 - [Supabase Staging Auth](supabase-staging-auth-boundary.md) — parallel trial preserves Clerk; opaque server keys require pinned-origin capability checks, not JWT assumptions.
-- [Auth query observers](auth-query-observers.md) — cache eviction can strand active loading observers; preserve session observers and reset account data on confirmed identity changes.
+- [Query observers](auth-query-observers.md) — preserve active sessions; read observed fields before delayed render callbacks, not only inside them.
 - [Auth support isolation](auth-support-schema-isolation.md) — private Auth support tables must not enter public tenant-RLS inventories or inherit tenant-runtime grants.
 - [Supabase MFA assurance](supabase-mfa-session-assurance.md) — verifying MFA in another context can invalidate pending-MFA sessions; probe deployed recovery-code capability, not upstream source.
 - [Auth mail prerequisites](development-auth-mail-configuration.md) — SMTP precedes custom templates; OTP/recovery share cooldowns; override mirrors are booleans.
@@ -61,3 +61,4 @@
 - [Exchange product scope](exchange-product-scope.md) — only Crypto/Fiat Swap and Crypto/Crypto Convert; preserve history, Landing/master and the retained protected Solara demo.
 - [Reference seed idempotency](reference-seed-idempotency.md) — schema-only releases must not replay identical previously applied seed data over later operator edits or deletions.
 - [Exchange group selectors](exchange-group-selectors.md) — typed Crypto/Fiat groups must survive scope reconciliation and unrelated settings saves, with server-consistent specificity.
+- [Semantic JSONB replay](semantic-jsonb-replay.md) — idempotency compares normalized field values, never JSON object insertion order.

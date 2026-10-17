@@ -6,12 +6,23 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ExchangeStatusInputExpectedStatus } from './exchangeStatusInputExpectedStatus';
+import type { ExchangeStatusInputOperation } from './exchangeStatusInputOperation';
 import type { ExchangeStatusInputStatus } from './exchangeStatusInputStatus';
 
 export interface ExchangeStatusInput {
   status: ExchangeStatusInputStatus;
   /** @maxLength 500 */
   note: string;
+  operation?: ExchangeStatusInputOperation;
+  /** @maxLength 200 */
+  assigneeId?: string;
+  /** @maxLength 200 */
+  depositReference?: string;
+  /** @maxLength 200 */
+  transactionHash?: string;
+  /** @maxLength 200 */
+  payoutReference?: string;
+  confirmCompletion?: boolean;
   /** Status observed when reviewing an update. Reject with conflict if another administrator changed the order. */
   expectedStatus?: ExchangeStatusInputExpectedStatus;
 }

@@ -7,21 +7,68 @@ import { providerRate, positiveRate } from "../../modules/integrations/pricing-a
 import { decimal } from "../../modules/entitlements/decimal";
 import { selectPricingRule } from "./pricing-rules";
 import { isFiat } from "./global-catalog";
+import { referenceMarkets, type ReferencePrice } from "./market-rates";
 
-export interface PricingSnapshot { providerKey: string; revision: number; routeId: string; rate: string; manualFallback: boolean }
+export interface PricingSnapshot {
+  providerKey: string; revision: number; routeId: string; rate: string; manualFallback: boolean;
+  sourceEndpoint?: string; sourceAssetId?:string; sourcePlanRate?: string; rateProvider?: string; rateUpdatedAt?: string;
+  quoteKind?: "manual"|"indicative"|"provider"; validUntil?: number;
+}
 export function applyPricing(settings: ExchangeSettings, snapshot?: PricingSnapshot): ExchangeSettings {
   if (!snapshot) return settings;
   const rate = positiveRate(snapshot.rate);
-  return { ...settings, routes: settings.routes.map(r => r.id === snapshot.routeId ? { ...r, rate } : r) };
+  const assetPrefix=snapshot.sourceAssetId;
+  return { ...settings, routes: settings.routes.map(r => r.id === snapshot.routeId ? { ...r, rate } : r),
+    ...(snapshot.sourcePlanRate && snapshot.sourceEndpoint ? isFiat(snapshot.sourceEndpoint)
+      ? {fiatPlanRates:{...settings.fiatPlanRates,[snapshot.sourceEndpoint.slice(5)]:snapshot.sourcePlanRate},
+        ...(snapshot.sourceEndpoint===`fiat:${settings.fiatCurrency}`?{fiatPlanRate:snapshot.sourcePlanRate}:{})}
+      : {assets:settings.assets.map(a=>a.assetId===assetPrefix?{...a,sandboxPlanRate:snapshot.sourcePlanRate!}:a)} : {}) };
 }
 export async function sandboxPricing(c: DatabaseClient, tenantId: string, input: ExchangeQuoteInput,
-  settings: ExchangeSettings, catalog: ExchangeCatalogAsset[]): Promise<PricingSnapshot | undefined> {
+  settings: ExchangeSettings, catalog: ExchangeCatalogAsset[], planCurrency=settings.fiatCurrency): Promise<PricingSnapshot | undefined> {
   if (!settings.enabled || !settings.actions[input.action]) throw new HttpError(409, "This exchange action is paused.");
   const route = settings.routes.find(r => r.enabled && r.action === input.action && r.source === input.source && r.destination === input.destination);
   if (!route) throw new HttpError(400, "No enabled route exists for this pair.");
   const amount = decimal(input.amount);
   if (amount <= 0n || amount < decimal(route.minimum) || amount > decimal(route.maximum)) throw new HttpError(400, "Amount is outside this route's limits.");
-  const rule = selectPricingRule(settings, input);
+  const rule = selectPricingRule(settings, input,catalog);
+  if(!rule&&input.action==="swap"&&settings.pricingRules?.some(r=>r.pricingMode==="market"))
+    throw new HttpError(409,"No pricing rule covers this Swap direction. Configure its own market or explicit manual rule.");
+  if(rule?.pricingMode==="market") {
+    const asset=(id:string)=> {
+      if(isFiat(id))return {symbol:id.slice(5),fiat:true};
+      const row=catalog.find(a=>a.assetNetworkId===id);
+      if(!row||!settings.assets.some(a=>a.assetId===row.assetId&&a.enabled)||!settings.networks.some(n=>n.assetNetworkId===id&&n.enabled&&n.available))
+        throw new HttpError(409,"Market pricing cannot enable an unavailable asset/network.");
+      return {symbol:row.symbol,fiat:false};
+    };
+    const forex=async(code:string):Promise<ReferencePrice>=>{
+      if(code!=="USD"){
+        const rows=await c.query("SELECT * FROM tenant_integrations WHERE tenant_id=$1 AND provider_key='1forge' AND enabled=true",[tenantId]);
+        const row=rows.rows[0];
+        if(row?.encrypted_credentials&&row.health?.state==="connected"){
+          try{
+            const secrets=open({tenantId,providerKey:"1forge",environment:"sandbox"},row.encrypted_credentials);
+            const url=new URL("https://api.1forge.com/quotes");
+            url.searchParams.set("pairs",`USD/${code}`);url.searchParams.set("api_key",secrets.apiKey);
+            const response=await fetch(url,{redirect:"error",signal:AbortSignal.timeout(8000)});
+            if(!response.ok)throw Error();
+            const data=await response.json();
+            const q=Array.isArray(data)&&data.find(x=>String(x.symbol??x.s).replace("/","")===`USD${code}`);
+            const raw=Number(q?.timestamp??q?.t),at=raw<1e12?raw*1000:raw;
+            if(!Number.isFinite(at)||Date.now()-at>180000||at>Date.now()+10000)throw Error();
+            return {rate:positiveRate(q.price??q.p),provider:"1Forge",updatedAt:new Date(at).toISOString(),validUntil:at+180000};
+          }catch{/* Explicit authorized Sandbox fallback; never manufacture a rate. */}
+        }
+      }
+      return referenceMarkets.usdFiat(code);
+    };
+    const reference=await referenceMarkets.pair(asset(input.source),asset(input.destination),planCurrency,forex);
+    return {providerKey:"market_reference",revision:0,routeId:route.id,rate:reference.rate,manualFallback:false,
+      sourceEndpoint:input.source,sourceAssetId:catalog.find(a=>a.assetNetworkId===input.source)?.assetId,
+      sourcePlanRate:reference.sourcePlanRate,rateProvider:reference.provider,
+      rateUpdatedAt:reference.updatedAt,validUntil:reference.validUntil,quoteKind:"indicative"};
+  }
   // An explicitly configured manual override never requires an external call.
   // The signed quote binds the entire tenant configuration, including this rule.
   if (rule?.rate !== undefined) return { providerKey: "manual_rule", revision: 0, routeId: route.id, rate: rule.rate, manualFallback: false };
@@ -72,7 +119,10 @@ export async function assertPricingSnapshot(c: DatabaseClient, tenantId: string,
   if (snapshot && ["quickex","whitebit"].includes(snapshot.providerKey) &&
     (!effective || effective.status !== "active" || !effective.features.crypto_exchange || !effective.features[snapshot.providerKey]))
     throw new HttpError(403,"This pricing provider is no longer included in the tenant's plan.");
-  if (snapshot?.providerKey === "manual_rule") return;
+  if (snapshot?.providerKey === "manual_rule" || snapshot?.providerKey==="market_reference") {
+    if(snapshot.validUntil && Date.now()>=snapshot.validUntil)throw new HttpError(409,"Accepted reference expired. Request a fresh quote.");
+    return;
+  }
   if (!snapshot) {
     const changed = await c.query(`SELECT 1 FROM tenant_integrations WHERE tenant_id=$1
       AND provider_key IN ('1forge','whitebit','quickex') AND settings->'quoteActions' ? $2`, [tenantId, action]);

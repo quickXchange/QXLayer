@@ -17,4 +17,5 @@ export interface AssetNetwork {
   /** @nullable */
   logoUrl?: string | null;
   decimals?: number;
+  memoRequired?: boolean;
 }

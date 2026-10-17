@@ -1,6 +1,6 @@
 ---
 name: Auth query observer lifecycle
-description: Why authentication cache clearing can leave protected pages loading indefinitely.
+description: TanStack observer lifecycle, active-session preservation and late render-prop subscription races.
 ---
 
 Do not evict active TanStack Query observers during an authentication transition, especially the session query that determines the current identity.
@@ -34,3 +34,9 @@ and role redirects, and revalidate on persisted pageshow without evicting
 observers. Distinguish first-entry validation from routine polling so background
 checks do not remount the form and erase typed credentials. Keep MFA, recovery
 and account-link continuations intact.
+
+Read every query-result field needed by a delayed render callback during the owning component's render, rather than only inside the callback.
+
+**Why:** Tracking initially read only `isError` in the parent. A successful order response could arrive before the site gate invoked its child. Because `isError` did not change, TanStack did not notify the parent; the late child retained the initial loading result even while the cache and observer reported success. Repeated requests alone did not recover it.
+
+**How to apply:** Destructure data, loading/error and refresh fields immediately after the query hook, or put the query in the gated child component. Reproduce an order response that resolves before the site shell. Inspect rendered state as well as successful HTTP/cache data.

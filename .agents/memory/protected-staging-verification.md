@@ -79,6 +79,17 @@ indefinitely rather than reaching the API. Keep credentials/cookies in memory.
 
 ## Immutable Preview origin rollover
 
+A newly approved release can also leave a same-origin browser broker pinned to
+the previous deployment ID. Refresh its release evidence from the actual alias
+and verify the deployment's commit against the approved successful CI release.
+Do not remove the deployment-ID guard.
+
+**Why:** Browser setup correctly refused access after a candidate update even
+though the origin was unchanged; its expected deployment receipt was stale.
+
+**How to apply:** Reconcile release evidence before creating temporary automation
+access, while retaining the original protection, owner/MFA and cleanup checks.
+
 An older protected Staging Preview can still render and accept its genuine
 Private Access form while its shared API accepts only the newly approved
 Preview's exact authentication origin.

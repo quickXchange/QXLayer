@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ExchangeAction } from './exchangeAction';
+import type { ExchangePricingRule } from './exchangePricingRule';
+import type { ExchangeQuoteQuoteKind } from './exchangeQuoteQuoteKind';
 
 export interface ExchangeQuote {
   token: string;
@@ -32,4 +34,11 @@ export interface ExchangeQuote {
      * @nullable
      */
   pricingRuleId?: string | null;
+  pricingRuleSnapshot?: ExchangePricingRule;
+  marketRate?: string;
+  rateProvider?: string;
+  rateUpdatedAt?: Date;
+  quoteKind?: ExchangeQuoteQuoteKind;
+  /** Explicit source-unit fees, directional rate/spread and destination-unit deductions */
+  calculation?: string;
 }

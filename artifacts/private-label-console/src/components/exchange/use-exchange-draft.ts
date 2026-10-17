@@ -11,9 +11,10 @@ import { isAllowedLogo } from './visual-catalog';
 import { gtDec, isDec, isInt, isPos } from './ui-validate';
 import { useGlobalCatalog } from '@/hooks/use-global-catalog';
 import { reconcileExchangeScope } from './draft-scope';
-import { routeEndpointsCompatible, pricingRuleSpecificity } from './route-endpoint-validation';
+import { routeEndpointsCompatible, pricingRulesConflict,activePricingRule } from './route-endpoint-validation';
 
 export interface ExchangeDraft {
+  tenantId: string;
   loading: boolean; error: boolean; refetch: () => void;
   draft: ExchangeSettings | null; catalog: ExchangeCatalogAsset[]; providerCatalog: ExchangeProvider[]; effectiveEnabled: boolean;
   patch: (p: Partial<ExchangeSettings>) => void;
@@ -94,28 +95,28 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[], r
   });
   const rules = s.pricingRules ?? [];
   if (new Set(rules.map(r => r.id)).size !== rules.length) e.push('Pricing rule identifiers must be unique');
-  const ruleEndpoint = (id: string) => id === '*' || id === 'crypto:*' || id === 'fiat:*' || id === fiat || (isFiatEp(id) && fiatCodes(s).includes(id.slice(5))) || s.networks.some(n => n.assetNetworkId === id);
-  const specificity = pricingRuleSpecificity;
+  const assetOf = (id: string) => (id.startsWith('asset:') ? id.slice(6) : cat.get(id)?.assetId);
+  const kindOf = (id: string): 'any' | 'crypto' | 'fiat' => (id === '*' ? 'any' : isFiatEp(id) ? 'fiat' : 'crypto');
+  const ruleEndpoint = (id: string) => id === '*' || id === 'crypto:*' || id === 'fiat:*' || id === fiat || (isFiatEp(id) && fiatCodes(s).includes(id.slice(5))) || (id.startsWith('asset:') && (s.assets.some(a => a.assetId === id.slice(6)) || catalog.some(c => c.assetId === id.slice(6)))) || s.networks.some(n => n.assetNetworkId === id);
+  const active = activePricingRule;
   rules.forEach((r, i) => {
-    if (!r.enabled) return;
+    if (!active(r)) return;
     const nm = `Pricing rule ${i + 1}`;
-    if (!ruleEndpoint(r.source) || !ruleEndpoint(r.destination)) e.push(`${nm}: select tenant endpoints or Any`);
+    if (!ruleEndpoint(r.source) || !ruleEndpoint(r.destination)) e.push(`${nm}: select tenant endpoints, asset-wide or typed groups, or Any`);
     if (r.source === r.destination && r.source !== '*' && !(r.action === 'convert' && r.source === 'crypto:*')) e.push(`${nm}: select distinct endpoints or Any`);
+    if (r.pricingMode === 'manual' && !(r.rate !== undefined && isPos(r.rate))) e.push(`${nm}: manual pricing needs an explicit positive rate`);
+    if (r.pricingMode === 'market' && r.rate !== undefined) e.push(`${nm}: market rules must not carry a rate`);
     if (r.rate !== undefined && !isPos(r.rate)) e.push(`${nm}: manual rate must be positive or left blank`);
+    if ((r.minimum !== undefined && !isDec(r.minimum)) || (r.maximum !== undefined && !isDec(r.maximum)) || (r.minimum && r.maximum && gtDec(r.minimum, r.maximum))) e.push(`${nm}: minimum and maximum must be decimals with minimum not above maximum`);
     if (!isDec(r.fixedFee) || !isInt(r.feeBps, 5000) || !isInt(r.spreadBps, 5000) || !isInt(r.priority, 1000)) e.push(`${nm}: check fees, spread and priority`);
     if (r.paymentMethodId && (r.action === 'convert' || !s.paymentMethods.some(p => p.id === r.paymentMethodId && p.enabled))) e.push(`${nm}: select a payment method supporting this action`);
-    if ((r.action === 'swap' && r.source !== '*' && r.destination !== '*' && isFiatEp(r.source) === isFiatEp(r.destination)) ||
-        (r.action === 'convert' && (r.source === 'fiat:*' || r.destination === 'fiat:*')) ||
-        (r.action === 'swap' && (r.source === 'crypto:*' ? r.destination === 'crypto:*' || (r.destination !== '*' && !isFiatEp(r.destination)) : false)) ||
-        (r.action === 'convert' && (isFiatEp(r.source) || isFiatEp(r.destination))) ||
+    const sk = kindOf(r.source), dk = kindOf(r.destination);
+    if ((r.action === 'swap' && sk !== 'any' && dk !== 'any' && sk === dk) ||
+        (r.action === 'convert' && (sk === 'fiat' || dk === 'fiat')) ||
         (r.action === 'buy' && ((r.source !== '*' && r.source !== fiat) || r.destination === fiat)) ||
-        (r.action === 'sell' && ((r.destination !== '*' && r.destination !== fiat) || r.source === fiat)) ||
-        false) e.push(`${nm}: endpoints do not fit its action`);
+        (r.action === 'sell' && ((r.destination !== '*' && r.destination !== fiat) || r.source === fiat))) e.push(`${nm}: endpoints do not fit its action`);
     rules.slice(i + 1).forEach(other => {
-      const compatible = (a: string, b: string) => a === '*' || b === '*' || a === b || (a === 'crypto:*' && !isFiatEp(b)) || (b === 'crypto:*' && !isFiatEp(a)) || (a === 'fiat:*' && isFiatEp(b)) || (b === 'fiat:*' && isFiatEp(a));
-      if (r.enabled && other.enabled && r.action === other.action && r.priority === other.priority &&
-          specificity(r) === specificity(other) && compatible(r.source, other.source) && compatible(r.destination, other.destination) &&
-          (!r.paymentMethodId || !other.paymentMethodId || r.paymentMethodId === other.paymentMethodId))
+      if (pricingRulesConflict(r,other,catalog))
         e.push(`${nm}: overlapping enabled rules need different priorities`);
     });
   });
@@ -189,5 +190,5 @@ export function useExchangeDraft(tenantId: string, enabled = true): ExchangeDraf
     });
   };
   const discard = () => { if (serverRef.current) { setDraft(reconcileExchangeScope(serverRef.current, catalog)); setSaveError(null); } };
-  return { loading: q.isLoading, error: q.isError, refetch: () => { q.refetch(); }, draft, catalog, providerCatalog: q.data?.providerCatalog ?? [], effectiveEnabled: q.data?.effectiveEnabled ?? false, patch, baseline: serverRef.current, dirty, errors, saveError, saving: m.isPending, save, discard };
+  return { tenantId, loading: q.isLoading, error: q.isError, refetch: () => { q.refetch(); }, draft, catalog, providerCatalog: q.data?.providerCatalog ?? [], effectiveEnabled: q.data?.effectiveEnabled ?? false, patch, baseline: serverRef.current, dirty, errors, saveError, saving: m.isPending, save, discard };
 }

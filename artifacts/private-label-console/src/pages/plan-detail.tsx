@@ -52,7 +52,9 @@ export default function PlanDetail() {
   }, [plan.data]);
   if (!can.manageCatalog) return <p className="text-sm text-muted-foreground">Only a super admin can manage plans.</p>;
   const set = (k: keyof typeof f, v: string) => setF((s) => ({ ...s, [k]: v }));
-  const d = defs.data ?? [];
+  // Historical entitlements remain stored, but retired products cannot be
+  // selected as active plan features for new Exchange deliveries.
+  const d = (defs.data ?? []).filter(x=>!["buy","sell"].includes(x.key));
   const order = Number(f.displayOrder);
   const err = f.name.trim().length < 2 ? 'Name needs 2+ characters' : configured && ![f.monthlyPrice, f.yearlyPrice, f.setupFee].every((x) => MONEY.test(x)) ? 'Configured pricing needs monthly, yearly and setup as decimals with up to 2 places'
     : !/^\d{1,3}(\.\d{1,2})?$/.test(f.discountPercent) || Number(f.discountPercent) > 100 ? 'Discount is a percentage from 0 to 100'

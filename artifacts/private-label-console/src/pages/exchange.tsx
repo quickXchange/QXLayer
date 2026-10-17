@@ -20,13 +20,15 @@ import { NotificationsPanel } from '@/components/exchange/notifications-panel';
 import { CustomersPanel } from '@/components/exchange/customers-panel';
 import { StaffPanel } from '@/components/exchange/staff-panel';
 import { AuditPanel } from '@/components/exchange/audit-panel';
+import { CurrenciesPanel } from '@/components/exchange/currencies-panel';
+import { WidgetDefaultsPanel } from '@/components/exchange/widget-defaults-panel';
 import { ExchangeAdminNavigation } from '@/components/exchange/admin-navigation';
 import { PreviewIntegrations } from '@/components/exchange/preview-integrations';
 import { sectionGate } from '@/lib/feature-gate';
 import { useConsoleNavigation } from '@/components/app/console-frame';
 
-const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['notifications', 'Notifications'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['fees', 'Fees / Spread'], ['pricing', 'Pricing & Fees'], ['wallets', 'Wallet Addresses'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
-const DRAFT_SECTIONS = ['assets', 'networks', 'routes', 'swap', 'convert', 'fees', 'payment-methods', 'pricing', 'wallets', 'settings'];
+const TABS: [string, string][] = [['', 'Overview'], ['orders', 'Orders'], ['customers', 'Customers'], ['notifications', 'Notifications'], ['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['swap', 'Swap'], ['convert', 'Convert'], ['fees', 'Pricing Rules'], ['pricing', 'Pricing Rules'], ['currencies', 'Currencies'], ['defaults', 'Widget Defaults'], ['wallets', 'Wallet Addresses'], ['payment-methods', 'Payment Methods'], ['providers', 'Providers / Integrations'], ['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain'], ['staff', 'Staff & Permissions'], ['api-keys', 'API keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview'], ['audit', 'Activity / Audit'], ['settings', 'Settings']];
+const DRAFT_SECTIONS = ['currencies', 'defaults', 'assets', 'networks', 'routes', 'swap', 'convert', 'fees', 'payment-methods', 'pricing', 'wallets', 'settings'];
 
 export default function Exchange() {
   const setNavigation = useConsoleNavigation();
@@ -74,12 +76,13 @@ export default function Exchange() {
   else if (sec === 'networks') body = <NetworksPanel tenant={t} d={d} locked={cfgLocked} />;
   else if (sec === 'routes') body = <RoutesPanel d={d} locked={cfgLocked} allowed={allowedActions} />;
   else if (sec === 'swap' || sec === 'convert') body = <RoutesPanel d={d} locked={cfgLocked} action={sec} />;
-  else if (sec === 'fees') body = <PricingPanel d={d} locked={cfgLocked} allowed={allowedActions} />;
+  else if (sec === 'fees' || sec === 'pricing') body = <PricingPanel d={d} locked={cfgLocked} allowed={allowedActions} />;
   else if (sec === 'domain') body = <div className="space-y-6"><Guide title="Domain" note="Custom domain and ownership verification." links={[['branding', 'Branding'], ['website', 'Website settings']]} root={root} /><DomainSection tenant={t} readOnly={ro('domains.manage')} /><DomainOwnershipSection tenant={t} readOnly={ro('domains.manage')} /></div>;
   else if (sec === 'payment-methods') body = <PaymentMethodsPanel d={d} locked={cfgLocked} />;
-  else if (sec === 'pricing') body = <PricingPanel d={d} locked={cfgLocked} allowed={allowedActions} />;
+  else if (sec === 'currencies') body = <CurrenciesPanel d={d} locked={cfgLocked} root={root} />;
+  else if (sec === 'defaults') body = <WidgetDefaultsPanel d={d} locked={cfgLocked} root={root} />;
   else if (sec === 'wallets') body = <WalletAddressesPanel d={d} locked={cfgLocked} tenantId={id} infrastructure={isSuper} />;
-  else if (sec === 'settings') body = <SettingsPanel tenantId={id} d={d} locked={cfgLocked} canManageSub={can.manageSubscription} features={F} />;
+  else if (sec === 'settings') body = <SettingsPanel root={root} tenantId={id} d={d} locked={cfgLocked} canManageSub={can.manageSubscription} features={F} />;
   else if (sec === 'branding') body = <div className="space-y-6"><Guide title="Branding" note="Logo, favicon, brand name, colors and appearance (dark and light mode)." links={[['website', 'Website settings'], ['domain', 'Domain']]} root={root} /><BrandSection tenant={t} readOnly={ro('branding.manage')} /></div>;
   else if (sec === 'website') body = <div className="space-y-6"><Guide title="Website settings" note="Public site content and presentation." links={[['branding', 'Branding'], ['domain', 'Domain']]} root={root} /><WebsiteSection tenant={t} readOnly={ro('branding.manage')} /></div>;
   else if (sec === 'staff') body = <div className="space-y-6"><PermissionMap /><StaffPanel tenantId={id} canEdit={can.manageStaffGrants && !base} />

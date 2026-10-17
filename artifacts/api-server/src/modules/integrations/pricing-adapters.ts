@@ -16,7 +16,20 @@ const readJson: ReadJson = async url => {
 };
 export function positiveRate(value: unknown): string {
   // The verified source accepts provider numeric prices, normalized to fixed-point.
-  if (typeof value === "number") value = Number.isFinite(value) ? value.toFixed(18) : "";
+  if (typeof value === "number") {
+    // Keep the provider's decimal spelling, not binary floating-point dust from
+    // toFixed(18). Expand scientific notation before fixed-point validation.
+    let text=Number.isFinite(value)?String(value):"";
+    if(/^\d+(?:\.\d+)?e[+-]?\d+$/i.test(text)){
+      const [coefficient,exponent]=text.toLowerCase().split("e");
+      const [whole,fraction=""]=coefficient.split("."),digits=whole+fraction;
+      const point=whole.length+Number(exponent);
+      if(Math.abs(point)>60)text="";
+      else text=point<=0?`0.${"0".repeat(-point)}${digits}`:point>=digits.length?digits+"0".repeat(point-digits.length):digits.slice(0,point)+"."+digits.slice(point);
+    }
+    const [whole,fraction]=text.split(".");
+    value=fraction===undefined?text:`${whole}.${fraction.slice(0,18)}`;
+  }
   if (typeof value !== "string" || !/^\d+(?:\.\d{1,18})?$/.test(value) || value.length > 70)
     throw new HttpError(502, "Provider returned an invalid rate.");
   const parsed = decimal(value);

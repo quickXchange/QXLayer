@@ -6,6 +6,7 @@ import {
   GetPublicExchangeParams, GetPublicExchangeResponse,
   CreateSandboxQuoteBody, CreateSandboxQuoteResponse,
   CreateSandboxOrderBody, CreateSandboxOrderResponse,
+  ReviewSandboxOrderBody,ReviewSandboxOrderResponse,
   TrackSandboxOrderParams, TrackSandboxOrderResponse,
   GetExchangeDashboardResponse, GetExchangeOrderParams, GetExchangeOrderResponse,
   UpdateExchangeOrderStatusBody, UpdateExchangeOrderStatusResponse,
@@ -77,6 +78,10 @@ router.get("/public/sites/:slug/exchange", async (req, res) => {
 });
 router.post("/public/sites/:slug/exchange/quotes", guardPublicDemo, async (req, res) => res.json(CreateSandboxQuoteResponse.parse(await sandboxQuote(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxQuoteBody.parse(req.body), req.get("X-QX-Channel") === "telegram" ? "telegram" : undefined))));
 router.post("/public/sites/:slug/exchange/orders", guardPublicDemo, async (req, res) => res.status(201).json(CreateSandboxOrderResponse.parse(await sandboxOrder(GetPublicExchangeParams.parse(req.params).slug, CreateSandboxOrderBody.parse(req.body), req.get("X-QX-Channel") === "telegram" ? "telegram" : undefined))));
+router.post("/public/sites/:slug/exchange/review",guardPublicDemo,async(req,res)=>{
+  const {reviewOrder}=await import("../products/exchange/service");
+  res.json(ReviewSandboxOrderResponse.parse(await reviewOrder(GetPublicExchangeParams.parse(req.params).slug,ReviewSandboxOrderBody.parse(req.body))));
+});
 router.get("/public/sites/:slug/exchange/orders/:orderId", async (req, res) => {
   const { slug, orderId } = TrackSandboxOrderParams.parse(req.params);
   res.json(TrackSandboxOrderResponse.parse(await trackOrder(slug, orderId, req.get("trackingToken") ?? "")));
@@ -90,6 +95,16 @@ router.get("/public/sites/:slug/exchange/orders/:orderId/invoice", async (req, r
 });
 router.use("/tenants/:tenantId/exchange", requireAuthentication, sameOriginMutation, (_req, res, next) => { res.set("Cache-Control", "no-store"); next(); });
 router.get("/tenants/:tenantId/exchange", async (req, res) => res.json(GetExchangeConfigurationResponse.parse(await exchangeConfiguration(principalFrom(res), GetExchangeConfigurationParams.parse(req.params).tenantId))));
+router.post("/tenants/:tenantId/exchange/test-quote",async(req,res)=>{
+  const tenantId=GetExchangeConfigurationParams.parse(req.params).tenantId;
+  const principal=principalFrom(res);
+  await exchangeConfiguration(principal,tenantId);
+  const {withDatabase}=await import("@workspace/db");
+  const {contextFor}=await import("../modules/authentication/service");
+  const slug=await withDatabase(contextFor(principal,tenantId),async c=>(await c.query("SELECT slug FROM tenants WHERE id=$1",[tenantId])).rows[0]?.slug);
+  if(!slug)throw new Error("Tenant not found");
+  res.json(CreateSandboxQuoteResponse.parse(await sandboxQuote(slug,CreateSandboxQuoteBody.parse(req.body))));
+});
 router.put("/tenants/:tenantId/exchange", async (req, res) => {
   // Check before Zod strips unknown keys: never accept credentials as configuration metadata.
   if (containsCredential(req.body)) throw new HttpError(400, "Provider credentials are not supported. Do not submit API keys or secrets.");

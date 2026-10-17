@@ -5,6 +5,8 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { ExchangeCustomerDetails } from './exchangeCustomerDetails';
+import type { ExchangeOrderInputWorkflowVersion } from './exchangeOrderInputWorkflowVersion';
 
 export interface ExchangeOrderInput {
   /**
@@ -22,4 +24,6 @@ export interface ExchangeOrderInput {
      */
   quoteToken: string;
   idempotencyKey: string;
+  workflowVersion?: ExchangeOrderInputWorkflowVersion;
+  customerDetails?: ExchangeCustomerDetails;
 }

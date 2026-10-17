@@ -9,6 +9,8 @@ import type { ExchangePaymentMethodAccountFields } from './exchangePaymentMethod
 import type { ExchangePaymentMethodMethodType } from './exchangePaymentMethodMethodType';
 
 export interface ExchangePaymentMethod {
+  /** Public field requirement only; no operator bank details */
+  receivingIbanRequired?: boolean;
   id: string;
   /**
      * @minLength 2
