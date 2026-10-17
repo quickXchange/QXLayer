@@ -1,5 +1,8 @@
 import type { LandingProductInput } from "./service";
 import { HttpError } from "../../lib/errors";
+import { CAPTURED_MEDIA } from "./captured-media";
+import { DEFAULT_CONCEPTS } from "./explore-concepts";
+import { FEATURE_DETAILS } from "./explore-feature-copy";
 type ProductExploreContent = NonNullable<LandingProductInput["explore"]>;
 
 const point = (title: string, body: string) => ({ title, body });
@@ -29,10 +32,12 @@ export function defaultExploreContent(key: string, name: string, description: st
   return {
     eyebrow: exchange ? "THE WHITE LABEL EXCHANGE" : "THE VYNOX LAYER ECOSYSTEM",
     headline: p.headline, summary: description, heroImageUrl: "",
+    conceptVisual: structuredClone(DEFAULT_CONCEPTS[key] ?? DEFAULT_CONCEPTS.crypto_engine),
+    sectionVisibility: {heroVisual:true,showcase:true,features:true,howItWorks:true,experience:true,integrations:true,faq:true,getStarted:true,pricing:true},
     customerExperience: exchange
-      ? "A customer arrives on your branded domain, chooses an enabled exchange action, reviews a sandbox quote, creates an illustrative order and follows its status through payment instructions, completion and a branded invoice. This preview never moves funds."
+      ? "A customer arrives on your branded domain, chooses an enabled exchange action, reviews a sandbox quote and follows a browser-held simulated order. Actual application captures show the shared customer and read-only operator interfaces with fictional demo data. Invoice layouts below are illustrative concepts, not a captured native invoice service. No funds move."
       : `Explore ${p.focus} with your identity, consistent navigation and clear service states. These interface previews describe a planned experience, not a delivered live service.`,
-    features: p.features.map(title => point(title, exchange ? `${title} is presented in the branded Exchange sandbox. Availability is governed by the assigned plan and operator configuration; live financial execution remains disabled.` : `${title} is part of the planned ${name} experience. The interface is illustrative; delivery and integration are subject to implementation and operator review.`)),
+    features: p.features.map((title, index) => point(title, FEATURE_DETAILS[key]?.[index] ?? (exchange ? `${title} is presented in the branded Exchange sandbox. Availability is governed by the assigned plan and operator configuration; live financial execution remains disabled.` : `${title} is part of the planned ${name} experience. The interface is illustrative; delivery and integration are subject to implementation and operator review.`))),
     benefits: [
       point("One recognizable brand", `Present ${p.focus} with a consistent identity instead of disconnected tools.`),
       point("A shared foundation", "Reuse the product registry, customer accounts and tenant-scoped configuration rather than creating separate customer databases."),
@@ -52,7 +57,7 @@ export function defaultExploreContent(key: string, name: string, description: st
       { question: "Who controls plans and integration access?", answer: "Super Admin manages existing plans, feature entitlements, limits, add-ons and service availability. RPC infrastructure and master credentials remain Super Admin only." },
       { question: "How do pricing and ordering work?", answer: "Approved offers come from the published pricing snapshot. Unpublished proposals are not purchasable. A verified payment method and operator approval are required; a preview does not start a subscription." },
     ],
-    gallery: [],
+    gallery: (CAPTURED_MEDIA[key] ?? []).map(({ file: _file, ...media }) => media),
     ...(exchange ? { landingHeadline: "One layer for every crypto product you brand.",
       landingSummary: "Exchange, payments, cards, staking, nodes, bots and apps on a single white-label foundation. Explore your future ecosystem through distinctive product previews, with service readiness clearly stated.",
       pricingTiers: [{ label: "Basic", planId: null }, { label: "Premium", planId: null }, { label: "Pro", planId: null }] } : {}),
@@ -61,6 +66,7 @@ export function defaultExploreContent(key: string, name: string, description: st
 
 export function assertPublicArtworkUrl(value: string) {
   if (!value) return;
+  if (/^\/api\/public\/marketing-media\/[a-f0-9]{24}\.webp$/.test(value)) return;
   let url: URL;
   try { url = new URL(value); } catch { throw new HttpError(400, "Artwork must use a public HTTPS URL."); }
   const host = url.hostname.toLowerCase();

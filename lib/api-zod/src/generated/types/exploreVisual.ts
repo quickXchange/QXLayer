@@ -5,6 +5,8 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { ExploreVisualDevice } from './exploreVisualDevice';
+import type { ExploreVisualMediaKind } from './exploreVisualMediaKind';
 
 export interface ExploreVisual {
   /** @maxLength 120 */
@@ -13,4 +15,9 @@ export interface ExploreVisual {
   caption: string;
   /** @maxLength 2048 */
   imageUrl: string;
+  mediaKind?: ExploreVisualMediaKind;
+  device?: ExploreVisualDevice;
+  /** @maxLength 180 */
+  sourceLabel?: string;
+  visible?: boolean;
 }

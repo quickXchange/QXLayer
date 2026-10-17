@@ -25,13 +25,16 @@ export function ExploreContentEditor({ product, onClose }: { product: LandingPro
   const [content, setContent] = useState<ProductExploreContent>(() => structuredClone(product.explore!));
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState('hero');
+  const [conceptDraft, setConceptDraft] = useState(() => JSON.stringify(product.explore?.conceptVisual ?? {}, null, 2));
   const mutation = useUpdateLandingProduct();
   const planQuery = useListPlans({ query: { queryKey: getListPlansQueryKey(), enabled: product.key === 'crypto_exchange' } });
   const qc = useQueryClient(); const { toast } = useToast();
   const set = <K extends keyof ProductExploreContent>(key: K, value: ProductExploreContent[K]) => setContent(c => ({ ...c, [key]: value }));
   function save() {
     setError(null);
-    mutation.mutate({ productKey: product.key, data: { ...product, explore: content } }, {
+    let conceptVisual = content.conceptVisual;
+    try { conceptVisual = JSON.parse(conceptDraft); } catch { setError('Product visual data must be valid JSON. Fix it before saving.'); return; }
+    mutation.mutate({ productKey: product.key, data: { ...product, explore: { ...content, conceptVisual } } }, {
       onSuccess: () => {
         void qc.invalidateQueries({ queryKey: getListLandingProductsQueryKey() });
         void qc.invalidateQueries({ queryKey: getGetPublicProductCatalogQueryKey() });
@@ -46,7 +49,7 @@ export function ExploreContentEditor({ product, onClose }: { product: LandingPro
     <DialogContent className="max-h-[92dvh] max-w-3xl overflow-y-auto" data-testid="dialog-explore-content">
       <DialogHeader><DialogTitle>Edit Explore page · {product.name}</DialogTitle><DialogDescription>Public marketing only. These fields never grant entitlements, connect services, or change pricing. <Link href={`/products/${product.key}`} target="_blank" className="underline">Preview page</Link></DialogDescription></DialogHeader>
       <div className="flex flex-wrap gap-1" role="tablist" aria-label="Explore content sections">
-        {[{ key: 'hero', label: 'Hero & experience' }, ...SECTIONS, { key: 'gallery', label: 'Images' }, { key: 'faqs', label: 'FAQ' }, ...(product.key === 'crypto_exchange' ? [{ key: 'pricing', label: 'Pricing tiers' }] : [])].map(t =>
+        {[{ key: 'hero', label: 'Hero & experience' }, ...SECTIONS, { key: 'gallery', label: 'Images' }, { key: 'visuals', label: 'Product visuals' }, { key: 'faqs', label: 'FAQ' }, ...(product.key === 'crypto_exchange' ? [{ key: 'pricing', label: 'Pricing tiers' }] : [])].map(t =>
           <Button key={t.key} size="sm" role="tab" aria-selected={tab === t.key} variant={tab === t.key ? 'default' : 'outline'} onClick={() => setTab(t.key)}>{t.label}</Button>)}
       </div>
       {tab === 'hero' && <div className="space-y-4">
@@ -59,7 +62,9 @@ export function ExploreContentEditor({ product, onClose }: { product: LandingPro
         <div><Label htmlFor="explore-summary">Introduction</Label><Textarea id="explore-summary" value={content.summary} maxLength={1200} rows={4} onChange={e => set('summary', e.target.value)} /></div>
         <div><Label htmlFor="explore-hero-image">Hero image · public HTTPS URL</Label><Input id="explore-hero-image" type="url" value={content.heroImageUrl} maxLength={2048} placeholder="https://…" onChange={e => set('heroImageUrl', e.target.value)} /><p className="mt-1 text-xs text-muted-foreground">Leave blank for the authored product interface. Use public artwork, never credentials, private or signed links. Describe its purpose in the introduction.</p></div>
         <div><Label htmlFor="explore-experience">Customer experience</Label><Textarea id="explore-experience" value={content.customerExperience} rows={5} maxLength={1600} onChange={e => set('customerExperience', e.target.value)} /></div>
+        <fieldset className="rounded-md border p-4"><legend className="px-1 text-sm">Section visibility</legend><div className="grid gap-3 sm:grid-cols-2">{(['heroVisual','showcase','features','howItWorks','experience','integrations','faq','getStarted','pricing'] as const).filter(k => product.key === 'crypto_exchange' || k !== 'pricing').map(k => <Label key={k} className="flex items-center gap-2"><input type="checkbox" checked={content.sectionVisibility?.[k] !== false} onChange={e => set('sectionVisibility', { ...content.sectionVisibility, [k]: e.target.checked })} />{({heroVisual:'Hero visual',showcase:'Product Showcase',features:'Features',howItWorks:'How It Works',experience:'Customer experience',integrations:'Integrations & use cases',faq:'FAQ',getStarted:'Get Started',pricing:'Pricing'})[k]}</Label>)}</div></fieldset>
       </div>}
+      {tab === 'visuals' && <div className="space-y-3"><Label htmlFor="explore-visual-json">Editable concept interface data</Label><p className="text-sm text-muted-foreground">Edit product-specific navigation, sample metrics, table columns and rows, chart bars, phone content and showcase story. These are clearly labelled planned concepts, not real performance or financial offers. Bars use values from 0 to 100; phone rows contain a label and value. All fields are validated on save.</p><Textarea id="explore-visual-json" aria-label="Product visual JSON" className="min-h-[360px] font-mono text-xs" value={conceptDraft} onChange={e => setConceptDraft(e.target.value)} /></div>}
       {section && <div className="space-y-3">
         {content[section.key].map((point, index) => <fieldset key={`${section.key}-${index}`} className="space-y-2 rounded-lg border p-4">
           <legend className="px-1 text-sm">{section.label} {index + 1}</legend>
@@ -73,11 +78,15 @@ export function ExploreContentEditor({ product, onClose }: { product: LandingPro
         <Button variant="outline" disabled={content[section.key].length >= section.limit} onClick={() => set(section.key, [...content[section.key], { title: '', body: '' }])}><Plus size={15} className="mr-2" />Add {section.label.toLowerCase()}</Button>
       </div>}
       {tab === 'gallery' && <div className="space-y-3">
-        <p className="text-sm text-muted-foreground">Additional images are presented alongside the authored showcases. Empty URLs use the product illustration. Public HTTPS only.</p>
+        <p className="text-sm text-muted-foreground">Reorder, replace or hide screenshots and concept images. Use public HTTPS artwork or an existing built-in marketing image path. Never use private customer files, credentials or expiring signed links. Real captures must be sanitized and accurately labelled.</p>
         {content.gallery.map((image, index) => <fieldset key={index} className="space-y-2 rounded-lg border p-4">
           <legend>Image {index + 1}</legend>
+          <Label className="flex items-center gap-2"><input type="checkbox" checked={image.visible !== false} onChange={e => set('gallery', content.gallery.map((p, i) => i === index ? { ...p, visible: e.target.checked } : p))} />Visible on Explore page</Label>
           <Input aria-label={`Image ${index + 1} title`} placeholder="Image title / accessible description" maxLength={120} value={image.title} onChange={e => set('gallery', content.gallery.map((p, i) => i === index ? { ...p, title: e.target.value } : p))} />
           <Input aria-label={`Image ${index + 1} URL`} placeholder="Public HTTPS URL" maxLength={2048} value={image.imageUrl} onChange={e => set('gallery', content.gallery.map((p, i) => i === index ? { ...p, imageUrl: e.target.value } : p))} />
+          <div className="grid gap-3 sm:grid-cols-2"><div><Label htmlFor={`image-kind-${index}`}>Preview type</Label><select id={`image-kind-${index}`} className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={image.mediaKind ?? 'concept'} onChange={e => set('gallery', content.gallery.map((p, i) => i === index ? { ...p, mediaKind: e.target.value as 'application_capture' | 'concept' } : p))}><option value="concept">Planned concept preview</option><option value="application_capture">Actual application capture · sanitized</option></select></div>
+            <div><Label htmlFor={`image-device-${index}`}>Presentation frame</Label><select id={`image-device-${index}`} className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={image.device ?? 'desktop'} onChange={e => set('gallery', content.gallery.map((p, i) => i === index ? { ...p, device: e.target.value as 'desktop' | 'phone' | 'tablet' } : p))}><option value="desktop">Desktop browser</option><option value="phone">Smartphone</option><option value="tablet">Tablet</option></select></div></div>
+          <Input aria-label={`Image ${index + 1} source`} value={image.sourceLabel ?? ''} maxLength={180} placeholder="Source / sandbox scope, e.g. Shared Exchange demo · fictional data" onChange={e => set('gallery', content.gallery.map((p, i) => i === index ? { ...p, sourceLabel: e.target.value } : p))} />
           <Textarea aria-label={`Image ${index + 1} caption`} maxLength={700} value={image.caption} placeholder="Caption" onChange={e => set('gallery', content.gallery.map((p, i) => i === index ? { ...p, caption: e.target.value } : p))} />
           <div className="flex gap-2"><Button variant="outline" size="sm" disabled={index === 0} onClick={() => set('gallery', move(content.gallery, index, -1))}>Move up</Button><Button variant="outline" size="sm" disabled={index === content.gallery.length - 1} onClick={() => set('gallery', move(content.gallery, index, 1))}>Move down</Button><Button variant="outline" size="sm" onClick={() => set('gallery', content.gallery.filter((_, i) => i !== index))}>Remove image</Button></div>
         </fieldset>)}

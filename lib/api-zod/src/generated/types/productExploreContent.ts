@@ -5,9 +5,11 @@
  * Sandbox administration and multi-tenant provisioning API
  * OpenAPI spec version: 0.1.0
  */
+import type { ExploreConceptVisual } from './exploreConceptVisual';
 import type { ExploreFaq } from './exploreFaq';
 import type { ExplorePoint } from './explorePoint';
 import type { ExplorePricingTier } from './explorePricingTier';
+import type { ExploreSectionVisibility } from './exploreSectionVisibility';
 import type { ExploreVisual } from './exploreVisual';
 
 export interface ProductExploreContent {
@@ -19,6 +21,8 @@ export interface ProductExploreContent {
   summary: string;
   /** @maxLength 2048 */
   heroImageUrl: string;
+  conceptVisual?: ExploreConceptVisual;
+  sectionVisibility?: ExploreSectionVisibility;
   /** @maxLength 180 */
   landingHeadline?: string;
   /** @maxLength 1200 */

@@ -4809,6 +4809,57 @@ export const getPublicProductCatalogResponseOneExploreSummaryMax = 1200;
 
 export const getPublicProductCatalogResponseOneExploreHeroImageUrlMax = 2048;
 
+export const getPublicProductCatalogResponseOneExploreConceptVisualHostMax = 200;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualNavItemMax = 80;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualNavMin = 2;
+export const getPublicProductCatalogResponseOneExploreConceptVisualNavMax = 12;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualTitleMax = 160;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualKpisItemItemMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualKpisItemMin = 2;
+export const getPublicProductCatalogResponseOneExploreConceptVisualKpisItemMax = 3;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualKpisMax = 6;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualColsItemMax = 80;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualColsMax = 8;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualRowsItemItemMax = 160;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualRowsItemMax = 8;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualRowsMax = 12;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualBarsItemMin = 0;
+export const getPublicProductCatalogResponseOneExploreConceptVisualBarsItemMax = 100;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualBarsMax = 24;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneTitleMax = 120;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneHeroItemMax = 160;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneHeroMin = 2;
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneHeroMax = 2;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneSubMax = 240;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsItemItemMax = 160;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsItemMin = 2;
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsItemMax = 2;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsMax = 8;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualPhoneCtaMax = 100;
+
+export const getPublicProductCatalogResponseOneExploreConceptVisualStoryMax = 700;
+
 export const getPublicProductCatalogResponseOneExploreLandingHeadlineMax = 180;
 
 export const getPublicProductCatalogResponseOneExploreLandingSummaryMax = 1200;
@@ -4857,6 +4908,8 @@ export const getPublicProductCatalogResponseOneExploreGalleryItemCaptionMax = 70
 
 export const getPublicProductCatalogResponseOneExploreGalleryItemImageUrlMax = 2048;
 
+export const getPublicProductCatalogResponseOneExploreGalleryItemSourceLabelMax = 180;
+
 export const getPublicProductCatalogResponseOneExploreGalleryMax = 12;
 
 export const getPublicProductCatalogResponseOneExplorePricingTiersItemLabelMin = 2;
@@ -4883,6 +4936,34 @@ export const GetPublicProductCatalogResponseItem = zod.object({
   "headline": zod.string().max(getPublicProductCatalogResponseOneExploreHeadlineMax),
   "summary": zod.string().max(getPublicProductCatalogResponseOneExploreSummaryMax),
   "heroImageUrl": zod.string().max(getPublicProductCatalogResponseOneExploreHeroImageUrlMax),
+  "conceptVisual": zod.object({
+  "host": zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualHostMax),
+  "nav": zod.array(zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualNavItemMax)).min(getPublicProductCatalogResponseOneExploreConceptVisualNavMin).max(getPublicProductCatalogResponseOneExploreConceptVisualNavMax),
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualTitleMax),
+  "kpis": zod.array(zod.array(zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualKpisItemItemMax)).min(getPublicProductCatalogResponseOneExploreConceptVisualKpisItemMin).max(getPublicProductCatalogResponseOneExploreConceptVisualKpisItemMax)).min(1).max(getPublicProductCatalogResponseOneExploreConceptVisualKpisMax),
+  "cols": zod.array(zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualColsItemMax)).min(1).max(getPublicProductCatalogResponseOneExploreConceptVisualColsMax),
+  "rows": zod.array(zod.array(zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualRowsItemItemMax)).min(1).max(getPublicProductCatalogResponseOneExploreConceptVisualRowsItemMax)).min(1).max(getPublicProductCatalogResponseOneExploreConceptVisualRowsMax),
+  "bars": zod.array(zod.number().min(getPublicProductCatalogResponseOneExploreConceptVisualBarsItemMin).max(getPublicProductCatalogResponseOneExploreConceptVisualBarsItemMax)).min(1).max(getPublicProductCatalogResponseOneExploreConceptVisualBarsMax),
+  "phone": zod.object({
+  "title": zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneTitleMax),
+  "hero": zod.array(zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneHeroItemMax)).min(getPublicProductCatalogResponseOneExploreConceptVisualPhoneHeroMin).max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneHeroMax),
+  "sub": zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneSubMax),
+  "items": zod.array(zod.array(zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsItemItemMax)).min(getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsItemMin).max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsItemMax)).min(1).max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneItemsMax),
+  "cta": zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualPhoneCtaMax)
+}),
+  "story": zod.string().max(getPublicProductCatalogResponseOneExploreConceptVisualStoryMax)
+}).optional(),
+  "sectionVisibility": zod.object({
+  "heroVisual": zod.boolean().optional(),
+  "showcase": zod.boolean().optional(),
+  "features": zod.boolean().optional(),
+  "howItWorks": zod.boolean().optional(),
+  "experience": zod.boolean().optional(),
+  "integrations": zod.boolean().optional(),
+  "faq": zod.boolean().optional(),
+  "getStarted": zod.boolean().optional(),
+  "pricing": zod.boolean().optional()
+}).optional(),
   "landingHeadline": zod.string().max(getPublicProductCatalogResponseOneExploreLandingHeadlineMax).optional(),
   "landingSummary": zod.string().max(getPublicProductCatalogResponseOneExploreLandingSummaryMax).optional(),
   "customerExperience": zod.string().max(getPublicProductCatalogResponseOneExploreCustomerExperienceMax),
@@ -4913,7 +4994,11 @@ export const GetPublicProductCatalogResponseItem = zod.object({
   "gallery": zod.array(zod.object({
   "title": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemTitleMax),
   "caption": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemCaptionMax),
-  "imageUrl": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemImageUrlMax)
+  "imageUrl": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemImageUrlMax),
+  "mediaKind": zod.enum(['application_capture', 'concept']).optional(),
+  "device": zod.enum(['desktop', 'phone', 'tablet']).optional(),
+  "sourceLabel": zod.string().max(getPublicProductCatalogResponseOneExploreGalleryItemSourceLabelMax).optional(),
+  "visible": zod.boolean().optional()
 })).max(getPublicProductCatalogResponseOneExploreGalleryMax),
   "pricingTiers": zod.array(zod.object({
   "label": zod.string().min(getPublicProductCatalogResponseOneExplorePricingTiersItemLabelMin).max(getPublicProductCatalogResponseOneExplorePricingTiersItemLabelMax),
@@ -4982,6 +5067,57 @@ export const listLandingProductsResponseOneExploreSummaryMax = 1200;
 
 export const listLandingProductsResponseOneExploreHeroImageUrlMax = 2048;
 
+export const listLandingProductsResponseOneExploreConceptVisualHostMax = 200;
+
+export const listLandingProductsResponseOneExploreConceptVisualNavItemMax = 80;
+
+export const listLandingProductsResponseOneExploreConceptVisualNavMin = 2;
+export const listLandingProductsResponseOneExploreConceptVisualNavMax = 12;
+
+export const listLandingProductsResponseOneExploreConceptVisualTitleMax = 160;
+
+export const listLandingProductsResponseOneExploreConceptVisualKpisItemItemMax = 120;
+
+export const listLandingProductsResponseOneExploreConceptVisualKpisItemMin = 2;
+export const listLandingProductsResponseOneExploreConceptVisualKpisItemMax = 3;
+
+export const listLandingProductsResponseOneExploreConceptVisualKpisMax = 6;
+
+export const listLandingProductsResponseOneExploreConceptVisualColsItemMax = 80;
+
+export const listLandingProductsResponseOneExploreConceptVisualColsMax = 8;
+
+export const listLandingProductsResponseOneExploreConceptVisualRowsItemItemMax = 160;
+
+export const listLandingProductsResponseOneExploreConceptVisualRowsItemMax = 8;
+
+export const listLandingProductsResponseOneExploreConceptVisualRowsMax = 12;
+
+export const listLandingProductsResponseOneExploreConceptVisualBarsItemMin = 0;
+export const listLandingProductsResponseOneExploreConceptVisualBarsItemMax = 100;
+
+export const listLandingProductsResponseOneExploreConceptVisualBarsMax = 24;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneTitleMax = 120;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneHeroItemMax = 160;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneHeroMin = 2;
+export const listLandingProductsResponseOneExploreConceptVisualPhoneHeroMax = 2;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneSubMax = 240;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneItemsItemItemMax = 160;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneItemsItemMin = 2;
+export const listLandingProductsResponseOneExploreConceptVisualPhoneItemsItemMax = 2;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneItemsMax = 8;
+
+export const listLandingProductsResponseOneExploreConceptVisualPhoneCtaMax = 100;
+
+export const listLandingProductsResponseOneExploreConceptVisualStoryMax = 700;
+
 export const listLandingProductsResponseOneExploreLandingHeadlineMax = 180;
 
 export const listLandingProductsResponseOneExploreLandingSummaryMax = 1200;
@@ -5030,6 +5166,8 @@ export const listLandingProductsResponseOneExploreGalleryItemCaptionMax = 700;
 
 export const listLandingProductsResponseOneExploreGalleryItemImageUrlMax = 2048;
 
+export const listLandingProductsResponseOneExploreGalleryItemSourceLabelMax = 180;
+
 export const listLandingProductsResponseOneExploreGalleryMax = 12;
 
 export const listLandingProductsResponseOneExplorePricingTiersItemLabelMin = 2;
@@ -5056,6 +5194,34 @@ export const ListLandingProductsResponseItem = zod.object({
   "headline": zod.string().max(listLandingProductsResponseOneExploreHeadlineMax),
   "summary": zod.string().max(listLandingProductsResponseOneExploreSummaryMax),
   "heroImageUrl": zod.string().max(listLandingProductsResponseOneExploreHeroImageUrlMax),
+  "conceptVisual": zod.object({
+  "host": zod.string().max(listLandingProductsResponseOneExploreConceptVisualHostMax),
+  "nav": zod.array(zod.string().max(listLandingProductsResponseOneExploreConceptVisualNavItemMax)).min(listLandingProductsResponseOneExploreConceptVisualNavMin).max(listLandingProductsResponseOneExploreConceptVisualNavMax),
+  "title": zod.string().max(listLandingProductsResponseOneExploreConceptVisualTitleMax),
+  "kpis": zod.array(zod.array(zod.string().max(listLandingProductsResponseOneExploreConceptVisualKpisItemItemMax)).min(listLandingProductsResponseOneExploreConceptVisualKpisItemMin).max(listLandingProductsResponseOneExploreConceptVisualKpisItemMax)).min(1).max(listLandingProductsResponseOneExploreConceptVisualKpisMax),
+  "cols": zod.array(zod.string().max(listLandingProductsResponseOneExploreConceptVisualColsItemMax)).min(1).max(listLandingProductsResponseOneExploreConceptVisualColsMax),
+  "rows": zod.array(zod.array(zod.string().max(listLandingProductsResponseOneExploreConceptVisualRowsItemItemMax)).min(1).max(listLandingProductsResponseOneExploreConceptVisualRowsItemMax)).min(1).max(listLandingProductsResponseOneExploreConceptVisualRowsMax),
+  "bars": zod.array(zod.number().min(listLandingProductsResponseOneExploreConceptVisualBarsItemMin).max(listLandingProductsResponseOneExploreConceptVisualBarsItemMax)).min(1).max(listLandingProductsResponseOneExploreConceptVisualBarsMax),
+  "phone": zod.object({
+  "title": zod.string().max(listLandingProductsResponseOneExploreConceptVisualPhoneTitleMax),
+  "hero": zod.array(zod.string().max(listLandingProductsResponseOneExploreConceptVisualPhoneHeroItemMax)).min(listLandingProductsResponseOneExploreConceptVisualPhoneHeroMin).max(listLandingProductsResponseOneExploreConceptVisualPhoneHeroMax),
+  "sub": zod.string().max(listLandingProductsResponseOneExploreConceptVisualPhoneSubMax),
+  "items": zod.array(zod.array(zod.string().max(listLandingProductsResponseOneExploreConceptVisualPhoneItemsItemItemMax)).min(listLandingProductsResponseOneExploreConceptVisualPhoneItemsItemMin).max(listLandingProductsResponseOneExploreConceptVisualPhoneItemsItemMax)).min(1).max(listLandingProductsResponseOneExploreConceptVisualPhoneItemsMax),
+  "cta": zod.string().max(listLandingProductsResponseOneExploreConceptVisualPhoneCtaMax)
+}),
+  "story": zod.string().max(listLandingProductsResponseOneExploreConceptVisualStoryMax)
+}).optional(),
+  "sectionVisibility": zod.object({
+  "heroVisual": zod.boolean().optional(),
+  "showcase": zod.boolean().optional(),
+  "features": zod.boolean().optional(),
+  "howItWorks": zod.boolean().optional(),
+  "experience": zod.boolean().optional(),
+  "integrations": zod.boolean().optional(),
+  "faq": zod.boolean().optional(),
+  "getStarted": zod.boolean().optional(),
+  "pricing": zod.boolean().optional()
+}).optional(),
   "landingHeadline": zod.string().max(listLandingProductsResponseOneExploreLandingHeadlineMax).optional(),
   "landingSummary": zod.string().max(listLandingProductsResponseOneExploreLandingSummaryMax).optional(),
   "customerExperience": zod.string().max(listLandingProductsResponseOneExploreCustomerExperienceMax),
@@ -5086,7 +5252,11 @@ export const ListLandingProductsResponseItem = zod.object({
   "gallery": zod.array(zod.object({
   "title": zod.string().max(listLandingProductsResponseOneExploreGalleryItemTitleMax),
   "caption": zod.string().max(listLandingProductsResponseOneExploreGalleryItemCaptionMax),
-  "imageUrl": zod.string().max(listLandingProductsResponseOneExploreGalleryItemImageUrlMax)
+  "imageUrl": zod.string().max(listLandingProductsResponseOneExploreGalleryItemImageUrlMax),
+  "mediaKind": zod.enum(['application_capture', 'concept']).optional(),
+  "device": zod.enum(['desktop', 'phone', 'tablet']).optional(),
+  "sourceLabel": zod.string().max(listLandingProductsResponseOneExploreGalleryItemSourceLabelMax).optional(),
+  "visible": zod.boolean().optional()
 })).max(listLandingProductsResponseOneExploreGalleryMax),
   "pricingTiers": zod.array(zod.object({
   "label": zod.string().min(listLandingProductsResponseOneExplorePricingTiersItemLabelMin).max(listLandingProductsResponseOneExplorePricingTiersItemLabelMax),
@@ -5132,6 +5302,57 @@ export const updateLandingProductBodyExploreHeadlineMax = 180;
 export const updateLandingProductBodyExploreSummaryMax = 1200;
 
 export const updateLandingProductBodyExploreHeroImageUrlMax = 2048;
+
+export const updateLandingProductBodyExploreConceptVisualHostMax = 200;
+
+export const updateLandingProductBodyExploreConceptVisualNavItemMax = 80;
+
+export const updateLandingProductBodyExploreConceptVisualNavMin = 2;
+export const updateLandingProductBodyExploreConceptVisualNavMax = 12;
+
+export const updateLandingProductBodyExploreConceptVisualTitleMax = 160;
+
+export const updateLandingProductBodyExploreConceptVisualKpisItemItemMax = 120;
+
+export const updateLandingProductBodyExploreConceptVisualKpisItemMin = 2;
+export const updateLandingProductBodyExploreConceptVisualKpisItemMax = 3;
+
+export const updateLandingProductBodyExploreConceptVisualKpisMax = 6;
+
+export const updateLandingProductBodyExploreConceptVisualColsItemMax = 80;
+
+export const updateLandingProductBodyExploreConceptVisualColsMax = 8;
+
+export const updateLandingProductBodyExploreConceptVisualRowsItemItemMax = 160;
+
+export const updateLandingProductBodyExploreConceptVisualRowsItemMax = 8;
+
+export const updateLandingProductBodyExploreConceptVisualRowsMax = 12;
+
+export const updateLandingProductBodyExploreConceptVisualBarsItemMin = 0;
+export const updateLandingProductBodyExploreConceptVisualBarsItemMax = 100;
+
+export const updateLandingProductBodyExploreConceptVisualBarsMax = 24;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneTitleMax = 120;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneHeroItemMax = 160;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneHeroMin = 2;
+export const updateLandingProductBodyExploreConceptVisualPhoneHeroMax = 2;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneSubMax = 240;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneItemsItemItemMax = 160;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneItemsItemMin = 2;
+export const updateLandingProductBodyExploreConceptVisualPhoneItemsItemMax = 2;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneItemsMax = 8;
+
+export const updateLandingProductBodyExploreConceptVisualPhoneCtaMax = 100;
+
+export const updateLandingProductBodyExploreConceptVisualStoryMax = 700;
 
 export const updateLandingProductBodyExploreLandingHeadlineMax = 180;
 
@@ -5181,6 +5402,8 @@ export const updateLandingProductBodyExploreGalleryItemCaptionMax = 700;
 
 export const updateLandingProductBodyExploreGalleryItemImageUrlMax = 2048;
 
+export const updateLandingProductBodyExploreGalleryItemSourceLabelMax = 180;
+
 export const updateLandingProductBodyExploreGalleryMax = 12;
 
 export const updateLandingProductBodyExplorePricingTiersItemLabelMin = 2;
@@ -5207,6 +5430,34 @@ export const UpdateLandingProductBody = zod.object({
   "headline": zod.string().max(updateLandingProductBodyExploreHeadlineMax),
   "summary": zod.string().max(updateLandingProductBodyExploreSummaryMax),
   "heroImageUrl": zod.string().max(updateLandingProductBodyExploreHeroImageUrlMax),
+  "conceptVisual": zod.object({
+  "host": zod.string().max(updateLandingProductBodyExploreConceptVisualHostMax),
+  "nav": zod.array(zod.string().max(updateLandingProductBodyExploreConceptVisualNavItemMax)).min(updateLandingProductBodyExploreConceptVisualNavMin).max(updateLandingProductBodyExploreConceptVisualNavMax),
+  "title": zod.string().max(updateLandingProductBodyExploreConceptVisualTitleMax),
+  "kpis": zod.array(zod.array(zod.string().max(updateLandingProductBodyExploreConceptVisualKpisItemItemMax)).min(updateLandingProductBodyExploreConceptVisualKpisItemMin).max(updateLandingProductBodyExploreConceptVisualKpisItemMax)).min(1).max(updateLandingProductBodyExploreConceptVisualKpisMax),
+  "cols": zod.array(zod.string().max(updateLandingProductBodyExploreConceptVisualColsItemMax)).min(1).max(updateLandingProductBodyExploreConceptVisualColsMax),
+  "rows": zod.array(zod.array(zod.string().max(updateLandingProductBodyExploreConceptVisualRowsItemItemMax)).min(1).max(updateLandingProductBodyExploreConceptVisualRowsItemMax)).min(1).max(updateLandingProductBodyExploreConceptVisualRowsMax),
+  "bars": zod.array(zod.number().min(updateLandingProductBodyExploreConceptVisualBarsItemMin).max(updateLandingProductBodyExploreConceptVisualBarsItemMax)).min(1).max(updateLandingProductBodyExploreConceptVisualBarsMax),
+  "phone": zod.object({
+  "title": zod.string().max(updateLandingProductBodyExploreConceptVisualPhoneTitleMax),
+  "hero": zod.array(zod.string().max(updateLandingProductBodyExploreConceptVisualPhoneHeroItemMax)).min(updateLandingProductBodyExploreConceptVisualPhoneHeroMin).max(updateLandingProductBodyExploreConceptVisualPhoneHeroMax),
+  "sub": zod.string().max(updateLandingProductBodyExploreConceptVisualPhoneSubMax),
+  "items": zod.array(zod.array(zod.string().max(updateLandingProductBodyExploreConceptVisualPhoneItemsItemItemMax)).min(updateLandingProductBodyExploreConceptVisualPhoneItemsItemMin).max(updateLandingProductBodyExploreConceptVisualPhoneItemsItemMax)).min(1).max(updateLandingProductBodyExploreConceptVisualPhoneItemsMax),
+  "cta": zod.string().max(updateLandingProductBodyExploreConceptVisualPhoneCtaMax)
+}),
+  "story": zod.string().max(updateLandingProductBodyExploreConceptVisualStoryMax)
+}).optional(),
+  "sectionVisibility": zod.object({
+  "heroVisual": zod.boolean().optional(),
+  "showcase": zod.boolean().optional(),
+  "features": zod.boolean().optional(),
+  "howItWorks": zod.boolean().optional(),
+  "experience": zod.boolean().optional(),
+  "integrations": zod.boolean().optional(),
+  "faq": zod.boolean().optional(),
+  "getStarted": zod.boolean().optional(),
+  "pricing": zod.boolean().optional()
+}).optional(),
   "landingHeadline": zod.string().max(updateLandingProductBodyExploreLandingHeadlineMax).optional(),
   "landingSummary": zod.string().max(updateLandingProductBodyExploreLandingSummaryMax).optional(),
   "customerExperience": zod.string().max(updateLandingProductBodyExploreCustomerExperienceMax),
@@ -5237,7 +5488,11 @@ export const UpdateLandingProductBody = zod.object({
   "gallery": zod.array(zod.object({
   "title": zod.string().max(updateLandingProductBodyExploreGalleryItemTitleMax),
   "caption": zod.string().max(updateLandingProductBodyExploreGalleryItemCaptionMax),
-  "imageUrl": zod.string().max(updateLandingProductBodyExploreGalleryItemImageUrlMax)
+  "imageUrl": zod.string().max(updateLandingProductBodyExploreGalleryItemImageUrlMax),
+  "mediaKind": zod.enum(['application_capture', 'concept']).optional(),
+  "device": zod.enum(['desktop', 'phone', 'tablet']).optional(),
+  "sourceLabel": zod.string().max(updateLandingProductBodyExploreGalleryItemSourceLabelMax).optional(),
+  "visible": zod.boolean().optional()
 })).max(updateLandingProductBodyExploreGalleryMax),
   "pricingTiers": zod.array(zod.object({
   "label": zod.string().min(updateLandingProductBodyExplorePricingTiersItemLabelMin).max(updateLandingProductBodyExplorePricingTiersItemLabelMax),
@@ -5268,6 +5523,57 @@ export const updateLandingProductResponseOneExploreHeadlineMax = 180;
 export const updateLandingProductResponseOneExploreSummaryMax = 1200;
 
 export const updateLandingProductResponseOneExploreHeroImageUrlMax = 2048;
+
+export const updateLandingProductResponseOneExploreConceptVisualHostMax = 200;
+
+export const updateLandingProductResponseOneExploreConceptVisualNavItemMax = 80;
+
+export const updateLandingProductResponseOneExploreConceptVisualNavMin = 2;
+export const updateLandingProductResponseOneExploreConceptVisualNavMax = 12;
+
+export const updateLandingProductResponseOneExploreConceptVisualTitleMax = 160;
+
+export const updateLandingProductResponseOneExploreConceptVisualKpisItemItemMax = 120;
+
+export const updateLandingProductResponseOneExploreConceptVisualKpisItemMin = 2;
+export const updateLandingProductResponseOneExploreConceptVisualKpisItemMax = 3;
+
+export const updateLandingProductResponseOneExploreConceptVisualKpisMax = 6;
+
+export const updateLandingProductResponseOneExploreConceptVisualColsItemMax = 80;
+
+export const updateLandingProductResponseOneExploreConceptVisualColsMax = 8;
+
+export const updateLandingProductResponseOneExploreConceptVisualRowsItemItemMax = 160;
+
+export const updateLandingProductResponseOneExploreConceptVisualRowsItemMax = 8;
+
+export const updateLandingProductResponseOneExploreConceptVisualRowsMax = 12;
+
+export const updateLandingProductResponseOneExploreConceptVisualBarsItemMin = 0;
+export const updateLandingProductResponseOneExploreConceptVisualBarsItemMax = 100;
+
+export const updateLandingProductResponseOneExploreConceptVisualBarsMax = 24;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneTitleMax = 120;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneHeroItemMax = 160;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneHeroMin = 2;
+export const updateLandingProductResponseOneExploreConceptVisualPhoneHeroMax = 2;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneSubMax = 240;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneItemsItemItemMax = 160;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneItemsItemMin = 2;
+export const updateLandingProductResponseOneExploreConceptVisualPhoneItemsItemMax = 2;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneItemsMax = 8;
+
+export const updateLandingProductResponseOneExploreConceptVisualPhoneCtaMax = 100;
+
+export const updateLandingProductResponseOneExploreConceptVisualStoryMax = 700;
 
 export const updateLandingProductResponseOneExploreLandingHeadlineMax = 180;
 
@@ -5317,6 +5623,8 @@ export const updateLandingProductResponseOneExploreGalleryItemCaptionMax = 700;
 
 export const updateLandingProductResponseOneExploreGalleryItemImageUrlMax = 2048;
 
+export const updateLandingProductResponseOneExploreGalleryItemSourceLabelMax = 180;
+
 export const updateLandingProductResponseOneExploreGalleryMax = 12;
 
 export const updateLandingProductResponseOneExplorePricingTiersItemLabelMin = 2;
@@ -5343,6 +5651,34 @@ export const UpdateLandingProductResponse = zod.object({
   "headline": zod.string().max(updateLandingProductResponseOneExploreHeadlineMax),
   "summary": zod.string().max(updateLandingProductResponseOneExploreSummaryMax),
   "heroImageUrl": zod.string().max(updateLandingProductResponseOneExploreHeroImageUrlMax),
+  "conceptVisual": zod.object({
+  "host": zod.string().max(updateLandingProductResponseOneExploreConceptVisualHostMax),
+  "nav": zod.array(zod.string().max(updateLandingProductResponseOneExploreConceptVisualNavItemMax)).min(updateLandingProductResponseOneExploreConceptVisualNavMin).max(updateLandingProductResponseOneExploreConceptVisualNavMax),
+  "title": zod.string().max(updateLandingProductResponseOneExploreConceptVisualTitleMax),
+  "kpis": zod.array(zod.array(zod.string().max(updateLandingProductResponseOneExploreConceptVisualKpisItemItemMax)).min(updateLandingProductResponseOneExploreConceptVisualKpisItemMin).max(updateLandingProductResponseOneExploreConceptVisualKpisItemMax)).min(1).max(updateLandingProductResponseOneExploreConceptVisualKpisMax),
+  "cols": zod.array(zod.string().max(updateLandingProductResponseOneExploreConceptVisualColsItemMax)).min(1).max(updateLandingProductResponseOneExploreConceptVisualColsMax),
+  "rows": zod.array(zod.array(zod.string().max(updateLandingProductResponseOneExploreConceptVisualRowsItemItemMax)).min(1).max(updateLandingProductResponseOneExploreConceptVisualRowsItemMax)).min(1).max(updateLandingProductResponseOneExploreConceptVisualRowsMax),
+  "bars": zod.array(zod.number().min(updateLandingProductResponseOneExploreConceptVisualBarsItemMin).max(updateLandingProductResponseOneExploreConceptVisualBarsItemMax)).min(1).max(updateLandingProductResponseOneExploreConceptVisualBarsMax),
+  "phone": zod.object({
+  "title": zod.string().max(updateLandingProductResponseOneExploreConceptVisualPhoneTitleMax),
+  "hero": zod.array(zod.string().max(updateLandingProductResponseOneExploreConceptVisualPhoneHeroItemMax)).min(updateLandingProductResponseOneExploreConceptVisualPhoneHeroMin).max(updateLandingProductResponseOneExploreConceptVisualPhoneHeroMax),
+  "sub": zod.string().max(updateLandingProductResponseOneExploreConceptVisualPhoneSubMax),
+  "items": zod.array(zod.array(zod.string().max(updateLandingProductResponseOneExploreConceptVisualPhoneItemsItemItemMax)).min(updateLandingProductResponseOneExploreConceptVisualPhoneItemsItemMin).max(updateLandingProductResponseOneExploreConceptVisualPhoneItemsItemMax)).min(1).max(updateLandingProductResponseOneExploreConceptVisualPhoneItemsMax),
+  "cta": zod.string().max(updateLandingProductResponseOneExploreConceptVisualPhoneCtaMax)
+}),
+  "story": zod.string().max(updateLandingProductResponseOneExploreConceptVisualStoryMax)
+}).optional(),
+  "sectionVisibility": zod.object({
+  "heroVisual": zod.boolean().optional(),
+  "showcase": zod.boolean().optional(),
+  "features": zod.boolean().optional(),
+  "howItWorks": zod.boolean().optional(),
+  "experience": zod.boolean().optional(),
+  "integrations": zod.boolean().optional(),
+  "faq": zod.boolean().optional(),
+  "getStarted": zod.boolean().optional(),
+  "pricing": zod.boolean().optional()
+}).optional(),
   "landingHeadline": zod.string().max(updateLandingProductResponseOneExploreLandingHeadlineMax).optional(),
   "landingSummary": zod.string().max(updateLandingProductResponseOneExploreLandingSummaryMax).optional(),
   "customerExperience": zod.string().max(updateLandingProductResponseOneExploreCustomerExperienceMax),
@@ -5373,7 +5709,11 @@ export const UpdateLandingProductResponse = zod.object({
   "gallery": zod.array(zod.object({
   "title": zod.string().max(updateLandingProductResponseOneExploreGalleryItemTitleMax),
   "caption": zod.string().max(updateLandingProductResponseOneExploreGalleryItemCaptionMax),
-  "imageUrl": zod.string().max(updateLandingProductResponseOneExploreGalleryItemImageUrlMax)
+  "imageUrl": zod.string().max(updateLandingProductResponseOneExploreGalleryItemImageUrlMax),
+  "mediaKind": zod.enum(['application_capture', 'concept']).optional(),
+  "device": zod.enum(['desktop', 'phone', 'tablet']).optional(),
+  "sourceLabel": zod.string().max(updateLandingProductResponseOneExploreGalleryItemSourceLabelMax).optional(),
+  "visible": zod.boolean().optional()
 })).max(updateLandingProductResponseOneExploreGalleryMax),
   "pricingTiers": zod.array(zod.object({
   "label": zod.string().min(updateLandingProductResponseOneExplorePricingTiersItemLabelMin).max(updateLandingProductResponseOneExplorePricingTiersItemLabelMax),

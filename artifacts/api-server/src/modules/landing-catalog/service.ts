@@ -17,7 +17,25 @@ const projection = `key,visible,name,description,icon,starting_price AS "startin
   (SELECT definition->'publicMarketing' FROM module_catalog WHERE module_catalog.key=landing_products.key) AS explore`;
 
 function withExplore(product: any) {
-  const explore = { ...defaultExploreContent(product.key, product.name, product.description), ...(product.explore ?? {}) };
+  const defaults = defaultExploreContent(product.key, product.name, product.description);
+  const stored = product.explore ?? {};
+  const explore = { ...defaults, ...stored };
+  // Upgrade the old generated presentation, not owner-authored copy. Once the
+  // current editor saves explicit visibility/concept data, all choices win.
+  if (!("sectionVisibility" in stored) && !("conceptVisual" in stored)) {
+    if (product.key === "crypto_exchange") {
+      const existing = stored.gallery ?? [];
+      explore.gallery = [...existing, ...defaults.gallery.filter(m => !existing.some((x: {imageUrl:string}) => x.imageUrl === m.imageUrl))].slice(0,12);
+    }
+    if (Array.isArray(stored.features)) explore.features = stored.features.map((f: {title:string;body:string}) => {
+      const old = product.key === "crypto_exchange"
+        ? `${f.title} is presented in the branded Exchange sandbox. Availability is governed by the assigned plan and operator configuration; live financial execution remains disabled.`
+        : `${f.title} is part of the planned ${product.name} experience. The interface is illustrative; delivery and integration are subject to implementation and operator review.`;
+      return f.body === old ? defaults.features.find(x => x.title === f.title) ?? f : f;
+    });
+    if (product.key === "crypto_exchange" && stored.customerExperience === "A customer arrives on your branded domain, chooses an enabled exchange action, reviews a sandbox quote, creates an illustrative order and follows its status through payment instructions, completion and a branded invoice. This preview never moves funds.")
+      explore.customerExperience = defaults.customerExperience;
+  }
   // Parse only the public content contract; never expose the registry definition.
   const parsed = UpdateLandingProductBody.parse({ ...product, explore });
   return { ...product, explore: parsed.explore };

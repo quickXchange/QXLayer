@@ -1510,6 +1510,23 @@ export interface ExplorePoint {
   body: string;
 }
 
+export type ExploreVisualMediaKind = typeof ExploreVisualMediaKind[keyof typeof ExploreVisualMediaKind];
+
+
+export const ExploreVisualMediaKind = {
+  application_capture: 'application_capture',
+  concept: 'concept',
+} as const;
+
+export type ExploreVisualDevice = typeof ExploreVisualDevice[keyof typeof ExploreVisualDevice];
+
+
+export const ExploreVisualDevice = {
+  desktop: 'desktop',
+  phone: 'phone',
+  tablet: 'tablet',
+} as const;
+
 export interface ExploreVisual {
   /** @maxLength 120 */
   title: string;
@@ -1517,6 +1534,91 @@ export interface ExploreVisual {
   caption: string;
   /** @maxLength 2048 */
   imageUrl: string;
+  mediaKind?: ExploreVisualMediaKind;
+  device?: ExploreVisualDevice;
+  /** @maxLength 180 */
+  sourceLabel?: string;
+  visible?: boolean;
+}
+
+export type ExploreConceptVisualPhone = {
+  /** @maxLength 120 */
+  title: string;
+  /**
+     * @minItems 2
+     * @maxItems 2
+     * @items.maxLength 160
+     */
+  hero: string[];
+  /** @maxLength 240 */
+  sub: string;
+  /**
+     * @minItems 1
+     * @maxItems 8
+     * @items.minItems 2
+     * @items.maxItems 2
+     * @items.items.maxLength 160
+     */
+  items: string[][];
+  /** @maxLength 100 */
+  cta: string;
+};
+
+export interface ExploreConceptVisual {
+  /** @maxLength 200 */
+  host: string;
+  /**
+     * @minItems 2
+     * @maxItems 12
+     * @items.maxLength 80
+     */
+  nav: string[];
+  /** @maxLength 160 */
+  title: string;
+  /**
+     * @minItems 1
+     * @maxItems 6
+     * @items.minItems 2
+     * @items.maxItems 3
+     * @items.items.maxLength 120
+     */
+  kpis: string[][];
+  /**
+     * @minItems 1
+     * @maxItems 8
+     * @items.maxLength 80
+     */
+  cols: string[];
+  /**
+     * @minItems 1
+     * @maxItems 12
+     * @items.minItems 1
+     * @items.maxItems 8
+     * @items.items.maxLength 160
+     */
+  rows: string[][];
+  /**
+     * @minItems 1
+     * @maxItems 24
+     * @items.minimum 0
+     * @items.maximum 100
+     */
+  bars: number[];
+  phone: ExploreConceptVisualPhone;
+  /** @maxLength 700 */
+  story: string;
+}
+
+export interface ExploreSectionVisibility {
+  heroVisual?: boolean;
+  showcase?: boolean;
+  features?: boolean;
+  howItWorks?: boolean;
+  experience?: boolean;
+  integrations?: boolean;
+  faq?: boolean;
+  getStarted?: boolean;
+  pricing?: boolean;
 }
 
 export interface ExploreFaq {
@@ -1535,6 +1637,8 @@ export interface ProductExploreContent {
   summary: string;
   /** @maxLength 2048 */
   heroImageUrl: string;
+  conceptVisual?: ExploreConceptVisual;
+  sectionVisibility?: ExploreSectionVisibility;
   /** @maxLength 180 */
   landingHeadline?: string;
   /** @maxLength 1200 */
