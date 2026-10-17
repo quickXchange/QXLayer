@@ -4,6 +4,7 @@ import { ArrowRight, CircleDot, Plug } from 'lucide-react';
 import type { LandingProduct } from '@workspace/api-client-react';
 import { ShowcaseScene } from './showcase-scenes';
 import { FALLBACK, MOCKS, type Mock } from './explore-data';
+import { cardPresentation } from './explore-visual-model';
 import '@/styles/explore-premium.css';
 
 type G = { title?: string; caption?: string; imageUrl?: string; mediaKind?: string; device?: string; sourceLabel?: string };
@@ -35,10 +36,11 @@ function Table({ m }: { m: Mock }) {
 }
 
 function CardArt({ m }: { m: Mock }) {
+  const card = cardPresentation(m.rows);
   return (
     <div className="xp-cardart">
-      <div className="xp-card"><b>VYNOX</b><i className="xp-chip" /><span className="xp-pan">4821 0437 9150 {m.rows[0][1].slice(-4)}</span><span className="xp-cn"><small>Cardholder</small>{m.rows[0][0]}</span></div>
-      <div className="xp-card v2"><b>Virtual</b><span className="xp-pan">4821 7702 3318 1190</span><span className="xp-cn"><small>Cardholder</small>{m.rows[2][0]}</span></div>
+      <div className="xp-card"><b>VYNOX</b><i className="xp-chip" /><span className="xp-pan">•••• •••• •••• {card.lastFour}</span><span className="xp-cn"><small>Cardholder</small>{card.primaryHolder}</span></div>
+      <div className="xp-card v2"><b>Virtual</b><span className="xp-pan">•••• •••• •••• 1190</span><span className="xp-cn"><small>Cardholder</small>{card.secondaryHolder}</span></div>
       <div className="xp-ctl"><h4>{m.title} <Concept /></h4>{m.phone.items.map(([a, b]) => <div key={a} className="xp-ph-row"><span>{a}</span><span>{b}</span></div>)}<Table m={m} /></div>
     </div>
   );
