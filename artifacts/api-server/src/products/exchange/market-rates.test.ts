@@ -31,3 +31,32 @@ test("stale or missing prices, unsupported coverage and blocked currencies fail 
   const oldFx=marketRates(async()=>({base:"USD",date:"2026-10-01",rates:{EUR:0.9}}),()=>now);
   await assert.rejects(()=>oldFx.usdFiat("EUR"),/stale/);
 });
+test("verified Kraken last-trade fallback keeps timestamps, real stablecoin prices and coalesced failures",async()=>{
+ const calls:string[]=[];
+ const markets=marketRates(async url=>{
+  calls.push(url);
+  if(url.includes("coingecko"))throw new Error("upstream unavailable");
+  if(url.includes("pair=USDTUSD"))return{error:[],result:{USDTZUSD:[["0.99871","1",now/1000-5]],last:"cursor"}};
+  if(url.includes("pair=ETHUSD"))return{error:[],result:{XETHZUSD:[["2376.49","1",now/1000-6]],last:"cursor"}};
+  throw new Error("unverified market");
+ },()=>now);
+ const [a,b]=await Promise.all([markets.cryptoUsd("USDT"),markets.cryptoUsd("USDT")]);
+ assert.equal(a.rate,"0.99871");assert.equal(a.updatedAt,new Date(now-5000).toISOString());
+ assert.equal(a.validUntil,now-5000+180000);assert.match(a.provider,/Kraken.*CoinGecko unavailable/);assert.deepEqual(a,b);
+ assert.equal((await markets.cryptoUsd("ETH")).rate,"2376.49");
+ assert.equal(calls.filter(u=>u.includes("coingecko")).length,1,"short failure cache avoids hammering the primary");
+ assert.equal(calls.filter(u=>u.includes("USDTUSD")).length,1,"simultaneous reads coalesce");
+});
+test("Kraken fallback never accepts stale, future, missing, wrong-pair or malformed prices",async()=>{
+ for(const row of[["100","1",now/1000-181],["100","1",now/1000+11],["0","1",now/1000],["-1","1",now/1000],["bad","1",now/1000]]){
+  const m=marketRates(async url=>url.includes("coingecko")?{}:{error:[],result:{XXBTZUSD:[row]}},()=>now);
+  await assert.rejects(()=>m.cryptoUsd("BTC"),/stale or unavailable/);
+ }
+ for(const data of[{error:["EGeneral:Permission denied"],result:{XXBTZUSD:[["100","1",now/1000]]}},
+  {error:[],result:{XETHZUSD:[["100","1",now/1000]]}},{error:[],result:{XXBTZUSD:[]}}]){
+  const m=marketRates(async url=>url.includes("coingecko")?{}:data,()=>now);
+  await assert.rejects(()=>m.cryptoUsd("BTC"),/stale or unavailable/);
+ }
+ let kraken=false;const noAlias=marketRates(async url=>{if(url.includes("kraken"))kraken=true;throw Error("Unavailable");},()=>now);
+ await assert.rejects(()=>noAlias.cryptoUsd("WBTC"));assert.equal(kraken,false,"wrapped assets never substitute another asset's price");
+});

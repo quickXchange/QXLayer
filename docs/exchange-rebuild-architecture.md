@@ -50,7 +50,11 @@ Selector weights: exact network/fiat endpoint **4**, asset across networks **2**
 
 Automatic references use the tenant's valid configured 1Forge connection for supported Forex pairs, otherwise the authorized Sandbox Frankfurter/ECB daily fallback. Crypto uses explicitly mapped CoinGecko Public identities with provider timestamps. USDT/USDC are fetched, never assumed to equal USD.
 
+If CoinGecko is unavailable, only independently verified BTC/USD, ETH/USD, USDT/USD and USDC/USD Kraken public spot markets may supply a read-only last-trade reference. The exact market key and actual trade timestamp are validated; the same 180-second age limit applies. Provider attribution explicitly identifies the fallback. Wrapped assets never substitute the underlying asset's price. Neither public feed establishes executable conversion capability.
+
 One coalesced CoinGecko request covers the explicit supported identity bundle; cached crypto references expire after at most 60 seconds and must independently remain under the 180-second provider-age limit. Forex is cached for five minutes; ECB daily references allow weekends/holidays but expire after four days. Missing, stale, unsupported, malformed or denied responses fail quoting. There is no manufactured fallback price.
+
+Primary-feed failures are briefly coalesced for 15 seconds to avoid repeated failed public API requests. Kraken requests use `count=1` and coalesce per verified asset. Contracts: https://docs.kraken.com/api-reference/market-data/get-recent-trades and verified live USD market response keys; this is protected Sandbox market-data use, not a claim of commercial redistribution licensing.
 
 Cross rate:
 

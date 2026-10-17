@@ -14,12 +14,18 @@ const COINS: Record<string, string> = {
   UNI: "uniswap", SHIB: "shiba-inu", ARB: "arbitrum", OP: "optimism",
 };
 type Read = (url: string) => Promise<any>;
+// Verified USD spot markets only. WBTC/WETH never inherit BTC/ETH prices.
+const KRAKEN:Record<string,{pair:string;result:string}>={
+  BTC:{pair:"XBTUSD",result:"XXBTZUSD"},ETH:{pair:"ETHUSD",result:"XETHZUSD"},
+  USDT:{pair:"USDTUSD",result:"USDTZUSD"},USDC:{pair:"USDCUSD",result:"USDCUSD"},
+};
 const publicJson: Read = async url => {
+  const provider=new URL(url).hostname==="api.coingecko.com"?"CoinGecko":new URL(url).hostname==="api.kraken.com"?"Kraken":"Frankfurter";
   try {
     const r = await fetch(url, { headers: { accept: "application/json" }, redirect: "error", signal: AbortSignal.timeout(10000) });
-    if (!r.ok) throw new Error();
+    if (!r.ok) throw new HttpError(503,`Fresh market data is unavailable (${provider} HTTP ${r.status}). Automatic quoting is disabled; no invented rate is substituted.`);
     return await r.json();
-  } catch { throw new HttpError(503, "Fresh market data is unavailable. Automatic quoting is disabled; no invented rate is substituted."); }
+  } catch(e) { if(e instanceof HttpError)throw e;throw new HttpError(503, `Fresh market data is unavailable (${provider} transport or invalid response). Automatic quoting is disabled; no invented rate is substituted.`); }
 };
 export interface ReferencePrice { rate: string; provider: string; updatedAt: string; validUntil: number }
 /** Read-only market data with bounded freshness and a coalesced, short-lived cache. */
@@ -31,7 +37,7 @@ export function marketRates(read: Read = publicJson, now = Date.now) {
     // One coalesced request covers all explicitly mapped identities. Never
     // spend one public API request per wildcard asset or customer quote.
     const promise=read(`https://api.coingecko.com/api/v3/simple/price?ids=${Object.values(COINS).join(",")}&vs_currencies=usd&include_last_updated_at=true`)
-      .catch(e=>{coinBundle=undefined;throw e;});
+      .catch(e=>{if(coinBundle?.promise===promise)coinBundle.until=now()+15000;throw e;});
     coinBundle={until:now()+60000,promise};return promise;
   };
   const cached = (key: string, load: () => Promise<ReferencePrice>) => {
@@ -45,11 +51,29 @@ export function marketRates(read: Read = publicJson, now = Date.now) {
     const id = COINS[symbol];
     if (!id) throw new HttpError(503, `No verified market-data identity is configured for ${symbol}.`);
     return cached(`coin:${id}`, async () => {
-      const data = await coins();
-      const row = data?.[id], at = Number(row?.last_updated_at) * 1000;
-      if (!Number.isFinite(at) || at > now() + 10000 || now() - at > 180000)
-        throw new HttpError(503, "Crypto reference data is stale or has no verified update timestamp.");
-      return { rate: positiveRate(row?.usd), provider: "CoinGecko Public", updatedAt: new Date(at).toISOString(), validUntil: at + 180000 };
+      let primaryError:unknown;
+      try{
+        const data = await coins();
+        const row = data?.[id], at = Number(row?.last_updated_at) * 1000;
+        if (!Number.isFinite(at) || at > now() + 10000 || now() - at > 180000)
+          throw new HttpError(503, "Crypto reference data is stale or has no verified update timestamp.");
+        return { rate: positiveRate(row?.usd), provider: "CoinGecko Public", updatedAt: new Date(at).toISOString(), validUntil: at + 180000 };
+      }catch(e){primaryError=e;}
+      const mapping=KRAKEN[symbol];
+      if(!mapping)throw primaryError;
+      try{
+        // Public read-only last trade, not a ticker without an as-of timestamp.
+        // count=1 bounds bandwidth; the per-asset cache coalesces simultaneous reads.
+        const data=await read(`https://api.kraken.com/0/public/Trades?pair=${mapping.pair}&count=1`);
+        const rows=data?.result?.[mapping.result],row=Array.isArray(rows)?rows.at(-1):undefined;
+        const at=Math.floor(Number(row?.[2])*1000);
+        if(!Array.isArray(data?.error)||data.error.length||!row||!Number.isFinite(at)||at>now()+10000||now()-at>180000)
+          throw new HttpError(503,"Kraken reference data is stale or has no verified market/timestamp.");
+        return {rate:positiveRate(row[0]),provider:"Kraken Public / USD last trade (CoinGecko unavailable)",updatedAt:new Date(at).toISOString(),validUntil:at+180000};
+      }catch(e){
+        const detail=e instanceof HttpError?e.message:"Kraken transport or invalid response";
+        throw new HttpError(503,`Fresh crypto reference data is stale or unavailable. ${primaryError instanceof HttpError?primaryError.message:"CoinGecko unavailable"} ${detail} No invented rate is substituted.`);
+      }
     });
   }
   function usdFiat(currency: string) {
