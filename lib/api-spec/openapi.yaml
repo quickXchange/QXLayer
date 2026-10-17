@@ -391,6 +391,18 @@ paths:
             schema: {$ref: "#/components/schemas/ExchangeSettings"}
       responses:
         "200": {description: Saved sandbox configuration, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeConfiguration"}}}}
+  /tenants/{tenantId}/exchange/test-quote:
+    post:
+      operationId: testExchangeQuote
+      parameters:
+        - {$ref: "#/components/parameters/TenantId"}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeQuoteInput"}
+      responses:
+        "200": {description: Read-only test of saved tenant pricing using the canonical public quote engine; never creates an order, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeQuote"}}}}
   /tenants/{tenantId}/exchange/orders:
     get:
       operationId: listExchangeOrders
@@ -456,6 +468,18 @@ paths:
             schema: {$ref: "#/components/schemas/ExchangeQuoteInput"}
       responses:
         "200": {description: Signed sandbox quote, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeQuote"}}}}
+  /public/sites/{slug}/exchange/review:
+    post:
+      operationId: reviewSandboxOrder
+      parameters:
+        - {name: slug, in: path, required: true, schema: {type: string}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ExchangeOrderInput"}
+      responses:
+        "200": {description: Read-only review after a valid signed quote and complete customer details; no order or financial execution, content: {application/json: {schema: {$ref: "#/components/schemas/ExchangeOrderReview"}}}}
   /public/sites/{slug}/exchange/orders:
     post:
       operationId: createSandboxOrder
@@ -1797,6 +1821,11 @@ components:
         feeBps: {type: integer, minimum: 0, maximum: 5000}
         fixedFee: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
         spreadBps: {type: integer, minimum: 0, maximum: 5000}
+        state: {type: string, enum: [enabled, disabled, blocked]}
+        pricingMode: {type: string, enum: [manual, market], description: "Market requires fresh real reference data. Manual requires an explicitly configured rate."}
+        minimum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        maximum: {type: string, pattern: '^\d{1,18}(\.\d{1,18})?$'}
+        routeIds: {type: array, maxItems: 100, items: {type: string, format: uuid}}
     ExchangeWalletScanInput:
       type: object
       required: [reason]
@@ -1845,6 +1874,7 @@ components:
       type: object
       required: [id, label, enabled, currency, buy, sell]
       properties:
+        receivingIbanRequired: {type: boolean, description: "Public field requirement only; no operator bank details"}
         id: {type: string, format: uuid}
         label: {type: string, minLength: 2, maxLength: 80}
         instructions: {type: string, maxLength: 2000, description: "Optional sandbox payment instructions, frozen on order creation; never include credentials"}
@@ -1972,6 +2002,12 @@ components:
         sandboxOnly: {type: boolean, const: true}
         pricingSource: {type: string, description: "Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution."}
         pricingRuleId: {type: ["string", "null"], format: uuid, description: "Matched tenant pricing rule; null for unchanged route pricing"}
+        pricingRuleSnapshot: {$ref: "#/components/schemas/ExchangePricingRule"}
+        marketRate: {type: string}
+        rateProvider: {type: string}
+        rateUpdatedAt: {type: string, format: date-time}
+        quoteKind: {type: string, enum: [manual, indicative, provider]}
+        calculation: {type: string, description: "Explicit source-unit fees, directional rate/spread and destination-unit deductions"}
     ExchangeOrderInput:
       type: object
       required: [quoteToken, idempotencyKey]
@@ -1981,12 +2017,41 @@ components:
         contactConsent: {type: boolean, description: "Must be true when optional contact details are supplied. Does not opt in to marketing."}
         quoteToken: {type: string, minLength: 40, maxLength: 12000}
         idempotencyKey: {type: string, format: uuid}
+        workflowVersion: {type: integer, enum: [2]}
+        customerDetails: {$ref: "#/components/schemas/ExchangeCustomerDetails"}
+    ExchangeCustomerDetails:
+      type: object
+      properties:
+        beneficiaryName: {type: string, maxLength: 120}
+        bankName: {type: string, maxLength: 120}
+        iban: {type: string, maxLength: 80}
+        accountNumber: {type: string, maxLength: 120}
+        walletAddress: {type: string, maxLength: 200}
+        memo: {type: string, maxLength: 120}
+        paymentDescription: {type: string, maxLength: 500}
+        telegram: {type: string, maxLength: 80}
+        address: {type: string, maxLength: 500}
+        phone: {type: string, maxLength: 60}
+    ExchangeOrderReview:
+      type: object
+      required: [quote, paymentInstructions]
+      properties:
+        quote: {$ref: "#/components/schemas/ExchangeQuote"}
+        paymentInstructions: {type: ["string", "null"]}
+        paymentAddress: {type: string}
+        paymentMemo: {type: string}
     ExchangeStatusInput:
       type: object
       required: [status, note]
       properties:
         status: {type: string, enum: [pending, processing, completed, cancelled, failed]}
         note: {type: string, maxLength: 500}
+        operation: {type: string, enum: [status, note, assign, review_payment, verify_deposit]}
+        assigneeId: {type: string, maxLength: 200}
+        depositReference: {type: string, maxLength: 200}
+        transactionHash: {type: string, maxLength: 200}
+        payoutReference: {type: string, maxLength: 200}
+        confirmCompletion: {type: boolean}
         expectedStatus:
           type: string
           enum: [pending, processing, completed, cancelled, failed]
@@ -2026,6 +2091,22 @@ components:
         customerName: {type: ["string", "null"]}
         customerEmail: {type: ["string", "null"]}
         sandboxOnly: {type: boolean, const: true}
+        customerDetails: {$ref: "#/components/schemas/ExchangeCustomerDetails"}
+        pricingRuleSnapshot: {$ref: "#/components/schemas/ExchangePricingRule"}
+        marketRate: {type: string}
+        rateProvider: {type: string}
+        rateUpdatedAt: {type: string, format: date-time}
+        quoteKind: {type: string, enum: [manual, indicative, provider]}
+        calculation: {type: string}
+        depositReference: {type: string}
+        transactionHash: {type: string}
+        payoutReference: {type: string}
+        completedAt: {type: string, format: date-time}
+        paymentVerification: {type: string, enum: [unverified, review, verified]}
+        paymentAddress: {type: string, description: "Frozen customer-configured source address; never an infrastructure/monitoring wallet"}
+        paymentMemo: {type: string}
+        assigneeId: {type: string}
+        internalNotes: {type: array, items: {$ref: "#/components/schemas/ExchangeOrderEvent"}}
     ExchangeCustomer:
       type: object
       required: [id, name, email, orders, lastActivity, status]
@@ -2516,6 +2597,7 @@ components:
         testnet: { type: boolean }
         logoUrl: {type: ["string", "null"]}
         decimals: {type: integer}
+        memoRequired: {type: boolean}
       required: [assetId, symbol, name, networkId, networkName, testnet]
     AssetNetworkCatalog:
       type: object

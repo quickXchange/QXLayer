@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { usePrincipal } from '@/lib/principal';
+import { ExchangeStatusInputOperation as Op } from '@workspace/api-client-react';
 import { useLocation } from 'wouter';
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import {
@@ -59,11 +61,11 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
   const orders = d?.orders ?? [];
   const stale = q.isFetching;
   const sel = useSelection(stale ? [] : orders.map((o) => o.id));
-  const [snap, setSnap] = useState<{ id: string; status: string }[]>([]);
+  const [snap, setSnap] = useState<{ id: string; status: string; ok: boolean }[]>([]);
   const pages = d ? Math.max(1, Math.ceil(d.total / d.pageSize)) : 1;
   const chosen = stale ? [] : orders.filter((o) => sel.has(o.id));
-  const allowed = chosen.length === 0 ? [] : (NEXT[chosen[0].status] ?? []).filter((s) => chosen.every((o) => (NEXT[o.status] ?? []).includes(s)));
-  const snapshotAllowed = snap.length === 0 ? [] : (NEXT[snap[0].status] ?? []).filter((s) => snap.every((o) => (NEXT[o.status] ?? []).includes(s)));
+  const allowed = chosen.length === 0 ? [] : (NEXT[chosen[0].status] ?? []).filter((s) => s !== 'completed' && chosen.every((o) => (NEXT[o.status] ?? []).includes(s) && (s !== 'processing' || o.status !== 'pending' || o.paymentVerification === 'verified')));
+  const snapshotAllowed = snap.length === 0 ? [] : (NEXT[snap[0].status] ?? []).filter((s) => s !== 'completed' && snap.every((o) => (NEXT[o.status] ?? []).includes(s) && (s !== 'processing' || o.status !== 'pending' || o.ok)));
   const shortcut = (v: string) => { setBucket(v === 'active' || v === 'archived' ? v : ''); setStatus(ALL); setAction(['swap', 'convert', 'buy', 'sell'].includes(v) ? v : ALL); setPage(1); sel.clear(); };
   const cur = bucket || (action !== ALL ? action : status === ALL ? 'all' : '');
   const reset = () => { setPage(1); sel.clear(); };
@@ -72,7 +74,7 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
     if (busy || !canEdit || snap.length === 0 || !snapshotAllowed.includes(target)) return; setBusy(true); setFailures([]);
     const bad: string[] = []; let ok = 0;
     for (const o of snap) {
-      try { await m.mutateAsync({ tenantId, orderId: o.id, data: { status: target as 'processing', expectedStatus: o.status as 'pending', note: `Bulk: Mark ${target}. ${note.trim()}`.trim().slice(0, 500) } }); ok++; }
+      try { await m.mutateAsync({ tenantId, orderId: o.id, data: { operation: 'status', status: target as 'processing', expectedStatus: o.status as 'pending', note: `Bulk: Mark ${target}. ${note.trim()}`.trim().slice(0, 500) } }); ok++; }
       catch (e) { bad.push(`${o.id}: ${(e as Error)?.message ?? 'rejected'}`); }
     }
     setBusy(false); setStep(null); setNote(''); setFailures(bad); sel.clear(); refresh(); snap.forEach((o) => qc.invalidateQueries({ queryKey: getGetExchangeOrderQueryKey(tenantId, o.id) }));
@@ -103,9 +105,9 @@ export function OrdersPanel({ tenantId, canEdit, orderId }: { tenantId: string; 
       {q.isLoading || q.isPlaceholderData ? <ListSkeleton /> : q.isError || !d ? <ErrorState what="orders" onRetry={() => q.refetch()} /> : orders.length === 0 ? <EmptyState title="No orders match" body="Adjust the filters, or wait for simulated orders from this tenant's widget." /> : (
         <>
           <BulkBar sel={sel} noun="orders" locked={!canEdit} testid="orders">
-            <BulkBtn sel={sel} locked={!canEdit || stale || allowed.length === 0} testid="button-bulk-status-orders" onClick={() => { setSnap(chosen.map((o) => ({ id: o.id, status: o.status }))); setTarget(allowed[0]); setStep('form'); }}>Update status</BulkBtn>
+            <BulkBtn sel={sel} locked={!canEdit || stale || allowed.length === 0} testid="button-bulk-status-orders" onClick={() => { setSnap(chosen.map((o) => ({ id: o.id, status: o.status, ok: o.paymentVerification === 'verified' }))); setTarget(allowed[0]); setStep('form'); }}>Update status</BulkBtn>
           </BulkBar>
-          {sel.count > 0 && allowed.length === 0 && <p className="text-xs text-muted-foreground" data-testid="text-no-common-status">The selected orders share no allowed next status (terminal orders cannot be reopened).</p>}
+          {sel.count > 0 && allowed.length === 0 && <p className="text-xs text-muted-foreground" data-testid="text-no-common-status">The selected orders share no allowed next status (terminal orders cannot be reopened). Completion needs individual payout confirmation in each order, and processing needs verified deposits.</p>}
            <DataTable testid="order" rows={orders} getId={(o) => o.id} sel={sel} locked={!canEdit} selectionLocked={stale || busy} onRowClick={(o) => setOpenId(o.id)} cols={[
             { h: 'Order', cell: (o) => <button type="button" className="font-mono text-xs text-copper hover:underline" data-testid={`link-order-${o.id}`} onClick={() => setOpenId(o.id)}>{o.id.slice(0, 8)}</button> },
             { h: 'Type', cell: (o) => <span className="capitalize">{o.action}</span> },
@@ -144,7 +146,7 @@ function Row({ l, v }: { l: string; v: React.ReactNode }) {
 export function OrderDrawer({ tenantId, orderId, canEdit, onClose }: { tenantId: string; orderId: string | null; canEdit: boolean; onClose: () => void }) {
   return (
     <Sheet open={!!orderId} onOpenChange={(v) => { if (!v) onClose(); }}>
-      <SheetContent className="w-full max-w-[min(100vw,28rem)] overflow-y-auto [overflow-wrap:anywhere] sm:max-w-[min(100vw,28rem)]" data-testid="drawer-order">
+      <SheetContent className="h-[100dvh] w-screen max-w-none overflow-y-auto [overflow-wrap:anywhere] sm:w-full sm:max-w-2xl" data-testid="drawer-order">
         {orderId && <DrawerBody key={orderId} tenantId={tenantId} orderId={orderId} canEdit={canEdit} />}
       </SheetContent>
     </Sheet>
@@ -164,83 +166,166 @@ function Copy({ value, label }: { value: string; label: string }) {
 }
 
 
+const SECTIONS: [string, string][] = [['overview', 'Overview'], ['customer', 'Customer'], ['pricing', 'Pricing'], ['transaction', 'Transaction'], ['operations', 'Operations']];
+const TERMINAL = ['completed', 'cancelled', 'failed'];
+
 function DrawerBody({ tenantId, orderId, canEdit }: { tenantId: string; orderId: string; canEdit: boolean }) {
   const { toast } = useToast(); const refresh = useRefresh(tenantId); const qc = useQueryClient();
+  const me = usePrincipal();
   const key = getGetExchangeOrderQueryKey(tenantId, orderId);
   const q = useGetExchangeOrder(tenantId, orderId, { query: { queryKey: key } });
   const cfg = useGetExchangeConfiguration(tenantId, { query: { queryKey: getGetExchangeConfigurationQueryKey(tenantId) } });
   const vis = useVisualCatalog();
   const m = useUpdateExchangeOrderStatus(); const [ask, confirmNode] = useConfirm(!canEdit);
-  const [note, setNote] = useState('');
+  const [tab, setTab] = useState('overview');
+  const [note, setNote] = useState(''); const [internal, setInternal] = useState('');
+  const [dep, setDep] = useState(''); const [hash, setHash] = useState(''); const [opNote, setOpNote] = useState('');
+  const [payout, setPayout] = useState(''); const [confirmDone, setConfirmDone] = useState(false);
   const o: ExchangeOrder | undefined = q.data;
   const next = o ? NEXT[o.status] ?? [] : [];
   const idr = useIdentityResolver(cfg.data?.configuration, cfg.data?.catalog);
   const pmKey = o ? (o.paymentMethodId || o.paymentMethod || null) : null;
   const pmId = pmKey ? idr.payment(pmKey) : null;
-  const go = (status: string) => { if (m.isPending || !o || !canEdit || q.isFetching) return; const seen = o.status; m.mutate({ tenantId, orderId, data: { status: status as 'processing', expectedStatus: seen as 'pending', note: note.trim() } }, {
-    onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); setNote(''); toast({ title: `Order marked ${status}` }); },
-    onError: (e) => toast({ title: 'Status change failed', description: (e as Error).message, variant: 'destructive' }),
-  }); };
+  const verified = o?.paymentVerification === 'verified';
+  const terminal = !!o && TERMINAL.includes(o.status);
+  const busy = m.isPending || q.isFetching;
+  /** Single mutation path; non-status operations always send the CURRENT status so no transition is faked. */
+  const send = (data: Record<string, unknown>, done: string, after?: () => void) => new Promise<void>((res, rej) => {
+    if (!o || !canEdit || busy) return rej(new Error('Not available'));
+    m.mutate({ tenantId, orderId, data: { status: o.status, expectedStatus: o.status, note: '', ...data } as never }, {
+      onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); after?.(); toast({ title: done }); res(); },
+      onError: (e) => { toast({ title: 'Update failed', description: (e as Error).message, variant: 'destructive' }); rej(e); },
+    });
+  }).catch(() => undefined);
   const side = (l: string, id: string, sym: string, amt: string) => {
     const e = idr.endpoint(id, sym, null); const fiat = id.startsWith('fiat:');
     return (
       <div className="min-w-0 flex-1 bg-card p-3" data-testid={`order-side-${l.toLowerCase()}`}>
         <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{l}</p>
-        <div className="mt-2 flex items-center gap-2">
-          <div className="min-w-0"><EndpointView r={idr} id={id} symbol={sym} amount={amt} paymentMethod={fiat ? pmKey : null} size={36} /><p className="mt-1 truncate text-xs text-muted-foreground">{e.name}</p></div></div>
+        <div className="mt-2"><EndpointView r={idr} id={id} symbol={sym} amount={amt} paymentMethod={fiat ? pmKey : null} size={36} /><p className="mt-1 truncate text-xs text-muted-foreground">{e.name}</p></div>
         <div className="mt-2 flex items-center gap-2 text-xs">
-          {fiat ? (<>{e.currencyLogoUrl || e.logoUrl ? <VisualImg url={e.currencyLogoUrl ?? e.logoUrl} label={e.label} kind="flag" size={18} /> : null}<span>Fiat currency{e.currencyFlagName ? `, ${e.currencyFlagName} (currency mapping, not customer country)` : ''}</span></>) : (<><VisualImg url={e.networkLogoUrl} label={e.network ?? ''} kind="network" size={18} /><span>{e.network ?? 'Unknown network'}</span></>)}
+          {fiat ? (<>{e.currencyLogoUrl || e.logoUrl ? <VisualImg url={e.currencyLogoUrl ?? e.logoUrl} label={e.label} kind="flag" size={18} /> : null}<span>Fiat currency</span></>) : (<><VisualImg url={e.networkLogoUrl} label={e.network ?? ''} kind="network" size={18} /><span>{e.network ?? 'Unknown network'}</span></>)}
         </div>
       </div>);
   };
+  const cd = o?.customerDetails;
+  const details: [string, string | undefined][] = cd ? [['Beneficiary', cd.beneficiaryName], ['Bank', cd.bankName], ['IBAN', cd.iban], ['Account number', cd.accountNumber], ['Wallet address', cd.walletAddress], ['Memo / tag', cd.memo], ['Payment description', cd.paymentDescription], ['Telegram', cd.telegram], ['Phone', cd.phone], ['Address', cd.address]] : [];
+  const filled = details.filter(([, v]) => v && v.trim());
+  const snap = o?.pricingRuleSnapshot;
+  const statusGo = (s: string) => {
+    if (!o) return;
+    if (s === 'processing' && o.status === 'pending' && !verified) { toast({ title: 'Verify the deposit first', description: 'New orders cannot enter processing before the payment is verified.', variant: 'destructive' }); setTab('transaction'); return; }
+    const run = async () => { await send({ operation: Op.status, status: s, note: note.trim() }, `Order marked ${s}`, () => setNote('')); };
+    if (s === 'cancelled' || s === 'failed') ask({ title: `Mark order ${o.id.slice(0, 8)} ${s}?`, destructive: true, label: `Mark ${s}`, body: <p>Order {o.id} moves from {o.status} to {s}. This cannot be reopened. Sandbox only.</p>, run: async () => { await run(); return <p>Order marked {s}.</p>; } });
+    else void run();
+  };
   return (
     <>
-      <SheetHeader><SheetTitle className="font-display text-2xl">{o ? `Order ${o.id.slice(0, 8)}` : 'Order'}</SheetTitle><SheetDescription>Sandbox order details. No funds move.</SheetDescription></SheetHeader>
+      <SheetHeader><SheetTitle className="font-display text-2xl">View order</SheetTitle><SheetDescription className="break-all font-mono text-xs" data-testid="text-drawer-order-id">{o ? o.id : orderId}. Sandbox order details; no funds move and no payout is executed.</SheetDescription></SheetHeader>
       <div className="mt-4 space-y-5">
         {q.isLoading ? <ListSkeleton rows={3} /> : q.isError || !o ? <ErrorState what="this order" onRetry={() => q.refetch()} /> : (
           <>
-            <div className="flex flex-wrap items-center gap-3"><OrderStatus status={o.status} /><span className="capitalize text-sm">{o.action}</span><span className="font-mono text-[10px] uppercase text-copper">sandbox only</span></div>
-            {vis.isError && <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="text-visual-unavailable">Artwork unavailable; showing text labels. <button type="button" className="underline" onClick={() => vis.refetch()}>Retry</button></p>}
-            <Panel title="Send → Receive" testid="order-exchange">
-              <div className="flex flex-col gap-px rounded-md border bg-border">{side('Send', o.source, o.sourceSymbol, o.inputAmount)}{side('Receive', o.destination, o.destinationSymbol, o.outputAmount)}</div>
-            </Panel>
-            <Panel title="Pricing">
-              <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2" data-testid="order-fields">
-                <Row l="Rate" v={<span className="font-mono"><span className="block">1 {o.sourceSymbol} =</span><span className="block">{o.rate} {o.destinationSymbol}</span></span>} />
+            <div className="flex flex-wrap items-center gap-3"><OrderStatus status={o.status} /><span className="capitalize text-sm">{o.action}</span><span className="font-mono text-[10px] uppercase text-copper">sandbox only</span>{o.paymentVerification && <span className="font-mono text-[10px] uppercase text-muted-foreground" data-testid="text-verification">payment {o.paymentVerification}</span>}</div>
+            <div className="sticky top-0 z-10 -mx-1 flex gap-1 overflow-x-auto bg-background px-1 py-1" role="tablist" data-testid="drawer-order-tabs">{SECTIONS.map(([k, l]) => <Button key={k} type="button" size="sm" role="tab" aria-selected={tab === k} variant={tab === k ? 'default' : 'outline'} data-testid={`tab-order-${k}`} onClick={() => setTab(k)}>{l}</Button>)}</div>
+            {vis.isError && <p className="text-xs text-muted-foreground" data-testid="text-visual-unavailable">Artwork unavailable; showing text labels. <button type="button" className="underline" onClick={() => vis.refetch()}>Retry</button></p>}
+
+            {o.status === 'completed' && <div className="rounded-md border border-copper/40 bg-card p-3" data-testid="banner-complete"><p className="font-mono text-[10px] uppercase tracking-wider text-copper">Transaction complete</p><p className="font-display text-lg">Your {o.action} is complete</p><p className="text-xs text-muted-foreground">Completed {o.completedAt ? stamp(o.completedAt) : ''}. Sandbox record only.</p></div>}
+            <ol className="grid grid-cols-4 gap-1 rounded-md border p-3 text-center text-[10px] font-medium" aria-label="Sandbox order progress" data-testid="order-lifecycle">
+              {['CREATED','DETECTED','PROCESSING','DONE'].map((label,i)=>{
+                const reached=o.status==='completed'?3:o.status==='processing'?2:o.paymentVerification==='verified'?1:0;
+                return <li key={label} className={i<=reached?'text-foreground':'text-muted-foreground opacity-50'} aria-current={i===reached?'step':undefined}>{label}</li>;
+              })}
+            </ol>
+            {tab === 'overview' && <div className="space-y-5">
+              <Panel title="Send to Receive" testid="order-exchange"><div className="flex flex-col gap-px rounded-md border bg-border sm:flex-row">{side('Send', o.source, o.sourceSymbol, o.inputAmount)}{side('Receive', o.destination, o.destinationSymbol, o.outputAmount)}</div></Panel>
+              <Panel title="Order"><div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2" data-testid="order-fields">
+                <Row l="Order ID" v={<span className="flex flex-wrap items-center gap-1"><span className="font-mono text-xs">{o.id}</span><Copy value={o.id} label="Order ID" /></span>} />
+                <Row l="Type" v={<span className="capitalize">{o.action}</span>} />
+                <Row l="Customer" v={o.customerName??'Not recorded'} /><Row l="Email" v={o.customerEmail??'Not recorded'} />
+                <Row l="Payment method" v={o.paymentMethod ? <span className="flex items-center gap-2"><VisualImg url={pmId?.logoUrl} label={pmId?.label ?? o.paymentMethod} kind="payment-method" generic={pmId?.generic} size={24} />{o.paymentMethod}</span> : 'None'} />
+                <Row l="Assignee" v={o.assigneeId ? (o.assigneeId === me.userId ? 'You' : <span className="font-mono text-xs">{o.assigneeId}</span>) : 'Unassigned'} />
+                <Row l="Created" v={stamp(o.createdAt)} /><Row l="Updated" v={o.updatedAt ? stamp(o.updatedAt) : 'Not updated'} />
+              </div></Panel>
+              {o.paymentInstructions && <Panel title="Payment instructions shown to customer"><p className="whitespace-pre-wrap rounded-md border bg-card p-3 text-sm" data-testid="text-order-payment-instructions">{o.paymentInstructions}</p><Copy value={o.paymentInstructions} label="Payment instructions" /></Panel>}
+            </div>}
+
+            {tab === 'customer' && <div className="space-y-5">
+              <Panel title="Contact"><div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
+                <Row l="Customer" v={o.customerName || 'Anonymous'} />
+                <Row l="Email" v={o.customerEmail ? <span className="flex flex-wrap items-center gap-1">{o.customerEmail}<Copy value={o.customerEmail} label="Email" /></span> : 'Not collected'} />
+              </div></Panel>
+              <Panel title="Customer-provided details" testid="order-customer-details">
+                {filled.length === 0 ? <p className="rounded-md border p-3 text-sm text-muted-foreground" data-testid="text-details-empty">The customer submitted no bank, account, memo, Telegram, phone or address details.</p> :
+                  <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">{filled.map(([l, v]) => <Row key={l} l={l} v={<span className="flex flex-wrap items-center gap-1"><span className="whitespace-pre-wrap">{v}</span><Copy value={v!} label={l} /></span>} />)}</div>}
+                <p className="text-xs text-muted-foreground">Only fields the customer filled in are shown.</p>
+              </Panel>
+            </div>}
+
+            {tab === 'pricing' && <div className="space-y-5">
+              <Panel title="Rate and fees"><div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
+                <Row l="Final rate" v={<span className="font-mono">1 {o.sourceSymbol} = {o.rate} {o.destinationSymbol}</span>} />
+                <Row l="Market rate" v={<span className="font-mono">{o.marketRate ?? 'Not recorded'}</span>} />
+                <Row l="Rate provider" v={o.rateProvider ?? o.pricingSource ?? 'Not recorded'} />
+                <Row l="Rate updated" v={o.rateUpdatedAt ? stamp(o.rateUpdatedAt) : 'Not recorded'} />
+                <Row l="Quote kind" v={o.quoteKind ?? 'Not recorded'} />
                 <Row l="Spread" v={`${o.spreadBps} bps`} />
                 <Row l="Source fee" v={<span className="font-mono">{o.fee} {o.sourceSymbol}</span>} />
                 <Row l="Destination fee" v={<span className="font-mono">{o.destinationFee ?? '0'} {o.destinationSymbol}</span>} />
               </div>
-            </Panel>
-            <Panel title="Payment">
-              <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
-                <Row l="Payment method" v={o.paymentMethod ? <span className="flex items-center gap-2"><VisualImg url={pmId?.logoUrl} label={pmId?.label ?? o.paymentMethod} kind="payment-method" generic={pmId?.generic} size={24} />{o.paymentMethod}</span> : 'None'} />
-                <Row l="Account or card details" v={<span className="text-muted-foreground">Not collected</span>} />
-                <Row l="Payment details" v={o.paymentInstructions ? <span className="space-y-2"><span className="block whitespace-pre-wrap break-words" data-testid="text-order-payment-instructions">{o.paymentInstructions}</span><Copy value={o.paymentInstructions} label="Payment instructions" /></span> : <span className="text-muted-foreground" data-testid="text-payment-not-collected">No instructions recorded for this sandbox order.</span>} />
-                {o.pricingRuleId && <Row l="Pricing rule" v={<span className="break-all font-mono text-xs">{o.pricingRuleId}</span>} />}
-              </div>
-            </Panel>
-            <Panel title="Customer and order">
-              <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
-                <Row l="Order ID" v={<span className="flex flex-wrap items-center gap-1"><span className="font-mono text-xs">{o.id}</span><Copy value={o.id} label="Order ID" /></span>} />
-                <Row l="Type" v={<span className="capitalize">{o.action}</span>} />
-                <Row l="Customer" v={o.customerName || 'Anonymous'} />
-                <Row l="Country" v={<span className="text-muted-foreground" data-testid="text-country-not-collected">Not collected</span>} />
-                <Row l="Email" v={o.customerEmail ? <span className="flex flex-wrap items-center gap-1">{o.customerEmail}<Copy value={o.customerEmail} label="Email" /></span> : 'Not collected'} />
-                <Row l="Created" v={stamp(o.createdAt)} />
-                <Row l="Updated" v={o.updatedAt ? stamp(o.updatedAt) : 'Not updated'} />
-              </div>
-              <div className="flex flex-wrap gap-1"><Copy value={`${o.inputAmount} ${o.sourceSymbol}`} label="Send amount" /><Copy value={`${o.outputAmount} ${o.destinationSymbol}`} label="Receive amount" /><Copy value={o.rate} label="Rate" /></div>
-            </Panel>
-            <section><h3 className="font-display mb-2 text-xl">Timeline and notes</h3>
-              <ol className="space-y-2 border-l pl-4">{o.history.map((h, i) => <li key={i} data-testid={`row-history-${i}`}><OrderStatus status={h.status} /><span className="ml-2 font-mono text-xs text-muted-foreground">{stamp(h.at)}</span>{h.note && <p className="mt-1 text-sm">{h.note}</p>}</li>)}</ol></section>
-            {next.length === 0 ? <p className="rounded-md border p-3 text-sm text-muted-foreground" data-testid="text-terminal">This order is {o.status}. Terminal orders cannot be reopened.</p> : !canEdit ? <p className="text-sm text-muted-foreground">Read only: updating orders needs configuration access, an active subscription and the exchange feature.</p> : (
-              <section className="space-y-2 rounded-md border bg-card p-4"><h3 className="font-display text-xl">Update status</h3>
-                <p className="text-xs text-muted-foreground">Simulated workflow only. No funds move.</p>
-                <Textarea data-testid="input-status-note" maxLength={500} placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
-                <div className="flex flex-wrap gap-2">{next.map((s) => <Button key={s} data-testid={`button-status-${s}`} variant={s === 'completed' || s === 'processing' ? 'default' : 'outline'} disabled={m.isPending || q.isFetching} onClick={() => (s === 'cancelled' || s === 'failed' ? ask({ title: `Mark order ${o?.id.slice(0, 8)} ${s}?`, destructive: true, label: `Mark ${s}`, body: <p>Order {o?.id} moves from {o?.status} to {s}. This cannot be reopened. Sandbox only, no funds move.</p>, run: async () => { await new Promise<void>((res, rej) => { if (!o) return rej(new Error('Order missing')); m.mutate({ tenantId, orderId, data: { status: s as 'processing', expectedStatus: o.status as 'pending', note: note.trim() } }, { onSuccess: (r) => { qc.setQueryData(key, r); refresh(orderId); setNote(''); res(); }, onError: (e) => rej(e) }); }); return <p>Order marked {s}.</p>; } }) : go(s))}>Mark {s}</Button>)}</div></section>)}
+              <Copy value={o.rate} label="Rate" /></Panel>
+              <Panel title="Matched rule snapshot" testid="order-rule-snapshot">
+                {snap ? <div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
+                  <Row l="Rule ID" v={<span className="font-mono text-xs">{snap.id}</span>} /><Row l="Mode" v={snap.pricingMode ?? 'legacy'} />
+                  <Row l="Match" v={`${snap.source} to ${snap.destination}`} /><Row l="Priority" v={snap.priority} />
+                  <Row l="Fee / spread" v={`${snap.feeBps} bps + ${snap.fixedFee}, spread ${snap.spreadBps} bps`} /><Row l="Manual rate" v={snap.rate ?? 'None'} />
+                </div> : <p className="rounded-md border p-3 text-sm text-muted-foreground">{o.pricingRuleId ? <span className="font-mono text-xs">Rule {o.pricingRuleId} (snapshot not stored)</span> : 'No rule matched; route pricing applied.'}</p>}
+              </Panel>
+              <Panel title="Calculation">{o.calculation ? <p className="rounded-md border bg-muted/40 p-3 font-mono text-xs" data-testid="text-order-calculation">{o.calculation}</p> : <p className="text-sm text-muted-foreground">No calculation recorded for this order.</p>}</Panel>
+            </div>}
+
+            {tab === 'transaction' && <div className="space-y-5">
+              <Panel title="Transaction references"><div className="grid gap-px overflow-hidden rounded-md border bg-border sm:grid-cols-2">
+                <Row l="Verification" v={<span className="capitalize">{o.paymentVerification ?? 'unverified'}</span>} />
+                <Row l="Deposit reference" v={o.depositReference ?? 'None'} />
+                <Row l="Transaction hash" v={o.transactionHash ? <span className="font-mono text-xs">{o.transactionHash}</span> : 'None'} />
+                <Row l="Payout reference" v={o.payoutReference ?? 'None'} />
+                <Row l="Completed" v={o.completedAt ? stamp(o.completedAt) : 'Not completed'} />
+              </div></Panel>
+              {canEdit && !terminal && <section className="space-y-2 rounded-md border bg-card p-4" data-testid="section-verify">
+                <h3 className="font-display text-lg">Payment review and verification</h3>
+                {o.paymentVerification !== 'review' && o.paymentVerification !== 'verified' && <Button size="sm" variant="outline" data-testid="button-review-payment" disabled={busy} onClick={() => void send({ operation: Op.review_payment, note: 'Payment sent for review' }, 'Payment marked for review')}>Mark payment under review</Button>}
+                {!verified && <div className="space-y-2">
+                  <Input data-testid="input-deposit-ref" placeholder="Deposit reference" maxLength={200} value={dep} onChange={(e) => setDep(e.target.value)} />
+                  <Input data-testid="input-tx-hash" placeholder="Transaction hash" maxLength={200} value={hash} onChange={(e) => setHash(e.target.value)} />
+                  <Textarea data-testid="input-verify-note" maxLength={450} placeholder="Operator note (required): confirm this is a Sandbox verification, no real funds" value={opNote} onChange={(e) => setOpNote(e.target.value)} />
+                  <Button size="sm" data-testid="button-verify-deposit" disabled={busy || (!dep.trim() && !hash.trim()) || !/sandbox/i.test(opNote)} onClick={() => void send({ operation: Op.verify_deposit, note: opNote.trim(), ...(dep.trim() ? { depositReference: dep.trim() } : {}), ...(hash.trim() ? { transactionHash: hash.trim() } : {}) }, 'Deposit verified (Sandbox)', () => { setDep(''); setHash(''); setOpNote(''); })}>Verify deposit</Button>
+                  <p className="text-xs text-muted-foreground">Needs a reference or hash and a note that mentions Sandbox.</p></div>}
+              </section>}
+              <section><h3 className="font-display mb-2 text-xl">History</h3>
+                <ol className="space-y-2 border-l pl-4">{o.history.map((h, i) => <li key={i} data-testid={`row-history-${i}`}><OrderStatus status={h.status} /><span className="ml-2 font-mono text-xs text-muted-foreground">{stamp(h.at)}</span>{h.note && <p className="mt-1 text-sm">{h.note}</p>}</li>)}</ol></section>
+            </div>}
+
+            {tab === 'operations' && <div className="space-y-5">
+              <Panel title="Internal notes (never shown to the customer)" testid="order-internal">
+                {(o.internalNotes ?? []).length === 0 ? <p className="text-sm text-muted-foreground">No internal notes yet.</p> : <ol className="space-y-2 border-l pl-4">{o.internalNotes!.map((n, i) => <li key={i} data-testid={`row-internal-note-${i}`}><span className="font-mono text-xs text-muted-foreground">{stamp(n.at)}</span><p className="text-sm">{n.note}</p></li>)}</ol>}
+                {canEdit && <div className="space-y-2"><Textarea data-testid="input-internal-note" maxLength={500} placeholder="Add an internal note" value={internal} onChange={(e) => setInternal(e.target.value)} /><Button size="sm" data-testid="button-add-internal-note" disabled={busy || !internal.trim()} onClick={() => void send({ operation: Op.note, note: internal.trim() }, 'Internal note added', () => setInternal(''))}>Add note</Button></div>}
+              </Panel>
+              <Panel title="Assignee"><p className="text-sm">{o.assigneeId ? (o.assigneeId === me.userId ? 'Assigned to you' : <span className="font-mono text-xs">{o.assigneeId}</span>) : 'Unassigned'}</p>
+                {canEdit && !terminal && o.assigneeId !== me.userId && <Button size="sm" variant="outline" data-testid="button-assign-me" disabled={busy} onClick={() => void send({ operation: Op.assign, assigneeId: me.userId, note: 'Assigned' }, 'Assigned to you')}>Assign to me</Button>}</Panel>
+              {next.length === 0 ? <p className="rounded-md border p-3 text-sm text-muted-foreground" data-testid="text-terminal">This order is {o.status}. Terminal orders cannot be reopened.</p> : !canEdit ? <p className="text-sm text-muted-foreground">Read only: updating orders needs configuration access, an active subscription and the exchange feature.</p> : (
+                <section className="space-y-2 rounded-md border bg-card p-4"><h3 className="font-display text-xl">Update status</h3>
+                  <p className="text-xs text-muted-foreground">Sandbox workflow only. {o.status === 'pending' && !verified ? 'Processing is available after deposit verification.' : ''}</p>
+                  <Textarea data-testid="input-status-note" maxLength={500} placeholder="Customer-visible status note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
+                  <div className="flex flex-wrap gap-2">{next.filter((s) => s !== 'completed').map((s) => <Button key={s} data-testid={`button-status-${s}`} variant={s === 'processing' ? 'default' : 'outline'} disabled={busy || (s === 'processing' && o.status === 'pending' && !verified)} onClick={() => statusGo(s)}>Mark {s}</Button>)}</div>
+                  {next.includes('completed') && <div className="space-y-2 border-t pt-3" data-testid="section-complete">
+                    <Input data-testid="input-payout-ref" placeholder="Payout reference (required)" maxLength={200} value={payout} onChange={(e) => setPayout(e.target.value)} />
+                    <label className="flex items-start gap-2 text-sm"><input type="checkbox" data-testid="check-confirm-completion" className="mt-1" checked={confirmDone} onChange={(e) => setConfirmDone(e.target.checked)} />I confirm the payout was made for this Sandbox order.</label>
+                    <Button data-testid="button-status-completed" disabled={busy || !payout.trim() || !confirmDone} onClick={() => void send({ operation: Op.status, status: 'completed', confirmCompletion: true, payoutReference: payout.trim(), note: note.trim() }, 'Order completed', () => { setPayout(''); setConfirmDone(false); setNote(''); })}>Complete order</Button></div>}
+                </section>)}
+            </div>}
           </>)}
       </div>
+      {o && <div className="sticky bottom-0 mt-4 flex gap-2 border-t bg-background py-3" data-testid="drawer-order-footer"><Button type="button" variant="outline" className="flex-1" data-testid="button-copy-info" onClick={async () => { try { await navigator.clipboard.writeText([`Order ${o.id}`, `${o.inputAmount} ${o.sourceSymbol} to ${o.outputAmount} ${o.destinationSymbol}`, `Rate ${o.rate}`, `Status ${o.status}`].join('\n')); toast({ title: 'Order info copied' }); } catch { toast({ title: 'Copy failed', variant: 'destructive' }); } }}>Copy info</Button></div>}
       {confirmNode}
     </>
   );

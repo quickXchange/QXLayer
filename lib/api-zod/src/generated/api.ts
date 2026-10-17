@@ -3887,6 +3887,10 @@ export const getExchangeConfigurationResponseConfigurationPricingRulesItemFixedF
 export const getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin = 0;
 export const getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax = 5000;
 
+export const getExchangeConfigurationResponseConfigurationPricingRulesItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationPricingRulesItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeConfigurationResponseConfigurationPricingRulesItemRouteIdsMax = 100;
+
 export const getExchangeConfigurationResponseConfigurationPricingRulesMax = 100;
 
 export const getExchangeConfigurationResponseConfigurationWalletsItemLabelMax = 80;
@@ -4011,7 +4015,12 @@ export const GetExchangeConfigurationResponse = zod.object({
   "rate": zod.string().regex(getExchangeConfigurationResponseConfigurationPricingRulesItemRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
   "feeBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationPricingRulesItemFeeBpsMin).max(getExchangeConfigurationResponseConfigurationPricingRulesItemFeeBpsMax),
   "fixedFee": zod.string().regex(getExchangeConfigurationResponseConfigurationPricingRulesItemFixedFeeRegExp),
-  "spreadBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin).max(getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax)
+  "spreadBps": zod.number().int().min(getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin).max(getExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(getExchangeConfigurationResponseConfigurationPricingRulesItemMinimumRegExp).optional(),
+  "maximum": zod.string().regex(getExchangeConfigurationResponseConfigurationPricingRulesItemMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(getExchangeConfigurationResponseConfigurationPricingRulesItemRouteIdsMax).optional()
 })).max(getExchangeConfigurationResponseConfigurationPricingRulesMax).optional(),
   "wallets": zod.array(zod.object({
   "purpose": zod.enum(['customer', 'monitoring']).optional().describe('Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records.'),
@@ -4027,6 +4036,7 @@ export const GetExchangeConfigurationResponse = zod.object({
   "providerKey": zod.enum(['rpc', 'alchemy'])
 })).max(getExchangeConfigurationResponseConfigurationWalletsMax).optional(),
   "paymentMethods": zod.array(zod.object({
+  "receivingIbanRequired": zod.boolean().optional().describe('Public field requirement only; no operator bank details'),
   "id": zod.string().uuid(),
   "label": zod.string().min(getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin).max(getExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax),
   "instructions": zod.string().max(getExchangeConfigurationResponseConfigurationPaymentMethodsItemInstructionsMax).optional().describe('Optional sandbox payment instructions, frozen on order creation; never include credentials'),
@@ -4160,6 +4170,10 @@ export const saveExchangeConfigurationBodyPricingRulesItemFixedFeeRegExp = new R
 export const saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMin = 0;
 export const saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMax = 5000;
 
+export const saveExchangeConfigurationBodyPricingRulesItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyPricingRulesItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationBodyPricingRulesItemRouteIdsMax = 100;
+
 export const saveExchangeConfigurationBodyPricingRulesMax = 100;
 
 export const saveExchangeConfigurationBodyWalletsItemLabelMax = 80;
@@ -4279,7 +4293,12 @@ export const SaveExchangeConfigurationBody = zod.object({
   "rate": zod.string().regex(saveExchangeConfigurationBodyPricingRulesItemRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
   "feeBps": zod.number().int().min(saveExchangeConfigurationBodyPricingRulesItemFeeBpsMin).max(saveExchangeConfigurationBodyPricingRulesItemFeeBpsMax),
   "fixedFee": zod.string().regex(saveExchangeConfigurationBodyPricingRulesItemFixedFeeRegExp),
-  "spreadBps": zod.number().int().min(saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMin).max(saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMax)
+  "spreadBps": zod.number().int().min(saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMin).max(saveExchangeConfigurationBodyPricingRulesItemSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(saveExchangeConfigurationBodyPricingRulesItemMinimumRegExp).optional(),
+  "maximum": zod.string().regex(saveExchangeConfigurationBodyPricingRulesItemMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationBodyPricingRulesItemRouteIdsMax).optional()
 })).max(saveExchangeConfigurationBodyPricingRulesMax).optional(),
   "wallets": zod.array(zod.object({
   "purpose": zod.enum(['customer', 'monitoring']).optional().describe('Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records.'),
@@ -4295,6 +4314,7 @@ export const SaveExchangeConfigurationBody = zod.object({
   "providerKey": zod.enum(['rpc', 'alchemy'])
 })).max(saveExchangeConfigurationBodyWalletsMax).optional(),
   "paymentMethods": zod.array(zod.object({
+  "receivingIbanRequired": zod.boolean().optional().describe('Public field requirement only; no operator bank details'),
   "id": zod.string().uuid(),
   "label": zod.string().min(saveExchangeConfigurationBodyPaymentMethodsItemLabelMin).max(saveExchangeConfigurationBodyPaymentMethodsItemLabelMax),
   "instructions": zod.string().max(saveExchangeConfigurationBodyPaymentMethodsItemInstructionsMax).optional().describe('Optional sandbox payment instructions, frozen on order creation; never include credentials'),
@@ -4400,6 +4420,10 @@ export const saveExchangeConfigurationResponseConfigurationPricingRulesItemFeeBp
 export const saveExchangeConfigurationResponseConfigurationPricingRulesItemFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
 export const saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin = 0;
 export const saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax = 5000;
+
+export const saveExchangeConfigurationResponseConfigurationPricingRulesItemMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationPricingRulesItemMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const saveExchangeConfigurationResponseConfigurationPricingRulesItemRouteIdsMax = 100;
 
 export const saveExchangeConfigurationResponseConfigurationPricingRulesMax = 100;
 
@@ -4525,7 +4549,12 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "rate": zod.string().regex(saveExchangeConfigurationResponseConfigurationPricingRulesItemRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
   "feeBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationPricingRulesItemFeeBpsMin).max(saveExchangeConfigurationResponseConfigurationPricingRulesItemFeeBpsMax),
   "fixedFee": zod.string().regex(saveExchangeConfigurationResponseConfigurationPricingRulesItemFixedFeeRegExp),
-  "spreadBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin).max(saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax)
+  "spreadBps": zod.number().int().min(saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMin).max(saveExchangeConfigurationResponseConfigurationPricingRulesItemSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(saveExchangeConfigurationResponseConfigurationPricingRulesItemMinimumRegExp).optional(),
+  "maximum": zod.string().regex(saveExchangeConfigurationResponseConfigurationPricingRulesItemMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(saveExchangeConfigurationResponseConfigurationPricingRulesItemRouteIdsMax).optional()
 })).max(saveExchangeConfigurationResponseConfigurationPricingRulesMax).optional(),
   "wallets": zod.array(zod.object({
   "purpose": zod.enum(['customer', 'monitoring']).optional().describe('Customer public-address configuration is separate from Super Admin RPC monitoring. Omitted on legacy monitoring records.'),
@@ -4541,6 +4570,7 @@ export const SaveExchangeConfigurationResponse = zod.object({
   "providerKey": zod.enum(['rpc', 'alchemy'])
 })).max(saveExchangeConfigurationResponseConfigurationWalletsMax).optional(),
   "paymentMethods": zod.array(zod.object({
+  "receivingIbanRequired": zod.boolean().optional().describe('Public field requirement only; no operator bank details'),
   "id": zod.string().uuid(),
   "label": zod.string().min(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMin).max(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemLabelMax),
   "instructions": zod.string().max(saveExchangeConfigurationResponseConfigurationPaymentMethodsItemInstructionsMax).optional().describe('Optional sandbox payment instructions, frozen on order creation; never include credentials'),
@@ -4593,6 +4623,92 @@ export const SaveExchangeConfigurationResponse = zod.object({
 })
 
 
+export const TestExchangeQuoteParams = zod.object({
+  "tenantId": zod.coerce.string().uuid()
+})
+
+export const testExchangeQuoteBodySourceMax = 80;
+
+export const testExchangeQuoteBodyDestinationMax = 80;
+
+export const testExchangeQuoteBodyAmountRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+
+
+export const TestExchangeQuoteBody = zod.object({
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(testExchangeQuoteBodySourceMax),
+  "destination": zod.string().min(1).max(testExchangeQuoteBodyDestinationMax),
+  "amount": zod.string().regex(testExchangeQuoteBodyAmountRegExp),
+  "paymentMethodId": zod.string().uuid().optional()
+})
+
+export const testExchangeQuoteResponsePricingRuleSnapshotSourceMax = 80;
+
+export const testExchangeQuoteResponsePricingRuleSnapshotDestinationMax = 80;
+
+export const testExchangeQuoteResponsePricingRuleSnapshotPriorityMin = 0;
+export const testExchangeQuoteResponsePricingRuleSnapshotPriorityMax = 1000;
+
+export const testExchangeQuoteResponsePricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const testExchangeQuoteResponsePricingRuleSnapshotFeeBpsMin = 0;
+export const testExchangeQuoteResponsePricingRuleSnapshotFeeBpsMax = 5000;
+
+export const testExchangeQuoteResponsePricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const testExchangeQuoteResponsePricingRuleSnapshotSpreadBpsMin = 0;
+export const testExchangeQuoteResponsePricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const testExchangeQuoteResponsePricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const testExchangeQuoteResponsePricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const testExchangeQuoteResponsePricingRuleSnapshotRouteIdsMax = 100;
+
+
+
+export const TestExchangeQuoteResponse = zod.object({
+  "token": zod.string(),
+  "expiresAt": zod.coerce.date(),
+  "routeId": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "minimum": zod.string(),
+  "maximum": zod.string(),
+  "spreadBps": zod.number().int(),
+  "sandboxOnly": zod.literal(true),
+  "pricingSource": zod.string().optional().describe('Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution.'),
+  "pricingRuleId": zod.string().uuid().nullish().describe('Matched tenant pricing rule; null for unchanged route pricing'),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(testExchangeQuoteResponsePricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(testExchangeQuoteResponsePricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(testExchangeQuoteResponsePricingRuleSnapshotPriorityMin).max(testExchangeQuoteResponsePricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(testExchangeQuoteResponsePricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(testExchangeQuoteResponsePricingRuleSnapshotFeeBpsMin).max(testExchangeQuoteResponsePricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(testExchangeQuoteResponsePricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(testExchangeQuoteResponsePricingRuleSnapshotSpreadBpsMin).max(testExchangeQuoteResponsePricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(testExchangeQuoteResponsePricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(testExchangeQuoteResponsePricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(testExchangeQuoteResponsePricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional().describe('Explicit source-unit fees, directional rate/spread and destination-unit deductions')
+})
+
+
 export const ListExchangeOrdersParams = zod.object({
   "tenantId": zod.coerce.string().uuid()
 })
@@ -4617,6 +4733,45 @@ export const ListExchangeOrdersQueryParams = zod.object({
 })
 
 export const listExchangeOrdersResponseOrdersItemPaymentInstructionsMax = 2000;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsBeneficiaryNameMax = 120;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsBankNameMax = 120;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsIbanMax = 80;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsAccountNumberMax = 120;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsWalletAddressMax = 200;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsMemoMax = 120;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsPaymentDescriptionMax = 500;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsTelegramMax = 80;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsAddressMax = 500;
+
+export const listExchangeOrdersResponseOrdersItemCustomerDetailsPhoneMax = 60;
+
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotSourceMax = 80;
+
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotDestinationMax = 80;
+
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotPriorityMin = 0;
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotPriorityMax = 1000;
+
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotFeeBpsMin = 0;
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotFeeBpsMax = 5000;
+
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotSpreadBpsMin = 0;
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const listExchangeOrdersResponseOrdersItemPricingRuleSnapshotRouteIdsMax = 100;
 
 
 
@@ -4649,7 +4804,55 @@ export const ListExchangeOrdersResponse = zod.object({
   "updatedAt": zod.coerce.date().optional(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
-  "sandboxOnly": zod.literal(true)
+  "sandboxOnly": zod.literal(true),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(listExchangeOrdersResponseOrdersItemCustomerDetailsPhoneMax).optional()
+}).optional(),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotPriorityMin).max(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotFeeBpsMin).max(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotSpreadBpsMin).max(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(listExchangeOrdersResponseOrdersItemPricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional(),
+  "depositReference": zod.string().optional(),
+  "transactionHash": zod.string().optional(),
+  "payoutReference": zod.string().optional(),
+  "completedAt": zod.coerce.date().optional(),
+  "paymentVerification": zod.enum(['unverified', 'review', 'verified']).optional(),
+  "paymentAddress": zod.string().optional().describe('Frozen customer-configured source address; never an infrastructure/monitoring wallet'),
+  "paymentMemo": zod.string().optional(),
+  "assigneeId": zod.string().optional(),
+  "internalNotes": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})).optional()
 })),
   "total": zod.number().int(),
   "page": zod.number().int(),
@@ -4663,6 +4866,45 @@ export const GetExchangeOrderParams = zod.object({
 })
 
 export const getExchangeOrderResponsePaymentInstructionsMax = 2000;
+
+export const getExchangeOrderResponseCustomerDetailsBeneficiaryNameMax = 120;
+
+export const getExchangeOrderResponseCustomerDetailsBankNameMax = 120;
+
+export const getExchangeOrderResponseCustomerDetailsIbanMax = 80;
+
+export const getExchangeOrderResponseCustomerDetailsAccountNumberMax = 120;
+
+export const getExchangeOrderResponseCustomerDetailsWalletAddressMax = 200;
+
+export const getExchangeOrderResponseCustomerDetailsMemoMax = 120;
+
+export const getExchangeOrderResponseCustomerDetailsPaymentDescriptionMax = 500;
+
+export const getExchangeOrderResponseCustomerDetailsTelegramMax = 80;
+
+export const getExchangeOrderResponseCustomerDetailsAddressMax = 500;
+
+export const getExchangeOrderResponseCustomerDetailsPhoneMax = 60;
+
+export const getExchangeOrderResponsePricingRuleSnapshotSourceMax = 80;
+
+export const getExchangeOrderResponsePricingRuleSnapshotDestinationMax = 80;
+
+export const getExchangeOrderResponsePricingRuleSnapshotPriorityMin = 0;
+export const getExchangeOrderResponsePricingRuleSnapshotPriorityMax = 1000;
+
+export const getExchangeOrderResponsePricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeOrderResponsePricingRuleSnapshotFeeBpsMin = 0;
+export const getExchangeOrderResponsePricingRuleSnapshotFeeBpsMax = 5000;
+
+export const getExchangeOrderResponsePricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeOrderResponsePricingRuleSnapshotSpreadBpsMin = 0;
+export const getExchangeOrderResponsePricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const getExchangeOrderResponsePricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeOrderResponsePricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeOrderResponsePricingRuleSnapshotRouteIdsMax = 100;
 
 
 
@@ -4694,7 +4936,55 @@ export const GetExchangeOrderResponse = zod.object({
   "updatedAt": zod.coerce.date().optional(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
-  "sandboxOnly": zod.literal(true)
+  "sandboxOnly": zod.literal(true),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(getExchangeOrderResponseCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(getExchangeOrderResponseCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(getExchangeOrderResponseCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(getExchangeOrderResponseCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(getExchangeOrderResponseCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(getExchangeOrderResponseCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(getExchangeOrderResponseCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(getExchangeOrderResponseCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(getExchangeOrderResponseCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(getExchangeOrderResponseCustomerDetailsPhoneMax).optional()
+}).optional(),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(getExchangeOrderResponsePricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(getExchangeOrderResponsePricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(getExchangeOrderResponsePricingRuleSnapshotPriorityMin).max(getExchangeOrderResponsePricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(getExchangeOrderResponsePricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(getExchangeOrderResponsePricingRuleSnapshotFeeBpsMin).max(getExchangeOrderResponsePricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(getExchangeOrderResponsePricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(getExchangeOrderResponsePricingRuleSnapshotSpreadBpsMin).max(getExchangeOrderResponsePricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(getExchangeOrderResponsePricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(getExchangeOrderResponsePricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(getExchangeOrderResponsePricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional(),
+  "depositReference": zod.string().optional(),
+  "transactionHash": zod.string().optional(),
+  "payoutReference": zod.string().optional(),
+  "completedAt": zod.coerce.date().optional(),
+  "paymentVerification": zod.enum(['unverified', 'review', 'verified']).optional(),
+  "paymentAddress": zod.string().optional().describe('Frozen customer-configured source address; never an infrastructure/monitoring wallet'),
+  "paymentMemo": zod.string().optional(),
+  "assigneeId": zod.string().optional(),
+  "internalNotes": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})).optional()
 })
 
 
@@ -4705,15 +4995,68 @@ export const UpdateExchangeOrderStatusParams = zod.object({
 
 export const updateExchangeOrderStatusBodyNoteMax = 500;
 
+export const updateExchangeOrderStatusBodyAssigneeIdMax = 200;
+
+export const updateExchangeOrderStatusBodyDepositReferenceMax = 200;
+
+export const updateExchangeOrderStatusBodyTransactionHashMax = 200;
+
+export const updateExchangeOrderStatusBodyPayoutReferenceMax = 200;
+
 
 
 export const UpdateExchangeOrderStatusBody = zod.object({
   "status": zod.enum(['pending', 'processing', 'completed', 'cancelled', 'failed']),
   "note": zod.string().max(updateExchangeOrderStatusBodyNoteMax),
+  "operation": zod.enum(['status', 'note', 'assign', 'review_payment', 'verify_deposit']).optional(),
+  "assigneeId": zod.string().max(updateExchangeOrderStatusBodyAssigneeIdMax).optional(),
+  "depositReference": zod.string().max(updateExchangeOrderStatusBodyDepositReferenceMax).optional(),
+  "transactionHash": zod.string().max(updateExchangeOrderStatusBodyTransactionHashMax).optional(),
+  "payoutReference": zod.string().max(updateExchangeOrderStatusBodyPayoutReferenceMax).optional(),
+  "confirmCompletion": zod.boolean().optional(),
   "expectedStatus": zod.enum(['pending', 'processing', 'completed', 'cancelled', 'failed']).optional().describe('Status observed when reviewing an update. Reject with conflict if another administrator changed the order.')
 })
 
 export const updateExchangeOrderStatusResponsePaymentInstructionsMax = 2000;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsBeneficiaryNameMax = 120;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsBankNameMax = 120;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsIbanMax = 80;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsAccountNumberMax = 120;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsWalletAddressMax = 200;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsMemoMax = 120;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsPaymentDescriptionMax = 500;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsTelegramMax = 80;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsAddressMax = 500;
+
+export const updateExchangeOrderStatusResponseCustomerDetailsPhoneMax = 60;
+
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotSourceMax = 80;
+
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotDestinationMax = 80;
+
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotPriorityMin = 0;
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotPriorityMax = 1000;
+
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotFeeBpsMin = 0;
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotFeeBpsMax = 5000;
+
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotSpreadBpsMin = 0;
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const updateExchangeOrderStatusResponsePricingRuleSnapshotRouteIdsMax = 100;
 
 
 
@@ -4745,7 +5088,55 @@ export const UpdateExchangeOrderStatusResponse = zod.object({
   "updatedAt": zod.coerce.date().optional(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
-  "sandboxOnly": zod.literal(true)
+  "sandboxOnly": zod.literal(true),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(updateExchangeOrderStatusResponseCustomerDetailsPhoneMax).optional()
+}).optional(),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(updateExchangeOrderStatusResponsePricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(updateExchangeOrderStatusResponsePricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(updateExchangeOrderStatusResponsePricingRuleSnapshotPriorityMin).max(updateExchangeOrderStatusResponsePricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(updateExchangeOrderStatusResponsePricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(updateExchangeOrderStatusResponsePricingRuleSnapshotFeeBpsMin).max(updateExchangeOrderStatusResponsePricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(updateExchangeOrderStatusResponsePricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(updateExchangeOrderStatusResponsePricingRuleSnapshotSpreadBpsMin).max(updateExchangeOrderStatusResponsePricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(updateExchangeOrderStatusResponsePricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(updateExchangeOrderStatusResponsePricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(updateExchangeOrderStatusResponsePricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional(),
+  "depositReference": zod.string().optional(),
+  "transactionHash": zod.string().optional(),
+  "payoutReference": zod.string().optional(),
+  "completedAt": zod.coerce.date().optional(),
+  "paymentVerification": zod.enum(['unverified', 'review', 'verified']).optional(),
+  "paymentAddress": zod.string().optional().describe('Frozen customer-configured source address; never an infrastructure/monitoring wallet'),
+  "paymentMemo": zod.string().optional(),
+  "assigneeId": zod.string().optional(),
+  "internalNotes": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})).optional()
 })
 
 
@@ -4754,6 +5145,45 @@ export const GetExchangeDashboardParams = zod.object({
 })
 
 export const getExchangeDashboardResponseRecentOrdersItemPaymentInstructionsMax = 2000;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsBeneficiaryNameMax = 120;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsBankNameMax = 120;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsIbanMax = 80;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsAccountNumberMax = 120;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsWalletAddressMax = 200;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsMemoMax = 120;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsPaymentDescriptionMax = 500;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsTelegramMax = 80;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsAddressMax = 500;
+
+export const getExchangeDashboardResponseRecentOrdersItemCustomerDetailsPhoneMax = 60;
+
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotSourceMax = 80;
+
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotDestinationMax = 80;
+
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotPriorityMin = 0;
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotPriorityMax = 1000;
+
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotFeeBpsMin = 0;
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotFeeBpsMax = 5000;
+
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotSpreadBpsMin = 0;
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotRouteIdsMax = 100;
 
 
 
@@ -4802,7 +5232,55 @@ export const GetExchangeDashboardResponse = zod.object({
   "updatedAt": zod.coerce.date().optional(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
-  "sandboxOnly": zod.literal(true)
+  "sandboxOnly": zod.literal(true),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(getExchangeDashboardResponseRecentOrdersItemCustomerDetailsPhoneMax).optional()
+}).optional(),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotPriorityMin).max(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotFeeBpsMin).max(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotSpreadBpsMin).max(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(getExchangeDashboardResponseRecentOrdersItemPricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional(),
+  "depositReference": zod.string().optional(),
+  "transactionHash": zod.string().optional(),
+  "payoutReference": zod.string().optional(),
+  "completedAt": zod.coerce.date().optional(),
+  "paymentVerification": zod.enum(['unverified', 'review', 'verified']).optional(),
+  "paymentAddress": zod.string().optional().describe('Frozen customer-configured source address; never an infrastructure/monitoring wallet'),
+  "paymentMemo": zod.string().optional(),
+  "assigneeId": zod.string().optional(),
+  "internalNotes": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})).optional()
 }))
 })
 
@@ -4926,7 +5404,8 @@ export const GetPublicExchangeResponse = zod.object({
   "networkName": zod.string(),
   "testnet": zod.boolean(),
   "logoUrl": zod.string().nullish(),
-  "decimals": zod.number().int().optional()
+  "decimals": zod.number().int().optional(),
+  "memoRequired": zod.boolean().optional()
 })),
   "routes": zod.array(zod.object({
   "id": zod.string().uuid(),
@@ -4944,6 +5423,7 @@ export const GetPublicExchangeResponse = zod.object({
   "providerId": zod.string().max(getPublicExchangeResponseRoutesItemProviderIdMax).optional()
 })),
   "paymentMethods": zod.array(zod.object({
+  "receivingIbanRequired": zod.boolean().optional().describe('Public field requirement only; no operator bank details'),
   "id": zod.string().uuid(),
   "label": zod.string().min(getPublicExchangeResponsePaymentMethodsItemLabelMin).max(getPublicExchangeResponsePaymentMethodsItemLabelMax),
   "instructions": zod.string().max(getPublicExchangeResponsePaymentMethodsItemInstructionsMax).optional().describe('Optional sandbox payment instructions, frozen on order creation; never include credentials'),
@@ -4986,6 +5466,27 @@ export const CreateSandboxQuoteBody = zod.object({
   "paymentMethodId": zod.string().uuid().optional()
 })
 
+export const createSandboxQuoteResponsePricingRuleSnapshotSourceMax = 80;
+
+export const createSandboxQuoteResponsePricingRuleSnapshotDestinationMax = 80;
+
+export const createSandboxQuoteResponsePricingRuleSnapshotPriorityMin = 0;
+export const createSandboxQuoteResponsePricingRuleSnapshotPriorityMax = 1000;
+
+export const createSandboxQuoteResponsePricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxQuoteResponsePricingRuleSnapshotFeeBpsMin = 0;
+export const createSandboxQuoteResponsePricingRuleSnapshotFeeBpsMax = 5000;
+
+export const createSandboxQuoteResponsePricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxQuoteResponsePricingRuleSnapshotSpreadBpsMin = 0;
+export const createSandboxQuoteResponsePricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const createSandboxQuoteResponsePricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxQuoteResponsePricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxQuoteResponsePricingRuleSnapshotRouteIdsMax = 100;
+
+
+
 export const CreateSandboxQuoteResponse = zod.object({
   "token": zod.string(),
   "expiresAt": zod.coerce.date(),
@@ -5005,7 +5506,156 @@ export const CreateSandboxQuoteResponse = zod.object({
   "spreadBps": zod.number().int(),
   "sandboxOnly": zod.literal(true),
   "pricingSource": zod.string().optional().describe('Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution.'),
-  "pricingRuleId": zod.string().uuid().nullish().describe('Matched tenant pricing rule; null for unchanged route pricing')
+  "pricingRuleId": zod.string().uuid().nullish().describe('Matched tenant pricing rule; null for unchanged route pricing'),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(createSandboxQuoteResponsePricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(createSandboxQuoteResponsePricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(createSandboxQuoteResponsePricingRuleSnapshotPriorityMin).max(createSandboxQuoteResponsePricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(createSandboxQuoteResponsePricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(createSandboxQuoteResponsePricingRuleSnapshotFeeBpsMin).max(createSandboxQuoteResponsePricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(createSandboxQuoteResponsePricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(createSandboxQuoteResponsePricingRuleSnapshotSpreadBpsMin).max(createSandboxQuoteResponsePricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(createSandboxQuoteResponsePricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(createSandboxQuoteResponsePricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(createSandboxQuoteResponsePricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional().describe('Explicit source-unit fees, directional rate/spread and destination-unit deductions')
+})
+
+
+export const ReviewSandboxOrderParams = zod.object({
+  "slug": zod.coerce.string()
+})
+
+export const reviewSandboxOrderBodyCustomerNameMax = 120;
+
+export const reviewSandboxOrderBodyCustomerEmailMax = 254;
+
+export const reviewSandboxOrderBodyQuoteTokenMin = 40;
+export const reviewSandboxOrderBodyQuoteTokenMax = 12000;
+
+export const reviewSandboxOrderBodyCustomerDetailsBeneficiaryNameMax = 120;
+
+export const reviewSandboxOrderBodyCustomerDetailsBankNameMax = 120;
+
+export const reviewSandboxOrderBodyCustomerDetailsIbanMax = 80;
+
+export const reviewSandboxOrderBodyCustomerDetailsAccountNumberMax = 120;
+
+export const reviewSandboxOrderBodyCustomerDetailsWalletAddressMax = 200;
+
+export const reviewSandboxOrderBodyCustomerDetailsMemoMax = 120;
+
+export const reviewSandboxOrderBodyCustomerDetailsPaymentDescriptionMax = 500;
+
+export const reviewSandboxOrderBodyCustomerDetailsTelegramMax = 80;
+
+export const reviewSandboxOrderBodyCustomerDetailsAddressMax = 500;
+
+export const reviewSandboxOrderBodyCustomerDetailsPhoneMax = 60;
+
+
+
+export const ReviewSandboxOrderBody = zod.object({
+  "customerName": zod.string().min(1).max(reviewSandboxOrderBodyCustomerNameMax).optional(),
+  "customerEmail": zod.string().email().max(reviewSandboxOrderBodyCustomerEmailMax).optional(),
+  "contactConsent": zod.boolean().optional().describe('Must be true when optional contact details are supplied. Does not opt in to marketing.'),
+  "quoteToken": zod.string().min(reviewSandboxOrderBodyQuoteTokenMin).max(reviewSandboxOrderBodyQuoteTokenMax),
+  "idempotencyKey": zod.string().uuid(),
+  "workflowVersion": zod.literal(2).optional(),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(reviewSandboxOrderBodyCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(reviewSandboxOrderBodyCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(reviewSandboxOrderBodyCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(reviewSandboxOrderBodyCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(reviewSandboxOrderBodyCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(reviewSandboxOrderBodyCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(reviewSandboxOrderBodyCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(reviewSandboxOrderBodyCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(reviewSandboxOrderBodyCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(reviewSandboxOrderBodyCustomerDetailsPhoneMax).optional()
+}).optional()
+})
+
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotSourceMax = 80;
+
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotDestinationMax = 80;
+
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotPriorityMin = 0;
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotPriorityMax = 1000;
+
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotFeeBpsMin = 0;
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotFeeBpsMax = 5000;
+
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotSpreadBpsMin = 0;
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const reviewSandboxOrderResponseQuotePricingRuleSnapshotRouteIdsMax = 100;
+
+
+
+export const ReviewSandboxOrderResponse = zod.object({
+  "quote": zod.object({
+  "token": zod.string(),
+  "expiresAt": zod.coerce.date(),
+  "routeId": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string(),
+  "destination": zod.string(),
+  "sourceSymbol": zod.string(),
+  "destinationSymbol": zod.string(),
+  "inputAmount": zod.string(),
+  "outputAmount": zod.string(),
+  "rate": zod.string(),
+  "fee": zod.string(),
+  "destinationFee": zod.string().optional(),
+  "minimum": zod.string(),
+  "maximum": zod.string(),
+  "spreadBps": zod.number().int(),
+  "sandboxOnly": zod.literal(true),
+  "pricingSource": zod.string().optional().describe('Read-only Sandbox pricing provider, manual, or explicitly configured manual fallback. Never implies financial execution.'),
+  "pricingRuleId": zod.string().uuid().nullish().describe('Matched tenant pricing rule; null for unchanged route pricing'),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(reviewSandboxOrderResponseQuotePricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(reviewSandboxOrderResponseQuotePricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(reviewSandboxOrderResponseQuotePricingRuleSnapshotPriorityMin).max(reviewSandboxOrderResponseQuotePricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(reviewSandboxOrderResponseQuotePricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(reviewSandboxOrderResponseQuotePricingRuleSnapshotFeeBpsMin).max(reviewSandboxOrderResponseQuotePricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(reviewSandboxOrderResponseQuotePricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(reviewSandboxOrderResponseQuotePricingRuleSnapshotSpreadBpsMin).max(reviewSandboxOrderResponseQuotePricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(reviewSandboxOrderResponseQuotePricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(reviewSandboxOrderResponseQuotePricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(reviewSandboxOrderResponseQuotePricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional().describe('Explicit source-unit fees, directional rate/spread and destination-unit deductions')
+}),
+  "paymentInstructions": zod.string().nullable(),
+  "paymentAddress": zod.string().optional(),
+  "paymentMemo": zod.string().optional()
 })
 
 
@@ -5020,6 +5670,26 @@ export const createSandboxOrderBodyCustomerEmailMax = 254;
 export const createSandboxOrderBodyQuoteTokenMin = 40;
 export const createSandboxOrderBodyQuoteTokenMax = 12000;
 
+export const createSandboxOrderBodyCustomerDetailsBeneficiaryNameMax = 120;
+
+export const createSandboxOrderBodyCustomerDetailsBankNameMax = 120;
+
+export const createSandboxOrderBodyCustomerDetailsIbanMax = 80;
+
+export const createSandboxOrderBodyCustomerDetailsAccountNumberMax = 120;
+
+export const createSandboxOrderBodyCustomerDetailsWalletAddressMax = 200;
+
+export const createSandboxOrderBodyCustomerDetailsMemoMax = 120;
+
+export const createSandboxOrderBodyCustomerDetailsPaymentDescriptionMax = 500;
+
+export const createSandboxOrderBodyCustomerDetailsTelegramMax = 80;
+
+export const createSandboxOrderBodyCustomerDetailsAddressMax = 500;
+
+export const createSandboxOrderBodyCustomerDetailsPhoneMax = 60;
+
 
 
 export const CreateSandboxOrderBody = zod.object({
@@ -5027,10 +5697,62 @@ export const CreateSandboxOrderBody = zod.object({
   "customerEmail": zod.string().email().max(createSandboxOrderBodyCustomerEmailMax).optional(),
   "contactConsent": zod.boolean().optional().describe('Must be true when optional contact details are supplied. Does not opt in to marketing.'),
   "quoteToken": zod.string().min(createSandboxOrderBodyQuoteTokenMin).max(createSandboxOrderBodyQuoteTokenMax),
-  "idempotencyKey": zod.string().uuid()
+  "idempotencyKey": zod.string().uuid(),
+  "workflowVersion": zod.literal(2).optional(),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(createSandboxOrderBodyCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(createSandboxOrderBodyCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(createSandboxOrderBodyCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(createSandboxOrderBodyCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(createSandboxOrderBodyCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(createSandboxOrderBodyCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(createSandboxOrderBodyCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(createSandboxOrderBodyCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(createSandboxOrderBodyCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(createSandboxOrderBodyCustomerDetailsPhoneMax).optional()
+}).optional()
 })
 
 export const createSandboxOrderResponseOrderPaymentInstructionsMax = 2000;
+
+export const createSandboxOrderResponseOrderCustomerDetailsBeneficiaryNameMax = 120;
+
+export const createSandboxOrderResponseOrderCustomerDetailsBankNameMax = 120;
+
+export const createSandboxOrderResponseOrderCustomerDetailsIbanMax = 80;
+
+export const createSandboxOrderResponseOrderCustomerDetailsAccountNumberMax = 120;
+
+export const createSandboxOrderResponseOrderCustomerDetailsWalletAddressMax = 200;
+
+export const createSandboxOrderResponseOrderCustomerDetailsMemoMax = 120;
+
+export const createSandboxOrderResponseOrderCustomerDetailsPaymentDescriptionMax = 500;
+
+export const createSandboxOrderResponseOrderCustomerDetailsTelegramMax = 80;
+
+export const createSandboxOrderResponseOrderCustomerDetailsAddressMax = 500;
+
+export const createSandboxOrderResponseOrderCustomerDetailsPhoneMax = 60;
+
+export const createSandboxOrderResponseOrderPricingRuleSnapshotSourceMax = 80;
+
+export const createSandboxOrderResponseOrderPricingRuleSnapshotDestinationMax = 80;
+
+export const createSandboxOrderResponseOrderPricingRuleSnapshotPriorityMin = 0;
+export const createSandboxOrderResponseOrderPricingRuleSnapshotPriorityMax = 1000;
+
+export const createSandboxOrderResponseOrderPricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxOrderResponseOrderPricingRuleSnapshotFeeBpsMin = 0;
+export const createSandboxOrderResponseOrderPricingRuleSnapshotFeeBpsMax = 5000;
+
+export const createSandboxOrderResponseOrderPricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxOrderResponseOrderPricingRuleSnapshotSpreadBpsMin = 0;
+export const createSandboxOrderResponseOrderPricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const createSandboxOrderResponseOrderPricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxOrderResponseOrderPricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const createSandboxOrderResponseOrderPricingRuleSnapshotRouteIdsMax = 100;
 
 
 
@@ -5063,7 +5785,55 @@ export const CreateSandboxOrderResponse = zod.object({
   "updatedAt": zod.coerce.date().optional(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
-  "sandboxOnly": zod.literal(true)
+  "sandboxOnly": zod.literal(true),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(createSandboxOrderResponseOrderCustomerDetailsPhoneMax).optional()
+}).optional(),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(createSandboxOrderResponseOrderPricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(createSandboxOrderResponseOrderPricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(createSandboxOrderResponseOrderPricingRuleSnapshotPriorityMin).max(createSandboxOrderResponseOrderPricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(createSandboxOrderResponseOrderPricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(createSandboxOrderResponseOrderPricingRuleSnapshotFeeBpsMin).max(createSandboxOrderResponseOrderPricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(createSandboxOrderResponseOrderPricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(createSandboxOrderResponseOrderPricingRuleSnapshotSpreadBpsMin).max(createSandboxOrderResponseOrderPricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(createSandboxOrderResponseOrderPricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(createSandboxOrderResponseOrderPricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(createSandboxOrderResponseOrderPricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional(),
+  "depositReference": zod.string().optional(),
+  "transactionHash": zod.string().optional(),
+  "payoutReference": zod.string().optional(),
+  "completedAt": zod.coerce.date().optional(),
+  "paymentVerification": zod.enum(['unverified', 'review', 'verified']).optional(),
+  "paymentAddress": zod.string().optional().describe('Frozen customer-configured source address; never an infrastructure/monitoring wallet'),
+  "paymentMemo": zod.string().optional(),
+  "assigneeId": zod.string().optional(),
+  "internalNotes": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})).optional()
 }),
   "trackingToken": zod.string()
 })
@@ -5084,6 +5854,45 @@ export const TrackSandboxOrderHeader = zod.object({
 })
 
 export const trackSandboxOrderResponsePaymentInstructionsMax = 2000;
+
+export const trackSandboxOrderResponseCustomerDetailsBeneficiaryNameMax = 120;
+
+export const trackSandboxOrderResponseCustomerDetailsBankNameMax = 120;
+
+export const trackSandboxOrderResponseCustomerDetailsIbanMax = 80;
+
+export const trackSandboxOrderResponseCustomerDetailsAccountNumberMax = 120;
+
+export const trackSandboxOrderResponseCustomerDetailsWalletAddressMax = 200;
+
+export const trackSandboxOrderResponseCustomerDetailsMemoMax = 120;
+
+export const trackSandboxOrderResponseCustomerDetailsPaymentDescriptionMax = 500;
+
+export const trackSandboxOrderResponseCustomerDetailsTelegramMax = 80;
+
+export const trackSandboxOrderResponseCustomerDetailsAddressMax = 500;
+
+export const trackSandboxOrderResponseCustomerDetailsPhoneMax = 60;
+
+export const trackSandboxOrderResponsePricingRuleSnapshotSourceMax = 80;
+
+export const trackSandboxOrderResponsePricingRuleSnapshotDestinationMax = 80;
+
+export const trackSandboxOrderResponsePricingRuleSnapshotPriorityMin = 0;
+export const trackSandboxOrderResponsePricingRuleSnapshotPriorityMax = 1000;
+
+export const trackSandboxOrderResponsePricingRuleSnapshotRateRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const trackSandboxOrderResponsePricingRuleSnapshotFeeBpsMin = 0;
+export const trackSandboxOrderResponsePricingRuleSnapshotFeeBpsMax = 5000;
+
+export const trackSandboxOrderResponsePricingRuleSnapshotFixedFeeRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const trackSandboxOrderResponsePricingRuleSnapshotSpreadBpsMin = 0;
+export const trackSandboxOrderResponsePricingRuleSnapshotSpreadBpsMax = 5000;
+
+export const trackSandboxOrderResponsePricingRuleSnapshotMinimumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const trackSandboxOrderResponsePricingRuleSnapshotMaximumRegExp = new RegExp('^\\d{1,18}(\\.\\d{1,18})?$');
+export const trackSandboxOrderResponsePricingRuleSnapshotRouteIdsMax = 100;
 
 
 
@@ -5115,7 +5924,55 @@ export const TrackSandboxOrderResponse = zod.object({
   "updatedAt": zod.coerce.date().optional(),
   "customerName": zod.string().nullish(),
   "customerEmail": zod.string().nullish(),
-  "sandboxOnly": zod.literal(true)
+  "sandboxOnly": zod.literal(true),
+  "customerDetails": zod.object({
+  "beneficiaryName": zod.string().max(trackSandboxOrderResponseCustomerDetailsBeneficiaryNameMax).optional(),
+  "bankName": zod.string().max(trackSandboxOrderResponseCustomerDetailsBankNameMax).optional(),
+  "iban": zod.string().max(trackSandboxOrderResponseCustomerDetailsIbanMax).optional(),
+  "accountNumber": zod.string().max(trackSandboxOrderResponseCustomerDetailsAccountNumberMax).optional(),
+  "walletAddress": zod.string().max(trackSandboxOrderResponseCustomerDetailsWalletAddressMax).optional(),
+  "memo": zod.string().max(trackSandboxOrderResponseCustomerDetailsMemoMax).optional(),
+  "paymentDescription": zod.string().max(trackSandboxOrderResponseCustomerDetailsPaymentDescriptionMax).optional(),
+  "telegram": zod.string().max(trackSandboxOrderResponseCustomerDetailsTelegramMax).optional(),
+  "address": zod.string().max(trackSandboxOrderResponseCustomerDetailsAddressMax).optional(),
+  "phone": zod.string().max(trackSandboxOrderResponseCustomerDetailsPhoneMax).optional()
+}).optional(),
+  "pricingRuleSnapshot": zod.object({
+  "id": zod.string().uuid(),
+  "action": zod.enum(['swap', 'convert', 'buy', 'sell']),
+  "source": zod.string().min(1).max(trackSandboxOrderResponsePricingRuleSnapshotSourceMax).describe('Tenant asset-network ID, fiat endpoint, or * for Any'),
+  "destination": zod.string().min(1).max(trackSandboxOrderResponsePricingRuleSnapshotDestinationMax),
+  "paymentMethodId": zod.string().uuid().optional(),
+  "enabled": zod.boolean(),
+  "priority": zod.number().int().min(trackSandboxOrderResponsePricingRuleSnapshotPriorityMin).max(trackSandboxOrderResponsePricingRuleSnapshotPriorityMax),
+  "rate": zod.string().regex(trackSandboxOrderResponsePricingRuleSnapshotRateRegExp).optional().describe('Optional explicit manual rate; omission preserves the route/provider base rate'),
+  "feeBps": zod.number().int().min(trackSandboxOrderResponsePricingRuleSnapshotFeeBpsMin).max(trackSandboxOrderResponsePricingRuleSnapshotFeeBpsMax),
+  "fixedFee": zod.string().regex(trackSandboxOrderResponsePricingRuleSnapshotFixedFeeRegExp),
+  "spreadBps": zod.number().int().min(trackSandboxOrderResponsePricingRuleSnapshotSpreadBpsMin).max(trackSandboxOrderResponsePricingRuleSnapshotSpreadBpsMax),
+  "state": zod.enum(['enabled', 'disabled', 'blocked']).optional(),
+  "pricingMode": zod.enum(['manual', 'market']).optional().describe('Market requires fresh real reference data. Manual requires an explicitly configured rate.'),
+  "minimum": zod.string().regex(trackSandboxOrderResponsePricingRuleSnapshotMinimumRegExp).optional(),
+  "maximum": zod.string().regex(trackSandboxOrderResponsePricingRuleSnapshotMaximumRegExp).optional(),
+  "routeIds": zod.array(zod.string().uuid()).max(trackSandboxOrderResponsePricingRuleSnapshotRouteIdsMax).optional()
+}).optional(),
+  "marketRate": zod.string().optional(),
+  "rateProvider": zod.string().optional(),
+  "rateUpdatedAt": zod.coerce.date().optional(),
+  "quoteKind": zod.enum(['manual', 'indicative', 'provider']).optional(),
+  "calculation": zod.string().optional(),
+  "depositReference": zod.string().optional(),
+  "transactionHash": zod.string().optional(),
+  "payoutReference": zod.string().optional(),
+  "completedAt": zod.coerce.date().optional(),
+  "paymentVerification": zod.enum(['unverified', 'review', 'verified']).optional(),
+  "paymentAddress": zod.string().optional().describe('Frozen customer-configured source address; never an infrastructure/monitoring wallet'),
+  "paymentMemo": zod.string().optional(),
+  "assigneeId": zod.string().optional(),
+  "internalNotes": zod.array(zod.object({
+  "status": zod.string(),
+  "at": zod.coerce.date(),
+  "note": zod.string()
+})).optional()
 })
 
 
@@ -6832,7 +7689,8 @@ export const ResolvePublicDomainResponse = zod.object({
   "networkName": zod.string(),
   "testnet": zod.boolean(),
   "logoUrl": zod.string().nullish(),
-  "decimals": zod.number().int().optional()
+  "decimals": zod.number().int().optional(),
+  "memoRequired": zod.boolean().optional()
 }))
 })
 
@@ -6946,7 +7804,8 @@ export const ListSandboxAssetNetworksResponse = zod.object({
   "networkName": zod.string(),
   "testnet": zod.boolean(),
   "logoUrl": zod.string().nullish(),
-  "decimals": zod.number().int().optional()
+  "decimals": zod.number().int().optional(),
+  "memoRequired": zod.boolean().optional()
 })),
   "sandboxOnly": zod.boolean()
 })
@@ -10157,7 +11016,8 @@ export const GetPublicSiteResponse = zod.object({
   "networkName": zod.string(),
   "testnet": zod.boolean(),
   "logoUrl": zod.string().nullish(),
-  "decimals": zod.number().int().optional()
+  "decimals": zod.number().int().optional(),
+  "memoRequired": zod.boolean().optional()
 }))
 })
 

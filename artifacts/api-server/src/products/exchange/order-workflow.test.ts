@@ -1,0 +1,30 @@
+import {test} from "node:test";
+import assert from "node:assert/strict";
+import {emptySettings} from "./settings";
+import {validatedCustomerDetails,publicHistory} from "./order-workflow";
+import {fundingWalletSnapshot,paymentInstructionsSnapshot} from "./payment-snapshot";
+import type {ExchangeOrderInput,ExchangeCatalogAsset,ExchangeQuoteInput} from "@workspace/api-zod";
+test("new orders need identity/consent and payment-specific receiving details",()=>{
+ const s=emptySettings();s.paymentMethods=[{id:"sepa",label:"SEPA",currency:"EUR",enabled:true,buy:false,sell:false}];
+ const input={quoteToken:"test",idempotencyKey:"test",customerName:"Sandbox QA",customerEmail:"qa@example.test",contactConsent:true} as ExchangeOrderInput;
+ const quote={action:"swap",source:"crypto",destination:"fiat:EUR",paymentMethodId:"sepa",amount:"100"} as ExchangeQuoteInput;
+ assert.throws(()=>validatedCustomerDetails({...input,customerName:""},quote,s,[]),/Full name/);
+ assert.throws(()=>validatedCustomerDetails(input,quote,s,[]),/beneficiary/);
+ assert.throws(()=>validatedCustomerDetails({...input,customerDetails:{beneficiaryName:"QA",accountNumber:"12345"}},quote,s,[]),/IBAN/);
+ assert(validatedCustomerDetails({...input,customerDetails:{beneficiaryName:"QA",iban:"DE89370400440532013000"}},quote,s,[]));
+ const crypto={...quote,action:"convert" as const,destination:"receiving"};
+ const catalog=[{assetNetworkId:"receiving",memoRequired:true}] as ExchangeCatalogAsset[];
+ assert.throws(()=>validatedCustomerDetails({...input,customerDetails:{walletAddress:"synthetic-address"}},crypto,s,catalog),/memo/);
+ assert(validatedCustomerDetails({...input,customerDetails:{walletAddress:"synthetic-address",memo:"Sandbox"}},crypto,s,catalog));
+});
+test("funding snapshots never disclose monitoring wallets and public history never carries operator notes",()=>{
+ const s=emptySettings(),q={action:"convert",source:"crypto",destination:"other",amount:"1"} as ExchangeQuoteInput;
+ s.routes=[{id:"r",enabled:true,...q,rate:"1",minimum:"0",maximum:"10",feeBps:0,fixedFee:"0",spreadBps:0,paymentMethodIds:[]}];
+ const wallet={id:"w",label:"QA",assetNetworkId:"crypto",address:"synthetic-public-address",enabled:true,adapterKind:"evm" as const,kind:"native" as const,providerKey:"rpc" as const};
+ s.wallets=[{...wallet,purpose:"monitoring"}];
+ assert.equal(fundingWalletSnapshot(s,q),undefined);assert.equal(paymentInstructionsSnapshot(s,q),null);
+ s.wallets=[{...wallet,purpose:"customer",memo:"Sandbox tag"}];
+ assert.equal(fundingWalletSnapshot(s,q)?.paymentAddress,wallet.address);
+ assert(paymentInstructionsSnapshot(s,q)?.includes("Sandbox tag"));
+ assert(!JSON.stringify(publicHistory([{status:"pending",at:"now",note:"PRIVATE OPERATOR NOTE"}])).includes("PRIVATE"));
+});

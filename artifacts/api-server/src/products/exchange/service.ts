@@ -13,11 +13,12 @@ import { calculateQuote } from "./calculation";
 import { validateTenantCatalog, validActionPair } from "./global-catalog";
 import { publicExchangeConfiguration } from "./public-configuration";
 import { statusesForOrderView } from "./order-views";
-import { paymentInstructionsSnapshot } from "./payment-snapshot";
+import { paymentInstructionsSnapshot,fundingWalletSnapshot } from "./payment-snapshot";
 import { assertTelegramTransaction } from "../../modules/integrations/channel";
 import { applyPricing, sandboxPricing, assertPricingSnapshot, type PricingSnapshot } from "./provider-pricing";
 import { customerExchangeConfiguration, mergeCustomerExchangeConfiguration } from "./customer-configuration";
 import { customerList, orderContact } from "./customer-management";
+import { publicHistory, validatedCustomerDetails } from "./order-workflow";
 
 const hash = (v: string) => createHash("sha256").update(v).digest("hex");
 function sign(v: string) {
@@ -30,7 +31,7 @@ function equal(a: string, b: string) {
   return x.length === y.length && timingSafeEqual(x, y);
 }
 function issue(tenantId: string, input: ExchangeQuoteInput, s: ExchangeSettings, planCurrency: string, pricing?: PricingSnapshot) {
-  const expiresAt = new Date(Date.now() + 90000).toISOString();
+  const expiresAt = new Date(Math.min(Date.now() + 90000,pricing?.validUntil??Infinity)).toISOString();
   const body = Buffer.from(JSON.stringify({ tenantId, input, settingsHash: hash(JSON.stringify(s)), planCurrency, expiresAt, pricing })).toString("base64url");
   return { token: `${body}.${sign(body)}`, expiresAt };
 }
@@ -143,30 +144,66 @@ export async function sandboxQuote(slug: string, input: ExchangeQuoteInput, chan
     const e = await operationalExchange(client, tenantId, input.action);
     if (channel) await assertTelegramTransaction(client, tenantId, input.action);
     const { configuration: s, catalog } = await readExchange(client, tenantId);
-    const pricing = await sandboxPricing(client, tenantId, input, s, catalog);
+    const pricing = await sandboxPricing(client, tenantId, input, s, catalog,e.plan!.currency);
     const { quote, volume } = calculateQuote(applyPricing(s, pricing), catalog, input);
     quoteAdmission(e, volume);
-    return { ...quote, pricingSource: pricing ? (pricing.manualFallback ? `${pricing.providerKey}:manual_fallback` : pricing.providerKey) : "manual",
+    return { ...quote,rateProvider:pricing?.rateProvider??pricing?.providerKey??"Manual",rateUpdatedAt:pricing?.rateUpdatedAt,
+      quoteKind:pricing?.quoteKind??(pricing&&["quickex","whitebit"].includes(pricing.providerKey)?"provider":"manual"),
+      pricingSource: pricing ? (pricing.manualFallback ? `${pricing.providerKey}:manual_fallback` : pricing.providerKey) : "manual",
       ...issue(tenantId, input, s, e.plan!.currency, pricing) };
   });
 }
-type StoredRequest = ReturnType<typeof calculateQuote>["quote"] & {
+type StoredRequest = Omit<ReturnType<typeof calculateQuote>["quote"],"rateUpdatedAt"> & {
   product: "crypto_exchange"; quoteHash: string; idempotencyHash: string;
   paymentMethod: string | null; paymentMethodId?: string | null; volume: string; history: { status: string; at: string; note: string }[];
   pricingSource?: string;
   paymentInstructions?: string | null;
   customerName?: string; customerEmail?: string; customerId?: string;
+  customerDetails?: ExchangeOrderInput["customerDetails"]; workflowVersion?: number;
+  internalNotes?:{status:string;at:string;note:string}[]; assigneeId?:string;
+  paymentVerification?:"unverified"|"review"|"verified"; depositReference?:string; transactionHash?:string;
+  payoutReference?:string; completedAt?:string; rateProvider?:string;rateUpdatedAt?:string;quoteKind?:"manual"|"indicative"|"provider";
+  paymentAddress?:string;paymentMemo?:string;
 };
 interface OrderRow { id: string; status: string; request: StoredRequest; created_at: Date }
-function serializeOrder(row: OrderRow): ExchangeOrder {
+// JSONB reorders object keys. Replay comparison is semantic, not insertion-order
+// JSON text; the same submitted details must not create a second order.
+export function customerDetailsKey(details:ExchangeOrderInput["customerDetails"]){
+  return JSON.stringify(Object.entries(details??{}).map(([k,v])=>[k,v?.trim()??""]).sort(([a],[b])=>a.localeCompare(b)));
+}
+export async function reviewOrder(slug:string,input:ExchangeOrderInput){
+  orderContact(input);
+  const tenantId=await publicTenantId(slug);
+  return withDatabase({actorId:"sandbox-visitor",tenantId},async c=>{
+    const e=await operationalExchange(c,tenantId);
+    const {configuration:s,catalog}=await readExchange(c,tenantId);
+    const request=verify(input.quoteToken,tenantId,s,e.plan!.currency);
+    validatedCustomerDetails(input,request,s,catalog);
+    guard(e,request.action);
+    await assertPricingSnapshot(c,tenantId,request.pricing,request.action,e);
+    const {quote}=calculateQuote(applyPricing(s,request.pricing),catalog,request);
+    const payload=JSON.parse(Buffer.from(input.quoteToken.split(".")[0],"base64url").toString("utf8"));
+    return {quote:{...quote,token:input.quoteToken,expiresAt:payload.expiresAt,
+      rateProvider:request.pricing?.rateProvider??request.pricing?.providerKey??"Manual",
+      rateUpdatedAt:request.pricing?.rateUpdatedAt,quoteKind:request.pricing?.quoteKind??"manual"},
+      paymentInstructions:paymentInstructionsSnapshot(s,request),...fundingWalletSnapshot(s,request)};
+  });
+}
+function serializeOrder(row: OrderRow,internal=false): ExchangeOrder {
   const r = row.request;
   return { id: row.id, status: row.status, action: r.action, source: r.source, destination: r.destination,
     sourceSymbol: r.sourceSymbol, destinationSymbol: r.destinationSymbol, inputAmount: r.inputAmount,
     outputAmount: r.outputAmount, rate: r.rate, fee: r.fee, destinationFee: r.destinationFee ?? "0", spreadBps: r.spreadBps,
     paymentMethod: r.paymentMethod, paymentMethodId: r.paymentMethodId ?? null, paymentInstructions: r.paymentInstructions ?? null, createdAt: row.created_at,
     updatedAt: new Date(r.history.at(-1)?.at ?? row.created_at), customerName: r.customerName ?? null, customerEmail: r.customerEmail ?? null,
-    history: r.history.map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true, pricingSource: r.pricingSource ?? "manual",
-    pricingRuleId: r.pricingRuleId ?? null };
+    history: (internal?r.history:publicHistory(r.history)).map(h => ({ ...h, at: new Date(h.at) })), sandboxOnly: true, pricingSource: r.pricingSource ?? "manual",
+    pricingRuleId: r.pricingRuleId ?? null,pricingRuleSnapshot:r.pricingRuleSnapshot,
+    marketRate:r.marketRate,rateProvider:r.rateProvider,rateUpdatedAt:r.rateUpdatedAt?new Date(r.rateUpdatedAt):undefined,quoteKind:r.quoteKind,calculation:r.calculation,
+    customerDetails:r.customerDetails,paymentVerification:r.paymentVerification??"unverified",
+    depositReference:r.depositReference,transactionHash:r.transactionHash,payoutReference:r.payoutReference,
+    completedAt:r.completedAt?new Date(r.completedAt):undefined,
+    paymentAddress:r.paymentAddress,paymentMemo:r.paymentMemo,
+    ...(internal?{assigneeId:r.assigneeId,internalNotes:r.internalNotes?.map(h=>({...h,at:new Date(h.at)}))}:{}) };
 }
 async function orderRow(client: DatabaseClient, tenantId: string, id: string, lock = false) {
   const r = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE tenant_id=$1 AND id=$2 AND request->>'product'='crypto_exchange'${lock ? " FOR UPDATE" : ""}`, [tenantId, id]);
@@ -184,12 +221,14 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
       if (channel) await assertTelegramTransaction(client, tenantId, old.rows[0].request.action);
       if (old.rows[0].request.quoteHash !== hash(input.quoteToken)) throw new HttpError(409, "This idempotency key belongs to another request.");
       if ((old.rows[0].request.customerEmail ?? null) !== (contact.customerEmail ?? null) ||
-          (old.rows[0].request.customerName ?? null) !== (contact.customerName ?? null))
+          (old.rows[0].request.customerName ?? null) !== (contact.customerName ?? null) ||
+           customerDetailsKey(old.rows[0].request.customerDetails)!==customerDetailsKey(input.customerDetails))
         throw new HttpError(409, "This submission key belongs to another contact selection.");
       return { order: serializeOrder(old.rows[0]), trackingToken: sign(`track:${tenantId}:${old.rows[0].id}`) };
     }
     const { configuration: s, catalog } = await readExchange(client, tenantId);
     const request = verify(input.quoteToken, tenantId, s, e.plan!.currency);
+    const customerDetails=validatedCustomerDetails(input,request,s,catalog);
     if (!validActionPair(request.action,request.source,request.destination))
       throw new HttpError(400,"This quote is for a retired or incompatible offering; request a new Swap or Convert quote.");
     await assertPricingSnapshot(client, tenantId, request.pricing, request.action, e);
@@ -198,8 +237,11 @@ export async function sandboxOrder(slug: string, input: ExchangeOrderInput, chan
     const { quote, volume, paymentMethod } = calculateQuote(applyPricing(s, request.pricing), catalog, request);
     await consumeMonthlyUsage(client, tenantId, "crypto_exchange", volume);
     const id = randomUUID();
-    const stored: StoredRequest = { ...quote, ...contact, product: "crypto_exchange", paymentMethod, paymentMethodId: request.paymentMethodId ?? null, volume,
-      paymentInstructions: paymentInstructionsSnapshot(s, request),
+    const stored: StoredRequest = { ...quote, ...contact,customerDetails,workflowVersion:2,paymentVerification:"unverified",
+      rateProvider:request.pricing?.rateProvider??request.pricing?.providerKey??"Manual",
+      rateUpdatedAt:request.pricing?.rateUpdatedAt,quoteKind:request.pricing?.quoteKind??"manual",
+      product: "crypto_exchange", paymentMethod, paymentMethodId: request.paymentMethodId ?? null, volume,
+      paymentInstructions: paymentInstructionsSnapshot(s, request),...fundingWalletSnapshot(s,request),
       pricingSource: request.pricing ? (request.pricing.manualFallback ? `${request.pricing.providerKey}:manual_fallback` : request.pricing.providerKey) : "manual",
       quoteHash: hash(input.quoteToken), idempotencyHash: hash(input.idempotencyKey),
       history: [{ status: "pending", at: new Date().toISOString(), note: "Sandbox order created. No funds, wallets, deposit addresses or payments exist." }] };
@@ -233,15 +275,43 @@ export function tenantOrder(principal: Principal, tenantId: string, id: string, 
     const row = await orderRow(client, tenantId, id, !!input);
     if (input) {
       if (input.expectedStatus !== undefined && input.expectedStatus !== row.status) throw new HttpError(409, "This order changed after review. Refresh its details and review again.");
+      const operation=input.operation??"status";
+      if(operation!=="status"){
+        if(!input.note.trim())throw new HttpError(400,"An internal audit note is required.");
+        row.request.internalNotes??=[];
+        row.request.internalNotes.push({status:operation,at:new Date().toISOString(),note:input.note});
+        if(operation==="assign"){
+          const assigned=await client.query("SELECT 1 FROM tenant_memberships WHERE tenant_id=$1 AND clerk_user_id=$2 UNION ALL SELECT 1 FROM platform_admins WHERE clerk_user_id=$2",[tenantId,input.assigneeId??""]);
+          if(!assigned.rowCount)throw new HttpError(400,"Assign an authorized operator belonging to this tenant.");
+          row.request.assigneeId=input.assigneeId;
+        }else if(operation==="review_payment"||operation==="verify_deposit"){
+          if(!["pending","processing"].includes(row.status))throw new HttpError(409,"Payment review is unavailable on a terminal order.");
+          if(operation==="verify_deposit"&&!(input.depositReference?.trim()||input.transactionHash?.trim()))throw new HttpError(400,"A Sandbox deposit reference or transaction hash is required.");
+          if(operation==="verify_deposit"&&!/sandbox/i.test(input.note))throw new HttpError(400,"An explicit Sandbox acknowledgement is required; this does not verify real funds.");
+          row.request.paymentVerification=operation==="verify_deposit"?"verified":"review";
+          if(input.depositReference)row.request.depositReference=input.depositReference;
+          if(input.transactionHash)row.request.transactionHash=input.transactionHash;
+        }
+        await client.query("UPDATE exchange_orders SET request=$3 WHERE tenant_id=$1 AND id=$2",[tenantId,id,JSON.stringify(row.request)]);
+        await audit(client,principal,tenantId,`exchange.order.${operation}`,"Recorded authorized Sandbox operator action",{orderId:id});
+        return serializeOrder(row,true);
+      }
       const next: Record<string, string[]> = { pending: ["processing", "cancelled", "failed"], processing: ["completed", "cancelled", "failed"], completed: [], cancelled: [], failed: [] };
       if (!(next[row.status] ?? []).includes(input.status)) throw new HttpError(409, "This sandbox status transition is not allowed. Terminal orders cannot be reopened.");
-      row.request.history.push({ status: input.status, at: new Date().toISOString(), note: input.note || "Status updated by tenant administrator (simulation only)." });
+      if(row.request.workflowVersion===2&&input.status==="processing"&&row.request.paymentVerification!=="verified")
+        throw new HttpError(409,"Review and verify the Sandbox deposit before processing.");
+      if(input.status==="completed"&&row.request.workflowVersion===2&&(!input.confirmCompletion||!input.payoutReference?.trim()))
+        throw new HttpError(400,"Explicit Sandbox payout confirmation and reference are required.");
+      if(input.status==="completed"){row.request.completedAt=new Date().toISOString();if(input.payoutReference)row.request.payoutReference=input.payoutReference;}
+      row.request.internalNotes??=[];
+      if(input.note)row.request.internalNotes.push({status:input.status,at:new Date().toISOString(),note:input.note});
+      row.request.history.push({ status: input.status, at: new Date().toISOString(), note: "Status updated by authorized operator (Sandbox)." });
       await client.query("UPDATE exchange_orders SET status=$3,request=$4 WHERE tenant_id=$1 AND id=$2", [tenantId, id, input.status, JSON.stringify(row.request)]);
       await audit(client, principal, tenantId, "exchange.order.status_changed", "Changed simulated exchange order status", { orderId: id, from: row.status, to: input.status });
       if (input.note.startsWith("Bulk:")) await audit(client, principal, tenantId, "exchange.orders.bulk_item", "Applied bulk workflow to a simulated order", { orderId: id, from: row.status, to: input.status });
       row.status = input.status;
     }
-    return serializeOrder(row);
+    return serializeOrder(row,true);
   });
 }
 export function tenantOrders(principal: Principal, tenantId: string, query: { search?: string; status?: string; action?: string; view?: "active" | "archived"; page?: number; from?: string; to?: string; customer?: string }) {
@@ -255,7 +325,7 @@ export function tenantOrders(principal: Principal, tenantId: string, query: { se
     const filtered = `${filter} AND ($8='' OR COALESCE(request->>'customerId','anonymous')=$8)`;
     const count = await client.query(`SELECT count(*)::int AS total FROM exchange_orders WHERE ${filtered}`, args);
     const rows = await client.query<OrderRow>(`SELECT id,status,request,created_at FROM exchange_orders WHERE ${filtered} ORDER BY created_at DESC,id DESC LIMIT $9 OFFSET $10`, [...args, pageSize, (page - 1) * pageSize]);
-    return { orders: rows.rows.map(serializeOrder), total: count.rows[0].total as number, page, pageSize };
+    return { orders: rows.rows.map(r=>serializeOrder(r,true)), total: count.rows[0].total as number, page, pageSize };
   });
 }
 export function exchangeDashboard(principal: Principal, tenantId: string) {
@@ -274,7 +344,7 @@ export function exchangeDashboard(principal: Principal, tenantId: string) {
       assets: s.assets.filter(a => a.enabled && catalog.some(c => c.assetId === a.assetId)).length,
       networks: new Set(enabledNetworks.map(n => catalog.find(c => c.assetNetworkId === n.assetNetworkId)!.networkId)).size,
       customers: (await customerList(client, tenantId)).filter(c => c.status !== "unidentified").length, paymentMethods: s.paymentMethods.filter(m => m.enabled && (m.buy || m.sell)).length,
-      routes: s.routes.filter(r => r.enabled).length, volume: volume.rows, recentOrders: recent.rows.map(serializeOrder) };
+      routes: s.routes.filter(r => r.enabled).length, volume: volume.rows, recentOrders: recent.rows.map(r=>serializeOrder(r,true)) };
   });
 }
 export function exchangeCustomers(principal: Principal, tenantId: string) {

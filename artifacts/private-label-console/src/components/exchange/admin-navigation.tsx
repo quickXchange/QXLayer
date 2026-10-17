@@ -7,8 +7,8 @@ type SectionLink = [string, string];
 type Group = { label: string; icon: ElementType; sections: SectionLink[] };
 const groups: Group[] = [
   { label: 'Orders', icon: ArrowLeftRight, sections: [['orders', 'All Orders'], ['swap', 'Swap'], ['convert', 'Convert']] },
-  { label: 'Exchange', icon: Boxes, sections: [['assets', 'Crypto Assets'], ['networks', 'Crypto Networks'], ['routes', 'Routes'], ['payment-methods', 'Payment Methods'], ['pricing', 'Pricing & Fees'], ['fees', 'Fees / Spread'], ['wallets', 'Wallet Addresses']] },
-  { label: 'Integrations', icon: Plug, sections: [['providers', 'Providers / Integrations'], ['api-keys', 'API Keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview']] },
+  { label: 'Exchange', icon: Boxes, sections: [['currencies', 'Currencies'], ['assets', 'Assets'], ['networks', 'Networks'], ['payment-methods', 'Payment Methods / Banks'], ['pricing', 'Pricing Rules'], ['defaults', 'Widget Defaults'], ['routes', 'Routes'], ['wallets', 'Wallets']] },
+  { label: 'Integrations', icon: Plug, sections: [['providers', 'Providers'], ['api-keys', 'API Keys'], ['api-preview', 'API Preview'], ['webhooks-preview', 'Webhooks Preview'], ['rpc-preview', 'RPC Preview']] },
   { label: 'Website', icon: Globe, sections: [['branding', 'Branding'], ['website', 'Website'], ['domain', 'Domain']] },
   { label: 'Management', icon: Settings, sections: [['staff', 'Staff & Permissions'], ['audit', 'Activity / Audit'], ['settings', 'Settings']] },
 ];
@@ -52,7 +52,7 @@ export function ExchangeAdminNavigation({ root, section, showWebsite, isSuper = 
       <Link href={`${root}/notifications`} className="qx-navlink" aria-current={section === 'notifications' ? 'page' : undefined} data-testid="link-exchange-notifications">
         <Bell className="h-4 w-4 shrink-0" /><span>Notifications</span>
       </Link>
-      {!isSuper && hasIntegrationGrant(features) && <Link href={`${root.replace(/\/exchange$/, '')}/integrations`} className="qx-navlink" data-testid="link-exchange-integrations"><Plug className="h-4 w-4 shrink-0" /><span>Integrations</span></Link>}
+      {!isSuper && hasIntegrationGrant(features) && <Link href={`${root.replace(/\/exchange$/, '')}/integrations`} className="qx-navlink" data-testid="link-exchange-integrations"><Plug className="h-4 w-4 shrink-0" /><span>API Integrations</span></Link>}
       {groups.slice(2).filter(group => isSuper || group.label !== 'Integrations').map(group => <NavigationGroup key={group.label} {...{ group, root, section, showWebsite, gate }} />)}
     </div>
   );

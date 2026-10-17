@@ -77,7 +77,7 @@ function RouteManagerInner({ d, locked, action, mode, allowed }: { d: ExchangeDr
   const empty = { feeBps: '', spreadBps: '', fixedFee: '', minimum: '', maximum: '', rate: '' };
   const title = mode === 'pricing' ? 'Pricing & fees' : action ? `Routes: ${action}` : 'Routes';
   return (
-    <Section n={mode === 'pricing' ? 'X5' : 'X3'} title={title} note={mode === 'pricing' ? 'Reference rates, service fee, spread, fixed fee and limits per route. Basis points are integers: 100 bps is 1%.' : 'Each route is one directed pair with an explicit manual rate. Nothing is derived or fetched.'} footer={<DraftFooter d={d} locked={locked} />}>
+    <Section n={mode === 'pricing' ? 'X5' : 'X3'} title={title} note={mode === 'pricing' ? 'Reference rates, service fee, spread, fixed fee and limits per route. Basis points are integers: 100 bps is 1%.' : 'Each route is one directed pair. Route rate, fee and spread are a legacy fallback used only when no pricing rule matches; configure pricing under Pricing Rules, not here.'} footer={<DraftFooter d={d} locked={locked} />}>
       <SimNote />
       {mode === 'pricing' && <fieldset disabled={locked} className="space-y-2" data-testid="fieldset-fiat-plan-rates"><p className="text-xs text-muted-foreground">Reference plan-currency rate per selected fiat currency. A currency without a positive rate cannot quote; nothing is assumed 1:1.</p><div className="grid gap-3 md:grid-cols-4">{fiatCodes(s).map((c) => <Field key={c} label={`Plan rate ${c}${c === s.fiatCurrency ? ' (primary)' : ''}`}><Dec positive value={c === s.fiatCurrency ? s.fiatPlanRate : planRates(s)[c] ?? ''} onChange={(v) => d.patch(c === s.fiatCurrency ? { fiatPlanRate: v, fiatPlanRates: { ...planRates(s), [c]: v } } : { fiatPlanRates: { ...planRates(s), [c]: v } })} testid={c === s.fiatCurrency ? 'input-fiat-plan-rate' : `input-fiat-plan-rate-${c}`} /></Field>)}</div></fieldset>}
       {scoped.length === 0 && <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground" data-testid="text-no-routes">{s.routes.length === 0 ? `No routes yet. ${d.catalog.length === 0 ? 'Select tenant assets first.' : 'Add a route and enter its manual rate.'}` : 'No routes for this action.'}</p>}{(
@@ -139,7 +139,15 @@ function RouteManagerInner({ d, locked, action, mode, allowed }: { d: ExchangeDr
 }
 
 export function RoutesPanel({ d, locked, action, allowed }: { d: ExchangeDraft; locked: boolean; action?: ExchangeRoute['action']; allowed?: string[] }) { return <RouteManager d={d} locked={locked} action={action} mode="routes" allowed={allowed} />; }
-export function PricingPanel({ d, locked, allowed }: { d: ExchangeDraft; locked: boolean; allowed?: string[] }) { return <RouteManager d={d} locked={locked} mode="pricing" allowed={allowed} />; }
+export function PricingPanel({ d, locked }: { d: ExchangeDraft; locked: boolean; allowed?: string[] }) {
+  const s = d.draft!;
+  return (
+    <Section n="X5" title="Pricing rules" note="One pricing engine: directional rules with Any, typed groups, asset-wide and exact endpoints. The same engine prices public quotes and the Test rule form below." footer={<DraftFooter d={d} locked={locked} />}>
+      <fieldset disabled={locked} className="space-y-2" data-testid="fieldset-fiat-plan-rates"><p className="text-xs text-muted-foreground">Reference plan-currency rate per selected fiat currency. A currency without a positive rate cannot quote; nothing is assumed 1:1.</p><div className="grid gap-3 md:grid-cols-4">{fiatCodes(s).map((c) => <Field key={c} label={`Plan rate ${c}${c === s.fiatCurrency ? ' (primary)' : ''}`}><Dec positive value={c === s.fiatCurrency ? s.fiatPlanRate : planRates(s)[c] ?? ''} onChange={(v) => d.patch(c === s.fiatCurrency ? { fiatPlanRate: v, fiatPlanRates: { ...planRates(s), [c]: v } } : { fiatPlanRates: { ...planRates(s), [c]: v } })} testid={c === s.fiatCurrency ? 'input-fiat-plan-rate' : `input-fiat-plan-rate-${c}`} /></Field>)}</div></fieldset>
+      <PricingRulesSection d={d} locked={locked} />
+    </Section>
+  );
+}
 
 type PM = ExchangePaymentMethod;
 const TYPES: [string, string][] = [['manual', 'Manual'], ['bank', 'Bank'], ['card', 'Card']];

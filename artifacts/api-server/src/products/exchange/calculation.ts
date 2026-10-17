@@ -11,9 +11,11 @@ export function calculateQuote(s: ExchangeSettings, catalog: ExchangeCatalogAsse
   if (!s.enabled || !s.actions[input.action]) throw new HttpError(409, "This exchange action is paused.");
   const configuredRoute = s.routes.find(r => r.enabled && r.action === input.action && r.source === input.source && r.destination === input.destination);
   if (!configuredRoute) throw new HttpError(400, "No enabled route exists for this action and asset/network pair.");
-  const pricingRule = selectPricingRule(s, input);
+  const pricingRule = selectPricingRule(s, input,catalog);
   const route = pricingRule ? { ...configuredRoute, feeBps: pricingRule.feeBps, fixedFee: pricingRule.fixedFee,
-    spreadBps: pricingRule.spreadBps, rate: pricingRule.rate ?? configuredRoute.rate } : configuredRoute;
+    spreadBps: pricingRule.spreadBps, rate: pricingRule.rate ?? configuredRoute.rate,
+    minimum: pricingRule.minimum!==undefined&&decimal(pricingRule.minimum)>decimal(configuredRoute.minimum)?pricingRule.minimum:configuredRoute.minimum,
+    maximum: pricingRule.maximum!==undefined&&decimal(pricingRule.maximum)<decimal(configuredRoute.maximum)?pricingRule.maximum:configuredRoute.maximum } : configuredRoute;
   const amount = decimal(input.amount);
   if (amount <= 0n || amount < decimal(route.minimum) || amount > decimal(route.maximum)) throw new HttpError(400, `Amount must be between ${route.minimum} and ${route.maximum}.`);
   const endpoint = (id: string) => {
@@ -74,6 +76,9 @@ export function calculateQuote(s: ExchangeSettings, catalog: ExchangeCatalogAsse
     destinationFee: decimalString(destination.networkFee + sellFee),
     minimum: route.minimum, maximum: route.maximum, spreadBps: route.spreadBps, sandboxOnly: true,
     pricingRuleId: pricingRule?.id ?? null,
+    ...(pricingRule?{pricingRuleSnapshot:{...pricingRule}}:{}),
+    marketRate:route.rate,
+    calculation:`(${decimalString(amount)} - ${decimalString(fee)} source fees) × (${route.rate} × (1 - ${route.spreadBps}/10000)) - ${decimalString(destination.networkFee + sellFee)} destination fees; rounded down to ${destination.decimals} decimals.`,
   };
   return { quote, volume: decimalString(volume), paymentMethod, pricingRuleId: pricingRule?.id ?? null };
 }

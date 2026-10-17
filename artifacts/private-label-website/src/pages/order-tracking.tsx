@@ -1,74 +1,41 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
-import { trackSandboxOrder, downloadSandboxOrderInvoice } from '@workspace/api-client-react';
+import { trackSandboxOrder } from '@workspace/api-client-react';
 import { Gate } from './site';
-
-const HEAD: Record<string, string> = { pending: 'Order pending', processing: 'Order processing', completed: 'Order completed', cancelled: 'Order cancelled', failed: 'Order failed' };
+import { OrderView } from '../components/exchange/order-view';
 
 export default function OrderTracking() {
   const { slug = '', orderId = '' } = useParams<{ slug: string; orderId: string }>();
   const [token, setToken] = useState(() => window.location.hash.slice(1));
   const [entry, setEntry] = useState(token);
-  const [copyStatus, setCopyStatus] = useState('');
-  const copy = async (value: string) => {
-    try { await navigator.clipboard.writeText(value); setCopyStatus('Instructions copied.'); }
-    catch { setCopyStatus('Copy unavailable. Select and copy the instructions manually.'); }
-  };
   useEffect(() => {
     const sync = () => { const next = window.location.hash.slice(1); setToken(next); setEntry(next); };
     sync();
     window.addEventListener('hashchange', sync);
     return () => window.removeEventListener('hashchange', sync);
   }, [slug, orderId]);
-  const [dl, setDl] = useState('');
-  const download = async () => {
-    setDl('Preparing PDF…');
-    try {
-      const blob = await downloadSandboxOrderInvoice(slug, orderId, { headers: { trackingToken: token } });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = `sandbox-order-${orderId.slice(0, 8)}.pdf`; document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      setDl('Download started.');
-    } catch { setDl('PDF unavailable right now. Try again shortly.'); }
-  };
-  const malformedToken = token.length > 0 && token.length < 32;
+  const malformed = token.length > 0 && token.length < 32;
   const q = useQuery({
     queryKey: ['sandbox-order-tracking', slug, orderId, token],
     queryFn: () => trackSandboxOrder(slug, orderId, { headers: { trackingToken: token } }),
     enabled: token.length >= 32, retry: false, refetchInterval: 15000,
   });
-  return <Gate slug={slug}>{(site) => <section className="s-wrap py-16">
-    <Link href={`/${slug}`} className="s-link">Back to exchange</Link>
-    <div className="s-glowframe mx-auto mt-8 max-w-2xl"><div className="s-glowinner p-6 sm:p-9">
-      <span className="s-badge">Sandbox tracking · no real funds</span>
-      <h1 className="mt-4 text-3xl font-semibold">Track your exchange order</h1>
-      <p className="s-muted mt-3 break-all text-xs">{orderId}</p>
-      {(token.length < 32 || q.isError) && <form className="mt-5" onSubmit={e => { e.preventDefault(); setToken(entry.trim()); }}>
-        <label className="s-muted text-sm">Private tracking code<input className="mt-2 w-full rounded-lg border bg-transparent p-3" value={entry} onChange={e => setEntry(e.target.value)} required minLength={32} maxLength={200} /></label>
-        <button type="submit" className="s-btn s-btn-primary mt-3">Track sandbox order</button>
-      </form>}
-      {q.isLoading && token && <p className="s-muted mt-6">Loading order…</p>}
-      {(q.isError || malformedToken) && <p role="alert" className="mt-6 text-sm">Order not available. Check your private tracking link and the client website.</p>}
-      {q.data && !q.isError && !malformedToken && token.length >= 32 && <div className="mt-6 space-y-4" data-testid="page-order-tracking">
-        <h2 className="text-xl font-semibold" data-testid="text-tracking-heading">{HEAD[q.data.status] ?? 'Order update'}</h2>
-        <p className="font-semibold capitalize" data-testid="text-tracking-status">{q.data.action} · {q.data.status}</p>
-        <p>{q.data.inputAmount} {q.data.sourceSymbol} → {q.data.outputAmount} {q.data.destinationSymbol}</p>
-        <p className="s-muted text-sm">Rate: {q.data.rate} · source fee: {q.data.fee} {q.data.sourceSymbol} · markup: {q.data.spreadBps / 100}%</p>
-        {q.data.pricingSource && <p className="s-muted text-sm">Sandbox pricing source: {q.data.pricingSource.replace(':manual_fallback', ' — manual fallback')}</p>}
-        {q.data.destinationFee && <p className="s-muted text-sm">Destination fees: {q.data.destinationFee} {q.data.destinationSymbol} (network and/or payment-method charges, included in output)</p>}
-        {q.data.paymentMethod && <p className="s-muted text-sm">Configured method: {q.data.paymentMethod} (not charged)</p>}
-        {q.data.paymentInstructions && <div className="rounded-xl border p-4 text-sm" style={{ borderColor: 'var(--s-line)' }}><p className="mb-2 font-semibold">Recorded sandbox payment instructions</p><p className="whitespace-pre-wrap break-words">{q.data.paymentInstructions}</p><button type="button" className="s-btn mt-3" onClick={() => copy(q.data!.paymentInstructions!)}>Copy instructions</button></div>}
-        {copyStatus && <p role="status" className="s-muted text-xs">{copyStatus}</p>}
-        <ol className="space-y-3 border-t pt-4" style={{ borderColor: 'var(--s-line)' }}>{q.data.history.map((event, i) => <li key={i} className="text-sm"><p className="capitalize">{event.status} · {new Date(event.at).toLocaleString()}</p><p className="s-muted mt-1">{event.note}</p></li>)}</ol>
-        {q.data.status === 'completed' && <div className="rounded-xl border p-4 text-sm" style={{ borderColor: 'var(--s-line)' }}>
-          <button type="button" className="s-btn s-btn-primary" onClick={download} data-testid="button-download-invoice">Download PDF</button>
-          {dl && <p role="status" className="s-muted mt-2 text-xs">{dl}</p>}
-          {(site.websiteSettings.reviewLinks ?? []).length > 0 && <div className="mt-4"><p className="mb-2 font-semibold">Leave a review</p><ul className="flex flex-wrap gap-3">{(site.websiteSettings.reviewLinks ?? []).map((l, i) => <li key={i}><a className="s-link" href={l.url} target="_blank" rel="noopener noreferrer">{l.label}</a></li>)}</ul></div>}
-        </div>}
-        <button type="button" className="s-btn" onClick={() => q.refetch()}>Refresh status</button>
-        <p className="s-muted text-xs">Every status is simulated. This order has no deposit address, wallet, blockchain transaction or payment.</p>
-      </div>}
-    </div></div>
+  const needsCode = token.length < 32 || q.isError;
+  return <Gate slug={slug}>{(site) => <section className="s-wrap py-10 sm:py-16">
+    <Link href={`/${slug}`} className="s-link s-noprint">Back to exchange</Link>
+    <div className="mt-6">
+      {q.isLoading && token && <div className="s-glowframe mx-auto max-w-3xl" aria-busy="true" data-testid="state-order-loading"><div className="s-glowinner space-y-4 p-8"><div className="h-6 w-40 animate-pulse rounded" style={{ background: 'var(--s-line)' }} /><div className="h-10 w-3/4 animate-pulse rounded" style={{ background: 'var(--s-line)' }} /><div className="h-24 animate-pulse rounded" style={{ background: 'var(--s-line)' }} /></div></div>}
+      {needsCode && !q.isLoading && <div className="s-glowframe mx-auto max-w-xl"><div className="s-glowinner p-6 sm:p-9">
+        <h1 className="text-2xl font-semibold">Track your exchange order</h1>
+        <p className="s-muted mt-2 break-all text-xs">{orderId}</p>
+        {(q.isError || malformed) && <p role="alert" className="mt-4 text-sm">Order not available. Check your private tracking link and the client website.</p>}
+        <form className="mt-5" onSubmit={(e) => { e.preventDefault(); setToken(entry.trim()); }}>
+          <label className="s-muted text-sm">Private tracking code<input className="mt-2 w-full rounded-lg border bg-transparent p-3" value={entry} onChange={(e) => setEntry(e.target.value)} required minLength={32} maxLength={200} data-testid="input-tracking-code" /></label>
+          <button type="submit" className="s-btn s-btn-primary mt-3" data-testid="button-track-order">Track order</button>
+        </form>
+      </div></div>}
+      {q.data && !q.isError && token.length >= 32 && <OrderView site={site} order={q.data} token={token} refreshing={q.isFetching} onRefresh={() => q.refetch()} />}
+    </div>
   </section>}</Gate>;
 }

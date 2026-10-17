@@ -6,7 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ExchangeAction } from './exchangeAction';
+import type { ExchangeCustomerDetails } from './exchangeCustomerDetails';
 import type { ExchangeOrderEvent } from './exchangeOrderEvent';
+import type { ExchangeOrderPaymentVerification } from './exchangeOrderPaymentVerification';
+import type { ExchangeOrderQuoteKind } from './exchangeOrderQuoteKind';
+import type { ExchangePricingRule } from './exchangePricingRule';
 
 export interface ExchangeOrder {
   id: string;
@@ -46,4 +50,21 @@ export interface ExchangeOrder {
   /** @nullable */
   customerEmail?: string | null;
   sandboxOnly: true;
+  customerDetails?: ExchangeCustomerDetails;
+  pricingRuleSnapshot?: ExchangePricingRule;
+  marketRate?: string;
+  rateProvider?: string;
+  rateUpdatedAt?: Date;
+  quoteKind?: ExchangeOrderQuoteKind;
+  calculation?: string;
+  depositReference?: string;
+  transactionHash?: string;
+  payoutReference?: string;
+  completedAt?: Date;
+  paymentVerification?: ExchangeOrderPaymentVerification;
+  /** Frozen customer-configured source address; never an infrastructure/monitoring wallet */
+  paymentAddress?: string;
+  paymentMemo?: string;
+  assigneeId?: string;
+  internalNotes?: ExchangeOrderEvent[];
 }

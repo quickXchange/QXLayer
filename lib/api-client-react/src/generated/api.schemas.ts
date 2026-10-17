@@ -981,6 +981,26 @@ export interface ExchangeRoute {
   providerId?: string;
 }
 
+export type ExchangePricingRuleState = typeof ExchangePricingRuleState[keyof typeof ExchangePricingRuleState];
+
+
+export const ExchangePricingRuleState = {
+  enabled: 'enabled',
+  disabled: 'disabled',
+  blocked: 'blocked',
+} as const;
+
+/**
+ * Market requires fresh real reference data. Manual requires an explicitly configured rate.
+ */
+export type ExchangePricingRulePricingMode = typeof ExchangePricingRulePricingMode[keyof typeof ExchangePricingRulePricingMode];
+
+
+export const ExchangePricingRulePricingMode = {
+  manual: 'manual',
+  market: 'market',
+} as const;
+
 export interface ExchangePricingRule {
   id: string;
   action: ExchangeAction;
@@ -1019,6 +1039,15 @@ export interface ExchangePricingRule {
      * @maximum 5000
      */
   spreadBps: number;
+  state?: ExchangePricingRuleState;
+  /** Market requires fresh real reference data. Manual requires an explicitly configured rate. */
+  pricingMode?: ExchangePricingRulePricingMode;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  minimum?: string;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  maximum?: string;
+  /** @maxItems 100 */
+  routeIds?: string[];
 }
 
 export interface ExchangeWalletScanInput {
@@ -1129,6 +1158,8 @@ export const ExchangePaymentMethodMethodType = {
 } as const;
 
 export interface ExchangePaymentMethod {
+  /** Public field requirement only; no operator bank details */
+  receivingIbanRequired?: boolean;
   id: string;
   /**
      * @minLength 2
@@ -1325,6 +1356,15 @@ export interface ExchangeQuoteInput {
   paymentMethodId?: string;
 }
 
+export type ExchangeQuoteQuoteKind = typeof ExchangeQuoteQuoteKind[keyof typeof ExchangeQuoteQuoteKind];
+
+
+export const ExchangeQuoteQuoteKind = {
+  manual: 'manual',
+  indicative: 'indicative',
+  provider: 'provider',
+} as const;
+
 export interface ExchangeQuote {
   token: string;
   expiresAt: string;
@@ -1350,6 +1390,43 @@ export interface ExchangeQuote {
      * @nullable
      */
   pricingRuleId?: string | null;
+  pricingRuleSnapshot?: ExchangePricingRule;
+  marketRate?: string;
+  rateProvider?: string;
+  rateUpdatedAt?: string;
+  quoteKind?: ExchangeQuoteQuoteKind;
+  /** Explicit source-unit fees, directional rate/spread and destination-unit deductions */
+  calculation?: string;
+}
+
+export type ExchangeOrderInputWorkflowVersion = typeof ExchangeOrderInputWorkflowVersion[keyof typeof ExchangeOrderInputWorkflowVersion];
+
+
+export const ExchangeOrderInputWorkflowVersion = {
+  NUMBER_2: 2,
+} as const;
+
+export interface ExchangeCustomerDetails {
+  /** @maxLength 120 */
+  beneficiaryName?: string;
+  /** @maxLength 120 */
+  bankName?: string;
+  /** @maxLength 80 */
+  iban?: string;
+  /** @maxLength 120 */
+  accountNumber?: string;
+  /** @maxLength 200 */
+  walletAddress?: string;
+  /** @maxLength 120 */
+  memo?: string;
+  /** @maxLength 500 */
+  paymentDescription?: string;
+  /** @maxLength 80 */
+  telegram?: string;
+  /** @maxLength 500 */
+  address?: string;
+  /** @maxLength 60 */
+  phone?: string;
 }
 
 export interface ExchangeOrderInput {
@@ -1368,6 +1445,16 @@ export interface ExchangeOrderInput {
      */
   quoteToken: string;
   idempotencyKey: string;
+  workflowVersion?: ExchangeOrderInputWorkflowVersion;
+  customerDetails?: ExchangeCustomerDetails;
+}
+
+export interface ExchangeOrderReview {
+  quote: ExchangeQuote;
+  /** @nullable */
+  paymentInstructions: string | null;
+  paymentAddress?: string;
+  paymentMemo?: string;
 }
 
 export type ExchangeStatusInputStatus = typeof ExchangeStatusInputStatus[keyof typeof ExchangeStatusInputStatus];
@@ -1379,6 +1466,17 @@ export const ExchangeStatusInputStatus = {
   completed: 'completed',
   cancelled: 'cancelled',
   failed: 'failed',
+} as const;
+
+export type ExchangeStatusInputOperation = typeof ExchangeStatusInputOperation[keyof typeof ExchangeStatusInputOperation];
+
+
+export const ExchangeStatusInputOperation = {
+  status: 'status',
+  note: 'note',
+  assign: 'assign',
+  review_payment: 'review_payment',
+  verify_deposit: 'verify_deposit',
 } as const;
 
 /**
@@ -1399,6 +1497,16 @@ export interface ExchangeStatusInput {
   status: ExchangeStatusInputStatus;
   /** @maxLength 500 */
   note: string;
+  operation?: ExchangeStatusInputOperation;
+  /** @maxLength 200 */
+  assigneeId?: string;
+  /** @maxLength 200 */
+  depositReference?: string;
+  /** @maxLength 200 */
+  transactionHash?: string;
+  /** @maxLength 200 */
+  payoutReference?: string;
+  confirmCompletion?: boolean;
   /** Status observed when reviewing an update. Reject with conflict if another administrator changed the order. */
   expectedStatus?: ExchangeStatusInputExpectedStatus;
 }
@@ -1408,6 +1516,24 @@ export interface ExchangeOrderEvent {
   at: string;
   note: string;
 }
+
+export type ExchangeOrderQuoteKind = typeof ExchangeOrderQuoteKind[keyof typeof ExchangeOrderQuoteKind];
+
+
+export const ExchangeOrderQuoteKind = {
+  manual: 'manual',
+  indicative: 'indicative',
+  provider: 'provider',
+} as const;
+
+export type ExchangeOrderPaymentVerification = typeof ExchangeOrderPaymentVerification[keyof typeof ExchangeOrderPaymentVerification];
+
+
+export const ExchangeOrderPaymentVerification = {
+  unverified: 'unverified',
+  review: 'review',
+  verified: 'verified',
+} as const;
 
 export interface ExchangeOrder {
   id: string;
@@ -1447,6 +1573,23 @@ export interface ExchangeOrder {
   /** @nullable */
   customerEmail?: string | null;
   sandboxOnly: true;
+  customerDetails?: ExchangeCustomerDetails;
+  pricingRuleSnapshot?: ExchangePricingRule;
+  marketRate?: string;
+  rateProvider?: string;
+  rateUpdatedAt?: string;
+  quoteKind?: ExchangeOrderQuoteKind;
+  calculation?: string;
+  depositReference?: string;
+  transactionHash?: string;
+  payoutReference?: string;
+  completedAt?: string;
+  paymentVerification?: ExchangeOrderPaymentVerification;
+  /** Frozen customer-configured source address; never an infrastructure/monitoring wallet */
+  paymentAddress?: string;
+  paymentMemo?: string;
+  assigneeId?: string;
+  internalNotes?: ExchangeOrderEvent[];
 }
 
 export type ExchangeCustomerStatus = typeof ExchangeCustomerStatus[keyof typeof ExchangeCustomerStatus];
@@ -1590,6 +1733,7 @@ export interface AssetNetwork {
   /** @nullable */
   logoUrl?: string | null;
   decimals?: number;
+  memoRequired?: boolean;
 }
 
 export interface PublicExchange {

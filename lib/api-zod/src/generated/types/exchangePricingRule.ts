@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ExchangeAction } from './exchangeAction';
+import type { ExchangePricingRulePricingMode } from './exchangePricingRulePricingMode';
+import type { ExchangePricingRuleState } from './exchangePricingRuleState';
 
 export interface ExchangePricingRule {
   id: string;
@@ -45,4 +47,13 @@ export interface ExchangePricingRule {
      * @maximum 5000
      */
   spreadBps: number;
+  state?: ExchangePricingRuleState;
+  /** Market requires fresh real reference data. Manual requires an explicitly configured rate. */
+  pricingMode?: ExchangePricingRulePricingMode;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  minimum?: string;
+  /** @pattern ^\d{1,18}(\.\d{1,18})?$ */
+  maximum?: string;
+  /** @maxItems 100 */
+  routeIds?: string[];
 }
