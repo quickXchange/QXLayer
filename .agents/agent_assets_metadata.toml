@@ -1134,3 +1134,17 @@ mtime_ms = 1792275055572
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/c3e2beb6-2cbb-435a-ad6f-c0f6ed9ef9a8/67fdd2fd-1d20-453b-bbab-368b2115b014"
 storage_version_token = "1792275113096597"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "nqYP3ZnlDjF7oXKXRZ3rp"
+uri = "file://docs/external-exchange-sync-readiness.md"
+type = "text"
+title = "GitHub Sync & external deployment readiness"
+description = "Verified deployed commits, repaired blockers, Supabase and Owner compatibility, safe Sync scope, and remaining steps. Protected candidate only; no public cutover."
+logical_id = "57dfc7f1-814e-459c-802e-fcf637ca0375"
+content_hash = "sha256:9c32cb78340086f16463416365cf79225561d533c54893049b21d11a0df0efad"
+size = 6140
+mtime_ms = 1792276088915
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/57dfc7f1-814e-459c-802e-fcf637ca0375/9b2074d9-a92b-4662-a32e-eb8286d7561a"
+storage_version_token = "1792276229575960"
+content_type = "text/markdown"

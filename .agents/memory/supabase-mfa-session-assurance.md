@@ -45,3 +45,13 @@ authenticator verification before email-primary business access. Password recove
 native TOTP requirements. Test privileged email-code logic with synthetic authorization and
 disposable identities; do not grant a substitute Owner or claim mailbox receipt
 from mocked delivery.
+
+Use the Admin single-user read when checking an existing user's MFA factors;
+absence of factors from the paginated users collection is not proof of absence.
+
+**Why:** The collection omitted the accepted Owner's verified factor while the
+single-user endpoint returned it. Treating that omission as lost MFA would
+incorrectly block readiness or encourage an unauthorized reset.
+
+**How to apply:** Resolve the previously approved subject without printing PII,
+inspect the individual user read-only, and preserve credentials and factors.

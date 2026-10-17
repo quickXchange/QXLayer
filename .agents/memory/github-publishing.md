@@ -68,3 +68,15 @@ not reference the saved `GITHUB_TOKEN` variable.
 Unset `GIT_CURL_VERBOSE` entirely: setting it to `0` still enabled verbose HTTP
 logging. Keep credential redaction enabled and capture/sanitize errors before
 displaying them.
+
+Bounded API snapshot releases do not advance the workspace's Git branch.
+Before native GitHub Sync, fetch the actual remote and compare ancestry as well
+as file contents. Preserve both histories with a normal merge, never force-push
+the workspace checkpoint history over external releases.
+
+**Why:** Identical application files coexisted with divergent local checkpoint
+and externally deployed commit histories, blocking an ordinary Sync.
+
+**How to apply:** Prove the merge result preserves the reviewed source tree,
+then reconcile locally and verify a non-force push dry-run without performing
+the user's synchronization prematurely.
