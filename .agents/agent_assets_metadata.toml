@@ -1148,3 +1148,17 @@ mtime_ms = 1792276088915
 storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/57dfc7f1-814e-459c-802e-fcf637ca0375/9b2074d9-a92b-4662-a32e-eb8286d7561a"
 storage_version_token = "1792276229575960"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "4A9dUdKf8Y20beKoTc6Pv"
+uri = "file://generated-artifacts/vynox-admin-plan/VYNOX-LAYER-Customer-Admin-Architecture-and-Release-Plan.pdf"
+type = "pdf"
+title = "VYNOX LAYER — Customer Admin Architecture & Release Plan"
+description = "Five-page PDF covering architecture, business logic, real release obstacles and the phased rollout plan. Focused on Customer Admin projects, not Super Admin."
+logical_id = "98f09f10-cef0-4687-a6a4-96e04acb26a0"
+content_hash = "sha256:dd8b9e9a10e3e44c4a7ec2413d029b7797e58a2128a8aab18b997f6746d70a65"
+size = 37713
+mtime_ms = 1792276609731
+storage_uri = "gcs://replit-rams-assets-reed/rams/assets/repl:372d2684-97ec-4ce5-b16a-77fb322db72a/98f09f10-cef0-4687-a6a4-96e04acb26a0/43a411da-7ce8-49ea-a9b8-c88e97b7690c"
+storage_version_token = "1792276618558567"
+content_type = "application/pdf"
