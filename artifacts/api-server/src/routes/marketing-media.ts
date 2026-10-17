@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { privateObject } from "../lib/private-object-storage";
-import { CAPTURED_MEDIA } from "../modules/landing-catalog/captured-media";
+import { ALL_CAPTURED_MEDIA } from "../modules/landing-catalog/captured-media";
 const router = Router();
 router.get("/public/marketing-media/:file", async (req, res) => {
-  const media = Object.values(CAPTURED_MEDIA).flat().find(m => m.file === req.params.file);
+  const media = ALL_CAPTURED_MEDIA.find(m => m.file === req.params.file);
   if (!media) { res.status(404).json({ error: "Marketing image not found." }); return; }
   const file = privateObject(`marketing/explore/${media.file}`);
   const [bytes] = await file.download();

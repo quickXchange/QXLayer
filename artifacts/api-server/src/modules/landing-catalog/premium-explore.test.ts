@@ -3,7 +3,7 @@ import test from "node:test";
 import {UpdateLandingProductBody} from "@workspace/api-zod";
 import {defaultExploreContent,assertPublicArtworkUrl} from "./explore-content";
 import {DEFAULT_CONCEPTS} from "./explore-concepts";
-import {CAPTURED_MEDIA} from "./captured-media";
+import {CAPTURED_MEDIA, ALL_CAPTURED_MEDIA, LEGACY_CAPTURED_MEDIA} from "./captured-media";
 import {FEATURE_DETAILS} from "./explore-feature-copy";
 const input=(key:string)=>({visible:true,name:key,description:"A managed product description.",icon:"engine",startingPrice:null,setupFee:null,currency:"EUR",billingPeriod:"on_request" as const,status:"coming_soon" as const,ctaLabel:"Explore",displayOrder:1,explore:defaultExploreContent(key,key,"A managed product description.")});
 test("all fifteen product concepts have complete validated, distinct editable interfaces",()=>{
@@ -21,14 +21,18 @@ test("all fifteen product concepts have complete validated, distinct editable in
   }
   assert.equal(titles.size,15);
 });
-test("capture provenance is limited to six actual shared Exchange interfaces",()=>{
+test("capture provenance is limited to twelve actual shared Exchange interfaces",()=>{
   assert.deepEqual(Object.keys(CAPTURED_MEDIA),["crypto_exchange"]);
   const media=CAPTURED_MEDIA.crypto_exchange;
-  assert.equal(media.length,6);
+  assert.equal(media.length,12);
   assert(media.some(m=>m.device==="phone"));
   for(const m of media){assert.match(m.file,/^[a-f0-9]{24}\.webp$/);assert.equal(m.mediaKind,"application_capture");assert.match(m.sourceLabel,/sandbox.*fictional/i);assert.doesNotThrow(()=>assertPublicArtworkUrl(m.imageUrl));}
   assert.equal(defaultExploreContent("telegram_mini_app","Mini App","Description").gallery.length,0);
   assert(!media.some(m=>/invoice|telegram/i.test(m.title)));
+  assert.equal(LEGACY_CAPTURED_MEDIA.crypto_exchange.length,6);
+  assert.equal(new Set(ALL_CAPTURED_MEDIA.map(m=>m.file)).size,18);
+  assert.equal(media[0].device,"desktop");
+  assert.equal(media[1].device,"phone");
 });
 test("media provenance, frame and visibility survive CMS input validation",()=>{
   const body=input("crypto_exchange");
