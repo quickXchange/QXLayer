@@ -26,7 +26,8 @@ export function QuotePanel({ quote, route, quoting, canRefresh, onRefresh }: { q
       <div className="pt-2 text-xs s-muted">
         {q?.calculation && <p className="mb-1" data-testid="text-calculation">{q.calculation}</p>}
         <p>Sandbox pricing only. No funds move until a real execution workflow is configured.</p>
-        {q?.rateProvider?.includes("CoinGecko")&&<p className="mt-1">Crypto reference: <a className="s-link" href="https://www.coingecko.com/en/api" target="_blank" rel="noreferrer">CoinGecko</a>.</p>}
+        {q?.rateProvider?.split(' + ').some(provider=>provider==='CoinGecko Public')&&<p className="mt-1">Crypto reference: <a className="s-link" href="https://www.coingecko.com/en/api" target="_blank" rel="noreferrer">CoinGecko</a>.</p>}
+        {q?.rateProvider?.includes("Kraken Public")&&<p className="mt-1">Crypto reference: <a className="s-link" href="https://docs.kraken.com/api-reference/market-data/get-recent-trades" target="_blank" rel="noreferrer">Kraken public USD last trade</a>, indicative only.</p>}
         {q?.rateProvider?.includes("Frankfurter")&&<p className="mt-1">Fiat: <a className="s-link" href="https://frankfurter.dev/v1/" target="_blank" rel="noreferrer">Frankfurter / ECB daily</a>, not an intraday executable price.</p>}
         {canRefresh && <button type="button" className="s-link mt-2" onClick={onRefresh} data-testid="button-refresh-quote">Request fresh quote</button>}
       </div>
