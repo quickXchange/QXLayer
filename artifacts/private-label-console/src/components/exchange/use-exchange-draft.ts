@@ -11,6 +11,7 @@ import { isAllowedLogo } from './visual-catalog';
 import { gtDec, isDec, isInt, isPos } from './ui-validate';
 import { useGlobalCatalog } from '@/hooks/use-global-catalog';
 import { reconcileExchangeScope } from './draft-scope';
+import { routeEndpointsCompatible } from './route-endpoint-validation';
 
 export interface ExchangeDraft {
   loading: boolean; error: boolean; refetch: () => void;
@@ -32,6 +33,7 @@ export const planRates = (s: ExchangeSettings): Record<string, string> => s.fiat
 export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[], requiredFor: (catalogId?: string) => string[] = () => []): string[] {
   const e: string[] = [];
   const cat = new Map(catalog.map((c) => [c.assetNetworkId, c]));
+  const networkEndpoints = new Set(cat.keys());
   const fiat = fiatId(s);
   if (!isDec(s.fiatPlanRate)) e.push('Fiat plan reference rate must be a decimal string');
   const rates = planRates(s);
@@ -66,13 +68,12 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[], r
       const af = p.accountFields ?? {};
       requiredFor(p.catalogId).forEach((f) => { if (!(af[f] ?? '').trim()) e.push(`${p.label || 'Payment method'}: account field "${f}" is required when enabled`); });
     }
-    if (!fiatCodes(s).some((c) => methodServes(p, c))) e.push(`${p.label || 'Payment method'}: no currency is among the tenant's selected fiat currencies`);
+    if (p.enabled && !fiatCodes(s).some((c) => methodServes(p, c))) e.push(`${p.label || 'Payment method'}: no currency is among the tenant's selected fiat currencies`);
   });
   s.routes.forEach((r, i) => {
     const nm = `Route ${i + 1}`;
-    const sc = cat.get(r.source), dc = cat.get(r.destination);
-    const fx = (id: string) => isFiatEp(id) && fiatCodes(s).includes(id.slice(5));
-    const ok = r.action === 'swap' ? ((fx(r.source) && !!dc) || (!!sc && fx(r.destination))) : r.action === 'buy' ? r.source === fiat && !!dc : r.action === 'sell' ? !!sc && r.destination === fiat : !!sc && !!dc && r.source !== r.destination;
+    const sc = cat.get(r.source);
+    const ok = routeEndpointsCompatible(r, fiatCodes(s), networkEndpoints);
     if (!ok) e.push(`${nm}: endpoints do not fit the ${r.action} action`);
     if (!isPos(r.rate)) e.push(`${nm}: a positive manual rate is required`);
     if (!isDec(r.minimum) || !isDec(r.maximum) || !isDec(r.fixedFee)) e.push(`${nm}: minimum, maximum and fixed fee must be decimal strings`);
@@ -96,6 +97,7 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[], r
   const ruleEndpoint = (id: string) => id === '*' || id === 'crypto:*' || id === 'fiat:*' || id === fiat || (isFiatEp(id) && fiatCodes(s).includes(id.slice(5))) || s.networks.some(n => n.assetNetworkId === id);
   const specificity = (r: typeof rules[number]) => Number(r.source !== '*') + Number(r.destination !== '*') + Number(Boolean(r.paymentMethodId));
   rules.forEach((r, i) => {
+    if (!r.enabled) return;
     const nm = `Pricing rule ${i + 1}`;
     if (!ruleEndpoint(r.source) || !ruleEndpoint(r.destination)) e.push(`${nm}: select tenant endpoints or Any`);
     if (r.source === r.destination && r.source !== '*' && !(r.action === 'convert' && r.source === 'crypto:*')) e.push(`${nm}: select distinct endpoints or Any`);

@@ -29,7 +29,7 @@ export default function GlobalCatalog() {
   const sec = SECTIONS.find((s) => s.kind === kind)!;
   const [q, setQ] = useState(''); const [fs, setFs] = useState('all'); const [fl, setFl] = useState('all');
   const [edit, setEdit] = useState<(CatalogEntry & { _new?: boolean; _links: string[]; _meta: Record<string, string> }) | null>(null);
-  const [ask, confirmNode] = useConfirm(false);
+  const [ask, confirmNode] = useConfirm(false, 'Global catalog changes have been saved. No separate Exchange settings save is needed.');
   const [linkEdit, setLinkEdit] = useState<{ l: CatalogLink; m: Record<string, string>; native: boolean; memo: boolean } | null>(null);
   const enableBlock = (e: Pick<CatalogEntry, 'metadata' | 'code'>) => (e.metadata.verified !== true ? `${e.code}: mark verified` : !str(e.metadata.sourceUrl).trim() ? `${e.code}: source URL required` : null);
   const fileRef = useRef<HTMLInputElement>(null);
