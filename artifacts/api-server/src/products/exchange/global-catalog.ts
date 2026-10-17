@@ -110,9 +110,15 @@ export async function globalCatalog(principal: Principal, patch?: GlobalCatalogP
         if (linked.rowCount || used.rowCount || selected?.rowCount)
           throw new HttpError(409, "This entry is linked or selected by a tenant. Disable it instead of deleting history.");
         await client.query("DELETE FROM global_exchange_catalog WHERE kind=$1 AND id=$2", [entry.kind,entry.id]);
+         if(entry.kind==="assets")await client.query("DELETE FROM asset_catalog WHERE id=$1 AND NOT EXISTS(SELECT 1 FROM asset_network_catalog WHERE asset_id=$1)",[entry.id]);
+         if(entry.kind==="networks")await client.query("DELETE FROM network_catalog WHERE id=$1 AND NOT EXISTS(SELECT 1 FROM asset_network_catalog WHERE network_id=$1)",[entry.id]);
       }
     }
     return readGlobalCatalog(client);
+  }).catch(error=>{
+    if(error?.code==="23505")throw new HttpError(409,"Duplicate catalog code or mapping. Edit the existing canonical entry instead.");
+    if(error?.code==="23503")throw new HttpError(409,"This catalog entry is referenced. Reload and disable it instead.");
+    throw error;
   });
 }
 async function syncLegacyCatalog(client: DatabaseClient, e: GlobalCatalogEntry) {

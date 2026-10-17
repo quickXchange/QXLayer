@@ -38,7 +38,7 @@ export function PricingRulesSection({ d, locked }: { d: ExchangeDraft; locked: b
 
   const add = () => { const r: Rule = { id: crypto.randomUUID(), action: 'swap', source: ANY, destination: ANY, enabled: false, priority: 100, feeBps: 0, fixedFee: '0', spreadBps: 0 }; setIsNew(true); setEdit(r); };
   const check = (r: Rule, all: Rule[]): string | null => {
-    if (r.source === r.destination && r.source !== ANY) return 'Source and destination must differ';
+    if (r.source === r.destination && r.source !== ANY && !(r.action === 'convert' && r.source === 'crypto:*')) return 'Source and destination must differ';
     if (r.action === 'buy' && r.source !== ANY && r.source !== fiat) return 'Buy source must be fiat or Any';
     if (r.action === 'sell' && r.destination !== ANY && r.destination !== fiat) return 'Sell destination must be fiat or Any';
     if (r.action === 'convert' && (isFiatEp(r.source) || isFiatEp(r.destination))) return 'Convert is crypto to crypto and cannot use a fiat endpoint';

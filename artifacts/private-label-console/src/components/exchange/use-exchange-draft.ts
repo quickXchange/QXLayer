@@ -98,7 +98,7 @@ export function validate(s: ExchangeSettings, catalog: ExchangeCatalogAsset[], r
   rules.forEach((r, i) => {
     const nm = `Pricing rule ${i + 1}`;
     if (!ruleEndpoint(r.source) || !ruleEndpoint(r.destination)) e.push(`${nm}: select tenant endpoints or Any`);
-    if (r.source === r.destination && r.source !== '*') e.push(`${nm}: select distinct endpoints or Any`);
+    if (r.source === r.destination && r.source !== '*' && !(r.action === 'convert' && r.source === 'crypto:*')) e.push(`${nm}: select distinct endpoints or Any`);
     if (r.rate !== undefined && !isPos(r.rate)) e.push(`${nm}: manual rate must be positive or left blank`);
     if (!isDec(r.fixedFee) || !isInt(r.feeBps, 5000) || !isInt(r.spreadBps, 5000) || !isInt(r.priority, 1000)) e.push(`${nm}: check fees, spread and priority`);
     if (r.paymentMethodId && (r.action === 'convert' || !s.paymentMethods.some(p => p.id === r.paymentMethodId && p.enabled))) e.push(`${nm}: select a payment method supporting this action`);

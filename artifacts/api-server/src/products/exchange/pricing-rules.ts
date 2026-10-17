@@ -35,9 +35,10 @@ export function validatePricingRules(settings: ExchangeSettings) {
   for (const rule of rules) {
     if (!rule.enabled) continue; // Retain retired and historical rule definitions without reactivating them.
     if (!valid(rule.source) || !valid(rule.destination)) throw new HttpError(400, "Pricing rule endpoint does not belong to this Exchange.");
-    if (rule.source === rule.destination && rule.source !== "*") throw new HttpError(400, "Pricing rule requires distinct endpoints or Any.");
+    if (rule.source === rule.destination && !["*","crypto:*"].includes(rule.source)) throw new HttpError(400, "Pricing rule requires distinct endpoints or Any.");
+    const categoryEndpoint=(id:string,side:string)=>id==="crypto:*"?`sample:${side}`:id==="fiat:*"?"fiat:USD":id;
     if (!["swap","convert"].includes(rule.action) ||
-        (rule.source !== "*" && rule.destination !== "*" && !validActionPair(rule.action,rule.source,rule.destination)) ||
+        (rule.source !== "*" && rule.destination !== "*" && !validActionPair(rule.action,categoryEndpoint(rule.source,"source"),categoryEndpoint(rule.destination,"destination"))) ||
         (rule.action === "convert" && (isFiat(rule.source) || isFiat(rule.destination))))
       throw new HttpError(400, "Pricing rule endpoints do not match its action.");
     if (rule.rate !== undefined && decimal(rule.rate) <= 0n) throw new HttpError(400, "Pricing rule manual rate must be positive.");

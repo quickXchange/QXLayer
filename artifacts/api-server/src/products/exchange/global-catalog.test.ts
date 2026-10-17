@@ -4,7 +4,7 @@ import reference from "./catalog-reference.json";
 import { validateCatalogEntry, validateCatalogMetadata, validActionPair, currentOfferings, fiatPrecision, globalCatalog } from "./global-catalog";
 import { calculateQuote } from "./calculation";
 import { emptySettings } from "./settings";
-import { selectPricingRule } from "./pricing-rules";
+import { selectPricingRule,validatePricingRules } from "./pricing-rules";
 import { paymentInstructionsSnapshot } from "./payment-snapshot";
 import type { ExchangeSettings, ExchangeCatalogAsset, GlobalCatalogEntry } from "@workspace/api-zod";
 import type { Principal } from "../../modules/authentication/service";
@@ -69,6 +69,13 @@ test("typed Any Crypto / Any Fiat rules are less specific than an exact pair",()
  const s=fixture(),base={id:method,action:"swap" as const,source:"crypto:*",destination:"fiat:*",enabled:true,priority:100,feeBps:0,fixedFee:"0",spreadBps:0};
  s.pricingRules=[base,{...base,id:"00000000-0000-4000-8000-000000000004",source:net,destination:"fiat:USD",priority:0}];
  assert.equal(selectPricingRule(s,{action:"swap",source:net,destination:"fiat:USD",amount:"0.01"})?.priority,0);
+});
+test("Any Crypto→Any Crypto is valid for Convert, not Swap or fiat-to-fiat",()=>{
+ const s=fixture();
+ const r={id:method,action:"convert" as const,source:"crypto:*",destination:"crypto:*",enabled:true,priority:1,feeBps:0,fixedFee:"0",spreadBps:0};
+ s.pricingRules=[r];assert.doesNotThrow(()=>validatePricingRules(s));
+ s.pricingRules=[{...r,action:"swap"}];assert.throws(()=>validatePricingRules(s),/action/);
+ s.pricingRules=[{...r,source:"fiat:*",destination:"fiat:*"}];assert.throws(()=>validatePricingRules(s));
 });
 test("retirement preserves stored history/configuration and cannot create routes from catalog data",()=>{
  const s=fixture();s.actions.buy=true;
