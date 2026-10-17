@@ -21,6 +21,9 @@ export function appliedVersionMatches(record, payload) {
   assert.equal(record.sha256, payload.dataSha256, "Applied reference versions are immutable; review and increment the package version");
   return true;
 }
+export function previouslyAppliedDataMatches(record,payload) {
+  return !!record && Number.isSafeInteger(record.version) && record.version<payload.version && record.sha256===payload.dataSha256;
+}
 
 export function productionReferences(source) {
   assert.deepEqual(Object.keys(source).sort(), [...TABLES].sort());
@@ -115,6 +118,16 @@ export async function synchronize({ apply = false, rehearse = false } = {}) {
         await c.query("ROLLBACK");
         return { mode: "already-applied", version: payload.version, dataSha256: payload.dataSha256,
           operatorChangesAndDeletionsPreserved: true, publicLiveChanged: false, dnsChanged: false };
+      }
+      // A reviewed additive schema release may carry the exact same immutable
+      // seed data. Never reapply that data over subsequent operator edits.
+      const priorData=await c.query("SELECT version,sha256 FROM qxlayer_migrations.reference_configuration WHERE version<$1 AND sha256=$2 ORDER BY version DESC LIMIT 1",
+        [payload.version,payload.dataSha256]);
+      if(previouslyAppliedDataMatches(priorData.rows[0],payload)) {
+        if(apply)await c.query("INSERT INTO qxlayer_migrations.reference_configuration(version,sha256) VALUES($1,$2)",[payload.version,payload.dataSha256]);
+        await c.query(apply?"COMMIT":"ROLLBACK");
+        return {mode:"reviewed-schema-data-already-applied",version:payload.version,dataSha256:payload.dataSha256,
+          operatorChangesAndDeletionsPreserved:true,referenceRowsWritten:0,publicLiveChanged:false,dnsChanged:false};
       }
     }
     if (apply || rehearse)
